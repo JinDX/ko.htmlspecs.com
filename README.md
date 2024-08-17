@@ -1,2 +1,2 @@
 # ko.htmlspecs.com
-HTML 표준 한국어 번역
+HTML 표준 한국어
