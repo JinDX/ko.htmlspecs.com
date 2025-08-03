@@ -1,2 +1,26 @@
 # ko.htmlspecs.com
 HTML 표준 한국어
+
+## TODO
+
+- [x] HTML
+- [x] ECMAScript
+- [ ] DOM
+- [ ] URL
+- [ ] URL Pattern
+- [ ] Web IDL
+- [ ] Encoding
+- [ ] MIME Sniffing
+- [ ] Infra
+- [ ] Compatibility
+- [ ] Compression
+- [ ] Quirks Mode
+- [ ] Test Utils
+- [ ] Fetch
+- [ ] Streams
+- [ ] XMLHttpRequest
+- [ ] WebSockets
+- [ ] Storage
+- [ ] File System
+- [ ] Notifications API
+- [ ] Console
