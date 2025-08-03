@@ -3,8 +3,8 @@ HTML 표준 한국어
 
 ## TODO
 
-- [x] HTML
-- [x] ECMAScript
+- [x] [HTML](https://ko.htmlspecs.com/)
+- [x] [ECMAScript](https://ecma262.com/ko)
 - [ ] DOM
 - [ ] URL
 - [ ] URL Pattern
