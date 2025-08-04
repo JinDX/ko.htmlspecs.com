@@ -5,7 +5,7 @@ HTML 표준 한국어
 
 - [x] [HTML](https://ko.htmlspecs.com/)
 - [x] [ECMAScript](https://ecma262.com/ko)
-- [ ] DOM
+- [x] [DOM](https://ko.htmlspecs.com/dom)
 - [ ] URL
 - [ ] URL Pattern
 - [ ] Web IDL
