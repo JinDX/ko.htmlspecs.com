@@ -7,7 +7,7 @@ HTML 표준 한국어
 - [x] [ECMAScript](https://ecma262.com/ko)
 - [x] [DOM](https://ko.htmlspecs.com/dom/)
 - [x] [URL](https://ko.htmlspecs.com/url/)
-- [ ] URL Pattern
+- [x] [URL Pattern](https://ko.htmlspecs.com/urlpattern/)
 - [ ] Web IDL
 - [ ] Encoding
 - [ ] MIME Sniffing
