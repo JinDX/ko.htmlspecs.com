@@ -8,7 +8,7 @@ HTML 표준 한국어
 - [x] [DOM](https://ko.htmlspecs.com/dom/)
 - [x] [URL](https://ko.htmlspecs.com/url/)
 - [x] [URL Pattern](https://ko.htmlspecs.com/urlpattern/)
-- [ ] Web IDL
+- [x] [Web IDL](https://ko.htmlspecs.com/webidl/)
 - [ ] Encoding
 - [ ] MIME Sniffing
 - [ ] Infra
