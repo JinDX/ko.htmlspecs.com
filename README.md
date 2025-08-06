@@ -24,5 +24,5 @@ HTML 표준 한국어
 - [ ] File System
 - [ ] Notifications API
 - [ ] Console
-- [ ] Fullscreen API 
+- [ ] Fullscreen API
 - [ ] Cookie Store API
