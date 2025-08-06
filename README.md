@@ -15,14 +15,14 @@ HTML 표준 한국어
 - [x] [Compatibility](https://ko.htmlspecs.com/compat/)
 - [x] [Compression](https://ko.htmlspecs.com/compression/)
 - [x] [Quirks Mode](https://ko.htmlspecs.com/quirks/)
-- [ ] Test Utils
-- [ ] Fetch
-- [ ] Streams
-- [ ] XMLHttpRequest
-- [ ] WebSockets
-- [ ] Storage
-- [ ] File System
-- [ ] Notifications API
-- [ ] Console
-- [ ] Fullscreen API
-- [ ] Cookie Store API
+- [ ] [Test Utils](https://ko.htmlspecs.com/testutils/)
+- [ ] [Fetch](https://ko.htmlspecs.com/fetch/)
+- [ ] [Streams](https://ko.htmlspecs.com/streams/)
+- [ ] [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)
+- [ ] [WebSockets](https://ko.htmlspecs.com/websockets/)
+- [ ] [Storage](https://ko.htmlspecs.com/storage/)
+- [ ] [File System](https://ko.htmlspecs.com/fs/)
+- [ ] [Notifications API](https://ko.htmlspecs.com/notifications/)
+- [ ] [Console](https://ko.htmlspecs.com/console/)
+- [ ] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
+- [ ] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
