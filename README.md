@@ -10,7 +10,7 @@ HTML 표준 한국어
 - [x] [URL Pattern](https://ko.htmlspecs.com/urlpattern/)
 - [x] [Web IDL](https://ko.htmlspecs.com/webidl/)
 - [x] [Encoding](https://ko.htmlspecs.com/encoding/)
-- [x] [MIME Sniffing](https://ko.htmlspecs.com/encoding/mimesniff/)
+- [x] [MIME Sniffing](https://ko.htmlspecs.com/mimesniff/)
 - [ ] Infra
 - [ ] Compatibility
 - [ ] Compression
