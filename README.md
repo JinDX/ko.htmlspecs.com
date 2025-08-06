@@ -9,7 +9,7 @@ HTML 표준 한국어
 - [x] [URL](https://ko.htmlspecs.com/url/)
 - [x] [URL Pattern](https://ko.htmlspecs.com/urlpattern/)
 - [x] [Web IDL](https://ko.htmlspecs.com/webidl/)
-- [ ] Encoding
+- [x] [Encoding](https://ko.htmlspecs.com/encoding/)
 - [ ] MIME Sniffing
 - [ ] Infra
 - [ ] Compatibility
