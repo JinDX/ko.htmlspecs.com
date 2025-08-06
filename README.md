@@ -14,7 +14,7 @@ HTML 표준 한국어
 - [x] [Infra](https://ko.htmlspecs.com/infra/)
 - [x] [Compatibility](https://ko.htmlspecs.com/compat/)
 - [x] [Compression](https://ko.htmlspecs.com/compression/)
-- [ ] Quirks Mode
+- [x] [Quirks Mode](https://ko.htmlspecs.com/quirks/)
 - [ ] Test Utils
 - [ ] Fetch
 - [ ] Streams
