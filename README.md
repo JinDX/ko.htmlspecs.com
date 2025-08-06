@@ -13,7 +13,7 @@ HTML 표준 한국어
 - [x] [MIME Sniffing](https://ko.htmlspecs.com/mimesniff/)
 - [x] [Infra](https://ko.htmlspecs.com/infra/)
 - [x] [Compatibility](https://ko.htmlspecs.com/compat/)
-- [ ] Compression
+- [x] [Compression](https://ko.htmlspecs.com/compression/)
 - [ ] Quirks Mode
 - [ ] Test Utils
 - [ ] Fetch
