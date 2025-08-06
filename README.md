@@ -11,7 +11,7 @@ HTML 표준 한국어
 - [x] [Web IDL](https://ko.htmlspecs.com/webidl/)
 - [x] [Encoding](https://ko.htmlspecs.com/encoding/)
 - [x] [MIME Sniffing](https://ko.htmlspecs.com/mimesniff/)
-- [ ] Infra
+- [x] [Infra](https://ko.htmlspecs.com/infra/)
 - [ ] Compatibility
 - [ ] Compression
 - [ ] Quirks Mode
