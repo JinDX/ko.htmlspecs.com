@@ -12,7 +12,7 @@ HTML 표준 한국어
 - [x] [Encoding](https://ko.htmlspecs.com/encoding/)
 - [x] [MIME Sniffing](https://ko.htmlspecs.com/mimesniff/)
 - [x] [Infra](https://ko.htmlspecs.com/infra/)
-- [ ] Compatibility
+- [x] [Compatibility](https://ko.htmlspecs.com/compat/)
 - [ ] Compression
 - [ ] Quirks Mode
 - [ ] Test Utils
