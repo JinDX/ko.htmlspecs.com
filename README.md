@@ -16,7 +16,7 @@ HTML 표준 한국어
 - [x] [Compression](https://ko.htmlspecs.com/compression/)
 - [x] [Quirks Mode](https://ko.htmlspecs.com/quirks/)
 - [x] [Test Utils](https://ko.htmlspecs.com/testutils/)
-- [ ] [Fetch](https://ko.htmlspecs.com/fetch/)
+- [x] [Fetch](https://ko.htmlspecs.com/fetch/)
 - [ ] [Streams](https://ko.htmlspecs.com/streams/)
 - [ ] [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)
 - [ ] [WebSockets](https://ko.htmlspecs.com/websockets/)
