@@ -24,5 +24,5 @@ HTML 표준 한국어
 - [ ] [File System](https://ko.htmlspecs.com/fs/)
 - [ ] [Notifications API](https://ko.htmlspecs.com/notifications/)
 - [ ] [Console](https://ko.htmlspecs.com/console/)
-- [ ] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
+- [x] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
 - [ ] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
