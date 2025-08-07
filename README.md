@@ -23,6 +23,6 @@ HTML 표준 한국어
 - [ ] [Storage](https://ko.htmlspecs.com/storage/)
 - [ ] [File System](https://ko.htmlspecs.com/fs/)
 - [ ] [Notifications API](https://ko.htmlspecs.com/notifications/)
-- [ ] [Console](https://ko.htmlspecs.com/console/)
+- [x] [Console](https://ko.htmlspecs.com/console/)
 - [x] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
 - [ ] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
