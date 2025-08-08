@@ -20,7 +20,7 @@ HTML 표준 한국어
 - [ ] [Streams](https://ko.htmlspecs.com/streams/)
 - [ ] [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)
 - [ ] [WebSockets](https://ko.htmlspecs.com/websockets/)
-- [ ] [Storage](https://ko.htmlspecs.com/storage/)
+- [x] [Storage](https://ko.htmlspecs.com/storage/)
 - [x] [File System](https://ko.htmlspecs.com/fs/)
 - [x] [Notifications API](https://ko.htmlspecs.com/notifications/)
 - [x] [Console](https://ko.htmlspecs.com/console/)
