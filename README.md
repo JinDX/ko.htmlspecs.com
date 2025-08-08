@@ -21,7 +21,7 @@ HTML 표준 한국어
 - [ ] [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)
 - [ ] [WebSockets](https://ko.htmlspecs.com/websockets/)
 - [ ] [Storage](https://ko.htmlspecs.com/storage/)
-- [ ] [File System](https://ko.htmlspecs.com/fs/)
+- [x] [File System](https://ko.htmlspecs.com/fs/)
 - [x] [Notifications API](https://ko.htmlspecs.com/notifications/)
 - [x] [Console](https://ko.htmlspecs.com/console/)
 - [x] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
