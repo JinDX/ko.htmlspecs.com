@@ -25,4 +25,4 @@ HTML 표준 한국어
 - [ ] [Notifications API](https://ko.htmlspecs.com/notifications/)
 - [x] [Console](https://ko.htmlspecs.com/console/)
 - [x] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
-- [ ] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
+- [x] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
