@@ -18,7 +18,7 @@ HTML 표준 한국어
 - [x] [Test Utils](https://ko.htmlspecs.com/testutils/)
 - [x] [Fetch](https://ko.htmlspecs.com/fetch/)
 - [ ] [Streams](https://ko.htmlspecs.com/streams/)
-- [ ] [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)
+- [x] [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)
 - [x] [WebSockets](https://ko.htmlspecs.com/websockets/)
 - [x] [Storage](https://ko.htmlspecs.com/storage/)
 - [x] [File System](https://ko.htmlspecs.com/fs/)
