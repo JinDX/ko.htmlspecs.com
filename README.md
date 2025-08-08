@@ -22,7 +22,7 @@ HTML 표준 한국어
 - [ ] [WebSockets](https://ko.htmlspecs.com/websockets/)
 - [ ] [Storage](https://ko.htmlspecs.com/storage/)
 - [ ] [File System](https://ko.htmlspecs.com/fs/)
-- [ ] [Notifications API](https://ko.htmlspecs.com/notifications/)
+- [x] [Notifications API](https://ko.htmlspecs.com/notifications/)
 - [x] [Console](https://ko.htmlspecs.com/console/)
 - [x] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
 - [x] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
