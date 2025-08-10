@@ -29,7 +29,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Web Application Manifest](https://ko.htmlspecs.com/appmanifest/)
 - [x] [WCAG 2.2](https://ko.htmlspecs.com/WCAG/)
 - [x] [Accessible Rich Internet Applications (WAI-ARIA) 1.2](https://ko.htmlspecs.com/wai-aria/)
-- [ ] Accessible Name and Description Computation 1.1
+- [x] [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname/)
 - [ ] WebTransport
 - [ ] Service Workers
 - [ ] Push API
