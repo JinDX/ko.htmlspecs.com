@@ -1,5 +1,5 @@
 # ko.htmlspecs.com
-HTML 표준 한국어
+HTML 및 관련 API, CSS 표준 시리즈.
 
 ## TODO
 
