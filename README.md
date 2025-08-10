@@ -26,7 +26,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Console](https://ko.htmlspecs.com/console/)
 - [x] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
 - [x] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
-- [ ] [Web Application Manifest](https://ko.htmlspecs.com/appmanifest/)
+- [x] [Web Application Manifest](https://ko.htmlspecs.com/appmanifest/)
 - [ ] WCAG 2.2
 - [ ] Accessible Rich Internet Applications (WAI-ARIA) 1.2
 - [ ] Accessible Name and Description Computation 1.1
