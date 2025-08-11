@@ -32,7 +32,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname/)
 - [x] [WebTransport](https://ko.htmlspecs.com/webtransport/)
 - [x] [Service Workers](https://ko.htmlspecs.com/service-workers/)
-- [x] [Push API]((https://ko.htmlspecs.com/push-api/)
+- [x] [Push API](https://ko.htmlspecs.com/push-api/)
 - [ ] WebRTC
 - [ ] Payment Request API
 - [ ] Background Fetch
