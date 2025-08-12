@@ -33,7 +33,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [WebTransport](https://ko.htmlspecs.com/webtransport/)
 - [x] [Service Workers](https://ko.htmlspecs.com/service-workers/)
 - [x] [Push API](https://ko.htmlspecs.com/push-api/)
-- [ ] WebRTC
+- [x] [WebRTC](https://ko.htmlspecs.com/webrtc/)
 - [ ] Payment Request API
 - [ ] Background Fetch
 - [ ] Beacon
