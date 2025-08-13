@@ -34,6 +34,6 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Service Workers](https://ko.htmlspecs.com/service-workers/)
 - [x] [Push API](https://ko.htmlspecs.com/push-api/)
 - [x] [WebRTC](https://ko.htmlspecs.com/webrtc/)
-- [ ] Payment Request API
+- [x] [Payment Request API](https://ko.htmlspecs.com/payment-request/)
 - [ ] Background Fetch
 - [ ] Beacon
