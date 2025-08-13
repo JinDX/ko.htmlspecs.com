@@ -37,4 +37,14 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Payment Request API](https://ko.htmlspecs.com/payment-request/)
 - [x] [Background Fetch](https://ko.htmlspecs.com/background-fetch/)
 - [x] [Beacon](https://ko.htmlspecs.com/beacon/)
-
+ko
+- [ ] [Cascading Style Sheets Level 2 Revision 2 (CSS 2.2)](https://ko.htmlspecs.com/css/css22)
+- [ ] [CSS Color Module Level 3](https://ko.htmlspecs.com/css/css-color-3)
+- [ ] [CSS Color Module Level 4](https://ko.htmlspecs.com/css/css-color-4)
+- [ ] [CSS Color Module Level 5](https://ko.htmlspecs.com/css/css-color-5)
+- [ ] [CSS Color Adjustment Module Level 1](https://ko.htmlspecs.com/css/css-color-adjust-1)
+- [ ] [CSS Filter Effects Module Level 1](https://ko.htmlspecs.com/css/filter-effects-1)
+- [ ] [Compositing and Blending Level 1](https://ko.htmlspecs.com/css/compositing-1)
+- [ ] [CSS Conditional Rules Module Level 4](https://ko.htmlspecs.com/css/css-conditional-4)
+- [ ] [CSS Backgrounds and Borders Level 3](https://ko.htmlspecs.com/css/css-backgrounds-3)
+- [ ] [CSS Custom Highlight API Module Level 1](https://ko.htmlspecs.com/css/css-highlight-api-1)
