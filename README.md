@@ -42,7 +42,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 - [x] [Cascading Style Sheets Level 2 Revision 2 (CSS 2.2)](https://ko.htmlspecs.com/css/css22)
 - [x] [CSS Color Module Level 3](https://ko.htmlspecs.com/css/css-color-3)
-- [ ] [CSS Color Module Level 4](https://ko.htmlspecs.com/css/css-color-4)
+- [x] [CSS Color Module Level 4](https://ko.htmlspecs.com/css/css-color-4)
 - [ ] [CSS Color Module Level 5](https://ko.htmlspecs.com/css/css-color-5)
 - [ ] [CSS Color Adjustment Module Level 1](https://ko.htmlspecs.com/css/css-color-adjust-1)
 - [ ] [CSS Filter Effects Module Level 1](https://ko.htmlspecs.com/css/filter-effects-1)
