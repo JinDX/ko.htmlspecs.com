@@ -44,7 +44,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Color Module Level 3](https://ko.htmlspecs.com/css/css-color-3)
 - [x] [CSS Color Module Level 4](https://ko.htmlspecs.com/css/css-color-4)
 - [x] [CSS Color Module Level 5](https://ko.htmlspecs.com/css/css-color-5)
-- [ ] [CSS Color Adjustment Module Level 1](https://ko.htmlspecs.com/css/css-color-adjust-1)
+- [x] [CSS Color Adjustment Module Level 1](https://ko.htmlspecs.com/css/css-color-adjust-1)
 - [ ] [CSS Filter Effects Module Level 1](https://ko.htmlspecs.com/css/filter-effects-1)
 - [ ] [Compositing and Blending Level 1](https://ko.htmlspecs.com/css/compositing-1)
 - [ ] [CSS Conditional Rules Module Level 4](https://ko.htmlspecs.com/css/css-conditional-4)
