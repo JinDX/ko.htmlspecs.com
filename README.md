@@ -1,46 +1,118 @@
 # ko.htmlspecs.com
 HTML 및 관련 API, CSS 표준 시리즈.
 
-## TODO
-
+### 핵심 표준
 - [x] [HTML](https://ko.htmlspecs.com/)
 - [x] [ECMAScript](https://ecma262.com/ko)
-- [x] [DOM](https://ko.htmlspecs.com/dom/)
-- [x] [URL](https://ko.htmlspecs.com/url/)
-- [x] [URL Pattern](https://ko.htmlspecs.com/urlpattern/)
-- [x] [Web IDL](https://ko.htmlspecs.com/webidl/)
-- [x] [Encoding](https://ko.htmlspecs.com/encoding/)
-- [x] [MIME Sniffing](https://ko.htmlspecs.com/mimesniff/)
-- [x] [Infra](https://ko.htmlspecs.com/infra/)
-- [x] [Compatibility](https://ko.htmlspecs.com/compat/)
-- [x] [Compression](https://ko.htmlspecs.com/compression/)
-- [x] [Quirks Mode](https://ko.htmlspecs.com/quirks/)
-- [x] [Test Utils](https://ko.htmlspecs.com/testutils/)
-- [x] [Fetch](https://ko.htmlspecs.com/fetch/)
-- [x] [Streams](https://ko.htmlspecs.com/streams/)
-- [x] [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)
-- [x] [WebSockets](https://ko.htmlspecs.com/websockets/)
-- [x] [Storage](https://ko.htmlspecs.com/storage/)
-- [x] [File System](https://ko.htmlspecs.com/fs/)
-- [x] [Notifications API](https://ko.htmlspecs.com/notifications/)
-- [x] [Console](https://ko.htmlspecs.com/console/)
-- [x] [Fullscreen API](https://ko.htmlspecs.com/fullscreen/)
-- [x] [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)
-- [x] [Web Application Manifest](https://ko.htmlspecs.com/appmanifest/)
-- [x] [WCAG 2.2](https://ko.htmlspecs.com/WCAG/)
-- [x] [Accessible Rich Internet Applications (WAI-ARIA) 1.2](https://ko.htmlspecs.com/wai-aria/)
-- [x] [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname/)
-- [x] [WebTransport](https://ko.htmlspecs.com/webtransport/)
-- [x] [Service Workers](https://ko.htmlspecs.com/service-workers/)
-- [x] [Push API](https://ko.htmlspecs.com/push-api/)
-- [x] [WebRTC](https://ko.htmlspecs.com/webrtc/)
-- [x] [Payment Request API](https://ko.htmlspecs.com/payment-request/)
-- [x] [Background Fetch](https://ko.htmlspecs.com/background-fetch/)
-- [x] [Beacon](https://ko.htmlspecs.com/beacon/)
+- [x] [DOM](https://ko.htmlspecs.com/dom)
+- [x] [URL](https://ko.htmlspecs.com/url)
+- [x] [URL Pattern](https://ko.htmlspecs.com/urlpattern)
+- [x] [Web IDL](https://ko.htmlspecs.com/webidl)
+- [x] [Encoding](https://ko.htmlspecs.com/encoding)
+- [x] [MIME Sniffing](https://ko.htmlspecs.com/mimesniff)
+- [x] [Infra](https://ko.htmlspecs.com/infra)
+- [x] [Web Application Manifest](https://ko.htmlspecs.com/appmanifest)
+- [x] [Compatibility](https://ko.htmlspecs.com/compat)
+- [x] [Compression](https://ko.htmlspecs.com/compression)
+- [x] [Quirks Mode](https://ko.htmlspecs.com/quirks)
+- [x] [Test Utils](https://ko.htmlspecs.com/testutils)
 
-### CSS
+### 접근성
+- [x] [WCAG 2.2](https://ko.htmlspecs.com/WCAG22)
+- [x] [WAI-ARIA 1.2](https://ko.htmlspecs.com/wai-aria)
+- [x] [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname)
 
+### 네트워크 및 통신
+- [x] [Fetch](https://ko.htmlspecs.com/fetch)
+- [x] [Streams](https://ko.htmlspecs.com/streams)
+- [x] [XMLHttpRequest](https://ko.htmlspecs.com/xhr)
+- [x] [WebSockets](https://ko.htmlspecs.com/websockets)
+- [x] [WebTransport](https://ko.htmlspecs.com/webtransport)
+- [x] [Service Workers](https://ko.htmlspecs.com/service-workers)
+- [x] [Push API](https://ko.htmlspecs.com/push-api)
+- [x] [WebRTC](https://ko.htmlspecs.com/webrtc)
+- [x] [Payment Request API](https://ko.htmlspecs.com/payment-request)
+- [x] [Background Fetch](https://ko.htmlspecs.com/background-fetch)
+- [x] [Beacon](https://ko.htmlspecs.com/beacon)
+
+### 저장소 및 데이터
+- [ ] [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB)
+- [x] [Storage](https://ko.htmlspecs.com/storage)
+- [ ] [File API](https://ko.htmlspecs.com/FileAPI)
+- [x] [File System](https://ko.htmlspecs.com/fs)
+- [x] [Cookie Store API](https://ko.htmlspecs.com/cookiestore)
+- [ ] [File and Directory Entries API](https://ko.htmlspecs.com/entries-api)
+- [ ] [Web Locks API](https://ko.htmlspecs.com/web-locks)
+
+### 디바이스 및 하드웨어 접근
+- [ ] [Pointer Events](https://ko.htmlspecs.com/pointerevents)
+- [ ] [Visual Viewport API](https://ko.htmlspecs.com/visual-viewport)
+- [ ] [Screen Orientation](https://ko.htmlspecs.com/screen-orientation)
+- [ ] [EyeDropper API](https://ko.htmlspecs.com/eyedropper-api)
+- [ ] [Fullscreen](https://ko.htmlspecs.com/fullscreen)
+- [ ] [Screen Capture](https://ko.htmlspecs.com/screen-capture)
+- [ ] [UI Events](https://ko.htmlspecs.com/uievents)
+- [ ] [Touch Events - Level 2](https://ko.htmlspecs.com/touchevents)
+- [ ] [Contact Picker API](https://ko.htmlspecs.com/contact-picker)
+- [x] [Notifications API](https://ko.htmlspecs.com/notifications)
+- [ ] [Badging API](https://ko.htmlspecs.com/badging)
+- [ ] [Virtual Keyboard](https://ko.htmlspecs.com/virtual-keyboard)
+- [ ] [Web Share API](https://ko.htmlspecs.com/web-share)
+- [ ] [Web Audio API](https://ko.htmlspecs.com/webaudio)
+- [ ] [Geolocation API](https://ko.htmlspecs.com/geolocation)
+- [ ] [Device Orientation and Motion](https://ko.htmlspecs.com/orientation-event)
+- [ ] [Pointer Lock 2.0](https://ko.htmlspecs.com/pointerlock)
+- [ ] [Clipboard API and events](https://ko.htmlspecs.com/clipboard-apis)
+- [ ] [Input Events Level 1](https://ko.htmlspecs.com/input-events-1)
+- [ ] [Input Events Level 2](https://ko.htmlspecs.com/input-events-2)
+- [ ] [Permissions](https://ko.htmlspecs.com/permissions)
+- [ ] [WebOTP API](https://ko.htmlspecs.com/web-otp)
+- [ ] [Device Posture API](https://ko.htmlspecs.com/device-posture)
+- [ ] [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light)
+- [ ] [Battery Status API](https://ko.htmlspecs.com/battery-status)
+
+### 성능 및 옵저버
+- [ ] [Performance Timeline](https://ko.htmlspecs.com/performance-timeline)
+- [ ] [High Resolution Time](https://ko.htmlspecs.com/hr-time-3)
+- [ ] [Intersection Observer](https://ko.htmlspecs.com/intersection-observer)
+- [ ] [Resize Observer](https://ko.htmlspecs.com/resize-observer)
+- [ ] [Navigation Timing Level 2](https://ko.htmlspecs.com/navigation-timing-2)
+- [ ] [Resource Timing](https://ko.htmlspecs.com/resource-timing)
+- [ ] [User Timing Level 2](https://ko.htmlspecs.com/user-timing-2)
+- [ ] [Observable](https://ko.htmlspecs.com/observable)
+- [ ] [Long Tasks API](https://ko.htmlspecs.com/longtasks-1)
+- [ ] [Reporting API](https://ko.htmlspecs.com/reporting-1)
+- [ ] [Server Timing](https://ko.htmlspecs.com/server-timing)
+- [ ] [Paint Timing](https://ko.htmlspecs.com/paint-timing)
+- [ ] [Event Timing API](https://ko.htmlspecs.com/event-timing)
+
+### 보안 및 인증
+- [ ] [Web Authentication Level 2](https://ko.htmlspecs.com/webauthn-2)
+- [ ] [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api)
+- [ ] [Subresource Integrity (SRI)](https://ko.htmlspecs.com/SRI)
+- [ ] [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3)
+- [ ] [Secure Contexts](https://ko.htmlspecs.com/secure-contexts)
+- [ ] [Referrer Policy](https://ko.htmlspecs.com/referrer-policy)
+- [ ] [Mixed Content](https://ko.htmlspecs.com/mixed-content)
+- [ ] [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1)
+
+### 미디어 및 그래픽
+- [ ] [WebGPU](https://ko.htmlspecs.com/webgpu)
+- [ ] [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL)
+- [ ] [Web Animations](https://ko.htmlspecs.com/web-animations-1)
+- [ ] [SVG 2](https://ko.htmlspecs.com/SVG2/)
+- [ ] [Picture-in-Picture](https://ko.htmlspecs.com/picture-in-picture)
+- [ ] [Presentation API](https://ko.htmlspecs.com/presentation-api)
+- [ ] [Scroll-driven Animations](https://ko.htmlspecs.com/scroll-animations-1)
+- [ ] [Media Capture and Streams](https://ko.htmlspecs.com/mediacapture-streams)
+
+### 개발자 도구
+- [x] [Console](https://ko.htmlspecs.com/console)
+
+## CSS
 - [x] [Cascading Style Sheets Level 2 Revision 2 (CSS 2.2)](https://ko.htmlspecs.com/css/css22)
+
+### 색상
 - [x] [CSS Color Module Level 3](https://ko.htmlspecs.com/css/css-color-3)
 - [x] [CSS Color Module Level 4](https://ko.htmlspecs.com/css/css-color-4)
 - [x] [CSS Color Module Level 5](https://ko.htmlspecs.com/css/css-color-5)
@@ -50,3 +122,110 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Conditional Rules Module Level 4](https://ko.htmlspecs.com/css/css-conditional-4)
 - [x] [CSS Backgrounds and Borders Level 3](https://ko.htmlspecs.com/css/css-backgrounds-3)
 - [x] [CSS Custom Highlight API Module Level 1](https://ko.htmlspecs.com/css/css-highlight-api-1)
+
+### 폰트
+- [ ] [CSS Fonts Module Level 3](https://ko.htmlspecs.com/css/css-fonts-3)
+- [ ] [CSS Fonts Module Level 4](https://ko.htmlspecs.com/css/css-fonts-4)
+- [ ] [CSS Font Loading Module Level 3](https://ko.htmlspecs.com/css/css-font-loading)
+
+### 텍스트 및 타이포그래피
+- [ ] [CSS Text Module Level 3](https://ko.htmlspecs.com/css/css-text-3)
+- [ ] [CSS Text Module Level 4](https://ko.htmlspecs.com/css/css-text-4)
+- [ ] [CSS Counter Styles Level 3](https://ko.htmlspecs.com/css/css-counter-styles-3)
+- [ ] [CSS Lists and Counters Module Level 3](https://ko.htmlspecs.com/css/css-lists-3)
+- [ ] [CSS Text Decoration Level 3](https://ko.htmlspecs.com/css/css-text-decor-3)
+
+### 미디어 쿼리
+- [ ] [Media Queries Level 3](https://ko.htmlspecs.com/css/mediaqueries-3)
+- [ ] [Media Queries Level 4](https://ko.htmlspecs.com/css/mediaqueries-4)
+- [ ] [Media Queries Level 5](https://ko.htmlspecs.com/css/mediaqueries-5)
+
+### 레이아웃
+- [ ] [CSS Box Model Level 3](https://ko.htmlspecs.com/css/css-box-3)
+- [ ] [CSS Box Model Level 4](https://ko.htmlspecs.com/css/css-box-4)
+- [ ] [CSS Display Module Level 3](https://ko.htmlspecs.com/css/css-display-3)
+- [ ] [CSS Flexible Box Layout Module Level 1](https://ko.htmlspecs.com/css/css-flexbox-1)
+- [ ] [CSS Grid Layout Module Level 1](https://ko.htmlspecs.com/css/css-grid-1)
+- [ ] [CSS Grid Layout Module Level 2](https://ko.htmlspecs.com/css/css-grid-2)
+- [ ] [CSS Grid Layout Module Level 3](https://ko.htmlspecs.com/css/css-grid-3)
+- [ ] [CSS Inline Layout Module Level 3](https://ko.htmlspecs.com/css/css-inline-3)
+- [ ] [CSS Multi-column Layout Module Level 1](https://ko.htmlspecs.com/css/css-multicol-1)
+- [ ] [CSS Shapes Module Level 1](https://ko.htmlspecs.com/css/css-shapes-1)
+- [ ] [CSS Positioned Layout Module Level 3](https://ko.htmlspecs.com/css/css-position-3)
+- [ ] [CSS Box Sizing Module Level 3](https://ko.htmlspecs.com/css/css-sizing-3)
+- [ ] [CSS Box Alignment Module Level 3](https://ko.htmlspecs.com/css/css-align-3)
+- [ ] [CSS Overflow Module Level 4](https://ko.htmlspecs.com/css/css-overflow-4)
+- [ ] [CSS Overflow Module Level 5](https://ko.htmlspecs.com/css/css-overflow-5)
+- [ ] [CSS Gap Decorations Module Level 1](https://ko.htmlspecs.com/css/css-gaps-1)
+- [ ] [CSS Anchor Positioning Module Level 1](https://ko.htmlspecs.com/css/css-anchor-position-1)
+
+### 내비게이션
+- [ ] [CSS Spatial Navigation Level 1](https://ko.htmlspecs.com/css/css-nav-1)
+
+### 쓰기 모드
+- [ ] [CSS Writing Modes Level 3](https://ko.htmlspecs.com/css/css-writing-modes-3)
+- [ ] [CSS Writing Modes Level 4](https://ko.htmlspecs.com/css/css-writing-modes-4)
+
+### 분할
+- [ ] [CSS Fragmentation Module Level 3](https://ko.htmlspecs.com/css/css-break-3)
+
+### 의사 요소
+- [ ] [CSS Pseudo-Elements Module Level 4](https://ko.htmlspecs.com/css/css-pseudo-4)
+
+### 이미지
+- [ ] [CSS Images Module Level 4](https://ko.htmlspecs.com/css/css-images-4)
+- [ ] [CSS Masking Module Level 1](https://ko.htmlspecs.com/css/css-masking-1)
+
+### 변환 및 애니메이션
+- [ ] [CSS Easing Functions Level 1](https://ko.htmlspecs.com/css/css-easing-1)
+- [ ] [CSS Easing Functions Level 2](https://ko.htmlspecs.com/css/css-easing-2)
+- [ ] [CSS Transforms Module Level 1](https://ko.htmlspecs.com/css/css-transforms-1)
+- [ ] [CSS Transforms Module Level 2](https://ko.htmlspecs.com/css/css-transforms-2)
+- [ ] [CSS Transitions Level 2](https://ko.htmlspecs.com/css/css-transitions-2)
+- [ ] [CSS Animations Level 1](https://ko.htmlspecs.com/css/css-animations-1)
+- [ ] [CSS Animations Level 2](https://ko.htmlspecs.com/css/css-animations-2)
+- [ ] [CSS Motion Path Module Level 1](https://ko.htmlspecs.com/css/motion-1)
+- [ ] [CSS View Transitions Module Level 1](https://ko.htmlspecs.com/css/css-view-transitions-1)
+- [ ] [CSS View Transitions Module Level 2](https://ko.htmlspecs.com/css/css-view-transitions-2)
+- [ ] [CSS Animation Worklet API](https://ko.htmlspecs.com/css/css-animation-worklet-1)
+
+### 포함
+- [ ] [CSS Containment Module Level 2](https://ko.htmlspecs.com/css/css-contain-2)
+- [ ] [CSS Containment Module Level 3](https://ko.htmlspecs.com/css/css-contain-3)
+
+### 음성
+- [ ] [CSS Speech Module Level 1](https://ko.htmlspecs.com/css/css-speech-1)
+
+### 기타
+- [ ] [CSS Snapshot 2023](https://ko.htmlspecs.com/css/css-2023)
+- [ ] [CSS Snapshot 2024](https://ko.htmlspecs.com/css/css-2024)
+- [ ] [CSS Namespaces](https://ko.htmlspecs.com/css/css-namespaces-3)
+- [ ] [Selectors Level 3](https://ko.htmlspecs.com/css/selectors-3)
+- [ ] [Selectors Level 4](https://ko.htmlspecs.com/css/selectors-4)
+- [ ] [CSS Style Attributes](https://ko.htmlspecs.com/css/css-style-attr)
+- [ ] [CSS Overscroll Behavior Module Level 1](https://ko.htmlspecs.com/css/css-overscroll-1)
+- [ ] [CSS Scroll Snap Module Level 1](https://ko.htmlspecs.com/css/css-scroll-snap-1)
+- [ ] [CSS Scroll Snap Module Level 2](https://ko.htmlspecs.com/css/css-scroll-snap-2)
+- [ ] [CSS Scrollbars Styling Module Level 1](https://ko.htmlspecs.com/css/css-scrollbars-1)
+- [ ] [CSS Scroll Anchoring Module Level 1](https://ko.htmlspecs.com/css/css-scroll-anchoring-1)
+- [ ] [CSS Will Change Module Level 1](https://ko.htmlspecs.com/css/css-will-change-1)
+- [ ] [CSS Nesting Module Level 1](https://ko.htmlspecs.com/css/css-nesting-1)
+- [ ] [CSS Custom Properties for Cascading Variables Module Level 1](https://ko.htmlspecs.com/css/css-variables-1)
+- [ ] [CSS Object Model (CSSOM)](https://ko.htmlspecs.com/css/cssom-1)
+- [ ] [CSSOM View Module](https://ko.htmlspecs.com/css/cssom-view)
+- [ ] [CSS Cascading and Inheritance Level 3](https://ko.htmlspecs.com/css/css-cascade-3)
+- [ ] [CSS Cascading and Inheritance Level 4](https://ko.htmlspecs.com/css/css-cascade-4)
+- [ ] [CSS Cascading and Inheritance Level 5](https://ko.htmlspecs.com/css/css-cascade-5)
+- [ ] [CSS Cascading and Inheritance Level 6](https://ko.htmlspecs.com/css/css-cascade-6)
+- [ ] [CSS Basic User Interface Module Level 3](https://ko.htmlspecs.com/css/css-ui-3)
+- [ ] [CSS Basic User Interface Module Level 4](https://ko.htmlspecs.com/css/css-ui-4)
+- [ ] [CSS Syntax Module Level 3](https://ko.htmlspecs.com/css/css-syntax-3)
+- [ ] [CSS Values and Units Module Level 3](https://ko.htmlspecs.com/css/css-values-3)
+- [ ] [CSS Logical Properties and Values Level 1](https://ko.htmlspecs.com/css/css-logical-1)
+- [ ] [CSS Mixins Module Level 1](https://ko.htmlspecs.com/css/css-mixins-1)
+
+### CSS Houdini APIs
+- [ ] [CSS Typed OM Level 1](https://ko.htmlspecs.com/css/css-typed-om-1)
+- [ ] [CSS Paint API Level 1](https://ko.htmlspecs.com/css/css-paint-api-1)
+- [ ] [CSS Layout API Level 1](https://ko.htmlspecs.com/css/css-layout-api-1)
+- [ ] [CSS Properties and Values API Level 1](https://ko.htmlspecs.com/css/css-properties-values-api-1)
