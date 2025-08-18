@@ -48,7 +48,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Pointer Events](https://ko.htmlspecs.com/pointerevents2)
 - [ ] ~~[Visual Viewport API](https://ko.htmlspecs.com/visual-viewport)~~
 - [x] [Screen Orientation](https://ko.htmlspecs.com/screen-orientation)
-- [ ] [EyeDropper API](https://ko.htmlspecs.com/eyedropper-api)
+- [x] [EyeDropper API](https://ko.htmlspecs.com/eyedropper-api)
 - [ ] [Fullscreen](https://ko.htmlspecs.com/fullscreen)
 - [ ] [Screen Capture](https://ko.htmlspecs.com/screen-capture)
 - [ ] [UI Events](https://ko.htmlspecs.com/uievents)

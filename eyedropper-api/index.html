@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>EyeDropper API</title>
+    <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove"></script>
+    <script class='remove'>
+        var respecConfig = {
+            specStatus: "CG-DRAFT",
+            shortName: "eyedropper-api",
+            editors: [{
+                name: "Ionel Popescu",
+                mailto: "iopopesc@microsoft.com",
+                company: "Microsoft Corporation",
+                companyURL: "https://www.microsoft.com/"
+            }],
+            group: "wicg",
+            github: "https://github.com/wicg/eyedropper-api",
+            xref: "web-platform",
+        };
+    </script>
+</head>
+
+<body>
+    <section id="abstract">
+        <p>
+            이 문서는 브라우저가 제공하는 아이드롭퍼에 접근할 수 있는 API에 대해 설명합니다.
+        </p>
+    </section>
+    <section id="sotd"></section>
+    <section class="informative" id="introduction">
+        <h2>소개</h2>
+        <p>
+            현재 웹에서는, 개발자가 화면의 픽셀(웹 페이지 외부에 렌더링된 픽셀을 포함)에서 사용자가 색상을 선택할 수 있게 하는 아이드롭퍼 도구를 구현하기 어렵습니다.
+        </p>
+        <p>
+            이 API는 저자가 브라우저 제공 아이드롭퍼를 사용하여 맞춤형 색상 선택기를 구축할 수 있게 합니다.
+        </p>
+    </section>
+    <section id="conformance"></section>
+    <section>
+        <h2>API 설명</h2>
+
+        <section data-dfn-for="ColorSelectionResult">
+            <h3>ColorSelectionResult 딕셔너리</h3>
+            <pre class="idl">
+          dictionary ColorSelectionResult {
+            DOMString sRGBHex;
+          };
+        </pre>
+            <dl>
+                <dt><dfn data-dfn-for="ColorSelectionResult">sRGBHex</dfn></dt>
+                <dd>
+                    유효한 <dfn data-cite="!HTML#valid-simple-colour">단순 색상</dfn> 값을 가져야 합니다.
+                </dd>
+            </dl>
+        </section>
+
+        <section data-dfn-for="ColorSelectionOptions">
+            <h3>ColorSelectionOptions 딕셔너리</h3>
+            <pre class="idl">
+          dictionary ColorSelectionOptions {
+            AbortSignal signal;
+          };
+        </pre>
+            <dl>
+                <dt><dfn data-dfn-for="ColorSelectionOptions">signal</dfn></dt>
+                <dd>
+                    {{EyeDropper/open}} 작업을 중단(abort)할 수 있게 합니다.
+                </dd>
+            </dl>
+        </section>
+
+        <section data-dfn-for="EyeDropper">
+            <h3>EyeDropper 인터페이스</h3>
+            <pre class="idl">
+            [Exposed=Window, SecureContext]
+            interface EyeDropper {
+                constructor();
+                Promise&lt;ColorSelectionResult> open(optional ColorSelectionOptions options = {});
+            };
+        </pre>
+            <dl>
+                <dt><dfn data-dfn-for="EyeDropper">open()</dfn></dt>
+                <dd>
+                    이 메서드는 다음 단계를 따라야 합니다:
+                    <ol>
+                        <li>
+                            [=this=]의 [=relevant global object=] 에 [=transient activation=]이 없으면, "NotAllowedError"
+                            {{DOMException}}로 거부된 새 프라미스를 반환합니다.
+                        </li>
+                        <li>
+                            다른 아이드롭퍼가 이미 열려 있으면 "InvalidStateError" {{DOMException}}로 거부된 새 프라미스를 반환합니다.
+                        </li>
+                        <li>
+                            |result|를 새 프라미스로 둡니다.
+                        </li>
+                        <li>
+                            options.<dfn data-cite="!dom#abortsignal">signal</dfn>이 존재하면 다음 하위 단계를 수행합니다:
+                            <ol>
+                                <li>
+                                    options.[=signal=]이 <dfn data-cite="!dom#dom-abortsignal-aborted">중단(aborted)</dfn>된
+                                    경우, options.[=signal=]의 <dfn data-cite="!dom#abortsignal-abort-reason">중단 이유(abort
+                                        reason)</dfn>로 |result|를 거부하고 |result|를 반환합니다.
+                                </li>
+                                <li>
+                                    options.[=signal=]에 다음의 중단 단계를 추가합니다:
+                                    <ol>
+                                        <li>"eyedropper 모드"를 종료하고 UI를 닫습니다.</li>
+                                        <li>options.[=signal=]의 <a data-cite="!dom#abortsignal-abort-reason">중단 이유</a>로
+                                            |result|를 거부합니다.</li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </li>
+                        <li>
+                            웹 페이지를 사용자 입력이 억제되는 "eyedropper 모드"로 전환합니다: 웹 페이지로 UI 이벤트가 전송되지 않습니다.
+                        </li>
+                        <li>
+                            [=In parallel=]:
+                            <ol>
+                                <li>사용자가 성공적으로 색상을 선택한 결과인 |colorSelectionResult|를 구합니다. 실패하면 다음을 수행합니다:
+                                    <ol>
+                                        <li>
+                                            사용자가 선택을 중단(abort)하면 "AbortError" {{DOMException}}로 |result|를 거부하고, 그렇지 않으면
+                                            "OperationError" {{DOMException}}로 |result|를 거부합니다.
+                                        </li>
+                                        <li>
+                                            이 단계들을 중단합니다.
+                                        </li>
+                                    </ol>
+                                </li>
+                                <li>"eyedropper 모드"를 종료하고 UI를 닫습니다.</li>
+                                <li>|colorSelectionResult|로 |result|를 해결(resolve)합니다.</li>
+                            </ol>
+                        </li>
+                        <li>
+                            |result|를 반환합니다.
+                        </li>
+                    </ol>
+                </dd>
+            </dl>
+        </section>
+    </section>
+    <section>
+        <h2>EyeDropper</h2>
+        <p>
+            {{EyeDropper/open}}로 아이드롭퍼를 열기 위해, 사용자 에이전트는 다음 규칙을 따르는 사용자 인터페이스를 제공해야 합니다:
+        </p>
+        <ul>
+            <li>
+                사용자 인터페이스 표시가 실패하거나 화면 콘텐츠 접근이 실패하면 실패를 반환해야 합니다.
+            </li>
+            <li>
+                UI는 색상 선택을 허용하기 전에 UI가 화면에 표시되었음을 보장해야 합니다.
+            </li>
+            <li>
+                UI는 어떤 색상이 선택될 것인지 명확히 표시해야 합니다.
+            </li>
+            <li>
+                UI는 색상을 선택하지 않고 취소/복귀할 수 있는 옵션을 제공해야 합니다.
+            </li>
+        </ul>
+    </section>
+    <section class="informative" id="privacy">
+        <h2>보안 및 개인정보 보호 고려사항</h2>
+        <p>
+            개발자가 사용자의 기기에서 제한 없는 픽셀 데이터에 접근할 수 있는 엔드포인트를 노출하는 것은 보안 문제를 야기합니다.
+            특히, 아이드롭퍼 구현은 사용자가 의도하지 않은 정보를 웹 페이지가 "스크린 스크래핑(screen scrape)"하지 못하도록 해야 합니다. 예를 들어 사용자가 화면 위에서 마우스를 움직이는
+            동안 의도치 않은 정보가 수집되지 않아야 합니다.
+        </p>
+        <p>
+            이 위협을 완화하는 한 방법은 픽셀 데이터를 웹 애플리케이션에 제공하기 위해 사용자가 마우스 버튼을 누르는 등의 명시적 동작을 수행해야 하도록 요구하는 것입니다.
+        </p>
+        <p>
+            또한, 브라우저는 사용자가 아이드롭퍼 모드로 전환되었음을 명확히 알릴 수 있어야 합니다. 예를 들어 커서를 변경하고 사용자가 ESC 키를 눌러 해당 모드를 종료할 수 있도록 하는 등의 수단을
+            제공해야 하며, 저자가 이를 취소할 수 없도록 해야 합니다.
+        </p>
+        <p>
+            사용자가 색상을 선택할 수 있도록 허용하기 전에 브라우저는 사용자가 UI를 볼 수 있는 기회를 제공했는지 확인해야 합니다. 이는 아이드롭퍼를 연 후 색상 선택을 허용하기까지 최소 시간 간격을
+            강제함으로써 달성될 수 있습니다.
+        </p>
+        <p>
+            아이드롭퍼 모드로의 전환은 소비 가능한 사용자 활성화(consumable user activation)를 요구해야 합니다. 예를 들어 웹 페이지의 버튼을 클릭하도록 요구함으로써 의도치 않게 픽셀
+            데이터가 노출되는 것을 방지할 수 있습니다.
+        </p>
+    </section>
+    <section class="informative" id="examples">
+        <h2>예제</h2>
+        <section>
+            <h3>플랫폼 지원</h3>
+            <aside class="example">
+                <pre>
+            <xmp>
+              if (window.EyeDropper == undefined) {
+                console.error('EyeDropper API is not supported on this platform');
+              }
+            </xmp>
+          </pre>
+            </aside>
+        </section>
+        <section>
+            <h3>색상 선택하기</h3>
+            <aside class="example">
+                <pre>
+            <xmp>
+              <button id="eyedropperButton">Open eyedropper</button>
+              <script>
+                // Create an EyeDropper object
+                let eyeDropper = new EyeDropper();
+
+                document.getElementById("eyedropperButton").addEventListener('click', e => {
+                    // Enter eyedropper mode
+                    eyeDropper.open()
+                        .then(colorSelectionResult => {
+                            // returns hex color value (#RRGGBB) of the selected pixel
+                            console.log(colorSelectionResult.sRGBHex);
+                        })
+                        .catch(error => {
+                            // handle the user choosing to exit eyedropper mode without a selection
+                        });
+                });
+            </script>
+            </xmp>
+          </pre>
+            </aside>
+        </section>
+    </section>
+    <section id="idl-index" class="appendix"></section>
+    <section id="references" class="appendix"></section>
+</body>
+
+</html>
