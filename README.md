@@ -42,7 +42,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [File System](https://ko.htmlspecs.com/fs)
 - [x] [Cookie Store API](https://ko.htmlspecs.com/cookiestore)
 - [x] [File and Directory Entries API](https://ko.htmlspecs.com/entries-api)
-- [ ] [Web Locks API](https://ko.htmlspecs.com/web-locks)
+- [x] [Web Locks API](https://ko.htmlspecs.com/web-locks)
 
 ### 디바이스 및 하드웨어 접근
 - [ ] [Pointer Events](https://ko.htmlspecs.com/pointerevents)
