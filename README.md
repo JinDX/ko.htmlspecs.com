@@ -45,7 +45,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Web Locks API](https://ko.htmlspecs.com/web-locks)
 
 ### 디바이스 및 하드웨어 접근
-- [ ] [Pointer Events](https://ko.htmlspecs.com/pointerevents2)
+- [x] [Pointer Events](https://ko.htmlspecs.com/pointerevents2)
 - [ ] [Visual Viewport API](https://ko.htmlspecs.com/visual-viewport)
 - [ ] [Screen Orientation](https://ko.htmlspecs.com/screen-orientation)
 - [ ] [EyeDropper API](https://ko.htmlspecs.com/eyedropper-api)
