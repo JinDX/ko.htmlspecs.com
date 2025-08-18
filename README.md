@@ -36,7 +36,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Beacon](https://ko.htmlspecs.com/beacon)
 
 ### 저장소 및 데이터
-- [ ] [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB)
+- [x] [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB)
 - [x] [Storage](https://ko.htmlspecs.com/storage)
 - [ ] [File API](https://ko.htmlspecs.com/FileAPI)
 - [x] [File System](https://ko.htmlspecs.com/fs)
