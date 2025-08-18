@@ -38,7 +38,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 ### 저장소 및 데이터
 - [x] [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB)
 - [x] [Storage](https://ko.htmlspecs.com/storage)
-- [ ] [File API](https://ko.htmlspecs.com/FileAPI)
+- [x] [File API](https://ko.htmlspecs.com/FileAPI)
 - [x] [File System](https://ko.htmlspecs.com/fs)
 - [x] [Cookie Store API](https://ko.htmlspecs.com/cookiestore)
 - [ ] [File and Directory Entries API](https://ko.htmlspecs.com/entries-api)
