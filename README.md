@@ -50,7 +50,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Screen Orientation](https://ko.htmlspecs.com/screen-orientation)
 - [x] [EyeDropper API](https://ko.htmlspecs.com/eyedropper-api)
 - [x] [Fullscreen](https://ko.htmlspecs.com/fullscreen)
-- [ ] [Screen Capture](https://ko.htmlspecs.com/screen-capture)
+- [x] [Screen Capture](https://ko.htmlspecs.com/screen-capture)
 - [ ] [UI Events](https://ko.htmlspecs.com/uievents)
 - [ ] [Touch Events - Level 2](https://ko.htmlspecs.com/touchevents)
 - [ ] [Contact Picker API](https://ko.htmlspecs.com/contact-picker)
