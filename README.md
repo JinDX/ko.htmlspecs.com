@@ -55,7 +55,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Touch Events - Level 2](https://ko.htmlspecs.com/touch-events)
 - [x] [Contact Picker API](https://ko.htmlspecs.com/contact-picker)
 - [x] [Notifications API](https://ko.htmlspecs.com/notifications)
-- [ ] [Badging API](https://ko.htmlspecs.com/badging)
+- [x] [Badging API](https://ko.htmlspecs.com/badging)
 - [ ] [Virtual Keyboard](https://ko.htmlspecs.com/virtual-keyboard)
 - [ ] [Web Share API](https://ko.htmlspecs.com/web-share)
 - [ ] [Web Audio API](https://ko.htmlspecs.com/webaudio)
