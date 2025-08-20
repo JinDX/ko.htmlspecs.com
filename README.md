@@ -59,7 +59,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Virtual Keyboard](https://ko.htmlspecs.com/virtual-keyboard)
 - [x] [Web Share API](https://ko.htmlspecs.com/web-share)
 - [x] [Web Audio API](https://ko.htmlspecs.com/webaudio)
-- [ ] [Geolocation API](https://ko.htmlspecs.com/geolocation)
+- [x] [Geolocation API](https://ko.htmlspecs.com/geolocation)
 - [ ] [Device Orientation and Motion](https://ko.htmlspecs.com/orientation-event)
 - [ ] [Pointer Lock 2.0](https://ko.htmlspecs.com/pointerlock)
 - [ ] [Clipboard API and events](https://ko.htmlspecs.com/clipboard-apis)
