@@ -57,7 +57,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Notifications API](https://ko.htmlspecs.com/notifications)
 - [x] [Badging API](https://ko.htmlspecs.com/badging)
 - [x] [Virtual Keyboard](https://ko.htmlspecs.com/virtual-keyboard)
-- [ ] [Web Share API](https://ko.htmlspecs.com/web-share)
+- [x] [Web Share API](https://ko.htmlspecs.com/web-share)
 - [ ] [Web Audio API](https://ko.htmlspecs.com/webaudio)
 - [ ] [Geolocation API](https://ko.htmlspecs.com/geolocation)
 - [ ] [Device Orientation and Motion](https://ko.htmlspecs.com/orientation-event)
