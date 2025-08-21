@@ -61,7 +61,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Web Audio API](https://ko.htmlspecs.com/webaudio)
 - [x] [Geolocation API](https://ko.htmlspecs.com/geolocation)
 - [x] [Device Orientation and Motion](https://ko.htmlspecs.com/orientation-event)
-- [ ] [Pointer Lock 2.0](https://ko.htmlspecs.com/pointerlock)
+- [x] [Pointer Lock 2.0](https://ko.htmlspecs.com/pointerlock)
 - [ ] [Clipboard API and events](https://ko.htmlspecs.com/clipboard-apis)
 - [ ] [Input Events Level 1](https://ko.htmlspecs.com/input-events-1)
 - [ ] [Input Events Level 2](https://ko.htmlspecs.com/input-events-2)
