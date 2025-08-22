@@ -75,7 +75,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Performance Timeline](https://ko.htmlspecs.com/performance-timeline)
 - [x] [High Resolution Time](https://ko.htmlspecs.com/hr-time-3)
 - [x] [Intersection Observer](https://ko.htmlspecs.com/intersection-observer)
-- [ ] [Resize Observer](https://ko.htmlspecs.com/resize-observer)
+- [x] [Resize Observer](https://ko.htmlspecs.com/resize-observer)
 - [ ] [Navigation Timing Level 2](https://ko.htmlspecs.com/navigation-timing-2)
 - [ ] [Resource Timing](https://ko.htmlspecs.com/resource-timing)
 - [ ] [User Timing Level 2](https://ko.htmlspecs.com/user-timing-2)
