@@ -72,7 +72,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Battery Status API](https://ko.htmlspecs.com/battery-status)
 
 ### 성능 및 옵저버
-- [ ] [Performance Timeline](https://ko.htmlspecs.com/performance-timeline)
+- [x] [Performance Timeline](https://ko.htmlspecs.com/performance-timeline)
 - [ ] [High Resolution Time](https://ko.htmlspecs.com/hr-time-3)
 - [ ] [Intersection Observer](https://ko.htmlspecs.com/intersection-observer)
 - [ ] [Resize Observer](https://ko.htmlspecs.com/resize-observer)
