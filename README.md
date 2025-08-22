@@ -68,7 +68,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Permissions](https://ko.htmlspecs.com/permissions)
 - [x] [WebOTP API](https://ko.htmlspecs.com/web-otp)
 - [x] [Device Posture API](https://ko.htmlspecs.com/device-posture)
-- [ ] [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light)
+- [x] [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light)
 - [ ] [Battery Status API](https://ko.htmlspecs.com/battery-status)
 
 ### 성능 및 옵저버
