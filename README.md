@@ -64,7 +64,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Pointer Lock 2.0](https://ko.htmlspecs.com/pointerlock)
 - [x] [Clipboard API and events](https://ko.htmlspecs.com/clipboard-apis)
 - [x] [Input Events Level 1](https://ko.htmlspecs.com/input-events-1)
-- [ ] [Input Events Level 2](https://ko.htmlspecs.com/input-events-2)
+- [x] [Input Events Level 2](https://ko.htmlspecs.com/input-events-2)
 - [ ] [Permissions](https://ko.htmlspecs.com/permissions)
 - [ ] [WebOTP API](https://ko.htmlspecs.com/web-otp)
 - [ ] [Device Posture API](https://ko.htmlspecs.com/device-posture)
