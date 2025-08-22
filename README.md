@@ -65,7 +65,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Clipboard API and events](https://ko.htmlspecs.com/clipboard-apis)
 - [x] [Input Events Level 1](https://ko.htmlspecs.com/input-events-1)
 - [x] [Input Events Level 2](https://ko.htmlspecs.com/input-events-2)
-- [ ] [Permissions](https://ko.htmlspecs.com/permissions)
+- [x] [Permissions](https://ko.htmlspecs.com/permissions)
 - [ ] [WebOTP API](https://ko.htmlspecs.com/web-otp)
 - [ ] [Device Posture API](https://ko.htmlspecs.com/device-posture)
 - [ ] [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light)
