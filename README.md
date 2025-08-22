@@ -66,7 +66,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Input Events Level 1](https://ko.htmlspecs.com/input-events-1)
 - [x] [Input Events Level 2](https://ko.htmlspecs.com/input-events-2)
 - [x] [Permissions](https://ko.htmlspecs.com/permissions)
-- [ ] [WebOTP API](https://ko.htmlspecs.com/web-otp)
+- [x] [WebOTP API](https://ko.htmlspecs.com/web-otp)
 - [ ] [Device Posture API](https://ko.htmlspecs.com/device-posture)
 - [ ] [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light)
 - [ ] [Battery Status API](https://ko.htmlspecs.com/battery-status)
