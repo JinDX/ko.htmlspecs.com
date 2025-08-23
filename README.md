@@ -82,7 +82,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Observable](https://ko.htmlspecs.com/observable)
 - [x] [Long Tasks API](https://ko.htmlspecs.com/longtasks-1)
 - [x] [Reporting API](https://ko.htmlspecs.com/reporting-1)
-- [ ] [Server Timing](https://ko.htmlspecs.com/server-timing)
+- [x] [Server Timing](https://ko.htmlspecs.com/server-timing)
 - [ ] [Paint Timing](https://ko.htmlspecs.com/paint-timing)
 - [ ] [Event Timing API](https://ko.htmlspecs.com/event-timing)
 
