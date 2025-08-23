@@ -84,7 +84,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Reporting API](https://ko.htmlspecs.com/reporting-1)
 - [x] [Server Timing](https://ko.htmlspecs.com/server-timing)
 - [x] [Paint Timing](https://ko.htmlspecs.com/paint-timing)
-- [ ] [Event Timing API](https://ko.htmlspecs.com/event-timing)
+- [x] [Event Timing API](https://ko.htmlspecs.com/event-timing)
 
 ### 보안 및 인증
 - [ ] [Web Authentication Level 2](https://ko.htmlspecs.com/webauthn-2)
