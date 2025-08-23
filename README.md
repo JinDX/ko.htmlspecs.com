@@ -87,7 +87,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Event Timing API](https://ko.htmlspecs.com/event-timing)
 
 ### 보안 및 인증
-- [ ] [Web Authentication Level 2](https://ko.htmlspecs.com/webauthn-2)
+- [x] [Web Authentication Level 2](https://ko.htmlspecs.com/webauthn-2)
 - [ ] [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api)
 - [ ] [Subresource Integrity (SRI)](https://ko.htmlspecs.com/SRI)
 - [ ] [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3)
