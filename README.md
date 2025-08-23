@@ -83,7 +83,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Long Tasks API](https://ko.htmlspecs.com/longtasks-1)
 - [x] [Reporting API](https://ko.htmlspecs.com/reporting-1)
 - [x] [Server Timing](https://ko.htmlspecs.com/server-timing)
-- [ ] [Paint Timing](https://ko.htmlspecs.com/paint-timing)
+- [x] [Paint Timing](https://ko.htmlspecs.com/paint-timing)
 - [ ] [Event Timing API](https://ko.htmlspecs.com/event-timing)
 
 ### 보안 및 인증
