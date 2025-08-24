@@ -93,7 +93,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3)
 - [x] [Secure Contexts](https://ko.htmlspecs.com/secure-contexts)
 - [x] [Referrer Policy](https://ko.htmlspecs.com/referrer-policy)
-- [ ] [Mixed Content](https://ko.htmlspecs.com/mixed-content)
+- [x] [Mixed Content](https://ko.htmlspecs.com/mixed-content)
 - [ ] [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1)
 
 ### 미디어 및 그래픽
