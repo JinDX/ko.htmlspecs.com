@@ -92,7 +92,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Subresource Integrity (SRI)](https://ko.htmlspecs.com/sri)
 - [x] [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3)
 - [x] [Secure Contexts](https://ko.htmlspecs.com/secure-contexts)
-- [ ] [Referrer Policy](https://ko.htmlspecs.com/referrer-policy)
+- [x] [Referrer Policy](https://ko.htmlspecs.com/referrer-policy)
 - [ ] [Mixed Content](https://ko.htmlspecs.com/mixed-content)
 - [ ] [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1)
 

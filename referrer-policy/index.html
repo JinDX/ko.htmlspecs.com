@@ -1,0 +1,2246 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <title>추천인 정책</title>
+    <meta content="CR" name="w3c-status">
+
+    <meta content="Bikeshed version af155f2e5c3bb772c32f7c8fe6857fd648994d60" name="generator">
+    <style>
+        /* style-md-lists */
+
+        /* This is a weird hack for me not yet following the commonmark spec
+               regarding paragraph and lists. */
+        [data-md]> :first-child {
+            margin-top: 0;
+        }
+
+        [data-md]> :last-child {
+            margin-bottom: 0;
+        }
+    </style>
+    <style>
+        /* style-selflinks */
+
+        .heading,
+        .issue,
+        .note,
+        .example,
+        li,
+        dt {
+            position: relative;
+        }
+
+        a.self-link {
+            position: absolute;
+            top: 0;
+            left: calc(-1 * (3.5rem - 26px));
+            width: calc(3.5rem - 26px);
+            height: 2em;
+            text-align: center;
+            border: none;
+            transition: opacity .2s;
+            opacity: .5;
+        }
+
+        a.self-link:hover {
+            opacity: 1;
+        }
+
+        .heading>a.self-link {
+            font-size: 83%;
+        }
+
+        li>a.self-link {
+            left: calc(-1 * (3.5rem - 26px) - 2em);
+        }
+
+        dfn>a.self-link {
+            top: auto;
+            left: auto;
+            opacity: 0;
+            width: 1.5em;
+            height: 1.5em;
+            background: gray;
+            color: white;
+            font-style: normal;
+            transition: opacity .2s, background-color .2s, color .2s;
+        }
+
+        dfn:hover>a.self-link {
+            opacity: 1;
+        }
+
+        dfn>a.self-link:hover {
+            color: black;
+        }
+
+        a.self-link::before {
+            content: "¶";
+        }
+
+        .heading>a.self-link::before {
+            content: "§";
+        }
+
+        dfn>a.self-link::before {
+            content: "#";
+        }
+    </style>
+    <style>
+        /* style-counters */
+
+        body {
+            counter-reset: example figure issue;
+        }
+
+        .issue {
+            counter-increment: issue;
+        }
+
+        .issue:not(.no-marker)::before {
+            content: "Issue " counter(issue);
+        }
+
+        .example {
+            counter-increment: example;
+        }
+
+        .example:not(.no-marker)::before {
+            content: "Example " counter(example);
+        }
+
+        .invalid.example:not(.no-marker)::before,
+        .illegal.example:not(.no-marker)::before {
+            content: "Invalid Example" counter(example);
+        }
+
+        figcaption {
+            counter-increment: figure;
+        }
+
+        figcaption:not(.no-marker)::before {
+            content: "Figure " counter(figure) " ";
+        }
+    </style>
+    <style>
+        /* style-autolinks */
+
+        .css.css,
+        .property.property,
+        .descriptor.descriptor {
+            color: #005a9c;
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+        .css::before,
+        .property::before,
+        .descriptor::before {
+            content: "‘";
+        }
+
+        .css::after,
+        .property::after,
+        .descriptor::after {
+            content: "’";
+        }
+
+        .property,
+        .descriptor {
+            /* Don't wrap property and descriptor names */
+            white-space: nowrap;
+        }
+
+        .type {
+            /* CSS value <type> */
+            font-style: italic;
+        }
+
+        pre .property::before,
+        pre .property::after {
+            content: "";
+        }
+
+        [data-link-type="property"]::before,
+        [data-link-type="propdesc"]::before,
+        [data-link-type="descriptor"]::before,
+        [data-link-type="value"]::before,
+        [data-link-type="function"]::before,
+        [data-link-type="at-rule"]::before,
+        [data-link-type="selector"]::before,
+        [data-link-type="maybe"]::before {
+            content: "‘";
+        }
+
+        [data-link-type="property"]::after,
+        [data-link-type="propdesc"]::after,
+        [data-link-type="descriptor"]::after,
+        [data-link-type="value"]::after,
+        [data-link-type="function"]::after,
+        [data-link-type="at-rule"]::after,
+        [data-link-type="selector"]::after,
+        [data-link-type="maybe"]::after {
+            content: "’";
+        }
+
+        [data-link-type].production::before,
+        [data-link-type].production::after,
+        .prod [data-link-type]::before,
+        .prod [data-link-type]::after {
+            content: "";
+        }
+
+        [data-link-type=element],
+        [data-link-type=element-attr] {
+            font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace;
+            font-size: .9em;
+        }
+
+        [data-link-type=element]::before {
+            content: "<"
+        }
+
+        [data-link-type=element]::after {
+            content: ">"
+        }
+
+        [data-link-type=biblio] {
+            white-space: pre;
+        }
+    </style>
+    <style>
+        /* style-dfn-panel */
+
+        .dfn-panel {
+            position: absolute;
+            z-index: 35;
+            height: auto;
+            width: -webkit-fit-content;
+            width: fit-content;
+            max-width: 300px;
+            max-height: 500px;
+            overflow: auto;
+            padding: 0.5em 0.75em;
+            font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+            background: #DDDDDD;
+            color: black;
+            border: outset 0.2em;
+        }
+
+        .dfn-panel:not(.on) {
+            display: none;
+        }
+
+        .dfn-panel * {
+            margin: 0;
+            padding: 0;
+            text-indent: 0;
+        }
+
+        .dfn-panel>b {
+            display: block;
+        }
+
+        .dfn-panel a {
+            color: black;
+        }
+
+        .dfn-panel a:not(:hover) {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+
+        .dfn-panel>b+b {
+            margin-top: 0.25em;
+        }
+
+        .dfn-panel ul {
+            padding: 0;
+        }
+
+        .dfn-panel li {
+            list-style: inside;
+        }
+
+        .dfn-panel.activated {
+            display: inline-block;
+            position: fixed;
+            left: .5em;
+            bottom: 2em;
+            margin: 0 auto;
+            max-width: calc(100vw - 1.5em - .4em - .5em);
+            max-height: 30vh;
+        }
+
+        .dfn-paneled {
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        /* style-syntax-highlighting */
+        pre.idl.highlight {
+            color: #708090;
+        }
+
+        .highlight:not(.idl) {
+            background: hsl(24, 20%, 95%);
+        }
+
+        code.highlight {
+            padding: .1em;
+            border-radius: .3em;
+        }
+
+        pre.highlight,
+        pre>code.highlight {
+            display: block;
+            padding: 1em;
+            margin: .5em 0;
+            overflow: auto;
+            border-radius: 0;
+        }
+
+        .highlight .c {
+            color: #708090
+        }
+
+        /* Comment */
+        .highlight .k {
+            color: #990055
+        }
+
+        /* Keyword */
+        .highlight .l {
+            color: #000000
+        }
+
+        /* Literal */
+        .highlight .n {
+            color: #0077aa
+        }
+
+        /* Name */
+        .highlight .o {
+            color: #999999
+        }
+
+        /* Operator */
+        .highlight .p {
+            color: #999999
+        }
+
+        /* Punctuation */
+        .highlight .cm {
+            color: #708090
+        }
+
+        /* Comment.Multiline */
+        .highlight .cp {
+            color: #708090
+        }
+
+        /* Comment.Preproc */
+        .highlight .c1 {
+            color: #708090
+        }
+
+        /* Comment.Single */
+        .highlight .cs {
+            color: #708090
+        }
+
+        /* Comment.Special */
+        .highlight .kc {
+            color: #990055
+        }
+
+        /* Keyword.Constant */
+        .highlight .kd {
+            color: #990055
+        }
+
+        /* Keyword.Declaration */
+        .highlight .kn {
+            color: #990055
+        }
+
+        /* Keyword.Namespace */
+        .highlight .kp {
+            color: #990055
+        }
+
+        /* Keyword.Pseudo */
+        .highlight .kr {
+            color: #990055
+        }
+
+        /* Keyword.Reserved */
+        .highlight .kt {
+            color: #990055
+        }
+
+        /* Keyword.Type */
+        .highlight .ld {
+            color: #000000
+        }
+
+        /* Literal.Date */
+        .highlight .m {
+            color: #000000
+        }
+
+        /* Literal.Number */
+        .highlight .s {
+            color: #a67f59
+        }
+
+        /* Literal.String */
+        .highlight .na {
+            color: #0077aa
+        }
+
+        /* Name.Attribute */
+        .highlight .nc {
+            color: #0077aa
+        }
+
+        /* Name.Class */
+        .highlight .no {
+            color: #0077aa
+        }
+
+        /* Name.Constant */
+        .highlight .nd {
+            color: #0077aa
+        }
+
+        /* Name.Decorator */
+        .highlight .ni {
+            color: #0077aa
+        }
+
+        /* Name.Entity */
+        .highlight .ne {
+            color: #0077aa
+        }
+
+        /* Name.Exception */
+        .highlight .nf {
+            color: #0077aa
+        }
+
+        /* Name.Function */
+        .highlight .nl {
+            color: #0077aa
+        }
+
+        /* Name.Label */
+        .highlight .nn {
+            color: #0077aa
+        }
+
+        /* Name.Namespace */
+        .highlight .py {
+            color: #0077aa
+        }
+
+        /* Name.Property */
+        .highlight .nt {
+            color: #669900
+        }
+
+        /* Name.Tag */
+        .highlight .nv {
+            color: #222222
+        }
+
+        /* Name.Variable */
+        .highlight .ow {
+            color: #999999
+        }
+
+        /* Operator.Word */
+        .highlight .mb {
+            color: #000000
+        }
+
+        /* Literal.Number.Bin */
+        .highlight .mf {
+            color: #000000
+        }
+
+        /* Literal.Number.Float */
+        .highlight .mh {
+            color: #000000
+        }
+
+        /* Literal.Number.Hex */
+        .highlight .mi {
+            color: #000000
+        }
+
+        /* Literal.Number.Integer */
+        .highlight .mo {
+            color: #000000
+        }
+
+        /* Literal.Number.Oct */
+        .highlight .sb {
+            color: #a67f59
+        }
+
+        /* Literal.String.Backtick */
+        .highlight .sc {
+            color: #a67f59
+        }
+
+        /* Literal.String.Char */
+        .highlight .sd {
+            color: #a67f59
+        }
+
+        /* Literal.String.Doc */
+        .highlight .s2 {
+            color: #a67f59
+        }
+
+        /* Literal.String.Double */
+        .highlight .se {
+            color: #a67f59
+        }
+
+        /* Literal.String.Escape */
+        .highlight .sh {
+            color: #a67f59
+        }
+
+        /* Literal.String.Heredoc */
+        .highlight .si {
+            color: #a67f59
+        }
+
+        /* Literal.String.Interpol */
+        .highlight .sx {
+            color: #a67f59
+        }
+
+        /* Literal.String.Other */
+        .highlight .sr {
+            color: #a67f59
+        }
+
+        /* Literal.String.Regex */
+        .highlight .s1 {
+            color: #a67f59
+        }
+
+        /* Literal.String.Single */
+        .highlight .ss {
+            color: #a67f59
+        }
+
+        /* Literal.String.Symbol */
+        .highlight .vc {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Class */
+        .highlight .vg {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Global */
+        .highlight .vi {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Instance */
+        .highlight .il {
+            color: #000000
+        }
+
+        /* Literal.Number.Integer.Long */
+    </style>
+    <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-CR" rel="stylesheet" type="text/css">
+
+<body class="h-entry">
+    <div class="head">
+        <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48"
+                    src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
+        <h1>추천인 정책</h1>
+        <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">W3C 후보 권고안, <time
+                    class="dt-updated" datetime="2017-01-26">2017년 1월 26일</time></span></h2>
+        <div data-fill-with="spec-metadata">
+            <dl>
+                <dt>이 버전:
+                <dd><a class="u-url"
+                        href="https://www.w3.org/TR/2017/CR-referrer-policy-20170126/">https://www.w3.org/TR/2017/CR-referrer-policy-20170126/</a>
+                <dt>최신 공개 버전:
+                <dd><a href="https://www.w3.org/TR/referrer-policy/">https://www.w3.org/TR/referrer-policy/</a>
+                <dt>이전 버전:
+                <dd><a href="https://www.w3.org/TR/2016/WD-referrer-policy-20161222/
+">https://www.w3.org/TR/2016/WD-referrer-policy-20161222/</a>
+
+                <dt>편집자 초안:
+                <dd><a
+                        href="https://w3c.github.io/webappsec-referrer-policy/">https://w3c.github.io/webappsec-referrer-policy/</a>
+                <dt>버전 기록:
+                <dd><a
+                        href="https://github.com/w3c/webappsec-referrer-policy/commits/master/index.src.html">https://github.com/w3c/webappsec-referrer-policy/commits/master/index.src.html</a>
+                <dt>피드백:
+                <dd><span><a
+                            href="mailto:public-webappsec@w3.org?subject=%5Breferrer-policy%5D%20YOUR%20TOPIC%20HERE">public-webappsec@w3.org</a>
+                        제목에 “<kbd>[referrer-policy] <i data-lt="">… 메시지 주제 …</i></kbd>” 포함 (<a
+                            href="https://lists.w3.org/Archives/Public/public-webappsec/"
+                            rel="discussion">아카이브</a>)</span>
+
+                <dt>이슈 추적:
+                <dd><a href="https://github.com/w3c/webappsec-referrer-policy/issues/">GitHub</a>
+                <dd><a href="#issues-index">명세 내 인라인</a>
+                <dt class="editor">편집자:
+                <dd class="editor p-author h-card vcard" data-editor-id="49402"><a class="p-name fn u-email email"
+                        href="mailto:eisinger@google.com">Jochen Eisinger</a> (<span class="p-org org">Google
+                        Inc.</span>)
+                <dd class="editor p-author h-card vcard" data-editor-id="76989"><a class="p-name fn u-email email"
+                        href="mailto:estark@google.com">Emily Stark</a> (<span class="p-org org">Google Inc.</span>)
+            </dl>
+        </div>
+        <div data-fill-with="warning"></div>
+        <p class="copyright" data-fill-with="copyright"><a
+                href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2017 <a
+                href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a
+                href="https://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a
+                href="https://www.ercim.eu/"><abbr
+                    title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a
+                href="https://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>). W3C <a
+                href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a
+                href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a
+                href="https://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply. </p>
+        <hr title="Separator for header">
+    </div>
+    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">요약</span></h2>
+    <div class="p-summary" data-fill-with="abstract">
+        <p>이 문서는 작성자가 생성한 문서에 대해 추천인 정책을 설정하는 방법과, 이러한 정책이 나가는 요청 및 이동에 대한 <code>Referer</code> HTTP 헤더에 미치는 영향을 설명합니다.
+        </p>
+    </div>
+    <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">이 문서의 상태</span>
+    </h2>
+    <div data-fill-with="status">
+        <p> <em>이 섹션은 이 문서가 발행된 시점의 상태를 설명합니다. 다른 문서가 이 문서를 대체할 수 있습니다. 현재 W3C 출판물 목록과 이 기술 보고서의 최신 개정본은 <a
+                    href="https://www.w3.org/TR/">W3C 기술 보고서 색인 https://www.w3.org/TR/</a>에서 확인할 수 있습니다.</em> </p>
+        <p> 이 문서는 <a href="https://www.w3.org/2011/webappsec/">웹 애플리케이션 보안 워킹 그룹</a>에 의해 후보 권고안으로 발행되었습니다. 이 문서는 W3C
+            권고안이 될 예정입니다.
+            이 문서는 폭넓은 검토 기회를 보장하기 위해 최소한 <time class="status-deadline" datetime="2017-02-26">2017년 2월 26일</time>까지 후보
+            권고안으로 유지됩니다. </p>
+        <p> (<a href="https://lists.w3.org/Archives/Public/public-webappsec/">아카이브</a>) 공개 메일링 리스트 <a
+                href="mailto:public-webappsec@w3.org?Subject=%5Breferrer-policy%5D%20PUT%20SUBJECT%20HERE">public-webappsec@w3.org</a>
+            (<a href="https://www.w3.org/Mail/Request">사용 방법</a> 참고)
+            는 이 명세 논의를 위한 선호 채널입니다.
+            이메일을 보낼 때는 제목에 “referrer-policy”를 포함해 주세요,
+            예를 들어:
+            “[referrer-policy] <em>…의견 요약…</em>” </p>
+        <p> 후보 권고안으로 게재된다는 것은 W3C 회원의 지지를 의미하지 않습니다. 이 문서는 초안이며 언제든지 업데이트, 대체 또는 폐기될 수 있습니다. 진행 중인 작업 외에 이 문서를 인용하는 것은
+            부적절합니다. </p>
+        <p> 이 문서가 제안 권고안 단계로 진입하기 위한 기준은 명세의 모든 기능을 구현하는 두 개 이상의 독립적이고 상호 운용 가능한 사용자 에이전트를 최소한 확보하는 것입니다. 이는 워킹 그룹에서 개발한
+            테스트 스위트를 통과함으로써 확인할 수 있습니다. 워킹 그룹은 진행 상황을 추적하기 위한 구현 보고서를 준비할 것입니다. </p>
+        <p> 이 문서는
+            <a href="https://www.w3.org/Consortium/Patent-Policy-20040205/">2004년 2월 5일 W3C 특허 정책</a>에 따라 운영되는 그룹에서
+            작성되었습니다.
+            W3C는 해당 그룹의 산출물과 관련해 공개된 <a href="https://www.w3.org/2004/01/pp-impl/49309/status" rel="disclosure">특허 공개
+                목록</a>을 유지합니다;
+            해당 페이지에는 특허 공개 방법에 대한 안내도 포함되어 있습니다.
+            특정 특허가 <a href="https://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">필수 청구항</a>을 포함한다고 판단되는
+            경우,
+            <a href="https://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">W3C 특허 정책 6절</a>에 따라 정보를 공개해야
+            합니다.
+        </p>
+        <p> 이 문서는 <a href="https://www.w3.org/2015/Process-20150901/" id="w3c_process_revision">2015년 9월 1일 W3C 프로세스
+                문서</a>의 적용을 받습니다. </p>
+        <p></p>
+    </div>
+    <div data-fill-with="at-risk"></div>
+    <nav data-fill-with="table-of-contents" id="toc">
+        <h2 class="no-num no-toc no-ref" id="contents">목차</h2>
+        <ol class="toc" role="directory">
+            <li>
+                <a href="#intro"><span class="secno">1</span> <span class="content">소개</span></a>
+                <ol class="toc">
+                    <li><a href="#intro-privacy"><span class="secno">1.1</span> <span class="content">프라이버시</span></a>
+                    <li><a href="#intro-security"><span class="secno">1.2</span> <span class="content">보안</span></a>
+                    <li><a href="#intro-trackback"><span class="secno">1.3</span> <span class="content">트랙백</span></a>
+                </ol>
+            <li><a href="#terms"><span class="secno">2</span> <span class="content">핵심 개념 및 용어</span></a>
+            <li>
+                <a href="#referrer-policies"><span class="secno">3</span> <span class="content">추천인 정책</span></a>
+                <ol class="toc">
+                    <li><a href="#referrer-policy-no-referrer"><span class="secno">3.1</span> <span
+                                class="content">"<code>no-referrer</code>"</span></a>
+                    <li><a href="#referrer-policy-no-referrer-when-downgrade"><span class="secno">3.2</span> <span
+                                class="content">"<code>no-referrer-when-downgrade</code>"</span></a>
+                    <li><a href="#referrer-policy-same-origin"><span class="secno">3.3</span> <span
+                                class="content">"<code>same-origin</code>"</span></a>
+                    <li><a href="#referrer-policy-origin"><span class="secno">3.4</span> <span
+                                class="content">"<code>origin</code>"</span></a>
+                    <li><a href="#referrer-policy-strict-origin"><span class="secno">3.5</span> <span
+                                class="content">"<code>strict-origin</code>"</span></a>
+                    <li><a href="#referrer-policy-origin-when-cross-origin"><span class="secno">3.6</span> <span
+                                class="content">"<code>origin-when-cross-origin</code>"</span></a>
+                    <li><a href="#referrer-policy-strict-origin-when-cross-origin"><span class="secno">3.7</span> <span
+                                class="content">"<code>strict-origin-when-cross-origin</code>"</span></a>
+                    <li><a href="#referrer-policy-unsafe-url"><span class="secno">3.8</span> <span
+                                class="content">"<code>unsafe-url</code>"</span></a>
+                    <li><a href="#referrer-policy-empty-string"><span class="secno">3.9</span> <span class="content">빈
+                                문자열</span></a>
+                </ol>
+            <li>
+                <a href="#referrer-policy-delivery"><span class="secno">4</span> <span class="content">추천인 정책
+                        전달</span></a>
+                <ol class="toc">
+                    <li>
+                        <a href="#referrer-policy-header"><span class="secno">4.1</span> <span
+                                class="content">Referrer-Policy 헤더를 통한 전달</span></a>
+                        <ol class="toc">
+                            <li><a href="#referrer-usage"><span class="secno">4.1.1</span> <span
+                                        class="content">사용법</span></a>
+                        </ol>
+                    <li><a href="#referrer-policy-delivery-meta"><span class="secno">4.2</span> <span
+                                class="content"><code><span>meta</span></code>를 통한 전달</span></a>
+                    <li><a href="#referrer-policy-delivery-referrer-attribute"><span class="secno">4.3</span> <span
+                                class="content"> <code>referrerpolicy</code> 콘텐츠 속성을 통한 전달</span></a>
+                    <li><a href="#referrer-policy-delivery-nested"><span class="secno">4.4</span> <span
+                                class="content">중첩 브라우징 컨텍스트</span></a>
+                </ol>
+            <li><a href="#integration-with-fetch"><span class="secno">5</span> <span class="content">Fetch와의
+                        통합</span></a>
+            <li><a href="#integration-with-html"><span class="secno">6</span> <span class="content">HTML과의 통합</span></a>
+            <li><a href="#integration-with-css"><span class="secno">7</span> <span class="content">CSS와의 통합</span></a>
+            <li>
+                <a href="#algorithms"><span class="secno">8</span> <span class="content">알고리즘</span></a>
+                <ol class="toc">
+                    <li><a href="#parse-referrer-policy-from-header"><span class="secno">8.1</span> <span
+                                class="content"> <span><code>Referrer-Policy</code></span> 헤더에서 추천인 정책 구문 분석 </span></a>
+                    <li><a href="#set-requests-referrer-policy-on-redirect"><span class="secno">8.2</span> <span
+                                class="content"> 리디렉션 시 <var>request</var>의 추천인 정책 설정 </span></a>
+                    <li><a href="#determine-requests-referrer"><span class="secno">8.3</span> <span class="content">
+                                <var>request</var>의 추천인 결정 </span></a>
+                    <li><a href="#strip-url"><span class="secno">8.4</span> <span class="content"> 추천인으로 사용하기 위해
+                                <var>url</var> 스트립 </span></a>
+                </ol>
+            <li>
+                <a href="#privacy"><span class="secno">9</span> <span class="content">프라이버시 고려사항</span></a>
+                <ol class="toc">
+                    <li><a href="#user-controls"><span class="secno">9.1</span> <span class="content">사용자 제어</span></a>
+                </ol>
+            <li>
+                <a href="#security"><span class="secno">10</span> <span class="content">보안 고려사항</span></a>
+                <ol class="toc">
+                    <li><a href="#information-leakage"><span class="secno">10.1</span> <span class="content">정보
+                                누출</span></a>
+                    <li><a href="#downgrade"><span class="secno">10.2</span> <span class="content">덜 엄격한 정책으로
+                                다운그레이드</span></a>
+                </ol>
+            <li>
+                <a href="#authoring"><span class="secno">11</span> <span class="content">저작 고려사항</span></a>
+                <ol class="toc">
+                    <li><a href="#unknown-policy-values"><span class="secno">11.1</span> <span class="content">알 수 없는 정책
+                                값</span></a>
+                </ol>
+            <li><a href="#acknowledgements"><span class="secno">12</span> <span class="content">감사의 말씀</span></a>
+            <li>
+                <a href="#conformance"><span class="secno"></span> <span class="content">적합성</span></a>
+                <ol class="toc">
+                    <li><a href="#conventions"><span class="secno"></span> <span class="content">문서 규약</span></a>
+                    <li><a href="#conformant-algorithms"><span class="secno"></span> <span class="content">적합성
+                                알고리즘</span></a>
+                </ol>
+            <li>
+                <a href="#index"><span class="secno"></span> <span class="content">색인</span></a>
+                <ol class="toc">
+                    <li><a href="#index-defined-here"><span class="secno"></span> <span class="content">이 명세서에서 정의한
+                                용어</span></a>
+                    <li><a href="#index-defined-elsewhere"><span class="secno"></span> <span class="content">참고 문서에서 정의된
+                                용어</span></a>
+                </ol>
+            <li>
+                <a href="#references"><span class="secno"></span> <span class="content">참고 문헌</span></a>
+                <ol class="toc">
+                    <li><a href="#normative"><span class="secno"></span> <span class="content">규범적 참고 문헌</span></a>
+                    <li><a href="#informative"><span class="secno"></span> <span class="content">참고용 참고 문헌</span></a>
+                </ol>
+            <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL 색인</span></a>
+            <li><a href="#issues-index"><span class="secno"></span> <span class="content">이슈 색인</span></a>
+        </ol>
+    </nav>
+    <main>
+        <section>
+            <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span
+                    class="content">소개</span><a class="self-link" href="#intro"></a></h2>
+            <p><em>이 섹션은 규범적인 내용이 아닙니다.</em></p>
+            <p>문서에서 이루어진 요청과 그 문서로부터의 네비게이션은 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더와 연관되어 있습니다. 이
+                헤더는 <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/semantics.html#link-type-noreferrer"><code>noreferrer</code></a>
+                링크 타입을 가진 링크에 대해 억제할 수 있지만, 저자는 다양한 이유로 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더를
+                보다 직접적으로 제어하고 싶을 수 있습니다:</p>
+            <h3 class="heading settled" data-level="1.1" id="intro-privacy"><span class="secno">1.1. </span><span
+                    class="content">프라이버시</span><a class="self-link" href="#intro-privacy"></a></h3>
+            <p>소셜 네트워킹 사이트에는 각 사용자별 프로필 페이지가 있으며, 사용자는 자신의 프로필 페이지에서 좋아하는 밴드로 하이퍼링크를 추가합니다. 소셜 네트워킹 사이트는 다른 사용자가 해당
+                하이퍼링크를 따라갈 때, 밴드 웹사이트에 사용자의 프로필 URL이 누출되는 것을 원하지 않을 수 있습니다(프로필 URL이 프로필 소유자의 신원을 드러낼 수 있기 때문입니다).</p>
+            <p>하지만 일부 소셜 네트워킹 사이트는 밴드 웹사이트에 링크가 소셜 네트워킹 사이트에서 비롯되었음을 알리되, 어떤 특정 사용자의 프로필에서 링크가 포함되었는지는 공개하지 않을 수도 있습니다.
+            </p>
+            <h3 class="heading settled" data-level="1.2" id="intro-security"><span class="secno">1.2. </span><span
+                    class="content">보안</span><a class="self-link" href="#intro-security"></a></h3>
+            <p>웹 애플리케이션이 HTTPS와 URL 기반 세션 식별자를 사용합니다. 웹 애플리케이션은 사용자의 세션 식별자가 URL에 포함된 채로 다른 웹사이트의 HTTPS 리소스로 링크할 때, 세션
+                식별자가 누출되지 않도록 하고 싶을 수 있습니다.</p>
+            <p>또는 웹 애플리케이션이 자체적으로 능력을 부여하는 URL을 사용할 수도 있습니다. 추천인(referrer)을 제어하면 이러한 capability URL이 추천인 헤더를 통해 누출되는 것을
+                방지하는 데 도움이 됩니다. <a data-link-type="biblio" href="#biblio-capability-urls">[CAPABILITY-URLS]</a></p>
+            <p>능력 부여 URL이 누출되는 다른 방식도 있으므로, 추천인을 제어하는 것만으로 모든 잠재적 누출을 막을 수 있는 것은 아니라는 점에 유의해야 합니다.</p>
+            <h3 class="heading settled" data-level="1.3" id="intro-trackback"><span class="secno">1.3. </span><span
+                    class="content">트랙백</span><a class="self-link" href="#intro-trackback"></a></h3>
+            <p>HTTPS로 호스팅되는 블로그가 HTTP로 호스팅되는 블로그에 링크를 걸고 트랙백 링크를 받고자 할 수 있습니다.</p>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="2" id="terms"><span class="secno">2. </span><span class="content">핵심
+                    개념 및 용어</span><a class="self-link" href="#terms"></a></h2>
+            <dl>
+                <dt> <a data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-1">추천인 정책</a>
+                <dd>
+                    <a data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-2">추천인 정책</a>은 <a
+                        data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더를 채우는 알고리즘을
+                    서브리소스 fetch, 프리페치, 네비게이션을 수행할 때 수정합니다. 이 문서는 각 <a data-link-type="dfn" href="#referrer-policy"
+                        id="ref-for-referrer-policy-3">추천인 정책</a>에 대한 다양한 동작을 정의합니다.
+                    <p>모든 <a data-link-type="dfn"
+                            href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                            settings object</a>는 <a data-link-type="dfn" href="#referrer-policy"
+                            id="ref-for-referrer-policy-4">추천인 정책</a>을 얻는 알고리즘을 가지며, 이는 해당 <a data-link-type="dfn"
+                            href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                            settings object</a>를 <a data-link-type="dfn"
+                            href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>로 갖는 모든 <a
+                            data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request">요청</a>에 기본적으로
+                        사용됩니다.</p>
+                <dt><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="same-origin-request">동일 출처
+                        요청</dfn>
+                <dd> <code
+                        class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#request">Request</a></code>
+                    <var>request</var>가 <strong>동일 출처 요청</strong>이 되려면 <var>request</var>의 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-request-origin">origin</a>과
+                    <var>request</var>의 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-request-current-url">current url</a>의 <a
+                        data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin">origin</a>이 <a
+                        data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc6454#section-5"><code>the same</code></a>여야 합니다.
+                <dt><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="cross-origin-request">교차 출처
+                        요청</dfn>
+                <dd> <code
+                        class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#request">Request</a></code>
+                    가 <a data-link-type="dfn" href="#same-origin-request" id="ref-for-same-origin-request-1">동일 출처</a>가
+                    <em>아닌 경우</em> <strong>교차 출처 요청</strong>입니다.
+            </dl>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="3" id="referrer-policies"><span class="secno">3. </span><span
+                    class="content">추천인 정책</span><span id="referrer-policy-states"></span><a class="self-link"
+                    href="#referrer-policies"></a></h2>
+            <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-export="" id="referrer-policy">추천인 정책</dfn>
+                은 빈 문자열, "<code>no-referrer</code>",
+                "<code>no-referrer-when-downgrade</code>", "<code>same-origin</code>",
+                "<code>origin</code>", "<code>strict-origin</code>",
+                "<code>origin-when-cross-origin</code>",
+                "<code>strict-origin-when-cross-origin</code>", 또는
+                "<code>unsafe-url</code>"입니다.</p>
+            <pre class="idl highlight def"><span class="kt">enum</span> <dfn class="nv idl-code" data-dfn-type="enum" data-export="" id="enumdef-referrerpolicy">ReferrerPolicy<a class="self-link" href="#enumdef-referrerpolicy"></a></dfn> {
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;&quot;|" id="dom-referrerpolicy">""<a class="self-link" href="#dom-referrerpolicy"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;no-referrer&quot;|no-referrer" id="dom-referrerpolicy-no-referrer">"no-referrer"<a class="self-link" href="#dom-referrerpolicy-no-referrer"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;no-referrer-when-downgrade&quot;|no-referrer-when-downgrade" id="dom-referrerpolicy-no-referrer-when-downgrade">"no-referrer-when-downgrade"<a class="self-link" href="#dom-referrerpolicy-no-referrer-when-downgrade"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;same-origin&quot;|same-origin" id="dom-referrerpolicy-same-origin">"same-origin"<a class="self-link" href="#dom-referrerpolicy-same-origin"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;origin&quot;|origin" id="dom-referrerpolicy-origin">"origin"<a class="self-link" href="#dom-referrerpolicy-origin"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;strict-origin&quot;|strict-origin" id="dom-referrerpolicy-strict-origin">"strict-origin"<a class="self-link" href="#dom-referrerpolicy-strict-origin"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;origin-when-cross-origin&quot;|origin-when-cross-origin" id="dom-referrerpolicy-origin-when-cross-origin">"origin-when-cross-origin"<a class="self-link" href="#dom-referrerpolicy-origin-when-cross-origin"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;strict-origin-when-cross-origin&quot;|strict-origin-when-cross-origin" id="dom-referrerpolicy-strict-origin-when-cross-origin">"strict-origin-when-cross-origin"<a class="self-link" href="#dom-referrerpolicy-strict-origin-when-cross-origin"></a></dfn>,
+  <dfn class="s idl-code" data-dfn-for="ReferrerPolicy" data-dfn-type="enum-value" data-export="" data-lt="&quot;unsafe-url&quot;|unsafe-url" id="dom-referrerpolicy-unsafe-url">"unsafe-url"<a class="self-link" href="#dom-referrerpolicy-unsafe-url"></a></dfn>
+};
+</pre>
+            <p>각 가능한 <a data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-5">추천인 정책</a>은 아래에서
+                설명합니다. 이들의 효과를 평가하는 상세 알고리즘은 <a href="#integration-with-fetch">§5 Fetch와의 통합</a> 및 <a
+                    href="#algorithms">§8 알고리즘</a> 섹션에서 제시합니다.</p>
+            <p class="note" role="note">참고: <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                    settings object</a>의 추천인 정책은 해당 <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                    settings
+                    object</a>가 <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-request-client">request client</a>로 사용될 때 요청의 기본 정책 역할을
+                합니다. 이 정책은
+                <code><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/semantics.html#link-type-noreferrer">noreferrer</a></code>
+                링크 타입과 같은 메커니즘을 통해 특정 요청에 대해 더욱 강화될 수 있습니다.
+            </p>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.1"
+                data-lt="&quot;no-referrer&quot;" id="referrer-policy-no-referrer"><span class="secno">3.1. </span><span
+                    class="content">"<code>no-referrer</code>"</span><span
+                    id="referrer-policy-state-no-referrer"></span></h3>
+            <p>가장 단순한 정책은 <a data-link-type="dfn" href="#referrer-policy-no-referrer"
+                    id="ref-for-referrer-policy-no-referrer-1">"<code>no-referrer</code>"</a>로, 특정 <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">request
+                    client</a>에서
+                어떤 <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>으로 요청을 보낼 때
+                추천인 정보를 전송하지 않도록 지정합니다. 헤더는 완전히 생략됩니다.</p>
+            <div class="example" id="example-df4273ed"><a class="self-link" href="#example-df4273ed"></a>
+                <code>https://example.com/page.html</code> 문서에서 <a data-link-type="dfn"
+                    href="#referrer-policy-no-referrer"
+                    id="ref-for-referrer-policy-no-referrer-2">"<code>no-referrer</code>"</a> 정책을 설정하면,
+                <code>https://example.com/</code>(또는 다른 모든 URL)로 이동할 때 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더가 전송되지 않습니다.
+            </div>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.2"
+                data-lt="&quot;no-referrer-when-downgrade&quot;" id="referrer-policy-no-referrer-when-downgrade"><span
+                    class="secno">3.2. </span><span
+                    class="content">"<code>no-referrer-when-downgrade</code>"</span><span
+                    id="referrer-policy-state-no-referrer-when-downgrade"></span></h3>
+            <p><a data-link-type="dfn" href="#referrer-policy-no-referrer-when-downgrade"
+                    id="ref-for-referrer-policy-no-referrer-when-downgrade-1">"<code>no-referrer-when-downgrade</code>"</a>
+                정책은 <a data-link-type="dfn" href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로
+                    보호된</a> <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                    settings
+                    object</a>에서 <a data-link-type="dfn"
+                    href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수 있는
+                    URL</a>로의 요청과, <em>TLS로 보호되지 않은</em> <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>에서 어떤 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>으로의 요청에 대해 전체 URL을 전송합니다.</p>
+            <p><a data-link-type="dfn" href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로 보호된</a> <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>에서 비-<a
+                    data-link-type="dfn"
+                    href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수 있는
+                    URL</a>로의 요청에는 추천인 정보가 포함되지 않습니다.
+                <code><a data-link-type="dfn" href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Referer</a></code>
+                HTTP 헤더가
+                전송되지 않습니다.
+            </p>
+            <div class="example" id="example-e13d3d6c">
+                <a class="self-link" href="#example-e13d3d6c"></a> <code>https://example.com/page.html</code> 문서에서 <a
+                    data-link-type="dfn" href="#referrer-policy-no-referrer-when-downgrade"
+                    id="ref-for-referrer-policy-no-referrer-when-downgrade-2">"<code>no-referrer-when-downgrade</code>"</a>
+                정책을 설정하면 <code>https://not.example.com/</code>으로의 네비게이션에는
+                <code><a data-link-type="dfn" href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Referer</a></code>
+                HTTP 헤더에 <code>https://example.com/page.html</code> 값이 전송됩니다. 두 리소스의 origin 모두 비-<a data-link-type="dfn"
+                    href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수 있는
+                    URL</a>이 아니기 때문입니다.
+                <p>동일 페이지에서 <code><strong>http</strong>://not.example.com/</code>으로 이동하면 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더가 전송되지 않습니다.
+                </p>
+            </div>
+            <p>이것이 별도의 정책이 지정되지 않았을 때 사용자 에이전트의 기본 동작입니다.</p>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.3"
+                data-lt="&quot;same-origin&quot;" id="referrer-policy-same-origin"><span class="secno">3.3. </span><span
+                    class="content">"<code>same-origin</code>"</span></h3>
+            <p><a data-link-type="dfn" href="#referrer-policy-same-origin"
+                    id="ref-for-referrer-policy-same-origin-1">"<code>same-origin</code>"</a> 정책은 특정 <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>에서 <a
+                    href="#strip-url">추천인으로 사용하기 위해 스트립된</a> 전체 URL을
+                <a data-link-type="dfn" href="#same-origin-request" id="ref-for-same-origin-request-2">동일 출처 요청</a>에 추천인
+                정보로 전송하도록 지정합니다.
+            </p>
+            <p><a data-link-type="dfn" href="#cross-origin-request" id="ref-for-cross-origin-request-1">교차 출처 요청</a>에는
+                추천인 정보가 포함되지 않으며,
+                <code><a data-link-type="dfn" href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Referer</a></code>
+                HTTP 헤더가
+                전송되지 않습니다.
+            </p>
+            <div class="example" id="example-af6c3f8c">
+                <a class="self-link" href="#example-af6c3f8c"></a> <code>https://example.com/page.html</code> 문서에서 <a
+                    data-link-type="dfn" href="#referrer-policy-same-origin"
+                    id="ref-for-referrer-policy-same-origin-2">"<code>same-origin</code>"</a> 정책을 설정하면
+                <code>https://example.com/not-page.html</code>으로의 네비게이션에는 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                <code>https://example.com/page.html</code> 값이 전송됩니다.
+                <p>동일 페이지에서 <code>https://<strong>not</strong>.example.com/</code>으로 이동하면 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더가 전송되지 않습니다.
+                </p>
+            </div>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.4"
+                data-lt="&quot;origin&quot;" id="referrer-policy-origin"><span class="secno">3.4. </span><span
+                    class="content">"<code>origin</code>"</span><span id="referrer-policy-state-origin"></span></h3>
+            <p><a data-link-type="dfn" href="#referrer-policy-origin"
+                    id="ref-for-referrer-policy-origin-1">"<code>origin</code>"</a> 정책은 특정 <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-request-client">request client</a>에서 <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-6.2">ASCII 직렬화</a>된 <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>만을
+                <a data-link-type="dfn" href="#same-origin-request" id="ref-for-same-origin-request-3">동일 출처 요청</a> 및 <a
+                    data-link-type="dfn" href="#cross-origin-request" id="ref-for-cross-origin-request-2">교차 출처 요청</a>에
+                추천인 정보로 전송하도록 지정합니다.
+            </p>
+            <p class="note" role="note">참고: origin의 직렬화 결과는 <code>https://example.com</code>과 같습니다. 사용자 에이전트는
+                <code>Referer</code> 헤더에 올바른 URL을 전송하기 위해 origin 뒤에 U+002F SOLIDUS("<code>/</code>") 문자를 추가합니다(예:
+                <code>https://example.com/</code>).
+            </p>
+            <p class="note" role="note">참고: <a data-link-type="dfn" href="#referrer-policy-origin"
+                    id="ref-for-referrer-policy-origin-2">"<code>origin</code>"</a> 정책은 HTTPS 추천인의 origin을 암호화되지 않은 HTTP
+                요청에도 네트워크로 전송하게 만듭니다.
+                <a data-link-type="dfn" href="#referrer-policy-strict-origin"
+                    id="ref-for-referrer-policy-strict-origin-1">"<code>strict-origin</code>"</a> 정책은 이 문제를 해결합니다.
+            </p>
+            <div class="example" id="example-ef2bdc9b"><a class="self-link" href="#example-ef2bdc9b"></a>
+                <code>https://example.com/page.html</code> 문서에서 <a data-link-type="dfn" href="#referrer-policy-origin"
+                    id="ref-for-referrer-policy-origin-3">"<code>origin</code>"</a> 정책을 설정하면, 모든 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>으로의 네비게이션에 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                <code>https://example.com/</code> 값이 전송됩니다. 이는 URL이 <a data-link-type="dfn"
+                    href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수 있는
+                    URL</a>이 아니더라도 마찬가지입니다.
+            </div>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.5"
+                data-lt="&quot;strict-origin&quot;" id="referrer-policy-strict-origin"><span class="secno">3.5.
+                </span><span class="content">"<code>strict-origin</code>"</span></h3>
+            <p><a data-link-type="dfn" href="#referrer-policy-strict-origin"
+                    id="ref-for-referrer-policy-strict-origin-2">"<code>strict-origin</code>"</a> 정책은 다음과 같이 <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-6.2">ASCII 직렬화</a>된 <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>을 추천인 정보로
+                전송합니다:
+            </p>
+            <ul>
+                <li><a data-link-type="dfn" href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로
+                        보호된</a> <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                        settings object</a>에서 <a data-link-type="dfn"
+                        href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수
+                        있는 URL</a>로 요청 시,
+                <li><em>TLS로 보호되지 않은</em> <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                        settings object</a>에서 어떤 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>으로의 요청 시
+            </ul>
+            <p><a data-link-type="dfn" href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로 보호된</a> <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">request
+                    client</a>에서 비-<a data-link-type="dfn"
+                    href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수 있는
+                    URL</a>로의 요청에는 추천인 정보가 포함되지 않습니다.
+                <code><a data-link-type="dfn" href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Referer</a></code>
+                HTTP 헤더가
+                전송되지 않습니다.
+            </p>
+            <div class="example" id="example-e6df45e4">
+                <a class="self-link" href="#example-e6df45e4"></a> <code>https://example.com/page.html</code> 문서에서 <a
+                    data-link-type="dfn" href="#referrer-policy-strict-origin"
+                    id="ref-for-referrer-policy-strict-origin-3">"<code>strict-origin</code>"</a> 정책을 설정하면
+                <code>https://<strong>not</strong>.example.com</code>으로의 네비게이션에 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                <code>https://example.com/</code> 값이 전송됩니다.
+                <p>동일 페이지에서 <code><strong>http://</strong>not.example.com</code>으로 이동하면 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더가 전송되지 않습니다.
+                </p>
+            </div>
+            <div class="example" id="example-e2f29a9f"><a class="self-link" href="#example-e2f29a9f"></a>
+                <code>http://example.com/page.html</code> 문서에서 <a data-link-type="dfn"
+                    href="#referrer-policy-strict-origin"
+                    id="ref-for-referrer-policy-strict-origin-4">"<code>strict-origin</code>"</a> 정책을 설정하면
+                <code>http://<strong>not</strong>.example.com</code> 또는
+                <code><strong>https</strong>://example.com</code>으로의 네비게이션에 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                <code>http://example.com/</code> 값이 전송됩니다.
+            </div>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.6"
+                data-lt="&quot;origin-when-cross-origin&quot;" id="referrer-policy-origin-when-cross-origin"><span
+                    class="secno">3.6. </span><span class="content">"<code>origin-when-cross-origin</code>"</span><span
+                    id="referrer-policy-state-origin-when-cross-origin"></span></h3>
+            <p><a data-link-type="dfn" href="#referrer-policy-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-origin-when-cross-origin-1">"<code>origin-when-cross-origin</code>"</a>
+                정책은 특정 <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">request
+                    client</a>에서 <a href="#strip-url">추천인으로 사용하기 위해 스트립된</a> 전체 URL을 <a data-link-type="dfn"
+                    href="#same-origin-request" id="ref-for-same-origin-request-4">동일 출처 요청</a>에 추천인 정보로 전송하고, <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-6.2">ASCII 직렬화</a>된 <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>만을 <a
+                    data-link-type="dfn" href="#cross-origin-request" id="ref-for-cross-origin-request-3">교차 출처 요청</a>에
+                추천인 정보로 전송하도록 지정합니다.</p>
+            <p class="note" role="note">참고: <a data-link-type="dfn" href="#referrer-policy-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-origin-when-cross-origin-2">"<code>origin-when-cross-origin</code>"</a>
+                정책에서는 프로토콜 업그레이드(예: <code>http://example.com/</code>에서 <code>https://example.com/</code>으로의 요청) 역시 <a
+                    data-link-type="dfn" href="#cross-origin-request" id="ref-for-cross-origin-request-4">교차 출처 요청</a>으로
+                간주합니다.
+            </p>
+            <p class="note" role="note">참고: <a data-link-type="dfn" href="#referrer-policy-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-origin-when-cross-origin-3">"<code>origin-when-cross-origin</code>"</a>
+                정책은 HTTPS 추천인의 origin을 암호화되지 않은 HTTP 요청에도 네트워크로 전송하게 만듭니다.
+                <a data-link-type="dfn" href="#referrer-policy-strict-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-strict-origin-when-cross-origin-1">"<code>strict-origin-when-cross-origin</code>"</a>
+                정책은 이 문제를 해결합니다.
+            </p>
+            <div class="example" id="example-747c716f">
+                <a class="self-link" href="#example-747c716f"></a> <code>https://example.com/page.html</code> 문서에서 <a
+                    data-link-type="dfn" href="#referrer-policy-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-origin-when-cross-origin-4">"<code>origin-when-cross-origin</code>"</a>
+                정책을 설정하면 <code>https://example.com/not-page.html</code>으로의 네비게이션에는 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                <code>https://example.com/page.html</code> 값이 전송됩니다.
+                <p>동일 페이지에서 <code>https://not.example.com/</code>으로 이동하면 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                    <code>https://example.com/</code> 값이 전송됩니다. 이는 URL이 <a data-link-type="dfn"
+                        href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수
+                        있는 URL</a>이 아니더라도 마찬가지입니다.
+                </p>
+            </div>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.7"
+                data-lt="&quot;strict-origin-when-cross-origin&quot;"
+                id="referrer-policy-strict-origin-when-cross-origin"><span class="secno">3.7. </span><span
+                    class="content">"<code>strict-origin-when-cross-origin</code>"</span></h3>
+            <p><a data-link-type="dfn" href="#referrer-policy-strict-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-strict-origin-when-cross-origin-2">"<code>strict-origin-when-cross-origin</code>"</a>
+                정책은 특정 <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">request
+                    client</a>에서 <a href="#strip-url">추천인으로 사용하기 위해 스트립된</a> 전체 URL을 <a data-link-type="dfn"
+                    href="#same-origin-request" id="ref-for-same-origin-request-5">동일 출처 요청</a>에 추천인 정보로 전송하고, <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-6.2">ASCII 직렬화</a>된 <a
+                    data-link-type="dfn" href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>만을 <a
+                    data-link-type="dfn" href="#cross-origin-request" id="ref-for-cross-origin-request-5">교차 출처 요청</a>에
+                추천인 정보로 전송합니다:
+            </p>
+            <ul>
+                <li><a data-link-type="dfn" href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로
+                        보호된</a> <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                        settings object</a>에서 <a data-link-type="dfn"
+                        href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수
+                        있는 URL</a>로 요청 시,
+                <li><em>TLS로 보호되지 않은</em> <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                        settings object</a>에서 어떤 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>으로의 요청 시
+            </ul>
+            <p><a data-link-type="dfn" href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로 보호된</a> <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>에서 비-<a
+                    data-link-type="dfn"
+                    href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수 있는
+                    URL</a>로의 요청에는 추천인 정보가 포함되지 않습니다.
+                <code><a data-link-type="dfn" href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Referer</a></code>
+                HTTP 헤더가
+                전송되지 않습니다.
+            </p>
+            <div class="example" id="example-2269af87">
+                <a class="self-link" href="#example-2269af87"></a> <code>https://example.com/page.html</code> 문서에서 <a
+                    data-link-type="dfn" href="#referrer-policy-strict-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-strict-origin-when-cross-origin-3">"<code>strict-origin-when-cross-origin</code>"</a>
+                정책을 설정하면 <code>https://example.com/not-page.html</code>으로의 네비게이션에는 <a data-link-type="dfn"
+                    href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                <code>https://example.com/page.html</code> 값이 전송됩니다.
+                <p>동일 페이지에서 <code>https://not.example.com/</code>으로 이동하면 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더에
+                    <code>https://example.com/</code> 값이 전송됩니다.
+                </p>
+                <p>동일 페이지에서 <code><strong>http://</strong>not.example.com/</code>으로 이동하면 <a data-link-type="dfn"
+                        href="https://tools.ietf.org/html/rfc7231#section-5.5.2"><code>Referer</code></a> 헤더가 전송되지 않습니다.
+                </p>
+            </div>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="3.8"
+                data-lt="&quot;unsafe-url&quot;" id="referrer-policy-unsafe-url"><span class="secno">3.8. </span><span
+                    class="content">"<code>unsafe-url</code>"</span><span id="referrer-policy-state-unsafe-url"></span>
+            </h3>
+            <p><a data-link-type="dfn" href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-1">"<code>unsafe-url</code>"</a> 정책은 특정 <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>에서 <a
+                    href="#strip-url">추천인으로 사용하기 위해 스트립된</a> 전체 URL을 <a data-link-type="dfn"
+                    href="#cross-origin-request" id="ref-for-cross-origin-request-6">교차 출처 요청</a> 및 <a
+                    data-link-type="dfn" href="#same-origin-request" id="ref-for-same-origin-request-6">동일 출처 요청</a> 모두에
+                추천인 정보로 전송하도록 지정합니다.</p>
+            <div class="example" id="example-32de6eb8"><a class="self-link" href="#example-32de6eb8"></a>
+                <code>https://example.com/sekrit.html</code> 문서에서 <a data-link-type="dfn"
+                    href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-2">"<code>unsafe-url</code>"</a> 정책을 설정하면
+                <code>http://not.example.com/</code>(그리고 모든 다른 origin)으로의 네비게이션에
+                <code><a data-link-type="dfn" href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Referer</a></code>
+                HTTP 헤더에 <code>https://example.com/sekrit.html</code> 값이 전송됩니다.
+            </div>
+            <p class="note" role="note">참고: 정책 이름에서 알 수 있듯이, 이 정책은 안전하지 않습니다. 이 정책은 <a data-link-type="dfn"
+                    href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로 보호된</a> 리소스의 origin과 경로가 안전하지
+                않은 origin으로 누출될 수 있습니다.
+                민감한 문서에 이 정책을 설정할 때는 반드시 그 영향을 신중히 고려해야 합니다.</p>
+            <h3 class="heading settled" data-dfn-type="dfn" data-export="" data-level="3.9" data-lt="The empty string"
+                id="referrer-policy-empty-string"><span class="secno">3.9. </span><span class="content">빈 문자열</span><a
+                    class="self-link" href="#referrer-policy-empty-string"></a></h3>
+            <p>빈 문자열 ""은 <a data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-6">추천인 정책</a>이 없음을
+                의미하며, 다른 곳에 정의된 <a data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-7">추천인
+                    정책</a>으로 폴백되거나, 더 상위 정책이 없을 경우 <a data-link-type="dfn"
+                    href="#referrer-policy-no-referrer-when-downgrade"
+                    id="ref-for-referrer-policy-no-referrer-when-downgrade-3">"<code>no-referrer-when-downgrade</code>"</a>로
+                기본 동작합니다.
+                이러한 기본 동작은 <a href="#determine-requests-referrer" id="ref-for-determine-requests-referrer-1">§8.3 요청의
+                    추천인 결정</a> 알고리즘에서 처리됩니다.</p>
+            <div class="example" id="example-27ee7725"><a class="self-link" href="#example-27ee7725"></a> HTML
+                <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-a-element">a</a></code>
+                요소에 명시적으로
+                <code><a data-link-type="element-sub" href="https://html.spec.whatwg.org/multipage/semantics.html#attr-hyperlink-referrerpolicy">referrerpolicy</a></code>
+                속성이 선언되어 있지 않다면, 추천인 정책은 빈 문자열입니다. 따라서 해당
+                <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-a-element">a</a></code>
+                요소를 클릭하여 시작된 네비게이션 요청은 <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/dom.html#concept-document-referrer-policy">추천인 정책</a>을
+                사용하게 됩니다.
+                <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-a-element">a</a></code>
+                요소의 <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>가
+                추천인 정책으로 빈 문자열을 가지고 있다면, <a href="#determine-requests-referrer"
+                    id="ref-for-determine-requests-referrer-2">§8.3 요청의 추천인 결정</a> 알고리즘은 빈 문자열을 <a data-link-type="dfn"
+                    href="#referrer-policy-no-referrer-when-downgrade"
+                    id="ref-for-referrer-policy-no-referrer-when-downgrade-4">"<code>no-referrer-when-downgrade</code>"</a>와
+                동일하게 처리합니다.
+            </div>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="4" id="referrer-policy-delivery"><span class="secno">4. </span><span
+                    class="content">추천인 정책 전달</span><a class="self-link" href="#referrer-policy-delivery"></a></h2>
+            <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request">요청</a>의 <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-referrer-policy">추천인
+                    정책</a>은 다섯 가지 방법 중 하나로 전달됩니다:</p>
+            <ul>
+                <li> <code>Referrer-Policy</code> HTTP 헤더를 통해 (<a href="#referrer-policy-header">§4.1 Referrer-Policy
+                        헤더를 통한 전달</a>에서 정의됨)
+                <li>
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#meta">meta</a></code>
+                    요소에서
+                    <code><a data-link-type="element-sub" href="https://html.spec.whatwg.org/multipage/semantics.html#attr-meta-name">name</a></code>
+                    속성이 <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/semantics.html#meta-referrer"><code>referrer</code></a>인
+                    경우
+                <li> <code>referrerpolicy</code> 콘텐츠 속성을 가진
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-a-element">a</a></code>,
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-area-element">area</a></code>,
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element">img</a></code>,
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-iframe-element">iframe</a></code>,
+                    또는
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-link-element">link</a></code>
+                    요소를 통해
+                <li>
+                    <code><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/semantics.html#link-type-noreferrer">noreferrer</a></code>
+                    링크 관계를 가진
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-a-element">a</a></code>,
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-area-element">area</a></code>,
+                    또는
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-link-element">link</a></code>
+                    요소를 통해
+                <li> 암묵적으로 상속을 통해
+            </ul>
+            <h3 class="heading settled" data-level="4.1" id="referrer-policy-header"><span class="secno">4.1.
+                </span><span class="content">Referrer-Policy 헤더를 통한 전달</span><a class="self-link"
+                    href="#referrer-policy-header"></a></h3>
+            <p>
+                <code><dfn class="dfn-paneled" data-dfn-type="dfn" data-local-lt="referrer-policy header" data-noexport="" id="referrer-policy-header-dfn">Referrer-Policy</dfn></code>
+                HTTP
+                헤더는 사용자 에이전트가 요청 시 어떤 추천인 정보를 포함할지 결정할 때 적용하는 추천인 정책을 지정합니다. 또한 보호된 리소스의 컨텍스트에서 생성된 <a
+                    data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">브라우징 컨텍스트</a>에도 적용됩니다.
+                헤더의 이름과 값에 대한 문법은 다음 ABNF 문법으로 설명됩니다:
+            </p>
+            <pre>"Referrer-Policy:" 1#<a data-link-type="dfn" href="#policy-token" id="ref-for-policy-token-1">policy-token</a>
+</pre>
+            <pre><dfn class="dfn-paneled" data-dfn-type="dfn" data-export="" id="policy-token">policy-token</dfn>   = "no-referrer" / "no-referrer-when-downgrade" / "strict-origin" / "strict-origin-when-cross-origin" / "same-origin" / "origin" / "origin-when-cross-origin" / "unsafe-url"
+</pre>
+            <p class="note" role="note">참고: 헤더 이름은 HTTP Referer 헤더의 오타를 공유하지 않습니다.</p>
+            <p><a href="#integration-with-fetch">§5 Fetch와의 통합</a> 및 <a href="#integration-with-html">§6 HTML과의 통합</a>에서
+                <code>Referrer-Policy</code> 헤더가 어떻게 처리되는지 설명합니다.
+            </p>
+            <section class="informative">
+                <h4 class="heading settled" data-level="4.1.1" id="referrer-usage"><span class="secno">4.1.1.
+                    </span><span class="content">사용법</span><a class="self-link" href="#referrer-usage"></a></h4>
+                <p><em>이 섹션은 규범적인 내용이 아닙니다.</em></p>
+                <p>보호된 리소스는 <code>Referrer-Policy</code> 헤더 값을 <code>no-referrer</code>로 지정하여 추천인 누출을 방지할 수 있습니다:</p>
+                <pre>Referrer-Policy: no-referrer
+</pre>
+                <p>이렇게 하면 보호된 리소스의 컨텍스트에서 이루어지는 모든 요청의 <code>Referer</code> 헤더가 비어 있게 됩니다.</p>
+            </section>
+            <section class="informative">
+                <h3 class="heading settled" data-level="4.2" id="referrer-policy-delivery-meta"><span class="secno">4.2.
+                    </span><span class="content">
+                        <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#meta">meta</a></code>를
+                        통한 전달</span><a class="self-link" href="#referrer-policy-delivery-meta"></a></h3>
+                <p><em>이 섹션은 규범적인 내용이 아닙니다.</em></p>
+                <p>HTML 표준은
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#meta">meta</a></code>
+                    요소의 <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/semantics.html#meta-referrer"><code>referrer</code></a>
+                    키워드를 정의하며, 이를 통해 마크업에서 <a data-link-type="dfn" href="#referrer-policy"
+                        id="ref-for-referrer-policy-8">추천인 정책</a>을 설정할 수 있습니다.
+                </p>
+            </section>
+            <section class="informative">
+                <h3 class="heading settled" data-level="4.3" id="referrer-policy-delivery-referrer-attribute"><span
+                        class="secno">4.3. </span><span class="content">
+                        <code>referrerpolicy</code> 콘텐츠 속성을 통한 전달</span><a class="self-link"
+                        href="#referrer-policy-delivery-referrer-attribute"></a></h3>
+                <p><em>이 섹션은 규범적인 내용이 아닙니다.</em></p>
+                <p>HTML 표준은 여러 요소에 적용되는 <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/infrastructure.html#referrer-policy-attribute">추천인
+                        정책
+                        속성</a> 개념을 정의하며, 예를 들면 다음과 같습니다:</p>
+                <pre class="example" id="example-4214a796"><a class="self-link" href="#example-4214a796"></a><code class="lang-html highlight"><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"http://example.com"</span> <span class="na">referrerpolicy=</span><span class="s">"origin"</span><span class="nt">></span>
+</code></pre>
+            </section>
+            <section class="informative">
+                <h3 class="heading settled" data-level="4.4" id="referrer-policy-delivery-nested"><span
+                        class="secno">4.4. </span><span class="content">중첩 브라우징 컨텍스트</span><span
+                        id="referrer-policy-delivery-implicit"></span><a class="self-link"
+                        href="#referrer-policy-delivery-nested"></a></h3>
+                <p><em>이 섹션은 규범적인 내용이 아닙니다.</em></p>
+                <p>HTML 표준과 Fetch 표준은 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-response">응답</a>에서 생성되지 않은 중첩 브라우징 컨텍스트(예:
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-iframe-element">iframe</a></code>
+                    요소가
+                    <code><a data-link-type="element-sub" href="https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-srcdoc">srcdoc</a></code>
+                    속성을 가진 경우 또는 blob URL로 생성된 경우)가 생성자 브라우징 컨텍스트나 blob URL로부터 <a data-link-type="dfn"
+                        href="#referrer-policy" id="ref-for-referrer-policy-9">추천인 정책</a>을 상속받는 방법을 정의합니다.
+                </p>
+            </section>
+        </section>
+        <section class="informative">
+            <h2 class="heading settled" data-level="5" id="integration-with-fetch"><span class="secno">5. </span><span
+                    class="content">Fetch와의 통합</span><a class="self-link" href="#integration-with-fetch"></a></h2>
+            <p><em>이 섹션은 규범적인 내용이 아닙니다.</em></p>
+            <p>Fetch 명세는 <a href="#set-requests-referrer-policy-on-redirect"
+                    id="ref-for-set-requests-referrer-policy-on-redirect-1">§8.2 리디렉션 시 요청의 추천인 정책 설정</a>을 <a
+                    href="https://fetch.spec.whatwg.org/#http-redirect-fetch">HTTP-redirect fetch의 13단계</a> 전에 호출하여 요청의
+                추천인 정책을 리디렉션 전에 업데이트할 수 있도록 합니다.</p>
+            <p>Fetch 명세는 <a href="#determine-requests-referrer" id="ref-for-determine-requests-referrer-3">§8.3 요청의 추천인
+                    결정</a>을 <a href="https://fetch.spec.whatwg.org/#main-fetch">Main fetch 알고리즘의 8단계</a>로 호출하며, 그 결과를
+                <var>request</var>의 <code>referrer</code> 속성에 설정합니다. Fetch는 제공된 URL을 직렬화하고 <var>request</var>에
+                `<code>Referer</code>` 헤더를 설정하는 역할을 합니다.
+            </p>
+        </section>
+        <section class="informative">
+            <h2 class="heading settled" data-level="6" id="integration-with-html"><span class="secno">6. </span><span
+                    class="content">HTML과의 통합</span><a class="self-link" href="#integration-with-html"></a>
+            </h2>
+            <p><em>이 섹션은 규범적인 내용이 아닙니다.</em></p>
+            <p>HTML 표준은 <a data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-10">추천인 정책</a>을
+                네비게이션 중이나 <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/workers.html#run-a-worker">워커 실행 시</a> 수신된 응답에 대해 결정하며,
+                그 결과를 <code
+                    class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/dom.html#document">Document</a></code>
+                또는 <code
+                    class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope">WorkerGlobalScope</a></code>의
+                추천인 정책에 설정합니다. 이후 해당 <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                    settings object</a>가 <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-request-client">request client</a> 역할을 하며, <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#fetching">fetch</a> 요청에 사용됩니다.</p>
+            <p class="note" role="note">참고: W3C HTML5는 <code>referrerpolicy</code> 콘텐츠 속성, <code>referrerPolicy</code>
+                IDL 속성, <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/semantics.html#meta-referrer"><code>referrer</code></a>
+                키워드,
+                네비게이션 또는 워커 실행과의 통합을 정의하지 않습니다. 이 명세가 W3C HTML5와 의미 있게 작동하려면 해당 내용이 <a data-link-type="biblio"
+                    href="#biblio-html">[HTML]</a>에서 복사되어야 합니다.
+            </p>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="7" id="integration-with-css"><span class="secno">7. </span><span
+                    class="content">CSS와의 통합</span><a class="self-link" href="#integration-with-css"></a>
+            </h2>
+            <p>CSS 표준은 스타일시트에서 참조된 리소스를 어떻게 fetch하는지 명시하지 않습니다. 그러나 구현체는 스타일시트에서 시작된 <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-request">요청</a>의 추천인 관련 속성을 다음과 같이 설정해야 합니다:</p>
+            <ol>
+                <li> <a data-link-type="dfn" href="https://drafts.csswg.org/cssom-1/#css-declaration-block">CSS 선언
+                        블록</a>이 요청의 원인일 경우,
+                    추천인은 블록의 <a data-link-type="dfn"
+                        href="https://drafts.csswg.org/cssom-1/#cssstyledeclaration-owner-node">owner node</a>의 <a
+                        data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-node-document">node
+                        document</a>의 <a data-link-type="dfn"
+                        href="https://dom.spec.whatwg.org/#concept-document-url">URL</a>로 설정하고, 추천인 정책은 블록의 <a
+                        data-link-type="dfn"
+                        href="https://drafts.csswg.org/cssom-1/#cssstyledeclaration-owner-node">owner node</a>의 <a
+                        data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-node-document">node
+                        document</a>의 <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/dom.html#concept-document-referrer-policy">추천인
+                        정책</a>으로 설정함
+                <li>
+                    <a data-link-type="dfn" href="https://www.w3.org/TR/cssom-1/#css-style-sheet">CSS 스타일 시트</a>가 요청의
+                    원인이고,
+                    <a data-link-type="dfn"
+                        href="https://drafts.csswg.org/cssom-1/#concept-css-style-sheet-location">location</a>이 null이
+                    아니라면,
+                    추천인은 <a data-link-type="dfn"
+                        href="https://drafts.csswg.org/cssom-1/#concept-css-style-sheet-location">location</a>으로, 추천인
+                    정책은 <a data-link-type="dfn" href="#cssstylesheet-referrer-policy"
+                        id="ref-for-cssstylesheet-referrer-policy-1">추천인 정책</a>으로 설정함
+                    <p class="issue" id="issue-8299c74c"><a class="self-link" href="#issue-8299c74c"></a> 이는 CSS 스타일 시트가
+                        `Referrer-Policy` 헤더를 처리하고, <dfn class="dfn-paneled" data-dfn-for="CSSStyleSheet"
+                            data-dfn-type="dfn" data-noexport="" id="cssstylesheet-referrer-policy">추천인 정책</dfn>을 <a
+                            data-link-type="dfn"
+                            href="https://html.spec.whatwg.org/multipage/dom.html#concept-document-referrer-policy">문서(Document)</a>와
+                        동일한 방식으로 저장해야 함을 의미합니다.</p>
+                <li> 그 외의 경우, <a data-link-type="dfn" href="https://www.w3.org/TR/cssom-1/#css-style-sheet">CSS 스타일
+                        시트</a>의 <a data-link-type="dfn"
+                        href="https://drafts.csswg.org/cssom-1/#concept-css-style-sheet-location">location</a>이 null이면,
+                    추천인은 <a data-link-type="dfn"
+                        href="https://drafts.csswg.org/cssom-1/#concept-css-style-sheet-owner-node">owner node</a>의 <a
+                        data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-node-document">node
+                        document</a>의 <a data-link-type="dfn"
+                        href="https://dom.spec.whatwg.org/#concept-document-url">URL</a>로 설정하고, 추천인 정책은 블록의 <a
+                        data-link-type="dfn"
+                        href="https://drafts.csswg.org/cssom-1/#concept-css-style-sheet-owner-node">owner node</a>의 <a
+                        data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-node-document">node
+                        document</a>의 <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/dom.html#concept-document-referrer-policy">추천인
+                        정책</a>으로 설정함
+            </ol>
+            <p class="note" role="note">참고: <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-request">요청</a>의 추천인 값과 추천인 정책 값은 해당 <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request">요청</a>이 생성되는 시점의 값을 기준으로
+                설정됩니다. 문서의 추천인 정책이 생명주기 중에 변경되면 인라인 스타일시트 요청에 연관된 정책도 변경됩니다.</p>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="8" id="algorithms"><span class="secno">8. </span><span
+                    class="content">알고리즘</span><a class="self-link" href="#algorithms"></a></h2>
+            <h3 class="heading settled" data-level="8.1" id="parse-referrer-policy-from-header"><span class="secno">8.1.
+                </span><span class="content"> <a data-link-type="dfn" href="#referrer-policy-header-dfn"
+                        id="ref-for-referrer-policy-header-dfn-1"><code>Referrer-Policy</code></a> 헤더에서 추천인 정책 구문 분석
+                </span><a class="self-link" href="#parse-referrer-policy-from-header"></a></h3>
+            <p><code
+                    class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#response">Response</a></code>
+                <var>response</var>가 주어졌을 때, 아래 단계는 <var>response</var>의 `<code>Referrer-Policy</code>` 헤더에 따라 <a
+                    data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-11">추천인 정책</a>을 반환합니다:
+            </p>
+            <ol>
+                <li> <var>policy-tokens</var>에 <var>response</var>의 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-response-header-list">헤더 리스트</a>에서
+                    `<code>Referrer-Policy</code>`를 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-header-parse">파싱</a>한 결과를 할당합니다.
+                <li> <var>policy</var>에 빈 문자열을 할당합니다.
+                <li>
+                    <var>policy-tokens</var>의 각 <var>token</var>에 대해, <var>token</var>이 <a data-link-type="dfn"
+                        href="#referrer-policy" id="ref-for-referrer-policy-12">추천인 정책</a>이고 빈 문자열이 아니면
+                    <var>policy</var>에 <var>token</var>을 할당합니다.
+                    <p class="note" role="note">참고: 이 알고리즘은 더 오래된 사용자 에이전트에 대한 폴백과 함께 새로운 정책 값을 배포할 수 있도록 여러 정책 값을
+                        반복합니다. 자세한 내용은 <a href="#unknown-policy-values">§11.1 알 수 없는 정책 값</a>을 참고하세요.</p>
+                <li> <var>policy</var>를 반환합니다.
+            </ol>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="8.2"
+                data-lt="Set request’s referrer policy on redirect" id="set-requests-referrer-policy-on-redirect"><span
+                    class="secno">8.2. </span><span class="content"> 리디렉션 시 <var>request</var>의 추천인 정책 설정 </span></h3>
+            <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request">request</a>
+                <var>request</var>와 <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-response">response</a> <var>actualResponse</var>가 주어지면,
+                이 알고리즘은 <var>actualResponse</var>의 Referrer-Policy 헤더(있는 경우)에 따라 <var>request</var>에 연결된 <a
+                    data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-referrer-policy">추천인
+                    정책</a>을 갱신합니다.
+            </p>
+            <ol>
+                <li> <var>policy</var>에 <var>actualResponse</var>에 대해 <a href="#parse-referrer-policy-from-header">§8.1
+                        Referrer-Policy 헤더에서 추천인 정책 구문 분석</a>을 실행한 결과를 할당합니다.
+                <li> <var>policy</var>가 빈 문자열이 아니면 <var>request</var>에 연결된 추천인 정책을 <var>policy</var>로 설정합니다.
+            </ol>
+            <h3 class="heading settled dfn-paneled" data-dfn-type="dfn" data-export="" data-level="8.3"
+                data-lt="Determine request’s Referrer" id="determine-requests-referrer"><span class="secno">8.3.
+                </span><span class="content"> <var>request</var>의 추천인 결정 </span></h3>
+            <p><code
+                    class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#request">Request</a></code>
+                <var>request</var>가 주어졌을 때, 연결된 <a data-link-type="dfn"
+                    href="https://fetch.spec.whatwg.org/#concept-request-referrer-policy">추천인 정책</a>을 검사하여 전송할 올바른 추천인
+                정보를 결정할 수 있습니다. 아래 단계에 따라 <code>추천인 없음</code> 또는 URL을 반환합니다:
+            </p>
+            <ol>
+                <li> <var>policy</var>에 <var>request</var>의 연결된 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-request-referrer-policy">추천인 정책</a>을 할당합니다.
+                <li> <var>environment</var>에 <var>request</var>의 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>를 할당합니다.
+                <li>
+                    <var>request</var>의 <a data-link-type="dfn"
+                        href="https://fetch.spec.whatwg.org/#concept-request-referrer">추천인</a> 값에 따라 분기합니다:
+                    <dl class="switch">
+                        <dt>"<code>client</code>"
+                        <dd>
+                            <ol>
+                                <li>
+                                    <var>environment</var>의 <a data-link-type="dfn"
+                                        href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-global">global
+                                        object</a>가 <code
+                                        class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a></code>
+                                    객체라면
+                                    <ol>
+                                        <li><var>document</var>에 <var>environment</var>의 <a data-link-type="dfn"
+                                                href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-global">global
+                                                object</a>에 연결된 <a data-link-type="dfn"
+                                                href="https://html.spec.whatwg.org/multipage/browsers.html#concept-document-window">Document</a>를
+                                            할당합니다.
+                                        <li><var>document</var>의 <a data-link-type="dfn"
+                                                href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>이 <a
+                                                data-link-type="dfn"
+                                                href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-opaque">불투명
+                                                origin</a>이면
+                                            <code>추천인 없음</code>을 반환합니다.
+                                        <li><var>document</var>가 <a data-link-type="dfn"
+                                                href="https://html.spec.whatwg.org/multipage/embedded-content.html#an-iframe-srcdoc-document">iframe
+                                                srcdoc 문서</a>일 때, <var>document</var>를 <var>document</var>의 <a
+                                                data-link-type="dfn"
+                                                href="https://html.spec.whatwg.org/multipage/browsers.html#concept-document-bc">브라우징
+                                                컨텍스트</a>의 <a data-link-type="dfn"
+                                                href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-container">브라우징
+                                                컨텍스트 컨테이너</a>의 <a data-link-type="dfn"
+                                                href="https://dom.spec.whatwg.org/#concept-node-document">node
+                                                document</a>로 바꿉니다.
+                                        <li><var>referrerSource</var>에 <var>document</var>의 <a data-link-type="dfn"
+                                                href="https://dom.spec.whatwg.org/#concept-document-url">URL</a>을 할당합니다.
+                                    </ol>
+                                <li>그 외의 경우 <var>referrerSource</var>에 <var>environment</var>의 <a data-link-type="dfn"
+                                        href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-creation-url">생성
+                                        URL</a>을 할당합니다.
+                            </ol>
+                        <dt><a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url">URL</a>
+                        <dd><var>referrerSource</var>에 <var>request</var>의 <a data-link-type="dfn"
+                                href="https://fetch.spec.whatwg.org/#concept-request-referrer">추천인</a> 값을 할당합니다.
+                    </dl>
+                    <p class="note" role="note">참고: <var>request</var>의 <a data-link-type="dfn"
+                            href="https://fetch.spec.whatwg.org/#concept-request-referrer">추천인</a>이
+                        "<code>no-referrer</code>"인 경우, Fetch는 이 알고리즘을 호출하지 않습니다.</p>
+                <li> <var>referrerURL</var>에 <a href="#strip-url">추천인으로 사용하기 위해 <var>referrerSource</var>를 스트립</a>한 결과를
+                    할당합니다.
+                <li> <var>referrerOrigin</var>에 <a href="#strip-url">추천인으로 사용하기 위해 <var>referrerSource</var>를 스트립</a>한
+                    결과(여기서
+                    <code><a data-link-type="dfn" href="#origin-only-flag" id="ref-for-origin-only-flag-1">origin-only flag</a></code>는
+                    <code>true</code>임)를 할당합니다.
+                <li>
+                    <var>policy</var>의 값에 따라 다음을 실행합니다:
+                    <dl class="switch">
+                        <dt><a data-link-type="dfn" href="#referrer-policy-no-referrer"
+                                id="ref-for-referrer-policy-no-referrer-3">"<code>no-referrer</code>"</a>
+                        <dd><code>추천인 없음</code>을 반환
+                        <dt><a data-link-type="dfn" href="#referrer-policy-origin"
+                                id="ref-for-referrer-policy-origin-4">"<code>origin</code>"</a>
+                        <dd><var>referrerOrigin</var>을 반환
+                        <dt><a data-link-type="dfn" href="#referrer-policy-unsafe-url"
+                                id="ref-for-referrer-policy-unsafe-url-3">"<code>unsafe-url</code>"</a>
+                        <dd><var>referrerURL</var>을 반환
+                        <dt><a data-link-type="dfn" href="#referrer-policy-strict-origin"
+                                id="ref-for-referrer-policy-strict-origin-5">"<code>strict-origin</code>"</a>
+                        <dd>
+                            <ol>
+                                <li>
+                                    <var>environment</var>가 null이 아니면:
+                                    <ol>
+                                        <li> <var>environment</var>가 <a data-link-type="dfn"
+                                                href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로
+                                                보호된</a> 상태이고 <var>request</var>의 <a
+                                                href="https://fetch.spec.whatwg.org/#concept-request-current-url">current
+                                                URL</a>이 <a data-link-type="dfn"
+                                                href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로
+                                                신뢰할 수 있는 URL</a>이 아니면 <code>추천인 없음</code>을 반환합니다.
+                                    </ol>
+                                <li><var>referrerOrigin</var>을 반환합니다.
+                            </ol>
+                        <dt><a data-link-type="dfn" href="#referrer-policy-strict-origin-when-cross-origin"
+                                id="ref-for-referrer-policy-strict-origin-when-cross-origin-4">"<code>strict-origin-when-cross-origin</code>"</a>
+                        <dd>
+                            <ol>
+                                <li> <var>request</var>가 <a data-link-type="dfn" href="#same-origin-request"
+                                        id="ref-for-same-origin-request-7">동일 출처 요청</a>이면 <var>referrerURL</var>을 반환합니다.
+                                <li>
+                                    <var>environment</var>가 null이 아니면:
+                                    <ol>
+                                        <li>
+                                            <var>environment</var>가 <a data-link-type="dfn"
+                                                href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로
+                                                보호된</a> 상태이고 <var>request</var>의 <a
+                                                href="https://fetch.spec.whatwg.org/#concept-request-current-url">current
+                                                URL</a>이 <a data-link-type="dfn"
+                                                href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로
+                                                신뢰할 수 있는 URL</a>이 아니면
+                                            <ol>
+                                                <li><code>추천인 없음</code>을 반환합니다.
+                                            </ol>
+                                    </ol>
+                                <li><var>referrerOrigin</var>을 반환합니다.
+                            </ol>
+                        <dt><a data-link-type="dfn" href="#referrer-policy-same-origin"
+                                id="ref-for-referrer-policy-same-origin-3">"<code>same-origin</code>"</a>
+                        <dd>
+                            <ol>
+                                <li> <var>request</var>가 <a data-link-type="dfn" href="#same-origin-request"
+                                        id="ref-for-same-origin-request-8">동일 출처 요청</a>이면 <var>referrerURL</var>을 반환합니다.
+                                <li> 그 외에는 <code>추천인 없음</code>을 반환합니다.
+                            </ol>
+                        <dt><a data-link-type="dfn" href="#referrer-policy-origin-when-cross-origin"
+                                id="ref-for-referrer-policy-origin-when-cross-origin-5">"<code>origin-when-cross-origin</code>"</a>
+                        <dd>
+                            <ol>
+                                <li> <var>request</var>가 <a data-link-type="dfn" href="#cross-origin-request"
+                                        id="ref-for-cross-origin-request-7">교차 출처 요청</a>이면 <var>referrerOrigin</var>을
+                                    반환합니다.
+                                <li> 그 외에는 <var>referrerURL</var>을 반환합니다.
+                            </ol>
+                        <dt><a data-link-type="dfn" href="#referrer-policy-no-referrer-when-downgrade"
+                                id="ref-for-referrer-policy-no-referrer-when-downgrade-5">"<code>no-referrer-when-downgrade</code>"</a>
+                        <dd>
+                            <ol>
+                                <li>
+                                    <var>environment</var>가 null이 아니면:
+                                    <ol>
+                                        <li> <var>environment</var>가 <a data-link-type="dfn"
+                                                href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">TLS로
+                                                보호된</a> 상태이고 <var>request</var>의 <a
+                                                href="https://fetch.spec.whatwg.org/#concept-request-current-url">current
+                                                URL</a>이 <a data-link-type="dfn"
+                                                href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로
+                                                신뢰할 수 있는 URL</a>이 아니면 <code>추천인 없음</code>을 반환합니다.
+                                    </ol>
+                                <li><var>referrerURL</var>을 반환합니다.
+                            </ol>
+                    </dl>
+                    <p class="note" role="note">참고: Fetch는 이 알고리즘을 호출하기 전에 <var>request</var>의 <a data-link-type="dfn"
+                            href="#referrer-policy" id="ref-for-referrer-policy-13">추천인 정책</a>이 빈 문자열이 아닌지 확인합니다.</p>
+            </ol>
+            <h3 class="heading settled" data-level="8.4" id="strip-url"><span class="secno">8.4. </span><span
+                    class="content"> 추천인으로 사용하기 위해 <var>url</var> 스트립 </span><a class="self-link" href="#strip-url"></a>
+            </h3>
+            <p>URL의 일부 구성요소는 `<code>Referer</code>` 헤더 값으로 전송할 때 반드시 포함되지 않아야 합니다: URL의 fragment, username, password
+                구성요소는 전송 전에 반드시 제거되어야 합니다. 이 알고리즘은 기본값이 <code>false</code>인
+                <code><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="origin-only-flag">origin-only flag</dfn></code>를
+                받으며, <code>true</code>로 설정하면 URL의 경로와 쿼리 구성요소까지 추가로 제거하여 scheme, host, port만 남깁니다.
+            </p>
+            <ol>
+                <li> <var>url</var>이 <code>null</code>이면 <code>추천인 없음</code>을 반환합니다.
+                <li> <var>url</var>의 <a data-link-type="dfn"
+                        href="https://url.spec.whatwg.org/#concept-url-scheme">scheme</a>이 <a data-link-type="dfn"
+                        href="https://url.spec.whatwg.org/#local-scheme">로컬 scheme</a>이면 <code>추천인 없음</code>을 반환합니다.
+                <li> <var>url</var>의 <a data-link-type="dfn"
+                        href="https://url.spec.whatwg.org/#concept-url-username">username</a>을 빈 문자열로 설정합니다.
+                <li> <var>url</var>의 <a data-link-type="dfn"
+                        href="https://url.spec.whatwg.org/#concept-url-password">password</a>를 <code>null</code>로 설정합니다.
+                <li> <var>url</var>의 <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/infrastructure.html#concept-url-fragment">fragment</a>를
+                    <code>null</code>로 설정합니다.
+                <li>
+                    <code><a data-link-type="dfn" href="#origin-only-flag" id="ref-for-origin-only-flag-2">origin-only flag</a></code>가
+                    <code>true</code>라면:
+                    <ol>
+                        <li> <var>url</var>의 <a data-link-type="dfn"
+                                href="https://url.spec.whatwg.org/#concept-url-path">path</a>를 <code>null</code>로 설정합니다.
+                        <li> <var>url</var>의 <a data-link-type="dfn"
+                                href="https://url.spec.whatwg.org/#concept-url-query">query</a>를 <code>null</code>로
+                            설정합니다.
+                    </ol>
+                <li> <var>url</var>을 반환합니다.
+            </ol>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="9" id="privacy"><span class="secno">9. </span><span
+                    class="content">프라이버시 고려사항</span><a class="self-link" href="#privacy"></a></h2>
+            <h3 class="heading settled" data-level="9.1" id="user-controls"><span class="secno">9.1. </span><span
+                    class="content">사용자 제어</span><a class="self-link" href="#user-controls"></a></h3>
+            <p>이 명세의 어느 부분도 사용자 에이전트가 `<code>Referer</code>` 헤더를 통해 전송되는 정보를 변경할 수 있는 옵션을 사용자에게 제공하는 것을 금지하는 것으로 해석되어서는
+                안 됩니다. 예를 들어, 사용자 에이전트는 페이지의 활성 <a data-link-type="dfn" href="#referrer-policy"
+                    id="ref-for-referrer-policy-14">추천인 정책</a>과 관계없이 추천인 헤더를 완전히 숨길 수 있도록 허용할 수 있습니다(MAY).</p>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="10" id="security"><span class="secno">10. </span><span
+                    class="content">보안 고려사항</span><a class="self-link" href="#security"></a></h2>
+            <h3 class="heading settled" data-level="10.1" id="information-leakage"><span class="secno">10.1.
+                </span><span class="content">정보 누출</span><a class="self-link" href="#information-leakage"></a></h3>
+            <p><a data-link-type="dfn" href="#referrer-policy" id="ref-for-referrer-policy-15">추천인 정책</a> 중 <a
+                    data-link-type="dfn" href="#referrer-policy-origin"
+                    id="ref-for-referrer-policy-origin-5">"<code>origin</code>"</a>, <a data-link-type="dfn"
+                    href="#referrer-policy-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-origin-when-cross-origin-6">"<code>origin-when-cross-origin</code>"</a>,
+                <a data-link-type="dfn" href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-4">"<code>unsafe-url</code>"</a>는 각각 안전하지 않은 전송을 통해 보안 사이트의
+                origin 또는 URL을 누출할 수 있습니다.
+            </p>
+            <p>이 세 가지 정책은 사이트가 안전한 전송을 도입하는 데 마찰을 줄이고자 명세에 포함되었습니다.</p>
+            <p>기본 정책보다 더 많은 정보가 누출되지 않도록 하고 싶은 저자는 <a data-link-type="dfn" href="#referrer-policy-same-origin"
+                    id="ref-for-referrer-policy-same-origin-4">"<code>same-origin</code>"</a>, <a data-link-type="dfn"
+                    href="#referrer-policy-strict-origin"
+                    id="ref-for-referrer-policy-strict-origin-6">"<code>strict-origin</code>"</a>, <a
+                    data-link-type="dfn" href="#referrer-policy-strict-origin-when-cross-origin"
+                    id="ref-for-referrer-policy-strict-origin-when-cross-origin-5">"<code>strict-origin-when-cross-origin</code>"</a>
+                또는 <a data-link-type="dfn" href="#referrer-policy-no-referrer"
+                    id="ref-for-referrer-policy-no-referrer-4">"<code>no-referrer</code>"</a> 정책 상태를 사용하는 것이 좋습니다.</p>
+            <h3 class="heading settled" data-level="10.2" id="downgrade"><span class="secno">10.2. </span><span
+                    class="content">덜 엄격한 정책으로 다운그레이드</span><a class="self-link" href="#downgrade"></a>
+            </h3>
+            <p>이 명세는 <a data-link-type="dfn" href="#referrer-policy-no-referrer"
+                    id="ref-for-referrer-policy-no-referrer-5">"<code>no-referrer</code>"</a>에서 <a data-link-type="dfn"
+                    href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-5">"<code>unsafe-url</code>"</a>로와 같이 덜 엄격한 정책으로 다운그레이드하는 것을
+                금지하지 않습니다.</p>
+            <p>한편, 모든 가능한 정책 쌍에 대해 어느 정책이 더 엄격한지 명확하지 않을 수 있습니다. 예를 들어 <a data-link-type="dfn"
+                    href="#referrer-policy-no-referrer-when-downgrade"
+                    id="ref-for-referrer-policy-no-referrer-when-downgrade-6">"<code>no-referrer-when-downgrade</code>"</a>는
+                안전하지 않은 전송에서는 정보를 누출하지 않지만, <a data-link-type="dfn" href="#referrer-policy-origin"
+                    id="ref-for-referrer-policy-origin-6">"<code>origin</code>"</a>은 그럴 수 있습니다. 하지만 후자는 교차 출처 네비게이션에서는 더
+                적은 정보를 노출합니다.</p>
+            <p>다른 한편으로, 덜 엄격한 정책을 설정할 수 있도록 허용하면 <a href="#unknown-policy-values">§11.1 알 수 없는 정책 값</a>에서 설명한 안전한 폴백을
+                저자가 정의할 수 있습니다.</p>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="11" id="authoring"><span class="secno">11. </span><span
+                    class="content">저작 고려사항</span><a class="self-link" href="#authoring"></a></h2>
+            <h3 class="heading settled" data-level="11.1" id="unknown-policy-values"><span class="secno">11.1.
+                </span><span class="content">알 수 없는 정책 값</span><a class="self-link" href="#unknown-policy-values"></a>
+            </h3>
+            <p><a href="#parse-referrer-policy-from-header">§8.1 Referrer-Policy 헤더에서 추천인 정책 구문 분석</a> 및
+                <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#meta">meta</a></code>
+                <a data-link-type="dfn"
+                    href="https://html.spec.whatwg.org/multipage/semantics.html#meta-referrer"><code>referrer</code></a>
+                알고리즘에서 설명한 바와 같이, 알 수 없는 정책 값은 무시되며 여러 소스에서 추천인 정책이 지정될 경우 가장 마지막 값을 사용합니다. 이를 통해 새로운 정책 값을 배포할 수 있습니다.
+            </p>
+            <div class="example" id="example-e42fe91b"><a class="self-link" href="#example-e42fe91b"></a> 예를 들어, 이전 사용자
+                에이전트가 <a data-link-type="dfn" href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-6">"<code>unsafe-url</code>"</a> 정책을 이해하지 못한다고 가정합니다. 사이트는 <a
+                    data-link-type="dfn" href="#referrer-policy-origin"
+                    id="ref-for-referrer-policy-origin-7">"<code>origin</code>"</a> 정책 뒤에 <a data-link-type="dfn"
+                    href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-7">"<code>unsafe-url</code>"</a> 정책을 지정할 수 있습니다. 이전 사용자 에이전트는
+                알 수 없는 <a data-link-type="dfn" href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-8">"<code>unsafe-url</code>"</a> 값을 무시하고 <a
+                    data-link-type="dfn" href="#referrer-policy-origin"
+                    id="ref-for-referrer-policy-origin-8">"<code>origin</code>"</a>을 사용하며, 최신 사용자 에이전트는 마지막에 처리된 <a
+                    data-link-type="dfn" href="#referrer-policy-unsafe-url"
+                    id="ref-for-referrer-policy-unsafe-url-9">"<code>unsafe-url</code>"</a>을 사용합니다. </div>
+            <p>하지만 이러한 동작은 <code>referrerpolicy</code> 속성에는 적용되지 않습니다. 저자는 특정 정책 값이 지원되는지 감지하기 위해
+                <code>referrerpolicy</code> 속성을 동적으로 설정하고 얻을 수 있습니다.
+            </p>
+        </section>
+        <section>
+            <h2 class="heading settled" data-level="12" id="acknowledgements"><span class="secno">12. </span><span
+                    class="content">감사의 말씀</span><a class="self-link" href="#acknowledgements"></a></h2>
+            <p>이 명세는 Adam Barth와 Jochen Eisinger의 <a href="https://wiki.whatwg.org/wiki/Meta_referrer">Meta referrer</a>
+                문서를 크게 참고하였습니다.</p>
+        </section>
+    </main>
+    <h2 class="no-ref no-num heading settled" id="conformance"><span class="content">적합성</span><a class="self-link"
+            href="#conformance"></a></h2>
+    <h3 class="no-ref no-num heading settled" id="conventions"><span class="content">문서 규약</span><a class="self-link"
+            href="#conventions"></a></h3>
+    <p>적합성 요구사항은 설명적 단정과 RFC 2119 용어의 조합으로 표현됩니다. 이 문서의 규범적 부분에서 “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+        “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, “OPTIONAL”과 같은 핵심 단어는 RFC 2119에서 설명된 대로 해석해야 합니다.
+        단, 가독성을 위해 이 명세서에서는 이러한 단어가 모두 대문자로 표시되지 않습니다. </p>
+    <p>명시적으로 비규범적임을 표시한 섹션, 예시, 참고를 제외한 명세서의 모든 텍스트는 규범적입니다. <a data-link-type="biblio"
+            href="#biblio-rfc2119">[RFC2119]</a></p>
+    <p>이 명세서의 예시는 “예를 들어”라는 단어로 시작하거나 <code>class="example"</code>와 같이 규범적 텍스트와 구분되어 제공됩니다. 예시: </p>
+    <div class="example" id="example-f839f6c8">
+        <a class="self-link" href="#example-f839f6c8"></a>
+        <p>이것은 참고용 예시입니다.</p>
+    </div>
+    <p>참고 노트는 “참고”라는 단어로 시작하며 <code>class="note"</code>와 같이 규범적 텍스트와 구분되어 제공됩니다: </p>
+    <p class="note" role="note">참고: 이것은 참고용 노트입니다.</p>
+    <h3 class="no-ref no-num heading settled" id="conformant-algorithms"><span class="content">적합성 알고리즘</span><a
+            class="self-link" href="#conformant-algorithms"></a></h3>
+    <p>알고리즘의 일부로 명령문으로 표현된 요구사항(예: "앞의 공백 문자를 제거한다" 또는 "false를 반환하고 이 단계들을 종료한다")는 알고리즘을 소개하는 데 사용된 핵심 단어("must",
+        "should", "may" 등)의 의미로 해석해야 합니다.</p>
+    <p>알고리즘 또는 특정 단계로 표현된 적합성 요구사항은 최종 결과가 동일하다면 어떤 방식으로든 구현할 수 있습니다. 특히, 이 명세서에서 정의된 알고리즘은 이해하기 쉽도록 작성된 것이며, 성능을 고려한 것이
+        아닙니다. 구현자는 최적화를 권장합니다.</p>
+    <script src="https://www.w3.org/scripts/TR/2016/fixup.js"></script>
+    <h2 class="no-num no-ref heading settled" id="index"><span class="content">색인</span><a class="self-link"
+            href="#index"></a></h2>
+    <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">이 명세서에서 정의한 용어</span><a
+            class="self-link" href="#index-defined-here"></a></h3>
+    <ul class="index">
+        <li><a href="#dom-referrerpolicy">""</a><span>, §3에서</span>
+        <li><a href="#cross-origin-request">교차 출처 요청</a><span>, §2에서</span>
+        <li><a href="#determine-requests-referrer">요청의 추천인 결정</a><span>, §8.2에서</span>
+        <li>
+            "no-referrer"
+            <ul>
+                <li><a href="#dom-referrerpolicy-no-referrer">ReferrerPolicy의 enum 값</a><span>, §3에서</span>
+                <li><a href="#referrer-policy-no-referrer">정의</a><span>, §3에서</span>
+            </ul>
+        <li><a href="#dom-referrerpolicy-no-referrer">no-referrer</a><span>, §3에서</span>
+        <li><a href="#dom-referrerpolicy-no-referrer-when-downgrade">no-referrer-when-downgrade</a><span>, §3에서</span>
+        <li>
+            "no-referrer-when-downgrade"
+            <ul>
+                <li><a href="#dom-referrerpolicy-no-referrer-when-downgrade">ReferrerPolicy의 enum 값</a><span>,
+                        §3에서</span>
+                <li><a href="#referrer-policy-no-referrer-when-downgrade">정의</a><span>, §3.1에서</span>
+            </ul>
+        <li><a href="#dom-referrerpolicy-origin">origin</a><span>, §3에서</span>
+        <li>
+            "origin"
+            <ul>
+                <li><a href="#dom-referrerpolicy-origin">ReferrerPolicy의 enum 값</a><span>, §3에서</span>
+                <li><a href="#referrer-policy-origin">정의</a><span>, §3.3에서</span>
+            </ul>
+        <li><a href="#origin-only-flag">origin-only flag</a><span>, §8.4에서</span>
+        <li><a href="#dom-referrerpolicy-origin-when-cross-origin">origin-when-cross-origin</a><span>, §3에서</span>
+        <li>
+            "origin-when-cross-origin"
+            <ul>
+                <li><a href="#dom-referrerpolicy-origin-when-cross-origin">ReferrerPolicy의 enum 값</a><span>, §3에서</span>
+                <li><a href="#referrer-policy-origin-when-cross-origin">정의</a><span>, §3.5에서</span>
+            </ul>
+        <li><a href="#policy-token">policy-token</a><span>, §4.1에서</span>
+        <li><a href="#enumdef-referrerpolicy">ReferrerPolicy</a><span>, §3에서</span>
+        <li>
+            추천인 정책
+            <ul>
+                <li><a href="#referrer-policy">정의</a><span>, §3에서</span>
+                <li><a href="#cssstylesheet-referrer-policy">CSSStyleSheet의 정의</a><span>, §7에서</span>
+            </ul>
+        <li><a href="#referrer-policy-header-dfn">Referrer-Policy</a><span>, §4.1에서</span>
+        <li><a href="#referrer-policy-header-dfn">referrer-policy 헤더</a><span>, §4.1에서</span>
+        <li>
+            "same-origin"
+            <ul>
+                <li><a href="#dom-referrerpolicy-same-origin">ReferrerPolicy의 enum 값</a><span>, §3에서</span>
+                <li><a href="#referrer-policy-same-origin">정의</a><span>, §3.2에서</span>
+            </ul>
+        <li><a href="#dom-referrerpolicy-same-origin">same-origin</a><span>, §3에서</span>
+        <li><a href="#same-origin-request">동일 출처 요청</a><span>, §2에서</span>
+        <li><a href="#set-requests-referrer-policy-on-redirect">리디렉션 시 요청의 추천인 정책 설정</a><span>, §8.1에서</span>
+        <li><a href="#dom-referrerpolicy-strict-origin">strict-origin</a><span>, §3에서</span>
+        <li>
+            "strict-origin"
+            <ul>
+                <li><a href="#dom-referrerpolicy-strict-origin">ReferrerPolicy의 enum 값</a><span>, §3에서</span>
+                <li><a href="#referrer-policy-strict-origin">정의</a><span>, §3.4에서</span>
+            </ul>
+        <li>
+            "strict-origin-when-cross-origin"
+            <ul>
+                <li><a href="#dom-referrerpolicy-strict-origin-when-cross-origin">ReferrerPolicy의 enum 값</a><span>,
+                        §3에서</span>
+                <li><a href="#referrer-policy-strict-origin-when-cross-origin">정의</a><span>, §3.6에서</span>
+            </ul>
+        <li><a href="#dom-referrerpolicy-strict-origin-when-cross-origin">strict-origin-when-cross-origin</a><span>,
+                §3에서</span>
+        <li><a href="#referrer-policy-empty-string">빈 문자열</a><span>, §3.8에서</span>
+        <li><a href="#dom-referrerpolicy-unsafe-url">unsafe-url</a><span>, §3에서</span>
+        <li>
+            "unsafe-url"
+            <ul>
+                <li><a href="#dom-referrerpolicy-unsafe-url">ReferrerPolicy의 enum 값</a><span>, §3에서</span>
+                <li><a href="#referrer-policy-unsafe-url">정의</a><span>, §3.7에서</span>
+            </ul>
+    </ul>
+    <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">참고 문서에서 정의된 용어</span><a
+            class="self-link" href="#index-defined-elsewhere"></a></h3>
+    <ul class="index">
+        <li>
+            <a data-link-type="biblio">[cssom-1]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://drafts.csswg.org/cssom-1/#css-declaration-block">css 선언 블록</a>
+                <li><a href="https://www.w3.org/TR/cssom-1/#css-style-sheet">css 스타일 시트</a>
+                <li><a href="https://drafts.csswg.org/cssom-1/#concept-css-style-sheet-location">location</a>
+                <li><a href="https://drafts.csswg.org/cssom-1/#cssstyledeclaration-owner-node">owner node
+                        <small>(CSSStyleDeclaration용)</small></a>
+                <li><a href="https://drafts.csswg.org/cssom-1/#concept-css-style-sheet-owner-node">owner node
+                        <small>(CSSStyleSheet용)</small></a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[DOM4]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://www.w3.org/TR/dom/#concept-node-document">node document</a>
+                <li><a href="https://www.w3.org/TR/dom/#concept-document-url">url</a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[FETCH]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://fetch.spec.whatwg.org/#request">Request</a>
+                <li><a href="https://fetch.spec.whatwg.org/#response">Response</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-request-current-url">current url</a>
+                <li><a href="https://fetch.spec.whatwg.org/#fetching">fetching</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-response-header-list">header list</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-request-origin">origin</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-header-parse">헤더 값 파싱</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-request-referrer">추천인</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-request-referrer-policy">추천인 정책</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-request">request</a>
+                <li><a href="https://fetch.spec.whatwg.org/#concept-response">response</a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[HTML]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://html.spec.whatwg.org/multipage/dom.html#document">Document</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a>
+                <li><a
+                        href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope">WorkerGlobalScope</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/semantics.html#the-a-element">a</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/embedded-content.html#an-iframe-srcdoc-document">iframe
+                        srcdoc 문서</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-area-element">area</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#concept-document-window">연결된
+                        document</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">브라우징 컨텍스트</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#concept-document-bc">브라우징 컨텍스트
+                        <small>(Document용)</small></a>
+                <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-container">브라우징 컨텍스트
+                        컨테이너</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-creation-url">생성
+                        url</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/dom.html#concept-document-referrer-policy">document
+                        추천인 정책</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment
+                        settings object</a>
+                <li><a
+                        href="https://html.spec.whatwg.org/multipage/infrastructure.html#concept-url-fragment">fragment</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-global">global
+                        object</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-iframe-element">iframe</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element">img</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/semantics.html#the-link-element">link</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/semantics.html#meta">meta</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/semantics.html#attr-meta-name">name</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#navigate">네비게이션</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/semantics.html#link-type-noreferrer">noreferrer</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-opaque">불투명 origin</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/semantics.html#meta-referrer">referrer</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/dom.html#concept-document-referrer-policy">추천인
+                        정책</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#referrer-policy-attribute">추천인
+                        정책 속성</a>
+                <li><a
+                        href="https://html.spec.whatwg.org/multipage/semantics.html#attr-hyperlink-referrerpolicy">referrerpolicy</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/workers.html#run-a-worker">워커 실행</a>
+                <li><a href="https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-srcdoc">srcdoc</a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[RFC6454]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://tools.ietf.org/html/rfc6454#section-6.2">origin의 ascii 직렬화</a>
+                <li><a href="https://tools.ietf.org/html/rfc6454#section-3.2">origin</a>
+                <li><a href="https://tools.ietf.org/html/rfc6454#section-5">the same</a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[RFC7231]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://tools.ietf.org/html/rfc7231#section-5.5.2">referer</a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[secure-contexts]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-url">잠재적으로 신뢰할 수
+                        있는 url</a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[WHATWG-URL]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://url.spec.whatwg.org/#local-scheme">로컬 scheme</a>
+                <li><a href="https://url.spec.whatwg.org/#concept-url-origin">origin</a>
+                <li><a href="https://url.spec.whatwg.org/#concept-url-password">password</a>
+                <li><a href="https://url.spec.whatwg.org/#concept-url-path">path</a>
+                <li><a href="https://url.spec.whatwg.org/#concept-url-query">query</a>
+                <li><a href="https://url.spec.whatwg.org/#concept-url-scheme">scheme</a>
+                <li><a href="https://url.spec.whatwg.org/#concept-url">url</a>
+                <li><a href="https://url.spec.whatwg.org/#concept-url-username">username</a>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[wsc-ui]</a>에서 다음 용어를 정의함:
+            <ul>
+                <li><a href="https://www.w3.org/TR/2010/REC-wsc-ui-20100812/#typesoftls">tls로 보호된</a>
+            </ul>
+    </ul>
+    <h2 class="no-num no-ref heading settled" id="references"><span class="content">참고 문헌</span><a class="self-link"
+            href="#references"></a></h2>
+    <h3 class="no-num no-ref heading settled" id="normative"><span class="content">규범적 참고 문헌</span><a class="self-link"
+            href="#normative"></a></h3>
+    <dl>
+        <dt id="biblio-cssom-1">[CSSOM-1]
+        <dd>Simon Pieters; Glenn Adams. <a href="https://www.w3.org/TR/cssom-1/">CSS Object Model (CSSOM)</a>. 2016년 3월
+            17일. WD. URL: <a href="https://www.w3.org/TR/cssom-1/">https://www.w3.org/TR/cssom-1/</a>
+        <dt id="biblio-fetch">[FETCH]
+        <dd>Anne van Kesteren. <a href="https://fetch.spec.whatwg.org/">Fetch</a>. 현행 표준. URL: <a
+                href="https://fetch.spec.whatwg.org/">http://fetch.spec.whatwg.org/</a>
+        <dt id="biblio-html">[HTML]
+        <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML 표준</a>. 현행 표준. URL: <a
+                href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
+        <dt id="biblio-rfc2119">[RFC2119]
+        <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">RFC에서 요구사항 수준을 표시하는 데 사용할 핵심 단어</a>. 1997년 3월. 최선의
+            현재 관행. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
+        <dt id="biblio-rfc6454">[RFC6454]
+        <dd>Adam Barth. <a href="http://www.ietf.org/rfc/rfc6454.txt">웹 Origin 개념</a>. RFC. URL: <a
+                href="http://www.ietf.org/rfc/rfc6454.txt">http://www.ietf.org/rfc/rfc6454.txt</a>
+        <dt id="biblio-rfc7231">[RFC7231]
+        <dd>Roy T. Fielding; Julian F. Reschke. <a href="http://www.ietf.org/rfc/rfc7231.txt">HTTP/1.1 의미론 및 콘텐츠</a>.
+            RFC. URL: <a href="http://www.ietf.org/rfc/rfc7231.txt">http://www.ietf.org/rfc/rfc7231.txt</a>
+        <dt id="biblio-secure-contexts">[SECURE-CONTEXTS]
+        <dd>Mike West. <a href="https://www.w3.org/TR/secure-contexts/">Secure Contexts</a>. 2016년 9월 15일. CR. URL: <a
+                href="https://www.w3.org/TR/secure-contexts/">https://www.w3.org/TR/secure-contexts/</a>
+        <dt id="biblio-dom4">[DOM4]
+        <dd>Anne van Kesteren, Aryeh Gregor, Ms2ger, Alex Russel, Robin Berjon. <a href="https://www.w3.org/TR/dom">W3C
+                DOM4</a>, 2015년 11월 19일. REC. URL: <a href="https://www.w3.org/TR/dom">https://www.w3.org/TR/dom</a>
+        <dt id="biblio-whatwg-url">[WHATWG-URL]
+        <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL 표준</a>. 현행 표준. URL: <a
+                href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
+        <dt id="biblio-wsc-ui">[WSC-UI]
+        <dd>Thomas Roessler; Anil Saldhana. <a href="https://www.w3.org/TR/wsc-ui/">웹 보안 컨텍스트: 사용자 인터페이스 가이드라인</a>.
+            2010년 8월 12일. REC. URL: <a href="https://www.w3.org/TR/wsc-ui/">https://www.w3.org/TR/wsc-ui/</a>
+    </dl>
+    <h3 class="no-num no-ref heading settled" id="informative"><span class="content">참고용 참고 문헌</span><a
+            class="self-link" href="#informative"></a></h3>
+    <dl>
+        <dt id="biblio-capability-urls">[CAPABILITY-URLS]
+        <dd>Jenni Tennison. <a href="https://www.w3.org/TR/capability-urls/">Capability URLs</a>. WD. URL: <a
+                href="https://www.w3.org/TR/capability-urls/">https://www.w3.org/TR/capability-urls/</a>
+    </dl>
+    <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL 색인</span><a class="self-link"
+            href="#idl-index"></a></h2>
+    <pre class="idl def"><span class="kt">enum</span> <a class="nv" href="#enumdef-referrerpolicy">ReferrerPolicy</a> {
+  <a class="s" href="#dom-referrerpolicy">""</a>,
+  <a class="s" href="#dom-referrerpolicy-no-referrer">"no-referrer"</a>,
+  <a class="s" href="#dom-referrerpolicy-no-referrer-when-downgrade">"no-referrer-when-downgrade"</a>,
+  <a class="s" href="#dom-referrerpolicy-same-origin">"same-origin"</a>,
+  <a class="s" href="#dom-referrerpolicy-origin">"origin"</a>,
+  <a class="s" href="#dom-referrerpolicy-strict-origin">"strict-origin"</a>,
+  <a class="s" href="#dom-referrerpolicy-origin-when-cross-origin">"origin-when-cross-origin"</a>,
+  <a class="s" href="#dom-referrerpolicy-strict-origin-when-cross-origin">"strict-origin-when-cross-origin"</a>,
+  <a class="s" href="#dom-referrerpolicy-unsafe-url">"unsafe-url"</a>
+};
+
+</pre>
+    <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">이슈 색인</span><a class="self-link"
+            href="#issues-index"></a></h2>
+    <div style="counter-reset:issue">
+        <div class="issue"> CSS 스타일 시트가 `Referrer-Policy`
+            헤더를 처리하고, <span>추천인 정책</span>을 <a data-link-type="dfn"
+                href="https://html.spec.whatwg.org/multipage/dom.html#concept-document-referrer-policy">문서(Document)</a>와
+            동일하게 저장해야 합니다.<a href="#issue-8299c74c"> ↵ </a></div>
+    </div>
+    <aside class="dfn-panel" data-for="same-origin-request">
+        <b><a href="#same-origin-request">#same-origin-request</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-same-origin-request-1">2. Key Concepts and Terminology</a>
+            <li><a href="#ref-for-same-origin-request-2">3.3. "same-origin"</a>
+            <li><a href="#ref-for-same-origin-request-3">3.4. "origin"</a>
+            <li><a href="#ref-for-same-origin-request-4">3.6. "origin-when-cross-origin"</a>
+            <li><a href="#ref-for-same-origin-request-5">3.7. "strict-origin-when-cross-origin"</a>
+            <li><a href="#ref-for-same-origin-request-6">3.8. "unsafe-url"</a>
+            <li><a href="#ref-for-same-origin-request-7">8.3.
+                    Determine request’s Referrer </a> <a href="#ref-for-same-origin-request-8">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="cross-origin-request">
+        <b><a href="#cross-origin-request">#cross-origin-request</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-cross-origin-request-1">3.3. "same-origin"</a>
+            <li><a href="#ref-for-cross-origin-request-2">3.4. "origin"</a>
+            <li><a href="#ref-for-cross-origin-request-3">3.6. "origin-when-cross-origin"</a> <a
+                    href="#ref-for-cross-origin-request-4">(2)</a>
+            <li><a href="#ref-for-cross-origin-request-5">3.7. "strict-origin-when-cross-origin"</a>
+            <li><a href="#ref-for-cross-origin-request-6">3.8. "unsafe-url"</a>
+            <li><a href="#ref-for-cross-origin-request-7">8.3.
+                    Determine request’s Referrer </a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy">
+        <b><a href="#referrer-policy">#referrer-policy</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-1">2. Key Concepts and Terminology</a> <a
+                    href="#ref-for-referrer-policy-2">(2)</a> <a href="#ref-for-referrer-policy-3">(3)</a> <a
+                    href="#ref-for-referrer-policy-4">(4)</a>
+            <li><a href="#ref-for-referrer-policy-5">3. Referrer Policies</a>
+            <li><a href="#ref-for-referrer-policy-6">3.9. The empty string</a> <a
+                    href="#ref-for-referrer-policy-7">(2)</a>
+            <li><a href="#ref-for-referrer-policy-8">4.2. Delivery via meta</a>
+            <li><a href="#ref-for-referrer-policy-9">4.4. Nested browsing contexts</a>
+            <li><a href="#ref-for-referrer-policy-10">6. Integration with HTML</a>
+            <li><a href="#ref-for-referrer-policy-11">8.1.
+                    Parse a referrer policy from a Referrer-Policy header </a> <a
+                    href="#ref-for-referrer-policy-12">(2)</a>
+            <li><a href="#ref-for-referrer-policy-13">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-14">9.1. User Controls</a>
+            <li><a href="#ref-for-referrer-policy-15">10.1. Information Leakage</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-no-referrer">
+        <b><a href="#referrer-policy-no-referrer">#referrer-policy-no-referrer</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-no-referrer-1">3.1. "no-referrer"</a> <a
+                    href="#ref-for-referrer-policy-no-referrer-2">(2)</a>
+            <li><a href="#ref-for-referrer-policy-no-referrer-3">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-no-referrer-4">10.1. Information Leakage</a>
+            <li><a href="#ref-for-referrer-policy-no-referrer-5">10.2. Downgrade to less strict policies</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-no-referrer-when-downgrade">
+        <b><a
+                href="#referrer-policy-no-referrer-when-downgrade">#referrer-policy-no-referrer-when-downgrade</a></b><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-no-referrer-when-downgrade-1">3.2. "no-referrer-when-downgrade"</a> <a
+                    href="#ref-for-referrer-policy-no-referrer-when-downgrade-2">(2)</a>
+            <li><a href="#ref-for-referrer-policy-no-referrer-when-downgrade-3">3.9. The empty string</a> <a
+                    href="#ref-for-referrer-policy-no-referrer-when-downgrade-4">(2)</a>
+            <li><a href="#ref-for-referrer-policy-no-referrer-when-downgrade-5">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-no-referrer-when-downgrade-6">10.2. Downgrade to less strict
+                    policies</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-same-origin">
+        <b><a href="#referrer-policy-same-origin">#referrer-policy-same-origin</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-same-origin-1">3.3. "same-origin"</a> <a
+                    href="#ref-for-referrer-policy-same-origin-2">(2)</a>
+            <li><a href="#ref-for-referrer-policy-same-origin-3">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-same-origin-4">10.1. Information Leakage</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-origin">
+        <b><a href="#referrer-policy-origin">#referrer-policy-origin</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-origin-1">3.4. "origin"</a> <a
+                    href="#ref-for-referrer-policy-origin-2">(2)</a> <a href="#ref-for-referrer-policy-origin-3">(3)</a>
+            <li><a href="#ref-for-referrer-policy-origin-4">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-origin-5">10.1. Information Leakage</a>
+            <li><a href="#ref-for-referrer-policy-origin-6">10.2. Downgrade to less strict policies</a>
+            <li><a href="#ref-for-referrer-policy-origin-7">11.1. Unknown Policy Values</a> <a
+                    href="#ref-for-referrer-policy-origin-8">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-strict-origin">
+        <b><a href="#referrer-policy-strict-origin">#referrer-policy-strict-origin</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-strict-origin-1">3.4. "origin"</a>
+            <li><a href="#ref-for-referrer-policy-strict-origin-2">3.5. "strict-origin"</a> <a
+                    href="#ref-for-referrer-policy-strict-origin-3">(2)</a> <a
+                    href="#ref-for-referrer-policy-strict-origin-4">(3)</a>
+            <li><a href="#ref-for-referrer-policy-strict-origin-5">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-strict-origin-6">10.1. Information Leakage</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-origin-when-cross-origin">
+        <b><a
+                href="#referrer-policy-origin-when-cross-origin">#referrer-policy-origin-when-cross-origin</a></b><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-origin-when-cross-origin-1">3.6. "origin-when-cross-origin"</a> <a
+                    href="#ref-for-referrer-policy-origin-when-cross-origin-2">(2)</a> <a
+                    href="#ref-for-referrer-policy-origin-when-cross-origin-3">(3)</a> <a
+                    href="#ref-for-referrer-policy-origin-when-cross-origin-4">(4)</a>
+            <li><a href="#ref-for-referrer-policy-origin-when-cross-origin-5">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-origin-when-cross-origin-6">10.1. Information Leakage</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-strict-origin-when-cross-origin">
+        <b><a
+                href="#referrer-policy-strict-origin-when-cross-origin">#referrer-policy-strict-origin-when-cross-origin</a></b><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-strict-origin-when-cross-origin-1">3.6. "origin-when-cross-origin"</a>
+            <li><a href="#ref-for-referrer-policy-strict-origin-when-cross-origin-2">3.7.
+                    "strict-origin-when-cross-origin"</a> <a
+                    href="#ref-for-referrer-policy-strict-origin-when-cross-origin-3">(2)</a>
+            <li><a href="#ref-for-referrer-policy-strict-origin-when-cross-origin-4">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-strict-origin-when-cross-origin-5">10.1. Information Leakage</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-unsafe-url">
+        <b><a href="#referrer-policy-unsafe-url">#referrer-policy-unsafe-url</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-unsafe-url-1">3.8. "unsafe-url"</a> <a
+                    href="#ref-for-referrer-policy-unsafe-url-2">(2)</a>
+            <li><a href="#ref-for-referrer-policy-unsafe-url-3">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-referrer-policy-unsafe-url-4">10.1. Information Leakage</a>
+            <li><a href="#ref-for-referrer-policy-unsafe-url-5">10.2. Downgrade to less strict policies</a>
+            <li><a href="#ref-for-referrer-policy-unsafe-url-6">11.1. Unknown Policy Values</a> <a
+                    href="#ref-for-referrer-policy-unsafe-url-7">(2)</a> <a
+                    href="#ref-for-referrer-policy-unsafe-url-8">(3)</a> <a
+                    href="#ref-for-referrer-policy-unsafe-url-9">(4)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="referrer-policy-header-dfn">
+        <b><a href="#referrer-policy-header-dfn">#referrer-policy-header-dfn</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-referrer-policy-header-dfn-1">8.1.
+                    Parse a referrer policy from a Referrer-Policy header </a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="policy-token">
+        <b><a href="#policy-token">#policy-token</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-policy-token-1">4.1. Delivery via Referrer-Policy header</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="cssstylesheet-referrer-policy">
+        <b><a href="#cssstylesheet-referrer-policy">#cssstylesheet-referrer-policy</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-cssstylesheet-referrer-policy-1">7. Integration with CSS</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="set-requests-referrer-policy-on-redirect">
+        <b><a
+                href="#set-requests-referrer-policy-on-redirect">#set-requests-referrer-policy-on-redirect</a></b><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-set-requests-referrer-policy-on-redirect-1">5. Integration with Fetch</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="determine-requests-referrer">
+        <b><a href="#determine-requests-referrer">#determine-requests-referrer</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-determine-requests-referrer-1">3.9. The empty string</a> <a
+                    href="#ref-for-determine-requests-referrer-2">(2)</a>
+            <li><a href="#ref-for-determine-requests-referrer-3">5. Integration with Fetch</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="origin-only-flag">
+        <b><a href="#origin-only-flag">#origin-only-flag</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-origin-only-flag-1">8.3.
+                    Determine request’s Referrer </a>
+            <li><a href="#ref-for-origin-only-flag-2">8.4.
+                    Strip url for use as a referrer </a>
+        </ul>
+    </aside>
+    <script>/* script-dfn-panel */
+
+        document.body.addEventListener("click", function (e) {
+            var queryAll = function (sel) { return [].slice.call(document.querySelectorAll(sel)); }
+            // Find the dfn element or panel, if any, that was clicked on.
+            var el = e.target;
+            var target;
+            var hitALink = false;
+            while (el.parentElement) {
+                if (el.tagName == "A") {
+                    // Clicking on a link in a <dfn> shouldn't summon the panel
+                    hitALink = true;
+                }
+                if (el.classList.contains("dfn-paneled")) {
+                    target = "dfn";
+                    break;
+                }
+                if (el.classList.contains("dfn-panel")) {
+                    target = "dfn-panel";
+                    break;
+                }
+                el = el.parentElement;
+            }
+            if (target != "dfn-panel") {
+                // Turn off any currently "on" or "activated" panels.
+                queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function (el) {
+                    el.classList.remove("on");
+                    el.classList.remove("activated");
+                });
+            }
+            if (target == "dfn" && !hitALink) {
+                // open the panel
+                var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+                if (dfnPanel) {
+                    console.log(dfnPanel);
+                    dfnPanel.classList.add("on");
+                    var rect = el.getBoundingClientRect();
+                    dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+                    dfnPanel.style.top = window.scrollY + rect.top + "px";
+                    var panelRect = dfnPanel.getBoundingClientRect();
+                    var panelWidth = panelRect.right - panelRect.left;
+                    if (panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                        // Reposition, because the panel is overflowing
+                        dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+                    }
+                } else {
+                    console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+                }
+            } else if (target == "dfn-panel") {
+                // Switch it to "activated" state, which pins it.
+                el.classList.add("activated");
+                el.style.left = null;
+                el.style.top = null;
+            }
+
+        });
+    </script>
