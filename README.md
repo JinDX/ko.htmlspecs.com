@@ -88,7 +88,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 보안 및 인증
 - [x] [Web Authentication Level 2](https://ko.htmlspecs.com/webauthn-2)
-- [ ] [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api)
+- [x] [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api)
 - [ ] [Subresource Integrity (SRI)](https://ko.htmlspecs.com/SRI)
 - [ ] [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3)
 - [ ] [Secure Contexts](https://ko.htmlspecs.com/secure-contexts)
