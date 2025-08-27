@@ -98,7 +98,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 미디어 및 그래픽
 - [X] [WebGPU](https://ko.htmlspecs.com/webgpu)
-- [ ] [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL)
+- [X] [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL)
 - [ ] [Web Animations](https://ko.htmlspecs.com/web-animations-1)
 - [ ] [SVG 2](https://ko.htmlspecs.com/SVG2/)
 - [ ] [Picture-in-Picture](https://ko.htmlspecs.com/picture-in-picture)
