@@ -12,7 +12,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Implementation Notes — SVG 2</title>
+    <title>구현 참고 사항 — SVG 2</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
@@ -21,11 +21,12 @@
   (or use <style>), and include it before here. -->
 
 
-    <link rel="stylesheet" title="Default" href="https://www.w3.org/TR/SVG2/style/svg.css" type="text/css" media="screen" />
-    <link rel="alternate stylesheet" title="Only annotations for publication" href="https://www.w3.org/TR/SVG2/style/default_no_maturity.css"
-        type="text/css" media="screen" />
-    <link rel="alternate stylesheet" title="No issues/annotations" href="https://www.w3.org/TR/SVG2/style/default_no_issues.css" type="text/css"
+    <link rel="stylesheet" title="Default" href="https://www.w3.org/TR/SVG2/style/svg.css" type="text/css"
         media="screen" />
+    <link rel="alternate stylesheet" title="Only annotations for publication"
+        href="https://www.w3.org/TR/SVG2/style/default_no_maturity.css" type="text/css" media="screen" />
+    <link rel="alternate stylesheet" title="No issues/annotations"
+        href="https://www.w3.org/TR/SVG2/style/default_no_issues.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2016/W3C-ED" type="text/css" media="screen" />
     <script src="https://www.w3.org/TR/SVG2/style/link-fixup.js"></script>
     <script data-script-mathjax="" async=""
@@ -34,106 +35,80 @@
 
 <body class="chapter-implnote">
 
-    <h1>Appendix B: Implementation Notes</h1>
+    <h1>부록 B: 구현 참고 사항</h1>
     <nav id="toc">
-        <div class="header top"><a href="index.html">Overview</a> . <a href="idl.html">Previous</a> . <a
-                href="access.html">Next</a> . <a href="eltindex.html">Elements</a> . <a
-                href="attindex.html">Attributes</a> . <a href="propidx.html">Properties</a></div>
-        <h2 id="Contents" class="contents">Contents</h2>
+        <div class="header top"><a href="index.html">개요</a> . <a href="idl.html">이전</a> . <a href="access.html">다음</a> .
+            <a href="eltindex.html">요소</a> . <a href="attindex.html">속성</a> . <a href="propidx.html">속성(Property)</a>
+        </div>
+        <h2 id="Contents" class="contents">목차</h2>
         <ol class="toc appendix-toc">
             <li>
                 <ol class="toc appendix-toc">
-                    <li><a href="implnote.html#Introduction"><span class="secno">B.1.</span> Introduction</a></li>
-                    <li><a href="implnote.html#ArcImplementationNotes"><span class="secno">B.2.</span> Elliptical arc
-                            parameter conversion</a>
+                    <li><a href="implnote.html#Introduction"><span class="secno">B.1.</span> 소개</a></li>
+                    <li><a href="implnote.html#ArcImplementationNotes"><span class="secno">B.2.</span> 타원 호 매개변수 변환</a>
                         <ol class="toc appendix-toc">
-                            <li><a href="implnote.html#ArcSyntax"><span class="secno">B.2.1.</span> Elliptical arc
-                                    endpoint syntax</a></li>
+                            <li><a href="implnote.html#ArcSyntax"><span class="secno">B.2.1.</span> 타원 호 끝점 문법</a></li>
                             <li><a href="implnote.html#ArcParameterizationAlternatives"><span
-                                        class="secno">B.2.2.</span> Parameterization alternatives</a></li>
+                                        class="secno">B.2.2.</span> 매개변수화 대안</a></li>
                             <li><a href="implnote.html#ArcConversionCenterToEndpoint"><span class="secno">B.2.3.</span>
-                                    Conversion from center to endpoint parameterization</a></li>
+                                    중심에서 끝점 매개변수화로의 변환</a></li>
                             <li><a href="implnote.html#ArcConversionEndpointToCenter"><span class="secno">B.2.4.</span>
-                                    Conversion from endpoint to center parameterization</a></li>
+                                    끝점에서 중심 매개변수화로의 변환</a></li>
                             <li><a href="implnote.html#ArcCorrectionOutOfRangeRadii"><span class="secno">B.2.5.</span>
-                                    Correction of out-of-range radii</a></li>
+                                    범위를 벗어난 반지름의 보정</a></li>
                         </ol>
                     </li>
                     <li><a href="implnote.html#NumericPrecisionImplementationNotes"><span class="secno">B.3.</span>
-                            Notes on generating high-precision geometry</a></li>
+                            고정밀 기하 생성에 관한 참고 사항</a></li>
                 </ol>
             </li>
         </ol>
     </nav>
 
-    <h2 id="Introduction" class="heading">B.1. Introduction<a class="self-link" href="#Introduction"></a></h2>
+    <h2 id="Introduction" class="heading">B.1. 소개<a class="self-link" href="#Introduction"></a></h2>
 
-    <p>The following notes describe algorithms and other strategies
-        which can be used by software developers when converting content
-        to and from the formats required by features in the SVG language.</p>
+    <p>다음 참고 사항에서는 소프트웨어 개발자가 SVG 언어의 기능에서 요구하는 형식으로 콘텐츠를 변환하거나 변환할 때 사용할 수 있는 알고리즘 및 기타 전략을 설명합니다.</p>
 
-    <h2 id="ArcImplementationNotes" class="heading">B.2. Elliptical arc parameter conversion<a class="self-link"
+    <h2 id="ArcImplementationNotes" class="heading">B.2. 타원 호 매개변수 변환<a class="self-link"
             href="#ArcImplementationNotes"></a></h2>
 
     <p>
-        To be consistent with other path segment notation,
-        arcs in SVG paths are defined in terms of start and end points on the curve.
+        다른 경로 세그먼트 표기법과 일관성을 유지하기 위해,
+        SVG 경로의 호는 곡선의 시작점과 끝점 기준으로 정의됩니다.
     </p>
 
     <p>
-        This parameterization of elliptical arcs will be referred to
-        as <em>endpoint parameterization</em>. One of the
-        advantages of endpoint parameterization is that it permits a
-        consistent path syntax in which all path commands end in the
-        coordinates of the new "current point".
+        타원 호의 이러한 매개변수화는 <em>끝점 매개변수화</em>라고 부릅니다. 끝점 매개변수화의 장점 중 하나는 모든 경로 명령이 새로운 "현재 점"의 좌표로 끝나는 일관된 경로 문법을 허용한다는
+        점입니다.
     </p>
 
     <p>
-        However, this is not the only way of describing arc geometry
-        used in software or mathematics.
-        This section describes the alternative center parameterization,
-        and how to convert it from and to SVG's endpoint parameterization.
+        그러나 이것만이 소프트웨어나 수학에서 호의 기하를 기술하는 방법은 아닙니다.
+        이 섹션에서는 대안인 중심 매개변수화와, SVG의 끝점 매개변수화와 상호 변환하는 방법을 설명합니다.
     </p>
 
     <div class="math">
 
-        <h3 id="ArcSyntax" class="heading">B.2.1. Elliptical arc endpoint syntax<a class="self-link"
-                href="#ArcSyntax"></a></h3>
+        <h3 id="ArcSyntax" class="heading">B.2.1. 타원 호 끝점 문법<a class="self-link" href="#ArcSyntax"></a></h3>
 
-        <p>An elliptical arc, as represented in the SVG path command,
-            is described by the following parameters in order:</p>
+        <p>SVG 경로 명령에서 표현되는 타원 호는 다음과 같은 순서로 매개변수로 설명됩니다:</p>
 
-        <p>(<var>x</var><sub>1</sub>, <var>y</var><sub>1</sub>) are the absolute coordinates of the
-            current point on the path, obtained from the last two
-            parameters of the previous path command.</p>
+        <p>(<var>x</var><sub>1</sub>, <var>y</var><sub>1</sub>)은 경로의 현재 지점의 절대 좌표로, 이전 경로 명령의 마지막 두 매개변수에서 얻습니다.</p>
 
-        <p><var>r<sub>x</sub></var>
-            and <var>r<sub>y</sub></var>
-            are the radii of the ellipse (also known as its semi-major and
-            semi-minor axes).</p>
+        <p><var>r<sub>x</sub></var>와 <var>r<sub>y</sub></var>는 타원의 반지름(반장축 및 반단축)입니다.</p>
 
-        <p><var>φ</var> is the angle from the x-axis of the current coordinate
-            system to the x-axis of the ellipse.</p>
+        <p><var>φ</var>는 현재 좌표계의 x축에서 타원의 x축까지의 각도입니다.</p>
 
-        <p><var>f<sub>A</sub></var> is
-            the large arc flag, and is 0
-            if an arc spanning less than or equal to 180 degrees is chosen, or 1
-            if an arc spanning greater than 180 degrees is chosen.</p>
+        <p><var>f<sub>A</sub></var>는 큰 호 플래그로, 180도 이하의 호가 선택되면 0이고, 180도를 초과하는 호가 선택되면 1입니다.</p>
 
-        <p><var>f<sub>S</sub></var> is
-            the sweep flag, and is 0 if
-            the line joining center to arc sweeps through decreasing
-            angles, or 1 if it sweeps
-            through increasing angles.</p>
+        <p><var>f<sub>S</sub></var>는 스윕 플래그로, 중심에서 호까지의 선이 각도가 감소하는 방향으로 스윕하면 0, 증가하는 방향으로 스윕하면 1입니다.</p>
 
-        <p>(<var>x</var><sub>2</sub>, <var>y</var><sub>2</sub>) are the absolute coordinates of the
-            final point of the arc.</p>
+        <p>(<var>x</var><sub>2</sub>, <var>y</var><sub>2</sub>)는 호의 마지막 지점의 절대 좌표입니다.</p>
 
-        <h3 id="ArcParameterizationAlternatives" class="heading">B.2.2. Parameterization alternatives<a
-                class="self-link" href="#ArcParameterizationAlternatives"></a></h3>
+        <h3 id="ArcParameterizationAlternatives" class="heading">B.2.2. 매개변수화 대안<a class="self-link"
+                href="#ArcParameterizationAlternatives"></a></h3>
 
-        <p>An arbitrary point (<var>x</var>, <var>y</var>) on the elliptical
-            arc can be described by the 2-dimensional matrix equation:</p>
+        <p>타원 호 위의 임의의 점 (<var>x</var>, <var>y</var>)은 다음과 같은 2차원 행렬 방정식으로 표현할 수 있습니다:</p>
 
         (eq. 3.1)
         <div role="math" aria-describedby="math-arbitrary-point-on-elliptical-arc">
@@ -253,50 +228,32 @@
   </pre>
         </div>
 
-        <p>(<var>c<sub>x</sub></var>, <var>c<sub>y</sub></var>) are
-            the coordinates of the center of the ellipse.</p>
+        <p>(<var>c<sub>x</sub></var>, <var>c<sub>y</sub></var>)는 타원의 중심 좌표입니다.</p>
 
-        <p><var>r<sub>x</sub></var> and <var>r<sub>y</sub></var>
-            are the radii of the ellipse (also known as its semi-major and
-            semi-minor axes).</p>
+        <p><var>r<sub>x</sub></var>와 <var>r<sub>y</sub></var>는 타원의 반지름(반장축 및 반단축)입니다.</p>
 
         <div class="ready-for-wider-review">
-            <p><var>φ</var> is the angle from the
-                x-axis of the current coordinate system to the x-axis of the
-                ellipse.</p>
+            <p><var>φ</var>는 현재 좌표계의 x축에서 타원의 x축까지의 각도입니다.</p>
 
-            <p><var>θ</var> is the angle around the arc that the point
-                (<var>x</var>, <var>y</var>) lies at, and ranges from:</p>
+            <p><var>θ</var>는 아크 위의 점 (<var>x</var>, <var>y</var>)이 위치한 아크 주위의 각도이며, 다음 범위 내에서 변합니다:</p>
 
             <ul>
-                <li><var>θ</var><sub>1</sub> which is
-                    the start angle of the elliptical arc prior to the stretch and
-                    rotate operations.</li>
+                <li><var>θ</var><sub>1</sub>: 타원 호가 늘어나거나 회전하기 전의 시작 각도입니다.</li>
 
-                <li><var>θ</var><sub>2</sub> which is
-                    the end angle of the elliptical arc prior to the stretch and
-                    rotate operations.</li>
+                <li><var>θ</var><sub>2</sub>: 타원 호가 늘어나거나 회전하기 전의 끝 각도입니다.</li>
 
-                <li>Δ<var>θ</var> which is the difference between these
-                    two angles.</li>
+                <li>Δ<var>θ</var>: 이 두 각도의 차이입니다.</li>
             </ul>
         </div>
-        <p>If one thinks of an ellipse as a circle that has been
-            stretched and then rotated, then <var>θ</var><sub>1</sub>,
-            <var>θ</var><sub>2</sub> and Δ<var>θ</var>
-            are the start angle, end angle and sweep angle, respectively
-            of the arc prior to the stretch and rotate operations.
-            This leads to an alternate parameterization which is common
-            among graphics APIs, which will be referred to as <em>center
-                parameterization</em>. In the next sections, formulas are
-            given for mapping in both directions between center
-            parameterization and endpoint parameterization.
+        <p>타원을 늘리고 회전시킨 원으로 생각한다면, <var>θ</var><sub>1</sub>,
+            <var>θ</var><sub>2</sub>, Δ<var>θ</var>는 각각 늘리기 및 회전 전 아크의 시작 각도, 끝 각도, 스윕 각도입니다.
+            이는 그래픽 API에서 흔히 사용되는 대안적 매개변수화로, <em>중심 매개변수화</em>라고 부릅니다. 다음 섹션에서는 중심 매개변수화와 끝점 매개변수화 간의 변환 공식이 나옵니다.
         </p>
 
-        <h3 id="ArcConversionCenterToEndpoint" class="heading">B.2.3. Conversion from center to endpoint
-            parameterization<a class="self-link" href="#ArcConversionCenterToEndpoint"></a></h3>
+        <h3 id="ArcConversionCenterToEndpoint" class="heading">B.2.3. 중심에서 끝점 매개변수화로의 변환<a class="self-link"
+                href="#ArcConversionCenterToEndpoint"></a></h3>
 
-        <p>Given the following variables:</p>
+        <p>다음 변수들이 주어졌다고 가정합니다:</p>
 
         <p class="indented separated">
             <var>c<sub>x</sub></var>
@@ -308,7 +265,7 @@
             Δ<var>θ</var>
         </p>
 
-        <p>the task is to find:</p>
+        <p>구해야 하는 값은 다음과 같습니다:</p>
 
         <p class="indented separated">
             <var>x</var><sub>1</sub>
@@ -319,15 +276,11 @@
             <var>f<sub>S</sub></var>
         </p>
 
-        <p>This can be achieved using the following formulas:</p>
+        <p>다음 공식들을 사용하여 구할 수 있습니다:</p>
 
         <table style="width: 90%">
             <tr>
                 <td>
-                    <!--<img
-    alt="Equation 4.1"
-    src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image004.png" />-->
-
                     <div role="math">
                         <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                             <mrow>
@@ -452,9 +405,6 @@
             </tr>
             <tr>
                 <td>
-                    <!--<img
-    alt="Equation 4.2"
-    src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image006.png" />-->
                     <div role="math">
                         <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                             <mrow>
@@ -598,9 +548,6 @@
             </tr>
             <tr>
                 <td>
-                    <!--<img
-    alt="Equation 4.3"
-    src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image008.png" />-->
                     <div role="math">
                         <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                             <mrow>
@@ -664,9 +611,6 @@
             </tr>
             <tr>
                 <td>
-                    <!--<img
-    alt="Equation 4.4"
-    src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image010.png" />-->
                     <div role="math">
                         <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                             <mrow>
@@ -721,10 +665,10 @@
             </tr>
         </table>
 
-        <h3 id="ArcConversionEndpointToCenter" class="heading">B.2.4. Conversion from endpoint to center
-            parameterization<a class="self-link" href="#ArcConversionEndpointToCenter"></a></h3>
+        <h3 id="ArcConversionEndpointToCenter" class="heading">B.2.4. 끝점에서 중심 매개변수화로의 변환<a class="self-link"
+                href="#ArcConversionEndpointToCenter"></a></h3>
 
-        <p>Given the following variables:</p>
+        <p>다음 변수들이 주어졌다고 가정합니다:</p>
 
         <p class="indented separated">
             <var>x</var><sub>1</sub>
@@ -738,7 +682,7 @@
             <var>φ</var>
         </p>
 
-        <p>the task is to find:</p>
+        <p>구해야 하는 값은 다음과 같습니다:</p>
 
         <p class="indented separated">
             <var>c<sub>x</sub></var>
@@ -747,24 +691,17 @@
             Δ<var>θ</var>
         </p>
 
-        <p>The equations simplify after a translation which
-            places the origin at the midpoint of the line joining
-            (<var>x</var><sub>1</sub>, <var>y</var><sub>1</sub>) to
-            (<var>x</var><sub>2</sub>, <var>y</var><sub>2</sub>), followed by
-            a rotation to line up the coordinate axes with the axes of the ellipse.
-            All transformed coordinates will be written with primes. They are
-            computed as intermediate values on the way toward finding the required
-            center parameterization variables. This procedure consists of the
-            following steps:</p>
+        <p>방정식은 (<var>x</var><sub>1</sub>, <var>y</var><sub>1</sub>)에서 (<var>x</var><sub>2</sub>,
+            <var>y</var><sub>2</sub>)를 잇는 선분의 중점에 원점을 옮기고, 이어서 좌표축을 타원의 축과 맞추는 회전을 거치면 더 간단해집니다.
+            모든 변환된 좌표는 프라임(′) 기호로 표시됩니다. 이 값들은 중심 매개변수화 변수들을 구하는 중간값입니다. 이 절차는 다음 단계로 구성됩니다:
+        </p>
 
         <ul>
             <li>
-                <p><em>Step 1: Compute</em> (<var>x</var><sub>1</sub>′, <var>y</var><sub>1</sub>′)</p>
+                <p><em>1단계: 계산</em> (<var>x</var><sub>1</sub>′, <var>y</var><sub>1</sub>′)</p>
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 5.1"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image012.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mrow>
@@ -881,12 +818,10 @@
             </li>
 
             <li>
-                <p><em>Step 2: Compute</em> (<var>c<sub>x</sub></var>′, <var>c<sub>y</sub></var>′)</p>
+                <p><em>2단계: 계산</em> (<var>c<sub>x</sub></var>′, <var>c<sub>y</sub></var>′)</p>
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 5.2"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image014.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mrow>
@@ -1082,19 +1017,17 @@
                         <td style="text-align: right">(eq. 5.2)</td>
                     </tr>
                 </table>
-                <p>where the + sign is chosen if <var>f<sub>A</sub></var> ≠ <var>f<sub>S</sub></var>, and
-                    the − sign is chosen if <var>f<sub>A</sub></var> = <var>f<sub>S</sub></var>.</p>
+                <p>여기서 + 부호는 <var>f<sub>A</sub></var> ≠ <var>f<sub>S</sub></var>일 때 선택하고,
+                    − 부호는 <var>f<sub>A</sub></var> = <var>f<sub>S</sub></var>일 때 선택합니다.</p>
             </li>
 
             <li>
-                <p><em>Step 3: Compute</em> (<var>c<sub>x</sub></var>, <var>c<sub>y</sub></var>)
+                <p><em>3단계: 계산</em> (<var>c<sub>x</sub></var>, <var>c<sub>y</sub></var>)
                     <em>from</em> (<var>c<sub>x</sub></var>′, <var>c<sub>y</sub></var>′)
                 </p>
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 5.3"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image016.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mrow>
@@ -1230,15 +1163,12 @@
             </li>
 
             <li>
-                <p><em>Step 4: Compute</em> <var>θ</var><sub>1</sub> and Δ<var>θ</var></p>
-                <p>In general, the angle between two vectors
-                    (<var>u<sub>x</sub></var>, <var>u<sub>y</sub></var>)
-                    and (<var>v<sub>x</sub></var>, <var>v<sub>y</sub></var>) can be computed as</p>
+                <p><em>4단계: 계산</em> <var>θ</var><sub>1</sub> 및 Δ<var>θ</var></p>
+                <p>일반적으로 두 벡터 (<var>u<sub>x</sub></var>, <var>u<sub>y</sub></var>)
+                    와 (<var>v<sub>x</sub></var>, <var>v<sub>y</sub></var>) 사이의 각은 다음과 같이 계산할 수 있습니다</p>
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 5.4"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image018.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mrow>
@@ -1305,19 +1235,15 @@
                     </tr>
                 </table>
 
-                <p>where the ± sign appearing here is the sign of
-                    <var>u<sub>x</sub></var> <var>v<sub>y</sub></var> − <var>u<sub>y</sub></var>
-                    <var>v<sub>x</sub></var>.
+                <p>여기에서 나타나는 ± 부호는 <var>u<sub>x</sub></var> <var>v<sub>y</sub></var> − <var>u<sub>y</sub></var>
+                    <var>v<sub>x</sub></var>의 부호입니다.
                 </p>
 
-                <p>This angle function can be used to express <var>θ</var><sub>1</sub> and
-                    Δ<var>θ</var> as follows:</p>
+                <p>이 각도 함수를 이용하여 <var>θ</var><sub>1</sub> 및 Δ<var>θ</var>를 다음과 같이 표현할 수 있습니다:</p>
 
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 5.5"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image020.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mrow>
@@ -1419,9 +1345,7 @@
                         <td style="text-align: right">(eq. 5.5)</td>
                     </tr>
                     <tr>
-                        <td><!--<img
-        alt="Equation 5.6"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image022.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mrow>
@@ -1577,50 +1501,41 @@
                     </tr>
                 </table>
 
-                <p>where Δ<var>θ</var> is fixed in the range
-                    −360° &lt; Δ<var>θ</var> &lt; 360° such that:</p>
+                <p>여기서 Δ<var>θ</var>는 −360° &lt; Δ<var>θ</var> &lt; 360° 범위로 고정되며, 다음과 같습니다:</p>
 
-                <p class="indented">if <var>f<sub>S</sub></var> = 0, then Δ<var>θ</var> &lt; 0,</p>
-                <p class="indented">else if <var>f<sub>S</sub></var> = 1, then Δ<var>θ</var> > 0.</p>
+                <p class="indented">만약 <var>f<sub>S</sub></var> = 0이면, Δ<var>θ</var> &lt; 0,</p>
+                <p class="indented">만약 <var>f<sub>S</sub></var> = 1이면, Δ<var>θ</var> &gt; 0.</p>
 
-                <p>In other words, if <var>f<sub>S</sub></var> = 0 and the
-                    right side of (eq. 5.6) is greater than 0, then subtract 360°,
-                    whereas if <var>f<sub>S</sub></var> = 1 and the right
-                    side of (eq. 5.6) is less than 0, then add 360°. In all other cases
-                    leave it as is.</p>
+                <p>즉, <var>f<sub>S</sub></var> = 0 이고 (eq. 5.6)의 오른쪽이 0보다 크면 360°를 빼고,
+                    <var>f<sub>S</sub></var> = 1 이고 (eq. 5.6)의 오른쪽이 0보다 작으면 360°를 더합니다.
+                    그 외에는 그대로 둡니다.
+                </p>
             </li>
         </ul>
 
-        <h3 id="ArcCorrectionOutOfRangeRadii" class="heading">B.2.5. Correction of out-of-range radii<a
-                class="self-link" href="#ArcCorrectionOutOfRangeRadii"></a></h3>
+        <h3 id="ArcCorrectionOutOfRangeRadii" class="heading">B.2.5. 범위를 벗어난 반지름의 보정<a class="self-link"
+                href="#ArcCorrectionOutOfRangeRadii"></a></h3>
 
-        <p>This section describes the mathematical adjustments required for out-of-range <var>r<sub>x</sub></var> and
-            <var>r<sub>y</sub></var>,
-            as described in the <a href="paths.html#ArcOutOfRangeParameters">Path implementation notes</a>.
-            Algorithmically these adjustments consist of the following
-            steps:
+        <p>이 섹션에서는 <a href="paths.html#ArcOutOfRangeParameters">경로 구현 참고 사항</a>에서 설명한 대로,
+            범위를 벗어난 <var>r<sub>x</sub></var>와 <var>r<sub>y</sub></var>에 대해 필요한 수학적 조정 방법을 설명합니다.
+            알고리즘적으로 이러한 조정은 다음 단계로 구성됩니다:
         </p>
 
         <ul>
             <li>
-                <p><em>Step 1: Ensure radii are non-zero</em></p>
-                <p>If <var>r<sub>x</sub></var> = 0 or
-                    <var>r<sub>y</sub></var> = 0, then treat
-                    this as a straight line from (<var>x</var><sub>1</sub>, <var>y</var><sub>1</sub>)
-                    to (<var>x</var><sub>2</sub>, <var>y</var><sub>2</sub>) and stop. Otherwise,
+                <p><em>1단계: 반지름이 0이 아님을 보장</em></p>
+                <p><var>r<sub>x</sub></var> = 0 또는 <var>r<sub>y</sub></var> = 0이면,
+                    (<var>x</var><sub>1</sub>, <var>y</var><sub>1</sub>)에서 (<var>x</var><sub>2</sub>,
+                    <var>y</var><sub>2</sub>)까지 직선으로 처리하고 중단합니다. 그렇지 않으면,
                 </p>
             </li>
 
             <li>
-                <p><em>Step 2: Ensure radii are positive</em></p>
-                <p>Take the absolute value of <var>r<sub>x</sub></var> and
-                    <var>r<sub>y</sub></var>:
-                </p>
+                <p><em>2단계: 반지름이 양수임을 보장</em></p>
+                <p><var>r<sub>x</sub></var>와 <var>r<sub>y</sub></var>의 절대값을 취합니다:</p>
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 6.1"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image024.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mtable columnalign="left">
@@ -1669,14 +1584,11 @@
             </li>
 
             <li>
-                <p><em>Step 3: Ensure radii are large enough</em></p>
-                <p>Using the primed coordinate values of equation (eq. 5.1),
-                    compute</p>
+                <p><em>3단계: 반지름이 충분히 큰지 확인</em></p>
+                <p>방정식 (eq. 5.1)의 프라임 좌표값을 사용하여 계산합니다</p>
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 6.2"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image026.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mrow>
@@ -1732,16 +1644,11 @@
                         <td style="text-align: right">(eq. 6.2)</td>
                     </tr>
                 </table>
-                <p>If the result of the above equation is less than or equal to
-                    1, then no further change need be made to <var>r<sub>x</sub></var>
-                    and <var>r<sub>y</sub></var>. If
-                    the result of the above equation is greater than 1, then make
-                    the replacements</p>
+                <p>위 방정식의 결과가 1 이하이면 <var>r<sub>x</sub></var>와 <var>r<sub>y</sub></var>를 추가로 변경할 필요가 없습니다.
+                    결과가 1보다 크면 다음과 같이 변경합니다</p>
                 <table style="width: 90%">
                     <tr>
-                        <td><!--<img
-        alt="Equation 6.3"
-        src="https://www.w3.org/TR/SVG2/images/implnote/arcs/image028.png" />-->
+                        <td>
                             <div role="math">
                                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                                     <mtable columnalign="left">
@@ -1794,105 +1701,86 @@
             </li>
 
             <li>
-                <p><em>Step 4: Proceed with computations</em></p>
-                <p>Proceed with the remaining elliptical arc computations, such
-                    as those in the <a href="#ArcConversionEndpointToCenter">Conversion from endpoint to center
-                        parameterization</a> algorithm.
-                    Note: As a consequence of the
-                    radii corrections in this section, the equation (5.2) for the
-                    center of the ellipse always has at least one solution (i.e.
-                    the radicand is never negative). In the case that the
-                    radii are scaled up using equation (eq. 6.3), the radicand of
-                    (eq. 5.2) is zero and there is exactly one solution for the
-                    center of the ellipse.</p>
+                <p><em>4단계: 계산 계속 진행</em></p>
+                <p>나머지 타원 호 계산을 계속 진행합니다.
+                    예: <a href="#ArcConversionEndpointToCenter">끝점에서 중심 매개변수화로의 변환</a> 알고리즘 등.
+                    참고: 이 섹션의 반지름 보정 결과로, 타원의 중심에 대한 방정식 (5.2)는 항상 적어도 하나의 해를 가지며(즉, 근호 안이 음수가 되지 않음),
+                    만약 반지름이 방정식 (eq. 6.3)으로 확대된 경우에는 (eq. 5.2)의 근호 안이 0이 되어 타원의 중심에 대해 정확히 하나의 해가 존재합니다.
+                </p>
             </li>
         </ul>
 
     </div>
 
-    <h2 id="NumericPrecisionImplementationNotes" class="heading">B.3. Notes on generating high-precision geometry<a
-            class="self-link" href="#NumericPrecisionImplementationNotes"></a></h2>
+    <h2 id="NumericPrecisionImplementationNotes" class="heading">B.3. 고정밀 기하 생성 참고 사항<a class="self-link"
+            href="#NumericPrecisionImplementationNotes"></a></h2>
 
-    <p class="normativity">This section is informative.</p>
+    <p class="normativity">이 섹션은 안내용입니다.</p>
 
-    <p>The <a href="types.html#Precision">real number precision</a> of SVG is
-        single-precision.
-        <a href="conform.html#ConformingSVGGenerators">conforming SVG generators</a> handling technical data
-        where expression of information exceeding single precision is desired,
-        such as maps and technical drawings,
-        are encouraged to follow the process outlined in this section
-        to ensure consistent display in <a href="conform.html#ConformingSVGViewers">conforming SVG viewers</a>.
+    <p>SVG의 <a href="types.html#Precision">실수 정밀도</a>는 단정밀도입니다.
+        <a href="conform.html#ConformingSVGGenerators">기술 데이터를 처리하는 적합한 SVG 생성기</a>에서 단정밀도를 초과하는 정보 표현이 필요한 경우(예: 지도나 기술
+        도면),
+        <a href="conform.html#ConformingSVGViewers">적합한 SVG 뷰어</a>에서 일관된 표시를 보장하기 위해 이 섹션의 절차를 따르는 것이 권장됩니다.
     </p>
 
     <p>
-        Presentation with an effective precision higher than
-        single-precision may be obtained by taking advantage
-        of the fact that at least double-precision floating point must be used
-        when generating a CTM (See CTM generation processing in the
-        <a href="conform.html#ConformingSVGViewers">Conforming SVG Viewers</a> section).
-        The steps for generating content that takes advantage of this are:
+        단정밀도보다 더 높은 실제 정밀도로 표시하려면, CTM을 생성할 때(자세한 내용은 <a href="conform.html#ConformingSVGViewers">적합한 SVG 뷰어</a> 섹션의 CTM
+        생성 처리 참조) 적어도 배정밀도 부동소수점이 사용된다는 점을 활용할 수 있습니다.
+        이를 활용한 콘텐츠 생성 절차는 다음과 같습니다:
     </p>
     <ol>
-        <li>Split content into tiles such that the number of significant digits
-            required to position and size each object within a tile is within the
-            range of single precision floats. Besides, in this description,
-            the coordinate system which the original content has originally will be called source space. </li>
-        <li>Generate a coordinate transformation matrix per tile to transform from
-            source space to tile space, where tile space is a coordinate system with origin
-            <var>(0,0)</var> at the top left of the tile. Each element of the
-            transformation matrix must be within the range of single precision.
+        <li>콘텐츠를 타일로 분할하여, 각 타일 내 객체의 위치와 크기를 지정할 때 필요한 유효 숫자 개수가 단정밀도 범위 내에 있도록 합니다.
+            여기서 원래 콘텐츠가 가진 좌표계를 소스 공간이라 부릅니다. </li>
+        <li>타일마다 소스 공간에서 타일 공간으로 변환하는 좌표 변환 행렬을 생성합니다. 타일 공간은 타일의 왼쪽 위가 원점 <var>(0,0)</var>인 좌표계입니다. 변환 행렬의 각 요소는 단정밀도
+            범위 내에 있어야 합니다.
         </li>
-        <li>Transform the contents of each tile from source space to tile space using
-            the generated coordinate transformation matrix. The result is that the parameters of each object can now be
-            expressed with significant digits within the range of single precision floats.</li>
-        <li>For each tile, generate an inverse transformation matrix for the
-            conversion of tile space to source space. This is used as a <a class="property"
-                href="coords.html#TransformProperty">transform</a> attribute of the element for the tile of the next
-            step. </li>
-        <li>Arrange each tile as a separate user coordinate system in SVG. For example,
-            the tiles may be expressed a <span class="element-name">‘<a
-                    href="struct.html#GElement"><span>g</span></a>’</span> elements
-            with an <a class="property" href="coords.html#TransformProperty">transform</a> attribute having the
-            transformation matrix generated by the previous step.
-            And the split graphics generated by the third step will be placed as children of it. </li>
+        <li>각 타일의 콘텐츠를 생성된 좌표 변환 행렬을 이용해 소스 공간에서 타일 공간으로 변환합니다. 그 결과 각 객체의 파라미터를 단정밀도 범위 내 유효 숫자로 표현할 수 있게 됩니다.</li>
+        <li>각 타일에 대해 타일 공간에서 소스 공간으로 변환하는 역변환 행렬을 생성합니다. 이는 이후 단계에서 해당 타일 요소의 <a class="property"
+                href="coords.html#TransformProperty">transform</a> 속성으로 사용됩니다. </li>
+        <li>각 타일을 SVG에서 독립적인 사용자 좌표계로 배치합니다. 예를 들어, 타일들은 <span class="element-name">‘<a
+                    href="struct.html#GElement"><span>g</span></a>’</span> 요소로 표현할 수 있으며,
+            <a class="property" href="coords.html#TransformProperty">transform</a> 속성에 이전 단계에서 생성한 변환 행렬을 지정합니다.
+            그리고 3단계에서 생성된 분할 그래픽은 그 하위에 배치합니다.
+        </li>
 
     </ol>
 
     <table>
         <caption>
-            Example Splitting vector graphics bigger than a tile
+            타일보다 큰 벡터 그래픽 분할 예시
         </caption>
         <tr>
-            <th>Before Splitting</th>
+            <th>분할 전</th>
             <th> </th>
-            <th>After Splitting</th>
+            <th>분할 후</th>
         </tr>
         <tr>
-            <td><img alt="Example Before splitting" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling3.png" width="200" /></td>
+            <td><img alt="분할 전 예시" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling3.png"
+                    width="200" /></td>
             <td> </td>
-            <td><img alt="Example After Splitting" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling4.png" width="200" /></td>
+            <td><img alt="분할 후 예시" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling4.png"
+                    width="200" /></td>
         </tr>
     </table>
 
     <table>
         <caption>
-            Example Improving Significant Digits
+            유효 숫자 개선 예시
         </caption>
         <tr>
-            <th>Step 1 : Splitting content</th>
+            <th>1단계 : 콘텐츠 분할</th>
             <th> </th>
-            <th>Step 5 : Arranging tiles with smaller effective digits and appropriate translate</th>
+            <th>5단계 : 더 작은 유효 숫자와 적절한 이동으로 타일 배치</th>
         </tr>
         <tr>
-            <td><img alt="Example Split content into tiles" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling1.png"
+            <td><img alt="타일로 콘텐츠 분할 예시" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling1.png"
                     width="400" /></td>
             <td> </td>
-            <td><img alt="Example Translate and assign split contents" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling2.png"
+            <td><img alt="분할된 콘텐츠 이동 및 배치 예시" src="https://www.w3.org/TR/SVG2/images/conform/betterPrecisionTiling2.png"
                     width="400" /></td>
         </tr>
         <tr>
-            <td colspan="3">This example provides the significant figure of eight digits using tiles with the user
-                coordinate system of seven digits.</td>
+            <td colspan="3">이 예시에서는 사용자 좌표계가 7자리인 타일을 사용해 8자리 유효 숫자를 제공합니다.</td>
         </tr>
     </table>
 
