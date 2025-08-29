@@ -104,7 +104,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Picture-in-Picture](https://ko.htmlspecs.com/picture-in-picture)
 - [x] [Presentation API](https://ko.htmlspecs.com/presentation-api)
 - [x] [Scroll-driven Animations](https://ko.htmlspecs.com/scroll-animations-1)
-- [ ] [Media Capture and Streams](https://ko.htmlspecs.com/mediacapture-streams)
+- [x] [Media Capture and Streams](https://ko.htmlspecs.com/mediacapture-streams)
 
 ### 개발자 도구
 - [x] [Console](https://ko.htmlspecs.com/console)
