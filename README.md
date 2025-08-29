@@ -103,7 +103,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [SVG 2](https://ko.htmlspecs.com/SVG2/)
 - [x] [Picture-in-Picture](https://ko.htmlspecs.com/picture-in-picture)
 - [x] [Presentation API](https://ko.htmlspecs.com/presentation-api)
-- [ ] [Scroll-driven Animations](https://ko.htmlspecs.com/scroll-animations-1)
+- [x] [Scroll-driven Animations](https://ko.htmlspecs.com/scroll-animations-1)
 - [ ] [Media Capture and Streams](https://ko.htmlspecs.com/mediacapture-streams)
 
 ### 개발자 도구
