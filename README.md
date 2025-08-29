@@ -100,7 +100,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [X] [WebGPU](https://ko.htmlspecs.com/webgpu)
 - [X] [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL)
 - [x] [Web Animations](https://ko.htmlspecs.com/web-animations-1)
-- [ ] [SVG 2](https://ko.htmlspecs.com/SVG2/)
+- [x] [SVG 2](https://ko.htmlspecs.com/SVG2/)
 - [ ] [Picture-in-Picture](https://ko.htmlspecs.com/picture-in-picture)
 - [ ] [Presentation API](https://ko.htmlspecs.com/presentation-api)
 - [ ] [Scroll-driven Animations](https://ko.htmlspecs.com/scroll-animations-1)
