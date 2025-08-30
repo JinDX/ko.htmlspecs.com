@@ -126,11 +126,11 @@ HTML 및 관련 API, CSS 표준 시리즈.
 ### 폰트
 - [x] [CSS Fonts Module Level 3](https://ko.htmlspecs.com/css/css-fonts-3)
 - [x] [CSS Fonts Module Level 4](https://ko.htmlspecs.com/css/css-fonts-4)
-- [ ] [CSS Font Loading Module Level 3](https://ko.htmlspecs.com/css/css-font-loading)
+- [x] [CSS Font Loading Module Level 3](https://ko.htmlspecs.com/css/css-font-loading)
 
 ### 텍스트 및 타이포그래피
-- [ ] [CSS Text Module Level 3](https://ko.htmlspecs.com/css/css-text-3)
-- [ ] [CSS Text Module Level 4](https://ko.htmlspecs.com/css/css-text-4)
+- [x] [CSS Text Module Level 3](https://ko.htmlspecs.com/css/css-text-3)
+- [x] [CSS Text Module Level 4](https://ko.htmlspecs.com/css/css-text-4)
 - [ ] [CSS Counter Styles Level 3](https://ko.htmlspecs.com/css/css-counter-styles-3)
 - [ ] [CSS Lists and Counters Module Level 3](https://ko.htmlspecs.com/css/css-lists-3)
 - [ ] [CSS Text Decoration Level 3](https://ko.htmlspecs.com/css/css-text-decor-3)
