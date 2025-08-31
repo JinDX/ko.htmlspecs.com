@@ -133,7 +133,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Text Module Level 4](https://ko.htmlspecs.com/css/css-text-4)
 - [x] [CSS Counter Styles Level 3](https://ko.htmlspecs.com/css/css-counter-styles-3)
 - [x] [CSS Lists and Counters Module Level 3](https://ko.htmlspecs.com/css/css-lists-3)
-- [ ] [CSS Text Decoration Level 3](https://ko.htmlspecs.com/css/css-text-decor-3)
+- [x] [CSS Text Decoration Level 3](https://ko.htmlspecs.com/css/css-text-decor-3)
 
 ### 미디어 쿼리
 - [ ] [Media Queries Level 3](https://ko.htmlspecs.com/css/mediaqueries-3)
