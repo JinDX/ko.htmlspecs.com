@@ -141,7 +141,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [Media Queries Level 5](https://ko.htmlspecs.com/css/mediaqueries-5)
 
 ### 레이아웃
-- [ ] [CSS Box Model Level 3](https://ko.htmlspecs.com/css/css-box-3)
+- [x] [CSS Box Model Level 3](https://ko.htmlspecs.com/css/css-box-3)
 - [ ] [CSS Box Model Level 4](https://ko.htmlspecs.com/css/css-box-4)
 - [ ] [CSS Display Module Level 3](https://ko.htmlspecs.com/css/css-display-3)
 - [ ] [CSS Flexible Box Layout Module Level 1](https://ko.htmlspecs.com/css/css-flexbox-1)
