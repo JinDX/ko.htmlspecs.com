@@ -136,7 +136,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Text Decoration Level 3](https://ko.htmlspecs.com/css/css-text-decor-3)
 
 ### 미디어 쿼리
-- [ ] [Media Queries Level 3](https://ko.htmlspecs.com/css/mediaqueries-3)
+- [x] [Media Queries Level 3](https://ko.htmlspecs.com/css/mediaqueries-3)
 - [ ] [Media Queries Level 4](https://ko.htmlspecs.com/css/mediaqueries-4)
 - [ ] [Media Queries Level 5](https://ko.htmlspecs.com/css/mediaqueries-5)
 
