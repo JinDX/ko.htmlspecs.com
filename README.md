@@ -137,8 +137,8 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 미디어 쿼리
 - [x] [Media Queries Level 3](https://ko.htmlspecs.com/css/mediaqueries-3)
-- [ ] [Media Queries Level 4](https://ko.htmlspecs.com/css/mediaqueries-4)
-- [ ] [Media Queries Level 5](https://ko.htmlspecs.com/css/mediaqueries-5)
+- [x] [Media Queries Level 4](https://ko.htmlspecs.com/css/mediaqueries-4)
+- [x] [Media Queries Level 5](https://ko.htmlspecs.com/css/mediaqueries-5)
 
 ### 레이아웃
 - [ ] [CSS Box Model Level 3](https://ko.htmlspecs.com/css/css-box-3)
