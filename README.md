@@ -146,7 +146,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Display Module Level 3](https://ko.htmlspecs.com/css/css-display-3)
 - [x] [CSS Flexible Box Layout Module Level 1](https://ko.htmlspecs.com/css/css-flexbox-1)
 - [x] [CSS Grid Layout Module Level 1](https://ko.htmlspecs.com/css/css-grid-1)
-- [ ] [CSS Grid Layout Module Level 2](https://ko.htmlspecs.com/css/css-grid-2)
+- [x] [CSS Grid Layout Module Level 2](https://ko.htmlspecs.com/css/css-grid-2)
 - [ ] [CSS Grid Layout Module Level 3](https://ko.htmlspecs.com/css/css-grid-3)
 - [ ] [CSS Inline Layout Module Level 3](https://ko.htmlspecs.com/css/css-inline-3)
 - [ ] [CSS Multi-column Layout Module Level 1](https://ko.htmlspecs.com/css/css-multicol-1)
