@@ -164,7 +164,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 쓰기 모드
 - [x] [CSS Writing Modes Level 3](https://ko.htmlspecs.com/css/css-writing-modes-3)
-- [ ] [CSS Writing Modes Level 4](https://ko.htmlspecs.com/css/css-writing-modes-4)
+- [x] [CSS Writing Modes Level 4](https://ko.htmlspecs.com/css/css-writing-modes-4)
 
 ### 분할
 - [ ] [CSS Fragmentation Module Level 3](https://ko.htmlspecs.com/css/css-break-3)
