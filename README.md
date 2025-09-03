@@ -174,7 +174,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 이미지
 - [x] [CSS Images Module Level 4](https://ko.htmlspecs.com/css/css-images-4)
-- [ ] [CSS Masking Module Level 1](https://ko.htmlspecs.com/css/css-masking-1)
+- [x] [CSS Masking Module Level 1](https://ko.htmlspecs.com/css/css-masking-1)
 
 ### 변환 및 애니메이션
 - [ ] [CSS Easing Functions Level 1](https://ko.htmlspecs.com/css/css-easing-1)
