@@ -170,7 +170,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Fragmentation Module Level 3](https://ko.htmlspecs.com/css/css-break-3)
 
 ### 의사 요소
-- [ ] [CSS Pseudo-Elements Module Level 4](https://ko.htmlspecs.com/css/css-pseudo-4)
+- [x] [CSS Pseudo-Elements Module Level 4](https://ko.htmlspecs.com/css/css-pseudo-4)
 
 ### 이미지
 - [ ] [CSS Images Module Level 4](https://ko.htmlspecs.com/css/css-images-4)
