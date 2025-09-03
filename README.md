@@ -167,7 +167,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Writing Modes Level 4](https://ko.htmlspecs.com/css/css-writing-modes-4)
 
 ### 분할
-- [ ] [CSS Fragmentation Module Level 3](https://ko.htmlspecs.com/css/css-break-3)
+- [x] [CSS Fragmentation Module Level 3](https://ko.htmlspecs.com/css/css-break-3)
 
 ### 의사 요소
 - [ ] [CSS Pseudo-Elements Module Level 4](https://ko.htmlspecs.com/css/css-pseudo-4)
