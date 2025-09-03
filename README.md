@@ -173,7 +173,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Pseudo-Elements Module Level 4](https://ko.htmlspecs.com/css/css-pseudo-4)
 
 ### 이미지
-- [ ] [CSS Images Module Level 4](https://ko.htmlspecs.com/css/css-images-4)
+- [x] [CSS Images Module Level 4](https://ko.htmlspecs.com/css/css-images-4)
 - [ ] [CSS Masking Module Level 1](https://ko.htmlspecs.com/css/css-masking-1)
 
 ### 변환 및 애니메이션
