@@ -157,7 +157,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Overflow Module Level 4](https://ko.htmlspecs.com/css/css-overflow-4)
 - [x] [CSS Overflow Module Level 5](https://ko.htmlspecs.com/css/css-overflow-5)
 - [x] [CSS Gap Decorations Module Level 1](https://ko.htmlspecs.com/css/css-gaps-1)
-- [ ] [CSS Anchor Positioning Module Level 1](https://ko.htmlspecs.com/css/css-anchor-position-1)
+- [x] [CSS Anchor Positioning Module Level 1](https://ko.htmlspecs.com/css/css-anchor-position-1)
 
 ### 내비게이션
 - [ ] [CSS Spatial Navigation Level 1](https://ko.htmlspecs.com/css/css-nav-1)
