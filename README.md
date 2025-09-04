@@ -190,8 +190,8 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Animation Worklet API](https://ko.htmlspecs.com/css/css-animation-worklet-1)
 
 ### 포함
-- [ ] [CSS Containment Module Level 2](https://ko.htmlspecs.com/css/css-contain-2)
-- [ ] [CSS Containment Module Level 3](https://ko.htmlspecs.com/css/css-contain-3)
+- [x] [CSS Containment Module Level 2](https://ko.htmlspecs.com/css/css-contain-2)
+- [x] [CSS Containment Module Level 3](https://ko.htmlspecs.com/css/css-contain-3)
 
 ### 음성
 - [ ] [CSS Speech Module Level 1](https://ko.htmlspecs.com/css/css-speech-1)
