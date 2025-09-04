@@ -177,8 +177,8 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Masking Module Level 1](https://ko.htmlspecs.com/css/css-masking-1)
 
 ### 변환 및 애니메이션
-- [ ] [CSS Easing Functions Level 1](https://ko.htmlspecs.com/css/css-easing-1)
-- [ ] [CSS Easing Functions Level 2](https://ko.htmlspecs.com/css/css-easing-2)
+- [x] [CSS Easing Functions Level 1](https://ko.htmlspecs.com/css/css-easing-1)
+- [x] [CSS Easing Functions Level 2](https://ko.htmlspecs.com/css/css-easing-2)
 - [ ] [CSS Transforms Module Level 1](https://ko.htmlspecs.com/css/css-transforms-1)
 - [ ] [CSS Transforms Module Level 2](https://ko.htmlspecs.com/css/css-transforms-2)
 - [ ] [CSS Transitions Level 2](https://ko.htmlspecs.com/css/css-transitions-2)
