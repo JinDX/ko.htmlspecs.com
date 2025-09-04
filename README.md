@@ -181,7 +181,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Easing Functions Level 2](https://ko.htmlspecs.com/css/css-easing-2)
 - [x] [CSS Transforms Module Level 1](https://ko.htmlspecs.com/css/css-transforms-1)
 - [x] [CSS Transforms Module Level 2](https://ko.htmlspecs.com/css/css-transforms-2)
-- [ ] [CSS Transitions Level 2](https://ko.htmlspecs.com/css/css-transitions-2)
+- [x] [CSS Transitions Level 2](https://ko.htmlspecs.com/css/css-transitions-2)
 - [ ] [CSS Animations Level 1](https://ko.htmlspecs.com/css/css-animations-1)
 - [ ] [CSS Animations Level 2](https://ko.htmlspecs.com/css/css-animations-2)
 - [ ] [CSS Motion Path Module Level 1](https://ko.htmlspecs.com/css/motion-1)
