@@ -198,7 +198,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 기타
 - [ ] ~~[CSS Snapshot 2023](https://ko.htmlspecs.com/css/css-2023)~~
-- [ ] [CSS Snapshot 2024](https://ko.htmlspecs.com/css/css-2024)
+- [x] [CSS Snapshot 2024](https://ko.htmlspecs.com/css/css-2024)
 - [ ] [CSS Namespaces](https://ko.htmlspecs.com/css/css-namespaces-3)
 - [ ] [Selectors Level 3](https://ko.htmlspecs.com/css/selectors-3)
 - [ ] [Selectors Level 4](https://ko.htmlspecs.com/css/selectors-4)
