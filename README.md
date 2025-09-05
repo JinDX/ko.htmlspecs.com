@@ -194,7 +194,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Containment Module Level 3](https://ko.htmlspecs.com/css/css-contain-3)
 
 ### 음성
-- [ ] [CSS Speech Module Level 1](https://ko.htmlspecs.com/css/css-speech-1)
+- [x] [CSS Speech Module Level 1](https://ko.htmlspecs.com/css/css-speech-1)
 
 ### 기타
 - [ ] [CSS Snapshot 2023](https://ko.htmlspecs.com/css/css-2023)
