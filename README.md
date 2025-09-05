@@ -202,7 +202,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Namespaces Module Level 3](https://ko.htmlspecs.com/css/css-namespaces-3)
 - [x] [Selectors Level 3](https://ko.htmlspecs.com/css/selectors-3)
 - [x] [Selectors Level 4](https://ko.htmlspecs.com/css/selectors-4)
-- [ ] [CSS Style Attributes](https://ko.htmlspecs.com/css/css-style-attr)
+- [x] [CSS Style Attributes](https://ko.htmlspecs.com/css/css-style-attr)
 - [ ] [CSS Overscroll Behavior Module Level 1](https://ko.htmlspecs.com/css/css-overscroll-1)
 - [ ] [CSS Scroll Snap Module Level 1](https://ko.htmlspecs.com/css/css-scroll-snap-1)
 - [ ] [CSS Scroll Snap Module Level 2](https://ko.htmlspecs.com/css/css-scroll-snap-2)
