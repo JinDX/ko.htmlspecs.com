@@ -219,7 +219,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [x] [CSS Cascading and Inheritance Level 6](https://ko.htmlspecs.com/css/css-cascade-6)
 - [x] [CSS Basic User Interface Module Level 3](https://ko.htmlspecs.com/css/css-ui-3)
 - [x] [CSS Basic User Interface Module Level 4](https://ko.htmlspecs.com/css/css-ui-4)
-- [ ] [CSS Syntax Module Level 3](https://ko.htmlspecs.com/css/css-syntax-3)
+- [x] [CSS Syntax Module Level 3](https://ko.htmlspecs.com/css/css-syntax-3)
 - [ ] [CSS Values and Units Module Level 3](https://ko.htmlspecs.com/css/css-values-3)
 - [ ] [CSS Logical Properties and Values Level 1](https://ko.htmlspecs.com/css/css-logical-1)
 - [ ] [CSS Mixins Module Level 1](https://ko.htmlspecs.com/css/css-mixins-1)
