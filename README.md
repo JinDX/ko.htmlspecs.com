@@ -227,5 +227,5 @@ HTML 및 관련 API, CSS 표준 시리즈.
 ### CSS Houdini APIs
 - [x] [CSS Typed OM Level 1](https://ko.htmlspecs.com/css/css-typed-om-1)
 - [x] [CSS Paint API Level 1](https://ko.htmlspecs.com/css/css-paint-api-1)
-- [ ] [CSS Layout API Level 1](https://ko.htmlspecs.com/css/css-layout-api-1)
-- [ ] [CSS Properties and Values API Level 1](https://ko.htmlspecs.com/css/css-properties-values-api-1)
+- [x] [CSS Layout API Level 1](https://ko.htmlspecs.com/css/css-layout-api-1)
+- [x] [CSS Properties and Values API Level 1](https://ko.htmlspecs.com/css/css-properties-values-api-1)
