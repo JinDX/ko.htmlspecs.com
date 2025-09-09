@@ -195,7 +195,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 ### 음성
 - [CSS Speech Module Level 1](https://ko.htmlspecs.com/css/css-speech-1)（[Source](https://www.w3.org/TR/2023/CRD-css-speech-1-20230214/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 
-### 其他
+### 기타
 - [CSS Snapshot 2023](https://ko.htmlspecs.com/css/css-2023)（[Source](https://www.w3.org/TR/2023/NOTE-css-2023-20231207/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [CSS Snapshot 2024](https://ko.htmlspecs.com/css/css-2024)（[Source](https://www.w3.org/TR/2025/NOTE-css-2024-20250225/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [CSS Namespaces Module Level 3](https://ko.htmlspecs.com/css/css-namespaces-3)（[Source](https://www.w3.org/TR/2014/REC-css-namespaces-3-20140320/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
