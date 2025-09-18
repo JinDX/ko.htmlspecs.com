@@ -197,7 +197,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 기타
 - [CSS Snapshot 2024](https://ko.htmlspecs.com/css/css-2024)（[Source](https://www.w3.org/TR/2025/NOTE-css-2024-20250225/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
-- [CSS Snapshot 2025](https://ko.htmlspecs.com/css/css-2025)（[Source](https://www.w3.org/TR/2025/NOTE-css-2025-20250909/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
+- [CSS Snapshot 2025](https://ko.htmlspecs.com/css/css-2025)（[Source](https://www.w3.org/TR/2025/NOTE-css-2025-20250918/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [CSS Namespaces Module Level 3](https://ko.htmlspecs.com/css/css-namespaces-3)（[Source](https://www.w3.org/TR/2014/REC-css-namespaces-3-20140320/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Selectors Level 3](https://ko.htmlspecs.com/css/selectors-3)（[Source](https://www.w3.org/TR/2018/REC-selectors-3-20181106/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Selectors Level 4](https://ko.htmlspecs.com/css/selectors-4)（[Source](https://www.w3.org/TR/2022/WD-selectors-4-20221111/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
