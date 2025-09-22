@@ -33,7 +33,7 @@
         src=https://resources.whatwg.org/logo.svg height=100></a>
     <hgroup>
       <h1 class=allcaps>HTML</h1>
-      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2025년 9월 19일</span>
+      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2025년 9월 22일</span>
     </hgroup>
 
     <nav>
@@ -62,7 +62,7 @@
         <a href=https://github.com/whatwg/html/commits class=changes><span><strong>커밋</strong>
             <code>on GitHub</code></span></a>
         <a id=commit-snapshot-link
-          href=https://html.spec.whatwg.org/commit-snapshots/69e858fd366bb65bccb55e53e920ea8c029edcb4/
+          href=https://html.spec.whatwg.org/commit-snapshots/90b5e3daf3fe8f359fba83eae4ddeda2497d831f/
           class=changes><span><strong>스냅샷</strong> <code>as of this commit</code></span></a>
         <a href=https://twitter.com/htmlstandard class=changes><span><strong>트위터 업데이트</strong>
             <code>@htmlstandard</code></span></a>
@@ -8097,6 +8097,14 @@ a<c- p>.</c->setAttribute<c- p>(</c-><c- t>&apos;href&apos;</c-><c- p>,</c-> <c-
           <li><dfn id=navigation-status-suggested-filename><a
                 href=https://w3c.github.io/webdriver-bidi/#navigation-status-suggested-filename>탐색 상태
                 제안된 파일 이름</a></dfn>
+          <li><dfn id="download-behavior-struct-allowed"><a
+                href="https://w3c.github.io/webdriver-bidi/#download-behavior-struct-allowed">다운로드 동작 허용됨</a></dfn></li>
+          <li><dfn id="download-behavior-struct-destination-folder"><a
+                href="https://w3c.github.io/webdriver-bidi/#download-behavior-struct-destination-folder">다운로드 동작 대상
+                폴더</a></dfn></li>
+          <li><dfn id="navigation-status-downloaded-filepath"><a
+                href="https://w3c.github.io/webdriver-bidi/#navigation-status-downloaded-filepath">네비게이션 상태 다운로드된 파일
+                경로</a></dfn></li>
           <li><dfn id=webdriver-bidi-navigation-aborted><a
                 href=https://w3c.github.io/webdriver-bidi/#webdriver-bidi-navigation-aborted>WebDriver
                 BiDi 탐색
@@ -8113,10 +8121,12 @@ a<c- p>.</c->setAttribute<c- p>(</c-><c- t>&apos;href&apos;</c-><c- p>,</c-> <c-
                 href=https://w3c.github.io/webdriver-bidi/#webdriver-bidi-navigation-started>WebDriver
                 BiDi 탐색
                 시작됨</a></dfn>
-          <li><dfn id=webdriver-bidi-download-started><a
-                href=https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-started>WebDriver
-                BiDi 다운로드
-                시작됨</a></dfn>
+          <li><dfn id="webdriver-bidi-download-end"><a
+                href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-end">WebDriver BiDi 다운로드
+                종료</a></dfn></li>
+          <li><dfn id="webdriver-bidi-download-will-begin"><a
+                href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-will-begin">WebDriver BiDi 다운로드 시작
+                예정</a></dfn></li>
           <li><dfn id=webdriver-bidi-fragment-navigated><a
                 href=https://w3c.github.io/webdriver-bidi/#webdriver-bidi-fragment-navigated>WebDriver
                 BiDi 프래그먼트
@@ -36903,27 +36913,185 @@ document<c- p>.</c->body<c- p>.</c->appendChild<c- p>(</c->wbr<c- p>);</c-></cod
               data-x-internal=use-url-credentials-flag>URL 자격 증명 플래그</a>를 설정합니다.
           </p>
         <li>
-          <p><var>request</var>를 <a href=https://fetch.spec.whatwg.org/#concept-fetch
-              id=downloading-resources:concept-fetch data-x-internal=concept-fetch>가져온</a> 결과를 <a
-              href=#handle-as-a-download id=downloading-resources:handle-as-a-download>다운로드로 처리합니다</a>.
+          <p><var>response</var>를 <a href="https://fetch.spec.whatwg.org/#concept-fetch"
+              id="downloading-resources:concept-fetch" data-x-internal="concept-fetch">fetch</a>
+            <var>request</var>의 결과로 한다.
           </p>
+        </li>
+        <li>
+          <p><a href="#handle-as-a-download" id="downloading-resources:handle-as-a-download">다운로드로 처리하기</a>
+            <var>response</var>와
+            <var>subject</var>의 <a href="#node-navigable" id="downloading-resources:node-navigable">node navigable</a>,
+            그리고 null로 처리한다.
+          </p>
+        </li>
       </ol>
+    </li>
   </ol>
 
-  <p><a href=https://fetch.spec.whatwg.org/#concept-response id=downloading-resources:concept-response
-      data-x-internal=concept-response>응답</a> <var>response</var>를 <dfn id=handle-as-a-download>다운로드로 처리하려면</dfn>
-    다음을 수행합니다.
+  <p><dfn id="handle-as-a-download">다운로드로 처리하기</dfn> <a href="https://fetch.spec.whatwg.org/#concept-response"
+      id="downloading-resources:concept-response" data-x-internal="concept-response">response</a>
+    <var>response</var>와 <a href="#navigable" id="downloading-resources:navigable">navigable</a>
+    <var>navigable</var>, 그리고 <a href="#navigation-id" id="downloading-resources:navigation-id">navigation ID</a> 또는
+    null <var>navigationId</var>로:
   </p>
 
   <ol>
     <li>
-      <p><var>suggestedFilename</var>을 <var>response</var>에 대한 <a href=#getting-the-suggested-filename
-          id=downloading-resources:getting-the-suggested-filename>제안된 파일 이름 가져오기</a>의 결과로 설정합니다.
+      <p><var>suggestedFilename</var>를 <a href="#getting-the-suggested-filename"
+          id="downloading-resources:getting-the-suggested-filename">추천 파일 이름 가져오기</a>의
+        <var>response</var>에 대한 결과로 한다.
+      </p>
+    </li>
     <li>
-      <p>사용자에게 나중에 사용할 수 있도록 <var>response</var>를 저장할 수 있는 방법을 제공합니다. 사용자 에이전트에 파일 이름이 필요한 경우
-        <var>suggestedFilename</var>을 사용해야 합니다. 파일 다운로드 중 발생하는 모든 문제를 사용자에게 보고합니다.
+      <p><var>download behavior</var>를 <a id="downloading-resources:webdriver-bidi-download-will-begin"
+          href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-will-begin"
+          data-x-internal="webdriver-bidi-download-will-begin">WebDriver BiDi 다운로드 시작 예정</a>의
+        <var>navigable</var> 및 새로운 <a id="downloading-resources:webdriver-bidi-navigation-status"
+          href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-navigation-status"
+          data-x-internal="webdriver-bidi-navigation-status">WebDriver BiDi 네비게이션 상태</a>로 한다.
+        <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-id"
+          id="downloading-resources:navigation-status-id" data-x-internal="navigation-status-id">id</a>는
+        <var>navigationId</var>,
+        <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-status"
+          id="downloading-resources:navigation-status-status" data-x-internal="navigation-status-status">status</a>는
+        "<code
+          id="downloading-resources:navigation-status-pending"><a data-x-internal="navigation-status-pending" href="https://w3c.github.io/webdriver-bidi/#navigation-status-pending">pending</a></code>",
+        <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-url"
+          id="downloading-resources:navigation-status-url" data-x-internal="navigation-status-url">url</a>은
+        <var>response</var>의 <a href="https://fetch.spec.whatwg.org/#concept-response-url"
+          id="downloading-resources:concept-response-url" data-x-internal="concept-response-url">URL</a>,
+        <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-suggested-filename"
+          id="downloading-resources:navigation-status-suggested-filename"
+          data-x-internal="navigation-status-suggested-filename">suggestedFilename</a>은
+        <var>suggestedFilename</var>이다.
+      </p>
+    </li>
     <li>
-      <p><var>suggestedFilename</var>을 반환합니다.
+      <p><var>download behavior</var>가 null이 아니고 <var>download behavior</var>의
+        <a href="https://w3c.github.io/webdriver-bidi/#download-behavior-struct-allowed"
+          id="downloading-resources:download-behavior-struct-allowed"
+          data-x-internal="download-behavior-struct-allowed">allowed</a>가 false인 경우:
+      </p>
+
+      <ol>
+        <li>
+          <p><a id="downloading-resources:webdriver-bidi-download-end"
+              href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-end"
+              data-x-internal="webdriver-bidi-download-end">WebDriver BiDi 다운로드 종료</a>를
+            <var>navigable</var> 및 새로운
+            <a id="downloading-resources:webdriver-bidi-navigation-status-2"
+              href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-navigation-status"
+              data-x-internal="webdriver-bidi-navigation-status">WebDriver BiDi 네비게이션 상태</a>로 호출한다.
+            <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-id"
+              id="downloading-resources:navigation-status-id-2" data-x-internal="navigation-status-id">id</a>는
+            <var>navigationId</var>,
+            <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-status"
+              id="downloading-resources:navigation-status-status-2"
+              data-x-internal="navigation-status-status">status</a>는 "<code
+              id="downloading-resources:navigation-status-canceled"><a data-x-internal="navigation-status-canceled" href="https://w3c.github.io/webdriver-bidi/#navigation-status-canceled">canceled</a></code>",
+            <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-url"
+              id="downloading-resources:navigation-status-url-2" data-x-internal="navigation-status-url">url</a>은
+            <var>response</var>의 <a href="https://fetch.spec.whatwg.org/#concept-response-url"
+              id="downloading-resources:concept-response-url-2" data-x-internal="concept-response-url">URL</a>이다.
+          </p>
+        </li>
+        <li>
+          <p>Return.</p>
+        </li>
+      </ol>
+    </li>
+    <li>
+      <p><var>download behavior</var>가 null이 아니면 <var>destinationFolder</var>를
+        <var>download behavior</var>의 <a
+          href="https://w3c.github.io/webdriver-bidi/#download-behavior-struct-destination-folder"
+          id="downloading-resources:download-behavior-struct-destination-folder"
+          data-x-internal="download-behavior-struct-destination-folder">destinationFolder</a>로 한다.
+      </p>
+    </li>
+    <li>
+      <p>다음 단계들을 <a href="#in-parallel" id="downloading-resources:in-parallel-2">병렬로 실행한다</a>:</p>
+
+      <ol>
+        <li>
+          <p><a id="downloading-resources:implementation-defined"
+              href="https://infra.spec.whatwg.org/#implementation-defined" data-x-internal="implementation-defined">구현
+              정의</a> 단계들을 실행하여 <var>response</var>를
+            나중에 사용할 수 있도록 저장한다.
+            <var>destinationFolder</var>가 null이 아니면, 사용자 에이전트는 해당 경로에 파일을 저장해야 한다.
+            파일 이름이 필요하면, 사용자 에이전트는 <var>suggestedFilename</var>을 사용해야 한다.
+          </p>
+        </li>
+        <li>
+          <p>다음 중 하나라도 참이면:</p>
+
+          <ul class="brief">
+            <li>
+              <p>사용자가 다운로드를 취소한 경우;</p>
+            </li>
+            <li>
+              <p>사용자 에이전트가 다운로드를 취소한 경우;</p>
+            </li>
+            <li>
+              <p>오류가 발생한 경우(예: 네트워크 오류, 저장 공간 부족, 사용할 수 없는 대상 폴더);</p>
+            </li>
+          </ul>
+
+          <p>다음 단계를 수행한다:</p>
+
+          <ol>
+            <li>
+              <p><a id="downloading-resources:webdriver-bidi-download-end-2"
+                  href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-end"
+                  data-x-internal="webdriver-bidi-download-end">WebDriver BiDi 다운로드 종료</a>를
+                <var>navigable</var> 및 새로운
+                <a id="downloading-resources:webdriver-bidi-navigation-status-3"
+                  href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-navigation-status"
+                  data-x-internal="webdriver-bidi-navigation-status">WebDriver BiDi 네비게이션 상태</a>로 호출한다.
+                <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-id"
+                  id="downloading-resources:navigation-status-id-3" data-x-internal="navigation-status-id">id</a>는
+                <var>navigationId</var>,
+                <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-status"
+                  id="downloading-resources:navigation-status-status-3"
+                  data-x-internal="navigation-status-status">status</a>는 "<code
+                  id="downloading-resources:navigation-status-canceled-2"><a data-x-internal="navigation-status-canceled" href="https://w3c.github.io/webdriver-bidi/#navigation-status-canceled">canceled</a></code>",
+                <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-url"
+                  id="downloading-resources:navigation-status-url-3" data-x-internal="navigation-status-url">url</a>은
+                <var>response</var>의 <a href="https://fetch.spec.whatwg.org/#concept-response-url"
+                  id="downloading-resources:concept-response-url-3" data-x-internal="concept-response-url">URL</a>이다.
+              </p>
+            </li>
+            <li>
+              <p>Return.</p>
+            </li>
+          </ol>
+        </li>
+        <li>
+          <p>다운로드가 성공적으로 완료되면, <a id="downloading-resources:webdriver-bidi-download-end-3"
+              href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-end"
+              data-x-internal="webdriver-bidi-download-end">WebDriver BiDi 다운로드 종료</a>를
+            <var>navigable</var> 및 새로운 <a id="downloading-resources:webdriver-bidi-navigation-status-4"
+              href="https://w3c.github.io/webdriver-bidi/#webdriver-bidi-navigation-status"
+              data-x-internal="webdriver-bidi-navigation-status">WebDriver BiDi 네비게이션 상태</a>로 호출한다.
+            <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-id"
+              id="downloading-resources:navigation-status-id-4" data-x-internal="navigation-status-id">id</a>는
+            <var>navigationId</var>,
+            <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-status"
+              id="downloading-resources:navigation-status-status-4"
+              data-x-internal="navigation-status-status">status</a>는 "<code
+              id="downloading-resources:navigation-status-complete"><a data-x-internal="navigation-status-complete" href="https://w3c.github.io/webdriver-bidi/#navigation-status-complete">complete</a></code>",
+            <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-downloaded-filepath"
+              id="downloading-resources:navigation-status-downloaded-filepath"
+              data-x-internal="navigation-status-downloaded-filepath">downloadedFilepath</a>는 파일의 절대 경로(가능한 경우), 아니면
+            null,
+            <a href="https://w3c.github.io/webdriver-bidi/#navigation-status-url"
+              id="downloading-resources:navigation-status-url-4" data-x-internal="navigation-status-url">url</a>은
+            <var>response</var>의 <a href="https://fetch.spec.whatwg.org/#concept-response-url"
+              id="downloading-resources:concept-response-url-4" data-x-internal="concept-response-url">URL</a>이다.
+          </p>
+        </li>
+      </ol>
+    </li>
   </ol>
 
   <p><a href=https://fetch.spec.whatwg.org/#concept-response id=downloading-resources:concept-response-2
@@ -36987,7 +37155,7 @@ document<c- p>.</c->body<c- p>.</c->appendChild<c- p>(</c->wbr<c- p>);</c-></cod
         <a href=#refsRFC6266>[RFC6266]</a>
     <li>
       <p><i>제안된 파일 이름 없음</i>: 만약 <var>trusted operation</var>이 true이거나 사용자가 해당 응답을 다운로드하는 것을 선호한다고 표시한 경우,
-        <var>filename</var>에 <a id=downloading-resources:implementation-defined
+        <var>filename</var>에 <a id=downloading-resources:implementation-defined-2
           href=https://infra.spec.whatwg.org/#implementation-defined data-x-internal=implementation-defined>구현
           정의</a> 방식으로 <var>response</var>의 <a id=downloading-resources:url href=https://url.spec.whatwg.org/#concept-url
           data-x-internal=url>URL</a>에서 파생된 값을 설정하고 아래의
@@ -148691,45 +148859,11 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
 
               <ol>
                 <li>
-                  <p><var>suggestedFilename</var>을 <var>navigationParams</var>의 <a href=#navigation-params-response
-                      id=populating-a-session-history-entry:navigation-params-response-7>응답</a>을
-                    <a href=#handle-as-a-download id=populating-a-session-history-entry:handle-as-a-download>다운로드로
-                      처리하는</a>
-                    결과로 설정합니다.
-                  </p>
-                </li>
-                <li>
-                  <p><var>navigable</var>과 <a href=https://w3c.github.io/webdriver-bidi/#navigation-status-id
-                      id=populating-a-session-history-entry:navigation-status-id-2
-                      data-x-internal=navigation-status-id>id</a>가
-                    <var>navigationId</var>이고, <a href=https://w3c.github.io/webdriver-bidi/#navigation-status-status
-                      id=populating-a-session-history-entry:navigation-status-status-2
-                      data-x-internal=navigation-status-status>상태</a>가 "<code
-                      id=populating-a-session-history-entry:navigation-status-complete><a data-x-internal=navigation-status-complete href=https://w3c.github.io/webdriver-bidi/#navigation-status-complete>complete</a></code>"이며,
-                    <a href=https://w3c.github.io/webdriver-bidi/#navigation-status-url
-                      id=populating-a-session-history-entry:navigation-status-url-2
-                      data-x-internal=navigation-status-url>url</a>이
-                    <var>navigationParams</var>의
-                    <a href=#navigation-params-response
-                      id=populating-a-session-history-entry:navigation-params-response-8>응답</a>의
-                    <a href=https://fetch.spec.whatwg.org/#concept-response-url
-                      id=populating-a-session-history-entry:concept-response-url-2
-                      data-x-internal=concept-response-url>URL</a>이고, <a
-                      href=https://w3c.github.io/webdriver-bidi/#navigation-status-suggested-filename
-                      id=populating-a-session-history-entry:navigation-status-suggested-filename
-                      data-x-internal=navigation-status-suggested-filename>suggestedFilename</a>이
-                    <var>suggestedFilename</var>인 새로운 <a
-                      id=populating-a-session-history-entry:webdriver-bidi-navigation-status-2
-                      href=https://w3c.github.io/webdriver-bidi/#webdriver-bidi-navigation-status
-                      data-x-internal=webdriver-bidi-navigation-status>WebDriver
-                      BiDi 탐색
-                      상태</a>로
-                    <a id=populating-a-session-history-entry:webdriver-bidi-download-started
-                      href=https://w3c.github.io/webdriver-bidi/#webdriver-bidi-download-started
-                      data-x-internal=webdriver-bidi-download-started>WebDriver
-                      BiDi 다운로드
-                      시작됨</a>을
-                    호출합니다.
+                  <p><a href="#handle-as-a-download" id="populating-a-session-history-entry:handle-as-a-download">다운로드로
+                      처리하기</a>
+                    <var>navigationParams</var>의 <a href="#navigation-params-response"
+                      id="populating-a-session-history-entry:navigation-params-response-7">response</a>를
+                    <var>navigable</var>과 <var>navigationId</var>로 처리한다.
                   </p>
                 </li>
               </ol>
@@ -148742,7 +148876,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
           </p>
         <li>
           <p>그렇지 않고, <var>navigationParams</var>의 <a href=#navigation-params-response
-              id=populating-a-session-history-entry:navigation-params-response-9>응답</a>의
+              id=populating-a-session-history-entry:navigation-params-response-8>응답</a>의
             <a href=https://fetch.spec.whatwg.org/#concept-response-status
               id=populating-a-session-history-entry:concept-response-status
               data-x-internal=concept-response-status>상태</a>가 204도 아니고 205도 아닌 경우,
@@ -148903,7 +149037,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
 
       <dl class=props>
         <dt><a href=https://fetch.spec.whatwg.org/#concept-response-url
-            id=populating-a-session-history-entry:concept-response-url-3 data-x-internal=concept-response-url>URL</a>
+            id=populating-a-session-history-entry:concept-response-url-2 data-x-internal=concept-response-url>URL</a>
         <dd><code id=populating-a-session-history-entry:about:srcdoc><a href=#about:srcdoc>about:srcdoc</a></code>
         <dt><a href=https://fetch.spec.whatwg.org/#concept-response-header-list
             id=populating-a-session-history-entry:concept-response-header-list
@@ -148923,7 +149057,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
       <p><var>responseOrigin</var>을 <a href=#determining-the-origin
           id=populating-a-session-history-entry:determining-the-origin>기원 결정</a>의 결과로 설정하고,
         <var>response</var>의 <a href=https://fetch.spec.whatwg.org/#concept-response-url
-          id=populating-a-session-history-entry:concept-response-url-4 data-x-internal=concept-response-url>URL</a>,
+          id=populating-a-session-history-entry:concept-response-url-3 data-x-internal=concept-response-url>URL</a>,
         <var>targetSnapshotParams</var>의 <a href=#target-snapshot-params-sandbox
           id=populating-a-session-history-entry:target-snapshot-params-sandbox-2>샌드박싱 플래그</a>
         및
@@ -148944,7 +149078,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
       <dl class=props>
         <dt><a href=#coop-enforcement-url id=populating-a-session-history-entry:coop-enforcement-url>URL</a>
         <dd><var>response</var>의 <a href=https://fetch.spec.whatwg.org/#concept-response-url
-            id=populating-a-session-history-entry:concept-response-url-5 data-x-internal=concept-response-url>URL</a>
+            id=populating-a-session-history-entry:concept-response-url-4 data-x-internal=concept-response-url>URL</a>
         <dt><a href=#coop-enforcement-origin id=populating-a-session-history-entry:coop-enforcement-origin>기원</a>
         <dd><var>responseOrigin</var>
         <dt><a href=#coop-enforcement-coop id=populating-a-session-history-entry:coop-enforcement-coop>교차 출처 오프너
@@ -148957,7 +149091,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
           매개변수
           정책 컨테이너
           결정</a>의 결과로 설정합니다. 이는 <var>response</var>의 <a href=https://fetch.spec.whatwg.org/#concept-response-url
-          id=populating-a-session-history-entry:concept-response-url-6 data-x-internal=concept-response-url>URL</a>,
+          id=populating-a-session-history-entry:concept-response-url-5 data-x-internal=concept-response-url>URL</a>,
         <var>entry</var>의 <a href=#she-document-state id=populating-a-session-history-entry:she-document-state-21>문서
           상태</a>의 <a href=#document-state-history-policy-container
           id=populating-a-session-history-entry:document-state-history-policy-container-2>기록
@@ -148983,7 +149117,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
         <dt><a href=#navigation-params-request id=populating-a-session-history-entry:navigation-params-request-4>요청</a>
         <dd>null
         <dt><a href=#navigation-params-response
-            id=populating-a-session-history-entry:navigation-params-response-10>응답</a>
+            id=populating-a-session-history-entry:navigation-params-response-9>응답</a>
         <dd><var>response</var>
         <dt><a href=#navigation-params-fetch-controller
             id=populating-a-session-history-entry:navigation-params-fetch-controller>페치
@@ -149597,7 +149731,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
           </p>
         <li>
           <p><var>responseOrigin</var>을 <var>response</var>의 <a href=https://fetch.spec.whatwg.org/#concept-response-url
-              id=populating-a-session-history-entry:concept-response-url-7 data-x-internal=concept-response-url>URL</a>,
+              id=populating-a-session-history-entry:concept-response-url-6 data-x-internal=concept-response-url>URL</a>,
             <var>finalSandboxFlags</var>,
             <var>entry</var>의 <a href=#she-document-state id=populating-a-session-history-entry:she-document-state-31>문서
               상태</a>의
@@ -149611,7 +149745,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
 
           <p class=note><var>response</var>가 리디렉션인 경우, <var>response</var>의 <a
               href=https://fetch.spec.whatwg.org/#concept-response-url
-              id=populating-a-session-history-entry:concept-response-url-8 data-x-internal=concept-response-url>URL</a>은
+              id=populating-a-session-history-entry:concept-response-url-7 data-x-internal=concept-response-url>URL</a>은
             리디렉션이 발생한 URL이며,
             <var>response</var>의
             <a href=https://fetch.spec.whatwg.org/#concept-response-location-url
@@ -149639,7 +149773,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
                   id=populating-a-session-history-entry:nav-bc-3>활성 탐색 컨텍스트</a>,
                 <var>response</var>의
                 <a href=https://fetch.spec.whatwg.org/#concept-response-url
-                  id=populating-a-session-history-entry:concept-response-url-9
+                  id=populating-a-session-history-entry:concept-response-url-8
                   data-x-internal=concept-response-url>URL</a>,
                 <var>responseOrigin</var>,
                 <var>responseCOOP</var>, <var>coopEnforcementResult</var> 및
@@ -150097,7 +150231,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
     <li>
       <p><var>resultPolicyContainer</var>를 <var>response</var>의 <a
           href=https://fetch.spec.whatwg.org/#concept-response-url
-          id=populating-a-session-history-entry:concept-response-url-10 data-x-internal=concept-response-url>URL</a>,
+          id=populating-a-session-history-entry:concept-response-url-9 data-x-internal=concept-response-url>URL</a>,
         <var>entry</var>의 <a href=#she-document-state id=populating-a-session-history-entry:she-document-state-39>문서
           상태</a>의 <a href=#document-state-history-policy-container
           id=populating-a-session-history-entry:document-state-history-policy-container-6>기록
@@ -150143,7 +150277,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
         <dt><a href=#navigation-params-request id=populating-a-session-history-entry:navigation-params-request-5>요청</a>
         <dd><var>request</var>
         <dt><a href=#navigation-params-response
-            id=populating-a-session-history-entry:navigation-params-response-11>응답</a>
+            id=populating-a-session-history-entry:navigation-params-response-10>응답</a>
         <dd><var>response</var>
         <dt><a href=#navigation-params-fetch-controller
             id=populating-a-session-history-entry:navigation-params-fetch-controller-2>페치
@@ -150242,7 +150376,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
           id=populating-a-session-history-entry:content-type-sniffing-2 data-x-internal=content-type-sniffing-2>계산된
           유형</a>으로 설정하고,
         <var>navigationParams</var>의 <a href=#navigation-params-response
-          id=populating-a-session-history-entry:navigation-params-response-12>응답</a>으로부터
+          id=populating-a-session-history-entry:navigation-params-response-11>응답</a>으로부터
         가져옵니다.
       </p>
     <li>
@@ -150382,7 +150516,7 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
         영향을 미치지
         않습니다.
         <var>navigationParams</var>의 <a href=#navigation-params-response
-          id=populating-a-session-history-entry:navigation-params-response-13>응답</a>,
+          id=populating-a-session-history-entry:navigation-params-response-12>응답</a>,
         <var>navigationParams</var>의 <a href=#navigation-params-navigable
           id=populating-a-session-history-entry:navigation-params-navigable-7>탐색 가능 객체</a>,
         <var>navigationParams</var>의 <a href=#navigation-params-sandboxing
