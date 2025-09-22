@@ -104,6 +104,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [Presentation API](https://ko.htmlspecs.com/presentation-api)（[Source](https://www.w3.org/TR/2025/CRD-presentation-api-20250212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Scroll-driven Animations](https://ko.htmlspecs.com/scroll-animations-1)（[Source](https://www.w3.org/TR/2023/WD-scroll-animations-1-20230606/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Media Capture and Streams](https://ko.htmlspecs.com/mediacapture-streams)（[Source](https://www.w3.org/TR/2025/CRD-mediacapture-streams-20250911/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebCodecs](https://ko.htmlspecs.com/webcodecs)（[Source](https://www.w3.org/TR/2025/WD-webcodecs-20250708/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 개발자 도구
 - [Console](https://ko.htmlspecs.com/console)（[Source](https://console.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
