@@ -109,6 +109,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [Media Capabilities](https://ko.htmlspecs.com/media-capabilities)（[Source](https://www.w3.org/TR/2025/WD-media-capabilities-20250825/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Image Capture](https://ko.htmlspecs.com/image-capture)（[Source](https://www.w3.org/TR/2025/WD-image-capture-20250423/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Encrypted Media Extensions](https://ko.htmlspecs.com/encrypted-media-2)（[Source](https://www.w3.org/TR/2025/WD-encrypted-media-2-20250821/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [WebXR Device API](https://ko.htmlspecs.com/webxr)（[Source](https://www.w3.org/TR/2025/CRD-webxr-20250417/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 개발자 도구
 - [Console](https://ko.htmlspecs.com/console)（[Source](https://console.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
