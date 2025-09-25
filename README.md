@@ -42,7 +42,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [File System](https://ko.htmlspecs.com/fs)（[Source](https://fs.spec.whatwg.org) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Cookie Store API](https://ko.htmlspecs.com/cookiestore)（[Source](https://cookiestore.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [File and Directory Entries API](https://ko.htmlspecs.com/entries-api)（[Source](https://wicg.github.io/entries-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [Web Locks API](https://ko.htmlspecs.com/web-locks)（[Source](https://www.w3.org/TR/2023/WD-web-locks-20230105/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Web Locks API](https://ko.htmlspecs.com/web-locks)（[Source](https://www.w3.org/TR/2025/WD-web-locks-20250924/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 디바이스 및 하드웨어 접근
 - [Pointer Events](https://ko.htmlspecs.com/pointerevents2)（[Source](https://www.w3.org/TR/2019/REC-pointerevents2-20190404/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
