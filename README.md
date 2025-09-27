@@ -97,7 +97,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 미디어 및 그래픽
 - [WebGPU](https://ko.htmlspecs.com/webgpu)（[Source](https://www.w3.org/TR/2025/CRD-webgpu-20250923/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL)（[Source](https://www.w3.org/TR/2025/CRD-WGSL-20250920/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL)（[Source](https://www.w3.org/TR/2025/CRD-WGSL-20250926/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Web Animations](https://ko.htmlspecs.com/web-animations-1)（[Source](https://www.w3.org/TR/2023/WD-web-animations-1-20230605/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Scalable Vector Graphics (SVG) 2](https://ko.htmlspecs.com/SVG2/)（[Source](https://www.w3.org/TR/2018/CR-SVG2-20181004/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Picture-in-Picture](https://ko.htmlspecs.com/picture-in-picture)（[Source](https://www.w3.org/TR/2025/WD-picture-in-picture-20250820/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
