@@ -179,7 +179,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [CSS Pseudo-Elements Module Level 4](https://ko.htmlspecs.com/css/css-pseudo-4)（[Source](https://www.w3.org/TR/2025/WD-css-pseudo-4-20250627/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 이미지
-- [CSS Images Module Level 4](https://ko.htmlspecs.com/css/css-images-4)（[Source](https://www.w3.org/TR/2023/WD-css-images-4-20230217/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [CSS Images Module Level 4](https://ko.htmlspecs.com/css/css-images-4)（[Source](https://www.w3.org/TR/2025/WD-css-images-4-20250930/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Masking Module Level 1](https://ko.htmlspecs.com/css/css-masking-1)（[Source](https://www.w3.org/TR/2021/CRD-css-masking-1-20210805/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 
 ### 변환 및 애니메이션
