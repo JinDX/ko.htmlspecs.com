@@ -17,6 +17,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [Compression](https://ko.htmlspecs.com/compression)（[Source](https://compression.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Quirks Mode](https://ko.htmlspecs.com/quirks)（[Source](https://quirks.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Test Utils](https://ko.htmlspecs.com/testutils)（[Source](https://testutils.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
+- [Minimum Common Web Platform API](https://ko.htmlspecs.com/min-common-api)（[Source](https://min-common-api.proposal.wintertc.org/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 접근성
 - [Web Content Accessibility Guidelines (WCAG) 2.2](https://ko.htmlspecs.com/WCAG22)（[Source](https://www.w3.org/TR/2024/REC-WCAG22-20241212/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
@@ -35,6 +36,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [WebRTC](https://ko.htmlspecs.com/webrtc)（[Source](https://www.w3.org/TR/2025/REC-webrtc-20250313/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Payment Request API](https://ko.htmlspecs.com/payment-request)（[Source](https://www.w3.org/TR/2025/CRD-payment-request-20250930/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Background Fetch](https://ko.htmlspecs.com/background-fetch)（[Source](https://wicg.github.io/background-fetch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [User-Agent Client Hints](https://ko.htmlspecs.com/ua-client-hints)（[Source](https://wicg.github.io/ua-client-hints/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Beacon](https://ko.htmlspecs.com/beacon)（[Source](https://www.w3.org/TR/2022/CRD-beacon-20220803/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 
 ### 저장 및 데이터
@@ -83,6 +85,8 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [Observable](https://ko.htmlspecs.com/observable)（[Source](https://wicg.github.io/observable/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Long Tasks API](https://ko.htmlspecs.com/longtasks-1)（[Source](https://www.w3.org/TR/2024/WD-longtasks-1-20240524/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Reporting API](https://ko.htmlspecs.com/reporting-1)（[Source](https://www.w3.org/TR/2025/WD-reporting-1-20250611/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Deprecation Reporting](https://ko.htmlspecs.com/deprecation-reporting)（[Source](https://wicg.github.io/deprecation-reporting/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Page Lifecycle](https://ko.htmlspecs.com/page-lifecycle)（[Source](https://wicg.github.io/page-lifecycle/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Server Timing](https://ko.htmlspecs.com/server-timing)（[Source](https://www.w3.org/TR/2023/WD-server-timing-20230411/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing)（[Source](https://www.w3.org/TR/2025/WD-paint-timing-20250915/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Event Timing API](https://ko.htmlspecs.com/event-timing)（[Source](https://www.w3.org/TR/2025/WD-event-timing-20250526/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
