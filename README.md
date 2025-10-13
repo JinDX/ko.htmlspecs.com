@@ -3,7 +3,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 핵심 표준
 - [HTML](https://ko.htmlspecs.com/)（[Source](https://html.spec.whatwg.org/multipage/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
-- [ECMAScript](https://ecma262.com/k)（[Source](https://tc39.es/ecma262/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [ECMAScript](https://ecma262.com/k)（[Source](https://tc39.es/ecma262/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)），- [How to Read](https://ko.htmlspecs.com/es-howto/)（[Source](https://timothygu.me/es-howto/)）
 - [DOM](https://ko.htmlspecs.com/dom)（[Source](https://dom.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [URL](https://ko.htmlspecs.com/url)（[Source](https://url.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [URL Pattern](https://ko.htmlspecs.com/urlpattern)（[Source](https://urlpattern.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
