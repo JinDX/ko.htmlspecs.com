@@ -52,7 +52,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 
 ### 디바이스 및 하드웨어 접근
 - [Pointer Events](https://ko.htmlspecs.com/pointerevents2)（[Source](https://www.w3.org/TR/2019/REC-pointerevents2-20190404/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
-- [Screen Orientation](https://ko.htmlspecs.com/screen-orientation)（[Source](https://www.w3.org/TR/2023/WD-screen-orientation-20230809/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Screen Orientation](https://ko.htmlspecs.com/screen-orientation)（[Source](https://www.w3.org/TR/2023/WD-screen-orientation-20251016/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [EyeDropper API](https://ko.htmlspecs.com/eyedropper-api)（[Source](https://wicg.github.io/eyedropper-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Fullscreen](https://ko.htmlspecs.com/fullscreen)（[Source](https://fullscreen.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Screen Capture](https://ko.htmlspecs.com/screen-capture)（[Source](https://www.w3.org/TR/2025/WD-screen-capture-20250717/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
