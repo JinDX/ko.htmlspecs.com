@@ -92,7 +92,7 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [Page Lifecycle](https://ko.htmlspecs.com/page-lifecycle)（[Source](https://wicg.github.io/page-lifecycle/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Server Timing](https://ko.htmlspecs.com/server-timing)（[Source](https://www.w3.org/TR/2023/WD-server-timing-20230411/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing)（[Source](https://www.w3.org/TR/2025/WD-paint-timing-20250915/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Event Timing API](https://ko.htmlspecs.com/event-timing)（[Source](https://www.w3.org/TR/2025/WD-event-timing-20250526/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Event Timing API](https://ko.htmlspecs.com/event-timing)（[Source](https://www.w3.org/TR/2025/WD-event-timing-20251017/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 보안 및 인증
 - [Web Authentication Level 2](https://ko.htmlspecs.com/webauthn-2)（[Source](https://www.w3.org/TR/2021/REC-webauthn-2-20210408/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
