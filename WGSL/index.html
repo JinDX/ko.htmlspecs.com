@@ -1463,7 +1463,7 @@ For darkmode:
         </p>
         <h1 class="p-name no-ref" id="title">WebGPU 셰이딩 언어</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CRD">W3C 후보 권고안 초안</a>,
-            <time class="dt-updated" datetime="2025-10-17">2025년 10월 17일</time>
+            <time class="dt-updated" datetime="2025-10-20">2025년 10월 20일</time>
         </p>
         <details open>
             <summary>이 문서에 대한 추가 정보</summary>
@@ -1471,14 +1471,14 @@ For darkmode:
                 <dl>
                     <dt>이 버전:
                     <dd><a class="u-url"
-                            href="https://www.w3.org/TR/2025/CRD-WGSL-20251017/">https://www.w3.org/TR/2025/CRD-WGSL-20251017/</a>
+                            href="https://www.w3.org/TR/2025/CRD-WGSL-20251020/">https://www.w3.org/TR/2025/CRD-WGSL-20251020/</a>
                     <dt>최신 공개 버전:
                     <dd><a href="https://www.w3.org/TR/WGSL/">https://www.w3.org/TR/WGSL/</a>
                     <dt>편집자 초안:
                     <dd><a href="https://gpuweb.github.io/gpuweb/wgsl/">https://gpuweb.github.io/gpuweb/wgsl/</a>
                     <dt>이전 버전:
-                    <dd><a href="https://www.w3.org/TR/2025/CRD-WGSL-20251015/"
-                            rel="prev">https://www.w3.org/TR/2025/CRD-WGSL-20251015/</a>
+                    <dd><a href="https://www.w3.org/TR/2025/CRD-WGSL-20251017/"
+                            rel="prev">https://www.w3.org/TR/2025/CRD-WGSL-20251017/</a>
                     <dt>히스토리:
                     <dd><a class="u-url"
                             href="https://www.w3.org/standards/history/WGSL/">https://www.w3.org/standards/history/WGSL/</a>
@@ -15294,50 +15294,85 @@ sampler_comparison
                     id="ref-for-syntax-func_call_statement①">func_call_statement</a></p>
         </div>
         <p><dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport
-                id="statement-for">for</dfn> 문장은
-            <code>for (초기화; 조건; 갱신부) { 본문 }</code> 형태를 가지며, 동일한 <code>본문</code>을 갖는 <a data-link-type="dfn"
-                href="#statement-loop" id="ref-for-statement-loop③">loop</a> 문장의 구문적 설탕입니다.
-            추가적으로:
-        </p>
+                id="statement-for">for</dfn> 문은 <a data-link-type="dfn" href="#compound-statement"
+                id="ref-for-compound-statement⑧">복합문</a> 안에 <a data-link-type="dfn" href="#statement-loop"
+                id="ref-for-statement-loop③">반복문</a>을 포함하는 문법적 설탕입니다.
+            일반적으로 <code>for</code> 문은 아래와 같은 형태를 가집니다.</p>
+        <blockquote>
+            <p><code>for (</code> <em>initializer</em> <code>;</code> <em>condition</em> <code>;</code>
+                <em>update_part</em> <code>) {</code> <em>body</em> <code>}</code>
+            </p>
+        </blockquote>
+        <p>조건식이 있을 경우, <code>for</code> 문은 다음과 같은 형태의 루프로 변환됩니다:</p>
+        <blockquote>
+            { <br>
+            <em>initializer</em> ; <br>
+            loop { <br>
+            if !(<em>condition</em>) { break; } <br>
+            <em>body</em> <br>
+            continuing { <em>update_part</em> } <br>
+            } <br>
+            }
+        </blockquote>
+
+        조건식이 없을 경우, <code>for</code> 문은 다음과 같은 형태의 루프로 변환됩니다:
+
+        <blockquote>
+            { <br>
+            <em>initializer</em> ; <br>
+            loop { <br>
+            <em>body</em> <br>
+            continuing { <em>update_part</em> } <br>
+            } <br>
+            }
+        </blockquote>
+        <p>추가적으로:</p>
         <ul>
             <li data-md>
-                <p><code>초기화</code>가 비어있지 않다면, 첫 <a data-link-type="dfn" href="#iteration"
+                <p><code>initializer</code>가 비어있지 않으면, 첫 번째 <a data-link-type="dfn" href="#iteration"
                         id="ref-for-iteration①">반복</a> 전에 추가 <a data-link-type="dfn" href="#scope"
                         id="ref-for-scope③">스코프</a> 내에서 실행됩니다.
-                    초기화 내 선언의 스코프는 loop 본문 끝까지 확장됩니다.</p>
+                    initializer에 선언된 변수의 스코프는 루프 본문의 끝까지 확장됩니다.</p>
             <li data-md>
                 <p><a data-link-type="dfn" href="#type-rule-preconditions" id="ref-for-type-rule-preconditions③">타입 규칙
-                        전제조건</a>: 조건이 비어있지 않으면, <a data-link-type="dfn" href="#shader-creation-error"
+                        사전조건</a>: 조건이 비어있지 않으면, <a data-link-type="dfn" href="#shader-creation-error"
                         id="ref-for-shader-creation-error①⓪⑨">반드시</a> <a data-link-type="dfn" href="#bool"
-                        id="ref-for-bool⑤">bool</a> 타입의 표현식이어야 합니다.
+                        id="ref-for-bool⑤">bool</a> 타입의 식이어야 합니다.
                 </p>
                 <ul>
                     <li data-md>
-                        <p>조건이 있을 경우, loop 본문 실행 직전에 평가합니다.
-                            조건이 false이면 <a href="#break-statement">§ 9.4.6 Break 문장</a>이 실행되어 loop 실행이 종료됩니다.
-                            이 확인은 각 반복 시작 시 수행됩니다.</p>
+                        <p>조건식이 존재하면 for-루프 본문을 실행하기 직전에 평가됩니다.
+                            만약 조건식이 false라면, <a href="#break-statement">§ 9.4.6 Break 문</a>이 실행되어 루프 실행이 종료됩니다.
+                            이 검사는 각 반복의 시작 시마다 수행됩니다.</p>
                 </ul>
             <li data-md>
-                <p><code>갱신부</code>가 비어있지 않으면, loop 본문 끝의 <a data-link-type="dfn" href="#statement-continuing"
-                        id="ref-for-statement-continuing①">continuing</a> 문장이 됩니다.</p>
+                <p><code>update_part</code>가 비어있지 않으면, 루프 구조의 끝에서 <a data-link-type="dfn" href="#statement-continuing"
+                        id="ref-for-statement-continuing①">continuing</a> 문이 됩니다.</p>
+            <li data-md>
+                <p><a data-link-type="dfn" href="#behavioral-requirements"
+                        id="ref-for-behavioral-requirements①⑦">디슈가링</a> 과정에서 <code>body</code>에 선언된 식별자는 필요에 따라 이름이
+                    변경되어,
+                    <code>update_part</code>의 모든 식별자가 디슈가링 이전과 동일한 선언을 <a data-link-type="dfn" href="#resolves"
+                        id="ref-for-resolves②②">참조</a>하도록 보장합니다.
+                </p>
         </ul>
-        <p>for 반복문의 <code>초기화</code>는 반복문 실행 전 한 번만 실행됩니다.
-            <a data-link-type="dfn" href="#declaration" id="ref-for-declaration①③">선언</a>이 초기화에 등장하면,
-            해당 <a data-link-type="dfn" href="#identifier" id="ref-for-identifier②⑥">식별자</a>는 <a data-link-type="dfn"
-                href="#in-scope" id="ref-for-in-scope①③">스코프 내</a>에 본문 끝까지 존재합니다.
-            본문 내 선언과 달리, 초기화 선언은 각 반복마다 재초기화되지 않습니다.
+        <p>for 루프의 <code>initializer</code>는 루프를 실행하기 전에 한 번 실행됩니다.
+            <a data-link-type="dfn" href="#declaration" id="ref-for-declaration①③">선언</a>이 initializer에 있을 때, 해당 <a
+                data-link-type="dfn" href="#identifier" id="ref-for-identifier②⑥">식별자</a>는 <a data-link-type="dfn"
+                href="#in-scope" id="ref-for-in-scope①③">스코프 내</a>에 있으며, <code>body</code>의 끝까지 유효합니다.
+            <code>body</code> 내부의 선언과 달리, 이 선언은 각 반복마다 다시 초기화되지 않습니다.
         </p>
-        <p><code>조건</code>, <code>본문</code>, <code>갱신부</code>는 해당 순서대로 실행되어 loop <a data-link-type="dfn"
-                href="#iteration" id="ref-for-iteration②">반복</a>을 형성합니다.
-            <code>본문</code>은 <a data-link-type="dfn" href="#compound-statement" id="ref-for-compound-statement⑧">복합
-                문장</a>의 특수 형태입니다.
-            본문 내 선언의 식별자는 <a data-link-type="dfn" href="#in-scope" id="ref-for-in-scope①④">스코프 내</a>에 다음 문장 시작부터 본문 끝까지
-            존재합니다.
-            선언은 매번 도달할 때 실행되므로, 각 반복마다 변수나 상수의 새 인스턴스를 생성 및 재초기화합니다.
+        <p><code>condition</code>, <code>body</code>, <code>update_part</code>는 그 순서대로 실행되어 하나의 <a data-link-type="dfn"
+                href="#iteration" id="ref-for-iteration②">반복</a>을 이룹니다.
+            <code>body</code>는 <a data-link-type="dfn" href="#compound-statement"
+                id="ref-for-compound-statement⑨">복합문</a>의 특별한 형태입니다.
+            <code>body</code> 내부 선언의 식별자는 다음 문이 시작될 때부터 <code>body</code>의 끝까지 <a data-link-type="dfn" href="#in-scope"
+                id="ref-for-in-scope①④">스코프 내</a>에 있습니다.
+            선언문은 도달할 때마다 실행되므로, 반복이 새로 시작될 때마다 변수나 상수의 새 인스턴스가 생성되고 재초기화됩니다.
         </p>
-        <div class="example wgsl function-scope no-marker" id="example-9a4b41da">
-            <a class="self-link" href="#example-9a4b41da"></a>
-            <div class="marker">예시: For를 Loop로 변환 - before</div>
+        <div class="example wgsl function-scope no-marker" id="example-02d65fbd">
+            <a class="self-link" href="#example-02d65fbd"></a>
+            <div class="marker">예제: 조건이 있는 For → Loop 변환 (변환 전)</div>
             <pre class="highlight"><c- a>var</c-> <c- n>a</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>2</c-><c- p>;</c->
 <c- k>for</c-> <c- p>(</c-><c- a>var</c-> <c- n>i</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>0</c-><c- p>;</c-> <c- n>i</c-> <c- o>&lt;</c-> <c- mi>4</c-><c- p>;</c-> <c- n>i</c-><c- o>++</c-><c- p>)</c-> <c- p>{</c->
   <c- k>if</c-> <c- n>a</c-> <c- o>==</c-> <c- mi>0</c-> <c- p>{</c->
@@ -15347,12 +15382,12 @@ sampler_comparison
 <c- p>}</c->
 </pre>
         </div>
-        <p>변환 결과:</p>
-        <div class="example wgsl function-scope no-marker" id="example-0f3415fb">
-            <a class="self-link" href="#example-0f3415fb"></a>
-            <div class="marker">예시: For를 Loop로 변환 - after</div>
+        <p>다음과 같이 변환됩니다:</p>
+        <div class="example wgsl function-scope no-marker" id="example-ed5ddd93">
+            <a class="self-link" href="#example-ed5ddd93"></a>
+            <div class="marker">예제: 조건이 있는 For → Loop 변환 (변환 후)</div>
             <pre class="highlight"><c- a>var</c-> <c- n>a</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>2</c-><c- p>;</c->
-<c- p>{</c-> <c- c1>// 반복 변수 i를 위한 새로운 스코프 도입</c->
+<c- p>{</c-> <c- c1>// 반복 변수 i를 위한 새 스코프 도입</c->
   <c- a>var</c-> <c- n>i</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>0</c-><c- p>;</c->
   <c- k>loop</c-> <c- p>{</c->
     <c- k>if</c-> <c- o>!</c-><c- p>(</c-><c- n>i</c-> <c- o>&lt;</c-> <c- mi>4</c-><c- p>)</c-> <c- p>{</c->
@@ -15371,11 +15406,48 @@ sampler_comparison
 <c- p>}</c->
 </pre>
         </div>
-        <p>for 반복문이 무한 반복될 경우 <a data-link-type="dfn" href="#dynamic-error" id="ref-for-dynamic-error④">동적 오류</a>가
-            발생합니다.
-            이 경우 반복이 조기에 종료되거나, 기타 비지역적 효과가 발생하거나 <a data-link-type="dfn"
-                href="https://gpuweb.github.io/gpuweb/#lose-the-device" id="ref-for-lose-the-device①">디바이스 손실</a>이 발생할 수
-            있습니다.
+        <div class="example wgsl function-scope no-marker" id="example-d2e2ecf8">
+            <a class="self-link" href="#example-d2e2ecf8"></a>
+            <div class="marker">예제: 조건 없는 For → Loop 변환 (변환 전)</div>
+            <pre class="highlight"><c- a>var</c-> <c- n>a</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>2</c-><c- p>;</c->
+<c- k>for</c-> <c- p>(</c-><c- a>var</c-> <c- n>i</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>0</c-><c- p>;</c-> <c- p>;</c-> <c- n>i</c-><c- o>++</c-><c- p>)</c-> <c- p>{</c->
+  <c- k>if</c-> <c- n>a</c-> <c- o>==</c-> <c- mi>0</c-> <c- p>{</c->
+    <c- k>continue</c-><c- p>;</c->
+  <c- p>}</c->
+  <c- k>if</c-> <c- n>i</c-> <c- o>==</c-> <c- mi>4</c-> <c- p>{</c-> <c- k>break</c-><c- p>;</c-> <c- p>}</c->
+  <c- n>a</c-> <c- o>=</c-> <c- n>a</c-> <c- o>+</c-> <c- mi>2</c-><c- p>;</c->
+<c- p>}</c->
+</pre>
+        </div>
+        <p>다음과 같이 변환됩니다:</p>
+        <div class="example wgsl function-scope no-marker" id="example-82c3ff67">
+            <a class="self-link" href="#example-82c3ff67"></a>
+            <div class="marker">예제: 조건 없는 For → Loop 변환 (변환 후)</div>
+            <pre class="highlight"><c- a>var</c-> <c- n>a</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>2</c-><c- p>;</c->
+<c- p>{</c-> <c- c1>// 반복 변수 i를 위한 새 스코프 도입</c->
+  <c- a>var</c-> <c- n>i</c-><c- p>:</c-> i32 <c- o>=</c-> <c- mi>0</c-><c- p>;</c->
+  <c- k>loop</c-> <c- p>{</c->
+    <c- c1>// 참고: 디슈가링은 여기서 if 구문을 추가하지 않습니다.</c->
+
+    <c- k>if</c-> <c- n>a</c-> <c- o>==</c-> <c- mi>0</c-> <c- p>{</c->
+      <c- k>continue</c-><c- p>;</c->
+    <c- p>}</c->
+    <c- k>if</c-> <c- n>i</c-> <c- o>==</c-> <c- mi>4</c-> <c- p>{</c-> <c- k>break</c-><c- p>;</c-> <c- p>}</c->
+    <c- n>a</c-> <c- o>=</c-> <c- n>a</c-> <c- o>+</c-> <c- mi>2</c-><c- p>;</c->
+
+    <c- k>continuing</c-> <c- p>{</c->
+      <c- n>i</c-><c- o>++</c-><c- p>;</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+        </div>
+        <p><a data-link-type="dfn" href="#dynamic-error" id="ref-for-dynamic-error④">동적 오류</a>는 <a data-link-type="dfn"
+                href="#statement-for" id="ref-for-statement-for③">for</a> 루프가 무한한 수의 <a data-link-type="dfn"
+                href="#iteration" id="ref-for-iteration③">반복</a>을 수행하게 될 경우 발생합니다.
+            이로 인해 루프가 조기에 종료되거나, 그 외의 비지역적 효과, 심지어 <a data-link-type="dfn"
+                href="https://gpuweb.github.io/gpuweb/#lose-the-device" id="ref-for-lose-the-device①">디바이스 손실</a>이 일어날
+            수도 있습니다.
         </p>
         <h4 class="heading settled" data-level="9.4.5" id="while-statement"><span class="secno">9.4.5. </span><span
                 class="content">while 문장</span><a class="self-link" href="#while-statement"></a></h4>
@@ -15590,7 +15662,7 @@ sampler_comparison
         <p><dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport
                 id="statement-continuing">continuing</dfn> 문장은 loop <a data-link-type="dfn" href="#iteration"
                 id="ref-for-iteration⑦">반복</a> 끝에 실행되는 <a data-link-type="dfn" href="#compound-statement"
-                id="ref-for-compound-statement⑨">복합 문장</a>을 지정합니다.
+                id="ref-for-compound-statement①⓪">복합 문장</a>을 지정합니다.
             이 구문은 선택적입니다.</p>
         <p>복합 문장에는 어느 중첩 단계에서도 <a data-link-type="dfn" href="#statement-return"
                 id="ref-for-statement-return①">return</a>이 올 수 <a data-link-type="dfn" href="#shader-creation-error"
@@ -15633,7 +15705,7 @@ sampler_comparison
                 id="ref-for-fragment">fragment</a> 셰이더 단계에서만 사용할 수 있습니다.
         </p>
         <p>정확히 말하면 <code>discard</code> 문장을 실행하면 <a data-link-type="dfn" href="#behavioral-requirements"
-                id="ref-for-behavioral-requirements①⑦">다음이 발생합니다</a>:</p>
+                id="ref-for-behavioral-requirements①⑧">다음이 발생합니다</a>:</p>
         <ul>
             <li data-md>
                 <p>현재 호출이 <a data-link-type="dfn" href="#helper-invocation" id="ref-for-helper-invocation①">helper
@@ -15643,7 +15715,7 @@ sampler_comparison
                         id="ref-for-gpurenderpipeline①">GPURenderPipeline</a>의 다운스트림에서 처리되지 않게 됩니다.</p>
         </ul>
         <p><code>discard</code> 문장 실행 전에 실행된 문장만 <a data-link-type="dfn" href="#behavioral-requirements"
-                id="ref-for-behavioral-requirements①⑧">관찰 가능한 효과</a>를 가집니다.
+                id="ref-for-behavioral-requirements①⑨">관찰 가능한 효과</a>를 가집니다.
         </p>
         <p class="note" role="note"><span class="marker">참고:</span> <code>discard</code> 문장은 fragment 단계의 어떤
             <a data-link-type="dfn" href="#functions-in-a-shader-stage"
@@ -16767,16 +16839,16 @@ sampler_comparison
         </p>
         <ul>
             <li data-md>
-                <p><var>E</var>가 변수로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves②②">해결되는</a> 식별자라면, 루트
+                <p><var>E</var>가 변수로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves②③">해결되는</a> 식별자라면, 루트
                     식별자는 해당 변수입니다.
                 </p>
             <li data-md>
                 <p><var>E</var>가 포인터 타입의 형식 매개변수로 <a data-link-type="dfn" href="#resolves"
-                        id="ref-for-resolves②③">해결되는</a> 식별자라면, 루트 식별자는 해당 형식 매개변수입니다.</p>
+                        id="ref-for-resolves②④">해결되는</a> 식별자라면, 루트 식별자는 해당 형식 매개변수입니다.</p>
             <li data-md>
                 <p><var>E</var>가 초기값 <var>E2</var>를 가진 <a data-link-type="dfn" href="#let-declaration"
                         id="ref-for-let-declaration⑧">let 선언</a>으로 <a data-link-type="dfn" href="#resolves"
-                        id="ref-for-resolves②④">해결되는</a> 식별자라면, 루트 식별자는 <var>E2</var>의 루트 식별자입니다.</p>
+                        id="ref-for-resolves②⑤">해결되는</a> 식별자라면, 루트 식별자는 <var>E2</var>의 루트 식별자입니다.</p>
             <li data-md>
                 <p><var>E</var>가 <code>(</code><var>E2</var><code>)</code>,
                     <code>&amp;</code><var>E2</var>, <code>*</code><var>E2</var>, 또는
@@ -17136,7 +17208,7 @@ sampler_comparison
                     <td><a data-link-type="dfn" href="#shader-creation-error"
                             id="ref-for-shader-creation-error①⑤⑨">반드시</a> <a data-link-type="dfn"
                             href="#const-expressions" id="ref-for-const-expressions⑤①">const-expression</a>이어야 하며, <a
-                            data-link-type="dfn" href="#resolves" id="ref-for-resolves②⑤">해석</a>된 결과가 <a
+                            data-link-type="dfn" href="#resolves" id="ref-for-resolves②⑥">해석</a>된 결과가 <a
                             data-link-type="dfn" href="#i32" id="ref-for-i32②⑤">i32</a> 또는 <a data-link-type="dfn"
                             href="#u32" id="ref-for-u32①①">u32</a>이고 값이 <code>0</code> 또는 <code>1</code>이어야 합니다.
 
@@ -18020,21 +18092,23 @@ sampler_comparison
                 id="statically-accessed">정적으로 접근됨</dfn>으로 간주될 때:</p>
         <ul>
             <li data-md>
-                <p>어떤 <a data-link-type="dfn" href="#functions-in-a-shader-stage"
-                        id="ref-for-functions-in-a-shader-stage②">셰이더 단계의 함수</a> 선언에서 <em>D</em>로 <a
-                        data-link-type="dfn" href="#resolves" id="ref-for-resolves②⑥">해결</a>되는 식별자가 등장할 때.</p>
+                <p><a data-link-type="dfn" href="#resolves" id="ref-for-resolves②⑦">D</a>에 <em>해결되는</em> 식별자가 <a
+                        data-link-type="dfn" href="#function-declaration" id="ref-for-function-declaration④">함수 선언</a>이나
+                    <a data-link-type="dfn" href="#functions-in-a-shader-stage"
+                        id="ref-for-functions-in-a-shader-stage②">셰이더 스테이지의 함수들</a>의 선언에 나타납니다.
+                </p>
             <li data-md>
-                <p><a data-link-type="dfn" href="#statically-accessed" id="ref-for-statically-accessed⑦">정적으로 접근된</a>
-                    선언의 타입을 정의하기 위해 <em>D</em>로 <a data-link-type="dfn" href="#resolves"
-                        id="ref-for-resolves②⑦">해결</a>되는 식별자가 사용될 때.</p>
+                <p><a data-link-type="dfn" href="#resolves" id="ref-for-resolves②⑧">D</a>에 <em>해결되는</em> 식별자가 <a
+                        data-link-type="dfn" href="#statically-accessed" id="ref-for-statically-accessed⑦">정적으로 접근되는</a>
+                    선언의 타입을 정의하는 데 사용됩니다.</p>
             <li data-md>
-                <p><a data-link-type="dfn" href="#statically-accessed" id="ref-for-statically-accessed⑧">정적으로 접근된</a>
-                    선언의 이니셜라이저에 <em>D</em>로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves②⑧">해결</a>되는
-                    식별자가 사용될 때.</p>
+                <p><a data-link-type="dfn" href="#resolves" id="ref-for-resolves②⑨">D</a>에 <em>해결되는</em> 식별자가 <a
+                        data-link-type="dfn" href="#statically-accessed" id="ref-for-statically-accessed⑧">정적으로 접근되는</a>
+                    선언의 초기화식에 사용됩니다.</p>
             <li data-md>
-                <p><a data-link-type="dfn" href="#statically-accessed" id="ref-for-statically-accessed⑨">정적으로 접근된</a>
-                    선언에 사용된 어트리뷰트에서 <em>D</em>로 <a data-link-type="dfn" href="#resolves"
-                        id="ref-for-resolves②⑨">해결</a>되는 식별자가 사용될 때.</p>
+                <p><a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⓪">D</a>에 <em>해결되는</em> 식별자가 <a
+                        data-link-type="dfn" href="#statically-accessed" id="ref-for-statically-accessed⑨">정적으로 접근되는</a>
+                    선언에 사용되는 속성(attribute)에 의해 사용됩니다.</p>
         </ul>
         <div class="note" role="note">
             <span class="marker">참고:</span>정적 접근은 다음을 고려하여 재귀적으로 정의됩니다:
@@ -18776,13 +18850,11 @@ sampler_comparison
                         <a data-link-type="dfn" href="https://gpuweb.github.io/gpuweb/#clip-space-coordinates"
                             id="ref-for-clip-space-coordinates">클립 공간 좌표(clip space coordinates)</a>로 표현됩니다.
 
-                        <p>출력 값 (<em>x</em>,<em>y</em>,<em>z</em>,<em>w</em>)은
-                            <a data-link-type="dfn" href="#behavioral-requirements"
-                                id="ref-for-behavioral-requirements①⑨">다음과 같이</a> WebGPU <a data-link-type="dfn"
-                                href="https://gpuweb.github.io/gpuweb/#ndc" id="ref-for-ndc">정규화 장치 좌표(normalized device
-                                coordinates)</a>에서 (<em>x</em>/<em>w</em>, <em>y</em>/<em>w</em>,
-                            <em>z</em>/<em>w</em>)로 매핑됩니다.
-                        </p>
+                        <p>출력 값(<em>x</em>,<em>y</em>,<em>z</em>,<em>w</em>)은 WebGPU <a data-link-type="dfn"
+                                href="#behavioral-requirements" id="ref-for-behavioral-requirements②⓪">동작 요구사항</a>에 따라
+                            (<em>x</em>/<em>w</em>, <em>y</em>/<em>w</em>, <em>z</em>/<em>w</em>)로 <a
+                                data-link-type="dfn" href="https://gpuweb.github.io/gpuweb/#ndc" id="ref-for-ndc">정규화 장치
+                                좌표</a>에 매핑됩니다.</p>
                         <p>자세한 내용은 <a href="https://www.w3.org/TR/webgpu/#coordinate-systems"><cite>WebGPU</cite> § 3.3
                                 좌표계(Coordinate Systems)</a>와 <a
                                 href="https://www.w3.org/TR/webgpu/#primitive-clipping"><cite>WebGPU</cite> § 23.2.4 원시
@@ -19463,7 +19535,7 @@ sampler_comparison
             vertex 출력의 보간 속성과 일치하는지 확인합니다.
             그렇지 않으면 <a data-link-type="dfn" href="#pipeline-creation-error" id="ref-for-pipeline-creation-error②⑥">파이프라인
                 생성 오류</a>가 <a data-link-type="dfn" href="#behavioral-requirements"
-                id="ref-for-behavioral-requirements②⓪">발생합니다</a>.
+                id="ref-for-behavioral-requirements②①">발생합니다</a>.
         </p>
         <h4 class="heading settled" data-level="13.3.2" id="resource-interface"><span class="secno">13.3.2. </span><span
                 class="content">리소스 인터페이스</span><a class="self-link" href="#resource-interface"></a></h4>
@@ -19898,7 +19970,7 @@ sampler_comparison
             메모리에 영향을 주는 연산은 하나 이상의 메모리 위치 집합에 작용합니다.
             <a data-link-type="dfn" href="#composite" id="ref-for-composite⑥">합성 타입(composite)</a>에 대한 메모리 연산은 <a
                 data-link-type="dfn" href="#behavioral-requirements"
-                id="ref-for-behavioral-requirements②①">패딩(padding)</a> 메모리 위치에 접근하지 않습니다.
+                id="ref-for-behavioral-requirements②②">패딩(padding)</a> 메모리 위치에 접근하지 않습니다.
             따라서 연산에 의해 접근되는 메모리 위치 집합은 연속적일 필요가 없습니다.
         </p>
         <p>두 메모리 위치 집합은 <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="overlap">오버랩(overlap)</dfn>된다고
@@ -20651,141 +20723,140 @@ sampler_comparison
         </div>
         <h4 class="heading settled" data-level="14.4.4" id="internal-value-layout"><span class="secno">14.4.4.
             </span><span class="content">값의 내부 레이아웃</span><a class="self-link" href="#internal-value-layout"></a></h4>
-        <p>이 섹션은 <a data-link-type="dfn" href="#host-shareable" id="ref-for-host-shareable①①">호스트-공유</a> 값의 내부가 버퍼의 바이트
-            위치에 어떻게 배치되는지 설명합니다.
-            전체 값의 배치가 주어졌을 때, 이러한 레이아웃은 값의 타입과 구조체 멤버의 <a data-link-type="dfn" href="#attribute-align"
+        <p>이 섹션에서는 <a data-link-type="dfn" href="#host-shareable" id="ref-for-host-shareable①①">host-shareable</a> 값의
+            내부가 전체 값의 배치가 가정된 상태에서 버퍼의 바이트 위치에 어떻게 배치되는지 설명합니다.
+            이 레이아웃은 값의 타입, 그리고 구조체 멤버에 대한 <a data-link-type="dfn" href="#attribute-align"
                 id="ref-for-attribute-align⑤">align</a> 및 <a data-link-type="dfn" href="#attribute-size"
                 id="ref-for-attribute-size⑥">size</a> 속성에 따라 달라집니다.</p>
-        <p>값이 배치되는 버퍼 바이트 오프셋은 타입의 정렬 요구조건을 만족해야 <a data-link-type="dfn" href="#shader-creation-error"
-                id="ref-for-shader-creation-error②②②">합니다</a>: 타입 <var>T</var>의 값이 버퍼 오프셋 <var>k</var>에 배치된다면,
+        <p>값이 배치되는 버퍼 바이트 오프셋은 타입 정렬 요건을 <a data-link-type="dfn" href="#shader-creation-error"
+                id="ref-for-shader-creation-error②②②">반드시</a> 충족해야 합니다: 타입 <var>T</var>의 값이 버퍼 오프셋 <var>k</var>에 배치될 때,
             <var>k</var> = <var>c</var> × <a data-link-type="dfn" href="#alignof"
-                id="ref-for-alignof①①">AlignOf</a>(<var>T</var>) (단, <var>c</var>는 0 이상의 정수)이어야 합니다.
+                id="ref-for-alignof①①">AlignOf</a>(<var>T</var>)이며, 여기서 <var>c</var>는 0 이상의 정수입니다.
         </p>
-        <p>데이터는 주소 공간에 상관없이 동일하게 나타납니다.</p>
+        <p>데이터는 주소 공간에 관계없이 <a data-link-type="dfn" href="#behavioral-requirements"
+                id="ref-for-behavioral-requirements②③">동일하게</a> 표시됩니다.</p>
         <p class="note" role="note"><span class="marker">참고:</span> <a data-link-type="dfn" href="#bool"
                 id="ref-for-bool①⑥">bool</a> 타입은 <a data-link-type="dfn" href="#host-shareable"
-                id="ref-for-host-shareable①②">호스트-공유</a>가 아닙니다.
-            WGSL은 <a data-link-type="dfn" href="#bool" id="ref-for-bool①⑦">bool</a> 값이 4바이트 크기와 정렬값을 갖도록 명시하지만, 내부 레이아웃은
-            명시하지 않습니다.</p>
-        <p><a data-link-type="dfn" href="#u32" id="ref-for-u32②①">u32</a> 또는 <a data-link-type="dfn" href="#i32"
-                id="ref-for-i32③⑤">i32</a> 타입의 값 <var>V</var>가 호스트-공유 버퍼의 바이트 오프셋 <var>k</var>에 배치된다면:</p>
+                id="ref-for-host-shareable①②">host-shareable</a>이 아닙니다.
+            WGSL은 <a data-link-type="dfn" href="#bool" id="ref-for-bool①⑦">bool</a> 값이 크기와 정렬이 4바이트임을 명시하지만, bool 값의 내부
+            레이아웃은 지정하지 않습니다.</p>
+        <p>타입 <a data-link-type="dfn" href="#u32" id="ref-for-u32②①">u32</a> 또는 <a data-link-type="dfn" href="#i32"
+                id="ref-for-i32③⑤">i32</a>의 값 <var>V</var>가 host-shared 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:</p>
         <ul>
             <li data-md>
-                <p>바이트 <var>k</var>: <var>V</var>의 0~7번 비트</p>
+                <p>바이트 <var>k</var>는 <var>V</var>의 0~7번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+1: <var>V</var>의 8~15번 비트</p>
+                <p>바이트 <var>k</var>+1은 <var>V</var>의 8~15번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+2: <var>V</var>의 16~23번 비트</p>
+                <p>바이트 <var>k</var>+2는 <var>V</var>의 16~23번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+3: <var>V</var>의 24~31번 비트</p>
+                <p>바이트 <var>k</var>+3은 <var>V</var>의 24~31번 비트를 포함합니다.</p>
         </ul>
         <p class="note" role="note"><span class="marker">참고:</span> <a data-link-type="dfn" href="#i32"
                 id="ref-for-i32③⑥">i32</a>는 2의 보수 표현을 사용하므로 부호 비트는 31번 위치에 있습니다.</p>
-        <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="64-bit-integer">64비트 정수</dfn> 레이아웃:
-            WebGPU API의 일부 기능은 버퍼에 64비트 부호 없는 정수 값을 기록합니다. 이러한 값 <var>V</var>가 호스트-공유 버퍼의 바이트 오프셋 <var>k</var>에 배치된다면:
-        </p>
+        <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="64-bit-integer">64비트 정수</dfn> 레이아웃: WebGPU
+            API의 일부 기능은 64비트 부호 없는 정수 값을 버퍼에 기록합니다. 이러한 값 <var>V</var>가 host-shared 버퍼의 바이트 오프셋 <var>k</var>에 나타날 때:</p>
         <ul>
             <li data-md>
-                <p>바이트 <var>k</var>: <var>V</var>의 0~7번 비트</p>
+                <p>바이트 <var>k</var>는 <var>V</var>의 0~7번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+1: <var>V</var>의 8~15번 비트</p>
+                <p>바이트 <var>k</var>+1은 <var>V</var>의 8~15번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+2: <var>V</var>의 16~23번 비트</p>
+                <p>바이트 <var>k</var>+2는 <var>V</var>의 16~23번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+3: <var>V</var>의 24~31번 비트</p>
+                <p>바이트 <var>k</var>+3은 <var>V</var>의 24~31번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+4: <var>V</var>의 32~39번 비트</p>
+                <p>바이트 <var>k</var>+4는 <var>V</var>의 32~39번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+5: <var>V</var>의 40~47번 비트</p>
+                <p>바이트 <var>k</var>+5는 <var>V</var>의 40~47번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+6: <var>V</var>의 48~55번 비트</p>
+                <p>바이트 <var>k</var>+6은 <var>V</var>의 48~55번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+7: <var>V</var>의 56~63번 비트</p>
+                <p>바이트 <var>k</var>+7은 <var>V</var>의 56~63번 비트를 포함합니다.</p>
         </ul>
         <p class="note" role="note"><span class="marker">참고:</span> WGSL에는 <a data-link-type="dfn" href="#type-concrete"
-                id="ref-for-type-concrete③⑨">구체적인(concrete)</a> <a data-link-type="dfn" href="#64-bit-integer"
+                id="ref-for-type-concrete③⑨">구체적인</a> <a data-link-type="dfn" href="#64-bit-integer"
                 id="ref-for-64-bit-integer">64비트 정수</a> 타입이 없습니다.</p>
-        <p><a data-link-type="dfn" href="#f32" id="ref-for-f32②①">f32</a> 타입 값 <var>V</var>는
-            <a data-link-type="biblio" href="#biblio-ieee-754"
-                title="IEEE Standard for Floating-Point Arithmetic">IEEE-754</a> <a data-link-type="dfn"
-                href="#ieee754-binary32" id="ref-for-ieee754-binary32②">binary32</a> 포맷으로 표현됩니다.
-            1비트 부호, 8비트 지수, 23비트 분수(fraction)로 구성됩니다.
-            <var>V</var>가 호스트-공유 버퍼의 바이트 오프셋 <var>k</var>에 배치된다면:
+        <p>타입 <a data-link-type="dfn" href="#f32" id="ref-for-f32②①">f32</a>의 값 <var>V</var>는 <a data-link-type="biblio"
+                href="#biblio-ieee-754" title="IEEE Standard for Floating-Point Arithmetic">IEEE-754</a> <a
+                data-link-type="dfn" href="#ieee754-binary32" id="ref-for-ieee754-binary32②">binary32</a> 형식으로 표현됩니다.
+            하나의 부호 비트, 8개의 지수 비트, 23개의 가수 비트를 가집니다.
+            <var>V</var>가 host-shared 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:
         </p>
         <ul>
             <li data-md>
-                <p>바이트 <var>k</var>: 분수의 0~7번 비트</p>
+                <p>바이트 <var>k</var>는 가수의 0~7번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+1: 분수의 8~15번 비트</p>
+                <p>바이트 <var>k</var>+1은 가수의 8~15번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+2의 0~6번 비트: 분수의 16~22번 비트</p>
+                <p>바이트 <var>k</var>+2의 0~6번 비트는 가수의 16~22번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+2의 7번 비트: 지수의 0번 비트</p>
+                <p>바이트 <var>k</var>+2의 7번 비트는 지수의 0번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+3의 0~6번 비트: 지수의 1~7번 비트</p>
+                <p>바이트 <var>k</var>+3의 0~6번 비트는 지수의 1~7번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+3의 7번 비트: 부호 비트</p>
+                <p>바이트 <var>k</var>+3의 7번 비트는 부호 비트를 포함합니다.</p>
         </ul>
-        <p><a data-link-type="dfn" href="#f16" id="ref-for-f16①⑤">f16</a> 타입 값 <var>V</var>는
-            <a data-link-type="biblio" href="#biblio-ieee-754"
-                title="IEEE Standard for Floating-Point Arithmetic">IEEE-754</a> <a data-link-type="dfn"
-                href="#ieee754-binary16" id="ref-for-ieee754-binary16②">binary16</a> 포맷으로 표현됩니다.
-            1비트 부호, 5비트 지수, 10비트 분수로 구성됩니다.
-            <var>V</var>가 호스트-공유 버퍼의 바이트 오프셋 <var>k</var>에 배치된다면:
+        <p>타입 <a data-link-type="dfn" href="#f16" id="ref-for-f16①⑤">f16</a>의 값 <var>V</var>는 <a data-link-type="biblio"
+                href="#biblio-ieee-754" title="IEEE Standard for Floating-Point Arithmetic">IEEE-754</a> <a
+                data-link-type="dfn" href="#ieee754-binary16" id="ref-for-ieee754-binary16②">binary16</a> 형식으로 표현됩니다.
+            하나의 부호 비트, 5개의 지수 비트, 10개의 가수 비트를 가집니다.
+            <var>V</var>가 host-shared 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:
         </p>
         <ul>
             <li data-md>
-                <p>바이트 <var>k</var>: 분수의 0~7번 비트</p>
+                <p>바이트 <var>k</var>는 가수의 0~7번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+1의 0~1번 비트: 분수의 8~9번 비트</p>
+                <p>바이트 <var>k</var>+1의 0~1번 비트는 가수의 8~9번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+1의 2~6번 비트: 지수의 0~4번 비트</p>
+                <p>바이트 <var>k</var>+1의 2~6번 비트는 지수의 0~4번 비트를 포함합니다.</p>
             <li data-md>
-                <p>바이트 <var>k</var>+1의 7번 비트: 부호 비트</p>
+                <p>바이트 <var>k</var>+1의 7번 비트는 부호 비트를 포함합니다.</p>
         </ul>
-        <p class="note" role="note"><span class="marker">참고:</span> 위 규칙은 숫자 값이 호스트-공유 버퍼에 리틀 엔디안(little-endian) 형식으로
-            저장됨을 의미합니다.</p>
+        <p class="note" role="note"><span class="marker">참고:</span> 위 규칙에 따라 host-shared 버퍼의 숫자 값은 리틀 엔디안 형식으로 저장됩니다.
+        </p>
         <p><a data-link-type="dfn" href="#atomic-type" id="ref-for-atomic-type①①">atomic 타입</a>
-            <code>atomic</code>&lt;<var>T</var>> 값 <var>V</var>가 호스트-공유 버퍼에 배치될 때, 내부 레이아웃은 기반 타입 <var>T</var> 값과 동일합니다.
+            <code>atomic</code>&lt;<var>T</var>>의 값 <var>V</var>가 host-shared 버퍼에 배치될 때, 기반 타입 <var>T</var>의 값과 동일한 내부
+            레이아웃을 가집니다.
         </p>
-        <p><a data-link-type="dfn" href="#vector" id="ref-for-vector②⓪">벡터 타입</a> vec<var>N</var>&lt;<var>T</var>> 값
-            <var>V</var>가 호스트-공유 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:
+        <p><a data-link-type="dfn" href="#vector" id="ref-for-vector②⓪">벡터 타입</a> vec<var>N</var>&lt;<var>T</var>>의 값
+            <var>V</var>가 host-shared 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:
         </p>
         <ul>
             <li data-md>
-                <p><var>V</var>.x는 바이트 오프셋 <var>k</var>에 배치</p>
+                <p><var>V</var>.x는 바이트 오프셋 <var>k</var>에 배치됩니다.</p>
             <li data-md>
                 <p><var>V</var>.y는 바이트 오프셋 <var>k</var> + <a data-link-type="dfn" href="#sizeof"
-                        id="ref-for-sizeof①①">SizeOf</a>(<var>T</var>)에 배치</p>
+                        id="ref-for-sizeof①①">SizeOf</a>(<var>T</var>)에 배치됩니다.</p>
             <li data-md>
-                <p><var>N</var> ≥ 3이면 <var>V</var>.z는 <var>k</var> + 2 × <a data-link-type="dfn" href="#sizeof"
-                        id="ref-for-sizeof①②">SizeOf</a>(<var>T</var>)에 배치</p>
+                <p><var>N</var> ≥ 3이면, <var>V</var>.z는 바이트 오프셋 <var>k</var> + 2 × <a data-link-type="dfn" href="#sizeof"
+                        id="ref-for-sizeof①②">SizeOf</a>(<var>T</var>)에 배치됩니다.</p>
             <li data-md>
-                <p><var>N</var> ≥ 4이면 <var>V</var>.w는 <var>k</var> + 3 × <a data-link-type="dfn" href="#sizeof"
-                        id="ref-for-sizeof①③">SizeOf</a>(<var>T</var>)에 배치</p>
+                <p><var>N</var> ≥ 4이면, <var>V</var>.w는 바이트 오프셋 <var>k</var> + 3 × <a data-link-type="dfn" href="#sizeof"
+                        id="ref-for-sizeof①③">SizeOf</a>(<var>T</var>)에 배치됩니다.</p>
         </ul>
         <p><a data-link-type="dfn" href="#matrix" id="ref-for-matrix①③">행렬 타입</a>
-            mat<var>C</var>x<var>R</var>&lt;<var>T</var>> 값 <var>V</var>가 호스트-공유 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:</p>
+            mat<var>C</var>x<var>R</var>&lt;<var>T</var>>의 값 <var>V</var>가 host-shared 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:
+        </p>
         <ul>
             <li data-md>
-                <p><var>V</var>의 <var>i</var>번째 열 벡터는 바이트 오프셋 <var>k</var> + <var>i</var> × <a data-link-type="dfn"
-                        href="#alignof" id="ref-for-alignof①②">AlignOf</a>(vec<var>R</var>&lt;<var>T</var>> )에 배치됨</p>
+                <p><var>V</var>의 열 벡터 <var>i</var>는 바이트 오프셋 <var>k</var> + <var>i</var> × <a data-link-type="dfn"
+                        href="#alignof" id="ref-for-alignof①②">AlignOf</a>(vec<var>R</var>&lt;<var>T</var>))에 배치됩니다.</p>
         </ul>
-        <p><a data-link-type="dfn" href="#array" id="ref-for-array①①">배열 타입</a> <var>A</var> 값이 호스트-공유 메모리 버퍼의 바이트 오프셋
-            <var>k</var>에 배치될 때:
-        </p>
+        <p><a data-link-type="dfn" href="#array" id="ref-for-array①①">배열 타입</a> <var>A</var>의 값이 host-shared 메모리 버퍼의 바이트
+            오프셋 <var>k</var>에 배치될 때:</p>
         <ul>
             <li data-md>
                 <p>배열의 <var>i</var>번째 요소는 바이트 오프셋 <var>k</var> + <var>i</var> × <a data-link-type="dfn" href="#strideof"
-                        id="ref-for-strideof⑤">StrideOf</a>(<var>A</var>)에 배치됨</p>
+                        id="ref-for-strideof⑤">StrideOf</a>(<var>A</var>)에 배치됩니다.</p>
         </ul>
-        <p><a data-link-type="dfn" href="#structure" id="ref-for-structure②③">구조체 타입</a> <var>S</var>의 값이 호스트-공유 메모리 버퍼의
-            바이트 오프셋 <var>k</var>에 배치될 때:</p>
+        <p><a data-link-type="dfn" href="#structure" id="ref-for-structure②③">구조체 타입</a> <var>S</var>의 값이 host-shared
+            메모리 버퍼의 바이트 오프셋 <var>k</var>에 배치될 때:</p>
         <ul>
             <li data-md>
                 <p>구조체 값의 <var>i</var>번째 멤버는 바이트 오프셋 <var>k</var> + <a data-link-type="dfn" href="#offsetofmember"
                         id="ref-for-offsetofmember⑤">OffsetOfMember</a>(<var>S</var>,<var>i</var>)에 배치됩니다.
-                    자세한 내용은 <a href="#structure-member-layout">§ 14.4.2 구조체 멤버 레이아웃</a>을 참조하세요.
+                    <a href="#structure-member-layout">§ 14.4.2 구조체 멤버 레이아웃</a>을 참고하세요.
                 </p>
         </ul>
         <h4 class="heading settled" data-level="14.4.5" id="address-space-layout-constraints"><span
@@ -21203,68 +21274,60 @@ sampler_comparison
         </p>
         <h3 class="heading settled" data-level="15.2" id="uniformity"><span class="secno">15.2. </span><span
                 class="content">균일성(Uniformity)</span><a class="self-link" href="#uniformity"></a></h3>
-        <p><a href="#collective-operations">집합 연산(collective operation)</a>
-            (예: barrier, 도함수, 암묵적으로 계산된 도함수에 의존하는 텍스처 연산)
-            은 GPU에서 동시에 실행되는 여러 호출 간의 협력이 필요합니다.
-            모든 호출이 동시에, 즉 <a data-link-type="dfn" href="#uniform-control-flow" id="ref-for-uniform-control-flow②">균일 제어
-                흐름(uniform control flow)</a>에서 실행될 때
-            해당 연산은 올바르고 이식성 있게 실행됩니다.</p>
-        <p>반대로, 호출의 엄격한 부분집합만 해당 연산을 실행하는 경우(즉, 비균일 제어 흐름),
-            올바르지 않거나 이식성 없는 동작이 발생합니다.
-            비공식적으로, 일부 호출만 집합 연산에 도달하거나, 다른 호출은 그렇지 않거나,
-            비균일 제어 의존성의 결과로 동시에 도달하지 않습니다.
-            비균일 제어 의존성은 <a href="#control-flow">제어 흐름</a> 문장이 <a data-link-type="dfn" href="#uniform-value"
-                id="ref-for-uniform-value①">비균일 값(non-uniform value)</a>에 따라 동작할 때 발생합니다.</p>
+        <p><a href="#collective-operations">집합 연산</a>
+            (예: barrier, 미분 또는 암시적으로 계산된 미분에 의존하는 텍스처 연산 등)은 GPU에서 동시에 실행되는 여러 인보케이션 간의 조정이 필요합니다.
+            이 연산은 모든 인보케이션이 동시에, 즉 <a data-link-type="dfn" href="#uniform-control-flow"
+                id="ref-for-uniform-control-flow②">uniform control flow</a> 내에서 실행될 때 올바르고 이식성 있게 동작합니다.</p>
+        <p>반대로, 일부 인보케이션만 연산을 실행하는 경우(즉, non-uniform control flow), 올바르지 않거나 이식성 없는 동작이 발생할 수 있습니다.
+            즉, 비균일한 제어 종속성으로 인해 일부 인보케이션만 집합 연산에 도달하거나, 동시에 도달하지 않게 됩니다.
+            비균일 제어 종속성은 <a href="#control-flow">제어 흐름</a>이 <a data-link-type="dfn" href="#uniform-value"
+                id="ref-for-uniform-value①">non-uniform 값</a>에 의존할 때 발생합니다.</p>
         <blockquote>
-            <p>예를 들어, 서로 다른 호출이
-                <a data-link-type="dfn" href="#statement-if" id="ref-for-statement-if①">if</a>, <a data-link-type="dfn"
-                    href="#statement-break-if" id="ref-for-statement-break-if">break-if</a>, <a data-link-type="dfn"
-                    href="#statement-while" id="ref-for-statement-while⑦">while</a>, <a data-link-type="dfn"
-                    href="#statement-for" id="ref-for-statement-for⑧">for</a>의 조건에 대해 서로 다른 값을 계산하거나,
-                <a data-link-type="dfn" href="#statement-switch" id="ref-for-statement-switch④">switch</a>의 선택자 값을 다르게
-                계산하거나,
-                단락 평가 이항 연산자(<code>&amp;&amp;</code> 또는 <code>||</code>)의 좌측 피연산자가 다를 때
-                비균일 제어 의존성이 발생합니다.
-            </p>
+            <p>예를 들어, 서로 다른 인보케이션이 <a data-link-type="dfn" href="#statement-if" id="ref-for-statement-if①">if</a>, <a
+                    data-link-type="dfn" href="#statement-break-if" id="ref-for-statement-break-if">break-if</a>, <a
+                    data-link-type="dfn" href="#statement-while" id="ref-for-statement-while⑦">while</a>, <a
+                    data-link-type="dfn" href="#statement-for" id="ref-for-statement-for⑧">for</a>의 조건에 대해 서로 다른 값을
+                계산하거나, <a data-link-type="dfn" href="#statement-switch" id="ref-for-statement-switch④">switch</a>의 선택자,
+                또는 단락 평가 이항 연산자(<code>&amp;&amp;</code> 또는 <code>||</code>)의 좌측 피연산자 값이 서로 다를 경우 비균일 제어 종속성이 발생합니다.</p>
         </blockquote>
-        <p>이러한 비균일 값은 종종 정적으로 균일하다고 증명되지 않은 특정 소스에서 유래할 수 있습니다.
-            대표적인 소스는 다음과 같습니다:</p>
+        <p>이러한 non-uniform 값들은 종종 정적으로 uniform임을 증명할 수 없는 특정 소스에서 비롯됩니다.
+            이러한 소스는 다음을 포함하지만, 이에 국한되지 않습니다:</p>
         <ul>
             <li data-md>
-                <p>변경 가능한 <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑨">모듈 범위</a> <a
+                <p>변경 가능한 <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑨">모듈 스코프</a> <a
                         data-link-type="dfn" href="#variable" id="ref-for-variable①⑧">변수</a></p>
             <li data-md>
                 <p>대부분의 <a data-link-type="dfn" href="#built-in-values" id="ref-for-built-in-values⑤">내장 값</a> (단, <a
                         data-link-type="dfn" href="#built-in-values-num_workgroups"
-                        id="ref-for-built-in-values-num_workgroups②">num_workgroups</a>와 <a data-link-type="dfn"
-                        href="#built-in-values-workgroup_id"
-                        id="ref-for-built-in-values-workgroup_id③">workgroup_id</a>는 예외)</p>
+                        id="ref-for-built-in-values-num_workgroups②">num_workgroups</a> 및 <a data-link-type="dfn"
+                        href="#built-in-values-workgroup_id" id="ref-for-built-in-values-workgroup_id③">workgroup_id</a>
+                    제외)</p>
             <li data-md>
                 <p><a data-link-type="dfn" href="#user-defined-input-datum" id="ref-for-user-defined-input-datum③">사용자
-                        정의 입력값</a></p>
+                        정의 입력</a></p>
             <li data-md>
-                <p>특정 <a data-link-type="dfn" href="#built-in-functions" id="ref-for-built-in-functions⑦">내장 함수</a> (자세한
-                    내용은 <a href="#uniformity-function-calls">§ 15.2.7 함수 호출의 균일성 규칙</a> 참조)</p>
+                <p>일부 <a data-link-type="dfn" href="#built-in-functions" id="ref-for-built-in-functions⑦">내장 함수</a> (<a
+                        href="#uniformity-function-calls">§ 15.2.7 함수 호출의 uniformity 규칙</a> 참조)</p>
         </ul>
-        <p>올바르고 이식 가능한 동작을 보장하기 위해, WGSL 구현은 정적 <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport
-                id="uniformity-analysis">균일성 분석(uniformity analysis)</dfn>을 수행하여 각 집합 연산이 <a data-link-type="dfn"
-                href="#uniform-control-flow" id="ref-for-uniform-control-flow③">균일 제어 흐름</a>에서 실행된다는 것을 증명하려고 시도합니다.
-            이후의 하위 섹션에서 분석을 설명합니다.</p>
-        <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="uniformity-failure">균일성 실패(uniformity
-                failure)</dfn>는
-            <a data-link-type="dfn" href="#behavioral-requirements" id="ref-for-behavioral-requirements②④">발생</a>하며,
-            <a data-link-type="dfn" href="#uniformity-analysis" id="ref-for-uniformity-analysis②">균일성 분석</a>이 특정 <a
-                href="#collective-operations">집합 연산</a>이 <a data-link-type="dfn" href="#uniform-control-flow"
-                id="ref-for-uniform-control-flow④">균일 제어 흐름</a>에서 실행된다는 것을 증명하지 못할 때 발생합니다.
-        </p>
+        <p>올바르고 이식성 있는 동작을 보장하기 위해 WGSL 구현체는 <a data-link-type="dfn" href="#behavioral-requirements"
+                id="ref-for-behavioral-requirements②④">정적</a> <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport
+                id="uniformity-analysis">uniformity 분석</dfn>을 수행하여 각 집합 연산이 <a data-link-type="dfn"
+                href="#uniform-control-flow" id="ref-for-uniform-control-flow③">uniform control flow</a> 내에서 실행됨을 증명하려고
+            시도합니다.
+            이후의 하위 섹션에서 이 분석 방법을 설명합니다.</p>
+        <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="uniformity-failure">uniformity 실패</dfn>는 <a
+                data-link-type="dfn" href="#behavioral-requirements" id="ref-for-behavioral-requirements②⑤">uniformity
+                분석</a>이 특정 <a href="#collective-operations">집합 연산</a>이 <a data-link-type="dfn"
+                href="#uniform-control-flow" id="ref-for-uniform-control-flow④">uniform control flow</a> 내에서 실행됨을 증명할 수
+            없을 때 발생합니다.</p>
         <ul>
             <li data-md>
-                <p>도함수를 계산하는 <a data-link-type="dfn" href="#builtin-functions-that-compute-a-derivative"
-                        id="ref-for-builtin-functions-that-compute-a-derivative①">내장 함수</a>에서 균일성 실패가 발생하면
+                <p>만약 미분을 계산하는 <a data-link-type="dfn" href="#builtin-functions-that-compute-a-derivative"
+                        id="ref-for-builtin-functions-that-compute-a-derivative①">내장 함수</a>에서 uniformity 실패가 발생하면,
                     <a data-link-type="dfn" href="#trigger-derivative_uniformity"
                         id="ref-for-trigger-derivative_uniformity②">derivative_uniformity</a> <a data-link-type="dfn"
-                        href="#diagnostic" id="ref-for-diagnostic⑤">진단(diagnostic)</a>이 <a data-link-type="dfn"
-                        href="#triggered" id="ref-for-triggered②">트리거</a>됩니다.
+                        href="#diagnostic" id="ref-for-diagnostic⑤">진단</a>이 <a data-link-type="dfn" href="#triggered"
+                        id="ref-for-triggered②">트리거</a>됩니다.
                 </p>
                 <ul>
                     <li data-md>
@@ -21274,12 +21337,11 @@ sampler_comparison
                     <li data-md>
                         <p>진단의 <a data-link-type="dfn" href="#diagnostic-severity"
                                 id="ref-for-diagnostic-severity④">심각도</a>는 기본적으로 <a data-link-type="dfn"
-                                href="#severity-error" id="ref-for-severity-error⑥">오류(error)</a>이지만, <a
-                                data-link-type="dfn" href="#diagnostic-filter" id="ref-for-diagnostic-filter⑥">진단
-                                필터</a>로 제어할 수 있습니다.</p>
+                                href="#severity-error" id="ref-for-severity-error⑥">오류</a>이지만, <a data-link-type="dfn"
+                                href="#diagnostic-filter" id="ref-for-diagnostic-filter⑥">진단 필터</a>로 제어할 수 있습니다.</p>
                 </ul>
             <li data-md>
-                <p>동기화 내장 함수(<a href="#sync-builtin-functions">synchronization builtin</a>)에서 균일성 실패가 발생하면,
+                <p>동기화 <a href="#sync-builtin-functions">내장 함수</a>에서 uniformity 실패가 발생하면,
                     <a data-link-type="dfn" href="#severity-error" id="ref-for-severity-error⑦">오류</a> <a
                         data-link-type="dfn" href="#diagnostic" id="ref-for-diagnostic⑥">진단</a>이 <a data-link-type="dfn"
                         href="#triggered" id="ref-for-triggered③">트리거</a>되어,
@@ -21288,27 +21350,26 @@ sampler_comparison
                 </p>
             <li data-md>
                 <p><a href="#subgroup-builtin-functions">subgroup</a> 또는 <a href="#quad-builtin-functions">quad</a> 내장
-                    함수에서 균일성 실패가 발생하면,
+                    함수에서 uniformity 실패가 발생하면,
                     <a data-link-type="dfn" href="#trigger-subgroup_uniformity"
-                        id="ref-for-trigger-subgroup_uniformity①">subgroup_uniformity</a>
-                    <a data-link-type="dfn" href="#diagnostic" id="ref-for-diagnostic⑦">진단</a>이 <a data-link-type="dfn"
-                        href="#triggered" id="ref-for-triggered④">트리거</a>됩니다.
+                        id="ref-for-trigger-subgroup_uniformity①">subgroup_uniformity</a> <a data-link-type="dfn"
+                        href="#diagnostic" id="ref-for-diagnostic⑦">진단</a>이 <a data-link-type="dfn" href="#triggered"
+                        id="ref-for-triggered④">트리거</a>됩니다.
                 </p>
                 <ul>
                     <li data-md>
                         <p>진단의 <a data-link-type="dfn" href="#diagnostic-triggering-location"
                                 id="ref-for-diagnostic-triggering-location④">트리거 위치</a>는 해당 내장 함수의 <a
-                                data-link-type="dfn" href="#call-site" id="ref-for-call-site①⓪">호출 위치</a>이거나,
-                            <a href="#subgroupshuffleup-builtin">subgroupShuffleUp</a>,
-                            <a href="#subgroupshuffledown-builtin">subgroupShuffleDown</a>,
-                            <a href="#subgroupshufflexor-builtin">subgroupShuffleXor</a>의 경우에는 균일해야 하는 파라미터의 위치입니다.
+                                data-link-type="dfn" href="#call-site" id="ref-for-call-site①⓪">호출 위치</a> 또는 <a
+                                href="#subgroupshuffleup-builtin">subgroupShuffleUp</a>, <a
+                                href="#subgroupshuffledown-builtin">subgroupShuffleDown</a>, <a
+                                href="#subgroupshufflexor-builtin">subgroupShuffleXor</a>의 경우 uniform해야 하는 매개변수의 위치입니다.
                         </p>
                     <li data-md>
                         <p>진단의 <a data-link-type="dfn" href="#diagnostic-severity"
                                 id="ref-for-diagnostic-severity⑤">심각도</a>는 기본적으로 <a data-link-type="dfn"
-                                href="#severity-error" id="ref-for-severity-error⑧">오류(error)</a>이지만, <a
-                                data-link-type="dfn" href="#diagnostic-filter" id="ref-for-diagnostic-filter⑦">진단
-                                필터</a>로 제어할 수 있습니다.</p>
+                                href="#severity-error" id="ref-for-severity-error⑧">오류</a>이지만, <a data-link-type="dfn"
+                                href="#diagnostic-filter" id="ref-for-diagnostic-filter⑦">진단 필터</a>로 제어할 수 있습니다.</p>
                 </ul>
         </ul>
         <h4 class="heading settled" data-level="15.2.1" id="uniformity-concepts"><span class="secno">15.2.1.
@@ -21356,7 +21417,7 @@ sampler_comparison
                 <li data-md>
                     <p>타당성(sound): <a data-link-type="dfn" href="#uniformity-failure"
                             id="ref-for-uniformity-failure">균일성 실패(uniformity failure)</a>가 <a data-link-type="dfn"
-                            href="#behavioral-requirements" id="ref-for-behavioral-requirements②⑤">발생</a>하여, 내장 함수의 균일성
+                            href="#behavioral-requirements" id="ref-for-behavioral-requirements②⑥">발생</a>하여, 내장 함수의 균일성
                         요구사항을 위반하는 프로그램을 검출할 수 있습니다.</p>
                 <li data-md>
                     <p>코드를 함수로 리팩터링하거나, 함수를 인라인하는 것은 셰이더가 이전에 유효했다면 유효성을 깨지 않습니다.</p>
@@ -21882,43 +21943,42 @@ sampler_comparison
         </p>
         <h4 class="heading settled" data-level="15.2.4" id="pointer-desugar"><span class="secno">15.2.4. </span><span
                 class="content">포인터 디슈가링</span><a class="self-link" href="#pointer-desugar"></a></h4>
-        <p><a data-link-type="dfn" href="#address-spaces-function" id="ref-for-address-spaces-function①③">function</a>
-            주소 공간에 있는 <a data-link-type="dfn" href="#pointer-type" id="ref-for-pointer-type⑨">포인터 타입</a>의 각 <a
-                data-link-type="dfn" href="#formal-parameter" id="ref-for-formal-parameter①⑨">파라미터</a>는
-            해당 파라미터를 역참조(dereferencing)한 것과 동등한 초기 값을 갖는 로컬 변수 선언으로 디슈가링됩니다.
-            즉, function 주소 공간 포인터는 로컬 변수 선언의 별칭으로 간주됩니다.
-            초기 값 할당은 <em>i</em><sup>번째</sup> 파라미터에 대한 <a data-link-type="dfn" href="#param_i_contents"
-                id="ref-for-param_i_contents①">param_i_contents</a>로의 엣지를 생성합니다 (<em>V(e)</em>는 <a data-link-type="dfn"
-                href="#param_i_contents" id="ref-for-param_i_contents②">param_i_contents</a>임).
+        <p><a data-link-type="dfn" href="#address-spaces-function" id="ref-for-address-spaces-function①③">함수</a> 주소 공간에
+            있는 <a data-link-type="dfn" href="#pointer-type" id="ref-for-pointer-type⑨">포인터 타입</a>의 각 <a
+                data-link-type="dfn" href="#formal-parameter" id="ref-for-formal-parameter①⑨">매개변수</a>는 해당 매개변수를 역참조한 것과
+            동일한 초기값을 갖는 지역 변수 선언으로 디슈가링됩니다.
+            즉, 함수 주소 공간 포인터는 지역 변수 선언의 별칭(alias)로 취급됩니다.
+            초기값 할당은 <em>i</em>번째 매개변수에 대해 <a data-link-type="dfn" href="#param_i_contents"
+                id="ref-for-param_i_contents①">param_i_contents</a>로의 엣지를 생성합니다(즉, <em>V(e)</em>는 <a
+                data-link-type="dfn" href="#param_i_contents" id="ref-for-param_i_contents②">param_i_contents</a>가 됩니다).
         </p>
-        <p><a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑨">let 선언</a> <em>L</em>이 <a
-                data-link-type="dfn" href="#effective-value-type"
+        <p><a data-link-type="dfn" href="#effective-value-type"
                 id="ref-for-effective-value-type⑨">effective-value-type</a>이 <a data-link-type="dfn"
-                href="#pointer-type" id="ref-for-pointer-type①⓪">포인터 타입</a>일 경우, 다음과 같이 디슈가링됩니다:
-        </p>
+                href="#pointer-type" id="ref-for-pointer-type①⓪">포인터 타입</a>인 각 <a data-link-type="dfn"
+                href="#let-declaration" id="ref-for-let-declaration⑨">let 선언</a> <em>L</em>은 다음과 같이 디슈가링됩니다:</p>
         <ul>
             <li data-md>
-                <p>초기화 식의 각 부분 표현식 <em>SE</em>를 postorder 깊이 우선 순회로 방문:</p>
+                <p><em>L</em>의 초기화 식의 각 하위 표현식 <em>SE</em>를 후위(postorder) 깊이 우선 탐색으로 방문합니다:</p>
                 <ul>
                     <li data-md>
                         <p><em>SE</em>가 <a data-link-type="dfn" href="#type-checking" id="ref-for-type-checking③">타입
-                                검사</a> 중 <a data-link-type="dfn" href="#load-rule" id="ref-for-load-rule①①">load
-                                rule</a>을 호출하고 <a data-link-type="dfn" href="#root-identifier"
-                                id="ref-for-root-identifier⑤">root identifier</a>가 변경 가능한 변수이면:</p>
+                                체크</a> 중에 <a data-link-type="dfn" href="#load-rule" id="ref-for-load-rule①①">로드 규칙</a>을
+                            호출하고 <a data-link-type="dfn" href="#root-identifier" id="ref-for-root-identifier⑤">루트
+                                식별자</a>가 변경 가능한 변수라면:</p>
                         <ul>
                             <li data-md>
-                                <p><em>L</em> 바로 앞에 <em>SE</em>로 초기화된 새로운 let 선언 <em>LSE</em>를 생성</p>
+                                <p><em>L</em> 바로 앞에 <em>SE</em>로 초기화된 새로운 let 선언 <em>LSE</em>를 생성합니다.</p>
                             <li data-md>
-                                <p><em>L</em>에서 <em>SE</em>를 <em>LSE</em>로 구성된 <a href="#value-identifier-expr">값 식별자
-                                        표현식</a>으로 교체</p>
+                                <p><em>L</em>의 <em>SE</em>를 <em>LSE</em>로 구성된 <a href="#value-identifier-expr">값 식별자
+                                        표현식</a>으로 교체합니다.</p>
                         </ul>
                 </ul>
             <li data-md>
-                <p>업데이트된 <em>L</em>의 초기화 식을 기록</p>
+                <p>변경될 수 있는 <em>L</em>의 초기화 식을 기록합니다.</p>
             <li data-md>
-                <p><a data-link-type="dfn" href="#identifier" id="ref-for-identifier②⑧">식별자</a> 중 <em>L</em>로 <a
-                        data-link-type="dfn" href="#resolves" id="ref-for-resolves③⓪">해결되는</a> 것을 기록된 초기화 식(괄호로 감싼
-                    표현식)으로 대체</p>
+                <p><a data-link-type="dfn" href="#identifier" id="ref-for-identifier②⑧">식별자</a> 중 <em>L</em>에 <a
+                        data-link-type="dfn" href="#resolves" id="ref-for-resolves③①">해결되는</a> 것을 기록된 초기화 식(괄호로 감싼 <a
+                        href="#parenthesized-expressions">괄호 표현식</a>으로 래핑)으로 대체합니다.</p>
         </ul>
         <p>이 디슈가링은 포인터의 <a data-link-type="dfn" href="#root-identifier" id="ref-for-root-identifier⑥">root
                 identifier</a>를 각 사용 지점에서 직접 노출함으로써 이후 분석을 단순화합니다.</p>
@@ -21975,7 +22035,7 @@ sampler_comparison
         </p>
         <ul>
             <li data-md>
-                <p>변수로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③①">해결되는</a> 식별자 <em>x</em></p>
+                <p>변수로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③②">해결되는</a> 식별자 <em>x</em></p>
             <li data-md>
                 <p><code>(</code><em>r</em><code>)</code>에서 <em>r</em>은 <a data-link-type="dfn" href="#full-reference"
                         id="ref-for-full-reference">전체 참조</a></p>
@@ -21990,7 +22050,7 @@ sampler_comparison
                 <p><code>&amp;</code><em>r</em>에서 <em>r</em>은 <a data-link-type="dfn" href="#full-reference"
                         id="ref-for-full-reference①">전체 참조</a></p>
             <li data-md>
-                <p>포인터로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③②">해결되는</a> 식별자 <em>p</em>가 <a
+                <p>포인터로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③③">해결되는</a> 식별자 <em>p</em>가 <a
                         data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration①⓪">let 선언</a>으로 초기화되어
                     <a data-link-type="dfn" href="#full-pointer" id="ref-for-full-pointer①">전체 포인터</a>인 경우
                 </p>
@@ -22960,7 +23020,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③③">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③④">resolving</a> to
                         function-scope 변수 "x",
                         식별자가 <a data-link-type="dfn" href="#root-identifier" id="ref-for-root-identifier⑦">루트 식별자</a>로
                         <a data-link-type="dfn" href="#memory-view" id="ref-for-memory-view③③">메모리 뷰</a> 표현식
@@ -22983,7 +23043,7 @@ sampler_comparison
                             (<a href="#func-var-value-analysis">§ 15.2.5 함수 범위 변수 값 분석</a> 참고)
                         </p>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③④">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑤">resolving</a> to
                         function-scope 변수 "x",
                         "x"가 디슈가 처리된 포인터 파라미터 <em>i</em>이고,
                         식별자가 <a data-link-type="dfn" href="#root-identifier" id="ref-for-root-identifier⑧">루트 식별자</a>로
@@ -22999,7 +23059,7 @@ sampler_comparison
 
                     <td class>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑤">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑥">resolving</a> to
                         function-scope 변수 "x",
                         식별자가 <a data-link-type="dfn" href="#root-identifier" id="ref-for-root-identifier⑨">루트 식별자</a>로
                         <a data-link-type="dfn" href="#memory-view" id="ref-for-memory-view③⑤">메모리 뷰</a> 표현식
@@ -23013,7 +23073,7 @@ sampler_comparison
 
                     <td class>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑥">resolving</a> to <a
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑦">resolving</a> to <a
                             data-link-type="dfn" href="#const-declaration"
                             id="ref-for-const-declaration⑨">const-declaration</a>, <a data-link-type="dfn"
                             href="#override-declaration" id="ref-for-override-declaration①⑧">override-declaration</a>,
@@ -23031,7 +23091,7 @@ sampler_comparison
                     <td class="nowrap"><em>Result</em> -> {<em>CF</em>, <em>X</em>}
 
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑦">resolving</a> to <a
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑧">resolving</a> to <a
                             data-link-type="dfn" href="#formal-parameter" id="ref-for-formal-parameter②①">formal
                             parameter</a> of
                         <a data-link-type="dfn" href="#pointer-type" id="ref-for-pointer-type①③">pointer type</a> in
@@ -23055,7 +23115,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑧">resolving</a> to <a
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑨">resolving</a> to <a
                             data-link-type="dfn" href="#formal-parameter" id="ref-for-formal-parameter②②">formal
                             parameter</a> of
                         <a data-link-type="dfn" href="#pointer-type" id="ref-for-pointer-type①④">pointer type</a> in
@@ -23078,7 +23138,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves③⑨">resolving</a> to <a
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⓪">resolving</a> to <a
                             data-link-type="dfn" href="#formal-parameter" id="ref-for-formal-parameter②③">formal
                             parameter</a> of
                         <a data-link-type="dfn" href="#pointer-type" id="ref-for-pointer-type①⑤">pointer type</a> in
@@ -23092,7 +23152,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⓪">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④①">resolving</a> to
                         uniform 내장 값 "x"
 
                     <td>
@@ -23101,7 +23161,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④①">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④②">resolving</a> to
                         non-uniform 내장 값 "x"
 
                     <td>
@@ -23112,7 +23172,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④②">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④③">resolving</a> to
                         읽기 전용 모듈 범위 변수 "x"
 
                     <td>
@@ -23121,7 +23181,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④③">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④④">resolving</a> to
                         읽기 전용이 아닌 모듈 범위
                         변수 "x", 식별자가 <a data-link-type="dfn" href="#root-identifier" id="ref-for-root-identifier①②">루트
                             식별자</a>로 <a data-link-type="dfn" href="#memory-view" id="ref-for-memory-view③⑧">메모리 뷰</a>
@@ -23137,7 +23197,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④④">resolving</a> to
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑤">resolving</a> to
                         읽기 전용이 아닌 모듈 범위
                         변수 "x", 식별자가 <a data-link-type="dfn" href="#root-identifier" id="ref-for-root-identifier①③">루트
                             식별자</a>로 <a data-link-type="dfn" href="#memory-view" id="ref-for-memory-view③⑨">메모리 뷰</a>
@@ -23236,7 +23296,7 @@ sampler_comparison
 
             <tbody>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑤">function-scope 변수
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑥">function-scope 변수
                             "x"로 해석됨</a>
 
                     <td><em>Result</em>
@@ -23254,7 +23314,7 @@ sampler_comparison
                             (<a href="#func-var-value-analysis">§ 15.2.5 함수 범위 변수 값 분석</a> 참고)
                         </p>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑥">const-declaration,
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑦">const-declaration,
                             override-declaration, let-declaration, 또는 formal parameter "x"로 해석됨</a>
 
                     <td>
@@ -23264,7 +23324,7 @@ sampler_comparison
 
                     <td>
                 <tr>
-                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑦">모듈 범위 변수 "x"로
+                    <td>identifier <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑧">모듈 범위 변수 "x"로
                             해석됨</a>
 
                     <td>
@@ -23419,11 +23479,10 @@ sampler_comparison
         <p class="note" role="note"><span class="marker">참고:</span> 그래프 내 부분 그래프는 이해를 돕기 위해 예제에만 포함되었습니다.</p>
         <h5 class="heading settled" data-level="15.2.10.3" id="uniformity-example3"><span class="secno">15.2.10.3.
             </span><span class="content">합성 값 분석의 한계</span><a class="self-link" href="#uniformity-example3"></a></h5>
-        <p>균일성 분석의 한계 중 하나는 <a data-link-type="dfn" href="#composite" id="ref-for-composite⑨">합성</a> 값의 <a
-                data-link-type="dfn" href="#components" id="ref-for-components⑤">각 컴포넌트</a>를 독립적으로 추적하지 않는다는 점입니다.
-            즉, 비균일 컴포넌트 값이 있으면
-            분석은 전체 합성 값을 비균일로 처리합니다.
-            이 예제는 해당 문제와 셰이더 개발자가 이 한계를 피하기 위해 사용할 수 있는 잠재적 우회 방법을 보여줍니다.
+        <p>uniformity 분석의 한계 중 하나는 <a data-link-type="dfn" href="#composite" id="ref-for-composite⑨">합성</a> 값의 <a
+                data-link-type="dfn" href="#components" id="ref-for-components⑤">구성 요소</a>를 개별적으로 추적하지 않는다는 점입니다.
+            즉, 어떤 구성 요소라도 non-uniform 값이 있으면, 분석은 전체 합성 값을 non-uniform으로 간주합니다.
+            이 예시는 이러한 문제와 셰이더 작성자가 이 한계를 피하기 위해 사용할 수 있는 잠재적 우회 방법을 보여줍니다.
         </p>
         <div class="example wgsl no-marker" id="example-8c798208">
             <a class="self-link" href="#example-8c798208"></a>
@@ -23663,35 +23722,35 @@ sampler_comparison
                 <p>ID 3: 우하단 호출</p>
         </ul>
         <p class="note" role="note"><span class="marker">참고:</span> 쿼드 ID에 접근하는 내장 값 accessor는 존재하지 않습니다.</p>
-        <p>일반적으로 <a href="https://www.w3.org/TR/webgpu/#fragment-processing">프래그먼트 처리</a>는
-            <a data-link-type="dfn" href="https://gpuweb.github.io/gpuweb/#rasterizationpoint"
-                id="ref-for-rasterizationpoint①">RasterizationPoint</a>마다 하나의 프래그먼트 셰이더 호출을 생성합니다
-            (<a href="https://www.w3.org/TR/webgpu/#rasterization">래스터화</a>에서 생성됨).
-            때때로 그래픽 프리미티브의 경계에서 쿼드를 완전히 채울 만큼의 RasterizationPoint가 부족할 수 있습니다.
-            쿼드에 1, 2, 또는 3개의 호출만 RasterizationPoint에 대응하면,
-            프래그먼트 처리는 쿼드의 비어있는 위치마다 <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="helper-invocation">헬퍼
-                호출(helper invocation)</dfn>을 생성합니다.
+        <p>일반적으로 <a href="https://www.w3.org/TR/webgpu/#fragment-processing">프래그먼트 처리</a>는 <a data-link-type="dfn"
+                href="https://gpuweb.github.io/gpuweb/#rasterizationpoint"
+                id="ref-for-rasterizationpoint①">RasterizationPoint</a>마다 프래그먼트 셰이더의 인보케이션을 하나 생성합니다. 이
+            RasterizationPoint는 <a href="https://www.w3.org/TR/webgpu/#rasterization">래스터화</a>에 의해 생성됩니다.
+            경우에 따라, 예를 들어 그래픽스 프리미티브의 경계에서는 쿼드를 완전히 채우기에 충분하지 않은 RasterizationPoint만 있을 수 있습니다.
+            쿼드에 1, 2, 3개의 RasterizationPoint에 해당하는 인보케이션만 있을 경우, 프래그먼트 처리는 쿼드의 미채워진 위치마다 <dfn class="dfn-paneled"
+                data-dfn-type="dfn" data-noexport id="helper-invocation">헬퍼 인보케이션</dfn>을 생성합니다.
         </p>
-        <p>헬퍼 호출은 관찰 가능한 효과를 가지지 않으며, 오직 <a href="#derivatives">도함수</a> 계산을 돕는 역할만 합니다.
-            따라서 헬퍼 호출에는 다음과 같은 제한이 적용됩니다:</p>
+        <p>헬퍼 인보케이션은 <a href="#derivatives">미분</a> 값을 계산하는 데 도움을 주는 것 외에는 관찰 가능한 효과를 갖지 않습니다.
+            따라서, 헬퍼 인보케이션에는 다음과 같은 제한이 적용됩니다:</p>
         <ul>
             <li data-md>
-                <p><a data-link-type="dfn" href="#write-access" id="ref-for-write-access①④">쓰기 접근</a>(자세한 내용은 <a
-                        href="#memory-operation">§ 14.5.1 메모리 연산</a> 참고)은
-                    <a data-link-type="dfn" href="#address-spaces-storage"
+                <p><a data-link-type="dfn" href="#address-spaces-storage"
                         id="ref-for-address-spaces-storage②①">storage</a> 또는 <a data-link-type="dfn"
-                        href="#address-spaces-handle" id="ref-for-address-spaces-handle⑦">handle</a> 주소 공간에서 수행되지 않습니다.
-                </p>
+                        href="#address-spaces-handle" id="ref-for-address-spaces-handle⑦">handle</a> 주소 공간에 대해 <a
+                        data-link-type="dfn" href="#write-access" id="ref-for-write-access①④">쓰기 접근</a>(<a
+                        href="#memory-operation">§ 14.5.1 메모리 연산</a>도 참고)은 <a data-link-type="dfn"
+                        href="#behavioral-requirements" id="ref-for-behavioral-requirements②⑨">수행되지 않습니다</a>.</p>
             <li data-md>
-                <p><a href="#atomic-builtin-functions">Atomic 내장 함수</a>는 <a data-link-type="dfn"
-                        href="#indeterminate-value" id="ref-for-indeterminate-value③">불확정(indeterminate)</a> 결과를 반환합니다.
-                </p>
+                <p><a href="#atomic-builtin-functions">원자적 내장 함수</a>는 <a data-link-type="dfn"
+                        href="#behavioral-requirements" id="ref-for-behavioral-requirements③⓪">실행 시</a> <a
+                        data-link-type="dfn" href="#indeterminate-value" id="ref-for-indeterminate-value③">불확정</a> 결과를
+                    반환합니다.</p>
             <li data-md>
-                <p><a data-link-type="dfn" href="#entry-point" id="ref-for-entry-point①⑨">엔트리 포인트</a>의 <a
-                        data-link-type="dfn" href="#return-value" id="ref-for-return-value⑨">반환 값</a>은
-                    <a data-link-type="dfn" href="#gpurenderpipeline"
-                        id="ref-for-gpurenderpipeline⑤">GPURenderPipeline</a>의 다운스트림에서 추가 처리가 이루어지지 않습니다.
-                </p>
+                <p><a data-link-type="dfn" href="#entry-point" id="ref-for-entry-point①⑨">엔트리 포인트</a> <a
+                        data-link-type="dfn" href="#return-value" id="ref-for-return-value⑨">반환값</a>은 <a
+                        data-link-type="dfn" href="#behavioral-requirements" id="ref-for-behavioral-requirements③①">더
+                        이상</a> <a data-link-type="dfn" href="#gpurenderpipeline"
+                        id="ref-for-gpurenderpipeline⑤">GPURenderPipeline</a>에서 후속 처리되지 않습니다.</p>
         </ul>
         <p>쿼드의 모든 호출이 헬퍼 호출이 되는 경우(예: <a data-link-type="dfn" href="#statement-discard"
                 id="ref-for-statement-discard①">discard</a> 문 실행으로 인해),
@@ -24167,7 +24226,7 @@ sampler_comparison
                 <ul>
                     <li data-md>
                         <p>WGSL에서의 부동소수점 연산은 <a data-link-type="dfn" href="#behavioral-requirements"
-                                id="ref-for-behavioral-requirements③①">반드시</a> IEEE-754 규칙에 따라 <a data-link-type="dfn"
+                                id="ref-for-behavioral-requirements③②">반드시</a> IEEE-754 규칙에 따라 <a data-link-type="dfn"
                                 href="#intermediate-result" id="ref-for-intermediate-result④">중간 결과</a>를 생성하지만,
                             IEEE-754에서 요구하는 예외는 해당 표현식이
                             <a data-link-type="dfn" href="#const-expressions"
@@ -24199,55 +24258,48 @@ sampler_comparison
                 <ul>
                     <li data-md>
                         <p><a data-link-type="dfn" href="#ieee754-overflow" id="ref-for-ieee754-overflow②">오버플로우</a>,
-                            무한대, NaN이 <a data-link-type="dfn" href="#shader-execution-start"
-                                id="ref-for-shader-execution-start②">셰이더 실행 시작</a> 전에 생성되면 <a data-link-type="dfn"
-                                href="#behavioral-requirements" id="ref-for-behavioral-requirements③②">오류가 발생합니다.</a>
+                            무한대, 그리고 NaN이 <a data-link-type="dfn" href="#shader-execution-start"
+                                id="ref-for-shader-execution-start②">셰이더 실행</a> 전에 생성된 경우 <a data-link-type="dfn"
+                                href="#behavioral-requirements" id="ref-for-behavioral-requirements③③">오류</a>가 발생합니다.
                         </p>
                         <ul>
                             <li data-md>
-                                <p><a data-link-type="dfn" href="#const-expressions"
-                                        id="ref-for-const-expressions⑥⓪">const-expression</a> 및 <a data-link-type="dfn"
-                                        href="#override-expressions"
-                                        id="ref-for-override-expressions③④">override-expression</a>이 유한 값에 대해 평가될 때,
-                                    <a data-link-type="dfn" href="#behavioral-requirements"
-                                        id="ref-for-behavioral-requirements③③">오버플로우, 무한대, NaN</a>을 IEEE-754 규칙에 따라 <a
-                                        data-link-type="dfn" href="#intermediate-result"
-                                        id="ref-for-intermediate-result⑥">중간 결과</a> 값으로 생성합니다.
-                                </p>
+                                <p><a data-link-type="dfn" href="#const-expressions" id="ref-for-const-expressions⑥⓪">상수
+                                        식</a> 및 <a data-link-type="dfn" href="#override-expressions"
+                                        id="ref-for-override-expressions③④">override 식</a>이 유한 값에 대해 동작할 때, IEEE-754 규칙에
+                                    따라 오버플로우, 무한대, NaN을 <a data-link-type="dfn" href="#intermediate-result"
+                                        id="ref-for-intermediate-result⑥">중간 결과</a> 값으로 생성할 수 있습니다.</p>
                                 <ul>
                                     <li data-md>
-                                        <p class="note" role="note"><span class="marker">참고:</span> 이 규칙은 구현체가 이러한 표현식들에
-                                            대해 오버플로우, 무한대, NaN을 정확도 한계 내에서 신뢰성 있게 검출하여 오류를 일관되게 발생시켜야 함을 요구합니다.</p>
+                                        <p class="note" role="note"><span class="marker">참고:</span> 이 규칙은 구현체가 이러한 식에 대해
+                                            오버플로우, 무한대, NaN을 신뢰할 수 있을 정도의 정확도로 감지하고, 오류를 일관되게 발생시켜야 함을 요구합니다.</p>
                                 </ul>
                             <li data-md>
                                 <p>부동소수점 타입의 <a data-link-type="dfn" href="#const-expressions"
-                                        id="ref-for-const-expressions⑥①">const-expression</a>에서 오버플로우, NaN, 무한대가 평가된 경우
-                                    <a data-link-type="dfn" href="#shader-creation-error"
-                                        id="ref-for-shader-creation-error②③①">셰이더 생성 오류</a>가 발생합니다.
-                                </p>
+                                        id="ref-for-const-expressions⑥①">상수 식</a>이 오버플로우되거나 NaN 또는 무한대가 되면 <a
+                                        data-link-type="dfn" href="#shader-creation-error"
+                                        id="ref-for-shader-creation-error②③①">셰이더 생성 오류</a>가 발생합니다.</p>
                             <li data-md>
                                 <p>부동소수점 타입의 <a data-link-type="dfn" href="#override-expressions"
-                                        id="ref-for-override-expressions③⑤">override-expression</a>에서 오버플로우, NaN, 무한대가
-                                    평가된 경우 <a data-link-type="dfn" href="#pipeline-creation-error"
+                                        id="ref-for-override-expressions③⑤">override 식</a>이 오버플로우되거나 NaN 또는 무한대가 되면 <a
+                                        data-link-type="dfn" href="#pipeline-creation-error"
                                         id="ref-for-pipeline-creation-error②⑧">파이프라인 생성 오류</a>가 발생합니다.</p>
                         </ul>
                     <li data-md>
                         <p>구현체는 <a data-link-type="dfn" href="#shader-execution-start"
-                                id="ref-for-shader-execution-start③">셰이더 실행</a> 동안 오버플로우, 무한대, NaN이 존재하지 않는다고 가정할 수
-                            있습니다.</p>
+                                id="ref-for-shader-execution-start③">셰이더 실행</a> 중 오버플로우, 무한대, NaN이 존재하지 않는다고 가정할 수 있습니다.
+                        </p>
                         <ul>
                             <li data-md>
-                                <p>이러한 구현체에서는, <a data-link-type="dfn" href="#runtime-expression"
-                                        id="ref-for-runtime-expression④">런타임 표현식</a>을 평가한 <a data-link-type="dfn"
+                                <p>이런 구현체에서 <a data-link-type="dfn" href="#runtime-expression"
+                                        id="ref-for-runtime-expression④">런타임 식</a>을 평가할 때 <a data-link-type="dfn"
                                         href="#intermediate-result" id="ref-for-intermediate-result⑦">중간 결과</a>가
-                                    오버플로우이거나 무한대, NaN을 생성하면, 최종 결과는 <a data-link-type="dfn"
-                                        href="#behavioral-requirements" id="ref-for-behavioral-requirements③④">반드시</a>
-                                    대상 타입의 <a data-link-type="dfn" href="#indeterminate-value"
-                                        id="ref-for-indeterminate-value⑦">불확정 값</a>이 됩니다.
-                                </p>
+                                    오버플로우되거나 무한대, NaN이 나오면, 최종 결과는 해당 타입의 <a data-link-type="dfn"
+                                        href="#behavioral-requirements" id="ref-for-behavioral-requirements③⑤">불확정
+                                        값</a>이 됩니다.</p>
                             <li data-md>
-                                <p class="note" role="note"><span class="marker">참고:</span> 즉, 일부 함수(<code>min</code>,
-                                    <code>max</code> 등)는 NaN과 무한대의 존재에 대한 최적화로 인해 기대하는 결과를 반환하지 않을 수 있습니다.
+                                <p class="note" role="note"><span class="marker">참고:</span> 이는 <code>min</code>이나
+                                    <code>max</code>와 같은 일부 함수가 NaN이나 무한대의 존재에 대한 최적화로 인해 기대한 결과를 반환하지 않을 수 있음을 의미합니다.
                                 </p>
                         </ul>
                 </ul>
@@ -25759,7 +25811,7 @@ sampler_comparison
             이와 같은 내장 함수가 사용되는 곳에서는, <a data-link-type="dfn" href="#identifier" id="ref-for-identifier②⑨">식별자</a>가
             타입 또는 타입 별칭의 <a data-link-type="dfn" href="#in-scope" id="ref-for-in-scope①⑥">스코프 내</a>에 반드시 있어야 하며,
             <a data-link-type="dfn" href="#identifier" id="ref-for-identifier③⓪">식별자</a>는
-            다른 선언으로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑧">해결(resolve)</a>되어서는 안 됩니다.
+            다른 선언으로 <a data-link-type="dfn" href="#resolves" id="ref-for-resolves④⑨">해결(resolve)</a>되어서는 안 됩니다.
         </p>
         <p class="note" role="note"><span class="marker">참고:</span> <a href="#frexp-builtin">frexp</a>,
             <a href="#modf-builtin">modf</a>, 그리고 <a href="#atomic-rmw">atomicCompareExchangeWeak</a>에 의해 반환되는 구조체 타입들은
@@ -31012,7 +31064,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         0부터 시작하는 텍스처 배열 인덱스.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements③⑤">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements③⑥">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>offset</code>
@@ -31188,7 +31240,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         0부터 시작하는 텍스처 배열 인덱스입니다.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements③⑥">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements③⑦">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>depth_ref</code>
@@ -31760,7 +31812,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         샘플링할 0부터 시작하는 텍스처 배열 인덱스입니다.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements③⑦">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements③⑧">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>offset</code>
@@ -31895,14 +31947,14 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         샘플링할 0부터 시작하는 텍스처 배열 인덱스입니다.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements③⑧">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements③⑨">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>bias</code>
                     <td>
                         샘플링 전에 mip 레벨에 적용할 바이어스.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements③⑨">[-16.0, 15.99]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements④⓪">[-16.0, 15.99]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>offset</code>
@@ -32026,7 +32078,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         샘플링할 0부터 시작하는 텍스처 배열 인덱스입니다.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements④⓪">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements④①">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>depth_ref</code>
@@ -32152,7 +32204,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         샘플링할 0부터 시작하는 텍스처 배열 인덱스입니다.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements④①">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements④②">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>depth_ref</code>
@@ -32300,7 +32352,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         샘플링할 0부터 시작하는 텍스처 배열 인덱스입니다.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements④②">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements④③">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>ddx</code>
@@ -32512,7 +32564,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                     <td>
                         샘플링할 0부터 시작하는 텍스처 배열 인덱스.<br>
                         이 값은 <a data-link-type="dfn" href="#behavioral-requirements"
-                            id="ref-for-behavioral-requirements④③">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
+                            id="ref-for-behavioral-requirements④④">[0, textureNumLayers(t) - 1]</a> 범위로 클램핑됩니다.
 
                 <tr>
                     <td><code>level</code>
@@ -32581,7 +32633,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
 
 
                         <p>샘플링 전에 지정한 좌표는 <a data-link-type="dfn" href="#behavioral-requirements"
-                                id="ref-for-behavioral-requirements④④">다음 사각형</a>으로 클램핑됩니다.</p>
+                                id="ref-for-behavioral-requirements④⑤">다음 사각형</a>으로 클램핑됩니다.</p>
                         <blockquote>
                             <p>[ <em>half_texel</em>, 1 - <em>half_texel</em> ]</p>
                         </blockquote>
@@ -32719,7 +32771,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                 <p><code>array_index</code>가 <code>[0, textureNumLayers(t))</code> 범위를 벗어나면</p>
         </ul>
         <p>논리 텍셀 주소가 유효하지 않은 경우, 내장 함수는 <a data-link-type="dfn" href="#behavioral-requirements"
-                id="ref-for-behavioral-requirements④⑤">실행되지 않습니다</a>.</p>
+                id="ref-for-behavioral-requirements④⑥">실행되지 않습니다</a>.</p>
         <h3 class="heading settled" data-level="17.8" id="atomic-builtin-functions"><span class="secno">17.8.
             </span><span class="content">원자 내장 함수</span><a class="self-link" href="#atomic-builtin-functions"></a></h3>
         <p>원자 내장 함수는 원자 객체를 읽기/쓰기/읽기-수정-쓰기 하는 데 사용할 수 있습니다. <a href="#atomic-types">§ 6.2.8 원자 타입</a>에서 허용된 유일한 연산입니다.
@@ -37283,7 +37335,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                 "b94a256c": { "dfnID": "b94a256c", "dfnText": "clip position", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-clip-position" }], "title": "13.3.1.1.9. position" }], "url": "https://gpuweb.github.io/gpuweb/#clip-position" },
                 "bb5c61d5": { "dfnID": "bb5c61d5", "dfnText": "GPUCompareFunction", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-enumdef-gpucomparefunction" }], "title": "6.5. Texture and Sampler Types" }], "url": "https://www.w3.org/TR/webgpu/#enumdef-gpucomparefunction" },
                 "behavior": { "dfnID": "behavior", "dfnText": "behavior", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-behavior" }, { "id": "ref-for-behavior\u2460" }, { "id": "ref-for-behavior\u2461" }, { "id": "ref-for-behavior\u2462" }, { "id": "ref-for-behavior\u2463" }, { "id": "ref-for-behavior\u2464" }, { "id": "ref-for-behavior\u2465" }, { "id": "ref-for-behavior\u2466" }, { "id": "ref-for-behavior\u2467" }, { "id": "ref-for-behavior\u2468" }], "title": "9.7.1. Rules" }, { "refs": [{ "id": "ref-for-behavior\u2460\u24ea" }, { "id": "ref-for-behavior\u2460\u2460" }], "title": "9.7.3. Examples" }], "url": "#behavior" },
-                "behavioral-requirements": { "dfnID": "behavioral-requirements", "dfnText": "Behavioral requirements", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-behavioral-requirements" }, { "id": "ref-for-behavioral-requirements\u2460" }, { "id": "ref-for-behavioral-requirements\u2461" }], "title": "2.2. Errors" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462" }], "title": "2.3.1. Diagnostic Processing" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463" }], "title": "2.4. Limits" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2464" }], "title": "3.9. Template Lists" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2465" }, { "id": "ref-for-behavioral-requirements\u2466" }], "title": "6.1. Type Checking" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2467" }], "title": "6.4.6. Out-of-Bounds Access" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2468" }], "title": "6.4.9. Comparison with References and Pointers in Other Languages" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u24ea" }], "title": "6.5.5. Storage Texture Types" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2460" }, { "id": "ref-for-behavioral-requirements\u2460\u2461" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2462" }, { "id": "ref-for-behavioral-requirements\u2460\u2463" }], "title": "8.1.1. const Expressions" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2464" }, { "id": "ref-for-behavioral-requirements\u2460\u2465" }], "title": "8.1.2. override Expressions" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2466" }, { "id": "ref-for-behavioral-requirements\u2460\u2467" }], "title": "9.4.11. Discard Statement" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2468" }], "title": "13.3.1.1.9. position" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u24ea" }], "title": "13.3.1.4. Interpolation" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2460" }], "title": "14.1. Memory Locations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2461" }], "title": "14.4.4. Internal Layout of Values" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2462" }, { "id": "ref-for-behavioral-requirements\u2461\u2463" }], "title": "15.2. Uniformity" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2464" }], "title": "15.2.2. Uniformity Analysis Overview" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2465" }], "title": "15.2.10.3. Composite Value Analysis Limitations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2466" }, { "id": "ref-for-behavioral-requirements\u2461\u2467" }, { "id": "ref-for-behavioral-requirements\u2461\u2468" }, { "id": "ref-for-behavioral-requirements\u2462\u24ea" }], "title": "15.4. Fragment Shaders and Helper Invocations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2460" }, { "id": "ref-for-behavioral-requirements\u2462\u2461" }, { "id": "ref-for-behavioral-requirements\u2462\u2462" }, { "id": "ref-for-behavioral-requirements\u2462\u2463" }], "title": "15.7.2. Differences from IEEE-754" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2464" }], "title": "17.7.2. textureGather" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2465" }], "title": "17.7.3. textureGatherCompare" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2466" }], "title": "17.7.8. textureSample" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2467" }, { "id": "ref-for-behavioral-requirements\u2462\u2468" }], "title": "17.7.9. textureSampleBias" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u24ea" }], "title": "17.7.10. textureSampleCompare" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2460" }], "title": "17.7.11. textureSampleCompareLevel" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2461" }], "title": "17.7.12. textureSampleGrad" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2462" }], "title": "17.7.13. textureSampleLevel" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2463" }], "title": "17.7.14. textureSampleBaseClampToEdge" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2464" }], "title": "17.7.15. textureStore" }], "url": "#behavioral-requirements" },
+                "behavioral-requirements": { "dfnID": "behavioral-requirements", "dfnText": "Behavioral requirements", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-behavioral-requirements" }, { "id": "ref-for-behavioral-requirements\u2460" }, { "id": "ref-for-behavioral-requirements\u2461" }], "title": "2.2. Errors" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462" }], "title": "2.3.1. Diagnostic Processing" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463" }], "title": "2.4. Limits" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2464" }], "title": "3.9. Template Lists" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2465" }, { "id": "ref-for-behavioral-requirements\u2466" }], "title": "6.1. Type Checking" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2467" }], "title": "6.4.6. Out-of-Bounds Access" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2468" }], "title": "6.4.9. Comparison with References and Pointers in Other Languages" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u24ea" }], "title": "6.5.5. Storage Texture Types" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2460" }, { "id": "ref-for-behavioral-requirements\u2460\u2461" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2462" }, { "id": "ref-for-behavioral-requirements\u2460\u2463" }], "title": "8.1.1. const Expressions" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2464" }, { "id": "ref-for-behavioral-requirements\u2460\u2465" }], "title": "8.1.2. override Expressions" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2466" }], "title": "9.4.4. For Statement" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2460\u2467" }, { "id": "ref-for-behavioral-requirements\u2460\u2468" }], "title": "9.4.11. Discard Statement" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u24ea" }], "title": "13.3.1.1.9. position" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2460" }], "title": "13.3.1.4. Interpolation" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2461" }], "title": "14.1. Memory Locations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2462" }], "title": "14.4.4. Internal Layout of Values" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2463" }, { "id": "ref-for-behavioral-requirements\u2461\u2464" }], "title": "15.2. Uniformity" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2465" }], "title": "15.2.2. Uniformity Analysis Overview" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2466" }], "title": "15.2.10.3. Composite Value Analysis Limitations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2461\u2467" }, { "id": "ref-for-behavioral-requirements\u2461\u2468" }, { "id": "ref-for-behavioral-requirements\u2462\u24ea" }, { "id": "ref-for-behavioral-requirements\u2462\u2460" }], "title": "15.4. Fragment Shaders and Helper Invocations" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2461" }, { "id": "ref-for-behavioral-requirements\u2462\u2462" }, { "id": "ref-for-behavioral-requirements\u2462\u2463" }, { "id": "ref-for-behavioral-requirements\u2462\u2464" }], "title": "15.7.2. Differences from IEEE-754" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2465" }], "title": "17.7.2. textureGather" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2466" }], "title": "17.7.3. textureGatherCompare" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2467" }], "title": "17.7.8. textureSample" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2462\u2468" }, { "id": "ref-for-behavioral-requirements\u2463\u24ea" }], "title": "17.7.9. textureSampleBias" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2460" }], "title": "17.7.10. textureSampleCompare" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2461" }], "title": "17.7.11. textureSampleCompareLevel" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2462" }], "title": "17.7.12. textureSampleGrad" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2463" }], "title": "17.7.13. textureSampleLevel" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2464" }], "title": "17.7.14. textureSampleBaseClampToEdge" }, { "refs": [{ "id": "ref-for-behavioral-requirements\u2463\u2465" }], "title": "17.7.15. textureStore" }], "url": "#behavioral-requirements" },
                 "blankspace": { "dfnID": "blankspace", "dfnText": "Blankspace", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-blankspace" }], "title": "3. Textual Structure" }, { "refs": [{ "id": "ref-for-blankspace\u2460" }], "title": "3.1. Parsing" }, { "refs": [{ "id": "ref-for-blankspace\u2461" }], "title": "3.2. Blankspace and Line Breaks" }, { "refs": [{ "id": "ref-for-blankspace\u2462" }, { "id": "ref-for-blankspace\u2463" }], "title": "3.9. Template Lists" }], "url": "#blankspace" },
                 "block-comment": { "dfnID": "block-comment", "dfnText": "block comment", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-block-comment" }], "title": "3.3. Comments" }], "url": "#block-comment" },
                 "bool": { "dfnID": "bool", "dfnText": "bool", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-bool" }, { "id": "ref-for-bool\u2460" }], "title": "6.1. Type Checking" }, { "refs": [{ "id": "ref-for-bool\u2461" }], "title": "6.2.5. Scalar Types" }, { "refs": [{ "id": "ref-for-bool\u2462" }], "title": "6.9. Predeclared Types and Type-Generators Summary" }, { "refs": [{ "id": "ref-for-bool\u2463" }], "title": "9.4.1. If Statement" }, { "refs": [{ "id": "ref-for-bool\u2464" }], "title": "9.4.4. For Statement" }, { "refs": [{ "id": "ref-for-bool\u2465" }], "title": "9.4.5. While Statement" }, { "refs": [{ "id": "ref-for-bool\u2466" }], "title": "9.4.7. Break-If Statement" }, { "refs": [{ "id": "ref-for-bool\u2467" }], "title": "10. Assertions" }, { "refs": [{ "id": "ref-for-bool\u2468" }, { "id": "ref-for-bool\u2460\u24ea" }, { "id": "ref-for-bool\u2460\u2460" }], "title": "13.2. Entry Point Declaration" }, { "refs": [{ "id": "ref-for-bool\u2460\u2461" }, { "id": "ref-for-bool\u2460\u2462" }, { "id": "ref-for-bool\u2460\u2463" }, { "id": "ref-for-bool\u2460\u2464" }], "title": "14.4.1. Alignment and Size" }, { "refs": [{ "id": "ref-for-bool\u2460\u2465" }, { "id": "ref-for-bool\u2460\u2466" }], "title": "14.4.4. Internal Layout of Values" }, { "refs": [{ "id": "ref-for-bool\u2460\u2467" }], "title": "14.4.5. Address Space Layout Constraints" }, { "refs": [{ "id": "ref-for-bool\u2460\u2468" }, { "id": "ref-for-bool\u2461\u24ea" }], "title": "17.1.2.2. bool" }, { "refs": [{ "id": "ref-for-bool\u2461\u2460" }], "title": "17.1.2.3. f16" }, { "refs": [{ "id": "ref-for-bool\u2461\u2461" }], "title": "17.1.2.4. f32" }, { "refs": [{ "id": "ref-for-bool\u2461\u2462" }], "title": "17.1.2.5. i32" }, { "refs": [{ "id": "ref-for-bool\u2461\u2463" }], "title": "17.1.2.16. u32" }], "url": "#bool" },
@@ -37340,7 +37392,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                 "components": { "dfnID": "components", "dfnText": "components", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-components" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-components\u2460" }, { "id": "ref-for-components\u2461" }], "title": "8.5. Composite Value Decomposition Expressions" }, { "refs": [{ "id": "ref-for-components\u2462" }], "title": "15.2.5. Function-scope Variable Value Analysis" }, { "refs": [{ "id": "ref-for-components\u2463" }], "title": "15.2.8. Uniformity Rules for Expressions" }, { "refs": [{ "id": "ref-for-components\u2464" }], "title": "15.2.10.3. Composite Value Analysis Limitations" }], "url": "#components" },
                 "composite": { "dfnID": "composite", "dfnText": "composite", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-composite" }], "title": "1.1. Overview" }, { "refs": [{ "id": "ref-for-composite\u2460" }], "title": "2.4. Limits" }, { "refs": [{ "id": "ref-for-composite\u2461" }], "title": "6.2. Plain Types" }, { "refs": [{ "id": "ref-for-composite\u2462" }, { "id": "ref-for-composite\u2463" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-composite\u2464" }], "title": "8.5. Composite Value Decomposition Expressions" }, { "refs": [{ "id": "ref-for-composite\u2465" }], "title": "14.1. Memory Locations" }, { "refs": [{ "id": "ref-for-composite\u2466" }], "title": "15.2.5. Function-scope Variable Value Analysis" }, { "refs": [{ "id": "ref-for-composite\u2467" }], "title": "15.2.8. Uniformity Rules for Expressions" }, { "refs": [{ "id": "ref-for-composite\u2468" }], "title": "15.2.10.3. Composite Value Analysis Limitations" }], "url": "#composite" },
                 "compound-assignment": { "dfnID": "compound-assignment", "dfnText": "compound assignment", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-compound-assignment" }], "title": "9.2.3. Compound Assignment" }, { "refs": [{ "id": "ref-for-compound-assignment\u2460" }, { "id": "ref-for-compound-assignment\u2461" }], "title": "14.5.1. Memory Operation" }], "url": "#compound-assignment" },
-                "compound-statement": { "dfnID": "compound-statement", "dfnText": "compound statement", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-compound-statement" }, { "id": "ref-for-compound-statement\u2460" }], "title": "2.3.3. Diagnostic Filtering" }, { "refs": [{ "id": "ref-for-compound-statement\u2461" }], "title": "9.4.1. If Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2462" }, { "id": "ref-for-compound-statement\u2463" }, { "id": "ref-for-compound-statement\u2464" }], "title": "9.4.2. Switch Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2465" }, { "id": "ref-for-compound-statement\u2466" }], "title": "9.4.3. Loop Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2467" }], "title": "9.4.4. For Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2468" }], "title": "9.4.9. Continuing Statement" }], "url": "#compound-statement" },
+                "compound-statement": { "dfnID": "compound-statement", "dfnText": "compound statement", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-compound-statement" }, { "id": "ref-for-compound-statement\u2460" }], "title": "2.3.3. Diagnostic Filtering" }, { "refs": [{ "id": "ref-for-compound-statement\u2461" }], "title": "9.4.1. If Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2462" }, { "id": "ref-for-compound-statement\u2463" }, { "id": "ref-for-compound-statement\u2464" }], "title": "9.4.2. Switch Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2465" }, { "id": "ref-for-compound-statement\u2466" }], "title": "9.4.3. Loop Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2467" }, { "id": "ref-for-compound-statement\u2468" }], "title": "9.4.4. For Statement" }, { "refs": [{ "id": "ref-for-compound-statement\u2460\u24ea" }], "title": "9.4.9. Continuing Statement" }], "url": "#compound-statement" },
                 "compute": { "dfnID": "compute", "dfnText": "compute", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-compute" }], "title": "12.11. location" }, { "refs": [{ "id": "ref-for-compute\u2460" }], "title": "13.2. Entry Point Declaration" }, { "refs": [{ "id": "ref-for-compute\u2461" }], "title": "13.3.1.2. User-defined Inputs and Outputs" }, { "refs": [{ "id": "ref-for-compute\u2462" }], "title": "17.11. Synchronization Built-in Functions" }, { "refs": [{ "id": "ref-for-compute\u2463" }], "title": "17.12. Subgroup Built-in Functions" }, { "refs": [{ "id": "ref-for-compute\u2464" }], "title": "17.13. Quad Operations" }], "url": "#compute" },
                 "compute-shader-grid": { "dfnID": "compute-shader-grid", "dfnText": "compute shader grid", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-compute-shader-grid" }], "title": "13.3.1.1.4. global_invocation_id" }, { "refs": [{ "id": "ref-for-compute-shader-grid\u2460" }], "title": "13.3.1.1.14. workgroup_id" }], "url": "#compute-shader-grid" },
                 "compute-shader-stage": { "dfnID": "compute-shader-stage", "dfnText": "compute shader stage", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-compute-shader-stage" }], "title": "1.1. Overview" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460" }], "title": "7. Variable and Value Declarations" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2461" }], "title": "12.14. workgroup_size" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2462" }], "title": "12.15.3. compute" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2463" }], "title": "13.3.1.1.4. global_invocation_id" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2464" }], "title": "13.3.1.1.6. local_invocation_id" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2465" }], "title": "13.3.1.1.7. local_invocation_index" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2466" }], "title": "13.3.1.1.8. num_workgroups" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2467" }], "title": "13.3.1.1.14. workgroup_id" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2468" }], "title": "13.3.1.1.15. subgroup_invocation_id" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u24ea" }], "title": "13.3.1.1.16. subgroup_size" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2460" }, { "id": "ref-for-compute-shader-stage\u2460\u2461" }], "title": "14.3. Address Spaces" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2462" }], "title": "15.2.1. Terminology and Concepts" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2463" }], "title": "15.2.8. Uniformity Rules for Expressions" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2464" }], "title": "15.3. Compute Shaders and Workgroups" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2465" }], "title": "15.5. Subgroups" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2466" }], "title": "15.6.1. Barriers" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2467" }], "title": "17.12. Subgroup Built-in Functions" }, { "refs": [{ "id": "ref-for-compute-shader-stage\u2460\u2468" }], "title": "17.13. Quad Operations" }], "url": "#compute-shader-stage" },
@@ -37674,7 +37726,7 @@ array<c- o>&lt;</c->bool<c- p>,</c-> <c- mi>2</c-><c- o>></c-><c- p>(</c-><c- kc
                 "requiredtobeuniformwarning": { "dfnID": "requiredtobeuniformwarning", "dfnText": "RequiredToBeUniform.warning", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-requiredtobeuniformwarning" }, { "id": "ref-for-requiredtobeuniformwarning\u2460" }, { "id": "ref-for-requiredtobeuniformwarning\u2461" }], "title": "15.2.3. Analyzing the Uniformity Requirements of a Function" }], "url": "#requiredtobeuniformwarning" },
                 "requires-directive": { "dfnID": "requires-directive", "dfnText": "requires-directive", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-requires-directive" }, { "id": "ref-for-requires-directive\u2460" }, { "id": "ref-for-requires-directive\u2461" }, { "id": "ref-for-requires-directive\u2462" }], "title": "4.1.2. Language Extensions" }], "url": "#requires-directive" },
                 "reserved-word": { "dfnID": "reserved-word", "dfnText": "reserved word", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-reserved-word" }], "title": "3.4. Tokens" }, { "refs": [{ "id": "ref-for-reserved-word\u2460" }], "title": "3.7. Identifiers" }, { "refs": [{ "id": "ref-for-reserved-word\u2461" }], "title": "3.8. Context-Dependent Names" }], "url": "#reserved-word" },
-                "resolves": { "dfnID": "resolves", "dfnText": "resolves", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-resolves" }], "title": "3.8. Context-Dependent Names" }, { "refs": [{ "id": "ref-for-resolves\u2460" }], "title": "4.1.1. Enable Extensions" }, { "refs": [{ "id": "ref-for-resolves\u2461" }], "title": "4.1.2. Language Extensions" }, { "refs": [{ "id": "ref-for-resolves\u2462" }, { "id": "ref-for-resolves\u2463" }], "title": "5. Declaration and Scope" }, { "refs": [{ "id": "ref-for-resolves\u2464" }], "title": "6.2.9. Array Types" }, { "refs": [{ "id": "ref-for-resolves\u2465" }], "title": "6.4.8. Forming Reference and Pointer Values" }, { "refs": [{ "id": "ref-for-resolves\u2466" }], "title": "7.2. Value Declarations" }, { "refs": [{ "id": "ref-for-resolves\u2467" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-resolves\u2468" }], "title": "8.1.1. const Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2460\u24ea" }, { "id": "ref-for-resolves\u2460\u2460" }], "title": "8.1.2. override Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2461" }], "title": "8.11. Variable Identifier Expression" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2462" }], "title": "8.12. Formal Parameter Expression" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2463" }, { "id": "ref-for-resolves\u2460\u2464" }, { "id": "ref-for-resolves\u2460\u2465" }], "title": "8.15. Identifier Expressions for Value Declarations" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2466" }], "title": "8.16. Enumeration Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2467" }, { "id": "ref-for-resolves\u2460\u2468" }, { "id": "ref-for-resolves\u2461\u24ea" }, { "id": "ref-for-resolves\u2461\u2460" }], "title": "8.17. Type Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2461\u2461" }, { "id": "ref-for-resolves\u2461\u2462" }, { "id": "ref-for-resolves\u2461\u2463" }], "title": "11.4.1.1. Root Identifier" }, { "refs": [{ "id": "ref-for-resolves\u2461\u2464" }], "title": "12.3. blend_src" }, { "refs": [{ "id": "ref-for-resolves\u2461\u2465" }, { "id": "ref-for-resolves\u2461\u2466" }, { "id": "ref-for-resolves\u2461\u2467" }, { "id": "ref-for-resolves\u2461\u2468" }], "title": "13.3. Shader Interface" }, { "refs": [{ "id": "ref-for-resolves\u2462\u24ea" }], "title": "15.2.4. Pointer Desugaring" }, { "refs": [{ "id": "ref-for-resolves\u2462\u2460" }, { "id": "ref-for-resolves\u2462\u2461" }], "title": "15.2.5. Function-scope Variable Value Analysis" }, { "refs": [{ "id": "ref-for-resolves\u2462\u2462" }, { "id": "ref-for-resolves\u2462\u2463" }, { "id": "ref-for-resolves\u2462\u2464" }, { "id": "ref-for-resolves\u2462\u2465" }, { "id": "ref-for-resolves\u2462\u2466" }, { "id": "ref-for-resolves\u2462\u2467" }, { "id": "ref-for-resolves\u2462\u2468" }, { "id": "ref-for-resolves\u2463\u24ea" }, { "id": "ref-for-resolves\u2463\u2460" }, { "id": "ref-for-resolves\u2463\u2461" }, { "id": "ref-for-resolves\u2463\u2462" }, { "id": "ref-for-resolves\u2463\u2463" }, { "id": "ref-for-resolves\u2463\u2464" }, { "id": "ref-for-resolves\u2463\u2465" }, { "id": "ref-for-resolves\u2463\u2466" }], "title": "15.2.8. Uniformity Rules for Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2463\u2467" }], "title": "17.1. Constructor Built-in Functions" }], "url": "#resolves" },
+                "resolves": { "dfnID": "resolves", "dfnText": "resolves", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-resolves" }], "title": "3.8. Context-Dependent Names" }, { "refs": [{ "id": "ref-for-resolves\u2460" }], "title": "4.1.1. Enable Extensions" }, { "refs": [{ "id": "ref-for-resolves\u2461" }], "title": "4.1.2. Language Extensions" }, { "refs": [{ "id": "ref-for-resolves\u2462" }, { "id": "ref-for-resolves\u2463" }], "title": "5. Declaration and Scope" }, { "refs": [{ "id": "ref-for-resolves\u2464" }], "title": "6.2.9. Array Types" }, { "refs": [{ "id": "ref-for-resolves\u2465" }], "title": "6.4.8. Forming Reference and Pointer Values" }, { "refs": [{ "id": "ref-for-resolves\u2466" }], "title": "7.2. Value Declarations" }, { "refs": [{ "id": "ref-for-resolves\u2467" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-resolves\u2468" }], "title": "8.1.1. const Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2460\u24ea" }, { "id": "ref-for-resolves\u2460\u2460" }], "title": "8.1.2. override Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2461" }], "title": "8.11. Variable Identifier Expression" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2462" }], "title": "8.12. Formal Parameter Expression" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2463" }, { "id": "ref-for-resolves\u2460\u2464" }, { "id": "ref-for-resolves\u2460\u2465" }], "title": "8.15. Identifier Expressions for Value Declarations" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2466" }], "title": "8.16. Enumeration Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2460\u2467" }, { "id": "ref-for-resolves\u2460\u2468" }, { "id": "ref-for-resolves\u2461\u24ea" }, { "id": "ref-for-resolves\u2461\u2460" }], "title": "8.17. Type Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2461\u2461" }], "title": "9.4.4. For Statement" }, { "refs": [{ "id": "ref-for-resolves\u2461\u2462" }, { "id": "ref-for-resolves\u2461\u2463" }, { "id": "ref-for-resolves\u2461\u2464" }], "title": "11.4.1.1. Root Identifier" }, { "refs": [{ "id": "ref-for-resolves\u2461\u2465" }], "title": "12.3. blend_src" }, { "refs": [{ "id": "ref-for-resolves\u2461\u2466" }, { "id": "ref-for-resolves\u2461\u2467" }, { "id": "ref-for-resolves\u2461\u2468" }, { "id": "ref-for-resolves\u2462\u24ea" }], "title": "13.3. Shader Interface" }, { "refs": [{ "id": "ref-for-resolves\u2462\u2460" }], "title": "15.2.4. Pointer Desugaring" }, { "refs": [{ "id": "ref-for-resolves\u2462\u2461" }, { "id": "ref-for-resolves\u2462\u2462" }], "title": "15.2.5. Function-scope Variable Value Analysis" }, { "refs": [{ "id": "ref-for-resolves\u2462\u2463" }, { "id": "ref-for-resolves\u2462\u2464" }, { "id": "ref-for-resolves\u2462\u2465" }, { "id": "ref-for-resolves\u2462\u2466" }, { "id": "ref-for-resolves\u2462\u2467" }, { "id": "ref-for-resolves\u2462\u2468" }, { "id": "ref-for-resolves\u2463\u24ea" }, { "id": "ref-for-resolves\u2463\u2460" }, { "id": "ref-for-resolves\u2463\u2461" }, { "id": "ref-for-resolves\u2463\u2462" }, { "id": "ref-for-resolves\u2463\u2463" }, { "id": "ref-for-resolves\u2463\u2464" }, { "id": "ref-for-resolves\u2463\u2465" }, { "id": "ref-for-resolves\u2463\u2466" }, { "id": "ref-for-resolves\u2463\u2467" }], "title": "15.2.8. Uniformity Rules for Expressions" }, { "refs": [{ "id": "ref-for-resolves\u2463\u2468" }], "title": "17.1. Constructor Built-in Functions" }], "url": "#resolves" },
                 "resource": { "dfnID": "resource", "dfnText": "resource", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-resource" }, { "id": "ref-for-resource\u2460" }, { "id": "ref-for-resource\u2461" }], "title": "1.1. Overview" }, { "refs": [{ "id": "ref-for-resource\u2462" }], "title": "2.1. Shader Lifecycle" }, { "refs": [{ "id": "ref-for-resource\u2463" }], "title": "2.2. Errors" }, { "refs": [{ "id": "ref-for-resource\u2464" }, { "id": "ref-for-resource\u2465" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-resource\u2466" }], "title": "12.2. binding" }, { "refs": [{ "id": "ref-for-resource\u2467" }], "title": "12.7. group" }, { "refs": [{ "id": "ref-for-resource\u2468" }], "title": "13.1. Shader Stages" }, { "refs": [{ "id": "ref-for-resource\u2460\u24ea" }], "title": "13.3. Shader Interface" }, { "refs": [{ "id": "ref-for-resource\u2460\u2460" }], "title": "14.5.2. Memory Model Reference" }], "url": "#resource" },
                 "resource-interface-of-a-shader": { "dfnID": "resource-interface-of-a-shader", "dfnText": "resource interface of a shader", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-resource-interface-of-a-shader" }], "title": "1.1. Overview" }, { "refs": [{ "id": "ref-for-resource-interface-of-a-shader\u2460" }], "title": "7.3. var Declarations" }, { "refs": [{ "id": "ref-for-resource-interface-of-a-shader\u2461" }], "title": "9.2.2. Phony Assignment" }], "url": "#resource-interface-of-a-shader" },
                 "result": { "dfnID": "result", "dfnText": "Result", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-result" }, { "id": "ref-for-result\u2460" }], "title": "15.2.6. Uniformity Rules for Statements" }, { "refs": [{ "id": "ref-for-result\u2461" }, { "id": "ref-for-result\u2462" }, { "id": "ref-for-result\u2463" }], "title": "15.2.7. Uniformity Rules for Function Calls" }, { "refs": [{ "id": "ref-for-result\u2464" }, { "id": "ref-for-result\u2465" }], "title": "15.2.8. Uniformity Rules for Expressions" }], "url": "#result" },
