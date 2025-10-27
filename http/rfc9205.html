@@ -1,0 +1,2262 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 9205 - HTTP로 프로토콜 구축</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC9205">
+    <meta property="og:description" content="Building Protocols with HTTP">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc9205.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 Is HTTP Being Used?" href="#rfc.section.2">
+    <link rel="Chapter" title="3 What's Important About HTTP" href="#rfc.section.3">
+    <link rel="Chapter" title="4 Best Practices for Specifying the Use of HTTP" href="#rfc.section.4">
+    <link rel="Chapter" title="5 IANA Considerations" href="#rfc.section.5">
+    <link rel="Chapter" title="6 Security Considerations" href="#rfc.section.6">
+    <link rel="Chapter" title="7 References" href="#rfc.section.7">
+    <link rel="Appendix" title="A Changes from RFC 3205" href="#rfc.section.A">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-bcp56bis-15" rel="prev">
+    <link href="https://dx.doi.org/10.17487/rfc9205" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc9205.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="https://www.rfc-editor.org/info/rfc9205">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="HTTP API">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Nottingham, M.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:9205">
+    <meta name="dcterms.issued" content="2022-06">
+    <meta name="dct.replaces" content="urn:ietf:rfc:3205">
+    <meta name="dcterms.abstract"
+        content="Applications often use HTTP as a substrate to create HTTP-based APIs. This document specifies best practices for writing specifications that use HTTP to define new application protocols. It is written primarily to guide IETF efforts to define application protocols using HTTP for deployment on the Internet but might be applicable in other situations.This document obsoletes RFC 3205.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="Applications often use HTTP as a substrate to create HTTP-based APIs. This document specifies best practices for writing specifications that use HTTP to define new application protocols. It is written primarily to guide IETF efforts to define application protocols using HTTP for deployment on the Internet but might be applicable in other situations.This document obsoletes RFC 3205.">
+</head>
+
+<body onload="getMeta(9205,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>9205</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#notational-conventions">표기 규약</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#used">HTTP가
+                                        사용되고 있습니까?</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#non-http-protocols">비-HTTP 프로토콜</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#overview">HTTP의
+                                        중요한 점</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#generic-semantics">일반 의미론</a></li>
+                                        <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a href="#links">링크</a>
+                                        </li>
+                                        <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rich-functionality">풍부한 기능성</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#bp">HTTP 사용을
+                                        명시하기 위한 모범 사례</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#specifying-the-use-of-http">HTTP 사용 명시</a></li>
+                                        <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a href="#resource">서버
+                                                동작 명시</a></li>
+                                        <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#clients">클라이언트 동작 명시</a></li>
+                                        <li><a href="#rfc.section.4.4">4.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#specifying-urls">URL 명시</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.4.4.1">4.4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#discovering-an-applications-urls">애플리케이션의 URL 검색</a></li>
+                                                <li><a href="#rfc.section.4.4.2">4.4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#scheme">URI 스킴 고려</a></li>
+                                                <li><a href="#rfc.section.4.4.3">4.4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#choosing-transport-ports">전송 포트 선택</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.4.5">4.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#using-http-methods">HTTP 메서드 사용</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.4.5.1">4.5.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#get">GET</a></li>
+                                                <li><a href="#rfc.section.4.5.2">4.5.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#options">OPTIONS</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.4.6">4.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#using-http-status-codes">HTTP 상태 코드 사용</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.4.6.1">4.6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#redirects">리디렉션</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.4.7">4.7.</a>&nbsp;&nbsp;&nbsp;<a href="#headers">HTTP
+                                                헤더 필드 명시</a></li>
+                                        <li><a href="#rfc.section.4.8">4.8.</a>&nbsp;&nbsp;&nbsp;<a href="#content">메시지
+                                                콘텐츠 정의</a></li>
+                                        <li><a href="#rfc.section.4.9">4.9.</a>&nbsp;&nbsp;&nbsp;<a href="#caching">HTTP
+                                                캐싱 활용</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.4.9.1">4.9.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#freshness">신선도</a></li>
+                                                <li><a href="#rfc.section.4.9.2">4.9.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#stale-responses">오래된 응답</a></li>
+                                                <li><a href="#rfc.section.4.9.3">4.9.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#caching-app-semantics">캐싱과 애플리케이션 의미론</a></li>
+                                                <li><a href="#rfc.section.4.9.4">4.9.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#varying-content-based-upon-the-request">요청에 따른 콘텐츠 변화</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.4.10">4.10.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#state">애플리케이션 상태 처리</a></li>
+                                        <li><a href="#rfc.section.4.11">4.11.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#multiplex">다중 요청 처리</a></li>
+                                        <li><a href="#rfc.section.4.12">4.12.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#client-auth">클라이언트 인증</a></li>
+                                        <li><a href="#rfc.section.4.13">4.13.</a>&nbsp;&nbsp;&nbsp;<a href="#browser">웹
+                                                브라우징과의 공존</a></li>
+                                        <li><a href="#rfc.section.4.14">4.14.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#other-apps">애플리케이션 경계 유지</a></li>
+                                        <li><a href="#rfc.section.4.15">4.15.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#server-push">서버 푸시 사용</a></li>
+                                        <li><a href="#rfc.section.4.16">4.16.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#versioning">버전 관리 및 진화 허용</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                        고려사항</a></li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#security-considerations">보안 고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#privacy-considerations">개인정보 보호 고려사항</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">규범적 참조</a></li>
+                                        <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.3">참고 참조</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.A">부록 A.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#changes-from-rfc-3205">RFC 3205과의 변경사항</a></li>
+                                <li><a href="#rfc.authors">작성자 주소</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">인터넷 엔지니어링 태스크 포스(IETF)</td>
+                                <td class="text-right">M. Nottingham</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Request for Comments: 9205</td>
+                                <td class="text-right">2022년 6월</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Obsoletes: <a href="#RFC3205">3205</a></td>
+                                <td class="text-right"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">BCP: <a href="https://www.rfc-editor.org/info/bcp56">56</a></td>
+                                <td class="text-right"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">카테고리: 현재 최선의 관행</td>
+                                <td class="text-right"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>HTTP로 프로토콜 구축</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">요약</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>애플리케이션은 종종 HTTP를 기반으로 하여 HTTP 기반 API를 생성합니다. 이 문서는 HTTP를 사용하여 새로운 애플리케이션 프로토콜을 정의할 때 명세를 작성하기
+                            위한 모범 사례를 규정합니다. 주로 인터넷에 배포하기 위해 HTTP를 사용하여 애플리케이션 프로토콜을 정의하려는 IETF 활동을 안내하기 위해 작성되었지만 다른
+                            상황에도 적용될 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.abstract.p.2">
+                        <p>이 문서는 RFC 3205를 대체합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 메모의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 메모는 인터넷의 현재 최선 관행(Internet Best Current Practice)을 문서화합니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물입니다. 이는 IETF 커뮤니티의 합의를 반영합니다. 공개 검토를 거쳤으며 인터넷 엔지니어링 운영
+                            그룹(IESG)에 의해 출판 승인을 받았습니다. BCP에 대한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc7841.html#section-2">RFC 7841의 섹션 2</a>에서 확인할 수
+                            있습니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 현재 상태, 정오표, 및 이에 대한 피드백 제공 방법에 관한 정보는 <a
+                                href="https://www.rfc-editor.org/info/rfc9205">https://www.rfc-editor.org/info/rfc9205</a>에서
+                            확인할 수 있습니다.
+                        </p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2022 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)
+                            in effect on the date of publication of this document. Please review these documents
+                            carefully, as they describe your rights and restrictions with respect to this document. Code
+                            Components extracted from this document must include Revised BSD License text as described
+                            in Section 4.e of the Trust Legal Provisions and are provided without warranty as described
+                            in the Revised BSD License.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#notational-conventions">표기 규약</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#used">HTTP가 사용되고 있습니까?</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#non-http-protocols">비-HTTP 프로토콜</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#overview">HTTP의 중요한 점</a>
+                            <ul>
+                                <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a href="#generic-semantics">일반
+                                        의미론</a></li>
+                                <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a href="#links">링크</a></li>
+                                <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rich-functionality">풍부한 기능성</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#bp">HTTP 사용을 명시하기 위한 모범 사례</a>
+                            <ul>
+                                <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#specifying-the-use-of-http">HTTP 사용 명시</a></li>
+                                <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a href="#resource">서버 동작
+                                        명시</a></li>
+                                <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a href="#clients">클라이언트 동작
+                                        명시</a></li>
+                                <li><a href="#rfc.section.4.4">4.4.</a>&nbsp;&nbsp;&nbsp;<a href="#specifying-urls">URL
+                                        명시</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.4.1">4.4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#discovering-an-applications-urls">애플리케이션의 URL 검색</a></li>
+                                        <li><a href="#rfc.section.4.4.2">4.4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#scheme">URI 스킴 고려</a></li>
+                                        <li><a href="#rfc.section.4.4.3">4.4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#choosing-transport-ports">전송 포트 선택</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4.5">4.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#using-http-methods">HTTP 메서드 사용</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.5.1">4.5.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#get">GET</a></li>
+                                        <li><a href="#rfc.section.4.5.2">4.5.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#options">OPTIONS</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4.6">4.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#using-http-status-codes">HTTP 상태 코드 사용</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.6.1">4.6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#redirects">리디렉션</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4.7">4.7.</a>&nbsp;&nbsp;&nbsp;<a href="#headers">HTTP 헤더 필드
+                                        명시</a></li>
+                                <li><a href="#rfc.section.4.8">4.8.</a>&nbsp;&nbsp;&nbsp;<a href="#content">메시지 콘텐츠
+                                        정의</a></li>
+                                <li><a href="#rfc.section.4.9">4.9.</a>&nbsp;&nbsp;&nbsp;<a href="#caching">HTTP 캐싱
+                                        활용</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.9.1">4.9.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#freshness">신선도</a></li>
+                                        <li><a href="#rfc.section.4.9.2">4.9.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#stale-responses">오래된 응답</a></li>
+                                        <li><a href="#rfc.section.4.9.3">4.9.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#caching-app-semantics">캐싱과 애플리케이션 의미론</a></li>
+                                        <li><a href="#rfc.section.4.9.4">4.9.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#varying-content-based-upon-the-request">요청에 따른 콘텐츠 변화</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4.10">4.10.</a>&nbsp;&nbsp;&nbsp;<a href="#state">애플리케이션 상태
+                                        처리</a></li>
+                                <li><a href="#rfc.section.4.11">4.11.</a>&nbsp;&nbsp;&nbsp;<a href="#multiplex">다중 요청
+                                        처리</a></li>
+                                <li><a href="#rfc.section.4.12">4.12.</a>&nbsp;&nbsp;&nbsp;<a href="#client-auth">클라이언트
+                                        인증</a></li>
+                                <li><a href="#rfc.section.4.13">4.13.</a>&nbsp;&nbsp;&nbsp;<a href="#browser">웹 브라우징과의
+                                        공존</a></li>
+                                <li><a href="#rfc.section.4.14">4.14.</a>&nbsp;&nbsp;&nbsp;<a href="#other-apps">애플리케이션
+                                        경계 유지</a></li>
+                                <li><a href="#rfc.section.4.15">4.15.</a>&nbsp;&nbsp;&nbsp;<a href="#server-push">서버 푸시
+                                        사용</a></li>
+                                <li><a href="#rfc.section.4.16">4.16.</a>&nbsp;&nbsp;&nbsp;<a href="#versioning">버전 관리 및
+                                        진화 허용</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                고려사항</a></li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#security-considerations">보안
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#privacy-considerations">개인정보 보호 고려사항</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.2">규범적
+                                        참조</a></li>
+                                <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.3">참고
+                                        참조</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.A">부록 A.</a>&nbsp;&nbsp;&nbsp;<a href="#changes-from-rfc-3205">RFC
+                                3205과의 변경사항</a></li>
+                        <li><a href="#rfc.authors">작성자 주소</a></li>
+                    </ul>
+                </div>
+                <hr class="hidden-print">
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1" class="avoidbreakafter">
+                        <p>웹 브라우징 이외의 애플리케이션은 종종 HTTP <a href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>를
+                            기반으로 사용합니다. 이러한 관행은 때때로 "HTTP 기반 API", "REST API" 또는 단순히 "HTTP API"를 생성한다고 불립니다. 이는 다음을 포함한
+                            다양한 이유로 수행됩니다:</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <ul>
+                            <li>구현자, 명세자, 관리자, 개발자 및 사용자에게 익숙함;</li>
+                            <li>다양한 클라이언트, 서버 및 프록시 구현의 이용 가능성;</li>
+                            <li>사용의 용이성;</li>
+                            <li>웹 브라우저의 이용 가능성;</li>
+                            <li>인증 및 암호화와 같은 기존 메커니즘의 재사용;</li>
+                            <li>대상 배포에 HTTP 서버와 클라이언트가 존재함; 및</li>
+                            <li>방화벽을 통과하는 능력.</li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.1.p.3">
+                        <p>이러한 프로토콜은 종종 임시적이며 하나 또는 소수의 서버에만 배포되고 제한된 클라이언트 집합에 의해 소비되도록 의도됩니다. 그 결과, 이러한 조건을 선호하는 HTTP
+                            기반 API를 정의하는 관행과 도구들의 집합이 등장했습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.4">
+                        <p>그러나 이러한 애플리케이션이 다수의 별도 구현을 가지고 여러 독립된 서버에 배포되며 다양한 클라이언트에 의해 소비되는 경우(표준화 작업으로 정의된 HTTP API의
+                            경우 흔히 그렇습니다), 제한된 배포를 위한 도구와 관행은 부적절해질 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.5">
+                        <p>이러한 불일치는 주로 API의 클라이언트와 서버가 서로 다른 속도로 구현 및 진화하기 때문에 발생하며, 서로 다른 기능과 버전을 가진 배포가 공존해야 하는 필요성이
+                            생깁니다. 결과적으로 이러한 배포를 목표로 하는 HTTP 기반 API의 설계자는 서비스의 확장성을 처리하는 방법과 다양한 배포 요구사항을 수용하는 방법을 더 신중하게
+                            고려해야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.6" class="avoidbreakafter">
+                        <p>보다 일반적으로, HTTP를 사용하는 애플리케이션 프로토콜은 다음과 같은 여러 설계 결정을 직면합니다:</p>
+                    </div>
+                    <div id="rfc.section.1.p.7">
+                        <ul>
+                            <li>새로운 URI 스킴을 정의해야 하는가? 새 포트를 사용해야 하는가?</li>
+                            <li>표준 HTTP 메서드와 상태 코드를 사용해야 하는가, 아니면 새로 정의해야 하는가?</li>
+                            <li>HTTP 사용에서 최대 가치를 어떻게 끌어낼 수 있는가?</li>
+                            <li>특히 웹 브라우징과 같은 다른 HTTP 사용과 어떻게 공존할 것인가?</li>
+                            <li>상호운용성 문제와 "프로토콜 막다른 길"을 어떻게 피할 것인가?</li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.1.p.8">
+                        <p><a href="#used" title="Is HTTP Being Used?">섹션 2</a>는 이 문서가 적용되는 경우를 정의하고, <a
+                                href="#overview" title="What's Important About HTTP">섹션 3</a>은 보존해야 할 HTTP의 속성을 조사하며, <a
+                                href="#bp" title="Best Practices for Specifying the Use of HTTP">섹션 4</a>는 HTTP를 사용하는
+                            애플리케이션의 명세를 위한 모범 사례를 포함합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.9">
+                        <p>이 문서는 주로 인터넷에 배포하기 위해 HTTP를 사용하여 애플리케이션 프로토콜을 정의하려는 IETF 활동을 안내하기 위해 작성되었지만 다른 상황에도 적용될 수
+                            있습니다. 여기서의 요구사항은 반드시 일반적인 HTTP 확장 개발에 적용되는 것은 아님을 유의하십시오.</p>
+                    </div>
+                    <div id="rfc.section.1.p.10">
+                        <p>이 문서는 <a href="#RFC3205"><cite
+                                    title="On the use of HTTP as a Substrate">[RFC3205]</cite></a>를 대체하여 그 사이에 있었던 HTTP에
+                            관한 경험과 발전을 반영합니다.</p>
+                    </div>
+                    <section id="notational-conventions">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a
+                                href="#notational-conventions">표기 규약</a></h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>이 문서에서 핵심 단어 "<em class="bcp14">MUST</em>", "<em class="bcp14">MUST NOT</em>", "<em
+                                    class="bcp14">REQUIRED</em>", "<em class="bcp14">SHALL</em>", "<em
+                                    class="bcp14">SHALL NOT</em>", "<em class="bcp14">SHOULD</em>", "<em
+                                    class="bcp14">SHOULD NOT</em>", "<em class="bcp14">RECOMMENDED</em>", "<em
+                                    class="bcp14">NOT RECOMMENDED</em>", "<em class="bcp14">MAY</em>", 및 "<em
+                                    class="bcp14">OPTIONAL</em>"은 모두 대문자로 표시된 경우에 한해 <span class="nobr">BCP 14</span> <a
+                                    href="#RFC2119"><cite
+                                        title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>
+                                및 <a href="#RFC8174"><cite
+                                        title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">[RFC8174]</cite></a>에서
+                                설명한 바와 같이 해석되어야 합니다.
+                            </p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="used">
+                    <h2 id="rfc.section.2" class="np"><a href="#rfc.section.2">2.</a>&nbsp;<a href="#used">HTTP가 사용되고
+                            있습니까?</a></h2>
+                    <div id="rfc.section.2.p.1" class="avoidbreakafter">
+                        <p>다른 애플리케이션은 HTTP를 사용할 때 서로 다른 목표를 가집니다. 이 문서의 권고는 다음을 정의하는 명세에 적용됩니다:</p>
+                    </div>
+                    <div id="rfc.section.2.p.2">
+                        <ul>
+                            <li>전송 포트 80 또는 443을 사용하는 경우, 또는</li>
+                            <li>URI 스킴 "http" 또는 "https"를 사용하는 경우, 또는</li>
+                            <li>일반적으로 HTTP를 식별하는 ALPN 프로토콜 ID <a href="#RFC7301"><cite
+                                        title="Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension">[RFC7301]</cite></a>를
+                                사용하는 경우(예: "http/1.1", "h2", "h3"), 또는</li>
+                            <li>HTTP에 대해 정의된 IANA 레지스트리에 등록하거나 전체적인 수정을 하는 경우.</li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.2.p.3">
+                        <p>또한, 명세가 HTTP를 사용하는 경우 HTTP 프로토콜 제품군의 모든 요구사항이 적용됩니다(<a href="#HTTP"><cite
+                                    title="HTTP Semantics">[HTTP]</cite></a>가 특히 해당되지만 사용 중인 HTTP의 특정 버전 및 사용 중인 확장을 포함한
+                            다른 명세들도 적용됩니다).</p>
+                    </div>
+                    <div id="rfc.section.2.p.4">
+                        <p>이 문서는 애플리케이션에 적용되도록 의도되었으며, 일반적인 HTTP 확장에는 적용되지 않음을 주목하십시오. 또한 IETF에서 지정한 애플리케이션을 위한 것이지만 다른
+                            표준화 기관들도 이 요구사항을 준수하는 것이 권장됩니다.</p>
+                    </div>
+                    <section id="non-http-protocols">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a
+                                href="#non-http-protocols">비-HTTP 프로토콜</a></h3>
+                        <div id="rfc.section.2.1.p.1">
+                            <p>애플리케이션은 위에서 정의한 기준을 충족하지 않더라도 HTTP에 의존할 수 있습니다. 예를 들어, 애플리케이션은 메시지 형식의 일부를 다시 명세하는 것을
+                                피하려고 하지만 프로토콜 동작의 다른 측면을 변경하거나 애플리케이션별 메서드를 사용하려고 할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.2">
+                            <p>이렇게 하면 프로토콜 동작을 수정할 자유가 커지지만, 대부분의 HTTP 구현은 이러한 변경에 쉽게 적응하지 못하므로 <a href="#overview"
+                                    title="What's Important About HTTP">섹션 3</a>에 요약된 이점의 적어도 일부가 상실됩니다. 또한 마음의 점유
+                                효과(mindshare)의 이점도 잃게 됩니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.3">
+                            <p>이러한 명세는 <em class="bcp14">MUST NOT</em> HTTP의 URI 스킴, 전송 포트, ALPN 프로토콜 ID 또는 IANA 레지스트리를
+                                사용해서는 안 되며; 대신 자체적인 것을 설정하는 것이 권장됩니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="overview">
+                    <h2 id="rfc.section.3" class="np"><a href="#rfc.section.3">3.</a>&nbsp;<a href="#overview">HTTP의 중요한
+                            점</a></h2>
+                    <div id="rfc.section.3.p.1">
+                        <p>이 섹션은 애플리케이션 프로토콜을 정의하기 위해 HTTP를 사용할 때 고려해야 할 HTTP의 특성을 검토합니다.</p>
+                    </div>
+                    <section id="generic-semantics">
+                        <h3 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a>&nbsp;<a
+                                href="#generic-semantics">일반 의미론</a></h3>
+                        <div id="rfc.section.3.1.p.1">
+                            <p>HTTP의 많은 가치는 일반 의미론에 있습니다 — 즉, HTTP에 의해 정의된 프로토콜 요소는 모든 리소스에 적용될 수 있으며 특정 맥락에 국한되지 않습니다.
+                                애플리케이션 특정 의미론은 상태 코드나 메서드(상태 코드와 메서드는 애플리케이션 상태와 관련된 일반적 의미론을 갖긴 하지만)를 재정의하기보다는 메시지 콘텐츠와
+                                헤더 필드에 표현되는 것이 가장 좋습니다.</p>
+                        </div>
+                        <div id="rfc.section.3.1.p.2">
+                            <p>일반 의미론과 애플리케이션 특정 의미론의 이러한 분리는 공통 소프트웨어(예: HTTP 서버, 중개자, 클라이언트 구현 및 캐시)가 애플리케이션을 이해할 필요
+                                없이 HTTP 메시지를 처리할 수 있게 합니다. 또한 사람들은 특정 애플리케이션에 대한 전문 지식 없이도 HTTP 의미론에 대한 지식을 활용할 수 있습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.1.p.3">
+                            <p>따라서 HTTP를 사용하는 애플리케이션은 메서드, 상태 코드 또는 기존 헤더 필드와 같은 일반 프로토콜 요소의 의미론을 재정의, 세분화 또는 오버레이해서는
+                                <em class="bcp14">안 됩니다</em>. 대신, 그들은 명세를 해당 애플리케이션에 특정한 프로토콜 요소 — 즉, 자신의 HTTP 리소스 — 에
+                                초점을 맞추어야 합니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.1.p.4" class="avoidbreakafter">
+                            <p>명세를 작성할 때 HTTP가 어떻게 구현되고 지원되며 사용되어야 하는지를 정확히 지정하고 싶은 유혹이 종종 있습니다. 그러나 이것은 의도치 않은 HTTP 동작
+                                프로파일로 쉽게 이어질 수 있습니다. 예를 들어, 다음과 같은 문장이 포함된 명세를 흔히 볼 수 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.3.1.p.5">
+                            <blockquote>
+                                <div id="rfc.section.3.1.p.5.1">
+                                    <p>A POST request MUST result in a 201 (Created) response.</p>
+                                </div>
+                            </blockquote>
+                        </div>
+                        <div id="rfc.section.3.1.p.6">
+                            <p>이것은 클라이언트에게 응답이 항상 201 (Created)이 될 것이라는 기대를 형성하는데, 실제 배포에서는 프록시가 인증을 요구할 수 있거나 서버 측 오류가
+                                발생하거나 리디렉션이 있을 수 있는 등 상태 코드가 달라질 수 있는 여러 이유가 있습니다. 클라이언트가 이를 예상하지 않으면 애플리케이션의 배포는
+                                취약해집니다.</p>
+                        </div>
+                        <div id="rfc.section.3.1.p.7">
+                            <p>자세한 내용은 <a href="#resource" title="Specifying Server Behaviour">섹션 4.2</a>를 참조하십시오.</p>
+                        </div>
+                    </section>
+                    <section id="links">
+                        <h3 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a>&nbsp;<a href="#links">링크</a>
+                        </h3>
+                        <div id="rfc.section.3.2.p.1">
+                            <p>또 다른 일반적인 관행은 HTTP 서버의 네임스페이스(또는 그 일부)가 단일 애플리케이션의 전용으로 사용된다고 가정하는 것입니다. 이는 해당 공간에 애플리케이션
+                                특정 의미를 덮어씌우는 것이며 다른 애플리케이션이 이를 사용하지 못하게 합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.2">
+                            <p><a href="#BCP190"><cite title="URI Design and Ownership">[BCP190]</cite></a>에서 설명된 바와 같이,
+                                표준이 URL 공간의 일부를 '점유'하는 것은 서버의 리소스에 대한 권한을 강탈하고 배포 문제를 일으킬 수 있으므로 표준 관행으로는 바람직하지 않습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.2.p.3">
+                            <p>경로와 같은 URI 구성 요소를 정적으로 정의하는 대신, HTTP를 사용하는 애플리케이션은 배포의 유연성을 허용하기 위해 링크 <a
+                                    href="#WEB-LINKING"><cite title="Web Linking">[WEB-LINKING]</cite></a>을 정의하고 사용하는 것이
+                                <em class="bcp14">권장됩니다</em>.
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.2.p.4">
+                            <p>런타임 링크를 이러한 방식으로 사용하면 특히 애플리케이션이 다중 구현 및/또는 배포를 가지는 경우(표준화되는 경우가 흔함) 여러 가지 다른 이점이 있습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.2.p.5">
+                            <p>예를 들어, 링크로 탐색하면 리디렉션의 오버헤드 없이 요청을 다른 서버로 라우팅할 수 있어 여러 머신에 걸친 배포를 잘 지원할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.6">
+                            <p>링크를 사용하면 동일한 서버에서 서로 다른 애플리케이션을 "혼합 및 매치"할 수 있게 됩니다. 링크의 문서는 그 대상에 대한 정보도 포함할 수 있기 때문에
+                                확장성, 버전 관리 및 기능 관리에 대한 자연스러운 메커니즘을 제공합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.7">
+                            <p>링크를 사용하면 웹에서 볼 수 있는 형태의 캐시 무효화도 제공됩니다; 리소스의 상태가 변경되면 애플리케이션은 영향을 받는 링크를 변경하여 항상 최신 복사본이
+                                가져오도록 할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.8">
+                            <p>자세한 내용은 <a href="#specifying-urls" title="Specifying URLs">섹션 4.4</a>를 참조하십시오.</p>
+                        </div>
+                    </section>
+                    <section id="rich-functionality">
+                        <h3 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a>&nbsp;<a
+                                href="#rich-functionality">풍부한 기능성</a></h3>
+                        <div id="rfc.section.3.3.p.1" class="avoidbreakafter">
+                            <p>HTTP는 애플리케이션에 다음과 같은 여러 기능을 제공합니다:</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.2">
+                            <ul>
+                                <li>메시지 프레이밍</li>
+                                <li>다중화(HTTP/2 <a href="#HTTP2"><cite title="HTTP/2">[HTTP/2]</cite></a> 및 HTTP/3 <a
+                                        href="#HTTP3"><cite title="HTTP/3">[HTTP/3]</cite></a>에서)</li>
+                                <li>TLS와의 통합</li>
+                                <li>중개자(프록시, 게이트웨이, 콘텐츠 전송 네트워크(CDN)) 지원</li>
+                                <li>클라이언트 인증</li>
+                                <li>형식, 언어 및 기타 기능에 대한 콘텐츠 협상</li>
+                                <li>서버 확장성, 대기시간 및 대역폭 감소, 신뢰성을 위한 캐싱</li>
+                                <li>풍부한 URL 공간을 통한 접근 제어의 세분성</li>
+                                <li>응답의 일부만 선택적으로 요청할 수 있는 부분적 콘텐츠</li>
+                                <li>웹 브라우저를 사용하여 애플리케이션과 쉽게 상호작용할 수 있는 능력</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.3">
+                            <p>HTTP를 사용하는 애플리케이션은 사용자가 이러한 기능으로부터 최대 이점을 얻고 다양한 상황에 배포될 수 있도록 프로토콜이 제공하는 다양한 기능을 활용하는 것이
+                                권장됩니다. 이 문서는 특정 기능의 사용을 요구하지는 않습니다. 적절한 설계 절충은 특정 상황에 따라 매우 달라지기 때문입니다. 그러나 <a
+                                    href="#bp" title="Best Practices for Specifying the Use of HTTP">섹션 4</a>의 관행을 따르는
+                                것이 좋은 출발점입니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="bp">
+                    <h2 id="rfc.section.4" class="np"><a href="#rfc.section.4">4.</a>&nbsp;<a href="#bp">HTTP 사용을 명시하기
+                            위한 모범 사례</a></h2>
+                    <div id="rfc.section.4.p.1">
+                        <p>이 섹션에는 애플리케이션에서 HTTP의 사용을 명시할 때의 모범 사례와 특정 HTTP 프로토콜 요소에 대한 관행이 포함되어 있습니다.</p>
+                    </div>
+                    <section id="specifying-the-use-of-http">
+                        <h3 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a>&nbsp;<a
+                                href="#specifying-the-use-of-http">HTTP 사용 명시</a></h3>
+                        <div id="rfc.section.4.1.p.1">
+                            <p>명세서는 HTTP에 대한 기본 참조로 <a href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>를 사용해야
+                                합니다; 특정 기능이 명시적으로 지적되는 경우를 제외하고 HTTP 제품군의 모든 명세를 참조할 필요는 없습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.2">
+                            <p>HTTP는 홉별(hop-by-hop) 프로토콜이므로 연결은 애플리케이션이 제어하지 않는 구현(예: 프록시, CDN, 방화벽 등)에 의해 처리될 수 있습니다.
+                                특정 HTTP 버전을 요구하면 이러한 상황에서 사용하기 어렵고 상호운용성에 해를 끼칩니다. 따라서 HTTP를 사용하는 애플리케이션이 최소 사용 버전을 지정하는
+                                것은 <em class="bcp14">권장되지 않습니다</em>.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.3">
+                            <p>그러나 애플리케이션 배포가 특정 HTTP 버전의 사용(예: HTTP/2의 다중화)으로부터 이익을 얻는다면, 이는 명시되어야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.4">
+                            <p>HTTP를 사용하는 애플리케이션은 프로토콜의 진화를 보장하기 위해 최대 버전을 지정해서는 <em class="bcp14">안 됩니다</em>.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.5" class="avoidbreakafter">
+                            <p>프로토콜 상호작용의 예를 명시할 때, 애플리케이션은 요청과 응답 메시지를 완전한 헤더 섹션과 함께 문서화해야 하며, 바람직하게는 HTTP/1.1 형식으로
+                                제시하는 것이 좋습니다 <a href="#HTTP11"><cite title="HTTP/1.1">[HTTP/1.1]</cite></a>. 예를 들어:</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.6">
+                            <pre class="text">
+GET /thing HTTP/1.1
+Host: example.com
+Accept: application/things+json
+User-Agent: Foo/1.0
+
+</pre>
+                        </div>
+                        <div id="rfc.section.4.1.p.7">
+                            <pre class="text">
+HTTP/1.1 200 OK
+Content-Type: application/things+json
+Content-Length: 500
+Server: Bar/2.2
+
+[content here]
+</pre>
+                        </div>
+                    </section>
+                    <section id="resource">
+                        <h3 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a>&nbsp;<a href="#resource">서버 동작
+                                명시</a></h3>
+                        <div id="rfc.section.4.2.p.1" class="avoidbreakafter">
+                            <p>애플리케이션의 서버측 동작은 다음과 같은 프로토콜 요소를 정의함으로써 가장 효과적으로 명시됩니다:</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.2">
+                            <ul>
+                                <li>종종 JSON과 같은 형식 관습에 기반한 미디어 타입 <a href="#RFC6838"><cite
+                                            title="Media Type Specifications and Registration Procedures">[RFC6838]</cite></a>;
+                                </li>
+                                <li>섹션 <a href="#headers" title="Specifying HTTP Header Fields">4.7</a>에 따른 HTTP 헤더 필드;
+                                </li>
+                                <li>링크 관계로 식별되는 리소스가 구현하는 동작(링크 관계 <a href="#WEB-LINKING"><cite
+                                            title="Web Linking">[WEB-LINKING]</cite></a>로 식별).</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.4.2.p.3" class="avoidbreakafter">
+                            <p>애플리케이션은 이러한 프로토콜 요소를 조합하여 링크 관계로 식별되는 리소스 집합을 정의하고 지정된 동작을 구현하도록 하여 그 동작을 정의할 수 있습니다. 예를
+                                들면 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.4">
+                            <ul>
+                                <li>하나 이상의 미디어 타입으로 식별된 형식에서 GET을 사용하여 리소스 상태를 조회;</li>
+                                <li>적절히 식별된 요청 콘텐츠 형식을 사용하여 POST 또는 PUT으로 리소스 생성 또는 업데이트;</li>
+                                <li>POST와 식별된 요청 및 응답 콘텐츠 형식을 사용한 데이터 처리;</li>
+                                <li>DELETE를 사용한 리소스 삭제.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.4.2.p.5" class="avoidbreakafter">
+                            <p>예를 들어, 애플리케이션은 다음을 명시할 수 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.6">
+                            <blockquote>
+                                <div id="rfc.section.4.2.p.6.1">
+                                    <p>"example-widget" 링크 관계 유형으로 링크된 리소스는 Widgets입니다. Widget의 상태는
+                                        "application/example-widget+json" 형식으로 가져올 수 있으며, 동일한 링크에 PUT하여 업데이트할 수 있습니다.
+                                        Widget 리소스는 삭제할 수 있습니다.</p>
+                                </div>
+                                <div id="rfc.section.4.2.p.6.2">
+                                    <p>Widget 표현에 있는 Example-Count 응답 헤더 필드는 발신자가 보유한 Widget의 수를 나타냅니다.</p>
+                                </div>
+                                <div id="rfc.section.4.2.p.6.3">
+                                    <p>"application/example-widget+json" 형식은 Widget의 상태를 나타내는 JSON [RFC8259] 형식입니다. 그것은
+                                        Link 헤더 필드 값에 "example-other-info" 링크 관계 유형으로 표시된 링크에서 관련 정보를 가리키는 링크를 포함합니다.
+                                    </p>
+                                </div>
+                            </blockquote>
+                        </div>
+                        <div id="rfc.section.4.2.p.7">
+                            <p>애플리케이션은 또한 클라이언트가 런타임 데이터를 기반으로 URL을 생성할 수 있도록 URI 템플릿 <a href="#URI-TEMPLATE"><cite
+                                        title="URI Template">[URI-TEMPLATE]</cite></a>의 사용을 명시할 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="clients">
+                        <h3 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a>&nbsp;<a href="#clients">클라이언트 동작
+                                명시</a></h3>
+                        <div id="rfc.section.4.3.p.1">
+                            <p>애플리케이션이 클라이언트 동작에 대해 기대하는 바는 웹 브라우저의 기대와 밀접하게 맞추어야 서로 사용될 때 상호운용성 문제를 피할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.3.p.2">
+                            <p>이렇게 하는 한 가지 방법은 브라우저가 HTTP에 대해 사용하는 추상화인 <a href="#FETCH"><cite
+                                        title="Fetch - Living Standard">[FETCH]</cite></a>를 기준으로 정의하는 것입니다.</p>
+                        </div>
+                        <div id="rfc.section.4.3.p.3" class="avoidbreakafter">
+                            <p>자동 리디렉션 처리와 같은 일부 클라이언트 동작이나 쿠키와 같은 확장은 HTTP에서 요구되지는 않지만 매우 일반적으로 사용됩니다. 애플리케이션에서 이들의 사용을
+                                명시적으로 지정하지 않으면 혼란과 상호운용성 문제가 발생할 수 있습니다. 특히:</p>
+                        </div>
+                        <div id="rfc.section.4.3.p.4">
+                            <dl>
+                                <dt>리디렉션 처리:</dt>
+                                <dd style="margin-left: 1.5em">애플리케이션은 리디렉션이 어떻게 처리되기를 기대하는지 명시할 필요가 있습니다; <a
+                                        href="#redirects" title="Redirection">섹션 4.6.1</a>을 참조하십시오.</dd>
+                                <dt>쿠키:</dt>
+                                <dd style="margin-left: 1.5em">HTTP를 사용하는 애플리케이션은 쿠키가 필요하다면 쿠키 명세 <a
+                                        href="#COOKIES"><cite
+                                            title="HTTP State Management Mechanism">[COOKIES]</cite></a>를 명시적으로 참조해야
+                                    합니다.</dd>
+                                <dt>인증서:</dt>
+                                <dd style="margin-left: 1.5em">HTTP를 사용하는 애플리케이션은 HTTPS가 사용될 때 TLS 인증서를 <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9110.html#section-4.3.4">Section
+                                        4.3.4</a>에 따라 확인하도록 명시해야 합니다.</dd>
+                            </dl>
+                        </div>
+                        <div id="rfc.section.4.3.p.5">
+                            <p>HTTP를 사용하는 애플리케이션은 협상되는 것이 일반적인 HTTP 기능을 클라이언트가 정적으로 지원하도록 요구해서는 안 됩니다. 예를 들어 특정 콘텐츠 인코딩을
+                                가진 응답을 클라이언트가 반드시 지원해야 한다고 요구(<a href="#HTTP"><cite
+                                        title="HTTP Semantics">[HTTP]</cite></a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9110.html#section-8.4.1">Section
+                                    8.4.1</a>)하는 대신 이를 위해 협상하도록(<a href="#HTTP"><cite
+                                        title="HTTP Semantics">[HTTP]</cite></a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.3">Section
+                                    12.5.3</a>) 요구하면, 그렇지 않은 준수 클라이언트는 애플리케이션과 상호운용할 수 없습니다. 다만 애플리케이션은 이러한 기능의 구현을 장려할
+                                수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="specifying-urls">
+                        <h3 id="rfc.section.4.4"><a href="#rfc.section.4.4">4.4.</a>&nbsp;<a href="#specifying-urls">URL
+                                명시</a></h3>
+                        <div id="rfc.section.4.4.p.1">
+                            <p>HTTP에서 클라이언트가 상호작용하는 리소스는 URL로 식별됩니다 <a href="#URL"><cite
+                                        title="Uniform Resource Identifier (URI): Generic Syntax">[URL]</cite></a>. <a
+                                    href="#BCP190"><cite title="URI Design and Ownership">[BCP190]</cite></a>가 설명하듯,
+                                URL의 일부는 그 서버의 소유자(또는 "권한")가 제어하도록 설계되어 배포에서 유연성을 제공합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.4.p.2">
+                            <p>이는 대부분의 경우 HTTP를 사용하는 애플리케이션 명세가 고정된 애플리케이션 URL이나 경로를 포함하지 않음을 의미합니다; 단일 배포 API의 명세에서
+                                "/app/v1"과 같은 경로 접두사를 지정하는 것은 일반적이지만, IETF 명세에서 그렇게 하는 것은 부적절합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.4.p.3">
+                            <p>따라서 명세 작성자는 클라이언트가 애플리케이션의 URL을 발견할 수 있도록 하는 메커니즘을 제공해야 합니다. 또한 어떤 URL 스킴을 사용할지, 전용 포트를
+                                사용할지 HTTP의 포트를 재사용할지 여부를 명시해야 합니다.</p>
+                        </div>
+                        <section id="discovering-an-applications-urls">
+                            <h4 id="rfc.section.4.4.1"><a href="#rfc.section.4.4.1">4.4.1.</a>&nbsp;<a
+                                    href="#discovering-an-applications-urls">애플리케이션의 URL 검색</a></h4>
+                            <div id="rfc.section.4.4.1.p.1">
+                                <p>일반적으로 클라이언트는 특정 배포에 관한 정보를 포함하는 초기 문서를 요청함으로써 애플리케이션 서버와 상호작용을 시작하며, 해당 문서에는 다른 관련
+                                    리소스에 대한 링크가 포함될 수 있습니다. 이렇게 하면 배포가 가능한 한 유연하게 되고(여러 서버에 걸칠 수 있음), 진화를 허용하며, 애플리케이션이
+                                    클라이언트에 맞게 "발견 문서"를 조정할 수 있는 기회를 제공합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.4.1.p.2">
+                                <p>초기 URL을 발견하기 위한 몇 가지 일반적인 패턴이 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.4.1.p.3">
+                                <p>URL 검색을 위한 가장 간단한 메커니즘은 클라이언트에 전체 URL을 구성하거나(또는 다른 방법으로 전달) 구성하는 것입니다. 이는 구성 문서나 다른
+                                    발견 메커니즘을 통해 이루어질 수 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.4.1.p.4">
+                                <p>그러나 클라이언트가 서버의 호스트 이름과 애플리케이션의 정체만 알고 있는 경우, 초기 URL을 그 정보로부터 유도할 방법이 필요합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.4.1.p.5" class="avoidbreakafter">
+                                <p>애플리케이션은 URL 경로에 대해 고정된 접두사를 정의할 수 없습니다; <a href="#BCP190"><cite
+                                            title="URI Design and Ownership">[BCP190]</cite></a>를 참조하십시오. 대신, 그러한
+                                    애플리케이션의 명세는 다음 전략 중 하나를 사용할 수 있습니다:</p>
+                            </div>
+                            <div id="rfc.section.4.4.1.p.6">
+                                <ul>
+                                    <li>그 애플리케이션의 진입점으로 잘 알려진 URI <a href="#WELL-KNOWN-URI"><cite
+                                                title="Well-Known Uniform Resource Identifiers (URIs)">[WELL-KNOWN-URI]</cite></a>를
+                                        등록합니다. 이것은 모든 잠재적 서버에서 충돌하지 않는 고정된 경로를 제공합니다.</li>
+                                    <li>서버 권한자가 진입점 URL을 생성하기 위한 URI 템플릿 <a href="#URI-TEMPLATE"><cite
+                                                title="URI Template">[URI-TEMPLATE]</cite></a> 또는 유사한 메커니즘을 전달하도록 허용합니다.
+                                        예를 들어, 이는 구성 문서나 다른 아티팩트에서 수행될 수 있습니다.</li>
+                                </ul>
+                            </div>
+                            <div id="rfc.section.4.4.1.p.7">
+                                <p>발견 문서가 위치하면, 이를 가져오고(허용된 경우 메타데이터에 따라 캐시하여) 애플리케이션과 관련된 다른 리소스를 전체 URI 또는 URL 템플릿을
+                                    사용하여 찾는 데 사용할 수 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.4.1.p.8">
+                                <p>경우에 따라 애플리케이션이 통신이 매우 짧거나 지연(latency) 문제로 인해 발견 문서 사용이 허용되지 않는 경우처럼 발견 문서를 사용하지 않을 수
+                                    있습니다. 이러한 상황은 애플리케이션의 모든 리소스를 잘 알려진 위치에 배치함으로써 해결할 수 있습니다.</p>
+                            </div>
+                        </section>
+                        <section id="scheme">
+                            <h4 id="rfc.section.4.4.2"><a href="#rfc.section.4.4.2">4.4.2.</a>&nbsp;<a
+                                    href="#scheme">URI 스킴 고려</a></h4>
+                            <div id="rfc.section.4.4.2.p.1">
+                                <p>HTTP를 사용하는 애플리케이션은 일반적으로 "http" 및/또는 "https" URI 스킴을 사용합니다. 인증성, 무결성 및 기밀성을 제공하고 만연
+                                    감시 공격을 완화하기 위해 "https"가 <em class="bcp14">권장됩니다</em> <a href="#RFC7258"><cite
+                                            title="Pervasive Monitoring Is an Attack">[RFC7258]</cite></a>.</p>
+                            </div>
+                            <div id="rfc.section.4.4.2.p.2" class="avoidbreakafter">
+                                <p>그러나 애플리케이션 전용 스킴을 정의할 수도 있습니다. HTTP를 사용하는 애플리케이션에 대한 URI 스킴을 정의할 때 염두에 둘 여러 가지 절충점과
+                                    주의사항이 있습니다:</p>
+                            </div>
+                            <div id="rfc.section.4.4.2.p.3">
+                                <ul>
+                                    <li>수정되지 않은 웹 브라우저는 새로운 스킴을 지원하지 않습니다. 웹 브라우저에 새로운 URI 스킴을 등록하는 것이 가능하긴 하지만(예: <a
+                                            href="#HTML"><cite title="HTML - Living Standard">[HTML]</cite></a>의
+                                        registerProtocolHandler()), 이러한 메커니즘에 대한 지원은 모든 브라우저에 동일하게 제공되지 않으며 기능이 다양합니다.
+                                    </li>
+                                    <li>기존의 비브라우저 클라이언트, 중개자, 서버 및 관련 소프트웨어는 새 스킴을 인식하지 못할 것입니다. 예를 들어, 클라이언트 라이브러리가 요청을
+                                        디스패치하지 못하거나, 캐시가 응답을 저장하지 않거나, 프록시가 요청을 전달하지 못할 수 있습니다.</li>
+                                    <li>URL은 HTTP 아티팩트에 흔히 등장하고 자동으로 생성되는 경우가 많기 때문에(예: Location 응답 헤더 필드) 새 스킴을 일관되게
+                                        사용하도록 보장하기 어려울 수 있습니다.</li>
+                                    <li>새 스킴으로 식별된 리소스는 여전히 "http" 및/또는 "https" URL을 통해 접근 가능할 것입니다. 이러한 URL이 사용으로
+                                        "유출"되어 보안 및 운용성 문제를 일으킬 수 있습니다. 예를 들어, 요청이 "일반" 웹 사이트로 전송되지 않도록 하기 위해 새 스킴을 사용하는
+                                        것은 실패할 가능성이 높습니다.</li>
+                                    <li>URL의 출처(origin)에 의존하는 기능들(예: 웹의 동일 출처 정책)은 스킴 변경으로 영향을 받습니다 <a
+                                            href="#RFC6454"><cite title="The Web Origin Concept">[RFC6454]</cite></a>.
+                                    </li>
+                                    <li>쿠키 <a href="#COOKIES"><cite
+                                                title="HTTP State Management Mechanism">[COOKIES]</cite></a>, 인증 <a
+                                            href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>, 캐싱 <a
+                                            href="#HTTP-CACHING"><cite title="HTTP Caching">[HTTP-CACHING]</cite></a>,
+                                        HSTS <a href="#RFC6797"><cite
+                                                title="HTTP Strict Transport Security (HSTS)">[RFC6797]</cite></a>, CORS
+                                        <a href="#FETCH"><cite title="Fetch - Living Standard">[FETCH]</cite></a>와 같은
+                                        HTTP-특정 기능들은 정의 및 구현 방식에 따라 제대로 동작하지 않을 수 있습니다. 일반적으로 이러한 기능들은 URL이 항상 "http" 또는
+                                        "https"일 것이라는 가정 하에 설계되고 구현됩니다.
+                                    </li>
+                                    <li>보안 컨텍스트를 요구하는 웹 기능은 새 스킴을 비안전한 것으로 취급할 가능성이 높습니다 <a href="#SECCTXT"><cite
+                                                title="Secure Contexts">[SECCTXT]</cite></a>.</li>
+                                </ul>
+                            </div>
+                            <div id="rfc.section.4.4.2.p.4">
+                                <p>새 URI 스킴을 만드는 것에 대한 자세한 정보는 <a href="#RFC7595"><cite
+                                            title="Guidelines and Registration Procedures for URI Schemes">[RFC7595]</cite></a>를
+                                    참조하십시오.</p>
+                            </div>
+                        </section>
+                        <section id="choosing-transport-ports">
+                            <h4 id="rfc.section.4.4.3"><a href="#rfc.section.4.4.3">4.4.3.</a>&nbsp;<a
+                                    href="#choosing-transport-ports">전송 포트 선택</a></h4>
+                            <div id="rfc.section.4.4.3.p.1">
+                                <p>애플리케이션은 기본 포트(HTTP의 경우 80, HTTPS의 경우 443)를 사용할 수 있으며, 또는 다른 포트에 배포될 수 있습니다. 이 결정은 배포
+                                    시점에 이루어지거나 애플리케이션 명세에서 권장될 수 있습니다(예: 해당 애플리케이션을 위해 포트를 등록함).</p>
+                            </div>
+                            <div id="rfc.section.4.4.3.p.2">
+                                <p>비기본 포트를 사용하는 경우 해당 리소스의 모든 URL 권한(authority)에 반영되어야 합니다; 기본 포트를 변경할 수 있는 유일한 메커니즘은
+                                    URI 스킴을 변경하는 것입니다(섹션 <a href="#scheme" title="Considering URI Schemes">4.4.2</a>
+                                    참조).</p>
+                            </div>
+                            <div id="rfc.section.4.4.3.p.3">
+                                <p>기본이 아닌 포트를 사용하는 것은 프라이버시 영향(즉, 프로토콜이 다른 트래픽과 구별될 수 있음)과 운용성 문제(일부 네트워크가 이를 차단하거나 방해할
+                                    수 있음)를 수반합니다. 이러한 구별성에서 비롯된 프라이버시 영향은 보안 고려사항에 문서화되어야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.4.3.p.4">
+                                <p>자세한 지침은 <a href="#RFC7605"><cite
+                                            title="Recommendations on Using Assigned Transport Port Numbers">[RFC7605]</cite></a>를
+                                    참조하십시오.</p>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="using-http-methods">
+                        <h3 id="rfc.section.4.5"><a href="#rfc.section.4.5">4.5.</a>&nbsp;<a
+                                href="#using-http-methods">HTTP 메서드 사용</a></h3>
+                        <div id="rfc.section.4.5.p.1">
+                            <p>HTTP를 사용하는 애플리케이션은 GET, POST, PUT, DELETE, PATCH와 같은 등록된 HTTP 메서드만 사용해야 <em
+                                    class="bcp14">합니다</em>.</p>
+                        </div>
+                        <div id="rfc.section.4.5.p.2">
+                            <p>새로운 HTTP 메서드는 드물며, IETF 검토와 함께 "HTTP Method Registry"에 등록되어야 하며(<a href="#HTTP"><cite
+                                        title="HTTP Semantics">[HTTP]</cite></a> 참조), 또한 일반적이어야 합니다. 즉, 해당 메서드는 한
+                                애플리케이션의 리소스에만 적용되는 것이 아니라 잠재적으로 모든 리소스에 적용될 수 있어야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.5.p.3">
+                            <p>역사적으로 일부 애플리케이션(예: <a href="#RFC4791"><cite
+                                        title="Calendaring Extensions to WebDAV (CalDAV)">[RFC4791]</cite></a>)이 애플리케이션
+                                전용 메서드를 정의한 적이 있지만, <a href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>은 이제
+                                이를 금지합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.5.p.4">
+                            <p>저자들이 새 메서드가 필요하다고 믿는 경우, 조기에 HTTP 커뮤니티와 논의(예: &lt;<a
+                                    href="mailto:ietf-http-wg@w3.org">mailto:ietf-http-wg@w3.org</a>&gt; 메일링 리스트)를 하고
+                                애플리케이션 명세의 일부로서가 아니라 별도의 HTTP 확장으로 그 제안을 문서화하는 것이 권장됩니다.</p>
+                        </div>
+                        <section id="get">
+                            <h4 id="rfc.section.4.5.1"><a href="#rfc.section.4.5.1">4.5.1.</a>&nbsp;<a
+                                    href="#get">GET</a></h4>
+                            <div id="rfc.section.4.5.1.p.1">
+                                <p>GET은 가장 일반적이고 유용한 HTTP 메서드입니다; 그 조회(검색) 의미론은 캐싱과 부작용 없는 링크를 허용하며, HTTP 사용의 많은 이점을
+                                    뒷받침합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.5.1.p.2">
+                                <p>쿼리는 종종 URL의 쿼리 구성요소를 사용하여 GET으로 수행할 수 있습니다; 이는 웹 브라우징에서 친숙한 패턴이며, 결과를 캐시할 수 있어 비용이 큰
+                                    프로세스의 효율성을 향상시킵니다. 그러나 경우에 따라 GET은 URI의 제한된 문법 때문에 쿼리를 표현하기에 불편할 수 있습니다; 특히 이진 데이터가
+                                    쿼리 항목의 일부인 경우 URI 문법에 맞게 인코딩해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.5.1.p.3">
+                                <p>짧은 쿼리에는 문제가 되지 않지만, 더 큰 쿼리 항목이나 높은 빈도의 요청을 유지해야 하는 경우 문제가 될 수 있습니다. 또한 일부 HTTP 구현은
+                                    지원하는 URL 크기를 제한하지만, 현대의 HTTP 소프트웨어는 과거보다 훨씬 관대한 한도를 갖습니다(일반적으로 <a href="#HTTP"><cite
+                                            title="HTTP Semantics">[HTTP]</cite></a>에서 요구하는 것보다 훨씬 큼, 보통 8000 옥텟보다 훨씬
+                                    많음).</p>
+                            </div>
+                            <div id="rfc.section.4.5.1.p.4">
+                                <p>이러한 경우 HTTP를 사용하는 애플리케이션은 요청의 콘텐츠에 쿼리를 표현하기 위해 POST를 고려할 수 있습니다; 이렇게 하면 인코딩 오버헤드와 구현의
+                                    URL 길이 제한을 피할 수 있습니다. 그러나 그렇게 하면 캐싱 및 쿼리 결과에 대한 링크와 같은 GET의 이점이 상실된다는 점을 유의해야 합니다.
+                                    따라서 POST 쿼리를 지원해야 하는 HTTP 애플리케이션은 두 메서드를 모두 허용하는 것을 고려해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.5.1.p.5">
+                                <p>GET 요청의 처리로 애플리케이션 상태가 변경되거나 클라이언트에게 중요할 수 있는 다른 부작용이 발생해서는 안 됩니다. 왜냐하면 구현체는 실패한 HTTP
+                                    GET 요청을 재시도할 수 있기 때문입니다. 또한 TLS 초기 데이터(early data)로 보호되는 일부 GET 요청은 재전송 공격에 취약할 수
+                                    있습니다(자세한 내용은 <a href="#RFC8470"><cite
+                                            title="Using Early Data in HTTP">[RFC8470]</cite></a> 참조). 이는 로깅과 유사한 기능을
+                                    제외한 것입니다; 관련 내용은 <a href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.1">Section
+                                        9.2.1</a>를 참조하십시오.</p>
+                            </div>
+                            <div id="rfc.section.4.5.1.p.6">
+                                <p>마지막으로, 일반적인 HTTP 문법은 GET 요청 메시지에 콘텐츠가 포함될 수 있도록 허용하지만, 그 목적은 메시지 파서가 일반적일 수 있게 하기 위한
+                                    것입니다; <a href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.1">Section
+                                        9.3.1</a>에 따르면 GET의 콘텐츠는 권장되지 않으며 의미가 없고 일반적인 HTTP 소프트웨어(중개자, 캐시, 서버, 클라이언트
+                                    라이브러리 등)에 의해 무시되거나 거부될 것입니다.</p>
+                            </div>
+                        </section>
+                        <section id="options">
+                            <h4 id="rfc.section.4.5.2"><a href="#rfc.section.4.5.2">4.5.2.</a>&nbsp;<a
+                                    href="#options">OPTIONS</a></h4>
+                            <div id="rfc.section.4.5.2.p.1">
+                                <p>OPTIONS 메서드는 메타데이터 검색을 위해 정의되었으며 WebDAV <a href="#RFC4918"><cite
+                                            title="HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)">[RFC4918]</cite></a>와
+                                    CORS <a href="#FETCH"><cite title="Fetch - Living Standard">[FETCH]</cite></a>에서
+                                    사용됩니다. HTTP 기반 API는 종종 리소스에 대한 메타데이터를 검색할 필요가 있기 때문에 OPTIONS가 고려되는 경우가 많습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.5.2.p.2" class="avoidbreakafter">
+                                <p>그러나 OPTIONS에는 중요한 제약이 있습니다:</p>
+                            </div>
+                            <div id="rfc.section.4.5.2.p.3">
+                                <ul>
+                                    <li>OPTIONS는 기본 메서드가 아니기 때문에 단순한 URL로 메타데이터에 링크할 수 없습니다.</li>
+                                    <li>OPTIONS 응답은 리소스의 표현(즉, GET과 HEAD)에 대해 작동하는 HTTP 캐시 때문에 캐시할 수 없습니다. OPTIONS 응답을
+                                        별도로 캐시하는 경우 HTTP 캐시 만료, 보조 키 및 기타 메커니즘과의 상호작용을 고려해야 합니다.</li>
+                                    <li>OPTIONS는 "채티(chatty)"합니다 -- 메타데이터를 별도로 요청하면 애플리케이션과 상호작용하는 데 필요한 요청 수가 증가합니다.
+                                    </li>
+                                    <li>OPTIONS에 대한 구현 지원이 보편적이지 않습니다; 일부 서버는 별도의 노력이 없이는 OPTIONS 요청에 응답하는 기능을 노출하지 않을 수
+                                        있습니다.</li>
+                                </ul>
+                            </div>
+                            <div id="rfc.section.4.5.2.p.4" class="avoidbreakafter">
+                                <p>OPTIONS 대신 다음과 같은 대체 접근법 중 하나가 더 적합할 수 있습니다:</p>
+                            </div>
+                            <div id="rfc.section.4.5.2.p.5">
+                                <ul>
+                                    <li>서버 전반의 메타데이터의 경우 잘 알려진 URI <a href="#WELL-KNOWN-URI"><cite
+                                                title="Well-Known Uniform Resource Identifiers (URIs)">[WELL-KNOWN-URI]</cite></a>를
+                                        만들거나 적절하다면 이미 존재하는 것을 사용합니다(예: host-meta <a href="#RFC6415"><cite
+                                                title="Web Host Metadata">[RFC6415]</cite></a>).</li>
+                                    <li>특정 리소스에 대한 메타데이터의 경우, 별도의 리소스를 만들고 Link 응답 헤더 필드 또는 응답 콘텐츠에 직렬화된 링크로 이를 가리키십시오.
+                                        <a href="#WEB-LINKING"><cite title="Web Linking">[WEB-LINKING]</cite></a>를
+                                        참조하십시오. Link 헤더 필드는 HEAD 응답에서 사용 가능하므로 클라이언트가 리소스와 상호작용하기 전에 해당 리소스의 기능을 발견하려는
+                                        경우 유용합니다.
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="using-http-status-codes">
+                        <h3 id="rfc.section.4.6"><a href="#rfc.section.4.6">4.6.</a>&nbsp;<a
+                                href="#using-http-status-codes">HTTP 상태 코드 사용</a></h3>
+                        <div id="rfc.section.4.6.p.1">
+                            <p>HTTP 상태 코드는 캐시, 중개자 및 클라이언트와 같은 일반적인 HTTP 구성요소와 애플리케이션 자체를 위해 의미를 전달합니다. 그러나 애플리케이션은 이를
+                                사용할 때 여러 함정에 직면할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.2">
+                            <p>첫째, 상태 코드는 종종 애플리케이션 자체가 아닌 다른 구성요소에 의해 생성됩니다. 이는 네트워크 오류가 발생하거나, 캡티브 포털, 프록시 또는 콘텐츠 전송
+                                네트워크가 존재하거나, 서버가 과부하 상태이거나 공격을 받는다고 판단할 때 발생할 수 있습니다. 특정 오류 조건이 발생할 때 일반적인 클라이언트 소프트웨어가
+                                상태 코드를 생성할 수도 있습니다. 그 결과, 애플리케이션이 이러한 상태 코드 중 하나에 특정 의미를 부여하면 클라이언트는 해당 상태 코드가 애플리케이션이
+                                아니라 일반 구성요소에 의해 생성되었기 때문에 자신의 상태를 오해할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.3">
+                            <p>더욱이, 애플리케이션 오류를 개별 HTTP 상태 코드에 일대일로 매핑하면 적용 가능한 HTTP 상태 코드의 유한한 공간이 소진되는 상황으로 이어지는 경우가
+                                많습니다. 이는 새로운 애플리케이션 전용 상태 코드를 생성하거나 기존 상태 코드를 애플리케이션 의미와 거의 관련이 없음에도 사용하는 등 여러 나쁜 관행으로
+                                이어집니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.4">
+                            <p>대신, HTTP를 사용하는 애플리케이션은 가장 적용 가능한 상태 코드를 사용하고 의심스러운 경우 일반 상태 코드(200, 400, 500)를 관대하게 사용하는
+                                것이 좋습니다. 중요하게도, 상태 코드와 애플리케이션 오류 간의 일대일 관계를 지정하지 않아야 합니다. 이렇게 하면 앞서 설명한 소진 문제를 피할 수
+                                있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.5">
+                            <p>동일한 상태 코드에 매핑된 여러 오류 조건을 구별하고 앞서 언급한 잘못된 귀속 문제를 피하기 위해, HTTP를 사용하는 애플리케이션은 응답의 메시지 콘텐츠
+                                및/또는 헤더 필드에서 더 세분화된 오류 정보를 전달해야 합니다. <a href="#PROBLEM-DETAILS"><cite
+                                        title="Problem Details for HTTP APIs">[PROBLEM-DETAILS]</cite></a>는 이를 구현하는 한 가지
+                                방법을 제공합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.6">
+                            <p>등록된 HTTP 상태 코드 집합은 확장될 수 있으므로, HTTP를 사용하는 애플리케이션은 클라이언트가 모든 적용 가능한 상태 코드를 우아하게 처리할 수 있어야
+                                한다고 명시하는 것이 좋습니다(즉, 특정 상태 코드를 인식하지 못할 경우 해당 상태 코드의 일반적인 n00 의미로 폴백하는 것; 예: 499를 인식하지 못하는
+                                클라이언트는 안전하게 400(Bad Request)으로 처리할 수 있음). 이는 가능한 상태 코드의 "목록"을 나열하는 것보다 바람직한데, 그러한 목록은
+                                가까운 미래에 완전하지 않을 것이기 때문입니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.7">
+                            <p>HTTP를 사용하는 애플리케이션은 HTTP 상태 코드의 의미를 재명세해서는 <em class="bcp14">안 됩니다</em>, 설령 그것이 정의를 복사하는
+                                것뿐이라도 마찬가지입니다. 또한 특정 이유 구문(reason phrase)의 사용을 요구하는 것은 <em class="bcp14">권장되지 않습니다</em>;
+                                이유 구문은 HTTP에서 기능을 갖지 않으며 구현에 의해 보존될 것이라고 보장되지 않고 HTTP/2 메시지 형식에는 전혀 포함되지 않습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.8">
+                            <p>애플리케이션은 <em class="bcp14">반드시</em> 등록된 HTTP 상태 코드만 사용해야 합니다. 메서드와 마찬가지로 새로운 HTTP 상태 코드는
+                                드물며, <a href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>에 의해 IETF 검토로 등록되어야
+                                합니다. 유사하게, HTTP 상태 코드는 일반적이어야 하며(<a href="#HTTP"><cite
+                                        title="HTTP Semantics">[HTTP]</cite></a>에 의해 요구됨), 한 애플리케이션의 리소스에만 적용되는 것이 아니라
+                                잠재적으로 모든 리소스에 적용 가능해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.6.p.9">
+                            <p>저자들이 새 상태 코드가 필요하다고 생각하면 조기에 HTTP 커뮤니티와 논의(예: &lt;<a
+                                    href="mailto:ietf-http-wg@w3.org">mailto:ietf-http-wg@w3.org</a>&gt; 메일링 리스트)를 하고 그
+                                제안을 애플리케이션 명세의 일부로서가 아니라 별도의 HTTP 확장으로 문서화하는 것이 권장됩니다.</p>
+                        </div>
+                        <section id="redirects">
+                            <h4 id="rfc.section.4.6.1"><a href="#rfc.section.4.6.1">4.6.1.</a>&nbsp;<a
+                                    href="#redirects">리디렉션</a></h4>
+                            <div id="rfc.section.4.6.1.p.1">
+                                <p><a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-15.4">Section 15.4</a>에
+                                    명시된 3xx 계열 상태 코드는 요청을 만족시키기 위해 사용자 에이전트를 다른 리소스로 안내합니다. 가장 일반적인 것은 301, 302, 307,
+                                    308이며, 모두 클라이언트가 요청을 다시 보낼 위치를 나타내기 위해 Location 응답 헤더 필드를 사용합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.6.1.p.2" class="avoidbreakafter">
+                                <p>이 그룹의 상태 코드들이 다른 두 가지 방식이 있습니다:</p>
+                            </div>
+                            <div id="rfc.section.4.6.1.p.3">
+                                <ul>
+                                    <li>영구인지 일시적인지 여부. 영구 리디렉션은 클라이언트에 저장된 링크(예: 북마크)를 업데이트하는 데 사용할 수 있는 반면, 일시적 리디렉션은
+                                        그렇지 않습니다. 이는 HTTP 캐싱에는 영향을 주지 않으며 완전히 별개입니다.</li>
+                                    <li>리디렉션된 요청이 POST에서 GET으로 요청 메서드를 변경할 수 있는지 여부. 웹 브라우저는 일반적으로 301 및 302에 대해 POST를
+                                        GET으로 변경하므로, 메서드를 변경하지 않고 리디렉션을 허용하기 위해 308과 307이 만들어졌습니다.</li>
+                                </ul>
+                            </div>
+                            <div id="rfc.section.4.6.1.p.4" class="avoidbreakafter">
+                                <p>이 표는 그들의 관계를 요약합니다:</p>
+                            </div>
+                            <div class="table table-condensed table-striped">
+                                <table class="v3 text-center">
+                                    <caption>표 1</caption>
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left" colspan="1" rowspan="1"><span class="nobr"> </span>
+                                            </th>
+                                            <th class="text-left" colspan="1" rowspan="1">영구</th>
+                                            <th class="text-left" colspan="1" rowspan="1">일시적</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-left" colspan="1" rowspan="1">POST에서 GET으로 요청 메서드 변경 허용</td>
+                                            <td class="text-left" colspan="1" rowspan="1">301</td>
+                                            <td class="text-left" colspan="1" rowspan="1">302</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" colspan="1" rowspan="1">요청 메서드 변경을 허용하지 않음</td>
+                                            <td class="text-left" colspan="1" rowspan="1">308</td>
+                                            <td class="text-left" colspan="1" rowspan="1">307</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="rfc.section.4.6.1.p.5">
+                                <p>303 (See Other) 상태 코드는 작업의 결과가 다른 위치에서 GET으로 이용 가능함을 클라이언트에 알리는 데 사용할 수 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.6.1.p.6">
+                                <p><a href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>에서 지적한 바와 같이, 사용자 에이전트는
+                                    특정 상태 코드의 의미를 이해하지 못하더라도 Location 응답 헤더 필드가 있는 3xx 리디렉션을 자동으로 따를 수 있습니다. 그러나 자동으로 따를
+                                    의무는 없으므로, HTTP를 사용하는 애플리케이션이 리디렉션을 자동으로 따르도록 요구하려면 언제 그런 동작이 필요한지 명시해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.6.1.p.7">
+                                <p>리디렉션은(적절한 캐시 지시자가 있는 경우) 캐시할 수 있지만, 그 외에는 "고정적"이지 않습니다 — 즉, URI의 리디렉션은 유사한 다른 URI(예:
+                                    다른 쿼리 매개변수를 가진 경우)에 대해서도 리디렉션이 있을 것이라고 클라이언트가 가정하게 만들지 않습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.6.1.p.8">
+                                <p>HTTP를 사용하는 애플리케이션은 브라우저와의 호환성을 위해 301 및 302 응답이 후속 요청 메서드를 POST에서 GET으로 변경하도록 명시하는 것이
+                                    권장됩니다(다른 메서드는 제외). 일반적으로 리디렉션된 요청이 만들어질 때 그 헤더 필드는 원래 요청에서 복사됩니다. 그러나 이는 다양한 메커니즘에
+                                    의해 수정될 수 있습니다; 예: 전송된 Authorization(<a href="#HTTP"><cite
+                                            title="HTTP Semantics">[HTTP]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9110.html#section-11">Section 11</a>) 및
+                                    Cookie(<a href="#COOKIES"><cite
+                                            title="HTTP State Management Mechanism">[COOKIES]</cite></a>) 헤더 필드는 요청의
+                                    출처(origin)(때로는 경로)가 변경되면 변합니다. HTTP를 사용하는 애플리케이션은 리디렉션 시 정의한 요청 헤더 필드 중 수정되거나 제거되어야
+                                    하는 것이 있는지 명시해야 하지만, 일반 클라이언트(예: 브라우저)는 이러한 요구를 알지 못하므로 이 동작에 의존할 수는 없습니다.</p>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="headers">
+                        <h3 id="rfc.section.4.7"><a href="#rfc.section.4.7">4.7.</a>&nbsp;<a href="#headers">HTTP 헤더 필드
+                                명시</a></h3>
+                        <div id="rfc.section.4.7.p.1" class="avoidbreakafter">
+                            <p>애플리케이션은 종종 새로운 HTTP 헤더 필드를 정의합니다. 일반적으로 HTTP 헤더 필드 사용이 적절한 몇 가지 상황은 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.2">
+                            <ul>
+                                <li>필드가 중개자에게 유용한 경우(중개자는 종종 메시지 콘텐츠를 파싱하지 않으려 함), 및/또는</li>
+                                <li>필드가 일반 HTTP 소프트웨어(예: 클라이언트, 서버)에 유용한 경우, 및/또는</li>
+                                <li>값을 메시지 콘텐츠에 포함할 수 없는 경우(일반적으로 형식이 허용하지 않음).</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.4.7.p.3">
+                            <p>위 조건이 충족되지 않는 경우에는 일반적으로 애플리케이션 특정 정보를 메시지 콘텐츠나 URL 쿼리 문자열 등의 다른 장소에 전달하는 것이 더 낫습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.4">
+                            <p>새 헤더 필드는 <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-16.3">Section
+                                    16.3</a>에 따라 등록되어야 <em class="bcp14">합니다</em> (<a href="#HTTP"><cite
+                                        title="HTTP Semantics">[HTTP]</cite></a>).</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.5">
+                            <p>새 헤더 필드를 발행할 때 고려할 지침은 <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9110.html#section-16.3.2">Section
+                                    16.3.2</a>를 참조하십시오. <a href="#STRUCTURED-FIELDS"><cite
+                                        title="Structured Field Values for HTTP">[STRUCTURED-FIELDS]</cite></a>는 새 헤더
+                                필드에 대한 공통 구조를 제공하여 파싱 및 처리의 여러 문제를 피하므로, 새 헤더 필드에 이를 사용하는 것이 <em
+                                    class="bcp14">권장됩니다</em>.</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.6">
+                            <p>헤더 필드 이름은 짧게 하는 것이 <em class="bcp14">권장됩니다</em> (필드 압축이 사용되더라도 오버헤드가 있기 때문) 그러나 적절히
+                                구체적이어야 합니다. 특히 헤더 필드가 애플리케이션에 특화된 경우, 애플리케이션 식별자가 하이픈으로 구분된 접두사로 필드 이름을 구성할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.7">
+                            <p>예를 들어 "example" 애플리케이션이 세 개의 헤더 필드를 만들어야 한다면 "example-foo", "example-bar",
+                                "example-baz"라고 부를 수 있습니다. 여기서 주요 동기는 네임스페이스의 더 일반적인 필드 이름을 소비하는 것을 피하기 위함이지, 애플리케이션을 위해
+                                네임스페이스 일부를 예약하려는 것은 아닙니다; 관련 고려사항은 <a href="#RFC6648"><cite
+                                        title="Deprecating the &#34;X-&#34; Prefix and Similar Constructs in Application Protocols">[RFC6648]</cite></a>를
+                                참조하십시오.</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.8">
+                            <p>기존 HTTP 헤더 필드의 의미는 등록을 업데이트하거나(허용되는 경우) 해당 확장을 정의하지 않고 재정의해서는 <em class="bcp14">안
+                                    됩니다</em>. 예를 들어, HTTP를 사용하는 애플리케이션은 특정 문맥에서 Location 헤더 필드에 특수한 의미를 부여할 수 없습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.9">
+                            <p>헤더 필드와 HTTP 캐싱 간의 상호작용에 대해서는 <a href="#caching" title="Leveraging HTTP Caching">섹션
+                                    4.9</a>를 참조하십시오; 특히 응답 선택(선택에 사용되는 요청 헤더 필드, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4.1">Section 4.1</a> 참조)의
+                                경우 캐싱에 영향을 미치므로 신중히 고려해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.7.p.10">
+                            <p>애플리케이션 상태(예: Cookie)를 전달하는 헤더 필드에 관한 고려사항은 <a href="#state"
+                                    title="Handling Application State">섹션 4.10</a>을 참조하십시오.</p>
+                        </div>
+                    </section>
+                    <section id="content">
+                        <h3 id="rfc.section.4.8"><a href="#rfc.section.4.8">4.8.</a>&nbsp;<a href="#content">메시지 콘텐츠
+                                정의</a></h3>
+                        <div id="rfc.section.4.8.p.1">
+                            <p>메시지 콘텐츠에 대한 일반적인 구문 관습에는 JSON <a href="#JSON"><cite
+                                        title="The JavaScript Object Notation (JSON) Data Interchange Format">[JSON]</cite></a>,
+                                XML <a href="#XML"><cite
+                                        title="Extensible Markup Language (XML) 1.0 (Fifth Edition)">[XML]</cite></a>,
+                                CBOR <a href="#RFC8949"><cite
+                                        title="Concise Binary Object Representation (CBOR)">[RFC8949]</cite></a> 등이
+                                있습니다. 이러한 사용에 대한 모범 사례는 이 문서의 범위를 벗어납니다.</p>
+                        </div>
+                        <div id="rfc.section.4.8.p.2">
+                            <p>애플리케이션은 정의하는 각 형식에 대해 고유한 미디어 타입을 등록해야 합니다; 이렇게 하면 해당 형식을 명확하게 식별하고 사용을 협상할 수 있습니다. 자세한
+                                내용은 <a href="#RFC6838"><cite
+                                        title="Media Type Specifications and Registration Procedures">[RFC6838]</cite></a>를
+                                참조하십시오.</p>
+                        </div>
+                    </section>
+                    <section id="caching">
+                        <h3 id="rfc.section.4.9"><a href="#rfc.section.4.9">4.9.</a>&nbsp;<a href="#caching">HTTP 캐싱
+                                활용</a></h3>
+                        <div id="rfc.section.4.9.p.1">
+                            <p>HTTP 캐싱 <a href="#HTTP-CACHING"><cite title="HTTP Caching">[HTTP-CACHING]</cite></a>은
+                                애플리케이션에 HTTP를 사용하는 주요 이점 중 하나입니다; 스케일링을 제공하고 대기시간을 줄이며 신뢰성을 향상시킵니다. 또한 HTTP 캐시는 브라우저 및
+                                기타 클라이언트, 네트워크의 포워드 및 리버스 프록시, CDN, 서버 소프트웨어의 일부로서 쉽게 이용 가능합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.9.p.2">
+                            <p>애플리케이션이 캐싱을 활용하도록 설계되지 않았더라도, 응답을 중간에 개입한 캐시가 어떻게 처리할지 고려하여 올바른 동작을 보존해야 합니다(네트워크, 서버,
+                                클라이언트 또는 중간 인프라의 어느 쪽에 개입하든 상관없음).</p>
+                        </div>
+                        <section id="freshness">
+                            <h4 id="rfc.section.4.9.1"><a href="#rfc.section.4.9.1">4.9.1.</a>&nbsp;<a
+                                    href="#freshness">신선도</a></h4>
+                            <div id="rfc.section.4.9.1.p.1">
+                                <p>짧은 신선도 수명(예: 5초)을 지정하는 것(<a href="#HTTP-CACHING"><cite
+                                            title="HTTP Caching">[HTTP-CACHING]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4.2">Section
+                                        4.2</a>)만으로도 응답을 여러 클라이언트 또는 동일한 요청을 반복하는 단일 클라이언트가 재사용할 수 있게 합니다. 일반적으로 재사용해도
+                                    안전한 것이라면 신선도 수명을 지정하는 것을 고려하십시오.</p>
+                            </div>
+                            <div id="rfc.section.4.9.1.p.2">
+                                <p>신선도를 지정하는 가장 일반적인 방법은 max-age 응답 지시자(<a href="#HTTP-CACHING"><cite
+                                            title="HTTP Caching">[HTTP-CACHING]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-5.2.2.1">Section
+                                        5.2.2.1</a>)입니다. Expires 헤더 필드(<a href="#HTTP-CACHING"><cite
+                                            title="HTTP Caching">[HTTP-CACHING]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-5.3">Section 5.3</a>)도
+                                    사용할 수 있지만 필요하지 않습니다; 모든 현대 캐시 구현은 Cache-Control 헤더 필드를 지원하고, 델타로 신선도를 지정하는 것이 보통 더
+                                    편리하고 오류가 적습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.9.1.p.3">
+                                <p>대부분의 응답에 public 응답 지시자(<a href="#HTTP-CACHING"><cite
+                                            title="HTTP Caching">[HTTP-CACHING]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-5.2.2.9">Section
+                                        5.2.2.9</a>)를 추가할 필요는 없습니다; 이는 인증된 응답을 저장하려는 경우나 캐시가 상태 코드를 이해하지 못하고 명시적 신선도 정보가
+                                    없는 경우에만 필요합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.9.1.p.4">
+                                <p>일부 상황에서는 명시적 캐시 신선도 지시자가 없는 응답이 휴리스틱 신선도 수명으로 저장되고 제공될 수 있습니다; 자세한 내용은 <a
+                                        href="#HTTP-CACHING"><cite title="HTTP Caching">[HTTP-CACHING]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4.2.2">Section
+                                        4.2.2</a>를 참조하십시오. 휴리스틱은 애플리케이션의 제어 하에 있지 않으므로, 일반적으로 명시적 신선도 수명을 설정하거나 응답을
+                                    명시적으로 캐시 불가능하게 만드는 것이 더 낫습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.9.1.p.5">
+                                <p>응답의 캐싱이 바람직하지 않은 경우 적절한 캐시 응답 지시어는 no-store입니다. 다른 지시자는 필요하지 않으며, no-store는 응답이 캐시될 수
+                                    있는 상황에서만 전송하면 됩니다; 자세한 내용은 <a href="#HTTP-CACHING"><cite
+                                            title="HTTP Caching">[HTTP-CACHING]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-3">Section 3</a>을
+                                    참조하십시오. no-cache 지시어는 응답을 저장하는 것을 허용하지만, 캐시가 검증 없이 재사용하지 못하게 할 뿐임을 유의하십시오; 이름과 달리
+                                    캐싱을 방지하지 않습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.9.1.p.6" class="avoidbreakafter">
+                                <p>예를 들어, 이 응답은 캐시에 의해 저장되거나 재사용될 수 없습니다:</p>
+                            </div>
+                            <div id="rfc.section.4.9.1.p.7">
+                                <pre class="text">
+HTTP/1.1 200 OK
+Content-Type: application/example+xml
+Cache-Control: no-store
+
+[content]
+</pre>
+                            </div>
+                        </section>
+                        <section id="stale-responses">
+                            <h4 id="rfc.section.4.9.2"><a href="#rfc.section.4.9.2">4.9.2.</a>&nbsp;<a
+                                    href="#stale-responses">오래된 응답</a></h4>
+                            <div id="rfc.section.4.9.2.p.1">
+                                <p>저자는 오래된 응답(예: Cache-Control: max-age=0)이 원본 서버와 연결이 끊겼을 때 캐시에 의해 재사용될 수 있음을 이해해야 합니다;
+                                    이는 네트워크 문제를 처리하는 데 유용할 수 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.4.9.2.p.2">
+                                <p>이런 방식이 특정 응답에 적합하지 않다면 원본은 must-revalidate 캐시 지시어를 전송해야 합니다. 추가적인 오래된 콘텐츠 제어를 위해 <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4.2.4">Section
+                                        4.2.4</a> 및 <a href="#RFC5861"><cite
+                                            title="HTTP Cache-Control Extensions for Stale Content">[RFC5861]</cite></a>를
+                                    참조하십시오.</p>
+                            </div>
+                            <div id="rfc.section.4.9.2.p.3">
+                                <p>오래된 응답은 검증자를 지정하여 새로 고칠 수 있으며, 이는 대역폭과 지연을 절약할 수 있습니다; 관련 내용은 <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9110.html#section-13">Section 13</a>을
+                                    참조하십시오.</p>
+                            </div>
+                        </section>
+                        <section id="caching-app-semantics">
+                            <h4 id="rfc.section.4.9.3"><a href="#rfc.section.4.9.3">4.9.3.</a>&nbsp;<a
+                                    href="#caching-app-semantics">캐싱과 애플리케이션 의미론</a></h4>
+                            <div id="rfc.section.4.9.3.p.1">
+                                <p>애플리케이션에 신선도 수명과 별개인 수명을 표현할 필요가 있는 경우, 이는 응답의 콘텐츠나 별도의 헤더 필드에 별도로 전달되어야 합니다. 이 경우
+                                    HTTP 캐싱과 그 수명 간의 관계를 신중히 고려해야 합니다. 응답은 신선하다고 간주되는 한 계속 사용될 것이기 때문입니다.</p>
+                            </div>
+                            <div id="rfc.section.4.9.3.p.2">
+                                <p>특히 애플리케이션 저자는 원본 서버에서 새로 얻은 것이 아닌 응답을 어떻게 처리할지 고려해야 합니다; 만약 유효 기간과 같은 개념이 있다면, 이는 응답의
+                                    연령을 고려하여 계산되어야 합니다(자세한 내용은 <a href="#HTTP-CACHING"><cite
+                                            title="HTTP Caching">[HTTP-CACHING]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4.2.3">Section
+                                        4.2.3</a> 참조).</p>
+                            </div>
+                            <div id="rfc.section.4.9.3.p.3">
+                                <p>이를 해결하는 한 가지 방법은 사용 시 응답이 신선해야 한다고 명시적으로 규정하는 것입니다.</p>
+                            </div>
+                        </section>
+                        <section id="varying-content-based-upon-the-request">
+                            <h4 id="rfc.section.4.9.4"><a href="#rfc.section.4.9.4">4.9.4.</a>&nbsp;<a
+                                    href="#varying-content-based-upon-the-request">요청에 따른 콘텐츠 변화</a></h4>
+                            <div id="rfc.section.4.9.4.p.1">
+                                <p>애플리케이션이 응답의 헤더 필드나 콘텐츠를 변경하기 위해 요청 헤더 필드를 사용하는 경우, 저자는 이것이 캐싱에 미치는 영향을 지적해야 합니다;
+                                    일반적으로 이러한 리소스는 응답을 캐시 불가능하게 만들거나(no-store) 모든 응답(기본 응답 포함)에 Vary 응답 헤더 필드(<a
+                                        href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.5">Section
+                                        12.5.5</a>)를 전송해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.4.9.4.p.2" class="avoidbreakafter">
+                                <p>예를 들어, 이 응답은:</p>
+                            </div>
+                            <div id="rfc.section.4.9.4.p.3">
+                                <pre class="text">
+HTTP/1.1 200 OK
+Content-Type: application/example+xml
+Cache-Control: max-age=60
+ETag: "sa0f8wf20fs0f"
+Vary: Accept-Encoding
+
+[content]
+</pre>
+                            </div>
+                            <div id="rfc.section.4.9.4.p.4">
+                                <p>은 개인 및 공유 캐시 모두에 의해 60초 동안 저장될 수 있고, If-None-Match로 재검증될 수 있으며, Accept-Encoding 요청 헤더
+                                    필드에 따라 달라집니다.</p>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="state">
+                        <h3 id="rfc.section.4.10"><a href="#rfc.section.4.10">4.10.</a>&nbsp;<a href="#state">애플리케이션 상태
+                                처리</a></h3>
+                        <div id="rfc.section.4.10.p.1">
+                            <p>애플리케이션은 상태 있는 쿠키 <a href="#COOKIES"><cite
+                                        title="HTTP State Management Mechanism">[COOKIES]</cite></a>를 사용하여 클라이언트를 식별하거나
+                                클라이언트별 데이터를 저장하여 요청을 맥락화할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.10.p.2">
+                            <p>사용할 때는 쿠키의 범위(scope)와 사용을 신중하게 명시하는 것이 중요합니다; 애플리케이션이 민감한 데이터나 권한을 노출하면(예: 주변 권한(ambient
+                                authority)으로 작동) 악용될 수 있습니다. 완화책으로는 클라이언트의 의도를 보장하기 위한 요청별 토큰 사용 등이 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="multiplex">
+                        <h3 id="rfc.section.4.11"><a href="#rfc.section.4.11">4.11.</a>&nbsp;<a href="#multiplex">다중 요청
+                                처리</a></h3>
+                        <div id="rfc.section.4.11.p.1">
+                            <p>클라이언트는 종종 작업을 수행하기 위해 여러 요청을 보내야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.11.p.2">
+                            <p>HTTP/1 <a href="#HTTP11"><cite title="HTTP/1.1">[HTTP/1.1]</cite></a>에서는 병렬 요청이 주로 여러 연결을
+                                여는 것으로 지원됩니다. 너무 많은 동시 연결이 사용되면 연결의 혼잡 제어가 조정되지 않아 애플리케이션 성능에 영향을 줄 수 있습니다. 또한 애플리케이션이
+                                언제 요청을 발행하고 특정 요청에 어떤 연결을 사용할지 결정하기 어려워 성능에 추가로 영향을 줄 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.11.p.3">
+                            <p>HTTP/2 <a href="#HTTP2"><cite title="HTTP/2">[HTTP/2]</cite></a> 및 HTTP/3 <a
+                                    href="#HTTP3"><cite title="HTTP/3">[HTTP/3]</cite></a>은 애플리케이션에 다중화를 제공하여 여러 연결을 사용할
+                                필요를 제거합니다. 그러나 서버가 응답 우선순위를 선택하는 방식에 따라 애플리케이션 성능이 여전히 크게 영향을 받을 수 있습니다. 애플리케이션에 따라 서버가
+                                응답의 우선순위를 결정하는 것이 최선인지, 아니면 클라이언트가 서버에 우선순위를 힌트로 제공하는 것이 좋은지(예: <a
+                                    href="#HTTP-PRIORITY"><cite
+                                        title="Extensible Prioritization Scheme for HTTP">[HTTP-PRIORITY]</cite></a> 참조)
+                                결정해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.11.p.4">
+                            <p>모든 HTTP 버전에서 요청은 독립적으로 이루어집니다 — 두 요청의 상대적 순서에 의존하여 처리 순서를 보장할 수 없습니다. 이는 요청이 중개자에 의해 다중화된
+                                프로토콜로 전송되거나 서로 다른 오리진 서버로 전송되거나 서버가 처리 순서를 다르게 수행할 수 있기 때문입니다. 두 요청에 엄격한 순서가 필요하다면, 신뢰할
+                                수 있는 유일한 방법은 첫 번째 요청에 대한 최종 응답이 시작된 후 두 번째 요청을 발행하는 것입니다.</p>
+                        </div>
+                        <div id="rfc.section.4.11.p.5">
+                            <p>애플리케이션은 단일 전송 연결에서 별도의 요청들 간의 관계에 대해 가정해서는 <em class="bcp14">안 됩니다</em>; 그렇게 하면 HTTP의
+                                무상태성 가정 중 많은 부분을 깨뜨려 상호운용성, 보안, 운용성 및 진화에 문제를 초래합니다.</p>
+                        </div>
+                    </section>
+                    <section id="client-auth">
+                        <h3 id="rfc.section.4.12"><a href="#rfc.section.4.12">4.12.</a>&nbsp;<a
+                                href="#client-auth">클라이언트 인증</a></h3>
+                        <div id="rfc.section.4.12.p.1">
+                            <p>애플리케이션은 클라이언트를 식별하기 위해 HTTP 인증(<a
+                                    href="https://www.rfc-editor.org/rfc/rfc9110.html#section-11">Section 11</a>의 <a
+                                    href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>)을 사용할 수 있습니다. <a
+                                    href="#RFC7617"><cite
+                                        title="The 'Basic' HTTP Authentication Scheme">[RFC7617]</cite></a>에 따라 Basic 인증
+                                방식은 채널이 안전하지 않다면(예: "https" URI 스킴 미사용) 민감하거나 가치 있는 정보를 보호하기에 적합하지 않습니다. 유사하게, <a
+                                    href="#RFC7616"><cite
+                                        title="HTTP Digest Access Authentication">[RFC7616]</cite></a>은 Digest 인증 방식을
+                                안전한 채널에서 사용하도록 요구합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.12.p.2">
+                            <p>HTTPS를 사용할 경우 클라이언트는 인증서를 사용하여 인증될 수 있지만 <a href="#RFC8446"><cite
+                                        title="The Transport Layer Security (TLS) Protocol Version 1.3">[RFC8446]</cite></a>,
+                                그러한 인증은 근본적으로 기저 전송 연결에 범위가 한정되어 있다는 점을 유의하십시오. 결과적으로 클라이언트는 인증된 상태가 응답 준비에 사용되었는지 알 수
+                                있는 방법이 없으며(Vary: * 및/또는 private 캐시 지시어가 부분적인 표시를 제공할 수 있음), 특정하게 비인증 응답을 얻는 유일한 방법은 새
+                                연결을 여는 것입니다.</p>
+                        </div>
+                        <div id="rfc.section.4.12.p.3">
+                            <p>사용할 때에는 인증의 범위와 사용을 신중하게 명시하는 것이 중요합니다; 애플리케이션이 민감한 데이터나 권한을 노출하면(예: 주변 권한으로 작동) 악용될 수
+                                있습니다. 완화책으로는 클라이언트의 의도를 보장하기 위한 요청별 토큰 사용 등이 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="browser">
+                        <h3 id="rfc.section.4.13"><a href="#rfc.section.4.13">4.13.</a>&nbsp;<a href="#browser">웹 브라우징과의
+                                공존</a></h3>
+                        <div id="rfc.section.4.13.p.1">
+                            <p>애플리케이션이 웹 브라우저와 함께 사용될 의도가 없더라도 그 리소스는 브라우저 및 다른 HTTP 클라이언트에서 여전히 접근 가능할 것입니다. 따라서 HTTP를
+                                사용하는 모든 애플리케이션은 브라우저가 어떻게 상호작용할지, 특히 보안과 관련하여 고려해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.13.p.2">
+                            <p>예를 들어, 애플리케이션 상태를 POST 요청으로 변경할 수 있다면, 웹 브라우저는 임의의 웹 사이트로부터 교차 사이트 요청 위조(CSRF)를 쉽게 당할 수
+                                있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.13.p.3">
+                            <p>또는 공격자가 애플리케이션 리소스에서 반환된 콘텐츠의 일부를 제어하게 되면(예: 요청의 일부가 응답에 반영되거나 응답에 포함된 외부 정보를 공격자가 변경할 수
+                                있는 경우), 공격자는 브라우저에 코드를 주입하고 출처인 것처럼 데이터와 기능에 접근할 수 있습니다. 이는 교차 사이트 스크립팅(XSS) 공격으로 알려진
+                                기법입니다.</p>
+                        </div>
+                        <div id="rfc.section.4.13.p.4">
+                            <p>이는 HTTP를 사용하는 애플리케이션이 고려해야 할 문제의 일부분에 불과합니다. 일반적으로 최선의 접근법은 애플리케이션을 실제로 웹 애플리케이션으로 간주하고
+                                그들의 안전한 개발을 위한 모범 사례를 따르는 것입니다.</p>
+                        </div>
+                        <div id="rfc.section.4.13.p.5" class="avoidbreakafter">
+                            <p>이러한 관행의 완전한 열거는 이 문서의 범위를 벗어나지만, 몇 가지 고려사항은 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.section.4.13.p.6">
+                            <ul>
+                                <li>Content-Type 헤더 필드에 애플리케이션 전용 미디어 타입을 사용하고, 클라이언트가 이를 사용하지 않으면 실패하도록 요구합니다.</li>
+                                <li>브라우저가 공격자 제어 콘텐츠를 활성 콘텐츠로 해석하지 못하도록 X-Content-Type-Options: nosniff <a
+                                        href="#FETCH"><cite title="Fetch - Living Standard">[FETCH]</cite></a>를 사용합니다.
+                                </li>
+                                <li>활성 콘텐츠(스크립트를 실행할 수 있는 HTML <a href="#HTML"><cite
+                                            title="HTML - Living Standard">[HTML]</cite></a> 및 PDF 등)의 기능을 제한하기 위해
+                                    Content-Security-Policy <a href="#CSP"><cite
+                                            title="Content Security Policy Level 3">[CSP]</cite></a>를 사용하여 XSS 공격을
+                                    완화합니다.</li>
+                                <li>Referrer-Policy <a href="#REFERRER-POLICY"><cite
+                                            title="Referrer Policy">[REFERRER-POLICY]</cite></a>를 사용하여 URL의 민감한 데이터가
+                                    Referer 요청 헤더 필드에 유출되는 것을 방지합니다.</li>
+                                <li>쿠키에 'HttpOnly' 플래그를 사용하여 쿠키가 브라우저 스크립팅 언어에 노출되지 않도록 합니다 <a href="#COOKIES"><cite
+                                            title="HTTP State Management Mechanism">[COOKIES]</cite></a>.</li>
+                                <li>인증 토큰이나 비밀번호와 같은 민감한 정보에는 압축 사용을 피하십시오. 브라우저가 제공하는 스크립팅 환경은 공격자가 압축 공간을 반복적으로 탐침할 수
+                                    있게 하며, 공격자가 통신 경로에 접근할 수 있는 경우 이 기능으로부터 정보를 복구할 수 있습니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.4.13.p.7">
+                            <p>배포 방식에 따라 HTTP를 사용하는 애플리케이션의 명세는 이러한 메커니즘의 사용을 특정 방식으로 요구할 수도 있고, 단지 보안 고려사항에서 이를 지적할 수도
+                                있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.13.p.8" class="avoidbreakafter">
+                            <p>브라우저가 해당 콘텐츠를 활성으로 처리하지 않기를 의도하는 애플리케이션의 HTTP 응답 예시는 다음과 같을 수 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.4.13.p.9">
+                            <pre class="text">
+HTTP/1.1 200 OK
+Content-Type: application/example+json
+X-Content-Type-Options: nosniff
+Content-Security-Policy: default-src 'none'
+Cache-Control: max-age=3600
+Referrer-Policy: no-referrer
+
+[content]
+</pre>
+                        </div>
+                        <div id="rfc.section.4.13.p.10">
+                            <p>애플리케이션이 브라우저 호환성을 목표로 한다면, 클라이언트 상호작용은 브라우저가 HTTP에 대해 사용하는 추상화인 <a href="#FETCH"><cite
+                                        title="Fetch - Living Standard">[FETCH]</cite></a>로 정의되어야 합니다; 이는 이러한 모범 사례 중 많은
+                                것을 강제합니다.</p>
+                        </div>
+                    </section>
+                    <section id="other-apps">
+                        <h3 id="rfc.section.4.14"><a href="#rfc.section.4.14">4.14.</a>&nbsp;<a
+                                href="#other-apps">애플리케이션 경계 유지</a></h3>
+                        <div id="rfc.section.4.14.p.1">
+                            <p>많은 HTTP 기능이 출처(origin)에 범위가 한정되어 있기 때문에 <a href="#RFC6454"><cite
+                                        title="The Web Origin Concept">[RFC6454]</cite></a>, 애플리케이션은 동일한 오리진 서버를 사용하는 다른
+                                애플리케이션(웹 브라우징 포함)과 배포가 어떻게 상호작용할지 고려해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.14.p.2">
+                            <p>예를 들어 애플리케이션이 애플리케이션 상태를 전달하기 위해 쿠키 <a href="#COOKIES"><cite
+                                        title="HTTP State Management Mechanism">[COOKIES]</cite></a>를 사용하는 경우, 쿠키는
+                                기본적으로(경로로 범위가 지정되지 않는 한) 해당 오리진에 대한 모든 요청에 함께 전송되며, 애플리케이션은 동일한 오리진의 다른 애플리케이션으로부터 쿠키를
+                                받을 수 있습니다. 이는 보안 문제와 쿠키 이름 충돌을 초래할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.14.p.3">
+                            <p>이러한 문제에 대한 한 가지 해결책은 애플리케이션에 전용 호스트 이름을 요구하여 고유한 오리진을 갖게 하는 것입니다. 그러나 여러 애플리케이션을 단일 호스트
+                                이름에 배포하는 것이 바람직할 때가 많습니다; 그렇게 하면 배포의 유연성이 극대화되고 애플리케이션을 "혼합"할 수 있게 됩니다(자세한 내용은 <a
+                                    href="#BCP190"><cite title="URI Design and Ownership">[BCP190]</cite></a> 참조).</p>
+                        </div>
+                        <div id="rfc.section.4.14.p.4">
+                            <p>따라서 HTTP를 사용하는 애플리케이션은 오리진에서 여러 애플리케이션이 공존할 수 있도록 노력해야 합니다. 특히 쿠키, HTTP 인증 영역(<a
+                                    href="#HTTP"><cite title="HTTP Semantics">[HTTP]</cite></a>) 또는 다른 오리진 전체의 HTTP
+                                메커니즘을 지정할 때 애플리케이션은 특정 이름의 사용을 강제하기보다는 배포가 이를 구성하도록 두어야 합니다. 해당 메커니즘이 제공하는 부분적 범위 지정 방식을
+                                사용하는 것을 고려해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.14.p.5">
+                            <p>현대 웹 브라우저는 한 오리진의 콘텐츠가 다른 오리진의 리소스에 접근하는 것을 제한하여 개인 정보를 유출하지 않도록 합니다. 결과적으로 브라우저에 교차 출처
+                                데이터를 노출하려는 애플리케이션은 CORS 프로토콜을 구현해야 합니다; <a href="#FETCH"><cite
+                                        title="Fetch - Living Standard">[FETCH]</cite></a>를 참조하십시오.</p>
+                        </div>
+                    </section>
+                    <section id="server-push">
+                        <h3 id="rfc.section.4.15"><a href="#rfc.section.4.15">4.15.</a>&nbsp;<a href="#server-push">서버
+                                푸시 사용</a></h3>
+                        <div id="rfc.section.4.15.p.1" class="avoidbreakafter">
+                            <p>HTTP/2는 서버가 클라이언트에게 요청/응답 쌍을 "푸시"할 수 있는 기능을 추가했습니다 <a href="#HTTP2"><cite
+                                        title="HTTP/2">[HTTP/2]</cite></a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9113.html#section-8.4">Section 8.4</a>. 서버
+                                푸시는 팬아웃이나 발행/구독과 같은 많은 일반적인 애플리케이션 의미론에 자연스럽게 맞아 보이지만 몇 가지 주의사항이 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.4.15.p.2">
+                            <ul>
+                                <li>서버 푸시는 홉별이며 중개자에 의해 자동으로 전달되지 않습니다. 따라서 프록시, 리버스 프록시 및 CDN과 쉽게(또는 전혀) 작동하지 않을 수
+                                    있습니다.</li>
+                                <li>서버 푸시는 잘못 사용하면 클라이언트가 실제로 요청한 리소스와 경쟁하는 경우 특히 HTTP 성능에 부정적인 영향을 미칠 수 있습니다.</li>
+                                <li>서버 푸시는 HTTP 캐싱과의 상호작용에 관해 클라이언트마다 다르게 구현되며 기능이 다양할 수 있습니다.</li>
+                                <li>서버 푸시에 대한 API는 일부 구현에서 현재 제공되지 않으며 다른 구현에서는 크게 다릅니다. 특히 현재 브라우저용 API는 없습니다.</li>
+                                <li>서버 푸시는 HTTP/1.1 또는 HTTP/1.0에서는 지원되지 않습니다.</li>
+                                <li>서버 푸시는 HTTP의 "핵심" 의미론의 일부가 아니므로 향후 버전의 프로토콜에서 지원되지 않을 수 있습니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.4.15.p.3">
+                            <p>클라이언트가 전체 응답이 준비되기 전에 관련 작업을 수행할 수 있도록 최적화하려는 애플리케이션은 103 (Early Hints) 상태 코드 사용으로 이점을 얻을
+                                수 있습니다; <a href="#RFC8297"><cite
+                                        title="An HTTP Status Code for Indicating Hints">[RFC8297]</cite></a>를 참조하십시오.
+                            </p>
+                        </div>
+                        <div id="rfc.section.4.15.p.4">
+                            <p>서버 푸시를 직접 사용하는 애플리케이션은 교차 출처 푸시 공격을 피하기 위해 <a href="#HTTP2"><cite
+                                        title="HTTP/2">[HTTP/2]</cite></a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9113.html#section-8.4">Section 8.4</a>의 권한
+                                관련 요구사항을 준수해야 합니다.</p>
+                        </div>
+                    </section>
+                    <section id="versioning">
+                        <h3 id="rfc.section.4.16"><a href="#rfc.section.4.16">4.16.</a>&nbsp;<a href="#versioning">버전 관리
+                                및 진화 허용</a></h3>
+                        <div id="rfc.section.4.16.p.1">
+                            <p>애플리케이션 프로토콜에 새 기능을 도입하고 기존 기능을 변경해야 하는 경우가 자주 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.16.p.2" class="avoidbreakafter">
+                            <p>HTTP에서는 다음과 같은 메커니즘을 사용하여 하위 호환성이 없는 변경을 할 수 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.4.16.p.3">
+                            <ul>
+                                <li>새 기능을 구현하는 리소스의 URL을 식별하기 위해 별도의 링크 관계 유형을 사용하는 것 <a href="#WEB-LINKING"><cite
+                                            title="Web Linking">[WEB-LINKING]</cite></a>.</li>
+                                <li>새 기능을 가능하게 하는 형식을 식별하기 위해 별도의 미디어 타입을 사용하는 것 <a href="#RFC6838"><cite
+                                            title="Media Type Specifications and Registration Procedures">[RFC6838]</cite></a>.
+                                </li>
+                                <li>메시지 콘텐츠 외부에서 새 기능을 구현하기 위해 별도의 HTTP 헤더 필드를 사용하는 것.</li>
+                            </ul>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="iana-considerations">
+                    <h2 id="rfc.section.5" class="np"><a href="#rfc.section.5">5.</a>&nbsp;<a
+                            href="#iana-considerations">IANA 고려사항</a></h2>
+                    <div id="rfc.section.5.p.1">
+                        <p>이 문서는 IANA 조치가 없습니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="security-considerations">
+                    <h2 id="rfc.section.6" class="np"><a href="#rfc.section.6">6.</a>&nbsp;<a
+                            href="#security-considerations">보안 고려사항</a></h2>
+                    <div id="rfc.section.6.p.1">
+                        <p>HTTP를 사용하는 애플리케이션은 HTTP 자체 및 사용되는 확장의 보안 고려사항의 적용을 받습니다; <a href="#HTTP"><cite
+                                    title="HTTP Semantics">[HTTP]</cite></a>, <a href="#HTTP-CACHING"><cite
+                                    title="HTTP Caching">[HTTP-CACHING]</cite></a>, 및 <a href="#WEB-LINKING"><cite
+                                    title="Web Linking">[WEB-LINKING]</cite></a> 등이 관련되는 경우가 많습니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.2">
+                        <p><a href="#scheme" title="Considering URI Schemes">섹션 4.4.2</a>는 "https" URL의 지원을 권장하고 인증, 무결성
+                            및 기밀성을 제공하며 만연한 감시 공격을 완화하기 위해 "http" URL의 사용을 지양할 것을 권고합니다. 많은 HTTP 기반 애플리케이션은 베어러 토큰(예: 세션
+                            쿠키)에 의한 인증 및 권한 부여를 수행합니다. 전송이 암호화되지 않은 경우, HTTP 통신을 도청하거나 변조할 수 있는 공격자는 종종 권한을 상승시켜 리소스에 대한
+                            작업을 수행할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.3">
+                        <p><a href="#caching-app-semantics" title="Caching and Application Semantics">섹션 4.9.3</a>은 HTTP
+                            캐싱과 응답 또는 그 안의 정보의 애플리케이션별 저장 간의 불일치 가능성을 강조합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.4">
+                        <p><a href="#state" title="Handling Application State">섹션 4.10</a>은 프로토콜에서 상태성 메커니즘을 주변
+                            권한(ambient authority)으로 사용하는 영향에 대해 논의하고 완화책을 제안합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.5">
+                        <p><a href="#browser" title="Coexisting with Web Browsing">섹션 4.13</a>은 웹 브라우저의 기능이 HTTP를 사용하는
+                            애플리케이션에 미치는 영향을 강조합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.6">
+                        <p><a href="#other-apps" title="Maintaining Application Boundaries">섹션 4.14</a>은 애플리케이션이 웹사이트(및
+                            다른 애플리케이션)과 동일한 오리진에 배포될 때 발생하는 문제들을 논의합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.7">
+                        <p><a href="#server-push" title="Using Server Push">섹션 4.15</a>는 규정된 방식 이외로 HTTP/2 서버 푸시를 사용할 때의
+                            위험을 강조합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.8">
+                        <p>새 URI 스킴이나 비표준 메서드 지원을 요구하는 등 구현의 수정을 수반하는 방식으로 HTTP를 사용하는 애플리케이션은 해당 구현이 원래의 HTTP 구현과 "포크"될
+                            위험이 있으며, 그 결과 상류에서 통합된 패치나 기타 보안 개선의 혜택을 받지 못할 수 있습니다.</p>
+                    </div>
+                    <section id="privacy-considerations">
+                        <h3 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a>&nbsp;<a
+                                href="#privacy-considerations">개인정보 보호 고려사항</a></h3>
+                        <div id="rfc.section.6.1.p.1">
+                            <p>HTTP 클라이언트는 서버에 다양한 정보를 노출할 수 있습니다. 애플리케이션의 동작의 일부로 명시적으로 전송되는 정보(예: 이름 및 사용자가 입력한 기타
+                                데이터)와 "전송 중"의 정보(이것이 <a href="#scheme" title="Considering URI Schemes">섹션 4.4.2</a>에서
+                                "https"가 권장되는 이유 중 하나입니다) 외에도, 덜 명백한 수단을 통해 시간이 지남에 따라 사용자의 활동을 연결하여 다른 정보를 수집할 수 있습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.6.1.p.2">
+                            <p>여기에는 세션 정보, 클라이언트의 지문(fingerprinting)을 통한 추적, 코드 실행 등이 포함됩니다.</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.3">
+                            <p>세션 정보에는 클라이언트의 IP 주소, TLS 세션 티켓, 쿠키, 클라이언트 캐시에 저장된 ETag 및 기타 상태성 메커니즘이 포함됩니다. 애플리케이션은
+                                불가피하거나 운영에 필요하지 않는 한 세션 메커니즘의 사용을 피하는 것이 권장되며, 필요한 경우 이러한 위험을 문서화해야 합니다. 사용되는 경우 구현체가
+                                이러한 상태를 지우도록 허용하는 것을 장려해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.4">
+                            <p>지문 추적은 클라이언트 메시지와 동작의 고유한 특성을 이용해 서로 다른 요청과 연결하는 기법입니다. 예를 들어 User-Agent 요청 헤더 필드는 구현에 관한
+                                특정 정보를 전달하고, Accept-Language 요청 헤더 필드는 사용자의 선호 언어를 전달합니다. 이러한 여러 표시기가 결합되면 클라이언트를 고유하게
+                                식별하는 데 사용되어 그 사용자의 데이터 통제에 영향을 줄 수 있습니다. 따라서 애플리케이션은 클라이언트가 요청에서 기능 수행에 필요한 정보만 발신하도록
+                                지정하도록 권고합니다.</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.5">
+                            <p>마지막으로, 애플리케이션이 코드 실행 기능을 노출하는 경우 환경을 관찰할 수 있는 모든 능력은 클라이언트 지문 생성과 개인 데이터(세션 정보 포함)의 획득 및
+                                조작 기회로 사용될 수 있으므로 큰 주의가 필요합니다. 예를 들어 고해상도 타이머에 대한 접근(간접 포함)은 하드웨어를 프로파일링하여 시스템의 고유 식별자를
+                                생성하는 데 사용될 수 있습니다. 애플리케이션은 가능한 한 모바일 코드 사용을 허용하지 않는 것이 권장되며, 피할 수 없는 경우 해당 시스템의 보안 속성을
+                                신중하게 검토해야 합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section class="np">
+                    <div id="rfc.references">
+                        <h2 id="rfc.section.7"><a href="#rfc.section.7">7.</a> 참고문헌</h2>
+                        <section>
+                            <div id="rfc.references.2">
+                                <h3 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a> 규범적 참조</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="BCP190">[<a href="#BCP190" class="smpl">BCP190</a>]</dt>
+                                    <dd>Nottingham, M., “<a href="https://www.rfc-editor.org/rfc/rfc8820">URI Design and
+                                            Ownership</a>”, <a href="https://www.rfc-editor.org/info/bcp190">BCP
+                                            190</a>, RFC 8820, <a href="https://dx.doi.org/10.17487/RFC8820">DOI
+                                            10.17487/RFC8820</a>, 2020년 6월, &lt;<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8820">https://www.rfc-editor.org/rfc/rfc8820</a>&gt;.
+                                    </dd>
+                                    <dt id="HTTP">[<a href="#HTTP" class="smpl">HTTP</a>]</dt>
+                                    <dd>Fielding, R., 편집., Nottingham, M., 편집., 및 J. Reschke, 편집., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9110.html">HTTP Semantics</a>”, <a
+                                            href="https://www.rfc-editor.org/info/std97">STD 97</a>, RFC 9110, <a
+                                            href="https://dx.doi.org/10.17487/RFC9110">DOI 10.17487/RFC9110</a>, 2022년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9110">https://www.rfc-editor.org/info/rfc9110</a>&gt;.
+                                    </dd>
+                                    <dt id="HTTP-CACHING">[<a href="#HTTP-CACHING" class="smpl">HTTP-CACHING</a>]</dt>
+                                    <dd>Fielding, R., 편집., Nottingham, M., 편집., 및 J. Reschke, 편집., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9111.html">HTTP Caching</a>”, <a
+                                            href="https://www.rfc-editor.org/info/std98">STD 98</a>, RFC 9111, <a
+                                            href="https://dx.doi.org/10.17487/RFC9111">DOI 10.17487/RFC9111</a>, 2022년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9111">https://www.rfc-editor.org/info/rfc9111</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                    <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">Key words
+                                            for use in RFCs to Indicate Requirement Levels</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 2119, <a
+                                            href="https://dx.doi.org/10.17487/RFC2119">DOI 10.17487/RFC2119</a>, 1997년
+                                        3월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6454">[<a href="#RFC6454" class="smpl">RFC6454</a>]</dt>
+                                    <dd>Barth, A., “<a href="https://www.rfc-editor.org/rfc/rfc6454.html">The Web Origin
+                                            Concept</a>”, RFC 6454, <a href="https://dx.doi.org/10.17487/RFC6454">DOI
+                                            10.17487/RFC6454</a>, 2011년 12월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6454">https://www.rfc-editor.org/info/rfc6454</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6648">[<a href="#RFC6648" class="smpl">RFC6648</a>]</dt>
+                                    <dd>Saint-Andre, P., Crocker, D., 및 M. Nottingham, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc6648.html">Deprecating the "X-"
+                                            Prefix and Similar Constructs in Application Protocols</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp178">BCP 178</a>, RFC 6648, <a
+                                            href="https://dx.doi.org/10.17487/RFC6648">DOI 10.17487/RFC6648</a>, 2012년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6648">https://www.rfc-editor.org/info/rfc6648</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6838">[<a href="#RFC6838" class="smpl">RFC6838</a>]</dt>
+                                    <dd>Freed, N., Klensin, J., 및 T. Hansen, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc6838.html">Media Type Specifications
+                                            and Registration Procedures</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp13">BCP 13</a>, RFC 6838, <a
+                                            href="https://dx.doi.org/10.17487/RFC6838">DOI 10.17487/RFC6838</a>, 2013년
+                                        1월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6838">https://www.rfc-editor.org/info/rfc6838</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8174">[<a href="#RFC8174" class="smpl">RFC8174</a>]</dt>
+                                    <dd>Leiba, B., “<a href="https://www.rfc-editor.org/rfc/rfc8174.html">Ambiguity of
+                                            Uppercase vs Lowercase in RFC 2119 Key Words</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 8174, <a
+                                            href="https://dx.doi.org/10.17487/RFC8174">DOI 10.17487/RFC8174</a>, 2017년
+                                        5월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;.
+                                    </dd>
+                                    <dt id="STRUCTURED-FIELDS">[<a href="#STRUCTURED-FIELDS"
+                                            class="smpl">STRUCTURED-FIELDS</a>]</dt>
+                                    <dd>Nottingham, M. 및 P-H. Kamp, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8941.html">Structured Field Values
+                                            for HTTP</a>”, RFC 8941, <a href="https://dx.doi.org/10.17487/RFC8941">DOI
+                                            10.17487/RFC8941</a>, 2021년 2월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8941">https://www.rfc-editor.org/info/rfc8941</a>&gt;.
+                                    </dd>
+                                    <dt id="URL">[<a href="#URL" class="smpl">URL</a>]</dt>
+                                    <dd>Berners-Lee, T., Fielding, R., 및 L. Masinter, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc3986.html">Uniform Resource
+                                            Identifier (URI): Generic Syntax</a>”, <a
+                                            href="https://www.rfc-editor.org/info/std66">STD 66</a>, RFC 3986, <a
+                                            href="https://dx.doi.org/10.17487/RFC3986">DOI 10.17487/RFC3986</a>, 2005년
+                                        1월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;.
+                                    </dd>
+                                    <dt id="WEB-LINKING">[<a href="#WEB-LINKING" class="smpl">WEB-LINKING</a>]</dt>
+                                    <dd>Nottingham, M., “<a href="https://www.rfc-editor.org/rfc/rfc8288.html">Web
+                                            Linking</a>”, RFC 8288, <a href="https://dx.doi.org/10.17487/RFC8288">DOI
+                                            10.17487/RFC8288</a>, 2017년 10월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8288">https://www.rfc-editor.org/info/rfc8288</a>&gt;.
+                                    </dd>
+                                    <dt id="WELL-KNOWN-URI">[<a href="#WELL-KNOWN-URI" class="smpl">WELL-KNOWN-URI</a>]
+                                    </dt>
+                                    <dd>Nottingham, M., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8615.html">Well-Known Uniform
+                                            Resource Identifiers (URIs)</a>”, RFC 8615, <a
+                                            href="https://dx.doi.org/10.17487/RFC8615">DOI 10.17487/RFC8615</a>, 2019년
+                                        5월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8615">https://www.rfc-editor.org/info/rfc8615</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                        <section>
+                            <div id="rfc.references.3">
+                                <h3 id="rfc.section.7.2"><a href="#rfc.section.7.2">7.2.</a> 참고 참조</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="COOKIES">[<a href="#COOKIES" class="smpl">COOKIES</a>]</dt>
+                                    <dd>Barth, A., “<a href="https://www.rfc-editor.org/rfc/rfc6265.html">HTTP State
+                                            Management Mechanism</a>”, RFC 6265, <a
+                                            href="https://dx.doi.org/10.17487/RFC6265">DOI 10.17487/RFC6265</a>, 2011년
+                                        4월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6265">https://www.rfc-editor.org/info/rfc6265</a>&gt;.
+                                    </dd>
+                                    <dt id="CSP">[<a href="#CSP" class="smpl">CSP</a>]</dt>
+                                    <dd>West, M., “<a href="https://www.w3.org/TR/2021/WD-CSP3-20210629">Content
+                                            Security Policy Level 3</a>”, W3C 작업 초안, 2021년 6월, &lt;<a
+                                            href="https://www.w3.org/TR/2021/WD-CSP3-20210629">https://www.w3.org/TR/2021/WD-CSP3-20210629</a>&gt;.
+                                    </dd>
+                                    <dt id="FETCH">[<a href="#FETCH" class="smpl">FETCH</a>]</dt>
+                                    <dd>WHATWG, “<a href="https://fetch.spec.whatwg.org">Fetch - Living Standard</a>”,
+                                        &lt;<a
+                                            href="https://fetch.spec.whatwg.org">https://fetch.spec.whatwg.org</a>&gt;.
+                                    </dd>
+                                    <dt id="HTML">[<a href="#HTML" class="smpl">HTML</a>]</dt>
+                                    <dd>WHATWG, “<a href="https://html.spec.whatwg.org">HTML - Living Standard</a>”,
+                                        &lt;<a href="https://html.spec.whatwg.org">https://html.spec.whatwg.org</a>&gt;.
+                                    </dd>
+                                    <dt id="HTTP-PRIORITY">[<a href="#HTTP-PRIORITY" class="smpl">HTTP-PRIORITY</a>]
+                                    </dt>
+                                    <dd>一穂, 奥. 및 L. Pardue, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9218.html">Extensible Prioritization
+                                            Scheme for HTTP</a>”, RFC 9218, <a
+                                            href="https://dx.doi.org/10.17487/RFC9218">DOI 10.17487/RFC9218</a>, 2022년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9218">https://www.rfc-editor.org/info/rfc9218</a>&gt;.
+                                    </dd>
+                                    <dt id="HTTP11">[<a href="#HTTP11" class="smpl">HTTP/1.1</a>]</dt>
+                                    <dd>Fielding, R., 편집., Nottingham, M., 편집., 및 J. Reschke, 편집., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9112.html">HTTP/1.1</a>”, <a
+                                            href="https://www.rfc-editor.org/info/std99">STD 99</a>, RFC 9112, <a
+                                            href="https://dx.doi.org/10.17487/RFC9112">DOI 10.17487/RFC9112</a>, 2022년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9112">https://www.rfc-editor.org/info/rfc9112</a>&gt;.
+                                    </dd>
+                                    <dt id="HTTP2">[<a href="#HTTP2" class="smpl">HTTP/2</a>]</dt>
+                                    <dd>Thomson, M., 편집. 및 C. Benfield, 편집., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9113.html">HTTP/2</a>”, RFC 9113, <a
+                                            href="https://dx.doi.org/10.17487/RFC9113">DOI 10.17487/RFC9113</a>, 2022년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9113">https://www.rfc-editor.org/info/rfc9113</a>&gt;.
+                                    </dd>
+                                    <dt id="HTTP3">[<a href="#HTTP3" class="smpl">HTTP/3</a>]</dt>
+                                    <dd>Bishop, M., 편집., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9114.html">HTTP/3</a>”, RFC 9114, <a
+                                            href="https://dx.doi.org/10.17487/RFC9114">DOI 10.17487/RFC9114</a>, 2022년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9114">https://www.rfc-editor.org/info/rfc9114</a>&gt;.
+                                    </dd>
+                                    <dt id="JSON">[<a href="#JSON" class="smpl">JSON</a>]</dt>
+                                    <dd>Bray, T., 편집., “<a href="https://www.rfc-editor.org/rfc/rfc8259.html">The
+                                            JavaScript Object Notation (JSON) Data Interchange Format</a>”, <a
+                                            href="https://www.rfc-editor.org/info/std90">STD 90</a>, RFC 8259, <a
+                                            href="https://dx.doi.org/10.17487/RFC8259">DOI 10.17487/RFC8259</a>, 2017년
+                                        12월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8259">https://www.rfc-editor.org/info/rfc8259</a>&gt;.
+                                    </dd>
+                                    <dt id="PROBLEM-DETAILS">[<a href="#PROBLEM-DETAILS"
+                                            class="smpl">PROBLEM-DETAILS</a>]</dt>
+                                    <dd>Nottingham, M. 및 E. Wilde, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7807.html">Problem Details for HTTP
+                                            APIs</a>”, RFC 7807, <a href="https://dx.doi.org/10.17487/RFC7807">DOI
+                                            10.17487/RFC7807</a>, 2016년 3월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7807">https://www.rfc-editor.org/info/rfc7807</a>&gt;.
+                                    </dd>
+                                    <dt id="REFERRER-POLICY">[<a href="#REFERRER-POLICY"
+                                            class="smpl">REFERRER-POLICY</a>]</dt>
+                                    <dd>Eisinger, J. 및 E. Stark, “<a
+                                            href="https://www.w3.org/TR/2017/CR-referrer-policy-20170126">Referrer
+                                            Policy</a>”, W3C 후보 권고 CR-referrer-policy-20170126, 2017년 1월, &lt;<a
+                                            href="https://www.w3.org/TR/2017/CR-referrer-policy-20170126">https://www.w3.org/TR/2017/CR-referrer-policy-20170126</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC3205">[<a href="#RFC3205" class="smpl">RFC3205</a>]</dt>
+                                    <dd>Moore, K., “<a href="https://www.rfc-editor.org/rfc/rfc3205.html">On the use of
+                                            HTTP as a Substrate</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp56">BCP 56</a>, RFC 3205, <a
+                                            href="https://dx.doi.org/10.17487/RFC3205">DOI 10.17487/RFC3205</a>, 2002년
+                                        2월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc3205">https://www.rfc-editor.org/info/rfc3205</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC4791">[<a href="#RFC4791" class="smpl">RFC4791</a>]</dt>
+                                    <dd>Daboo, C., Desruisseaux, B., 및 L. Dusseault, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc4791.html">Calendaring Extensions to
+                                            WebDAV (CalDAV)</a>”, RFC 4791, <a
+                                            href="https://dx.doi.org/10.17487/RFC4791">DOI 10.17487/RFC4791</a>, 2007년
+                                        3월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc4791">https://www.rfc-editor.org/info/rfc4791</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC4918">[<a href="#RFC4918" class="smpl">RFC4918</a>]</dt>
+                                    <dd>Dusseault, L., 편집., “<a href="https://www.rfc-editor.org/rfc/rfc4918.html">HTTP
+                                            Extensions for Web Distributed Authoring and Versioning (WebDAV)</a>”, RFC
+                                        4918, <a href="https://dx.doi.org/10.17487/RFC4918">DOI 10.17487/RFC4918</a>,
+                                        2007년 6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc4918">https://www.rfc-editor.org/info/rfc4918</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC5861">[<a href="#RFC5861" class="smpl">RFC5861</a>]</dt>
+                                    <dd>Nottingham, M., “<a href="https://www.rfc-editor.org/rfc/rfc5861.html">HTTP
+                                            Cache-Control Extensions for Stale Content</a>”, RFC 5861, <a
+                                            href="https://dx.doi.org/10.17487/RFC5861">DOI 10.17487/RFC5861</a>, 2010년
+                                        5월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc5861">https://www.rfc-editor.org/info/rfc5861</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6415">[<a href="#RFC6415" class="smpl">RFC6415</a>]</dt>
+                                    <dd>Hammer-Lahav, E., 편집. 및 B. Cook, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc6415.html">Web Host Metadata</a>”,
+                                        RFC 6415, <a href="https://dx.doi.org/10.17487/RFC6415">DOI
+                                            10.17487/RFC6415</a>, 2011년 10월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6415">https://www.rfc-editor.org/info/rfc6415</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6797">[<a href="#RFC6797" class="smpl">RFC6797</a>]</dt>
+                                    <dd>Hodges, J., Jackson, C., 및 A. Barth, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc6797.html">HTTP Strict Transport
+                                            Security (HSTS)</a>”, RFC 6797, <a
+                                            href="https://dx.doi.org/10.17487/RFC6797">DOI 10.17487/RFC6797</a>, 2012년
+                                        11월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6797">https://www.rfc-editor.org/info/rfc6797</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7258">[<a href="#RFC7258" class="smpl">RFC7258</a>]</dt>
+                                    <dd>Farrell, S. 및 H. Tschofenig, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7258.html">Pervasive Monitoring Is
+                                            an Attack</a>”, <a href="https://www.rfc-editor.org/info/bcp188">BCP
+                                            188</a>, RFC 7258, <a href="https://dx.doi.org/10.17487/RFC7258">DOI
+                                            10.17487/RFC7258</a>, 2014년 5월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7258">https://www.rfc-editor.org/info/rfc7258</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7301">[<a href="#RFC7301" class="smpl">RFC7301</a>]</dt>
+                                    <dd>Friedl, S., Popov, A., Langley, A., 및 E. Stephan, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7301.html">Transport Layer Security
+                                            (TLS) Application-Layer Protocol Negotiation Extension</a>”, RFC 7301, <a
+                                            href="https://dx.doi.org/10.17487/RFC7301">DOI 10.17487/RFC7301</a>, 2014년
+                                        7월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7301">https://www.rfc-editor.org/info/rfc7301</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7595">[<a href="#RFC7595" class="smpl">RFC7595</a>]</dt>
+                                    <dd>Thaler, D., 편집., Hansen, T., 및 T. Hardie, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7595.html">Guidelines and
+                                            Registration Procedures for URI Schemes</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp35">BCP 35</a>, RFC 7595, <a
+                                            href="https://dx.doi.org/10.17487/RFC7595">DOI 10.17487/RFC7595</a>, 2015년
+                                        6월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7595">https://www.rfc-editor.org/info/rfc7595</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7605">[<a href="#RFC7605" class="smpl">RFC7605</a>]</dt>
+                                    <dd>Touch, J., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7605.html">Recommendations on Using
+                                            Assigned Transport Port Numbers</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp165">BCP 165</a>, RFC 7605, <a
+                                            href="https://dx.doi.org/10.17487/RFC7605">DOI 10.17487/RFC7605</a>, 2015년
+                                        8월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7605">https://www.rfc-editor.org/info/rfc7605</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7616">[<a href="#RFC7616" class="smpl">RFC7616</a>]</dt>
+                                    <dd>Shekh-Yusef, R., 편집., Ahrens, D., 및 S. Bremer, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7616.html">HTTP Digest Access
+                                            Authentication</a>”, RFC 7616, <a
+                                            href="https://dx.doi.org/10.17487/RFC7616">DOI 10.17487/RFC7616</a>, 2015년
+                                        9월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7616">https://www.rfc-editor.org/info/rfc7616</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7617">[<a href="#RFC7617" class="smpl">RFC7617</a>]</dt>
+                                    <dd>Reschke, J., “<a href="https://www.rfc-editor.org/rfc/rfc7617.html">The 'Basic'
+                                            HTTP Authentication Scheme</a>”, RFC 7617, <a
+                                            href="https://dx.doi.org/10.17487/RFC7617">DOI 10.17487/RFC7617</a>, 2015년
+                                        9월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7617">https://www.rfc-editor.org/info/rfc7617</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8297">[<a href="#RFC8297" class="smpl">RFC8297</a>]</dt>
+                                    <dd>Oku, K., “<a href="https://www.rfc-editor.org/rfc/rfc8297.html">An HTTP Status
+                                            Code for Indicating Hints</a>”, RFC 8297, <a
+                                            href="https://dx.doi.org/10.17487/RFC8297">DOI 10.17487/RFC8297</a>, 2017년
+                                        12월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8297">https://www.rfc-editor.org/info/rfc8297</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8446">[<a href="#RFC8446" class="smpl">RFC8446</a>]</dt>
+                                    <dd>Rescorla, E., “<a href="https://www.rfc-editor.org/rfc/rfc8446.html">The
+                                            Transport Layer Security (TLS) Protocol Version 1.3</a>”, RFC 8446, <a
+                                            href="https://dx.doi.org/10.17487/RFC8446">DOI 10.17487/RFC8446</a>, 2018년
+                                        8월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8470">[<a href="#RFC8470" class="smpl">RFC8470</a>]</dt>
+                                    <dd>Thomson, M., Nottingham, M., 및 W. Tarreau, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8470.html">Using Early Data in
+                                            HTTP</a>”, RFC 8470, <a href="https://dx.doi.org/10.17487/RFC8470">DOI
+                                            10.17487/RFC8470</a>, 2018년 9월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8470">https://www.rfc-editor.org/info/rfc8470</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8949">[<a href="#RFC8949" class="smpl">RFC8949</a>]</dt>
+                                    <dd>Bormann, C. 및 P. Hoffman, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8949.html">Concise Binary Object
+                                            Representation (CBOR)</a>”, <a
+                                            href="https://www.rfc-editor.org/info/std94">STD 94</a>, RFC 8949, <a
+                                            href="https://dx.doi.org/10.17487/RFC8949">DOI 10.17487/RFC8949</a>, 2020년
+                                        12월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8949">https://www.rfc-editor.org/info/rfc8949</a>&gt;.
+                                    </dd>
+                                    <dt id="SECCTXT">[<a href="#SECCTXT" class="smpl">SECCTXT</a>]</dt>
+                                    <dd>West, M., “<a
+                                            href="https://www.w3.org/TR/2021/CRD-secure-contexts-20210918">Secure
+                                            Contexts</a>”, W3C 후보 권고, 2021년 9월, &lt;<a
+                                            href="https://www.w3.org/TR/2021/CRD-secure-contexts-20210918">https://www.w3.org/TR/2021/CRD-secure-contexts-20210918</a>&gt;.
+                                    </dd>
+                                    <dt id="URI-TEMPLATE">[<a href="#URI-TEMPLATE" class="smpl">URI-TEMPLATE</a>]</dt>
+                                    <dd>Gregorio, J., Fielding, R., Hadley, M., Nottingham, M., 및 D. Orchard, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc6570.html">URI Template</a>”, RFC
+                                        6570, <a href="https://dx.doi.org/10.17487/RFC6570">DOI 10.17487/RFC6570</a>,
+                                        2012년 3월, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6570">https://www.rfc-editor.org/info/rfc6570</a>&gt;.
+                                    </dd>
+                                    <dt id="XML">[<a href="#XML" class="smpl">XML</a>]</dt>
+                                    <dd>Bray, T., Paoli, J., Sperberg-McQueen, M., Maler, E., 및 F. Yergeau, “<a
+                                            href="https://www.w3.org/TR/2008/REC-xml-20081126">Extensible Markup
+                                            Language (XML) 1.0 (Fifth Edition)</a>”, W3C 권고, 2008년 11월, &lt;<a
+                                            href="https://www.w3.org/TR/2008/REC-xml-20081126">https://www.w3.org/TR/2008/REC-xml-20081126</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="changes-from-rfc-3205">
+                    <h2 id="rfc.section.A" class="np"><a href="#rfc.section.A">Appendix A.</a>&nbsp;<a
+                            href="#changes-from-rfc-3205">RFC 3205로부터의 변경사항</a></h2>
+                    <div id="rfc.section.A.p.1">
+                        <p><a href="#RFC3205"><cite title="On the use of HTTP as a Substrate">[RFC3205]</cite></a>
+                            은 2000년대 초반의 프로토콜 설계자들이 직면한 우려를 바탕으로 당시의 최선 관행을 담고 있었습니다. 그 이후 HTTP의 사용은 상당히 변화했으므로 이 문서는
+                            상당히 다릅니다. 결과적으로 변경 사항이 너무 많아 개별적으로 모두 나열할 수 없습니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="rfc.authors" class="np">
+                    <h2><a href="#rfc.authors">작성자 주소</a></h2>
+                    <address><b>Mark Nottingham</b><br>Prahran<br>Australia<br>EMail: <a
+                            href="mailto:mnot@mnot.net">mnot@mnot.net</a><br>URI: <a
+                            href="https://www.mnot.net/">https://www.mnot.net/</a></address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
