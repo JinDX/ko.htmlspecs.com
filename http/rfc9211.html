@@ -1,0 +1,984 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 9211 - Cache-Status HTTP 응답 헤더 필드</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC9211">
+    <meta property="og:description" content="The Cache-Status HTTP Response Header Field">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc9211.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 The Cache-Status HTTP Response Header Field" href="#rfc.section.2">
+    <link rel="Chapter" title="3 Examples" href="#rfc.section.3">
+    <link rel="Chapter" title="4 Defining New Cache-Status Parameters" href="#rfc.section.4">
+    <link rel="Chapter" title="5 IANA Considerations" href="#rfc.section.5">
+    <link rel="Chapter" title="6 Security Considerations" href="#rfc.section.6">
+    <link rel="Chapter" title="7 References" href="#rfc.section.7">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-cache-header-10" rel="prev">
+    <link href="https://dx.doi.org/10.17487/rfc9211" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc9211.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="https://www.rfc-editor.org/info/rfc9211">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="http, cache, debugging, x-cache">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Nottingham, M.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:9211">
+    <meta name="dcterms.issued" content="2022-06">
+    <meta name="dcterms.abstract"
+        content="To aid debugging, HTTP caches often append header fields to a response, explaining how they handled the request in an ad hoc manner. This specification defines a standard mechanism to do so that is aligned with HTTP's caching model.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="To aid debugging, HTTP caches often append header fields to a response, explaining how they handled the request in an ad hoc manner. This specification defines a standard mechanism to do so that is aligned with HTTP's caching model.">
+</head>
+
+<body onload="getMeta(9211,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>9211</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#notational-conventions">표기 규약</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#field">Cache-Status HTTP
+                                        응답 헤더 필드</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-hit-parameter">hit 파라미터</a></li>
+                                        <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-fwd-parameter">fwd 파라미터</a></li>
+                                        <li><a href="#rfc.section.2.3">2.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-fwd-status-parameter">fwd-status 파라미터</a></li>
+                                        <li><a href="#rfc.section.2.4">2.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-ttl-parameter">ttl 파라미터</a></li>
+                                        <li><a href="#rfc.section.2.5">2.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-stored-parameter">stored 파라미터</a></li>
+                                        <li><a href="#rfc.section.2.6">2.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-collapsed-parameter">collapsed 파라미터</a></li>
+                                        <li><a href="#rfc.section.2.7">2.7.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-key-parameter">key 파라미터</a></li>
+                                        <li><a href="#rfc.section.2.8">2.8.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#the-detail-parameter">detail 파라미터</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#examples">예시</a>
+                                </li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#register">새로운
+                                        Cache-Status 파라미터 정의</a></li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                        고려사항</a></li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#security">보안 고려사항</a>
+                                </li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">규범적 참고문헌</a></li>
+                                        <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.3">비공식 참고문헌</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.authors">저자 주소</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">인터넷 엔지니어링 태스크 포스 (IETF)</td>
+                                <td class="text-right">M. Nottingham</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">의견 요청: 9211</td>
+                                <td class="text-right">Fastly</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">카테고리: 표준 트랙</td>
+                                <td class="text-right">2022년 6월</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>Cache-Status HTTP 응답 헤더 필드</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">초록</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>디버깅을 돕기 위해, HTTP 캐시는 종종 응답에 헤더 필드를 추가하여 요청을 어떻게 처리했는지 임시로 설명합니다. 이 명세는 HTTP의 캐싱 모델에 맞춘 표준
+                            메커니즘을 정의합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 메모의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 문서입니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물입니다. IETF 커뮤니티의 합의를 반영하며, 공개 검토를 거쳐 인터넷 엔지니어링 스티어링 그룹(IESG)에
+                            의해 발행 승인을 받았습니다. 인터넷 표준에 대한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc7841.html#section-2">RFC 7841 2절</a>에서 확인할 수
+                            있습니다.
+                        </p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 최신 상태, 정오표, 피드백 방법 등은 <a
+                                href="https://www.rfc-editor.org/info/rfc9211">https://www.rfc-editor.org/info/rfc9211</a>에서
+                            확인할 수 있습니다.
+                        </p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2022 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)
+                            in effect on the date of publication of this document. Please review these documents
+                            carefully, as they describe your rights and restrictions with respect to this document. Code
+                            Components extracted from this document must include Revised BSD License text as described
+                            in Section 4.e of the Trust Legal Provisions and are provided without warranty as described
+                            in the Revised BSD License.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#notational-conventions">표기 규약</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#field">Cache-Status HTTP 응답 헤더
+                                필드</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-hit-parameter">hit 파라미터</a></li>
+                                <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-fwd-parameter">fwd 파라미터</a></li>
+                                <li><a href="#rfc.section.2.3">2.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-fwd-status-parameter">fwd-status 파라미터</a></li>
+                                <li><a href="#rfc.section.2.4">2.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-ttl-parameter">ttl 파라미터</a></li>
+                                <li><a href="#rfc.section.2.5">2.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-stored-parameter">stored 파라미터</a></li>
+                                <li><a href="#rfc.section.2.6">2.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-collapsed-parameter">collapsed 파라미터</a></li>
+                                <li><a href="#rfc.section.2.7">2.7.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-key-parameter">key 파라미터</a></li>
+                                <li><a href="#rfc.section.2.8">2.8.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-detail-parameter">detail 파라미터</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#examples">예시</a></li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#register">새로운 Cache-Status 파라미터
+                                정의</a></li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                고려사항</a></li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#security">보안 고려사항</a></li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.2">규범적
+                                        참고문헌</a></li>
+                                <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.3">참고
+                                        참고문헌</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.authors">저자 주소</a></li>
+                    </ul>
+                </div>
+                <hr class="hidden-print">
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>디버깅(사람과 자동화 도구 모두)을 돕기 위해, HTTP 캐시는 종종 요청을 어떻게 처리했는지를 설명하는 헤더 필드를 응답에 추가합니다. 안타깝게도 이러한 헤더 필드의
+                            의미는 종종 불명확하며, 의미와 문법이 구현마다 다릅니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <p>이 명세서는 이 목적을 위해 표준화된 문법과 의미를 가진 새로운 HTTP 응답 헤더 필드 "Cache-Status"를 정의합니다.</p>
+                    </div>
+                    <section id="notational-conventions">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a
+                                href="#notational-conventions">표기 규약</a></h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>이 문서에서 "<em class="bcp14">MUST</em>", "<em class="bcp14">MUST NOT</em>", "<em
+                                    class="bcp14">REQUIRED</em>", "<em class="bcp14">SHALL</em>", "<em
+                                    class="bcp14">SHALL NOT</em>", "<em class="bcp14">SHOULD</em>", "<em
+                                    class="bcp14">SHOULD NOT</em>", "<em class="bcp14">RECOMMENDED</em>", "<em
+                                    class="bcp14">NOT RECOMMENDED</em>", "<em class="bcp14">MAY</em>", 및 "<em
+                                    class="bcp14">OPTIONAL</em>"과 같은 핵심 용어는, 모두 대문자로 표기된 경우에 한해 BCP 14(<a
+                                    href="#RFC2119">RFC2119</a> 및 <a href="#RFC8174">RFC8174</a>)에 따라 해석됩니다.</p>
+                        </div>
+                        <div id="rfc.section.1.1.p.2">
+                            <p>이 문서는 구문과 파싱을 명시하기 위해 <a
+                                    href="https://www.rfc-editor.org/rfc/rfc8941.html#section-3">Section 3</a>의 용어인
+                                List, String, Token, Integer, Boolean(<a
+                                    href="#STRUCTURED-FIELDS">STRUCTURED-FIELDS</a>)을 사용합니다.</p>
+                        </div>
+                        <div id="rfc.section.1.1.p.3">
+                            <p>또한 이 문서는 <a href="#HTTP">HTTP</a> 및 <a href="#HTTP-CACHING">HTTP-CACHING</a>의 용어를 사용합니다.
+                            </p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="field">
+                    <h2 id="rfc.section.2" class="np"><a href="#rfc.section.2">2.</a>&nbsp;<a href="#field">Cache-Status
+                            HTTP 응답 헤더 필드</a></h2>
+                    <div id="rfc.section.2.p.1">
+                        <p>Cache-Status HTTP 응답 헤더 필드는 캐시가 해당 응답과 관련 요청을 어떻게 처리했는지를 나타냅니다. 이 헤더 필드의 문법은 <a
+                                href="#STRUCTURED-FIELDS">STRUCTURED-FIELDS</a>를 따릅니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.2">
+                        <p>값은 List입니다. List의 각 항목은 요청을 처리한 캐시를 나타냅니다. 첫 번째 항목은 오리진 서버에 가장 가까운 캐시를, 마지막 항목은 사용자에 가장 가까운
+                            캐시(사용자 에이전트의 캐시가 값을 추가한 경우 해당 캐시 포함)를 나타냅니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.3">
+                        <p>캐시는 언제 Cache-Status 헤더 필드를 응답에 추가할지 자체적으로 결정합니다. 어떤 캐시는 모든 응답에 추가할 수 있고, 다른 캐시는 특정 구성일 때나 요청에
+                            디버그 모드를 활성화하는 헤더가 포함된 경우에만 추가할 수 있습니다. 관련 보안 고려사항은 <a href="#security"
+                                title="Security Considerations">Section 6</a>을 참조하십시오.</p>
+                    </div>
+                    <div id="rfc.section.2.p.4">
+                        <p>중개자는 자신이 로컬에서 생성한 응답(예: 잘못된 요청으로 생성된 400 응답)에는 Cache-Status 멤버를 추가해서는 <em
+                                class="bcp14">안됩니다</em>. 단, 생성된 응답이 저장된 응답을 기반으로 하는 경우(예: 304 또는 206과 같이 저장된 응답을 기반으로 하는
+                            경우)는 예외입니다. 예를 들어 프록시가 잘못된 요청으로 400 응답을 생성했다면, 이는 오리진이 아닌 프록시가 생성한 응답이므로 Cache-Status 값을
+                            추가하지 않습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.5">
+                        <p>캐시가 Cache-Status 헤더 필드에 값을 추가할 때는 기존 필드 값을 <em class="bcp14">보존해야</em> 하며, 이를 통해 요청을 처리한 전체
+                            캐시 체인을 디버깅할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.6">
+                        <p>각 List 항목은 해당 항목을 삽입한 캐시를 식별하며, 이 식별자는 <em class="bcp14">String</em> 또는 <em
+                                class="bcp14">Token</em>이어야 합니다. 배포 환경에 따라 제품명 또는 서비스명(예: "ExampleCache" 또는 "Example
+                            CDN"), 호스트명("cache-3.example.com"), IP 주소 또는 생성된 문자열일 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.7">
+                        <p>List의 각 항목은 해당 캐시의 요청 처리 방식을 설명하는 파라미터를 가질 수 있습니다. 이러한 파라미터는 <em class="bcp14">선택 사항</em>이지만,
+                            캐시는 가능한 한 많은 정보를 제공하는 것이 권장됩니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.8">
+                        <p>이 명세서는 다음과 같은 파라미터들을 정의합니다.</p>
+                    </div>
+                    <section id="the-hit-parameter">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a
+                                href="#the-hit-parameter">hit 파라미터</a></h3>
+                        <div id="rfc.section.2.1.p.1">
+                            <p>"hit"의 값은 Boolean으로, true일 때 해당 요청이 캐시에서 만족되었음을 나타냅니다. 즉, 요청이 전달되지 않았고 응답이 캐시에서 얻어진
+                                경우입니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.2">
+                            <p>원래 오리진에서 생성되었으나 캐시가 수정한 응답(예: 304 또는 206 상태 코드)도 검증 등으로 전달되지 않았다면 여전히 hit로 간주됩니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.3">
+                            <p>캐시에 있었지만 전달 없이는 사용할 수 없었던 응답(예: 만료되었거나 부분 응답)은 hit로 간주되지 않습니다. 단, 오리진 서버가 사용 불가하여 전달 없이
+                                사용된 만료 응답은 hit로 간주될 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.4">
+                            <p>"hit"와 "fwd"는 상호 배타적이며, 각 리스트 항목에는 둘 중 하나만 표시되어야 합니다.</p>
+                        </div>
+                    </section>
+                    <section id="the-fwd-parameter">
+                        <h3 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a>&nbsp;<a
+                                href="#the-fwd-parameter">fwd 파라미터</a></h3>
+                        <div id="rfc.section.2.2.p.1">
+                            <p>"fwd"가 있을 경우 요청이 오리진 쪽으로 전달되었음을 나타내며, 그 값은 전달된 이유를 나타내는 Token입니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.2" class="avoidbreakafter">
+                            <p>요청이 전달된 이유를 설명하기 위해, 다음 값들이 가장 구체적인 것에서 덜 구체적인 것 순으로 정의되어 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.3">
+                            <dl>
+                                <dt>bypass:</dt>
+                                <dd style="margin-left: 1.5em">캐시가 이 요청을 처리하지 않도록 구성되었음.</dd>
+                                <dt>method:</dt>
+                                <dd style="margin-left: 1.5em">요청 메서드의 의미상 요청을 전달해야 함.</dd>
+                                <dt>uri-miss:</dt>
+                                <dd style="margin-left: 1.5em">캐시에 요청 URI와 일치하는 응답이 없음.</dd>
+                                <dt>vary-miss:</dt>
+                                <dd style="margin-left: 1.5em">캐시에 요청 URI와 일치하는 응답은 있었으나, 요청의 헤더 필드와 저장된 Vary 헤더 필드에 따라
+                                    적절한 응답을 선택할 수 없었음.</dd>
+                                <dt>miss:</dt>
+                                <dd style="margin-left: 1.5em">이 요청을 만족시킬 수 있는 응답이 캐시에 없었음(구현이 uri-miss와 vary-miss를 구분하지
+                                    못할 때 사용).</dd>
+                                <dt>request:</dt>
+                                <dd style="margin-left: 1.5em">캐시는 요청에 대해 신선한 응답을 선택할 수 있었지만, 요청의 의미(예: Cache-Control 요청
+                                    지시어)가 그것의 사용을 허용하지 않았음.</dd>
+                                <dt>stale:</dt>
+                                <dd style="margin-left: 1.5em">캐시는 요청에 대해 응답을 선택할 수 있었지만, 해당 응답이 만료되었음.</dd>
+                                <dt>partial:</dt>
+                                <dd style="margin-left: 1.5em">캐시는 요청에 대해 부분 응답을 선택할 수 있었으나, 요청된 모든 범위를 포함하지 않았거나 요청이 전체
+                                    응답에 대한 것이었음.</dd>
+                            </dl>
+                        </div>
+                        <div id="rfc.section.2.2.p.4">
+                            <p>캐시가 알 수 있는 가장 구체적인 이유를 가능한 한 <em class="bcp14">사용해야</em> 합니다. 관련 내용은 <a
+                                    href="#HTTP-CACHING">HTTP-CACHING</a> 및 <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4">Section 4</a>도 참조하십시오.
+                            </p>
+                        </div>
+                    </section>
+                    <section id="the-fwd-status-parameter">
+                        <h3 id="rfc.section.2.3"><a href="#rfc.section.2.3">2.3.</a>&nbsp;<a
+                                href="#the-fwd-status-parameter">fwd-status 파라미터</a></h3>
+                        <div id="rfc.section.2.3.p.1">
+                            <p>"fwd-status"의 값은 Integer로, 전달된 요청에 대해 다음 홉 서버가 반환한 상태 코드를 나타냅니다(관련: <a
+                                    href="#HTTP">HTTP</a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9110.html#section-15">Section 15</a>).
+                                fwd-status 파라미터는 fwd가 있을 때에만 의미가 있습니다. fwd가 있으나 fwd-status가 없으면, 응답에 포함된 상태 코드가 기본값으로
+                                간주됩니다.</p>
+                        </div>
+                        <div id="rfc.section.2.3.p.2">
+                            <p>이 파라미터는 다음 홉 서버가 조건부 요청에 대해 304(수정 없음)를 반환했는지, 또는 범위 요청으로 인해 206(부분 콘텐츠)을 반환했는지를 구분하는 데
+                                유용합니다.</p>
+                        </div>
+                    </section>
+                    <section id="the-ttl-parameter">
+                        <h3 id="rfc.section.2.4"><a href="#rfc.section.2.4">2.4.</a>&nbsp;<a
+                                href="#the-ttl-parameter">ttl 파라미터</a></h3>
+                        <div id="rfc.section.2.4.p.1">
+                            <p>"ttl"의 값은 Integer로, 캐시가 계산한 응답의 남은 신선도 수명(초 단위)을 나타냅니다(측정 시점은 캐시가 응답 헤더 섹션을 전송하는 시점과 가능한
+                                한 가깝게). 이 값에는 캐시의 휴리스틱, 로컬 구성 또는 기타 요인으로 할당된 신선도도 포함됩니다. 음수이면 만료(stale)를 의미합니다(관련: <a
+                                    href="#HTTP-CACHING">HTTP-CACHING</a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4.2.1">Section 4.2.1</a>).
+                            </p>
+                        </div>
+                    </section>
+                    <section id="the-stored-parameter">
+                        <h3 id="rfc.section.2.5"><a href="#rfc.section.2.5">2.5.</a>&nbsp;<a
+                                href="#the-stored-parameter">stored 파라미터</a></h3>
+                        <div id="rfc.section.2.5.p.1">
+                            <p>"stored"의 값은 Boolean으로, 캐시가 해당 응답을 저장했는지를 나타냅니다(관련: <a
+                                    href="#HTTP-CACHING">HTTP-CACHING</a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9111.html#section-3">Section 3</a>). true이면
+                                저장되었음을 의미합니다. stored 파라미터는 fwd가 있을 때에만 의미가 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="the-collapsed-parameter">
+                        <h3 id="rfc.section.2.6"><a href="#rfc.section.2.6">2.6.</a>&nbsp;<a
+                                href="#the-collapsed-parameter">collapsed 파라미터</a></h3>
+                        <div id="rfc.section.2.6.p.1">
+                            <p>"collapsed"의 값은 Boolean으로, 이 요청이 하나 이상의 다른 전달 요청과 합쳐졌는지를 나타냅니다(관련: <a
+                                    href="#HTTP-CACHING">HTTP-CACHING</a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9111.html#section-4">Section 4</a>). true이면
+                                응답이 성공적으로 재사용되었음을 의미하고, 그렇지 않으면 새 요청을 만들어야 했음을 의미합니다. 해당 파라미터가 없으면 요청은 다른 요청과 합쳐지지 않은
+                                것입니다. collapsed 파라미터는 fwd가 있을 때에만 의미가 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="the-key-parameter">
+                        <h3 id="rfc.section.2.7"><a href="#rfc.section.2.7">2.7.</a>&nbsp;<a
+                                href="#the-key-parameter">key 파라미터</a></h3>
+                        <div id="rfc.section.2.7.p.1">
+                            <p>"key"의 값은 String으로, 해당 응답에 사용된 캐시 키의 표현을 전달합니다(관련: <a
+                                    href="#HTTP-CACHING">HTTP-CACHING</a>, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9111.html#section-2">Section 2</a>). 이 값은
+                                구현에 따라 달라질 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="the-detail-parameter">
+                        <h3 id="rfc.section.2.8"><a href="#rfc.section.2.8">2.8.</a>&nbsp;<a
+                                href="#the-detail-parameter">detail 파라미터</a></h3>
+                        <div id="rfc.section.2.8.p.1">
+                            <p>"detail"의 값은 String 또는 Token으로, 구현별 상태나 기타 캐싱 관련 지표처럼 다른 파라미터에 포착되지 않는 추가 정보를 전달할 수 있게
+                                합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.8.p.2" class="avoidbreakafter">
+                            <p>예를 들면:</p>
+                        </div>
+                        <div id="rfc.section.2.8.p.3">
+                            <pre class="text">
+Cache-Status: ExampleCache; hit; detail=MEMORY
+</pre>
+                        </div>
+                        <div id="rfc.section.2.8.p.4">
+                            <p>detail 파라미터의 의미는 그것을 보낸 캐시에 항상 특화되어 있습니다. 다른 캐시에서 동일한 detail 값을 보내더라도 그 의미가 같지 않을 수 있습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.2.8.p.5">
+                            <p>이 파라미터는 의도적으로 제한되어 있습니다. 구현자나 운영자가 상호 운용 가능한 방식으로 추가 정보를 전달해야 한다면, 확장 파라미터를 등록(섹션 <a
+                                    href="#register" title="Defining New Cache-Status Parameters">4</a> 참조)하거나 다른 헤더 필드를
+                                정의하는 것이 권장됩니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="examples">
+                    <h2 id="rfc.section.3" class="np"><a href="#rfc.section.3">3.</a>&nbsp;<a href="#examples">예시</a>
+                    </h2>
+                    <div id="rfc.section.3.p.1" class="avoidbreakafter">
+                        <p>다음은 최소한의 캐시 히트 예시입니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.2">
+                        <pre class="text">
+Cache-Status: ExampleCache; hit
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.3" class="avoidbreakafter">
+                        <p>그러나 친절한 캐시는 더 많은 정보를 제공합니다. 예:</p>
+                    </div>
+                    <div id="rfc.section.3.p.4">
+                        <pre class="text">
+Cache-Status: ExampleCache; hit; ttl=376
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.5" class="avoidbreakafter">
+                        <p>만료된 히트는 단지 음수의 freshness 값을 갖습니다. 예:</p>
+                    </div>
+                    <div id="rfc.section.3.p.6">
+                        <pre class="text">
+Cache-Status: ExampleCache; hit; ttl=-412
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.7" class="avoidbreakafter">
+                        <p>반면, 다음은 완전한 미스의 예입니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.8">
+                        <pre class="text">
+Cache-Status: ExampleCache; fwd=uri-miss
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.9" class="avoidbreakafter">
+                        <p>다음은 백엔드 서버에서 성공적으로 검증된 미스의 예입니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.10">
+                        <pre class="text">
+Cache-Status: ExampleCache; fwd=stale; fwd-status=304
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.11" class="avoidbreakafter">
+                        <p>다음은 다른 요청과 병합(collapsed)된 미스의 예입니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.12">
+                        <pre class="text">
+Cache-Status: ExampleCache; fwd=uri-miss; collapsed
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.13" class="avoidbreakafter">
+                        <p>다음은 캐시가 병합을 시도했지만 실패한 미스의 예입니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.14">
+                        <pre class="text">
+Cache-Status: ExampleCache; fwd=uri-miss; collapsed=?0
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.15" class="avoidbreakafter">
+                        <p>다음은 두 계층의 캐시를 거친 예입니다. 오리진에 가장 가까운 캐시는 이전 요청에 대해 저장된 응답으로 응답했으며, 두 번째 캐시는 해당 응답을 저장하여 이후 요청을
+                            처리할 때 재사용했습니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.16">
+                        <pre class="text">
+Cache-Status: OriginCache; hit; ttl=1100,
+              "CDN Company Here"; hit; ttl=545
+</pre>
+                    </div>
+                    <div id="rfc.section.3.p.17" class="avoidbreakafter">
+                        <p>다음은 세 계층 캐싱 시스템을 거친 예입니다. 오리진에 가장 가까운 것은 리버스 프록시로(응답이 캐시에서 제공됨), 다음은 네트워크에 개입한 전달 프록시로(요청이
+                            URI에 일치하는 응답이 없어 전달되었고 요청이 다른 요청과 병합되었으며 결과 응답이 저장됨), 사용자에 가장 가까운 것은 브라우저 캐시로(요청 URI와 일치하는
+                            응답이 없음) 구성된 경우입니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.18">
+                        <pre class="text">
+Cache-Status: ReverseProxyCache; hit
+Cache-Status: ForwardProxyCache; fwd=uri-miss; collapsed; stored
+Cache-Status: BrowserCache; fwd=uri-miss
+</pre>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="register">
+                    <h2 id="rfc.section.4" class="np"><a href="#rfc.section.4">4.</a>&nbsp;<a href="#register">새로운
+                            Cache-Status 파라미터 정의</a></h2>
+                    <div id="rfc.section.4.p.1">
+                        <p>새로운 Cache-Status 파라미터는 "HTTP Cache-Status" 레지스트리에 등록하여 정의할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.2">
+                        <p>등록 요청은 지정된 전문가가 검토하고 승인합니다(관련: <a href="#RFC8126">RFC8126</a>, <a
+                                href="https://www.rfc-editor.org/rfc/rfc8126.html#section-4.5">Section 4.5</a>). 명세 문서는
+                            권장되지만 필수는 아닙니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.3" class="avoidbreakafter">
+                        <p>전문가는 요청을 평가할 때 다음 요소들을 고려해야 합니다:</p>
+                    </div>
+                    <div id="rfc.section.4.p.4">
+                        <ul>
+                            <li>커뮤니티 피드백</li>
+                            <li>값이 충분히 잘 정의되어 있는지 여부</li>
+                            <li>일반적인 파라미터가 벤더 특정, 애플리케이션 특정 또는 배포 특정 값보다 선호됩니다. 커뮤니티에서 일반 값을 합의할 수 없다면, 파라미터 이름은 벤더나
+                                애플리케이션 또는 배포를 식별하는 접두사를 포함하는 등 그에 맞게 구체적이어야 합니다.</li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.4.p.5" class="avoidbreakafter">
+                        <p>등록 요청은 다음 템플릿을 사용해야 합니다:</p>
+                    </div>
+                    <div id="rfc.section.4.p.6">
+                        <dl>
+                            <dt>Name:</dt>
+                            <dd style="margin-left: 1.5em">[Cache-Status 파라미터 키의 이름; 구문 요구사항은 <a
+                                    href="https://www.rfc-editor.org/rfc/rfc8941.html#section-3.1.2">Section
+                                    3.1.2</a>(<a href="#STRUCTURED-FIELDS">STRUCTURED-FIELDS</a>) 참조]</dd>
+                            <dt>Type:</dt>
+                            <dd style="margin-left: 1.5em">[파라미터 값의 Structured Type; <a
+                                    href="https://www.rfc-editor.org/rfc/rfc8941.html#section-3.1.2">Section 3.1.2</a>
+                                참조]</dd>
+                            <dt>Description:</dt>
+                            <dd style="margin-left: 1.5em">[파라미터의 의미에 대한 설명]</dd>
+                            <dt>Reference:</dt>
+                            <dd style="margin-left: 1.5em">[해당 파라미터를 정의하는 명세에 대한 참조(가능한 경우)]</dd>
+                        </dl>
+                    </div>
+                    <div id="rfc.section.4.p.7">
+                        <p>등록 요청을 보낼 위치에 대한 세부사항은 레지스트리(&lt;<a
+                                href="https://www.iana.org/assignments/http-cache-status">https://www.iana.org/assignments/http-cache-status</a>&gt;)를
+                            참조하십시오.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="iana-considerations">
+                    <h2 id="rfc.section.5" class="np"><a href="#rfc.section.5">5.</a>&nbsp;<a
+                            href="#iana-considerations">IANA 고려사항</a></h2>
+                    <div id="rfc.section.5.p.1">
+                        <p>IANA는 &lt;<a
+                                href="https://www.iana.org/assignments/http-cache-status">https://www.iana.org/assignments/http-cache-status</a>&gt;에
+                            "HTTP Cache-Status" 레지스트리를 생성하고, 섹션 <a href="#field"
+                                title="The Cache-Status HTTP Response Header Field">2</a>에 정의된 타입들로 이를 채웠습니다. 관련 절차는 섹션
+                            <a href="#register" title="Defining New Cache-Status Parameters">4</a>를 참조하십시오.
+                        </p>
+                    </div>
+                    <div id="rfc.section.5.p.2" class="avoidbreakafter">
+                        <p>IANA는 또한 <a href="#HTTP">HTTP</a>의 "Hypertext Transfer Protocol (HTTP) Field Name
+                            Registry"(정의: <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-18.4">Section
+                                18.4</a>)에 다음 항목을 추가했습니다:</p>
+                    </div>
+                    <div id="rfc.section.5.p.3">
+                        <dl class="compact">
+                            <dt>Field name:</dt>
+                            <dd style="margin-left: 1.5em">Cache-Status</dd>
+                            <dt>Status:</dt>
+                            <dd style="margin-left: 1.5em">permanent</dd>
+                            <dt>Reference:</dt>
+                            <dd style="margin-left: 1.5em">RFC 9211</dd>
+                        </dl>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="security">
+                    <h2 id="rfc.section.6" class="np"><a href="#rfc.section.6">6.</a>&nbsp;<a href="#security">보안
+                            고려사항</a></h2>
+                    <div id="rfc.section.6.p.1">
+                        <p>공격자는 Cache-Status에 포함된 정보를 사용해 캐시(및 기타 구성 요소)의 동작을 탐색하고, 캐시를 이용하는 이들의 활동을 추론할 수 있습니다.
+                            Cache-Status 헤더 필드 자체만으로 이러한 위험을 만들지는 않더라도, 공격자가 이를 악용하는 데 도움을 줄 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.2">
+                        <p>예를 들어, 캐시가 응답을 저장했는지 여부를 알면 민감한 데이터에 대한 타이밍 공격을 수행하는 데 도움이 될 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.3">
+                        <p>또한 캐시 키를 노출하면 공격자가 캐시 키의 변경을 이해하는 데 도움이 되어 캐시 포이즈닝 공격을 도울 수 있습니다. 자세한 내용은 <a
+                                href="#ENTANGLE">ENTANGLE</a>을 참조하십시오.</p>
+                    </div>
+                    <div id="rfc.section.6.p.4">
+                        <p>기본 위험은 암호화 및 인증 사용, 공격자가 제어하는 데이터를 캐시 키에 포함하지 않음 등 다양한 기법으로 완화할 수 있습니다. 단순한 키의 난독화는 이 위험을
+                            완화하지 못합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.5">
+                        <p>이러한 공격을 돕지 않기 위해 Cache-Status 헤더 필드는 생략하거나, 클라이언트가 수신 권한이 있을 때에만 전송하거나, 민감한 정보(예: key 파라미터)는
+                            클라이언트가 권한이 있을 때에만 전송할 수 있습니다.</p>
+                    </div>
+                </section>
+                <section class="np">
+                    <div id="rfc.references">
+                        <h2 id="rfc.section.7"><a href="#rfc.section.7">7.</a> 참고문헌</h2>
+                        <section>
+                            <div id="rfc.references.2">
+                                <h3 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a> 규범적 참고문헌</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="HTTP">[<a href="#HTTP" class="smpl">HTTP</a>]</dt>
+                                    <dd>Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9110.html">HTTP Semantics</a>”, STD
+                                        97, RFC 9110, <a href="https://dx.doi.org/10.17487/RFC9110">DOI
+                                            10.17487/RFC9110</a>, June 2022, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9110">https://www.rfc-editor.org/info/rfc9110</a>&gt;.
+                                    </dd>
+                                    <dt id="HTTP-CACHING">[<a href="#HTTP-CACHING" class="smpl">HTTP-CACHING</a>]</dt>
+                                    <dd>Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9111.html">HTTP Caching</a>”, STD
+                                        98, RFC 9111, <a href="https://dx.doi.org/10.17487/RFC9111">DOI
+                                            10.17487/RFC9111</a>, June 2022, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9111">https://www.rfc-editor.org/info/rfc9111</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                    <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">Key words
+                                            for use in RFCs to Indicate Requirement Levels</a>”, BCP 14, RFC 2119, March
+                                        1997, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8126">[<a href="#RFC8126" class="smpl">RFC8126</a>]</dt>
+                                    <dd>Cotton, M., Leiba, B., and T. Narten, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8126.html">Guidelines for Writing an
+                                            IANA Considerations Section in RFCs</a>”, BCP 26, RFC 8126, June 2017,
+                                        &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8174">[<a href="#RFC8174" class="smpl">RFC8174</a>]</dt>
+                                    <dd>Leiba, B., “<a href="https://www.rfc-editor.org/rfc/rfc8174.html">Ambiguity of
+                                            Uppercase vs Lowercase in RFC 2119 Key Words</a>”, BCP 14, RFC 8174, May
+                                        2017, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;.
+                                    </dd>
+                                    <dt id="STRUCTURED-FIELDS">[<a href="#STRUCTURED-FIELDS"
+                                            class="smpl">STRUCTURED-FIELDS</a>]</dt>
+                                    <dd>Nottingham, M. and P-H. Kamp, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8941.html">Structured Field Values
+                                            for HTTP</a>”, RFC 8941, February 2021, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8941">https://www.rfc-editor.org/info/rfc8941</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                        <section>
+                            <div id="rfc.references.3">
+                                <h3 id="rfc.section.7.2"><a href="#rfc.section.7.2">7.2.</a> 참고 참고문헌</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="ENTANGLE">[<a href="#ENTANGLE" class="smpl">ENTANGLE</a>]</dt>
+                                    <dd>Kettle, J., “<a
+                                            href="https://portswigger.net/research/web-cache-entanglement">Web Cache
+                                            Entanglement: Novel Pathways to Poisoning</a>”, September 2020, &lt;<a
+                                            href="https://portswigger.net/research/web-cache-entanglement">https://portswigger.net/research/web-cache-entanglement</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="rfc.authors" class="np">
+                    <h2><a href="#rfc.authors">저자 주소</a></h2>
+                    <address><b>Mark Nottingham</b><br>Fastly<br>Prahran<br>Australia<br>EMail: <a
+                            href="mailto:mnot@mnot.net">mnot@mnot.net</a><br>URI: <a
+                            href="https://www.mnot.net/">https://www.mnot.net/</a></address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>

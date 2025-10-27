@@ -1,0 +1,692 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 8246 - HTTP 변경 불가능(Immutable) 응답</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC8246">
+    <meta property="og:description" content="HTTP Immutable Responses">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc8246.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 The Immutable Cache-Control Extension" href="#rfc.section.2">
+    <link rel="Chapter" title="3 Security Considerations" href="#rfc.section.3">
+    <link rel="Chapter" title="4 IANA Considerations" href="#rfc.section.4">
+    <link rel="Chapter" title="5 References" href="#rfc.section.5">
+    <link rel="Appendix" title="Acknowledgments" href="#rfc.section.unnumbered-1">
+    <link rel="convertedFrom" href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-immutable/">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc8246.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="https://www.rfc-editor.org/info/rfc8246">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="McManus, P.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:8246">
+    <meta name="dcterms.issued" content="2017-09">
+    <meta name="dcterms.abstract"
+        content="The immutable HTTP response Cache-Control extension allows servers to identify resources that will not be updated during their freshness lifetime. This ensures that a client never needs to revalidate a cached fresh resource to be certain it has not been modified.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="The immutable HTTP response Cache-Control extension allows servers to identify resources that will not be updated during their freshness lifetime. This ensures that a client never needs to revalidate a cached fresh resource to be certain it has not been modified.">
+</head>
+
+<body onload="getMeta(8246,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>8246</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#notational-conventions">표기 규약</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-immutable-cache-control-extension">Immutable Cache-Control 확장</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#about-intermediaries">중간자 관련</a></li>
+                                        <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#example">예시</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#security-considerations">보안 고려사항</a></li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                        고려사항</a></li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.5.1">5.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.1">규범적 참고문헌</a></li>
+                                        <li><a href="#rfc.section.5.2">5.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">비공식 참고문헌</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#acknowledgments">감사의 글</a></li>
+                                <li><a href="#rfc.authors">저자 주소</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">인터넷 엔지니어링 태스크 포스 (IETF)</td>
+                                <td class="text-right">P. McManus</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">의견 요청: 8246</td>
+                                <td class="text-right">Mozilla</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">카테고리: 표준 트랙</td>
+                                <td class="text-right">2017년 9월</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>HTTP 변경 불가능(Immutable) 응답</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">요약</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>immutable HTTP 응답 Cache-Control 확장은 서버가 신선도 수명 동안 업데이트되지 않는 리소스를 식별할 수 있게 해줍니다. 이를 통해 클라이언트는
+                            캐시에 저장된 신선한 리소스가 변경되지 않았는지 확인하기 위해 재검증할 필요가 없습니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 메모의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 문서입니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물입니다. IETF 커뮤니티의 합의를 반영하며, 공개 검토를 거쳐 인터넷 엔지니어링 스티어링 그룹(IESG)에
+                            의해 발행 승인을 받았습니다. 인터넷 표준에 관한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc7841.html#section-2">RFC 7841 2절</a>에서 확인할 수
+                            있습니다.
+                        </p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 최신 상태, 정오표, 피드백 방법 등은 <a
+                                href="https://www.rfc-editor.org/info/rfc8246">https://www.rfc-editor.org/info/rfc8246</a>에서
+                            확인할 수 있습니다.
+                        </p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2017 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)
+                            in effect on the date of publication of this document. Please review these documents
+                            carefully, as they describe your rights and restrictions with respect to this document. Code
+                            Components extracted from this document must include Simplified BSD License text as
+                            described in Section 4.e of the Trust Legal Provisions and are provided without warranty as
+                            described in the Simplified BSD License.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#notational-conventions">표기 규약</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#the-immutable-cache-control-extension">Immutable Cache-Control 확장</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#about-intermediaries">중간자에 대하여</a></li>
+                                <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a href="#example">예시</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#security-considerations">보안
+                                고려사항</a></li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                고려사항</a></li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.5.1">5.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.1">규범적
+                                        참고문헌</a></li>
+                                <li><a href="#rfc.section.5.2">5.2.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.2">비공식
+                                        참고문헌</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#acknowledgments">감사의 글</a></li>
+                        <li><a href="#rfc.authors">저자 주소</a></li>
+                    </ul>
+                </div>
+                <hr class="hidden-print">
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>HTTP의 신선도 수명 메커니즘 <a href="#RFC7234"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Caching">[RFC7234]</cite></a>은 클라이언트가
+                            지정된 기간 동안 저장된 응답을 안전하게 재사용하여 향후 요청을 처리할 수 있게 해줍니다. 하지만 그 기간 동안 리소스가 수정될 가능성은 여전히 존재합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <p>예를 들어, 일간 신문 첫 페이지의 사진에 1시간의 신선도 수명이 부여되면, 어느 사용자도 1시간 이상 된 캐시된 사진을 보지 않게 됩니다. 하지만 사진은 언제든지
+                            변경될 수 있으므로, 서로 다른 사용자가 최대 1시간 동안 각자 캐시에 저장된 다른 사진을 볼 수 있습니다. 이는 <a href="#RFC7234"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Caching">[RFC7234]</cite></a>에 정의된 캐싱
+                            메커니즘을 준수합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.3">
+                        <p>캐시된 응답에 대한 변경 여부를 확인해야 하는 사용자는 일반적으로 사용자 에이전트에서 새로고침(리로드) 기능을 사용합니다. 이는 조건부 요청 <a
+                                href="#RFC7232"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Conditional Requests">[RFC7232]</cite></a>을
+                            발생시키며, 리소스가 변경되었을 경우 새 표현(Representation)이, 변경되지 않았을 경우 304 (Not Modified) 응답 <a
+                                href="#RFC7232"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Conditional Requests">[RFC7232]</cite></a>이
+                            반환됩니다. HTML을 이해하고 종속 하위 리소스를 불러오는 사용자 에이전트는 한 페이지의 모든 부분을 새로고침하기 위해 수백 개의 조건부 요청을 발생시킬 수
+                            있습니다 <a href="#REQPERPAGE"><cite title="Total Requests per Page">[REQPERPAGE]</cite></a>.
+                        </p>
+                    </div>
+                    <div id="rfc.section.1.p.4">
+                        <p>하지만 일부 콘텐츠 제공자는 "버전이 명시된" URL을 사용하기 때문에 하위 리소스의 변형을 한 개만 생성합니다. 이러한 리소스가 업데이트될 때는, 단순히 새로운
+                            URL에 해당 리소스를 게시하며, 일반적으로 경로에 해당 버전만의 고유 식별자를 포함시킵니다. 하위 리소스에 대한 참조도 새로운 경로 정보로 갱신됩니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.5">
+                        <p>예를 들어, <span class="tt">https://www.example.com/101016/main.css</span>가 업데이트되어 <span
+                                class="tt">https://www.example.com/102026/main.css</span>로 재게시될 수 있으며, 이를 참조하는 링크도 동시에
+                            변경됩니다. 이 설계 패턴을 통해 하위 리소스에 대해 매우 긴 신선도 수명을 부여할 수 있으며, 언제 업데이트될지 예측할 필요가 없습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.6">
+                        <p>안타깝게도 사용자 에이전트는 이러한 버전 관리 URL 설계 패턴이 사용되는지 알지 못합니다. 결과적으로 사용자가 새로고침을 시도하면 각 하위 리소스마다 쓸모없는 조건부
+                            요청이 발생하며, 이는 모두 304 응답을 반환하게 됩니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.7">
+                        <p>immutable HTTP 응답 Cache-Control 확장은 서버가 신선도 수명 동안 업데이트되지 않을 응답을 식별할 수 있게 해줍니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.8">
+                        <p>이 확장은 해당 응답에 대해 조건부 요청을 생략해도 업데이트 여부를 걱정할 필요가 없음을 클라이언트에 명확히 알려줍니다.</p>
+                    </div>
+                    <section id="notational-conventions">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a
+                                href="#notational-conventions">표기 규약</a></h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>이 문서에서 "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
+                                "RECOMMENDED", "NOT RECOMMENDED", "MAY", "OPTIONAL"과 같은 핵심 용어는 BCP 14 <a
+                                    href="#RFC2119"><cite
+                                        title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>
+                                <a href="#RFC8174"><cite
+                                        title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">[RFC8174]</cite></a>에
+                                설명된 대로 해석되어야 하며, 여기서처럼 모두 대문자로 표기된 경우에만 적용됩니다.
+                            </p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="the-immutable-cache-control-extension">
+                    <h2 id="rfc.section.2" class="np"><a href="#rfc.section.2">2.</a>&nbsp;<a
+                            href="#the-immutable-cache-control-extension">Immutable Cache-Control 확장</a></h2>
+                    <div id="rfc.section.2.p.1">
+                        <p>HTTP 응답에 immutable Cache-Control 확장이 포함되어 있으면, 원본 서버가 해당 응답의 신선도 수명 동안 해당 리소스의
+                            표현(Representation)을 변경하지 않음을 나타냅니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.2">
+                        <p>클라이언트는 응답의 신선도 수명 동안(예: 새로고침 시) 명시적으로 사용자가 강제 새로고침을 하지 않는 한 조건부 요청을 발행하지 않아야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.3">
+                        <p>immutable 확장은 저장된 응답의 신선도 수명 동안에만 적용됩니다. 만료된(stale) 응답은 immutable 확장이 없는 경우와 동일하게 재검증되어야 합니다.
+                        </p>
+                    </div>
+                    <div id="rfc.section.2.p.4">
+                        <p>immutable 확장은 인자를 갖지 않습니다. 인자가 있을 경우 의미가 없으며 무시되어야 합니다. immutable 확장이 여러 번 등장해도 한 번 등장한 것과
+                            동일하게 간주합니다. 요청에서 immutable Cache-Control 확장이 사용되어도 아무런 효과가 없습니다.</p>
+                    </div>
+                    <section id="about-intermediaries">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a
+                                href="#about-intermediaries">중간자에 대하여</a></h3>
+                        <div id="rfc.section.2.1.p.1">
+                            <p>immutable 응답은 프록시 클라이언트가 받아도, 사용자 에이전트 기반 클라이언트가 받아도 동일한 의미를 가집니다. 따라서 프록시는 immutable 확장이
+                                포함된 신선한 응답에 대해, 클라이언트로부터 검증 신호(예: <a
+                                    href="https://www.rfc-editor.org/rfc/rfc7234.html#section-5.2.1.4">5.2.1.4절</a> <a
+                                    href="#RFC7234"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Caching">[RFC7234]</cite></a>에
+                                정의된 no-cache Cache-Control 요청 지시어 등)가 없는 한 조건부 재검증을 생략해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.2">
+                            <p>프록시가 immutable 확장을 사용하여 조건부 재검증을 우회할 경우, 프록시는 수신한 요청 헤더에 따라 304 또는 200 응답을 선택적으로 반환할 수
+                                있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="example">
+                        <h3 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a>&nbsp;<a href="#example">예시</a></h3>
+                        <div id="rfc.figure.u.1">
+                            <div>
+                                <pre class="text">
+Cache-Control: max-age=31536000, immutable
+</pre>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="security-considerations">
+                    <h2 id="rfc.section.3" class="np"><a href="#rfc.section.3">3.</a>&nbsp;<a
+                            href="#security-considerations">보안 고려사항</a></h2>
+                    <div id="rfc.section.3.p.1" class="avoidbreakafter">
+                        <p>immutable 메커니즘은 일종의 소프트 고정(soft pinning)으로 동작하며, 모든 고정 메커니즘과 마찬가지로 캐시 오염 사고의 증폭 벡터가 될 수 있습니다.
+                            여기에는 캐시 오염 공격이 포함됩니다. 이러한 위험을 완화하기 위해 세 가지 메커니즘이 제안됩니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.2">
+                        <ul>
+                            <li>클라이언트는 HTTPS와 같은 인증된 컨텍스트에 속하지 않은 리소스의 immutable 확장은 무시해야 합니다. 인증된 리소스는 캐시 오염에 덜 취약합니다.
+                            </li>
+                            <li>사용자 에이전트는 보통 리로드와 강제 리로드 두 가지 새로고침 메커니즘을 제공합니다. 강제 리로드는 중단된 로드나 기타 오염을 바로잡기 위해 사용됩니다. 이
+                                리로드(보통 no-cache 요청 속성으로 표시)는 immutable 확장 역시 무시해야 합니다.</li>
+                            <li>클라이언트는 저장된 응답 크기가 올바른지 강하게 보장하지 않는 리소스(연결 종료로 구분되는 응답 등)에 대해서는 immutable 확장을 무시해야 합니다.
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="iana-considerations">
+                    <h2 id="rfc.section.4" class="np"><a href="#rfc.section.4">4.</a>&nbsp;<a
+                            href="#iana-considerations">IANA 고려사항</a></h2>
+                    <div id="rfc.section.4.p.1">
+                        <p>immutable 확장은 <a href="https://www.rfc-editor.org/rfc/rfc7234.html#section-7.1">7.1절</a> <a
+                                href="#RFC7234"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Caching">[RFC7234]</cite></a>에 설명된
+                            가이드라인에 따라 “Hypertext Transfer Protocol (HTTP) Cache Directive Registry”에 등록되었습니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.2">
+                        <ul>
+                            <li>캐시 지시어: immutable</li>
+                            <li>참고: RFC 8246</li>
+                        </ul>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="rfc.references" class="np">
+                    <h2 id="rfc.section.5"><a href="#rfc.section.5">5.</a> 참고문헌</h2>
+                    <section class="np">
+                        <div id="rfc.references.1">
+                            <h3 id="rfc.section.5.1"><a href="#rfc.section.5.1">5.1.</a> 규범적 참고문헌</h3>
+                            <dl class="dl-horizontal">
+                                <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">RFC에서 요구 수준을
+                                        나타내기 위한 핵심 용어(Key words for use in RFCs to Indicate Requirement Levels)</a>”, <a
+                                        href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 2119, <a
+                                        href="https://dx.doi.org/10.17487/RFC2119">DOI 10.17487/RFC2119</a>, 1997년 3월,
+                                    &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;.
+                                </dd>
+                                <dt id="RFC7232">[<a href="#RFC7232" class="smpl">RFC7232</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7232.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Conditional Requests</a>”, RFC 7232, <a
+                                        href="https://dx.doi.org/10.17487/RFC7232">DOI 10.17487/RFC7232</a>, 2014년 6월,
+                                    &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc7232">https://www.rfc-editor.org/info/rfc7232</a>&gt;.
+                                </dd>
+                                <dt id="RFC7234">[<a href="#RFC7234" class="smpl">RFC7234</a>]</dt>
+                                <dd>Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7234.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Caching</a>”, RFC 7234, <a
+                                        href="https://dx.doi.org/10.17487/RFC7234">DOI 10.17487/RFC7234</a>, 2014년 6월,
+                                    &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc7234">https://www.rfc-editor.org/info/rfc7234</a>&gt;.
+                                </dd>
+                                <dt id="RFC8174">[<a href="#RFC8174" class="smpl">RFC8174</a>]</dt>
+                                <dd>Leiba, B., “<a href="https://www.rfc-editor.org/rfc/rfc8174.html">RFC 2119의 핵심 용어
+                                        대문자/소문자 모호성(Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words)</a>”, <a
+                                        href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 8174, <a
+                                        href="https://dx.doi.org/10.17487/RFC8174">DOI 10.17487/RFC8174</a>, 2017년 5월,
+                                    &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;.
+                                </dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section>
+                        <div id="rfc.references.2">
+                            <h3 id="rfc.section.5.2"><a href="#rfc.section.5.2">5.2.</a> 비공식 참고문헌</h3>
+                            <dl class="dl-horizontal">
+                                <dt id="REQPERPAGE">[<a href="#REQPERPAGE" class="smpl">REQPERPAGE</a>]</dt>
+                                <dd>HTTP Archive, “<a href="http://httparchive.org/interesting.php#reqTotal">페이지당 총 요청
+                                        수(Total Requests per Page)</a>”, &lt;<a
+                                        href="http://httparchive.org/interesting.php#reqTotal">http://httparchive.org/interesting.php#reqTotal</a>&gt;.
+                                </dd>
+                            </dl>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="acknowledgments">
+                    <h2 id="rfc.section.unnumbered-1" class="np"><a href="#acknowledgments">감사의 글</a></h2>
+                    <div id="rfc.section.unnumbered-1.p.1">
+                        <p>이 아이디어의 개발과 테스트에 협력해준 Ben Maurer에게 감사드립니다. 프록시 상호작용에 도움을 준 Amos Jeffries와 문서화에 도움을 준 Mark
+                            Nottingham에게도 감사드립니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="rfc.authors" class="np">
+                    <h2><a href="#rfc.authors">저자 주소</a></h2>
+                    <address><b>Patrick McManus</b><br>Mozilla<br>EMail: <a
+                            href="mailto:mcmanus@ducksong.com">mcmanus@ducksong.com</a></address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
