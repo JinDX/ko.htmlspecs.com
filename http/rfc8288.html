@@ -1,0 +1,1632 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 8288 - 웹 링크</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC8288">
+    <meta property="og:description" content="Web Linking">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc8288.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 Links" href="#rfc.section.2">
+    <link rel="Chapter" title="3 Link Serialisation in HTTP Headers" href="#rfc.section.3">
+    <link rel="Chapter" title="4 IANA Considerations" href="#rfc.section.4">
+    <link rel="Chapter" title="5 Security Considerations" href="#rfc.section.5">
+    <link rel="Chapter" title="6 Internationalisation Considerations" href="#rfc.section.6">
+    <link rel="Chapter" title="7 References" href="#rfc.section.7">
+    <link rel="Appendix" title="A Notes on Other Link Serialisations" href="#rfc.section.A">
+    <link rel="Appendix" title="B Algorithms for Parsing Link Header Fields" href="#rfc.section.B">
+    <link rel="Appendix" title="C Changes from RFC 5988" href="#rfc.section.C">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc8288.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="https://www.rfc-editor.org/info/rfc8288">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="link relation">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Nottingham, M.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:8288">
+    <meta name="dcterms.issued" content="2017-09">
+    <meta name="dct.replaces" content="urn:ietf:rfc:5988">
+    <meta name="dcterms.abstract"
+        content="This specification defines a model for the relationships between resources on the Web (“links”) and the type of those relationships (“link relation types”).It also defines the serialisation of such links in HTTP headers with the Link header field.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="This specification defines a model for the relationships between resources on the Web (“links”) and the type of those relationships (“link relation types”).It also defines the serialisation of such links in HTTP headers with the Link header field.">
+</head>
+
+<body onload="getMeta(8288,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>8288</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#notational-conventions">표기 규약</a></li>
+                                        <li><a href="#rfc.section.1.2">1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#conformance-and-error-handling">적합성 및 오류 처리</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#links">링크</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#link-relation-types">링크 관계 타입</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.2.1.1">2.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#registered">등록된 관계 타입</a></li>
+                                                <li><a href="#rfc.section.2.1.2">2.1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#extension-relation-types">확장 관계 타입</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#attributes">대상 속성</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#header">HTTP 헤더의 링크
+                                        직렬화</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#link-target">링크 대상</a></li>
+                                        <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#header-context">링크 컨텍스트</a></li>
+                                        <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#header-type">관계 타입</a></li>
+                                        <li><a href="#rfc.section.3.4">3.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#header-attrs">대상 속성</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.3.4.1">3.4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#serialisation-defined-attributes">직렬화-정의 속성</a></li>
+                                                <li><a href="#rfc.section.3.4.2">3.4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#extension-attributes">확장 속성</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.3.5">3.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#link-header-field-examples">Link 헤더 필드 예시</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                        고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#link-http-header-field-registration">Link HTTP 헤더 필드 등록</a></li>
+                                        <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#link-relation-type-registry">링크 관계 타입 레지스트리</a></li>
+                                        <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#link-relation-application-data-registry">링크 관계 응용 데이터 레지스트리</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#security-considerations">보안 고려사항</a></li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#internationalisation-considerations">국제화 고려사항</a></li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.1">규범적 참고문헌</a></li>
+                                        <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">비규범적 참고문헌</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.A">Appendix A.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#notes-on-other-link-serialisations">다른 링크 직렬화에 대한 주석</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.A.1">A.1.</a>&nbsp;&nbsp;&nbsp;<a href="#html">HTML의
+                                                링크 직렬화</a></li>
+                                        <li><a href="#rfc.section.A.2">A.2.</a>&nbsp;&nbsp;&nbsp;<a href="#atom">Atom의
+                                                링크 직렬화</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.B">Appendix B.</a>&nbsp;&nbsp;&nbsp;<a href="#parse">Link 헤더
+                                        필드 파싱 알고리즘</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.B.1">B.1.</a>&nbsp;&nbsp;&nbsp;<a href="#parse-set">헤더
+                                                집합에서 링크 파싱</a></li>
+                                        <li><a href="#rfc.section.B.2">B.2.</a>&nbsp;&nbsp;&nbsp;<a href="#parse-fv">링크
+                                                필드 값 파싱</a></li>
+                                        <li><a href="#rfc.section.B.3">B.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#parse-param">파라미터 파싱</a></li>
+                                        <li><a href="#rfc.section.B.4">B.4.</a>&nbsp;&nbsp;&nbsp;<a href="#parse-qs">인용
+                                                문자열 파싱</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.C">Appendix C.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#changes-from-rfc-5988">RFC 5988로부터의 변경사항</a></li>
+                                <li><a href="#rfc.authors">저자 주소</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">인터넷 엔지니어링 태스크 포스 (IETF)</td>
+                                <td class="text-right">M. Nottingham</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Request for Comments: 8288</td>
+                                <td class="text-right">2017년 9월</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Obsoletes: <a
+                                        href="https://www.rfc-editor.org/rfc/rfc5988.html">5988</a></td>
+                                <td class="text-right"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Category: Standards Track</td>
+                                <td class="text-right"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>웹 링크</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">초록</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>이 명세서는 웹 상의 리소스들 간의 관계("링크")와 그 관계의 유형("링크 관계 타입")에 대한 모델을 정의합니다.</p>
+                    </div>
+                    <div id="rfc.abstract.p.2">
+                        <p>또한 이러한 링크를 Link 헤더 필드를 사용해 HTTP 헤더에 직렬화하는 방법을 정의합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 메모의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 문서입니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물입니다. 이는 IETF 커뮤니티의 합의를 반영합니다. 공개 검토를 거쳤으며 인터넷 엔지니어링 스티어링
+                            그룹(IESG)에 의해 발행 승인을 받았습니다. 인터넷 표준에 관한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc7841.html#section-2">RFC 7841의 섹션 2</a>를 참조하십시오.
+                        </p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 현재 상태, 정오표, 피드백 제공 방법에 관한 정보는 <a
+                                href="https://www.rfc-editor.org/info/rfc8288">https://www.rfc-editor.org/info/rfc8288</a>에서
+                            확인할 수 있습니다.
+                        </p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2017 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)
+                            in effect on the date of publication of this document. Please review these documents
+                            carefully, as they describe your rights and restrictions with respect to this document. Code
+                            Components extracted from this document must include Simplified BSD License text as
+                            described in Section 4.e of the Trust Legal Provisions and are provided without warranty as
+                            described in the Simplified BSD License.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.3">
+                        <p>This document may contain material from IETF Documents or IETF Contributions published or
+                            made publicly available before November 10, 2008. The person(s) controlling the copyright in
+                            some of this material may not have granted the IETF Trust the right to allow modifications
+                            of such material outside the IETF Standards Process. Without obtaining an adequate license
+                            from the person(s) controlling the copyright in such materials, this document may not be
+                            modified outside the IETF Standards Process, and derivative works of it may not be created
+                            outside the IETF Standards Process, except to format it for publication as an RFC or to
+                            translate it into languages other than English.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#notational-conventions">표기 규약</a></li>
+                                <li><a href="#rfc.section.1.2">1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#conformance-and-error-handling">적합성 및 오류 처리</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#links">링크</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#link-relation-types">링크 관계 타입</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1.1">2.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#registered">등록된 관계 타입</a></li>
+                                        <li><a href="#rfc.section.2.1.2">2.1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#extension-relation-types">확장 관계 타입</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a href="#attributes">대상
+                                        속성</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#header">HTTP 헤더의 링크
+                                직렬화</a>
+                            <ul>
+                                <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a href="#link-target">링크
+                                        대상</a></li>
+                                <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a href="#header-context">링크
+                                        컨텍스트</a></li>
+                                <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a href="#header-type">관계
+                                        타입</a></li>
+                                <li><a href="#rfc.section.3.4">3.4.</a>&nbsp;&nbsp;&nbsp;<a href="#header-attrs">대상
+                                        속성</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.4.1">3.4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#serialisation-defined-attributes">직렬화-정의 속성</a></li>
+                                        <li><a href="#rfc.section.3.4.2">3.4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#extension-attributes">확장 속성</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3.5">3.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#link-header-field-examples">Link 헤더 필드 예시</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#link-http-header-field-registration">Link HTTP 헤더 필드 등록</a></li>
+                                <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#link-relation-type-registry">링크 관계 타입 레지스트리</a></li>
+                                <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#link-relation-application-data-registry">링크 관계 응용 데이터 레지스트리</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#security-considerations">보안
+                                고려사항</a></li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#internationalisation-considerations">국제화 고려사항</a></li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.1">규범적
+                                        참고문헌</a></li>
+                                <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references.2">비규범적 참고문헌</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.A">부록 A.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#notes-on-other-link-serialisations">다른 링크 직렬화에 대한 주석</a>
+                            <ul>
+                                <li><a href="#rfc.section.A.1">A.1.</a>&nbsp;&nbsp;&nbsp;<a href="#html">HTML의 링크
+                                        직렬화</a></li>
+                                <li><a href="#rfc.section.A.2">A.2.</a>&nbsp;&nbsp;&nbsp;<a href="#atom">Atom의 링크
+                                        직렬화</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.B">부록 B.</a>&nbsp;&nbsp;&nbsp;<a href="#parse">Link 헤더 필드 파싱 알고리즘</a>
+                            <ul>
+                                <li><a href="#rfc.section.B.1">B.1.</a>&nbsp;&nbsp;&nbsp;<a href="#parse-set">헤더 집합에서 링크
+                                        파싱</a></li>
+                                <li><a href="#rfc.section.B.2">B.2.</a>&nbsp;&nbsp;&nbsp;<a href="#parse-fv">링크 필드 값
+                                        파싱</a></li>
+                                <li><a href="#rfc.section.B.3">B.3.</a>&nbsp;&nbsp;&nbsp;<a href="#parse-param">파라미터
+                                        파싱</a></li>
+                                <li><a href="#rfc.section.B.4">B.4.</a>&nbsp;&nbsp;&nbsp;<a href="#parse-qs">인용 문자열
+                                        파싱</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.C">부록 C.</a>&nbsp;&nbsp;&nbsp;<a href="#changes-from-rfc-5988">RFC
+                                5988로부터의 변경사항</a></li>
+                        <li><a href="#rfc.authors">저자 주소</a></li>
+                    </ul>
+                </div>
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>이 명세서는 웹 상의 리소스들 간의 관계("링크")와 그 관계의 유형("링크 관계 타입")에 대한 모델을 정의합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <p>HTML <a href="#W3C.REC-html5-20141028"><cite
+                                    title="HTML5">[W3C.REC-html5-20141028]</cite></a> 및 Atom <a href="#RFC4287"><cite
+                                    title="The Atom Syndication Format">[RFC4287]</cite></a>은 모두 잘 정의된 링크 개념을 가지고 있습니다.
+                            <a href="#links" title="Links">섹션 2</a>는 이러한 형식과 (잠재적으로) 다른 곳에서의 링크를 포괄하는 프레임워크로 이를 일반화합니다.
+                        </p>
+                    </div>
+                    <div id="rfc.section.1.p.3">
+                        <p>또한, <a href="#header" title="Link Serialisation in HTTP Headers">섹션 3</a>은 이러한 링크를 전달하기 위한
+                            HTTP 헤더 필드를 정의합니다.</p>
+                    </div>
+                    <section id="notational-conventions">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a
+                                href="#notational-conventions">표기 규약</a></h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>이 문서에서 대문자로만 나타나는 "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD
+                                NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", 및 "OPTIONAL"은 BCP 14 <a
+                                    href="#RFC2119"><cite
+                                        title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>
+                                및 <a href="#RFC8174"><cite
+                                        title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">[RFC8174]</cite></a>에서
+                                설명된 대로 해석됩니다.</p>
+                        </div>
+                        <div id="rfc.section.1.1.p.2">
+                            <p>이 문서는 Augmented Backus-Naur Form(ABNF) <a href="#RFC5234"><cite
+                                        title="Augmented BNF for Syntax Specifications: ABNF">[RFC5234]</cite></a> 표기와
+                                <a href="#RFC7230"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing">[RFC7230]</cite></a>에서
+                                사용하는 #rule을 포함하여, quoted-string, token, SP, BWS, OWS, RWS, LOALPHA, DIGIT 규칙을 명시적으로
+                                포함합니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.1.1.p.3" class="avoidbreakafter">
+                            <p>추가로 다음 규칙들이 포함됩니다:</p>
+                        </div>
+                        <div id="rfc.section.1.1.p.4">
+                            <ul>
+                                <li>URI 및 URI-Reference (RFC3986에서)</li>
+                                <li>type-name 및 subtype-name (RFC6838에서)</li>
+                                <li>media-query-list (W3C Media Queries에서)</li>
+                                <li>Language-Tag (RFC5646에서)</li>
+                            </ul>
+                        </div>
+                    </section>
+                    <section id="conformance-and-error-handling">
+                        <h3 id="rfc.section.1.2"><a href="#rfc.section.1.2">1.2.</a>&nbsp;<a
+                                href="#conformance-and-error-handling">적합성 및 오류 처리</a></h3>
+                        <div id="rfc.section.1.2.p.1">
+                            <p>적합성과 오류 처리에 관한 요구사항은 <a href="#RFC7230"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing">[RFC7230]</cite></a>의
+                                섹션 2.5에 강조된 사항이 본 문서에도 적용됩니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="links">
+                    <h2 id="rfc.section.2"><a href="#rfc.section.2">2.</a>&nbsp;<a href="#links">링크</a></h2>
+                    <div id="rfc.section.2.p.1" class="avoidbreakafter">
+                        <p>이 명세서에서 링크는 두 리소스 간의 유형화된 연결이며 다음으로 구성됩니다:</p>
+                    </div>
+                    <div id="rfc.section.2.p.2">
+                        <ul>
+                            <li>링크 컨텍스트,</li>
+                            <li>링크 관계 타입(<a href="#link-relation-types" title="Link Relation Types">섹션 2.1</a>),</li>
+                            <li>링크 대상, 및</li>
+                            <li>선택적으로 대상 속성(<a href="#attributes" title="Target Attributes">섹션 2.2</a>).</li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.2.p.3">
+                        <p>링크는 “링크 컨텍스트가 링크 대상에 대해 링크 관계 타입 리소스를 가진다, 그 리소스는 대상 속성을 가진다”라는 형태의 명제로 볼 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.4">
+                        <p>예를 들어, “https://www.example.com/”은 “https://example.com”에 “canonical” 리소스를 가지며, 그 리소스는
+                            “text/html”이라는 “type”을 가진다고 말할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.5">
+                        <p>링크 컨텍스트와 링크 대상은 모두 국제화된 리소스 식별자(IRI) <a href="#RFC3987"><cite
+                                    title="Internationalized Resource Identifiers (IRIs)">[RFC3987]</cite></a>일 수 있습니다.
+                            그러나 일반적인 경우 링크 컨텍스트는 많은 프로토콜(예: HTTP)이 IRI의 역참조를 지원하지 않기 때문에 URI <a href="#RFC3986"><cite
+                                    title="Uniform Resource Identifier (URI): Generic Syntax">[RFC3986]</cite></a>이기도
+                            합니다. 마찬가지로 링크 대상은 직렬화가 IRI를 지원하지 않는 경우(예: 섹션 3의 Link 헤더 필드) URI로 변환될 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.6">
+                        <p>이 명세서는 링크의 기수성(cardinality)에 제한을 두지 않습니다; 특정 대상에 대해 여러 링크가 존재할 수 있으며 동일한 컨텍스트와 대상 사이에 동일하거나
+                            다른 타입의 여러 링크가 있을 수 있습니다. 또한 특정 직렬화에서의 링크의 상대적 순서나 직렬화 간의 순서(예: Link 헤더 필드와 문서 내 링크)는 본 명세서에서
+                            지정되거나 중요한 것이 아닙니다. 순서를 중요하게 여기는 애플리케이션은 자체적으로 고려할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.7">
+                        <p>링크는 링크 직렬화로 전달됩니다; 이는 "wire 상의 바이트"이며 다양한 형식으로 나타날 수 있습니다. 예를 들어 Atom과 HTML은 각각의 형식으로 링크를
+                            직렬화하는 방법을 정의했으며, <a href="#header" title="Link Serialisation in HTTP Headers">섹션 3</a>은 링크를
+                            HTTP 헤더 필드에 직렬화하는 방법을 정의합니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.8">
+                        <p>이 명세서는 서로 다른 직렬화 전반에 걸친 일반적인 링크 문법을 정의하지 않으며, 특정 링크에 대해 특정 컨텍스트를 강제하지도 않습니다; 직렬화는 이러한 측면을
+                            명시해야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.9">
+                        <p>마지막으로, 링크는 링크 애플리케이션에 의해 사용됩니다. 일반적으로 애플리케이션은 자신이 사용하는 링크 관계 타입과 그것들이 나타날 수 있는 직렬화를 정의합니다. 예를
+                            들어 "웹 브라우징" 애플리케이션은 HTML 링크 직렬화(및 선택적으로 Link 헤더 필드)에서 "stylesheet" 관계 타입을 찾으며, "AtomPub"
+                            애플리케이션은 Atom 직렬화에서 "edit" 및 "edit-media" 링크 관계를 사용합니다.</p>
+                    </div>
+                    <section id="link-relation-types">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a
+                                href="#link-relation-types">링크 관계 타입</a></h3>
+                        <div id="rfc.section.2.1.p.1">
+                            <p>가장 단순한 경우 링크 관계 타입은 링크의 의미를 식별합니다. 예를 들어, 관계 타입이 "copyright"인 링크는 현재 링크 컨텍스트가 링크 대상에 대한
+                                저작권 리소스를 가짐을 나타냅니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.2">
+                            <p>링크 관계 타입은 대상 리소스가 특정 속성을 가지거나 특정 동작을 수행함을 나타내는 데에도 사용될 수 있습니다; 예를 들어 "service" 링크는 링크 대상이
+                                정의된 프로토콜의 일부로 사용될 수 있음을 의미합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.3">
+                            <p>관계 타입은 미디어 타입과 혼동되어서는 안 됩니다; 관계 타입은 링크를 역참조했을 때 얻어지는 표현의 형식을 식별하지 않습니다. 대신, 현재 컨텍스트가 다른
+                                리소스와 어떻게 관련되는지를 설명합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.4">
+                            <p>관계 타입은 다른 관계 타입의 존재 여부나 출현 기수성에 기반한 추가 의미를 유추해서는 안 됩니다. 예외적으로 "alternate"와 "stylesheet"의
+                                조합은 역사적 이유로 HTML에서 특별한 의미를 갖습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.5">
+                            <p>관계 타입에는 등록된 것과 확장된 것의 두 가지가 있습니다.</p>
+                        </div>
+                        <section id="registered">
+                            <h4 id="rfc.section.2.1.1"><a href="#rfc.section.2.1.1">2.1.1.</a>&nbsp;<a
+                                    href="#registered">등록된 관계 타입</a></h4>
+                            <div id="rfc.section.2.1.1.p.1">
+                                <p>잘 정의된 관계 타입은 편의성과 다른 애플리케이션의 재사용을 촉진하기 위해 토큰으로 등록될 수 있으며, 절차는 <a href="#procedure"
+                                        title="Registering Link Relation Types">섹션 2.1.1.1</a>에 설명되어 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.2">
+                                <p>등록된 관계 타입 이름은 reg-rel-type 규칙을 준수해야 하며(섹션 3.3 참고), 문자 단위로 대소문자 구분 없이 비교되어야 합니다. 의미가
+                                    특정 애플리케이션에 매우 특화되어 있다면 이름도 그에 맞춰야 하며, 덜 특화된 용도를 위해 일반적인 이름을 남겨두어야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.3">
+                                <p>등록된 관계 타입은 링크 컨텍스트의 미디어 타입이나 링크 대상의 사용 가능한 표현 미디어 타입을 제한해서는 안 됩니다. 다만 대상 리소스의 동작과
+                                    속성(예: 허용되는 HTTP 메서드, 요구되는 요청/응답 미디어 타입)은 지정할 수 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.4">
+                                <p>역사적으로 등록된 관계 타입은 애플리케이션 정의 기본 URI를 접두사로 붙여 URI로 식별되기도 했습니다(예: Atom의 예). 이 관행은 권장되지
+                                    않습니다. 그러한 문자열은 다른 애플리케이션에서 등록된 관계 타입과 동등하게 간주되지 않을 수 있기 때문입니다. 내부적으로 이러한 URI를 사용하는
+                                    애플리케이션은 이를 명시적으로 수용하는 직렬화에서만 사용해야 합니다.</p>
+                            </div>
+                            <section id="procedure">
+                                <h5 id="rfc.section.2.1.1.1"><a href="#rfc.section.2.1.1.1">2.1.1.1.</a>&nbsp;<a
+                                        href="#procedure">링크 관계 타입 등록 절차</a></h5>
+                                <div id="rfc.section.2.1.1.1.p.1">
+                                    <p>"Link Relations" 레지스트리는 “https://www.iana.org/assignments/link-relations/”에
+                                        위치합니다. 등록 요청은 해당 지침을 따르거나 “link-relations@ietf.org” 메일링 리스트로 이메일을 보내어 제출할 수
+                                        있습니다.</p>
+                                </div>
+                                <div id="rfc.section.2.1.1.1.p.2" class="avoidbreakafter">
+                                    <p>등록 요청은 최소한 다음 정보를 포함해야 합니다:</p>
+                                </div>
+                                <div id="rfc.section.2.1.1.1.p.3">
+                                    <ul>
+                                        <li><strong>Relation Name</strong>: 관계 타입의 이름</li>
+                                        <li><strong>Description</strong>: 타입 의미에 대한 짧은 영어 설명. 링크 컨텍스트와 링크 대상 간의 관계 관점에서
+                                            기술하는 것이 좋습니다.</li>
+                                        <li><strong>Reference</strong>: 링크 관계 타입을 규정하는 문서에 대한 참조, 가능하면 해당 문서를 가져올 수 있는
+                                            URI 포함. 관련 섹션을 명시할 수는 있으나 필수는 아닙니다.</li>
+                                    </ul>
+                                </div>
+                                <div id="rfc.section.2.1.1.1.p.4">
+                                    <p>전문가는 레지스트리에 수집할 추가 필드를 정의할 수 있습니다.</p>
+                                </div>
+                                <div id="rfc.section.2.1.1.1.p.5">
+                                    <p>등록된 관계 타입의 일반 요건은 <a href="#registered" title="Registered Relation Types">섹션
+                                            2.1.1</a>에 설명되어 있습니다.</p>
+                                </div>
+                                <div id="rfc.section.2.1.1.1.p.6">
+                                    <p>등록은 자유롭게 접근 가능한 안정적 명세를 참조해야 합니다.</p>
+                                </div>
+                                <div id="rfc.section.2.1.1.1.p.7">
+                                    <p>관계 타입은 제3자(전문가 포함)에 의해 등록될 수 있으며, 전문가가 미등록 관계 타입이 널리 배포되어 있고 적시에 등록될 가능성이 낮다고
+                                        판단하면 등록할 수 있습니다. 이러한 등록은 여전히 규정된 요구사항과 명세 참조 필요성을 따릅니다.</p>
+                                </div>
+                            </section>
+                            <section id="processing">
+                                <h5 id="rfc.section.2.1.1.2"><a href="#rfc.section.2.1.1.2">2.1.1.2.</a>&nbsp;<a
+                                        href="#processing">등록 요청 처리</a></h5>
+                                <div id="rfc.section.2.1.1.2.p.1">
+                                    <p>관계 타입은 Specification Required 정책에 따라 등록되며(참조 RFC8126 섹션 4.6), 이는 지정 전문가의 검토 및 승인을
+                                        의미합니다.</p>
+                                </div>
+                                <div id="rfc.section.2.1.1.2.p.2">
+                                    <p>레지스트리의 목표는 인터넷에서의 일반적인 링크 사용을 반영하는 것입니다. 따라서 전문가는 남용적이거나 하찮거나 인터넷에서 사용될 가능성이 낮거나
+                                        해로운 경우를 제외하고는 등록을 승인하는 쪽으로 편향되어야 합니다. 제안된 응용에 대해 이름이 지나치게 일반적이면 등록을 보류할 수 있습니다.
+                                    </p>
+                                </div>
+                                <div id="rfc.section.2.1.1.2.p.3">
+                                    <p>등록이 거부되는 경우 전문가는 그 이유를 명확히 밝혀야 합니다. 의미에 관한 조언을 제공할 수 있으나, 등록을 차단하지 않는 한 이는 명시적으로
+                                        표시되어야 합니다.</p>
+                                </div>
+                                <div id="rfc.section.2.1.1.2.p.4">
+                                    <p>요청이 승인되면 전문가는 IANA에 통보하고 등록이 처리됩니다. IESG는 이의 제기에 대한 최종 중재자입니다.</p>
+                                </div>
+                            </section>
+                        </section>
+                        <section id="extension-relation-types">
+                            <h4 id="rfc.section.2.1.2"><a href="#rfc.section.2.1.2">2.1.2.</a>&nbsp;<a
+                                    href="#extension-relation-types">확장 관계 타입</a></h4>
+                            <div id="rfc.section.2.1.2.p.1">
+                                <p>등록을 원치 않는 애플리케이션은 확장 관계 타입을 사용할 수 있으며, 이는 관계 타입을 고유하게 식별하는 URI입니다. URI는 그 의미를 정의한
+                                    리소스를 가리킬 수 있지만, 클라이언트는 그 리소스를 자동으로 접근해서는 안 됩니다(서버 과부하 방지).</p>
+                            </div>
+                            <div id="rfc.section.2.1.2.p.2">
+                                <p>확장 관계 타입에 사용되는 URI는 해당 정의를 내린 사람 또는 당사자가 제어하거나 위임받은 것이어야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.2.p.3">
+                                <p>확장 관계 타입을 비교할 때는 문자열(직렬화가 다른 형식인 경우 URI로 변환한 후)을 문자 단위로 대소문자 구분 없이 비교해야 합니다. 따라서 소문자
+                                    URI 사용을 권장합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.2.p.4">
+                                <p>확장 관계 타입은 URI여야 하지만, 직렬화가 다른 형식으로 표현될 수 있고 URI로 변환될 수 있다면 해당 직렬화에서 다른 형태로 표현하는 것을 허용할
+                                    수 있습니다.</p>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="attributes">
+                        <h3 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a>&nbsp;<a href="#attributes">대상
+                                속성</a></h3>
+                        <div id="rfc.section.2.2.p.1">
+                            <p>대상 속성은 링크 또는 그 대상에 대해 설명하는 키/값 쌍의 목록입니다; 예를 들어 미디어 타입 힌트가 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.2">
+                            <p>이들은 개별 링크 관계 타입이나 링크 직렬화에 의해 정의될 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.3">
+                            <p>본 명세서는 대상 속성의 이름, 기수성, 또는 사용을 조정하려 하지 않습니다. 직렬화를 작성하고 유지하는 이들은 의미나 문법의 충돌을 피하기 위해 대상 속성을
+                                조정해야 하며 자체 레지스트리를 정의할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.4">
+                            <p>대상 속성의 이름은 token 규칙을 따르는 것이 바람직하지만, 이식성을 위해 "%", "’", "*" 문자를 포함해서는 안 되며 대소문자 구분 없이 비교되어야
+                                합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.5" class="avoidbreakafter">
+                            <p>대상 속성 정의는 다음을 지정하는 것이 바람직합니다:</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.6">
+                            <ul>
+                                <li>값을 유니코드 또는 그 부분집합으로 직렬화하는 방법(직렬화 간 이식성 최대화),</li>
+                                <li>주어진 링크에 대해 대상 속성이 여러 번 발생할 때의 의미와 오류 처리.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.2.2.p.7">
+                            <p>본 명세서는 Link HTTP 헤더 필드에서 사용하기 위한 대상 속성을 <a href="#header-attrs"
+                                    title="Target Attributes">섹션 3.4</a>에 정의합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="header">
+                    <h2 id="rfc.section.3"><a href="#rfc.section.3">3.</a>&nbsp;<a href="#header">HTTP 헤더의 링크 직렬화</a>
+                    </h2>
+                    <div id="rfc.section.3.p.1">
+                        <p>Link 헤더 필드는 하나 이상의 링크를 HTTP 헤더에 직렬화하는 수단을 제공합니다.</p>
+                    </div>
+                    <div id="rfc.section.3.p.2" class="avoidbreakafter">
+                        <p>필드 값의 ABNF는 다음과 같습니다:</p>
+                    </div>
+                    <div id="rfc.figure.1">
+                        <div>
+                            <pre class="inline">
+  Link       = #link-value
+  link-value = "&lt;" URI-Reference "&gt;" *( OWS ";" OWS link-param )
+  link-param = token BWS [ "=" BWS ( token / quoted-string ) ]
+</pre>
+                        </div>
+                    </div>
+                    <div id="rfc.section.3.p.3" class="avoidbreakafter">
+                        <p>어떤 link-param이든 token 또는 quoted-string 문법을 사용한 값으로 생성될 수 있으므로 수신자는 두 형식을 모두 파싱할 수 있어야 합니다. 즉,
+                            다음의 파라미터들은 동등합니다:</p>
+                    </div>
+                    <div id="rfc.figure.2">
+                        <div>
+                            <pre>
+  x=y
+  x="y"
+</pre>
+                        </div>
+                    </div>
+                    <div id="rfc.section.3.p.4">
+                        <p>이전의 Link 헤더 정의들은 token과 quoted-string 형식을 명시적으로 동일시하지 않았습니다; title 파라미터는 항상 인용되었고 hreflang
+                            파라미터는 항상 token이었습니다. 상호운용성을 극대화하려는 송신자는 해당 형식을 따르는 것이 좋습니다.</p>
+                    </div>
+                    <div id="rfc.section.3.p.5">
+                        <p>개별 link-params는 필요한 언인쿼팅 후의 값에 대한 문법을 지정합니다(RFC7230 섹션 3.2.6 참조).</p>
+                    </div>
+                    <div id="rfc.section.3.p.6">
+                        <p>본 명세서는 일반 링크 모델의 일부인 "rel", "anchor", "rev" 링크 파라미터뿐만 아니라 직렬화에서 정의된 대상 속성인 "hreflang",
+                            "media", "title", "title*", 및 "type" 링크 파라미터를 설정합니다.</p>
+                    </div>
+                    <section id="link-target">
+                        <h3 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a>&nbsp;<a href="#link-target">링크
+                                대상</a></h3>
+                        <div id="rfc.section.3.1.p.1">
+                            <p>각 link-value는 꺾쇠 괄호("&lt;&gt;") 안에 URI-Reference 형태로 하나의 대상 IRI를 전달합니다(필요 시
+                                URI-Reference로 변환). 만약 URI-Reference가 상대적이면 파서는 RFC3986 섹션 5에 따라 이를 해석해야 합니다. 메시지 콘텐츠에
+                                나타난 어떤 기준 IRI(base IRI)도 적용되지 않는다는 점에 유의하세요.</p>
+                        </div>
+                    </section>
+                    <section id="header-context">
+                        <h3 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a>&nbsp;<a href="#header-context">링크
+                                컨텍스트</a></h3>
+                        <div id="rfc.section.3.2.p.1">
+                            <p>기본적으로 Link 헤더 필드에 전달된 링크의 컨텍스트는 해당 링크가 연관된 표현의 URL이며(RFC7231 섹션 3.1.4.1 참조), URI로 직렬화됩니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.2.p.2">
+                            <p>anchor 파라미터가 존재하면 이는 해당 표현의 일부(예: 프래그먼트)나 제3의 리소스(절대 URI일 때)로 이를 대체합니다. anchor 값이 상대 URI인
+                                경우 파서는 RFC3986 섹션 5에 따라 이를 해석해야 합니다. 본문에 있는 기준 URI는 적용되지 않습니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.3" class="avoidbreakafter">
+                            <p>anchor 파라미터 값의 ABNF는 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.figure.3">
+                            <div>
+                                <pre class="inline">
+  URI-Reference ; Section 4.1 of [RFC3986]
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.2.p.4">
+                            <p>링크 애플리케이션은 anchor 파라미터가 있는 링크를 무시할 수 있습니다. 예를 들어, 사용 중인 애플리케이션이 링크 컨텍스트를 다른 리소스로 할당하는 것을
+                                허용하지 않을 수 있습니다. 그런 경우 전체 링크를 무시해야 하며, anchor를 적용하지 않고 링크를 처리해서는 안 됩니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.5">
+                            <p>HTTP 상태 코드 및 응답 헤더에 따라 링크 컨텍스트가 “익명(anonymous)”일 수 있다는 점에 유의하세요(예: GET 요청에 대한 404 응답).
+                            </p>
+                        </div>
+                    </section>
+                    <section id="header-type">
+                        <h3 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a>&nbsp;<a href="#header-type">관계
+                                타입</a></h3>
+                        <div id="rfc.section.3.3.p.1">
+                            <p>Link 헤더 필드에서 전달된 링크의 관계 타입은 "rel" 파라미터 값으로 전달됩니다. rel 파라미터는 반드시 존재해야 하며, 단일 link-value에서
+                                두 번 이상 나타나서는 안 됩니다; 첫 번째 이후의 발생은 파서가 무시해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.2">
+                            <p>rel 파라미터는 여러 링크 관계 타입을 포함할 수 있습니다. 이 경우 동일한 컨텍스트, 대상 및 대상 속성을 공유하는 여러 링크가 성립됩니다.</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.3">
+                            <p>과거에 "rev" 파라미터는 관계 의미가 역방향임을 표시하는 데 사용되었습니다. 즉 A에서 B로 REL="X"인 링크는 B에서 A로 REV="X"인 링크와
+                                동일한 관계를 표현합니다. rev는 저자를 혼동시키는 경우가 많기 때문에 본 명세서에서는 사용이 권장되지 않습니다; 대부분의 경우 별도의 관계 타입을 사용하는
+                                것이 바람직합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.4" class="avoidbreakafter">
+                            <p>rel 및 rev 파라미터 값의 ABNF는 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.figure.4">
+                            <div>
+                                <pre class="inline">
+  relation-type *( 1*SP relation-type )
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.3.p.5" class="avoidbreakafter">
+                            <p>여기서:</p>
+                        </div>
+                        <div id="rfc.figure.5">
+                            <div>
+                                <pre class="inline">
+  relation-type  = reg-rel-type / ext-rel-type
+  reg-rel-type   = LOALPHA *( LOALPHA / DIGIT / "." / "-" )
+  ext-rel-type   = URI ; Section 3 of [RFC3986]
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.3.p.6">
+                            <p>확장 관계 타입은 Link 헤더 필드에서 절대 URI여야 하며, 세미콜론(;)이나 쉼표(,)와 같은 토큰에서 허용되지 않는 문자를 포함하면 인용되어야
+                                합니다(헤더 필드 자체에서 이러한 문자는 구분자이기 때문).</p>
+                        </div>
+                    </section>
+                    <section id="header-attrs">
+                        <h3 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a>&nbsp;<a href="#header-attrs">대상
+                                속성</a></h3>
+                        <div id="rfc.section.3.4.p.1">
+                            <p>Link 헤더 필드는 이 직렬화에 특정한 여러 대상 속성을 정의하며 확장 대상 속성도 허용합니다. 대상 속성은 Link 헤더 필드에서 파라미터로
+                                직렬화됩니다(RFC7231 섹션 3.1.1.1의 문법 정의 참조).</p>
+                        </div>
+                        <section id="serialisation-defined-attributes">
+                            <h4 id="rfc.section.3.4.1"><a href="#rfc.section.3.4.1">3.4.1.</a>&nbsp;<a
+                                    href="#serialisation-defined-attributes">직렬화-정의 속성</a></h4>
+                            <div id="rfc.section.3.4.1.p.1">
+                                <p>"hreflang", "media", "title", "title*", 및 "type" 링크-파라미터는 링크의 직렬화-정의 대상 속성으로 변환될 수
+                                    있습니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.2">
+                                <p>"hreflang" 속성은 존재할 때 링크를 역참조했을 때의 결과 언어에 대한 힌트를 제공합니다. 이는 단지 힌트일 뿐이며, 예를 들어 실제로 링크를
+                                    따라 얻은 HTTP 응답의 Content-Language 헤더를 무시하지 않습니다. 단일 link-value에 여러 hreflang이 있으면 여러
+                                    언어가 제공됨을 나타냅니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.3" class="avoidbreakafter">
+                                <p>hreflang 파라미터 값의 ABNF는 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.figure.6">
+                                <div>
+                                    <pre class="inline">
+  Language-Tag
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.4">
+                                <p>"media" 속성은 스타일 정보의 대상 매체를 나타내며(HTML5 섹션 4.2.4 참조) 값에 세미콜론(;)이나 쉼표(,)가 포함되면 반드시 인용되어야
+                                    합니다. link-value 당 media 속성은 하나만 있어야 하며, 이후의 발생은 파서가 무시해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.5" class="avoidbreakafter">
+                                <p>media 파라미터 값의 ABNF는 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.figure.7">
+                                <div>
+                                    <pre class="inline">
+  media-query-list
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.6">
+                                <p>"title" 속성은 링크 대상의 목적지를 사람 읽을 수 있는 식별자(예: 메뉴 항목)로 표시하는 데 사용되며, Content-Language 헤더
+                                    필드가 있을 때 그 언어로 간주됩니다. title 속성은 단일 link-value에 두 번 이상 나타나서는 안 되며 이후 발생은 파서가 무시해야
+                                    합니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.7">
+                                <p>"title*" 링크-파라미터는 RFC8187에 따라 다른 문자 집합으로 인코딩하거나 언어 정보를 포함할 수 있습니다. title* 링크-파라미터는 단일
+                                    link-value에 두 번 이상 나타나서는 안 되며 이후 발생은 파서가 무시해야 합니다. 속성이 언어 정보를 포함하지 않을 경우 그 언어는
+                                    Content-Language 헤더로 표시됩니다(존재할 때).</p>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.8">
+                                <p>title과 title*이 모두 나타나면 애플리케이션은 title*의 값을 사용하는 것이 바람직합니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.9">
+                                <p>"type" 속성은 링크를 역참조했을 때의 결과 미디어 타입에 대한 힌트를 제공합니다. 이는 단지 힌트이며, 실제로 링크를 따라 얻은 HTTP 응답의
+                                    Content-Type 헤더를 무시하지 않습니다. type 속성은 단일 link-value에 두 번 이상 나타나서는 안 되며 이후 발생은 파서가
+                                    무시해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.10" class="avoidbreakafter">
+                                <p>type 파라미터 값의 ABNF는 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.figure.8">
+                                <div>
+                                    <pre class="inline">
+  type-name "/" subtype-name ; see Section 4.2 of [RFC6838]
+</pre>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="extension-attributes">
+                            <h4 id="rfc.section.3.4.2"><a href="#rfc.section.3.4.2">3.4.2.</a>&nbsp;<a
+                                    href="#extension-attributes">확장 속성</a></h4>
+                            <div id="rfc.section.3.4.2.p.1">
+                                <p>다른 link-params는 링크 확장으로 간주되며 대상 속성으로 처리됩니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.2.p.2">
+                                <p>이러한 대상 속성은 RFC8187 인코딩을 사용할 수 있습니다(예: "example" 및 "example*"). 두 형식이 모두 존재할 경우 동일한 대상
+                                    속성으로 간주되어야 하며, 애플리케이션은 이름이 "*"로 끝나는 쪽의 값을 RFC8187 디코딩 후 사용하는 것이 바람직하나, 디코딩 오류가 발생하거나
+                                    디코딩을 지원하지 않는 경우 대체 값으로 되돌아갈 수 있습니다.</p>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="link-header-field-examples">
+                        <h3 id="rfc.section.3.5"><a href="#rfc.section.3.5">3.5.</a>&nbsp;<a
+                                href="#link-header-field-examples">Link 헤더 필드 예시</a></h3>
+                        <div id="rfc.section.3.5.p.1" class="avoidbreakafter">
+                            <p>예를 들면:</p>
+                        </div>
+                        <div id="rfc.figure.9">
+                            <div>
+                                <pre>
+Link: &lt;http://example.com/TheBook/chapter2&gt;; rel="previous";
+      title="previous chapter"
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.5.p.2">
+                            <p>이는 “chapter2”가 논리적 내비게이션 경로에서 이 리소스보다 이전에 있음을 나타냅니다.</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.3">
+                            <p>유사하게,</p>
+                        </div>
+                        <div id="rfc.figure.10">
+                            <div>
+                                <pre>
+Link: &lt;/&gt;; rel="http://example.net/foo"
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.5.p.4">
+                            <p>이는 루트 리소스("/")가 확장 관계 타입 "http://example.net/foo"로 이 리소스와 관련되어 있음을 나타냅니다.</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.5" class="avoidbreakafter">
+                            <p>다음 링크는:</p>
+                        </div>
+                        <div id="rfc.figure.11">
+                            <div>
+                                <pre>
+Link: &lt;/terms&gt;; rel="copyright"; anchor="#foo"
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.5.p.6">
+                            <p>이는 연결된 저작권 조건이 문서의 프래그먼트 식별자 "foo"가 가리키는 부분에만 적용됨을 나타냅니다.</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.7">
+                            <p>다음 예시는 Link 헤더 필드가 여러 링크를 인코딩하는 사례와 RFC 8187 인코딩을 사용하여 비-ASCII 문자와 언어 정보를 인코딩하는 방법을
+                                보여줍니다.</p>
+                        </div>
+                        <div id="rfc.figure.12">
+                            <div>
+                                <pre>
+Link: &lt;/TheBook/chapter2&gt;;
+      rel="previous"; title*=UTF-8'de'letztes%20Kapitel,
+      &lt;/TheBook/chapter4&gt;;
+      rel="next"; title*=UTF-8'de'n%c3%a4chstes%20Kapitel
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.5.p.8">
+                            <p>여기서 두 링크 모두 독일어("de")로 인코딩된 제목을 가지고 있으며, 두 번째 링크는 유니코드 코드 포인트 U+00E4를 포함합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.9" class="avoidbreakafter">
+                            <p>링크 값은 동일한 링크 대상과 링크 컨텍스트 사이에 여러 링크를 전달할 수 있습니다; 예를 들어:</p>
+                        </div>
+                        <div id="rfc.figure.13">
+                            <div>
+                                <pre>
+Link: &lt;http://example.org/&gt;;
+      rel="start http://example.net/relation/other"
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.5.p.10">
+                            <p>여기서 "http://example.org/"에 대한 링크는 등록된 관계 타입 "start"와 확장 관계 타입
+                                "http://example.net/relation/other"을 가집니다.</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.11" class="avoidbreakafter">
+                            <p>마지막으로, 다음 헤더 필드는:</p>
+                        </div>
+                        <div id="rfc.figure.14">
+                            <div>
+                                <pre>
+Link: &lt;https://example.org/&gt;; rel="start",
+      &lt;https://example.org/index&gt;; rel="index"
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.3.5.p.12" class="avoidbreakafter">
+                            <p>다음과 동등합니다:</p>
+                        </div>
+                        <div id="rfc.figure.15">
+                            <div>
+                                <pre>
+Link: &lt;https://example.org/&gt;; rel="start"
+Link: &lt;https://example.org/index&gt;; rel="index"
+</pre>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+                <section id="iana-considerations">
+                    <h2 id="rfc.section.4"><a href="#rfc.section.4">4.</a>&nbsp;<a href="#iana-considerations">IANA
+                            고려사항</a></h2>
+                    <section id="link-http-header-field-registration">
+                        <h3 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a>&nbsp;<a
+                                href="#link-http-header-field-registration">Link HTTP 헤더 필드 등록</a></h3>
+                        <div id="rfc.section.4.1.p.1">
+                            <p>이 명세서는 HTTP의 "Message Headers" 레지스트리에서 "Link" 항목을 본 문서를 참조하도록 업데이트합니다(RFC3864 참조).</p>
+                        </div>
+                        <div id="rfc.figure.16">
+                            <div>
+                                <pre>
+Header Field Name: Link
+Protocol: http
+Status: standard
+Reference: RFC 8288
+</pre>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="link-relation-type-registry">
+                        <h3 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a>&nbsp;<a
+                                href="#link-relation-type-registry">링크 관계 타입 레지스트리</a></h3>
+                        <div id="rfc.section.4.2.p.1">
+                            <p>이 명세서는 "Link Relation Types" 레지스트리의 등록 절차를 업데이트합니다; <a href="#procedure"
+                                    title="Registering Link Relation Types">섹션 2.1.1.1</a> 참조. 또한 그 레지스트리의 RFC 5988에 대한
+                                모든 참조는 본 문서로 대체되었습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.2">
+                            <p>IANA는 레지스트리에 대한 모든 수신 요청을 본 문서 및(정의된 경우) 전문가가 설정한 프로세스로 안내할 것입니다; 일반적으로 이는 레지스트리 웹 페이지로의
+                                참조를 의미합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.3">
+                            <p>전문가는 레지스트리에 수집할 추가 필드를 정의할 수 있습니다(섹션 2.1.1.1 참조).</p>
+                        </div>
+                    </section>
+                    <section id="link-relation-application-data-registry">
+                        <h3 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a>&nbsp;<a
+                                href="#link-relation-application-data-registry">링크 관계 응용 데이터 레지스트리</a></h3>
+                        <div id="rfc.section.4.3.p.1">
+                            <p>본 명세에 따라 IANA는 사용되지 않았고 향후 사용이 예상되지 않으므로 "Link Relation Application Data" 레지스트리를 제거했습니다.
+                            </p>
+                        </div>
+                    </section>
+                </section>
+                <section id="security-considerations">
+                    <h2 id="rfc.section.5"><a href="#rfc.section.5">5.</a>&nbsp;<a href="#security-considerations">보안
+                            고려사항</a></h2>
+                    <div id="rfc.section.5.p.1">
+                        <p>Link 헤더 필드의 내용은 보안, 프라이버시 또는 무결성이 보장되지 않습니다. 이러한 속성을 제공하는 현재 유일한 종단 간 방법은 HTTP에 대한 전송 계층
+                            보안(TLS)을 사용하는 것입니다 (RFC2818 참조).</p>
+                    </div>
+                    <div id="rfc.section.5.p.2">
+                        <p>링크 애플리케이션은 HTTP 헤더 필드에서 수집된 링크를 자동으로 따라가거나 신뢰하거나 사용하는 경우 열릴 수 있는 공격 벡터를 고려해야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.3">
+                        <p>예를 들어, anchor 파라미터를 사용하여 링크 컨텍스트를 다른 리소스와 연결하는 Link 헤더 필드는 제3자의 주장으로 인해 부정확하거나 악의적일 수 있으므로
+                            신뢰할 수 없습니다. 애플리케이션은 이러한 링크를 폐기하도록 지정하거나(예: 리소스 간에 동일한 권한(authority)이 있음이 확립된 경우에만 허용) 위험을
+                            완화할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.4">
+                        <p>링크를 역참조하는 것은 사용 중인 애플리케이션에 따라 여러 위험을 수반합니다. 예를 들어 Referer 헤더(RFC7231 참조)는 애플리케이션 상태(민감한 정보
+                            포함)에 대한 정보를 노출할 수 있습니다. 마찬가지로 쿠키(RFC6265 참조)도 공격 벡터가 될 수 있습니다. 애플리케이션은 이러한 메커니즘이 어떻게 동작해야
+                            하는지 신중히 규정하여 위험을 완화할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.5">
+                        <p>Link 헤더 필드는 IRI와 URI를 광범위하게 사용합니다. IRI 관련 보안 고려사항은 RFC3987 섹션 8을, URI 관련 보안 고려사항은 RFC3986 섹션
+                            7을, HTTP 헤더 필드 관련 보안 고려사항은 RFC7230 섹션 9를 참조하십시오.</p>
+                    </div>
+                </section>
+                <section id="internationalisation-considerations">
+                    <h2 id="rfc.section.6"><a href="#rfc.section.6">6.</a>&nbsp;<a
+                            href="#internationalisation-considerations">국제화 고려사항</a></h2>
+                    <div id="rfc.section.6.p.1">
+                        <p>링크 대상은 IRI를 지원하지 않는 직렬화에서 표현하기 위해 URI로 변환되어야 할 수 있습니다. 이는 Link HTTP 헤더 필드를 포함합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.2">
+                        <p>유사하게, Link 헤더 필드의 anchor 파라미터는 IRI를 지원하지 않으므로 포함하기 전에 IRI를 URI로 변환해야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.3">
+                        <p>관계 타입은 비교를 용이하게 하기 위해 URI로 정의됩니다. 이들은 최종 사용자에게 표시될 것으로 기대되지 않습니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.4">
+                        <p>등록된 관계 이름은 소문자 ASCII 문자여야 한다는 점에 유의하십시오.</p>
+                    </div>
+                </section>
+                <section id="rfc.references">
+                    <h2 id="rfc.section.7"><a href="#rfc.section.7">7.</a> 참고문헌</h2>
+                    <section>
+                        <div id="rfc.references.1">
+                            <h3 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a> 규범적 참고문헌</h3>
+                            <dl class="dl-horizontal">
+                                <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">Key words for
+                                        use in RFCs to Indicate Requirement Levels</a>”, BCP 14, RFC 2119, March 1997.
+                                </dd>
+                                <dt id="RFC3864">[<a href="#RFC3864" class="smpl">RFC3864</a>]</dt>
+                                <dd>Klyne, G., Nottingham, M., and J. Mogul, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc3864.html">Registration Procedures for
+                                        Message Header Fields</a>”, BCP 90, RFC 3864, September 2004.</dd>
+                                <dt id="RFC3986">[<a href="#RFC3986" class="smpl">RFC3986</a>]</dt>
+                                <dd>Berners-Lee, T., Fielding, R., and L. Masinter, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc3986.html">Uniform Resource Identifier
+                                        (URI): Generic Syntax</a>”, STD 66, RFC 3986, January 2005.</dd>
+                                <dt id="RFC3987">[<a href="#RFC3987" class="smpl">RFC3987</a>]</dt>
+                                <dd>Duerst, M. and M. Suignard, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc3987.html">Internationalized Resource
+                                        Identifiers (IRIs)</a>”, RFC 3987, January 2005.</dd>
+                                <dt id="RFC5234">[<a href="#RFC5234" class="smpl">RFC5234</a>]</dt>
+                                <dd>Crocker, D., Ed. and P. Overell, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc5234.html">Augmented BNF for Syntax
+                                        Specifications: ABNF</a>”, STD 68, RFC 5234, January 2008.</dd>
+                                <dt id="RFC5646">[<a href="#RFC5646" class="smpl">RFC5646</a>]</dt>
+                                <dd>Phillips, A., Ed. and M. Davis, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc5646.html">Tags for Identifying
+                                        Languages</a>”, BCP 47, RFC 5646, September 2009.</dd>
+                                <dt id="RFC6838">[<a href="#RFC6838" class="smpl">RFC6838</a>]</dt>
+                                <dd>Freed, N., Klensin, J., and T. Hansen, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc6838.html">Media Type Specifications and
+                                        Registration Procedures</a>”, BCP 13, RFC 6838, January 2013.</dd>
+                                <dt id="RFC7230">[<a href="#RFC7230" class="smpl">RFC7230</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Message Syntax and Routing</a>”, RFC 7230, June 2014.</dd>
+                                <dt id="RFC7231">[<a href="#RFC7231" class="smpl">RFC7231</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7231.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Semantics and Content</a>”, RFC 7231, June 2014.</dd>
+                                <dt id="RFC8126">[<a href="#RFC8126" class="smpl">RFC8126</a>]</dt>
+                                <dd>Cotton, M., Leiba, B., and T. Narten, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc8126.html">Guidelines for Writing an
+                                        IANA Considerations Section in RFCs</a>”, BCP 26, RFC 8126, June 2017.</dd>
+                                <dt id="RFC8174">[<a href="#RFC8174" class="smpl">RFC8174</a>]</dt>
+                                <dd>Leiba, B., “<a href="https://www.rfc-editor.org/rfc/rfc8174.html">Ambiguity of
+                                        Uppercase vs Lowercase in RFC 2119 Key Words</a>”, BCP 14, RFC 8174, May 2017.
+                                </dd>
+                                <dt id="RFC8187">[<a href="#RFC8187" class="smpl">RFC8187</a>]</dt>
+                                <dd>Reschke, J., “<a href="https://www.rfc-editor.org/rfc/rfc8187.html">Indicating
+                                        Character Encoding and Language for HTTP Header Field Parameters</a>”, RFC 8187,
+                                    September 2017.</dd>
+                                <dt id="W3C.REC-css3-mediaqueries-20120619">[<a
+                                        href="#W3C.REC-css3-mediaqueries-20120619"
+                                        class="smpl">W3C.REC-css3-mediaqueries-20120619</a>]</dt>
+                                <dd>Rivoal, F., “<a
+                                        href="http://www.w3.org/TR/2012/REC-css3-mediaqueries-20120619">Media
+                                        Queries</a>”, W3C Recommendation, June 2012.</dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section>
+                        <div id="rfc.references.2">
+                            <h3 id="rfc.section.7.2"><a href="#rfc.section.7.2">7.2.</a> 비규범적 참고문헌</h3>
+                            <dl class="dl-horizontal">
+                                <dt id="RFC2046">[<a href="#RFC2046" class="smpl">RFC2046</a>]</dt>
+                                <dd>Freed, N. and N. Borenstein, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc2046.html">Multipurpose Internet Mail
+                                        Extensions (MIME) Part Two: Media Types</a>”, RFC 2046, November 1996.</dd>
+                                <dt id="RFC2818">[<a href="#RFC2818" class="smpl">RFC2818</a>]</dt>
+                                <dd>Rescorla, E., “<a href="https://www.rfc-editor.org/rfc/rfc2818.html">HTTP Over
+                                        TLS</a>”, RFC 2818, May 2000.</dd>
+                                <dt id="RFC4287">[<a href="#RFC4287" class="smpl">RFC4287</a>]</dt>
+                                <dd>Nottingham, M., Ed. and R. Sayre, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc4287.html">The Atom Syndication
+                                        Format</a>”, RFC 4287, December 2005.</dd>
+                                <dt id="RFC6265">[<a href="#RFC6265" class="smpl">RFC6265</a>]</dt>
+                                <dd>Barth, A., “<a href="https://www.rfc-editor.org/rfc/rfc6265.html">HTTP State
+                                        Management Mechanism</a>”, RFC 6265, April 2011.</dd>
+                                <dt id="W3C.REC-html5-20141028">[<a href="#W3C.REC-html5-20141028"
+                                        class="smpl">W3C.REC-html5-20141028</a>]</dt>
+                                <dd>Hickson, I., Berjon, R., Faulkner, S., et al., “<a
+                                        href="http://www.w3.org/TR/2014/REC-html5-20141028">HTML5</a>”, W3C
+                                    Recommendation, October 2014.</dd>
+                            </dl>
+                        </div>
+                    </section>
+                </section>
+                <section id="notes-on-other-link-serialisations">
+                    <h2 id="rfc.section.A" class="np"><a href="#rfc.section.A">부록 A.</a>&nbsp;<a
+                            href="#notes-on-other-link-serialisations">다른 링크 직렬화에 대한 주석</a></h2>
+                    <div id="rfc.section.A.p.1">
+                        <p>헤더 필드(<a href="#header" title="Link Serialisation in HTTP Headers">섹션 3</a>)는 링크의 한 가지 직렬화에
+                            불과하며, 다른 명세들은 대체 직렬화를 정의했습니다.</p>
+                    </div>
+                    <section id="html">
+                        <h3 id="rfc.section.A.1"><a href="#rfc.section.A.1">A.1.</a>&nbsp;<a href="#html">HTML의 링크
+                                직렬화</a></h3>
+                        <div id="rfc.section.A.1.p.1">
+                            <p>HTML은 Link 헤더 필드의 원래 문법에 영감을 주었으며, 본 문서의 많은 설계 결정은 이에 대한 호환성을 유지하려는 욕구에서 비롯되었습니다.</p>
+                        </div>
+                        <div id="rfc.section.A.1.p.2">
+                            <p>HTML에서 link 요소는 "href" 속성으로 대상 URI를, "rel"로 관계 타입을 전달하여 이곳에서 규정한 링크로 매핑될 수 있습니다. 링크의
+                                컨텍스트는 전체 HTML 문서와 연관된 URI입니다. HTML은 "media", "hreflang", "type", "sizes" 등의 링크 속성을
+                                정의합니다.</p>
+                        </div>
+                        <div id="rfc.section.A.1.p.3">
+                            <p>HTML5의 섹션 4.8은 현대 HTML 링크를 정의합니다. 해당 문서는 Microformats 위키를 레지스트리로 연결하며, 시간이 지나면 IANA
+                                레지스트리가 그 내용을 반영하고 이상적으로는 교체할 수 있어야 합니다(그러나 이는 HTML 커뮤니티에 달려 있습니다).</p>
+                        </div>
+                        <div id="rfc.section.A.1.p.4">
+                            <p>기존 HTML 콘텐츠 조사 결과 등록되지 않은, URI가 아닌 짧은 링크 관계 타입이 일반적으로 사용되는 것으로 나타났습니다. HTML을 소비하는 구현체는
+                                그러한 비등록 짧은 링크를 오류로 간주해서는 안 되며, 문서에 국한된(local scope) 의미를 갖는 것으로 처리해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.A.1.p.5">
+                            <p>마지막으로, HTML 명세는 "alternate" 관계 타입이 동일 링크에서 다른 관계 타입과 결합될 때 특별한 의미를 부여합니다. 이러한 링크는 Link 헤더
+                                필드에서 단일 관계 타입 목록(예: rel="alternate stylesheet")으로 직렬화되어 이 관계를 보존해야 합니다.</p>
+                        </div>
+                    </section>
+                    <section id="atom">
+                        <h3 id="rfc.section.A.2"><a href="#rfc.section.A.2">A.2.</a>&nbsp;<a href="#atom">Atom의 링크
+                                직렬화</a></h3>
+                        <div id="rfc.section.A.2.p.1">
+                            <p>Atom은 atom:link 요소에서 링크를 전달하는 직렬화로, "href" 속성은 링크 대상, "rel" 속성은 관계 타입을 나타냅니다. 링크의 컨텍스트는
+                                피드 위치자나 항목 ID에 따라 달라지며, 일반적으로 피드 수준 링크는 Link 헤더 필드로 전송하기에 적합합니다.</p>
+                        </div>
+                        <div id="rfc.section.A.2.p.2">
+                            <p>atom:link를 Link 헤더 필드로 직렬화할 때는 링크 대상을 URI로 변환해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.A.2.p.3">
+                            <p>Atom은 확장 관계 타입을 IRI로 정의합니다. 본 명세는 비교를 단순화하고 오류를 줄이기 위해 이를 URI로 재정의합니다.</p>
+                        </div>
+                        <div id="rfc.section.A.2.p.4">
+                            <p>Atom은 등록된 링크 관계 타입을 "http://www.iana.org/assignments/relation/" 접두사를 사용하여 절대 URI로 직렬화할 수
+                                있습니다. 이 접두사는 Atom 직렬화에 특화된 것입니다.</p>
+                        </div>
+                        <div id="rfc.section.A.2.p.5">
+                            <p>또한 링크 관계 타입은 항상 대소문자 구분 방식으로 비교되므로, Atom 문서에 직렬화할 때는 등록된 형태(대개 소문자)로 변환하는 것이 권장됩니다.</p>
+                        </div>
+                        <div id="rfc.section.A.2.p.6">
+                            <p>Link 헤더 필드는 단일 링크에 여러 관계를 직렬화할 수 있지만 atom:link는 그렇지 않습니다. 이 경우 하나의 link-value는 여러
+                                atom:link 요소에 매핑될 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.A.2.p.7">
+                            <p>HTML과 마찬가지로 atom:link는 Link 헤더 문법에 명시적으로 반영되지 않은 몇몇 속성을 정의하지만, 이러한 속성은 링크 확장으로 사용되어 충실도를
+                                유지할 수 있습니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="parse">
+                    <h2 id="rfc.section.B"><a href="#rfc.section.B">부록 B.</a>&nbsp;<a href="#parse">Link 헤더 필드 파싱
+                            알고리즘</a></h2>
+                    <div id="rfc.section.B.p.1">
+                        <p>이 부록은 헤더 집합에서 Link 헤더를 추출하는 알고리즘, Link 헤더 필드 값을 파싱하는 알고리즘, 및 필드 값의 일반 부분을 파싱하는 알고리즘을 제시하는
+                            비규범적 알고리즘 집합을 개괄합니다.</p>
+                    </div>
+                    <div id="rfc.section.B.p.2">
+                        <p>이 알고리즘들은 ABNF가 제시하는 문법보다 더 관대합니다; 여기에 포함된 오류 처리는 합리적인 접근법이지만 필수적인 것은 아닙니다. 따라서 이들은 권고적이며,
+                            불일치가 있는 경우에는 본 명세서 본문에 정의된 동작이 올바른 동작입니다.</p>
+                    </div>
+                    <section id="parse-set">
+                        <h3 id="rfc.section.B.1"><a href="#rfc.section.B.1">B.1.</a>&nbsp;<a href="#parse-set">헤더 집합에서
+                                링크 파싱</a></h3>
+                        <div id="rfc.section.B.1.p.1">
+                            <p>이 알고리즘은 HTTP 헤더 집합에 포함된 Link 헤더 필드를 파싱하는 데 사용됩니다. (field_name, field_value) 쌍의
+                                header_set이 주어지면(ASCII 인코딩 가정), 링크 객체 목록을 반환합니다.</p>
+                        </div>
+                        <div id="rfc.section.B.1.p.2">
+                            <ol>
+                                <li>field_values를 field_name이 대소문자 구분 없이 "link"와 일치하는 header_set의 멤버들로 구성된 리스트로 둡니다.
+                                </li>
+                                <li>links를 빈 리스트로 둡니다.</li>
+                                <li>각 field_value에 대해: <ol>
+                                        <li>field_value에서 링크 필드 값 파싱(<a href="#parse-fv"
+                                                title="Parsing a Link Field Value">부록 B.2</a>)의 결과를 value_links로 둡니다.
+                                        </li>
+                                        <li>value_links의 각 멤버를 links에 추가합니다.</li>
+                                    </ol>
+                                </li>
+                                <li>links를 반환합니다.</li>
+                            </ol>
+                        </div>
+                    </section>
+                    <section id="parse-fv">
+                        <h3 id="rfc.section.B.2"><a href="#rfc.section.B.2">B.2.</a>&nbsp;<a href="#parse-fv">링크 필드 값
+                                파싱</a></h3>
+                        <div id="rfc.section.B.2.p.1">
+                            <p>이 알고리즘은 Link 헤더 필드에서 쉼표로 구분된 0개 이상의 link-value를 파싱합니다. ASCII 문자열 field_value가 주어지면 링크 객체
+                                목록을 반환합니다.</p>
+                        </div>
+                        <div id="rfc.section.B.2.p.2">
+                            <ol>
+                                <li>links를 빈 리스트로 둡니다.</li>
+                                <li>field_value에 내용이 있는 동안: <ol>
+                                        <li>선행 OWS를 소비합니다.</li>
+                                        <li>첫 문자가 "&lt;"가 아니면 links를 반환합니다.</li>
+                                        <li>첫 문자인 "&lt;"를 버립니다.</li>
+                                        <li>첫 "&gt;" 문자 또는 field_value의 끝까지를 소비하고 그 결과를 target_string으로 둡니다.</li>
+                                        <li>다음 문자가 "&gt;"가 아니면 links를 반환합니다.</li>
+                                        <li>선행 "&gt;" 문자를 버립니다.</li>
+                                        <li>link_parameters를 파싱 파라미터(<a href="#parse-param"
+                                                title="Parsing Parameters">부록 B.3</a>)의 결과로 둡니다(0개 이상의 문자 소비).</li>
+                                        <li>target_uri를 target_string을 상대적으로 해석한 결과로 둡니다(RFC3986 섹션 5.2). 본문에 있는 기준 URI는
+                                            사용되지 않습니다.</li>
+                                        <li>relations_string을 link_parameters에서 첫 번째 튜플 whose first item matches "rel"의
+                                            두 번째 항목으로 하거나, 없으면 빈 문자열로 둡니다.</li>
+                                        <li>relations_string을 RWS로 분할하여 relation_types 리스트로 만듭니다.</li>
+                                        <li>context_string을 link_parameters에서 첫 번째 튜플 whose first item matches "anchor"의
+                                            두 번째 항목으로 둡니다. 없으면 컨텍스트 문자열은 Link 헤더를 갖는 표현의 URL(RFC7231 섹션 3.1.4.1)이며, URI로
+                                            직렬화됩니다. URL이 익명인 경우 context_string은 null입니다.</li>
+                                        <li>context_uri를 context_string을 상대적으로 해석한 결과로 둡니다(RFC3986 섹션 5.2), 만약
+                                            context_string이 null이면 context는 null입니다. 본문 기준 URI는 사용되지 않습니다.</li>
+                                        <li>target_attributes를 빈 리스트로 둡니다.</li>
+                                        <li>link_parameters의 각 튜플(param_name, param_value)에 대해: <ol>
+                                                <li>param_name이 "rel" 또는 "anchor"와 일치하면 이 튜플을 건너뜁니다.</li>
+                                                <li>param_name이 "media", "title", "title*" 또는 "type"이며
+                                                    target_attributes가 이미 같은 param_name을 가진 튜플을 포함하면 이 튜플을 건너뜁니다.</li>
+                                                <li>(param_name, param_value)를 target_attributes에 추가합니다.</li>
+                                            </ol>
+                                        </li>
+                                        <li>star_param_names를 link_parameters 중 param_name의 마지막 문자가 "*"인 param_name들의
+                                            집합으로 둡니다.</li>
+                                        <li>각 star_param_name에 대해: <ol>
+                                                <li>base_param_name을 star_param_name에서 마지막 문자를 제거한 값으로 둡니다.</li>
+                                                <li>만약 구현체가 base_param_name의 국제화된 형태를 지원하지 않기로 선택하면(금지 포함),
+                                                    link_parameters에서 star_param_name인 튜플들을 모두 제거하고 다음 star_param_name으로
+                                                    건너뜁니다.</li>
+                                                <li>link_parameters에서 base_param_name인 튜플들을 모두 제거합니다.</li>
+                                                <li>link_parameters에서 star_param_name인 모든 튜플의 첫 번째 멤버를 base_param_name으로
+                                                    변경합니다.</li>
+                                            </ol>
+                                        </li>
+                                        <li>각 relation_type에 대해: <ol>
+                                                <li>relation_type을 소문자로 정규화합니다.</li>
+                                                <li>target이 target_uri, 관계 타입이 relation_type, 컨텍스트가 context_uri, 대상 속성이
+                                                    target_attributes인 링크 객체를 links에 추가합니다.</li>
+                                            </ol>
+                                        </li>
+                                    </ol>
+                                </li>
+                                <li>links를 반환합니다.</li>
+                            </ol>
+                        </div>
+                    </section>
+                    <section id="parse-param">
+                        <h3 id="rfc.section.B.3"><a href="#rfc.section.B.3">B.3.</a>&nbsp;<a href="#parse-param">파라미터
+                                파싱</a></h3>
+                        <div id="rfc.section.B.3.p.1">
+                            <p>이 알고리즘은 헤더 필드 값에서 파라미터를 파싱합니다. ASCII 문자열 input이 주어지면 포함된 (parameter_name,
+                                parameter_value) 튜플 목록을 반환합니다. input은 파싱된 파라미터를 제거하도록 수정됩니다.</p>
+                        </div>
+                        <div id="rfc.section.B.3.p.2">
+                            <ol>
+                                <li>parameters를 빈 리스트로 둡니다.</li>
+                                <li>input에 내용이 있는 동안: <ol>
+                                        <li>선행 OWS를 소비합니다.</li>
+                                        <li>첫 문자가 ";"가 아니면 parameters를 반환합니다.</li>
+                                        <li>선행 ";" 문자를 버립니다.</li>
+                                        <li>선행 OWS를 소비합니다.</li>
+                                        <li>첫 BWS, "=", ";" 또는 "," 문자 또는 입력의 끝까지를 소비하여 parameter_name으로 둡니다.</li>
+                                        <li>선행 BWS를 소비합니다.</li>
+                                        <li>다음 문자가 "="이면: <ol>
+                                                <li>선행 "=" 문자를 버립니다.</li>
+                                                <li>선행 BWS를 소비합니다.</li>
+                                                <li>다음 문자가 DQUOTE이면 인용 문자열 파싱(<a href="#parse-qs"
+                                                        title="Parsing a Quoted String">부록 B.4</a>)의 결과를
+                                                    parameter_value로 둡니다(0개 이상의 문자 소비).</li>
+                                                <li>그렇지 않으면 첫 ";" 또는 "," 문자 전까지 또는 입력의 끝까지를 소비하여 parameter_value로 둡니다.
+                                                </li>
+                                                <li>parameter_name의 마지막 문자가 "*"이면 parameter_value를 RFC8187에 따라 디코딩합니다.
+                                                    복구 불가능한 오류가 발생해도 처리를 계속합니다.</li>
+                                            </ol>
+                                        </li>
+                                        <li>그렇지 않으면: <ol>
+                                                <li>parameter_value를 빈 문자열로 둡니다.</li>
+                                            </ol>
+                                        </li>
+                                        <li>parameter_name을 소문자로 정규화합니다.</li>
+                                        <li>(parameter_name, parameter_value)를 parameters에 추가합니다.</li>
+                                        <li>선행 OWS를 소비합니다.</li>
+                                        <li>다음 문자가 ","이거나 입력의 끝이면 처리 중단하고 parameters를 반환합니다.</li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </div>
+                    </section>
+                    <section id="parse-qs">
+                        <h3 id="rfc.section.B.4"><a href="#rfc.section.B.4">B.4.</a>&nbsp;<a href="#parse-qs">인용 문자열
+                                파싱</a></h3>
+                        <div id="rfc.section.B.4.p.1">
+                            <p>이 알고리즘은 RFC7230 섹션 3.2.6에 따라 인용 문자열을 파싱합니다. ASCII 문자열 input이 주어지면 언인쿼팅된 문자열을 반환합니다.
+                                input은 파싱된 문자열을 제거하도록 수정됩니다.</p>
+                        </div>
+                        <div id="rfc.section.B.4.p.2">
+                            <ol>
+                                <li>output을 빈 문자열로 둡니다.</li>
+                                <li>input의 첫 문자가 DQUOTE가 아니면 output을 반환합니다.</li>
+                                <li>첫 문자를 버립니다.</li>
+                                <li>input에 내용이 있는 동안: <ol>
+                                        <li>첫 문자가 백슬래시("\")이면: <ol>
+                                                <li>첫 문자를 버립니다.</li>
+                                                <li>더 이상 입력이 없으면 output을 반환합니다.</li>
+                                                <li>그렇지 않으면 첫 문자를 소비하고 output에 추가합니다.</li>
+                                            </ol>
+                                        </li>
+                                        <li>그렇지 않고 첫 문자가 DQUOTE이면 그것을 버리고 output을 반환합니다.</li>
+                                        <li>그렇지 않으면 첫 문자를 소비하고 output에 추가합니다.</li>
+                                    </ol>
+                                </li>
+                                <li>output을 반환합니다.</li>
+                            </ol>
+                        </div>
+                    </section>
+                </section>
+                <section id="changes-from-rfc-5988">
+                    <h2 id="rfc.section.C"><a href="#rfc.section.C">부록 C.</a>&nbsp;<a href="#changes-from-rfc-5988">RFC
+                            5988로부터의 변경사항</a></h2>
+                    <div id="rfc.section.C.p.1" class="avoidbreakafter">
+                        <p>이 명세서는 이전 버전인 RFC 5988과 다음과 같은 차이점이 있습니다:</p>
+                    </div>
+                    <div id="rfc.section.C.p.2">
+                        <ul>
+                            <li>초기 관계 타입 등록 항목은 RFC 5988에서 이미 등록되었으므로 제거되었습니다.</li>
+                            <li>소개가 축약되었습니다.</li>
+                            <li>"Link Relation Application Data" 레지스트리가 제거되었습니다.</li>
+                            <li>정오표(errata)가 통합되었습니다.</li>
+                            <li>참조가 업데이트되었습니다.</li>
+                            <li>링크 기수성에 대한 설명이 명확해졌습니다.</li>
+                            <li>용어가 "target IRI" 및 "context IRI"에서 각각 "link target" 및 "link context"로 변경되었습니다.</li>
+                            <li>등록된 관계 타입에 URI를 할당하는 것은 직렬화별로 하도록 변경되었습니다.</li>
+                            <li>Link 헤더 필드가 HTML 및 Atom 링크와 의미적으로 동등하다는 오해의 소지가 있는 진술이 제거되었습니다.</li>
+                            <li>"link serialisations" 및 "link applications"의 정의와 사용이 보다 신중해졌습니다.</li>
+                            <li>대상 속성의 기수성(일반적 및 "type"에 대해)이 명확히 규정되었습니다.</li>
+                            <li>Link 헤더 필드의 기본 링크 컨텍스트를 RFC 7231에 따라 표현의 식별성(identity)에 의존하도록 수정했습니다.</li>
+                            <li>Link 헤더의 권장 파싱 알고리즘을 정의했습니다.</li>
+                            <li>대상 속성의 값 공간 및 정의가 지정되었습니다.</li>
+                            <li>ABNF가 RFC7230과 호환되도록 업데이트되었습니다(특히 공백이 명시적임).</li>
+                            <li>HTTP 헤더 필드의 일부 파라미터가 이제 token으로 나타날 수 있습니다.</li>
+                            <li>HTTP 헤더의 파라미터가 이제 값이 없을 수 있습니다.</li>
+                            <li>인용 문자열 처리 방식이 RFC7230에 의해 정의되었습니다.</li>
+                            <li>type 헤더 필드 파라미터는 이제 "/"를 허용하지 않는 token이므로 인용되어야 합니다.</li>
+                        </ul>
+                    </div>
+                </section>
+                <section id="rfc.authors" class="avoidbreakinside">
+                    <h2><a href="#rfc.authors">저자 주소</a></h2>
+                    <address><b>Mark Nottingham</b><br>Email: <a href="mailto:mnot@mnot.net">mnot@mnot.net</a><br>URI:
+                        <a href="https://www.mnot.net/">https://www.mnot.net/</a>
+                    </address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>

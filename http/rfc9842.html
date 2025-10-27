@@ -1,0 +1,1772 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 9842 - 압축 사전 전송</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC9842">
+    <meta property="og:description" content="Compression Dictionary Transport">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc9842.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 Dictionary Negotiation" href="#rfc.section.2">
+    <link rel="Chapter" title="3 The &#34;compression-dictionary&#34; Link Relation Type" href="#rfc.section.3">
+    <link rel="Chapter" title="4 Dictionary-Compressed Brotli" href="#rfc.section.4">
+    <link rel="Chapter" title="5 Dictionary-Compressed Zstandard" href="#rfc.section.5">
+    <link rel="Chapter" title="6 Negotiating the Content Encoding" href="#rfc.section.6">
+    <link rel="Chapter" title="7 IANA Considerations" href="#rfc.section.7">
+    <link rel="Chapter" title="8 Compatibility Considerations" href="#rfc.section.8">
+    <link rel="Chapter" title="9 Security Considerations" href="#rfc.section.9">
+    <link rel="Chapter" title="10 Privacy Considerations" href="#rfc.section.10">
+    <link rel="Chapter" title="11 References" href="#rfc.section.11">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-compression-dictionary-19" rel="prev">
+    <link href="https://dx.doi.org/10.17487/rfc9842" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc9842.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="https://www.rfc-editor.org/info/rfc9842">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="compression dictionary, shared brotli, zstandard dictionary, delta compression">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Meenan, P.">
+    <meta name="dcterms.creator" content="Weiss, Y.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:9842">
+    <meta name="dcterms.issued" content="2025-09">
+    <meta name="dcterms.abstract"
+        content="This document specifies a mechanism for dictionary-based compression in the Hypertext Transfer Protocol (HTTP). By utilizing this technique, clients and servers can reduce the size of transmitted data, leading to improved performance and reduced bandwidth consumption. This document extends existing HTTP compression methods and provides guidelines for the delivery and use of compression dictionaries within the HTTP protocol.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="This document specifies a mechanism for dictionary-based compression in the Hypertext Transfer Protocol (HTTP). By utilizing this technique, clients and servers can reduce the size of transmitted data, leading to improved performance and reduced bandwidth consumption. This document extends existing HTTP compression methods and provides guidelines for the delivery and use of compression dictionaries within the HTTP protocol.">
+</head>
+
+<body onload="getMeta(9842,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>9842</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a href="#use-cases">사용
+                                                사례</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.1.1.1">1.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#version-upgrade">버전 업그레이드</a></li>
+                                                <li><a href="#rfc.section.1.1.2">1.1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#common-content">공통 콘텐츠</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.1.2">1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#notational-conventions">표기 규약</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#dictionary-negotiation">사전 협상</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#use-as-dictionary">Use-As-Dictionary</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.2.1.1">2.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#match">"match"</a></li>
+                                                <li><a href="#rfc.section.2.1.2">2.1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#match-dest">"match-dest"</a></li>
+                                                <li><a href="#rfc.section.2.1.3">2.1.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#id">"id"</a></li>
+                                                <li><a href="#rfc.section.2.1.4">2.1.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#type">"type"</a></li>
+                                                <li><a href="#rfc.section.2.1.5">2.1.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#examples">예시</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#available-dictionary">사용 가능한 사전(Available-Dictionary)</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.2.2.1">2.2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#dictionary-freshness-requirement">사전 신선도 요구사항</a></li>
+                                                <li><a href="#rfc.section.2.2.2">2.2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#dictionary-url-matching">사전 URL 매칭</a></li>
+                                                <li><a href="#rfc.section.2.2.3">2.2.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#multiple-matching-dictionaries">다중 매칭 사전</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.2.3">2.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#dictionary-id">사전 ID</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-compression-dictionary-link-relation-type">"compression-dictionary"
+                                        링크 관계 타입</a></li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#dictionary-compressed-brotli">사전 압축된 Brotli</a></li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#dictionary-compressed-zstandard">사전 압축된 Zstandard</a></li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#negotiating-the-content-encoding">콘텐츠 인코딩 협상</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#accept-encoding">Accept-Encoding</a></li>
+                                        <li><a href="#rfc.section.6.2">6.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#content-encoding">Content-Encoding</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                        고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#content-encoding-1">콘텐츠 인코딩 등록</a></li>
+                                        <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#header-field-registration">헤더 필드 등록</a></li>
+                                        <li><a href="#rfc.section.7.3">7.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#link-relation-registration">링크 관계 등록</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.8">8.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#compatibility-considerations">호환성 고려사항</a></li>
+                                <li><a href="#rfc.section.9">9.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#security-considerations">보안 고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.9.1">9.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#changing-content">콘텐츠 변경</a></li>
+                                        <li><a href="#rfc.section.9.2">9.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#reading-content">콘텐츠 읽기</a></li>
+                                        <li><a href="#rfc.section.9.3">9.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#security-mitigations">보안 완화책</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.9.3.1">9.3.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#cross-origin-protection">교차 출처 보호</a></li>
+                                                <li><a href="#rfc.section.9.3.2">9.3.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#response-readability">응답 가독성</a></li>
+                                                <li><a href="#rfc.section.9.3.3">9.3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#server-responsibility">서버 책임</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.10">10.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#privacy-considerations">프라이버시 고려사항</a></li>
+                                <li><a href="#rfc.section.11">11.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references">참고문헌</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.11.1">11.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">규범적 참고문헌</a></li>
+                                        <li><a href="#rfc.section.11.2">11.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.3">비규범적 참고문헌</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.authors">저자 주소</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">인터넷 엔지니어링 태스크 포스 (IETF)</td>
+                                <td class="text-right">P. Meenan, Editor</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">의견 요청: 9842</td>
+                                <td class="text-right">Google LLC</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">카테고리: 표준 트랙</td>
+                                <td class="text-right">Y. Weiss, Editor</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right">Shopify Inc.</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left"></td>
+                                <td class="text-right">2025년 9월</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>압축 사전 전송</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">초록</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>이 문서는 하이퍼텍스트 전송 프로토콜(HTTP)에서 사전 기반 압축을 위한 메커니즘을 규정합니다. 이 기법을 활용함으로써 클라이언트와 서버는 전송되는 데이터의 크기를
+                            줄여 성능 향상과 대역폭 소비 감소를 달성할 수 있습니다. 본 문서는 기존 HTTP 압축 방법을 확장하고 HTTP 프로토콜 내에서 압축 사전의 전달 및 사용에 대한
+                            지침을 제공합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 메모의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 문서입니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물입니다. 이는 IETF 커뮤니티의 합의를 반영합니다. 공개 검토를 거쳤으며 인터넷 엔지니어링 스티어링
+                            그룹(IESG)에 의해 발행 승인을 받았습니다. 인터넷 표준에 관한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc7841.html#section-2">RFC 7841의 섹션 2</a>를 참조하십시오.
+                        </p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 현재 상태, 정오표, 피드백 제공 방법에 관한 정보는 <a
+                                href="https://www.rfc-editor.org/info/rfc9842">https://www.rfc-editor.org/info/rfc9842</a>에서
+                            확인할 수 있습니다.
+                        </p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2025 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)
+                            in effect on the date of publication of this document. Please review these documents
+                            carefully, as they describe your rights and restrictions with respect to this document. Code
+                            Components extracted from this document must include Revised BSD License text as described
+                            in Section 4.e of the Trust Legal Provisions and are provided without warranty as described
+                            in the Revised BSD License.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a href="#use-cases">사용 사례</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1.1">1.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#version-upgrade">버전 업그레이드</a></li>
+                                        <li><a href="#rfc.section.1.1.2">1.1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#common-content">공통 콘텐츠</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.1.2">1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#notational-conventions">표기 규약</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#dictionary-negotiation">사전 협상</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#use-as-dictionary">Use-As-Dictionary</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1.1">2.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#match">"match"</a></li>
+                                        <li><a href="#rfc.section.2.1.2">2.1.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#match-dest">"match-dest"</a></li>
+                                        <li><a href="#rfc.section.2.1.3">2.1.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#id">"id"</a></li>
+                                        <li><a href="#rfc.section.2.1.4">2.1.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#type">"type"</a></li>
+                                        <li><a href="#rfc.section.2.1.5">2.1.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#examples">예시</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#available-dictionary">Available-Dictionary</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.2.1">2.2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#dictionary-freshness-requirement">사전 신선도 요구사항</a></li>
+                                        <li><a href="#rfc.section.2.2.2">2.2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#dictionary-url-matching">사전 URL 매칭</a></li>
+                                        <li><a href="#rfc.section.2.2.3">2.2.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#multiple-matching-dictionaries">다중 매칭 사전</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2.3">2.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#dictionary-id">Dictionary-ID</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#the-compression-dictionary-link-relation-type">"compression-dictionary" 링크 관계
+                                타입</a></li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#dictionary-compressed-brotli">사전
+                                압축된 Brotli</a></li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#dictionary-compressed-zstandard">사전 압축된 Zstandard</a></li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#negotiating-the-content-encoding">콘텐츠 인코딩 협상</a>
+                            <ul>
+                                <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#accept-encoding">Accept-Encoding</a></li>
+                                <li><a href="#rfc.section.6.2">6.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#content-encoding">Content-Encoding</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#content-encoding-1">콘텐츠 인코딩 등록</a></li>
+                                <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#header-field-registration">헤더 필드 등록</a></li>
+                                <li><a href="#rfc.section.7.3">7.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#link-relation-registration">링크 관계 등록</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.8">8.</a>&nbsp;&nbsp;&nbsp;<a href="#compatibility-considerations">호환성
+                                고려사항</a></li>
+                        <li><a href="#rfc.section.9">9.</a>&nbsp;&nbsp;&nbsp;<a href="#security-considerations">보안
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.9.1">9.1.</a>&nbsp;&nbsp;&nbsp;<a href="#changing-content">콘텐츠
+                                        변경</a></li>
+                                <li><a href="#rfc.section.9.2">9.2.</a>&nbsp;&nbsp;&nbsp;<a href="#reading-content">콘텐츠
+                                        읽기</a></li>
+                                <li><a href="#rfc.section.9.3">9.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#security-mitigations">보안 완화책</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.9.3.1">9.3.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#cross-origin-protection">교차 출처 보호</a></li>
+                                        <li><a href="#rfc.section.9.3.2">9.3.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#response-readability">응답 가독성</a></li>
+                                        <li><a href="#rfc.section.9.3.3">9.3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#server-responsibility">서버 책임</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.10">10.</a>&nbsp;&nbsp;&nbsp;<a href="#privacy-considerations">프라이버시
+                                고려사항</a></li>
+                        <li><a href="#rfc.section.11">11.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.11.1">11.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references.2">규범적 참고문헌</a></li>
+                                <li><a href="#rfc.section.11.2">11.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references.3">비규범적 참고문헌</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.authors">저자 주소</a></li>
+                    </ul>
+                </div>
+                <hr class="hidden-print">
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>이 명세서는 지정된 HTTP <a href="#RFC9110"><cite title="HTTP Semantics">[HTTP]</cite></a> 응답을, 향후
+                            HTTP 응답에서 외부 사전으로 사용하도록 하는 메커니즘을 정의합니다. 이는 외부 사전을 사용할 수 있는 압축 방식(e.g., Brotli <a
+                                href="#RFC7932"><cite title="Brotli Compressed Data Format">[RFC7932]</cite></a> 및
+                            Zstandard <a href="#RFC8878"><cite
+                                    title="Zstandard Compression and the 'application/zstd' Media Type">[ZSTD]</cite></a>)에
+                            적용됩니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <p>이 문서는 사전 사용 협상을 위해 사용하는 HTTP 헤더를 설명하고, 협상된 사전을 사용하는 Brotli 및 Zstandard 압축을 위한
+                            content-encoding 값을 등록합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.3">
+                        <p>사전 사용 협상은 HTTP의 콘텐츠 협상(참조 <a
+                                href="https://www.rfc-editor.org/rfc/rfc9110.html#section-12">RFC 9110 섹션 12</a>)을 활용하며
+                            모든 버전의 HTTP에서 사용할 수 있습니다.</p>
+                    </div>
+                    <section id="use-cases">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a href="#use-cases">사용 사례</a>
+                        </h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>어떤 HTTP 응답이든 향후 요청을 위한 압축 사전으로 지정될 수 있어 유연성이 큽니다. 자주 관찰되는 두 가지 일반적인 사용 사례를 아래에 설명합니다.</p>
+                        </div>
+                        <section id="version-upgrade">
+                            <h4 id="rfc.section.1.1.1"><a href="#rfc.section.1.1.1">1.1.1.</a>&nbsp;<a
+                                    href="#version-upgrade">버전 업그레이드</a></h4>
+                            <div id="rfc.section.1.1.1.p.1">
+                                <p>리소스의 이전 버전을 새 버전의 사전으로 사용하면 변경분을 델타 압축하여 전달할 수 있어, 일반 압축만으로 얻을 수 있는 것보다 훨씬 작은 응답을 얻을
+                                    수 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.1.1.1.p.2" class="avoidbreakafter">
+                                <p>예를 들어:</p>
+                            </div>
+                            <div id="rfc.figure.1">
+                                <div class="artwork art-svg"><svg xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xi="http://www.w3.org/2001/XInclude" version="1.1" height="432"
+                                        width="424" viewBox="0 0 424 432" class="diagram" text-anchor="middle"
+                                        font-family="monospace" font-size="13px" stroke-linecap="round">
+                                        <path d="M 8,48 L 8,176" fill="none" stroke="black" />
+                                        <path d="M 8,256 L 8,416" fill="none" stroke="black" />
+                                        <path d="M 416,48 L 416,176" fill="none" stroke="black" />
+                                        <path d="M 416,256 L 416,416" fill="none" stroke="black" />
+                                        <path d="M 16,80 L 408,80" fill="none" stroke="black" />
+                                        <path d="M 16,160 L 408,160" fill="none" stroke="black" />
+                                        <path d="M 16,320 L 408,320" fill="none" stroke="black" />
+                                        <path d="M 16,400 L 408,400" fill="none" stroke="black" />
+                                        <polygon class="arrowhead" points="416,320 404,314.4 404,325.6" fill="black"
+                                            transform="rotate(0,408,320)" />
+                                        <polygon class="arrowhead" points="416,80 404,74.4 404,85.6" fill="black"
+                                            transform="rotate(0,408,80)" />
+                                        <polygon class="arrowhead" points="24,400 12,394.4 12,405.6" fill="black"
+                                            transform="rotate(180,16,400)" />
+                                        <polygon class="arrowhead" points="24,160 12,154.4 12,165.6" fill="black"
+                                            transform="rotate(180,16,160)" />
+                                        <g class="text">
+                                            <text x="28" y="36">클라이언트</text>
+                                            <text x="396" y="36">서버</text>
+                                            <text x="32" y="68">GET</text>
+                                            <text x="92" y="68">/app.v1.js</text>
+                                            <text x="64" y="116">200</text>
+                                            <text x="92" y="116">OK</text>
+                                            <text x="124" y="132">Use-As-Dictionary:</text>
+                                            <text x="264" y="132">match="/app*js"</text>
+                                            <text x="72" y="148">&lt;full</text>
+                                            <text x="136" y="148">app.v1.js</text>
+                                            <text x="212" y="148">리소스</text>
+                                            <text x="256" y="148">-</text>
+                                            <text x="288" y="148">100KB</text>
+                                            <text x="360" y="148">compressed&gt;</text>
+                                            <text x="20" y="212">잠시</text>
+                                            <text x="60" y="212">후</text>
+                                            <text x="104" y="212">...</text>
+                                            <text x="28" y="244">클라이언트</text>
+                                            <text x="396" y="244">서버</text>
+                                            <text x="32" y="276">GET</text>
+                                            <text x="92" y="276">/app.v2.js</text>
+                                            <text x="104" y="292">Available-Dictionary:</text>
+                                            <text x="272" y="292">:pZGm1A...2a2fFG4=:</text>
+                                            <text x="84" y="308">Accept-Encoding:</text>
+                                            <text x="176" y="308">gzip,</text>
+                                            <text x="216" y="308">br,</text>
+                                            <text x="256" y="308">zstd,</text>
+                                            <text x="300" y="308">dcb,</text>
+                                            <text x="336" y="308">dcz</text>
+                                            <text x="72" y="356">200</text>
+                                            <text x="100" y="356">OK</text>
+                                            <text x="128" y="372">Content-Encoding:</text>
+                                            <text x="216" y="372">dcb</text>
+                                            <text x="128" y="388">&lt;delta-compressed</text>
+                                            <text x="240" y="388">app.v2.js</text>
+                                            <text x="316" y="388">리소스</text>
+                                            <text x="360" y="388">-</text>
+                                            <text x="388" y="388">1KB&gt;</text>
+                                        </g>
+                                    </svg></div>
+                            </div>
+                            <p class="figure">그림 1: 버전 업그레이드 예시</p>
+                        </section>
+                        <section id="common-content">
+                            <h4 id="rfc.section.1.1.2"><a href="#rfc.section.1.1.2">1.1.2.</a>&nbsp;<a
+                                    href="#common-content">공통 콘텐츠</a></h4>
+                            <div id="rfc.section.1.1.2.p.1">
+                                <p>여러 리소스가 응답에서 공통 패턴을 공유하는 경우, 그러한 공통 패턴을 포함한 외부 사전을 참조하여 응답에서 해당 패턴을 효과적으로 압축해낼 수
+                                    있습니다. 예로는 사이트 전반에 걸친 유사 페이지의 공통 템플릿 HTML이나 API 호출의 공통 키/값 쌍 등이 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.1.1.2.p.2" class="avoidbreakafter">
+                                <p>예를 들어:</p>
+                            </div>
+                            <div id="rfc.figure.2">
+                                <div class="artwork art-svg"><svg xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xi="http://www.w3.org/2001/XInclude" version="1.1" height="544"
+                                        width="440" viewBox="0 0 440 544" class="diagram" text-anchor="middle"
+                                        font-family="monospace" font-size="13px" stroke-linecap="round">
+                                        <path d="M 8,48 L 8,288" fill="none" stroke="black" />
+                                        <path d="M 8,368 L 8,528" fill="none" stroke="black" />
+                                        <path d="M 432,48 L 432,288" fill="none" stroke="black" />
+                                        <path d="M 432,368 L 432,528" fill="none" stroke="black" />
+                                        <path d="M 16,80 L 424,80" fill="none" stroke="black" />
+                                        <path d="M 16,160 L 424,160" fill="none" stroke="black" />
+                                        <path d="M 16,208 L 424,208" fill="none" stroke="black" />
+                                        <path d="M 16,272 L 424,272" fill="none" stroke="black" />
+                                        <path d="M 16,432 L 424,432" fill="none" stroke="black" />
+                                        <path d="M 16,512 L 424,512" fill="none" stroke="black" />
+                                        <polygon class="arrowhead" points="432,432 420,426.4 420,437.6" fill="black"
+                                            transform="rotate(0,424,432)" />
+                                        <polygon class="arrowhead" points="432,208 420,202.4 420,213.6" fill="black"
+                                            transform="rotate(0,424,208)" />
+                                        <polygon class="arrowhead" points="432,80 420,74.4 420,85.6" fill="black"
+                                            transform="rotate(0,424,80)" />
+                                        <polygon class="arrowhead" points="24,512 12,506.4 12,517.6" fill="black"
+                                            transform="rotate(180,16,512)" />
+                                        <polygon class="arrowhead" points="24,272 12,266.4 12,277.6" fill="black"
+                                            transform="rotate(180,16,272)" />
+                                        <polygon class="arrowhead" points="24,160 12,154.4 12,165.6" fill="black"
+                                            transform="rotate(180,16,160)" />
+                                        <g class="text">
+                                            <text x="28" y="36">클라이언트</text>
+                                            <text x="412" y="36">서버</text>
+                                            <text x="32" y="68">GET</text>
+                                            <text x="96" y="68">/index.html</text>
+                                            <text x="64" y="116">200</text>
+                                            <text x="92" y="116">OK</text>
+                                            <text x="72" y="132">Link:</text>
+                                            <text x="144" y="132">&lt;.../dict&gt;;</text>
+                                            <text x="308" y="132">rel="compression-dictionary"</text>
+                                            <text x="72" y="148">&lt;full</text>
+                                            <text x="140" y="148">index.html</text>
+                                            <text x="220" y="148">리소스</text>
+                                            <text x="264" y="148">-</text>
+                                            <text x="296" y="148">100KB</text>
+                                            <text x="368" y="148">compressed&gt;</text>
+                                            <text x="32" y="196">GET</text>
+                                            <text x="72" y="196">/dict</text>
+                                            <text x="168" y="244">200</text>
+                                            <text x="196" y="244">OK</text>
+                                            <text x="228" y="260">Use-As-Dictionary:</text>
+                                            <text x="364" y="260">match="/*html"</text>
+                                            <text x="20" y="324">잠시</text>
+                                            <text x="60" y="324">후</text>
+                                            <text x="104" y="324">...</text>
+                                            <text x="28" y="356">클라이언트</text>
+                                            <text x="412" y="356">서버</text>
+                                            <text x="32" y="388">GET</text>
+                                            <text x="96" y="388">/page2.html</text>
+                                            <text x="104" y="404">Available-Dictionary:</text>
+                                            <text x="272" y="404">:pZGm1A...2a2fFG4=:</text>
+                                            <text x="84" y="420">Accept-Encoding:</text>
+                                            <text x="176" y="420">gzip,</text>
+                                            <text x="216" y="420">br,</text>
+                                            <text x="256" y="420">zstd,</text>
+                                            <text x="300" y="420">dcb,</text>
+                                            <text x="336" y="420">dcz</text>
+                                            <text x="72" y="468">200</text>
+                                            <text x="100" y="468">OK</text>
+                                            <text x="128" y="484">Content-Encoding:</text>
+                                            <text x="216" y="484">dcb</text>
+                                            <text x="128" y="500">&lt;delta-compressed</text>
+                                            <text x="244" y="500">page2.html</text>
+                                            <text x="324" y="500">리소스</text>
+                                            <text x="368" y="500">-</text>
+                                            <text x="400" y="500">10KB&gt;</text>
+                                        </g>
+                                    </svg></div>
+                            </div>
+                            <p class="figure">그림 2: 공통 콘텐츠 예시</p>
+                        </section>
+                    </section>
+                    <section id="notational-conventions">
+                        <h3 id="rfc.section.1.2"><a href="#rfc.section.1.2">1.2.</a>&nbsp;<a
+                                href="#notational-conventions">표기 규약</a></h3>
+                        <div id="rfc.section.1.2.p.1">
+                            <p>이 문서에서 키워드 "<em class="bcp14">MUST</em>", "<em class="bcp14">MUST NOT</em>", "<em
+                                    class="bcp14">REQUIRED</em>", "<em class="bcp14">SHALL</em>", "<em
+                                    class="bcp14">SHALL NOT</em>", "<em class="bcp14">SHOULD</em>", "<em
+                                    class="bcp14">SHOULD NOT</em>", "<em class="bcp14">RECOMMENDED</em>", "<em
+                                    class="bcp14">NOT RECOMMENDED</em>", "<em class="bcp14">MAY</em>", 및 "<em
+                                    class="bcp14">OPTIONAL</em>"은 모두 대문자로 표시될 때에 한해 BCP 14 <a href="#RFC2119"><cite
+                                        title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>
+                                및 <a href="#RFC8174"><cite
+                                        title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">[RFC8174]</cite></a>에
+                                설명된 대로 해석됩니다.</p>
+                        </div>
+                        <div id="rfc.section.1.2.p.2">
+                            <p>이 문서는 구문과 파싱을 지정하기 위해 <a href="https://www.rfc-editor.org/rfc/rfc9651.html#section-3">RFC
+                                    9651 섹션 3</a>에서 정의한 용어들(예: Dictionary, String, Inner List, Token, Byte Sequence)을
+                                사용합니다.</p>
+                        </div>
+                        <div id="rfc.section.1.2.p.3">
+                            <p>이 문서는 긴 줄 처리 전략으로 <a href="#RFC8792"><cite
+                                        title="Handling Long Lines in Content of Internet-Drafts and RFCs">[FOLDING]</cite></a>에
+                                설명된 방식을 사용합니다.</p>
+                        </div>
+                        <div id="rfc.section.1.2.p.4">
+                            <p>또한 이 문서는 <a href="#RFC9110"><cite title="HTTP Semantics">[HTTP]</cite></a> 및 <a
+                                    href="#RFC9111"><cite title="HTTP Caching">[HTTP-CACHING]</cite></a>의 용어를 사용합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="dictionary-negotiation">
+                    <h2 id="rfc.section.2" class="np"><a href="#rfc.section.2">2.</a>&nbsp;<a
+                            href="#dictionary-negotiation">사전 협상</a></h2>
+                    <section id="use-as-dictionary">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a
+                                href="#use-as-dictionary">Use-As-Dictionary</a></h3>
+                        <div id="rfc.section.2.1.p.1">
+                            <p>서버는 HTTP 요청에 응답할 때 해당 응답이 향후 특정 규칙에 맞는 URL 요청들에 대해 사전으로 사용될 수 있음을 "Use-As-Dictionary" 응답
+                                헤더로 광고할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.2">
+                            <p>"Use-As-Dictionary" 응답 헤더는 Structured Field <a href="#RFC9651"><cite
+                                        title="Structured Field Values for HTTP">[STRUCTURED-FIELDS]</cite></a> 형식의
+                                Dictionary로, "match", "match-dest", "id", 및 "type" 값을 가집니다.</p>
+                        </div>
+                        <section id="match">
+                            <h4 id="rfc.section.2.1.1"><a href="#rfc.section.2.1.1">2.1.1.</a>&nbsp;<a
+                                    href="#match">"match"</a></h4>
+                            <div id="rfc.section.2.1.1.p.1">
+                                <p>"Use-As-Dictionary" 응답 헤더의 "match" 값은 요청 매칭에 사용할 URL 패턴을 제공하는 String 값입니다(참조 <a
+                                        href="#URLPATTERN"><cite title="URL Pattern Standard">[URLPATTERN]</cite></a>).
+                                </p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.2">
+                                <p>매칭에 사용되는 URL 패턴은 정규 표현식 사용을 지원하지 않습니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.3">
+                                <p>주어진 String 값이 정규 표현식을 사용하지 않고 사전과 동일한 Origin에 해당하는 유효한 URL 패턴인지 검증하기 위해 다음 알고리즘을
+                                    사용합니다. 유효한 패턴이면 TRUE를, 잘못된 패턴이면 FALSE를 반환합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.4">
+                                <ol type="1">
+                                    <li>
+                                        <div>
+                                            <p>MATCH를 해당 사전의 "match" 값으로 둡니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>URL을 사전 요청의 URL로 둡니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>PATTERN을 input=MATCH 및 baseURL=URL로 하여 "create a URL pattern" 절차를 실행해 만든
+                                                "URL pattern struct"로 둡니다 (참조 <a
+                                                    href="https://urlpattern.spec.whatwg.org/#high-level-operations">URLPATTERN
+                                                    섹션 1.4</a>).</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>PATTERN에 대해 "has regexp groups" 검사 결과가 TRUE이면 FALSE를 반환합니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>TRUE를 반환합니다.</p>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.5">
+                                <p>"match" 값은 필수이며, 사전이 유효하다고 간주되기 위해 "Use-As-Dictionary" 응답 헤더에 반드시 포함되어야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.6">
+                                <p>HTTP 수준에서 지정된 match 패턴은 URL 경로의 퍼센트 인코딩된 버전에서 작동합니다(참조 <a
+                                        href="https://www.rfc-editor.org/rfc/rfc3986.html#section-2">RFC 3986 섹션 2</a>).
+                                </p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.7" class="avoidbreakafter">
+                                <p>예를 들어 URL "http://www.example.com/düsseldorf"는
+                                    "http://www.example.com/d%C3%BCsseldorf"로 인코딩되며 관련 매칭 패턴은 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.section.2.1.1.p.8">
+                                <pre class="text">
+Use-As-Dictionary: match="/d%C3%BCsseldorf"
+</pre>
+                            </div>
+                        </section>
+                        <section id="match-dest">
+                            <h4 id="rfc.section.2.1.2"><a href="#rfc.section.2.1.2">2.1.2.</a>&nbsp;<a
+                                    href="#match-dest">"match-dest"</a></h4>
+                            <div id="rfc.section.2.1.2.p.1">
+                                <p>"Use-As-Dictionary" 응답 헤더의 "match-dest" 값은 String 값들의 Inner List로, 해당 사전이 매칭될 Fetch
+                                    요청의 destinations 목록을 제공합니다(참조 Fetch의 "RequestDestination", <a href="#FETCH"><cite
+                                            title="Fetch Standard">[FETCH]</cite></a>).</p>
+                            </div>
+                            <div id="rfc.section.2.1.2.p.2">
+                                <p>"match-dest"가 빈 리스트이면 모든 destination에 매치되어야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.2.p.3">
+                                <p>요청 destination을 지원하지 않는 클라이언트는 "match-dest"를 빈 리스트로 처리하고 모든 destination에 매치해야 합니다.
+                                </p>
+                            </div>
+                            <div id="rfc.section.2.1.2.p.4">
+                                <p>"match-dest" 값은 선택적이며 기본값은 빈 리스트입니다.</p>
+                            </div>
+                        </section>
+                        <section id="id">
+                            <h4 id="rfc.section.2.1.3"><a href="#rfc.section.2.1.3">2.1.3.</a>&nbsp;<a
+                                    href="#id">"id"</a></h4>
+                            <div id="rfc.section.2.1.3.p.1">
+                                <p>"Use-As-Dictionary" 응답 헤더의 "id" 값은 사전에 대한 서버 식별자를 지정하는 String 값입니다. "id" 값이 존재하고 길이가
+                                    0보다 크면, 클라이언트는 동일한 사전에 대해 "Available-Dictionary" 요청 헤더를 보낼 때 "Dictionary-ID" 요청 헤더에
+                                    저장된 "id"를 전송해야 합니다(참조 <a href="#available-dictionary"
+                                        title="Available-Dictionary">섹션 2.2</a>).</p>
+                            </div>
+                            <div id="rfc.section.2.1.3.p.2">
+                                <p>서버 식별자는 클라이언트에 의해 불투명한 문자열로 취급되어야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.3.p.3">
+                                <p>서버는 식별자만으로 사전 내용을 보증해서는 안 되며, 사전 해시를 검증한 후에만 사용해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.3.p.4">
+                                <p>"id" 값 문자열 길이(디코딩 후)는 최대 1024자를 지원합니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.3.p.5">
+                                <p>"id" 값은 선택적이며 기본값은 빈 문자열입니다.</p>
+                            </div>
+                        </section>
+                        <section id="type">
+                            <h4 id="rfc.section.2.1.4"><a href="#rfc.section.2.1.4">2.1.4.</a>&nbsp;<a
+                                    href="#type">"type"</a></h4>
+                            <div id="rfc.section.2.1.4.p.1">
+                                <p>"Use-As-Dictionary" 응답 헤더의 "type" 값은 제공된 사전의 파일 형식을 설명하는 Token 값입니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.4.p.2">
+                                <p>"raw"는 포맷화되지 않은 바이트 덩어리로서 어떤 압축 방식에도 적합한 사전 형식으로 정의됩니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.4.p.3">
+                                <p>클라이언트가 이해하지 못하는 타입의 사전을 수신한 경우, 클라이언트는 해당 사전을 사용해서는 안 됩니다.</p>
+                            </div>
+                            <div id="rfc.section.2.1.4.p.4">
+                                <p>"type" 값은 선택적이며 기본값은 "raw"입니다.</p>
+                            </div>
+                        </section>
+                        <section id="examples">
+                            <h4 id="rfc.section.2.1.5"><a href="#rfc.section.2.1.5">2.1.5.</a>&nbsp;<a
+                                    href="#examples">예시</a></h4>
+                            <section id="path-prefix">
+                                <h5 id="rfc.section.2.1.5.1"><a href="#rfc.section.2.1.5.1">2.1.5.1.</a>&nbsp;<a
+                                        href="#path-prefix">경로 접두사</a></h5>
+                                <div id="rfc.section.2.1.5.1.p.1" class="avoidbreakafter">
+                                    <p>다음과 같은 응답 헤더를 포함한 응답은 동일한 Origin의 요청에 대해 경로 접두사 /product/ 를 가진 모든 문서 요청에 매칭됨을
+                                        지정합니다(참조 <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-4.3.1">RFC
+                                            9110 섹션 4.3.1</a>).</p>
+                                </div>
+                                <div id="rfc.section.2.1.5.1.p.2">
+                                    <pre class="text">
+NOTE: '\' line wrapping per RFC 8792
+
+Use-As-Dictionary: \
+  match="/product/*", match-dest=("document")
+</pre>
+                                </div>
+                            </section>
+                            <section id="versioned-directories">
+                                <h5 id="rfc.section.2.1.5.2"><a href="#rfc.section.2.1.5.2">2.1.5.2.</a>&nbsp;<a
+                                        href="#versioned-directories">버전 디렉터리</a></h5>
+                                <div id="rfc.section.2.1.5.2.p.1" class="avoidbreakafter">
+                                    <p>다음과 같은 응답 헤더는 "/app/"로 시작하고 "/main.js"로 끝나는 모든 경로와 매칭됩니다:</p>
+                                </div>
+                                <div id="rfc.section.2.1.5.2.p.2">
+                                    <pre class="text">
+Use-As-Dictionary: match="/app/*/main.js"
+</pre>
+                                </div>
+                            </section>
+                        </section>
+                    </section>
+                    <section id="available-dictionary">
+                        <h3 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a>&nbsp;<a
+                                href="#available-dictionary">Available-Dictionary</a></h3>
+                        <div id="rfc.section.2.2.p.1">
+                            <p>클라이언트가 적절한 사전을 보유하고 있는 리소스를 요청할 때, 해당 클라이언트는 사용 가능한 사전이 있음을 서버에 알리기 위해
+                                "Available-Dictionary" 요청 헤더를 추가할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.2">
+                            <p>"Available-Dictionary" 요청 헤더는 단일 사용 가능한 사전의 내용에 대한 SHA-256 해시를 포함하는 Structured Field <a
+                                    href="#RFC9651"><cite
+                                        title="Structured Field Values for HTTP">[STRUCTURED-FIELDS]</cite></a> Byte
+                                Sequence입니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.3">
+                            <p>클라이언트는 가장 적합한 단일 매칭을 위해 단 하나의 "Available-Dictionary" 요청 헤더만을 전송해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.4" class="avoidbreakafter">
+                            <p>예시:</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.5">
+                            <pre class="text">
+Available-Dictionary: :pZGm1Av0IEBKARczz7exkNYsZb8LzaMrV7J32a2fFG4=:
+</pre>
+                        </div>
+                        <section id="dictionary-freshness-requirement">
+                            <h4 id="rfc.section.2.2.1"><a href="#rfc.section.2.2.1">2.2.1.</a>&nbsp;<a
+                                    href="#dictionary-freshness-requirement">사전 신선도 요구사항</a></h4>
+                            <div id="rfc.section.2.2.1.p.1">
+                                <p>매칭으로 간주되려면, 사전 리소스는 신선해야 하거나(참조 <a href="#RFC9111"><cite
+                                            title="HTTP Caching">[HTTP-CACHING]</cite></a>) 허용되는 범위 내에서 오래된(stale) 상태로
+                                    제공될 수 있어야 합니다(참조 <a href="#RFC5861"><cite
+                                            title="HTTP Cache-Control Extensions for Stale Content">[RFC5861]</cite></a>).
+                                </p>
+                            </div>
+                        </section>
+                        <section id="dictionary-url-matching">
+                            <h4 id="rfc.section.2.2.2"><a href="#rfc.section.2.2.2">2.2.2.</a>&nbsp;<a
+                                    href="#dictionary-url-matching">사전 URL 매칭</a></h4>
+                            <div id="rfc.section.2.2.2.p.1">
+                                <p>"Use-As-Dictionary" 지시의 결과로 저장된 사전은 "match" 문자열과 선택적 "match-dest" 문자열을 포함하며, 이는
+                                    클라이언트의 발신 요청을 사용 가능한 사전과 매칭하는 데 사용됩니다.</p>
+                            </div>
+                            <div id="rfc.section.2.2.2.p.2" class="avoidbreakafter">
+                                <p>발신 요청이 주어진 사전과 매치되는지 확인하기 위해 다음 알고리즘은 성공적인 매치에 대해 TRUE를, 매치 실패에 대해 FALSE를 반환합니다:</p>
+                            </div>
+                            <div id="rfc.section.2.2.2.p.3">
+                                <ol type="1">
+                                    <li>
+                                        <div class="avoidbreakafter">
+                                            <p>클라이언트가 요청 destination을 지원하고 사전에 "match-dest" 문자열이 제공된 경우:</p>
+                                        </div>
+                                        <div>
+                                            <ul>
+                                                <li>
+                                                    <div>
+                                                        <p>DEST를 해당 사전의 "match-dest" 값으로 둡니다.</p>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <p>REQUEST_DEST를 현재 요청의 destination 값으로 둡니다.</p>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <p>만약 DEST가 빈 리스트가 아니고 REQUEST_DEST가 DEST 리스트에 포함되지 않으면 FALSE를
+                                                            반환합니다.</p>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>BASEURL을 사전 요청의 URL로 둡니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>URL을 검사 대상 발신 요청의 URL로 둡니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>BASEURL의 Origin과 URL의 Origin이 동일하지 않으면 FALSE를 반환합니다(참조 <a
+                                                    href="https://www.rfc-editor.org/rfc/rfc9110.html#section-4.3.1">RFC
+                                                    9110 섹션 4.3.1</a>).</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>MATCH를 해당 사전의 "match" 값으로 둡니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>PATTERN을 input=MATCH 및 baseURL=URL로 하여 "create a URL pattern" 절차를 실행해 만든
+                                                "URL pattern struct"로 둡니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>PATTERN에 대해 input=URL로 "match" 단계를 실행한 결과를 반환합니다(요청 URL과 "match" 문자열 간의
+                                                매칭을 검사함).</p>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </section>
+                        <section id="multiple-matching-dictionaries">
+                            <h4 id="rfc.section.2.2.3"><a href="#rfc.section.2.2.3">2.2.3.</a>&nbsp;<a
+                                    href="#multiple-matching-dictionaries">다중 매칭 사전</a></h4>
+                            <div id="rfc.section.2.2.3.p.1" class="avoidbreakafter">
+                                <p>주어진 요청 URL에 대해 여러 사전이 매칭되는 경우, 클라이언트는 다음 규칙을 사용해 단일 사전을 선택해야 합니다:</p>
+                            </div>
+                            <div id="rfc.section.2.2.3.p.2">
+                                <ol type="1">
+                                    <li>
+                                        <div>
+                                            <p>요청 destination을 지원하는 클라이언트의 경우, "match-dest"를 지정하고 매칭하는 사전이 목적지 미지정 매치보다
+                                                우선합니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>동일한 목적지 우선순위라면, "match"가 가장 긴 사전이 우선합니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>목적지 및 match 길이가 동등하다면, 가장 최근에 가져온 사전이 우선합니다.</p>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="dictionary-id">
+                        <h3 id="rfc.section.2.3"><a href="#rfc.section.2.3">2.3.</a>&nbsp;<a
+                                href="#dictionary-id">Dictionary-ID</a></h3>
+                        <div id="rfc.section.2.3.p.1">
+                            <p>클라이언트가 적절한 사전을 보유하고 있고 그 사전이 "Use-As-Dictionary" 응답 헤더에 서버가 제공한 "id"로 저장된 경우, 클라이언트는 향후
+                                해당 사전에 매칭되는 요청을 보낼 때 저장된 "id"를 "Dictionary-ID" 요청 헤더에 반영해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.3.p.2">
+                            <p>"Dictionary-ID" 요청 헤더는 Structured Field <a href="#RFC9651"><cite
+                                        title="Structured Field Values for HTTP">[STRUCTURED-FIELDS]</cite></a>
+                                String이며(디코딩 후) 최대 1024자를 지원하고, 서버가 제공한 "id"와 동일해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.2.3.p.3" class="avoidbreakafter">
+                            <p>예를 들어, 다음과 같이 사전 ID를 설정한 HTTP 응답이 있다고 가정하면:</p>
+                        </div>
+                        <div id="rfc.section.2.3.p.4">
+                            <pre class="text">
+Use-As-Dictionary: match="/app/*/main.js", id="dictionary-12345"
+</pre>
+                        </div>
+                        <div id="rfc.section.2.3.p.5" class="avoidbreakafter">
+                            <p>이후 해당 사전에 매치되는 요청은 해시와 ID를 모두 포함합니다:</p>
+                        </div>
+                        <div id="rfc.section.2.3.p.6">
+                            <pre class="text">
+Available-Dictionary: :pZGm1Av0IEBKARczz7exkNYsZb8LzaMrV7J32a2fFG4=:
+Dictionary-ID: "dictionary-12345"
+</pre>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="the-compression-dictionary-link-relation-type">
+                    <h2 id="rfc.section.3" class="np"><a href="#rfc.section.3">3.</a>&nbsp;<a
+                            href="#the-compression-dictionary-link-relation-type">"compression-dictionary" 링크 관계 타입</a>
+                    </h2>
+                    <div id="rfc.section.3.p.1">
+                        <p>이 명세서는 현재 HTTP 응답과 관련되어 있지만 현재 응답에서 직접 사용되지는 않는 압축 사전의 URL을 제공하기 위한 메커니즘을 제공하는
+                            "compression-dictionary" 링크 관계 타입을 정의합니다(<a href="#RFC8288"><cite
+                                    title="Web Linking">[WEB-LINKING]</cite></a>).</p>
+                    </div>
+                    <div id="rfc.section.3.p.2">
+                        <p>"compression-dictionary" 링크 관계 타입은 지정된 리소스를 가져와 캐시하는 것이 향후 요청에 유익할 가능성이 높음을 나타냅니다. 이러한 향후 요청의
+                            일부 응답은 지정된 리소스를 압축 사전으로 사용할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.3.p.3">
+                        <p>클라이언트는 적절하다고 판단되는 시점에 제공된 리소스를 가져올 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.3.p.4">
+                        <p>압축 사전을 가져오려면 해당 응답에 "Use-As-Dictionary" 응답 헤더와 캐싱 응답 헤더가 포함되어야 사전으로 사용할 수 있습니다. 링크 관계는 사전의
+                            가져오기를 트리거하는 메커니즘만 제공합니다.</p>
+                    </div>
+                    <div id="rfc.section.3.p.5" class="avoidbreakafter">
+                        <p>다음 예는 https://example.org/dict.dat 에 있는 리소스를 가리키는 링크로서 압축 사전 생성이 예상됨을 보여줍니다:</p>
+                    </div>
+                    <div id="rfc.section.3.p.6">
+                        <pre class="text">
+Link: &lt;https://example.org/dict.dat&gt;; rel="compression-dictionary"
+</pre>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="dictionary-compressed-brotli">
+                    <h2 id="rfc.section.4" class="np"><a href="#rfc.section.4">4.</a>&nbsp;<a
+                            href="#dictionary-compressed-brotli">사전 압축된 Brotli</a></h2>
+                    <div id="rfc.section.4.p.1">
+                        <p>"dcb" 콘텐츠 인코딩은 "Dictionary-Compressed Brotli" 스트림을 식별합니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.2">
+                        <p>"Dictionary-Compressed Brotli" 스트림은 고정 헤더가 뒤따르는 Shared Brotli <a href="#RFC9841"><cite
+                                    title="Shared Brotli Compressed Data Format">[SHARED-BROTLI]</cite></a> 스트림으로 구성됩니다.
+                            헤더는 4바이트 고정 시퀀스와 사용된 외부 사전의 32바이트 해시로 이루어집니다. Shared Brotli 스트림은 참조된 외부 사전과 최대 16MB 크기의 압축
+                            윈도우를 사용하여 생성됩니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.3">
+                        <p>"dcb" 콘텐츠 인코딩에 사용되는 사전은 <a href="#type" title="&#34;type&#34;">섹션 2.1.4</a>에서 정의된 "raw" 사전
+                            타입이며, <a href="#RFC9841"><cite
+                                    title="Shared Brotli Compressed Data Format">[SHARED-BROTLI]</cite></a>의 섹션 8.2에서
+                            정의된 접두사 사전(prefix dictionary)으로 처리됩니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.4" class="avoidbreakafter">
+                        <p>36바이트 고정 헤더는 다음과 같습니다:</p>
+                    </div>
+                    <div id="rfc.section.4.p.5">
+                        <dl>
+                            <dt>Magic_Number:</dt>
+                            <dd style="margin-left: 1.5em">
+                                <div>고정 4바이트 -- 0xff, 0x44, 0x43, 0x42.</div>
+                            </dd>
+                            <dt>SHA_256_Hash:</dt>
+                            <dd style="margin-left: 1.5em">
+                                <div>32바이트. 사전의 SHA-256 해시 다이제스트.</div>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div id="rfc.section.4.p.6">
+                        <p>dcb 콘텐츠 인코딩을 지원한다고 선언하는 클라이언트는 최대 16MB의 윈도우 크기로 압축된 리소스를 해제할 수 있어야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.7">
+                        <p>Brotli 압축에서는 전체 사전이 압축/해제 동안 압축 윈도우와 무관하게 사용 가능하므로, 압축 윈도우보다 큰 리소스에 대해서도 델타 압축이 가능합니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="dictionary-compressed-zstandard">
+                    <h2 id="rfc.section.5" class="np"><a href="#rfc.section.5">5.</a>&nbsp;<a
+                            href="#dictionary-compressed-zstandard">사전 압축된 Zstandard</a></h2>
+                    <div id="rfc.section.5.p.1">
+                        <p>"dcz" 콘텐츠 인코딩은 "Dictionary-Compressed Zstandard" 스트림을 식별합니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.2">
+                        <p>"Dictionary-Compressed Zstandard" 스트림은 40바이트 고정 헤더로 시작하고, 이어서 외부 사전으로 압축된 Zstandard <a
+                                href="#RFC8878"><cite
+                                    title="Zstandard Compression and the 'application/zstd' Media Type">[ZSTD]</cite></a>
+                            스트림이 옵니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.3">
+                        <p>"dcz" 콘텐츠 인코딩에 사용되는 사전은 <a href="#type" title="&#34;type&#34;">섹션 2.1.4</a>에서 정의된 "raw" 타입이며,
+                            <a href="#RFC8878"><cite
+                                    title="Zstandard Compression and the 'application/zstd' Media Type">[ZSTD]</cite></a>의
+                            섹션 5에 따라 raw 사전으로 처리됩니다.
+                        </p>
+                    </div>
+                    <div id="rfc.section.5.p.4" class="avoidbreakafter">
+                        <p>40바이트 헤더는 8바이트 고정 시퀀스와 이어서 사용된 외부 사전의 32바이트 SHA-256 해시로 구성됩니다:</p>
+                    </div>
+                    <div id="rfc.section.5.p.5">
+                        <dl>
+                            <dt>Magic_Number:</dt>
+                            <dd style="margin-left: 1.5em">
+                                <div>8바이트 고정 -- 0x5e, 0x2a, 0x4d, 0x18, 0x20, 0x00, 0x00, 0x00.</div>
+                            </dd>
+                            <dt>SHA_256_Hash:</dt>
+                            <dd style="margin-left: 1.5em">
+                                <div>32바이트. 사전의 SHA-256 해시 다이제스트.</div>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div id="rfc.section.5.p.6">
+                        <p>40바이트 헤더는 Zstandard 스킵가능 프레임(little-endian 0x184D2A5E)에 32바이트 길이(little-endian 0x00000020)를
+                            가진 형태로 기존 Zstandard 디코더와 호환됩니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.7">
+                        <p>dcz 콘텐츠 인코딩을 지원한다고 선언하는 클라이언트는 최소 8MB 또는 사전 크기의 1.25배 중 큰 값(최대 128MB까지)의 윈도우 크기로 압축된 리소스를 해제할
+                            수 있어야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.8">
+                        <p>사용된 윈도우 크기는 콘텐츠에 인코딩되며(현재는 2의 거듭제곱으로만 표현 가능), 이 값은 위 제한보다 작아야 합니다. 구현체는 이 제한을 초과하는 윈도우 크기를
+                            디코딩 오류로 처리할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.5.p.9">
+                        <p>Zstandard 압축에서는 입력 크기가 압축 윈도우를 초과할 때까지 전체 사전이 압축/해제 동안 사용 가능합니다. 그 지점을 넘으면 사전은 더 이상 사용
+                            불가능해집니다. 사전 크기의 1.25배 윈도우를 사용하면, 릴리스 간에 리소스가 25% 증가한 경우에도 완전한 델타 압축이 가능하면서 클라이언트가 해당 응답을 위해
+                            할당할 메모리를 제어할 수 있게 됩니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="negotiating-the-content-encoding">
+                    <h2 id="rfc.section.6" class="np"><a href="#rfc.section.6">6.</a>&nbsp;<a
+                            href="#negotiating-the-content-encoding">콘텐츠 인코딩 협상</a></h2>
+                    <div id="rfc.section.6.p.1">
+                        <p>특정 요청에 대해 압축 사전을 사용하여 응답을 압축할 수 있을 때, 사용될 인코딩은 "Accept-Encoding" 요청 헤더와 "Content-Encoding" 응답
+                            헤더를 통한 HTTP의 일반적인 콘텐츠 인코딩 협상 메커니즘으로 협상됩니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.2">
+                        <p>사용할 사전은 별도로 협상되며 "Available-Dictionary" 요청 헤더에 광고됩니다.</p>
+                    </div>
+                    <section id="accept-encoding">
+                        <h3 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a>&nbsp;<a
+                                href="#accept-encoding">Accept-Encoding</a></h3>
+                        <div id="rfc.section.6.1.p.1" class="avoidbreakafter">
+                            <p>클라이언트가 주어진 요청에 대해 사용할 사전을 보유하고 있고 사전 기반 콘텐츠 인코딩을 사용하기로 결정하면, 클라이언트는 지원하는 사전 인식 콘텐츠 인코딩들을
+                                "Accept-Encoding" 요청 헤더에 추가합니다. 예를 들면:</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.2">
+                            <pre class="text">
+Accept-Encoding: gzip, deflate, br, zstd, dcb, dcz
+</pre>
+                        </div>
+                        <div id="rfc.section.6.1.p.3">
+                            <p>클라이언트가 요청에 대해 저장된 사전이 없거나 사전 사용을 선택하지 않는 경우, 클라이언트는 "Accept-Encoding" 요청 헤더에 사전 인식 콘텐츠
+                                인코딩을 보내서는 안 됩니다.</p>
+                        </div>
+                    </section>
+                    <section id="content-encoding">
+                        <h3 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a>&nbsp;<a
+                                href="#content-encoding">Content-Encoding</a></h3>
+                        <div id="rfc.section.6.2.p.1" class="avoidbreakafter">
+                            <p>서버가 클라이언트가 광고한 사전 인코딩 중 하나를 지원하고 클라이언트가 광고한 사전을 사용해 응답을 압축하기로 선택하면, 서버는 선택된 알고리즘에 해당하는
+                                값으로 "Content-Encoding" 응답 헤더를 설정합니다. 예:</p>
+                        </div>
+                        <div id="rfc.section.6.2.p.2">
+                            <pre class="text">
+Content-Encoding: dcb
+</pre>
+                        </div>
+                        <div id="rfc.section.6.2.p.3" class="avoidbreakafter">
+                            <p>응답이 캐시 가능하면, 캐시가 사전-압축된 리소스를 지원하지 않는 클라이언트에게 제공하거나 잘못된 사전으로 압축된 응답을 제공하지 못하도록 "Vary" 헤더를
+                                포함해야 합니다. 예:</p>
+                        </div>
+                        <div id="rfc.section.6.2.p.4">
+                            <pre class="text">
+Vary: accept-encoding, available-dictionary
+</pre>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="iana-considerations">
+                    <h2 id="rfc.section.7" class="np"><a href="#rfc.section.7">7.</a>&nbsp;<a
+                            href="#iana-considerations">IANA 고려사항</a></h2>
+                    <section id="content-encoding-1">
+                        <h3 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a>&nbsp;<a
+                                href="#content-encoding-1">콘텐츠 인코딩 등록</a></h3>
+                        <div id="rfc.section.7.1.p.1" class="avoidbreakafter">
+                            <p>IANA는 다음 항목을 "HTTP Content Coding Registry"에 추가했습니다:</p>
+                        </div>
+                        <div id="rfc.section.7.1.p.2">
+                            <dl class="compact">
+                                <dt>Name:</dt>
+                                <dd style="margin-left: 1.5em">dcb</dd>
+                                <dt>Description:</dt>
+                                <dd style="margin-left: 1.5em">"Dictionary-Compressed Brotli" 데이터 형식.</dd>
+                                <dt>Reference:</dt>
+                                <dd style="margin-left: 1.5em">RFC 9842, <a href="#dictionary-compressed-brotli"
+                                        title="Dictionary-Compressed Brotli">섹션 4</a></dd>
+                            </dl>
+                        </div>
+                        <div id="rfc.section.7.1.p.3">
+                            <dl class="compact">
+                                <dt>Name:</dt>
+                                <dd style="margin-left: 1.5em">dcz</dd>
+                                <dt>Description:</dt>
+                                <dd style="margin-left: 1.5em">"Dictionary-Compressed Zstandard" 데이터 형식.</dd>
+                                <dt>Reference:</dt>
+                                <dd style="margin-left: 1.5em">RFC 9842, <a href="#dictionary-compressed-zstandard"
+                                        title="Dictionary-Compressed Zstandard">섹션 5</a></dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section id="header-field-registration">
+                        <h3 id="rfc.section.7.2"><a href="#rfc.section.7.2">7.2.</a>&nbsp;<a
+                                href="#header-field-registration">헤더 필드 등록</a></h3>
+                        <div id="rfc.section.7.2.p.1" class="avoidbreakafter">
+                            <p>IANA는 다음 항목을 "Hypertext Transfer Protocol (HTTP) Field Name Registry"에 추가했습니다:</p>
+                        </div>
+                        <div class="table table-condensed table-striped">
+                            <table class="v3 text-center">
+                                <caption>Table 1</caption>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left" colspan="1" rowspan="1">Field Name</th>
+                                        <th class="text-left" colspan="1" rowspan="1">Status</th>
+                                        <th class="text-left" colspan="1" rowspan="1">Reference</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-left" colspan="1" rowspan="1">Use-As-Dictionary</td>
+                                        <td class="text-left" colspan="1" rowspan="1">permanent</td>
+                                        <td class="text-left" colspan="1" rowspan="1">RFC 9842, <a
+                                                href="#use-as-dictionary" title="Use-As-Dictionary">섹션 2.1</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" colspan="1" rowspan="1">Available-Dictionary</td>
+                                        <td class="text-left" colspan="1" rowspan="1">permanent</td>
+                                        <td class="text-left" colspan="1" rowspan="1">RFC 9842, <a
+                                                href="#available-dictionary" title="Available-Dictionary">섹션 2.2</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" colspan="1" rowspan="1">Dictionary-ID</td>
+                                        <td class="text-left" colspan="1" rowspan="1">permanent</td>
+                                        <td class="text-left" colspan="1" rowspan="1">RFC 9842, <a href="#dictionary-id"
+                                                title="Dictionary-ID">섹션 2.3</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <section id="link-relation-registration">
+                        <h3 id="rfc.section.7.3"><a href="#rfc.section.7.3">7.3.</a>&nbsp;<a
+                                href="#link-relation-registration">링크 관계 등록</a></h3>
+                        <div id="rfc.section.7.3.p.1" class="avoidbreakafter">
+                            <p>IANA는 다음 항목을 "Link Relation Types" 레지스트리에 추가했습니다:</p>
+                        </div>
+                        <div id="rfc.section.7.3.p.2">
+                            <dl class="compact">
+                                <dt>Relation Name:</dt>
+                                <dd style="margin-left: 1.5em">compression-dictionary</dd>
+                                <dt>Description:</dt>
+                                <dd style="margin-left: 1.5em">콘텐츠 인코딩에 사용되는 압축 사전을 가리킴.</dd>
+                                <dt>Reference:</dt>
+                                <dd style="margin-left: 1.5em">RFC 9842, <a
+                                        href="#the-compression-dictionary-link-relation-type"
+                                        title="The &#34;compression-dictionary&#34; Link Relation Type">섹션 3</a>
+                                </dd>
+                            </dl>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="compatibility-considerations">
+                    <h2 id="rfc.section.8" class="np"><a href="#rfc.section.8">8.</a>&nbsp;<a
+                            href="#compatibility-considerations">호환성 고려사항</a></h2>
+                    <div id="rfc.section.8.p.1">
+                        <p>네트워크 경로상에 HTTP 요청을 가로채고 검사 및 처리하는 장치들(웹 프록시, 방화벽, 침입 탐지 시스템 등)이 존재하는 것은 흔한 일입니다. 이러한 장치들이 사전
+                            압축 응답을 잘못 처리할 위험을 최소화하기 위해, 압축 사전 전송은 보안 컨텍스트(HTTPS)에서만 사용되어야 합니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="security-considerations">
+                    <h2 id="rfc.section.9" class="np"><a href="#rfc.section.9">9.</a>&nbsp;<a
+                            href="#security-considerations">보안 고려사항</a></h2>
+                    <div id="rfc.section.9.p.1">
+                        <p>Brotli, Shared Brotli 및 Zstandard에 대한 기존 보안 고려사항이 사전 기반 버전에도 적용됩니다.</p>
+                    </div>
+                    <section id="changing-content">
+                        <h3 id="rfc.section.9.1"><a href="#rfc.section.9.1">9.1.</a>&nbsp;<a
+                                href="#changing-content">콘텐츠 변경</a></h3>
+                        <div id="rfc.section.9.1.p.1">
+                            <p>사전은 콘텐츠와 동일한 보안 주의사항으로 다뤄져야 합니다. 사전의 변경은 압축 해제된 콘텐츠 변경으로 이어질 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.9.1.p.2">
+                            <p>사전은 콘텐츠의 SHA-256 해시로 검증되어 클라이언트와 서버가 동일한 사전을 사용하는지 확인합니다. SHA-256의 강도는 사전이 동일
+                                출처(origin)에서 제공되므로 공격을 막기 위한 명시적 필요성은 크지 않지만, 추후 다른 해시 알고리즘 사용 필요가 있으면
+                                "Use-As-Dictionary" 응답 헤더를 확장하여 다른 알고리즘을 지정할 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="reading-content">
+                        <h3 id="rfc.section.9.2"><a href="#rfc.section.9.2">9.2.</a>&nbsp;<a href="#reading-content">콘텐츠
+                                읽기</a></h3>
+                        <div id="rfc.section.9.2.p.1">
+                            <p>RFC 7457의 압축 관련 공격들은 공개 데이터와 비공개 데이터가 섞여 압축되는 것은 위험하다는 것을 보여줍니다. 데이터 소스에는 압축된 데이터뿐 아니라
+                                사전도 포함됩니다. 예를 들어 비밀 쿠키가 공개 데이터 전용 사전으로 압축되면 쿠키에 대한 정보가 유출될 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.9.2.p.2">
+                            <p>사전은 압축된 데이터에 대한 정보를 드러낼 수 있고 그 반대도 성립합니다. 즉, 공격자가 압축되는 데이터의 일부를 제어하고 압축된 크기를 관찰할 수 있으면 사전
+                                내용을 추론할 수 있고, 반대로 공격자가 사전을 제어하면 압축된 데이터에 대한 정보를 얻을 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="security-mitigations">
+                        <h3 id="rfc.section.9.3"><a href="#rfc.section.9.3">9.3.</a>&nbsp;<a
+                                href="#security-mitigations">보안 완화책</a></h3>
+                        <div id="rfc.section.9.3.p.1">
+                            <p>완화책이 통과하지 못하면, 클라이언트는 응답을 버리고 오류를 반환해야 합니다.</p>
+                        </div>
+                        <section id="cross-origin-protection">
+                            <h4 id="rfc.section.9.3.1"><a href="#rfc.section.9.3.1">9.3.1.</a>&nbsp;<a
+                                    href="#cross-origin-protection">교차 출처 보호</a></h4>
+                            <div id="rfc.section.9.3.1.p.1">
+                                <p>사전이 제공된 동일 출처의 콘텐츠에만 영향을 미치도록 보장하기 위해, 사전을 요청과 매칭하는 데 사용되는 URL 패턴(섹션 <a href="#match"
+                                        title="&#34;match&#34;">2.1.1</a>)은 사전이 제공된 동일한 출처에 속하도록 보장됩니다.</p>
+                            </div>
+                        </section>
+                        <section id="response-readability">
+                            <h4 id="rfc.section.9.3.2"><a href="#rfc.section.9.3.2">9.3.2.</a>&nbsp;<a
+                                    href="#response-readability">응답 가독성</a></h4>
+                            <div id="rfc.section.9.3.2.p.1">
+                                <p>브라우저와 같은 클라이언트는 응답 페이로드의 가독성과 사용자 추적에 대해 추가 보호를 제공하므로, 사전 기반 압축 사용이 공개되지 않아야 할 정보를
+                                    드러내지 않도록 추가 보호 조치를 취해야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.9.3.2.p.2">
+                                <p>이러한 경우 사전 압축은 사전과 압축된 응답이 클라이언트에 의해 완전히 읽을 수 있는 경우에만 사용되어야 합니다.</p>
+                            </div>
+                            <div id="rfc.section.9.3.2.p.3">
+                                <p>브라우저 관점에서는, 이는 사전과 압축된 응답이 동시 출처(same-origin)이거나 교차 출처일 경우 CORS 검사를 통과해야 함을 의미합니다(참조
+                                    Fetch의 CORS 체크 섹션 4.9).</p>
+                            </div>
+                        </section>
+                        <section id="server-responsibility">
+                            <h4 id="rfc.section.9.3.3"><a href="#rfc.section.9.3.3">9.3.3.</a>&nbsp;<a
+                                    href="#server-responsibility">서버 책임</a></h4>
+                            <div id="rfc.section.9.3.3.p.1">
+                                <p>사전의 일부를 공격자가 제어하거나 사전을 읽을 수 있고 압축되는 콘텐츠의 일부를 제어할 수 있는 경우 타이밍 공격이 발생할 수 있습니다. 이런 공격에서
+                                    응답의 크기나 처리 시간의 변화는 내용에 대한 정보를 유출할 수 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.9.3.3.p.2">
+                                <p>일반적으로 서버는 동일 콘텐츠에 대해 여러 사전의 활성 사용을 금지하거나, 제어 불가능한 소스에서 오는 콘텐츠가 포함되면 압축을 비활성화하는 등 요청별
+                                    변이를 방지하여 이러한 공격을 완화할 수 있습니다. 또한 사전 콘텐츠에 대한 접근과 제어를 응답 콘텐츠와 동일한 수준으로 보호해야 합니다. 추가로,
+                                    클라이언트가 교차 출처 요청 컨텍스트를 나타내는 CORS 관련 요청 헤더를 제공하는 경우 서버가 사전 인식 압축을 비활성화하도록 하기 위한 요구사항들이
+                                    있습니다.</p>
+                            </div>
+                            <div id="rfc.section.9.3.3.p.3" class="avoidbreakafter">
+                                <p>다음 알고리즘은 교차 출처 요청에 대해 FALSE를 반환하며, 이러한 경우 사전 기반 압축 사용을 피해야 합니다:</p>
+                            </div>
+                            <div id="rfc.section.9.3.3.p.4">
+                                <ol type="1">
+                                    <li>
+                                        <div>
+                                            <p>"Sec-Fetch-Site" 요청 헤더가 없으면 TRUE를 반환합니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>"Sec-Fetch-Site" 값이 "same-origin"이면 TRUE를 반환합니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>"Sec-Fetch-Mode" 요청 헤더가 없으면 TRUE를 반환합니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>"Sec-Fetch-Mode" 값이 "navigate" 또는 "same-origin"이면 TRUE를 반환합니다.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="avoidbreakafter">
+                                            <p>"Sec-Fetch-Mode" 값이 "cors"인 경우:</p>
+                                        </div>
+                                        <div>
+                                            <ul>
+                                                <li>
+                                                    <div>
+                                                        <p>응답에 "Access-Control-Allow-Origin" 응답 헤더가 없으면 FALSE를 반환합니다.
+                                                        </p>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <p>요청에 "Origin" 요청 헤더가 없으면 FALSE를 반환합니다.</p>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <p>"Access-Control-Allow-Origin" 응답 헤더 값이 "*"이면 TRUE를 반환합니다.</p>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <p>"Access-Control-Allow-Origin" 응답 헤더 값이 "Origin" 요청 헤더 값과 일치하면
+                                                            TRUE를 반환합니다.</p>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <p>FALSE를 반환합니다.</p>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="privacy-considerations">
+                    <h2 id="rfc.section.10" class="np"><a href="#rfc.section.10">10.</a>&nbsp;<a
+                            href="#privacy-considerations">프라이버시 고려사항</a></h2>
+                    <div id="rfc.section.10.p.1">
+                        <p>사전은 사전 콘텐츠의 해시를 사용하여 향후 요청에서 광고되므로 사전이 추적 쿠키로 악용될 가능성이 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.10.p.2">
+                        <p>추가적인 추적 우려를 완화하기 위해, 클라이언트는 사전을 쿠키를 처리하는 방식과 동일하게 취급해야 합니다. 이는 쿠키에 사용하는 것과 동일하거나 더 엄격한 파티셔닝을
+                            사용하여 저장소를 분할하고, 쿠키가 지워질 때 사전도 함께 지우는 것을 포함합니다.</p>
+                    </div>
+                </section>
+                <section id="sec-combined-references" class="np">
+                    <div id="rfc.references">
+                        <h2 id="rfc.section.11"><a href="#rfc.section.11">11.</a> 참고문헌</h2>
+                        <section id="sec-normative-references">
+                            <div id="rfc.references.2">
+                                <h3 id="rfc.section.11.1"><a href="#rfc.section.11.1">11.1.</a> 규범적 참고문헌
+                                </h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="FETCH">[<a href="#FETCH" class="smpl">FETCH</a>]</dt>
+                                    <dd>WHATWG, “<a href="https://fetch.spec.whatwg.org/">Fetch Standard</a>”, WHATWG
+                                        Living Standard, &lt;<a
+                                            href="https://fetch.spec.whatwg.org/">https://fetch.spec.whatwg.org/</a>&gt;.<br>Commit
+                                        snapshot: &lt;<a
+                                            href="https://fetch.spec.whatwg.org/commit-snapshots/5a9680638ebfc2b3b7f4efb2bef0b579a2663951/">https://fetch.spec.whatwg.org/commit-snapshots/5a9680638ebfc2b3b7f4efb2bef0b579a2663951/</a>&gt;
+                                    </dd>
+                                    <dt id="RFC8792">[<a href="#RFC8792" class="smpl">FOLDING</a>]</dt>
+                                    <dd>Watsen, K., Auerswald, E., Farrel, A., and Q. Wu, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8792.html">Handling Long Lines in
+                                            Content of Internet-Drafts and RFCs</a>”, RFC 8792, June 2020, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8792">https://www.rfc-editor.org/info/rfc8792</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC9111">[<a href="#RFC9111" class="smpl">HTTP-CACHING</a>]</dt>
+                                    <dd>Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9111.html">HTTP Caching</a>”, RFC
+                                        9111, June 2022, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9111">https://www.rfc-editor.org/info/rfc9111</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC9110">[<a href="#RFC9110" class="smpl">HTTP</a>]</dt>
+                                    <dd>Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9110.html">HTTP Semantics</a>”, RFC
+                                        9110, June 2022, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9110">https://www.rfc-editor.org/info/rfc9110</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                    <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">Key words
+                                            for use in RFCs to Indicate Requirement Levels</a>”, BCP 14, RFC 2119, March
+                                        1997, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8174">[<a href="#RFC8174" class="smpl">RFC8174</a>]</dt>
+                                    <dd>Leiba, B., “<a href="https://www.rfc-editor.org/rfc/rfc8174.html">Ambiguity of
+                                            Uppercase vs Lowercase in RFC 2119 Key Words</a>”, RFC 8174, May 2017,
+                                        &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6234">[<a href="#RFC6234" class="smpl">SHA-256</a>]</dt>
+                                    <dd>Eastlake 3rd, D. and T. Hansen, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc6234.html">US Secure Hash Algorithms
+                                            (SHA and SHA-based HMAC and HKDF)</a>”, RFC 6234, May 2011, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6234">https://www.rfc-editor.org/info/rfc6234</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC9841">[<a href="#RFC9841" class="smpl">SHARED-BROTLI</a>]</dt>
+                                    <dd>Alakuijala, J., Duong, T., Kliuchnikov, E., Szabadka, Z., and L. Vandevenne,
+                                        Ed., “<a href="https://www.rfc-editor.org/rfc/rfc9841.html">Shared Brotli
+                                            Compressed Data Format</a>”, RFC 9841, September 2025, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9841">https://www.rfc-editor.org/info/rfc9841</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC9651">[<a href="#RFC9651" class="smpl">STRUCTURED-FIELDS</a>]</dt>
+                                    <dd>Nottingham, M. and P-H. Kamp, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc9651.html">Structured Field Values
+                                            for HTTP</a>”, RFC 9651, September 2024, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc9651">https://www.rfc-editor.org/info/rfc9651</a>&gt;.
+                                    </dd>
+                                    <dt id="URLPATTERN">[<a href="#URLPATTERN" class="smpl">URLPATTERN</a>]</dt>
+                                    <dd>WHATWG, “<a href="https://urlpattern.spec.whatwg.org/">URL Pattern
+                                            Standard</a>”, WHATWG Living Standard, &lt;<a
+                                            href="https://urlpattern.spec.whatwg.org/">https://urlpattern.spec.whatwg.org/</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC3986">[<a href="#RFC3986" class="smpl">URL</a>]</dt>
+                                    <dd>Berners-Lee, T., Fielding, R., and L. Masinter, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc3986.html">Uniform Resource
+                                            Identifier (URI): Generic Syntax</a>”, RFC 3986, January 2005, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8288">[<a href="#RFC8288" class="smpl">WEB-LINKING</a>]</dt>
+                                    <dd>Nottingham, M., “<a href="https://www.rfc-editor.org/rfc/rfc8288.html">Web
+                                            Linking</a>”, RFC 8288, October 2017, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8288">https://www.rfc-editor.org/info/rfc8288</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8878">[<a href="#RFC8878" class="smpl">ZSTD</a>]</dt>
+                                    <dd>Collet, Y. and M. Kucherawy, Ed., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8878.html">Zstandard Compression and
+                                            the 'application/zstd' Media Type</a>”, RFC 8878, February 2021, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8878">https://www.rfc-editor.org/info/rfc8878</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                        <section id="sec-informative-references">
+                            <div id="rfc.references.3">
+                                <h3 id="rfc.section.11.2"><a href="#rfc.section.11.2">11.2.</a> 비규범적 참고문헌
+                                </h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="RFC5861">[<a href="#RFC5861" class="smpl">RFC5861</a>]</dt>
+                                    <dd>Nottingham, M., “<a href="https://www.rfc-editor.org/rfc/rfc5861.html">HTTP
+                                            Cache-Control Extensions for Stale Content</a>”, RFC 5861, May 2010, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc5861">https://www.rfc-editor.org/info/rfc5861</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6265">[<a href="#RFC6265" class="smpl">RFC6265</a>]</dt>
+                                    <dd>Barth, A., “<a href="https://www.rfc-editor.org/rfc/rfc6265.html">HTTP State
+                                            Management Mechanism</a>”, RFC 6265, April 2011, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6265">https://www.rfc-editor.org/info/rfc6265</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7457">[<a href="#RFC7457" class="smpl">RFC7457</a>]</dt>
+                                    <dd>Sheffer, Y., Holz, R., and P. Saint-Andre, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7457.html">Summarizing Known Attacks
+                                            on Transport Layer Security (TLS) and Datagram TLS (DTLS)</a>”, RFC 7457,
+                                        February 2015, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7457">https://www.rfc-editor.org/info/rfc7457</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7932">[<a href="#RFC7932" class="smpl">RFC7932</a>]</dt>
+                                    <dd>Alakuijala, J. and Z. Szabadka, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7932.html">Brotli Compressed Data
+                                            Format</a>”, RFC 7932, July 2016, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7932">https://www.rfc-editor.org/info/rfc7932</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="rfc.authors" class="np">
+                    <h2><a href="#rfc.authors">저자 주소</a></h2>
+                    <address><b>Patrick Meenan</b> (editor)<br>Google LLC<br>EMail: <a
+                            href="mailto:pmeenan@google.com">pmeenan@google.com</a></address>
+                    <address><b>Yoav Weiss</b> (editor)<br>Shopify Inc.<br>EMail: <a
+                            href="mailto:yoav.weiss@shopify.com">yoav.weiss@shopify.com</a></address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>

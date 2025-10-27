@@ -1,0 +1,1237 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 7240 - HTTP에 대한 Prefer 헤더</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <script>try {
+            PR['registerLangHandler'](
+                PR['createSimpleLexer'](
+                    [
+                        // comment
+                        [PR['PR_COMMENT'], /^;[^\x00-\x1f]*/, null, ";"],
+                    ],
+                    [
+                        // string literals
+                        [PR['PR_STRING'], /^(\%s|\%i)?"[^"\x00-\x1f]*"/, null],
+                        // binary literals
+                        [PR['PR_LITERAL'], /^\%b[01]+((-[01]+)|(\.[01]+)*)/, null],
+                        // decimal literals
+                        [PR['PR_LITERAL'], /^\%d[0-9]+((-[0-9]+)|(\.[0-9]+)*)/, null],
+                        // hex literals
+                        [PR['PR_LITERAL'], /^(\%x[A-Za-z0-9]+((-[A-Za-z0-9]+)|(\.[A-Za-z0-9]+)*))/, null],
+                        // prose rule
+                        [PR['PR_NOCODE'], /^<[^>\x00-\x1f]*>/, null],
+                        // rule name
+                        [PR['PR_TYPE'], /^([A-Za-z][A-Za-z0-9-]*)/, null],
+                        [PR['PR_PUNCTUATION'], /^[=\(\)\*\/\[\]#]/, null],
+                    ]),
+                ['ietf_abnf']);
+        } catch (e) { }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC7240">
+    <meta property="og:description" content="Prefer Header for HTTP">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc7240.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css" href="/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 The Prefer Request Header Field" href="#rfc.section.2">
+    <link rel="Chapter" title="3 The Preference-Applied Response Header Field" href="#rfc.section.3">
+    <link rel="Chapter" title="4 Preference Definitions" href="#rfc.section.4">
+    <link rel="Chapter" title="5 IANA Considerations" href="#rfc.section.5">
+    <link rel="Chapter" title="6 Security Considerations" href="#rfc.section.6">
+    <link rel="Chapter" title="7 References" href="#rfc.section.7">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc7240.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="http://www.rfc-editor.org/info/rfc7240">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="http, prefer">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Snell, J.M.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:7240">
+    <meta name="dcterms.issued" content="2014-06">
+    <meta name="dcterms.abstract"
+        content="This specification defines an HTTP header field that can be used by a client to request that certain behaviors be employed by a server while processing a request.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="This specification defines an HTTP header field that can be used by a client to request that certain behaviors be employed by a server while processing a request.">
+</head>
+
+<body onload="getMeta(7240,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>7240</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#intro">Introduction</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.1.1">Syntax Notation</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#prefer">The Prefer
+                                        Request Header Field</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.2.1">Examples</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#preference-applied">The
+                                        Preference-Applied Response Header Field</a></li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#definitions">Preference
+                                        Definitions</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#respond-async">The "respond-async" Preference</a></li>
+                                        <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a href="#return">The
+                                                "return=representation" and "return=minimal" Preferences</a></li>
+                                        <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a href="#wait">The
+                                                "wait" Preference</a></li>
+                                        <li><a href="#rfc.section.4.4">4.4.</a>&nbsp;&nbsp;&nbsp;<a href="#handling">The
+                                                "handling=strict" and "handling=lenient" Processing Preferences</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.5">IANA
+                                        Considerations</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.5.1">5.1.</a>&nbsp;&nbsp;&nbsp;<a href="#registry">The
+                                                Registry of Preferences</a></li>
+                                        <li><a href="#rfc.section.5.2">5.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.2">Initial Registry Contents</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.6">Security
+                                        Considerations</a></li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references">References</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.1">Normative References</a></li>
+                                        <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">Informative References</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.authors">Author's Address</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">Internet Engineering Task Force (IETF)</td>
+                                <td class="text-right">J. Snell</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Request for Comments: 7240</td>
+                                <td class="text-right">June 2014</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Category: Standards Track</td>
+                                <td class="text-right"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>HTTP용 Prefer 헤더</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>이 명세서는 클라이언트가 요청을 처리하는 동안 서버가 특정 동작을 사용하도록 요청할 때 사용할 수 있는 HTTP 헤더 필드를 정의합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">Status of This Memo</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 문서입니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물입니다. 이는 IETF 커뮤니티의 합의를 반영합니다. 공개 검토를 거쳤으며 인터넷 엔지니어링 스티어링
+                            그룹(IESG)에 의해 발행 승인을 받았습니다. 인터넷 표준에 관한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc5741.html#section-2">RFC 5741의 섹션 2</a>에서 확인할 수
+                            있습니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 현재 상태, 정오표, 및 피드백 제공 방법에 대한 정보는 <a
+                                href="http://www.rfc-editor.org/info/rfc7240">http://www.rfc-editor.org/info/rfc7240</a>에서
+                            확인할 수 있습니다.</p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2014 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in
+                            effect on the date of publication of this document. Please review these documents carefully,
+                            as they describe your rights and restrictions with respect to this document. Code Components
+                            extracted from this document must include Simplified BSD License text as described in
+                            Section 4.e of the Trust Legal Provisions and are provided without warranty as described in
+                            the Simplified BSD License.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#intro">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.1.1">문법
+                                        표기</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#prefer">Prefer 요청 헤더 필드</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.2.1">예시</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#preference-applied">Preference-Applied 응답 헤더 필드</a></li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#definitions">선호사항 정의</a>
+                            <ul>
+                                <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#respond-async">"respond-async" 선호사항</a></li>
+                                <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#return">"return=representation" 및 "return=minimal" 선호사항</a></li>
+                                <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a href="#wait">"wait" 선호사항</a>
+                                </li>
+                                <li><a href="#rfc.section.4.4">4.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#handling">"handling=strict" 및 "handling=lenient" 처리 선호사항</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.5">IANA 고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.5.1">5.1.</a>&nbsp;&nbsp;&nbsp;<a href="#registry">선호사항
+                                        등록소</a></li>
+                                <li><a href="#rfc.section.5.2">5.2.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.5.2">초기
+                                        등록 내용</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.6">보안 고려사항</a></li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.1">규범적
+                                        참고문헌</a></li>
+                                <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references.2">비규범적 참고문헌</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.authors">저자 주소</a></li>
+                    </ul>
+                </div>
+                <section id="intro">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a href="#intro">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>HTTP 요청을 처리하는 과정에서는 일반적으로 서버나 중계자가 적용할 수 있는 필수 및 선택적 동작들이 다양하게 존재합니다. 이러한 동작들은 응답 내에서 미묘하거나
+                            명백한 여러 방식으로 드러납니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <p>예를 들어 Atom Publishing Protocol(<a href="#RFC5023"><cite
+                                    title="The Atom Publishing Protocol">[RFC5023]</cite></a>)에서 정의된 것과 유사하게 리소스를 수정하기
+                            위해 HTTP PUT 메서드를 사용할 때, 서버는 수정된 리소스의 전체 표현을 반환할지 또는 작업의 성공 완료만을 나타내는 최소한의 응답을 반환할지 선택할 수
+                            있습니다. 어떤 유형의 응답을 클라이언트에 반환할지의 선택은 일반적으로 요청의 성공적인 처리에는 영향을 미치지 않지만, 예를 들어 응답을 받은 후 클라이언트가 취해야
+                            할 추가 작업에 영향을 줄 수 있습니다. 즉, 응답에 수정된 리소스의 표현을 포함하면 클라이언트가 후속 GET 요청을 보내는 것을 피할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.3">
+                        <p>마찬가지로, 요청을 처리하는 서버는 기술적으로 무효이거나 잘못되었지만 여전히 이해 가능한 요청을 어떻게 처리할지에 대해 결정을 내려야 하는 상황에 직면하는 경우가 자주
+                            있습니다. 서버가 요청의 기술적 오류를 무시하고도 요청을 성공적으로 처리할 수 있을 수 있습니다. 애플리케이션의 특정 요구사항과 요청의 성격에 따라, 클라이언트는
+                            그러한 관대한 처리가 적절한지 여부를 달리 판단할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.4">
+                        <p>이러한 경우에 어떤 동작을 적용할지는 요청을 처리하는 서버의 결정에 달려 있지만, 서버는 선택적 동작에 대해 클라이언트가 선호를 지정하도록 위임하고 싶을 수 있습니다.
+                        </p>
+                    </div>
+                    <div id="rfc.section.1.p.5">
+                        <p>현재 HTTP는 주어진 요청의 선택적 처리 측면에 대한 클라이언트의 선호를 명시적으로 표현하는 수단을 제공하지 않습니다. HTTP는 Expect 헤더를 제공하여 요청
+                            처리에 대한 필수 기대사항을 식별하는 데 사용할 수 있지만, 선택적 선호를 전달하는 데 Expect 헤더를 사용하는 것은 문제가 있습니다: </p>
+                        <ol>
+                            <li>Expect 헤더 필드의 의미는 인식되지 않거나 지원되지 않는 기대사항을 명시한 요청을 중계자나 서버가 거부하도록 요구합니다.</li>
+                            <li>Expect 헤더 필드는 종단 간(end-to-end)이지만 HTTP 명세는 해당 헤더가 홉-바이-홉으로 처리되도록 요구합니다. 즉, 클라이언트와 오리진 서버
+                                사이에 요청을 처리하는 모든 중간 중계자는 기대사항을 처리할 수 있는지 판단해야 합니다.</li>
+                        </ol>
+                    </div>
+                    <div id="rfc.section.1.p.6">
+                        <p>Expect 헤더의 must-understand 의미는 선택적 선호를 표현하기에 적절하지 않습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.7">
+                        <p>클라이언트가 선택할 수 있는 다른 방법은 요청 URI의 쿼리 문자열 매개변수를 사용해 선호를 표현하는 것입니다. 그러나 URI를 변경하는 어떤 메커니즘도 캐시가 변경된
+                            URI를 기록하는 등 바람직하지 않은 부작용을 초래할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.8">
+                        <p>대안으로, 본 명세서는 클라이언트가 요청 처리 중 서버에 선택적 동작의 적용을 요청할 수 있도록 하는 새로운 HTTP 요청 헤더 필드를 정의합니다. 또한 이 새
+                            헤더에서 사용할 몇 가지 초기 선호 토큰을 정의합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.9">
+                        <p>이 문서에서 키워드 "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
+                            "RECOMMENDED", "MAY", 및 "OPTIONAL"은 <a href="#RFC2119"><cite
+                                    title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>에
+                            설명된 대로 해석됩니다.</p>
+                    </div>
+                    <section id="n-syntax-notation">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a
+                                href="#n-syntax-notation">문법 표기</a></h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>이 명세서는 Augmented Backus-Naur Form(ABNF) 표기법(<a href="#RFC5234"><cite
+                                        title="Augmented BNF for Syntax Specifications: ABNF">[RFC5234]</cite></a>)을
+                                사용하며, <a href="#RFC7230"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing">[RFC7230]</cite></a>의
+                                섹션 3.2.1 및 3.2.4에서 정의된 "token", "word", "OWS", "BWS" 규칙과 #rule 확장을 참조로 포함합니다; 또한 <a
+                                    href="#RFC7231"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content">[RFC7231]</cite></a>의
+                                섹션 8.1.3에서 정의된 "delta-seconds" 규칙도 포함합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="prefer">
+                    <h2 id="rfc.section.2"><a href="#rfc.section.2">2.</a>&nbsp;<a href="#prefer">Prefer 요청 헤더 필드</a>
+                    </h2>
+                    <div id="rfc.section.2.p.1">
+                        <p>Prefer 요청 헤더 필드는 특정 서버 동작이 클라이언트에 의해 선호되지만 요청의 성공적인 완료에 필수적이지 않음을 나타내는 데 사용됩니다. Prefer는 <a
+                                href="#RFC7231"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content">[RFC7231]</cite></a>의
+                            섹션 6.1.2에서 정의된 Expect 헤더 필드와 성격이 유사하지만, 서버는 명시된 선호를 무시할 수 있다는 점이 다릅니다.</p>
+                    </div>
+                    <div id="rfc.figure.1">
+                        <p>ABNF:</p>
+                        <div>
+                            <pre class="inline prettyprint lang-ietf_abnf">
+  Prefer     = "Prefer" ":" 1#preference
+  preference = token [ BWS "=" BWS word ] 
+               *( OWS ";" [ OWS parameter ] )
+  parameter  = token [ BWS "=" BWS word ]
+      </pre>
+                        </div>
+                    </div>
+                    <div id="rfc.section.2.p.2">
+                        <p>이 헤더 필드는 향후 Registry of Preferences(<a href="#registry"
+                                title="The Registry of Preferences">섹션 5.1</a>)에 포함될 수 있는 값을 허용하도록 확장 가능한 문법으로 정의됩니다.
+                            요청의 Prefer 헤더 필드에 포함된 특정 선호 토큰을 서버가 인식하지 못하거나 준수할 수 없으면, 그 토큰들을 무시하고 오류를 신호하는 대신 계속 처리해야
+                            합니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.3">
+                        <p>선호 토큰과 매개변수 내에서의 빈값 또는 길이가 0인 값은 아무 값도 지정되지 않은 것과 동등합니다. 따라서 다음의 예들은 단일 "bar" 매개변수를 가진 "foo"
+                            선호의 동등한 예시입니다.</p>
+                    </div>
+                    <div id="rfc.figure.2">
+                        <div>
+                            <pre class="text">
+  Prefer: foo; bar
+  Prefer: foo; bar=""
+  Prefer: foo=""; bar
+      </pre>
+                        </div>
+                    </div>
+                    <div id="rfc.section.2.p.4">
+                        <p>선호 토큰마다 선택적 매개변수 집합을 지정할 수 있습니다. 이러한 매개변수의 의미와 적용은 각 선호 토큰의 정의 및 서버 구현에 따라 달라집니다. 주어진 선호에서
+                            매개변수들의 순서에는 의미가 부여되지 않습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.5">
+                        <p>선호 토큰 이름과 매개변수 이름의 비교는 대소문자 구분 없이 수행되는 반면, 값은 토큰이든 인용 문자열이든 관계없이 대소문자 구분이 적용됩니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.6">
+                        <p>Prefer 헤더 필드는 종단 간(end to end)이며, 요청이 전달될 경우 Proxy는 Prefer가 <a href="#RFC7230"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing">[RFC7230]</cite></a>
+                            섹션 6.1에 정의된 Connection 헤더 필드를 사용해 명시적으로 홉-바이-홉으로 식별되지 않는 한 Prefer 헤더를 전달해야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.7">
+                        <p>여러 상황에서 중계자는 대상 서버와 무관하게 선호를 자체적으로 준수할 수 있다고 판단할 수 있습니다. 예를 들어, 개입 중인 중계자가 오리진 서버와 무관하게 202
+                            (Accepted) 응답을 사용해 비동기 처리를 제공할 수 있으면, 해당 중계자는 오리진이 이를 제공할 수 있든 없든 "respond-async" 선호를 자체적으로
+                            존중할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.8">
+                        <p>개별 선호 토큰은 중계자가 오리진 서버와 독립적으로 요청에 선호를 적용할 수 있는지 여부와 방법에 대해 자체 요구사항과 제한을 정의할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.9" class="avoidbreakafter">
+                        <p>클라이언트는 단일 메시지에 Prefer 헤더 필드를 여러 인스턴스로 사용할 수 있으며, 또는 콤마로 구분된 여러 선호 토큰을 포함한 단일 Prefer 헤더 필드를
+                            사용할 수 있습니다. 여러 Prefer 헤더 필드를 사용하면 이는 모든 토큰을 콤마로 연결한 단일 Prefer 헤더 필드와 동일합니다. 예를 들어 다음은 동등합니다:
+                        </p>
+                    </div>
+                    <div id="rfc.figure.3">
+                        <p>세 개의 서로 다른 선호 토큰을 정의하는 여러 Prefer 헤더 필드:</p>
+                        <div>
+                            <pre class="text2">
+POST /foo HTTP/1.1
+Host: example.org
+Prefer: respond-async, wait=100
+Prefer: handling=lenient
+Date: Tue, 20 Dec 2011 12:34:56 GMT
+</pre>
+                        </div>
+                    </div>
+                    <div id="rfc.figure.4">
+                        <p>같은 세 선호 토큰을 정의하는 단일 Prefer 헤더 필드:</p>
+                        <div>
+                            <pre class="text2">
+POST /foo HTTP/1.1
+Host: example.org
+Prefer: handling=lenient, wait=100, respond-async
+Date: Tue, 20 Dec 2011 12:34:56 GMT
+</pre>
+                        </div>
+                    </div>
+                    <div id="rfc.section.2.p.10">
+                        <p>모든 모호성을 피하기 위해, 개별 선호 토큰은 단일 요청 내에서 여러 번 나타나지 않아야 합니다. 어떤 선호가 여러 번 지정된 경우 처음 인스턴스만 고려되어야 합니다.
+                            이후 발생한 모든 항목은 오류를 신호하거나 요청 처리를 변경하지 않고 무시해야 합니다. 이것이 요청 내 선호의 순서가 중요하게 고려되는 유일한 경우입니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.11">
+                        <p>서버 주도의 콘텐츠 협상, 효과적인 캐싱 및 선택적 선호 적용을 올바르게 구현하는 데 수반되는 고유한 복잡성으로 인해, 구현자는 응답의 캐싱에 영향을 주는 방식으로
+                            선호를 사용하는 경우 주의해야 하며 Prefer 헤더 메커니즘을 콘텐츠 협상에 사용해서는 안 됩니다. 서버가 캐시의 응답 엔터티 처리 방식에 변화를 초래할 수 있는
+                            선택적 선호를 지원하는 경우, 클라이언트가 실제로 Prefer를 요청했는지 여부와 상관없이 응답에 Prefer 헤더 필드를 나열하는 Vary 헤더 필드를 포함해야
+                            합니다. 대안으로 서버는 <a href="#RFC7231"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content">[RFC7231]</cite></a>
+                            섹션 8.2.1에서 정의된 특수 값 "*"를 가진 Vary 헤더를 포함할 수 있습니다. 다만 "Vary: *"를 사용하면 프록시가 응답을 캐시할 수 없게 된다는 점에
+                            유의하십시오.</p>
+                    </div>
+                    <div id="rfc.section.2.p.12">
+                        <p>선호 토큰은 구조적으로 Expect 토큰과 유사하지만, Prefer와 Expect 헤더 필드는 매우 다른 목적을 제공하며 선호는 기대사항(expectation)으로
+                            사용할 수 없습니다.</p>
+                    </div>
+                    <section id="n-examples">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a href="#n-examples">예시</a>
+                        </h3>
+                        <div id="rfc.section.2.1.p.1" class="avoidbreakafter">
+                            <p>다음 예시는 본 명세서에서 정의한 여러 선호의 사용과 순전히 설명 목적으로 정의되지 않은 확장 예시를 보여줍니다:</p>
+                        </div>
+                        <div id="rfc.figure.5">
+                            <p>1. 요청을 10초 내에 처리하지 못할 경우 비동기 처리로 202 (Accepted) 응답을 반환하도록 요청합니다. 또한 정의되지 않은 "priority"
+                                선호도 지정되어 있습니다:</p>
+                            <div>
+                                <pre class="text2">
+POST /some-resource HTTP/1.1
+Host: example.org
+Content-Type: text/plain
+Prefer: respond-async, wait=10
+Prefer: priority=5
+
+{...}
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.figure.6">
+                            <p>2. 관대한(lenient) 처리를 사용:</p>
+                            <div>
+                                <pre class="text2">
+POST /some-resource HTTP/1.1
+Host: example.org
+Content-Type: text/plain
+Prefer: Lenient
+
+{...}
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.figure.7">
+                            <p>3. return=minimal 선호에 대해 선택적이며 정의되지 않은 매개변수를 사용하는 예:</p>
+                            <div>
+                                <pre class="text2">
+POST /some-resource HTTP/1.1
+Host: example.org
+Content-Type: text/plain
+Prefer: return=minimal; foo="some parameter"
+
+{...}
+</pre>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+                <section id="preference-applied">
+                    <h2 id="rfc.section.3"><a href="#rfc.section.3">3.</a>&nbsp;<a
+                            href="#preference-applied">Preference-Applied 응답 헤더 필드</a></h2>
+                    <div id="rfc.section.3.p.1">
+                        <p>Preference-Applied 응답 헤더는 응답 메시지에 포함되어 서버가 요청 처리에 대해 어떤 Prefer 토큰을 존중하고 적용했는지를 표시할 수 있습니다.
+                        </p>
+                    </div>
+                    <div id="rfc.figure.8">
+                        <p>ABNF:</p>
+                        <div>
+                            <pre class="inline prettyprint lang-ietf_abnf">
+  Preference-Applied = "Preference-Applied" ":" 1#applied-pref
+  applied-pref = token [ BWS "=" BWS word ]
+      </pre>
+                        </div>
+                    </div>
+                    <div id="rfc.section.3.p.2">
+                        <p>Preference-Applied 헤더의 문법은 Prefer 헤더와 달리 매개변수를 포함하지 않는다는 점에서 차이가 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.3.p.3">
+                        <p>Preference-Applied 헤더는 서버가 특정 선호를 적용했는지 여부가 명확하지 않아 클라이언트의 응답 처리에 영향을 줄 수 있는 경우에만 필요합니다. 예를
+                            들어 "return=representation" 또는 "return=minimal" 선호를 사용하는 경우, 클라이언트 애플리케이션은 응답의 페이로드만 검사해서는
+                            선호가 적용되었는지 신뢰성 있게 판단하지 못할 수 있습니다. 이런 경우 Preference-Applied 헤더 필드를 사용할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.figure.9">
+                        <p>요청:</p>
+                        <div>
+                            <pre class="text2">
+PATCH /my-document HTTP/1.1
+Host: example.org
+Content-Type: application/example-patch
+Prefer: return=representation
+
+[{"op": "add", "path": "/a", "value": 1}]
+</pre>
+                        </div>
+                    </div>
+                    <div id="rfc.figure.10">
+                        <p>응답:</p>
+                        <div>
+                            <pre class="text">
+HTTP/1.1 200 OK
+Content-Type: application/json
+Preference-Applied: return=representation
+Content-Location: /my-document
+
+{"a": 1}
+</pre>
+                        </div>
+                    </div>
+                </section>
+                <section id="definitions">
+                    <h2 id="rfc.section.4"><a href="#rfc.section.4">4.</a>&nbsp;<a href="#definitions">선호사항 정의</a></h2>
+                    <div id="rfc.section.4.p.1">
+                        <p>다음 하위절들은 초기 선호 집합을 정의합니다. 추가 선호는 편의성을 위해 또는 다른 애플리케이션의 재사용을 촉진하기 위해 등록될 수 있습니다. 본 명세서는 IANA의
+                            선호사항 레지스트리를 설정합니다(참조 <a href="#registry" title="The Registry of Preferences">섹션 5.1</a>).
+                        </p>
+                    </div>
+                    <section id="respond-async">
+                        <h3 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a>&nbsp;<a
+                                href="#respond-async">"respond-async" 선호사항</a></h3>
+                        <div id="rfc.section.4.1.p.1">
+                            <p>"respond-async" 선호는 클라이언트가 서버가 응답을 비동기적으로 수행하는 것을 선호함을 나타냅니다. 예를 들어 응답을 생성하는 데 걸리는 시간이
+                                서버가 설정한 임의의 임계값을 초과할 경우, 서버는 202 (Accepted) 응답을 반환함으로써 "respond-async" 선호를 존중할 수 있습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.figure.11">
+                            <p>ABNF:</p>
+                            <div>
+                                <pre class="inline prettyprint lang-ietf_abnf">
+  respond-async = "respond-async"
+      </pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.4.1.p.2">
+                            <p>"respond-async" 선호의 주요 동기는 클라이언트가 비동기 응답 처리에 대한 능력과 선호를 서버에 표시할 수 있게 하여 비동기 요청 처리의 작동을
+                                용이하게 하는 것입니다.</p>
+                        </div>
+                        <div id="rfc.figure.12">
+                            <p>"respond-async" 선호를 지정한 요청 예시:</p>
+                            <div>
+                                <pre class="text2">
+POST /collection HTTP/1.1
+Host: example.org
+Content-Type: text/plain
+Prefer: respond-async
+
+{Data}
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.figure.13">
+                            <p>202 (Accepted)를 사용한 비동기 응답 예시:</p>
+                            <div>
+                                <pre class="text">
+HTTP/1.1 202 Accepted
+Location: http://example.org/collection/123
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.4.1.p.3">
+                            <p>202 (Accepted) 응답 상태는 <a href="#RFC7231"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content">[RFC7231]</cite></a>에서
+                                정의되어 있지만, 해당 응답 코드를 언제 어떻게 사용하고 최종 결과를 결정하는 절차에 대해서는 거의 지침이 제공되지 않습니다. 따라서 특정 서버가 비동기
+                                응답을 어떻게 지원하는지는 구현별 세부사항이며 본 명세서의 범위를 벗어납니다.</p>
+                        </div>
+                    </section>
+                    <section id="return">
+                        <h3 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a>&nbsp;<a
+                                href="#return">"return=representation" 및 "return=minimal" 선호사항</a></h3>
+                        <div id="rfc.section.4.2.p.1">
+                            <p>"return=representation" 선호는 클라이언트가 성공적인 요청에 대한 응답에 해당 리소스의 현재 상태를 나타내는 엔터티를 포함하기를 선호함을
+                                나타냅니다.</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.2">
+                            <p>반면 "return=minimal" 선호는 클라이언트가 성공적인 요청에 대해 서버가 최소한의 응답만 반환하길 원함을 나타냅니다. 일반적으로 이러한 응답은 204
+                                (No Content) 상태를 사용할 수 있지만, 0 길이의 응답 엔터티를 가진 200 (OK)과 같은 다른 코드가 적절하게 사용될 수도 있습니다. 적절한
+                                최소 응답의 판단은 전적으로 서버의 재량입니다.</p>
+                        </div>
+                        <div id="rfc.figure.14">
+                            <p>ABNF:</p>
+                            <div>
+                                <pre class="inline prettyprint lang-ietf_abnf">
+  return = "return" BWS "=" BWS ("representation" / "minimal")
+      </pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.4.2.p.3">
+                            <p>"return=representation" 선호를 존중할 때 반환된 표현은 요청이 영향을 미치는 다른 리소스를 위한 표현일 수 있으며, 이 경우 반환된 표현의
+                                URI를 식별하기 위해 Content-Location 헤더를 사용할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.4">
+                            <p>"return=representation" 선호는 수정 이후 리소스의 현재 표현을 가져오기 위한 추가 GET 요청의 필요성을 제거하여 클라이언트와 서버 간
+                                통신을 최적화하는 수단을 제공하는 것을 목표로 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.5">
+                            <p>POST 또는 PUT과 같은 수정 요청을 성공적으로 처리한 후, 서버는 작업의 상태를 설명하는 엔터티를 반환하거나 수정된 리소스 자체의 표현을 반환하기로 선택할
+                                수 있습니다. 반환할 엔터티의 유형 선택은 전적으로 서버의 재량이지만, "return=representation" 및 아래 정의된
+                                "return=minimal" 선호는 서버가 응답을 구성할 때 클라이언트의 선호를 고려할 수 있게 합니다.</p>
+                        </div>
+                        <div id="rfc.figure.15">
+                            <p>"return=representation" 선호를 지정한 요청 예시:</p>
+                            <div>
+                                <pre class="text2">
+PATCH /item/123 HTTP/1.1
+Host: example.org
+Content-Type: application/example-patch
+Prefer: return=representation
+
+1c1
+&lt; ABCDEFGHIJKLMNOPQRSTUVWXYZ
+---
+&gt; BCDFGHJKLMNPQRSTVWXYZ
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.figure.16">
+                            <p>리소스 표현을 포함한 응답 예시:</p>
+                            <div>
+                                <pre class="text">
+HTTP/1.1 200 OK
+Content-Location: http://example.org/item/123
+Content-Type: text/plain
+ETag: "d3b07384d113edec49eaa6238ad5ff00"
+
+BCDFGHJKLMNPQRSTVWXYZ
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.4.2.p.6">
+                            <p>대조적으로 "return=minimal" 선호는 요청 후 서버가 클라이언트에게 반환해야 하는 데이터 양을 줄일 수 있습니다. 이는 대역폭이 제한된 모바일 장치와
+                                통신하거나 클라이언트가 요청 결과에 대한 추가 정보를 전혀 필요로 하지 않을 때 특히 유용합니다.</p>
+                        </div>
+                        <div id="rfc.figure.17">
+                            <p>"return=minimal" 선호를 지정한 요청 예시:</p>
+                            <div>
+                                <pre class="text2">
+POST /collection HTTP/1.1
+Host: example.org
+Content-Type: text/plain
+Prefer: return=minimal
+
+{Data}
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.figure.18">
+                            <p>최소 응답 예시:</p>
+                            <div>
+                                <pre class="text">
+HTTP/1.1 201 Created
+Location: http://example.org/collection/123
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.4.2.p.7">
+                            <p>"return=minimal"과 "return=representation" 선호는 상호 배타적인 지시입니다. 단일 요청에 두 선호가 동시에 포함되는 상황은
+                                의미가 없을 것으로 예상되며, 그러한 요청은 보통 클라이언트의 코딩 오류로 인한 것입니다. 따라서 두 선호가 모두 포함된 요청은 어느 것도 지정되지 않은
+                                것처럼 처리할 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="wait">
+                        <h3 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a>&nbsp;<a href="#wait">"wait"
+                                선호사항</a></h3>
+                        <div id="rfc.section.4.3.p.1">
+                            <p>"wait" 선호는 클라이언트가 요청이 수신된 후 서버가 요청을 처리하는 데 걸릴 것으로 예상하는 최대 시간을 초 단위로 설정하는 데 사용할 수 있습니다. 응답
+                                생성이 지정된 시간보다 오래 걸리는 경우 서버나 프록시는 비동기 처리 모델을 선택하여 예를 들어 202 (Accepted) 응답을 반환할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.figure.19">
+                            <p>ABNF:</p>
+                            <div>
+                                <pre class="inline prettyprint lang-ietf_abnf">
+  wait = "wait" BWS "=" BWS delta-seconds
+      </pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.4.3.p.2">
+                            <p>HTTP 메시지는 네트워크를 통과하고 중계자에 의해 처리되는 동안 일정 시간이 소요된다는 점을 고려하는 것이 중요합니다. 이는 클라이언트가 서버가 요청을
+                                처리하는 데 걸리는 시간 외에도 응답을 기다리는 총 시간을 증가시킵니다. 엄격한 시간 요구사항을 가진 클라이언트는 이러한 요인을 추정하여 wait 값을 적절히
+                                조정할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.3.p.3">
+                            <p>다른 선호와 마찬가지로 "wait" 선호는 무시될 수 있습니다. 클라이언트는 기다릴 준비가 된 시간보다 오래 걸리는 요청을 포기할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.figure.20">
+                            <p>예를 들어 다음 요청을 받은 서버는 처리에 10초 이상 걸리는 경우 비동기 응답을 선택할 수 있습니다:</p>
+                            <div>
+                                <pre class="text2">
+POST /collection HTTP/1.1
+Host: example.org
+Content-Type: text/plain
+Prefer: respond-async, wait=10
+
+{Data}
+</pre>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="handling">
+                        <h3 id="rfc.section.4.4"><a href="#rfc.section.4.4">4.4.</a>&nbsp;<a
+                                href="#handling">"handling=strict" 및 "handling=lenient" 처리 선호사항</a></h3>
+                        <div id="rfc.section.4.4.p.1">
+                            <p>"handling=strict" 및 "handling=lenient" 선호는 요청 처리 중 발생할 수 있는 잠재적 오류 조건을 서버가 어떻게 처리하길 원하는지를
+                                클라이언트가 표시할 때 사용됩니다. 예를 들어 요청의 페이로드에 다양한 경미한 구문 또는 의미론적 오류가 포함되어 있지만 서버가 요청을 이해하고 성공적으로
+                                처리할 수 있는 경우, 요청을 적절한 "4xx" 오류로 거부할지 아니면 처리를 계속할지 결정해야 합니다. "handling=strict" 선호는 개별 오류가
+                                복구 가능하더라도 클라이언트가 요청을 거부하기를 선호함을 나타냅니다. 반대로 "handling=lenient" 선호는 서버가 요청 처리를 시도하기를 원함을
+                                나타냅니다.</p>
+                        </div>
+                        <div id="rfc.figure.21">
+                            <p>ABNF:</p>
+                            <div>
+                                <pre class="inline prettyprint lang-ietf_abnf">
+  handling = "handling" BWS "=" BWS ("strict" / "lenient")
+    </pre>
+                            </div>
+                        </div>
+                        <div id="rfc.figure.22">
+                            <p>"strict" 선호를 지정한 요청 예시:</p>
+                            <div>
+                                <pre class="text2">
+POST /collection HTTP/1.1
+Host: example.org
+Content-Type: text/plain
+Prefer: handling=strict
+</pre>
+                            </div>
+                        </div>
+                        <div id="rfc.section.4.4.p.2">
+                            <p>"handling=strict"와 "handling=lenient" 선호는 서로 배타적인 지시입니다. 단일 요청에 두 선호가 동시에 포함되는 상황은 의미가 없을
+                                것으로 예상되며, 그러한 요청은 대개 클라이언트의 코딩 오류로 인한 것입니다. 따라서 두 선호가 모두 포함된 요청은 어느 것도 지정되지 않은 것처럼 처리할 수
+                                있습니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="n-iana-considerations">
+                    <h2 id="rfc.section.5"><a href="#rfc.section.5">5.</a>&nbsp;<a href="#n-iana-considerations">IANA
+                            고려사항</a></h2>
+                    <div id="rfc.section.5.p.1">
+                        <p>'Prefer' 및 'Preference-Applied' 헤더 필드는 <a href="#RFC3864"><cite
+                                    title="Registration Procedures for Message Header Fields">[RFC3864]</cite></a>에 정의된
+                            "Permanent Message Header Field Names" 레지스트리에 추가되었습니다
+                            (http://www.iana.org/assignments/message-headers).</p>
+                    </div>
+                    <div id="rfc.section.5.p.2">
+                        <ul class="empty">
+                            <li>Header field name: Prefer</li>
+                            <li>Applicable Protocol: HTTP</li>
+                            <li>Status: Standard</li>
+                            <li>Author: James M Snell &lt;jasnell@gmail.com&gt;</li>
+                            <li>Change controller: IETF</li>
+                            <li>Specification document: this specification, <a href="#prefer"
+                                    title="The Prefer Request Header Field">섹션 2</a></li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.5.p.3">
+                        <ul class="empty">
+                            <li>Header field name: Preference-Applied</li>
+                            <li>Applicable Protocol: HTTP</li>
+                            <li>Status: Standard</li>
+                            <li>Author: James M Snell &lt;jasnell@gmail.com&gt;</li>
+                            <li>Change controller: IETF</li>
+                            <li>Specification document: this specification, <a href="#preference-applied"
+                                    title="The Preference-Applied Response Header Field">섹션 3</a></li>
+                        </ul>
+                    </div>
+                    <section id="registry">
+                        <h3 id="rfc.section.5.1"><a href="#rfc.section.5.1">5.1.</a>&nbsp;<a href="#registry">선호사항
+                                등록소</a></h3>
+                        <div id="rfc.section.5.1.p.1">
+                            <p>IANA는 "HTTP Preferences"라는 새 레지스트리를 "Hypertext Transfer Protocol (HTTP) Parameters" 레지스트리
+                                아래에 생성했습니다. 새 등록은 Specification Required 정책(<a href="#RFC5226"><cite
+                                        title="Guidelines for Writing an IANA Considerations Section in RFCs">[RFC5226]</cite></a>)을
+                                사용합니다. 등록된 선호에 대한 요구사항은 <a href="#definitions" title="Preference Definitions">섹션 4</a>에
+                                설명되어 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.1.p.2">
+                            <p>등록 요청은 일반적으로 필요한 명세에서 완성된 등록 템플릿을 포함합니다. 그러나 출판 이전에 값 할당을 허용하기 위해, 지정 전문가(Designated
+                                Expert)는 사전에 제출된 템플릿을 근거로 명세서가 출판될 것이라고 확신되면 등록을 승인할 수 있습니다. 지정 전문가는 널리 배포되어 있고 적시에 등록될
+                                가능성이 낮은 비등록 선호를 제3자가 등록하도록 결정할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.1.p.3" class="avoidbreakafter">
+                            <p>등록 템플릿은 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.section.5.1.p.4">
+                            <ul>
+                                <li>Preference: (섹션 <a href="#prefer" title="The Prefer Request Header Field">2</a>에 주어진
+                                    문법 규칙을 따르는 Prefer 요청 헤더 필드의 값)</li>
+                                <li>Value: (선호 토큰에 대한 가능한 값의 열거 또는 설명)</li>
+                                <li>Optional Parameters: (선호 토큰과 관련된 선택적 매개변수 및 그 값의 열거)</li>
+                                <li>Description:</li>
+                                <li>Reference:</li>
+                                <li>Notes: [optional]</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.5.1.p.5">
+                            <p>"Value" 및 "Optional Parameters" 필드는 특정 선호 토큰 정의가 어느 하나를 정의하지 않을 경우 등록 템플릿에서 생략될 수 있습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.5.1.p.6">
+                            <p>등록 요청은 &lt;ietf-http-wg@w3.org&gt; 메일링 리스트로 보내져야 하며, 제목란에 명확히 표시되어야 합니다(예: "NEW
+                                PREFERENCE - example"은 "example" 선호를 등록하기 위한 것). 요청 제출 후 최대 14일 이내에 지정 전문가는 등록 요청을 승인하거나
+                                거부하고 그 결정을 검토 리스트 및 IANA에 통지합니다. 거부 시에는 설명과, 해당되는 경우 성공적인 요청이 되기 위한 제안이 포함되어야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.5.1.p.7">
+                            <p>전문가는 다음을 확인해야 합니다: </p>
+                            <ul>
+                                <li>요청된 선호 이름이 섹션 <a href="#prefer" title="The Prefer Request Header Field">2</a>의 token
+                                    규칙을 따르며 다른 등록된 선호 이름과 동일하지 않다는 것;</li>
+                                <li>관련된 값, 매개변수 이름 및 값이 섹션 <a href="#prefer"
+                                        title="The Prefer Request Header Field">2</a>의 해당 ABNF 문법 사양에 부합하는지;</li>
+                                <li>이름이 선호의 특수성에 적합한지; 즉 의미가 특정 애플리케이션에 매우 특화된 경우 이름이 이를 반영하여 덜 특화된 용도를 위한 일반 이름을 남겨둬야
+                                    한다는 것;</li>
+                                <li>요청된 선호가 성공적인 처리를 위해 서버, 클라이언트 또는 중계자에게 필수적인 동작을 강제하지 않는지;</li>
+                                <li>선호를 정의하는 명세 문서가 선호 사용과 관련된 적절하고 완전한 보안 고려사항 논의를 포함하는지.</li>
+                            </ul>
+                        </div>
+                    </section>
+                    <section id="n-initial-registry-contents">
+                        <h3 id="rfc.section.5.2"><a href="#rfc.section.5.2">5.2.</a>&nbsp;<a
+                                href="#n-initial-registry-contents">초기 등록 내용</a></h3>
+                        <div id="rfc.section.5.2.p.1" class="avoidbreakafter">
+                            <p>"HTTP Preferences" 레지스트리의 초기 내용은 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.section.5.2.p.2">
+                            <ul>
+                                <li>Preference: respond-async</li>
+                                <li>Description: 클라이언트가 서버가 요청에 대해 비동기적으로 응답하기를 선호함을 나타냄</li>
+                                <li>Reference: [this specification], <a href="#respond-async"
+                                        title="The &#34;respond-async&#34; Preference">섹션 4.1</a></li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.5.2.p.3">
+                            <ul>
+                                <li>Preference: return</li>
+                                <li>Value: "minimal" 또는 "representation" 중 하나</li>
+                                <li>Description: 값이 "minimal"인 경우 서버가 요청에 대해 최소 응답을 반환하기를 선호함을 나타냄. 값이 "representation"인
+                                    경우 서버가 요청에 대한 응답에 리소스의 현재 상태 표현을 포함하기를 선호함을 나타냄.</li>
+                                <li>Reference: [this specification], <a href="#return"
+                                        title="The &#34;return=representation&#34; and &#34;return=minimal&#34; Preferences">섹션
+                                        4.2</a></li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.5.2.p.4">
+                            <ul>
+                                <li>Preference: wait</li>
+                                <li>Description: 클라이언트가 요청이 수신된 후 서버가 요청을 처리하는 데 걸릴 것으로 예상하는 최대 시간을 나타냄</li>
+                                <li>Reference: [this specification], <a href="#wait"
+                                        title="The &#34;wait&#34; Preference">섹션 4.3</a></li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.5.2.p.5">
+                            <ul>
+                                <li>Preference: handling</li>
+                                <li>Value: "strict" 또는 "lenient" 중 하나</li>
+                                <li>Description: 값이 "strict"인 경우 클라이언트가 요청 처리에 엄격한 검증과 오류 처리를 적용하길 원함을 나타냄. 값이
+                                    "lenient"인 경우 클라이언트가 관대한 검증과 오류 처리를 적용하길 원함을 나타냄.</li>
+                                <li>Reference: [this specification], <a href="#handling"
+                                        title="The &#34;handling=strict&#34; and &#34;handling=lenient&#34; Processing Preferences">섹션
+                                        4.4</a></li>
+                            </ul>
+                        </div>
+                    </section>
+                </section>
+                <section id="n-security-considerations">
+                    <h2 id="rfc.section.6"><a href="#rfc.section.6">6.</a>&nbsp;<a href="#n-security-considerations">보안
+                            고려사항</a></h2>
+                    <div id="rfc.section.6.p.1">
+                        <p>클라이언트가 요청한 특정 선호는 <a href="#RFC7230"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing">HTTP/1.1</cite></a>
+                            및 관련 명세에서 논의된 것들 이상의 보안 고려사항과 우려를 도입할 수 있습니다. 구현자는 각 선호의 명세와 설명을 참조하여 해당 선호 사용과 관련된 보안 고려사항을
+                            판단해야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.6.p.2">
+                        <p>서버는 특정 선호를 준수하려 시도함으로써 더 큰 비용을 부담할 수 있습니다(예: 일반적으로 포함하지 않을 응답에 표현을 제공하는 비용, 또는 비동기 응답을 위해 상태를
+                            추적하는 데 필요한 자원 할당). 서버가 무조건적으로 선호에 따를 경우 서비스 거부(DoS)에 선호가 악용될 수 있습니다. 서버는 자원을 소비하고 싶지 않은 경우
+                            표현된 선호를 무시할 수 있습니다.</p>
+                    </div>
+                </section>
+                <section id="rfc.references">
+                    <h2 id="rfc.section.7"><a href="#rfc.section.7">7.</a> 참고문헌</h2>
+                    <section>
+                        <div id="rfc.references.1">
+                            <h3 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a> 규범적 참고문헌</h3>
+                            <dl class="dl-horizontal">
+                                <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">Key words for
+                                        use in RFCs to Indicate Requirement Levels</a>”, <a
+                                        href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 2119, March 1997,
+                                    &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>&gt;.
+                                </dd>
+                                <dt id="RFC3864">[<a href="#RFC3864" class="smpl">RFC3864</a>]</dt>
+                                <dd>Klyne, G., Nottingham, M., and J. Mogul, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc3864.html">Registration Procedures for
+                                        Message Header Fields</a>”, <a href="https://www.rfc-editor.org/info/bcp90">BCP
+                                        90</a>, RFC 3864, September 2004, &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc3864">https://www.rfc-editor.org/info/rfc3864</a>&gt;.
+                                </dd>
+                                <dt id="RFC5226">[<a href="#RFC5226" class="smpl">RFC5226</a>]</dt>
+                                <dd>Narten, T. and H. Alvestrand, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc5226.html">Guidelines for Writing an
+                                        IANA Considerations Section in RFCs</a>”, RFC 5226, May 2008, &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc5226">https://www.rfc-editor.org/info/rfc5226</a>&gt;.
+                                </dd>
+                                <dt id="RFC5234">[<a href="#RFC5234" class="smpl">RFC5234</a>]</dt>
+                                <dd>Crocker, D., Ed. and P. Overell, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc5234.html">Augmented BNF for Syntax
+                                        Specifications: ABNF</a>”, <a href="https://www.rfc-editor.org/info/std68">STD
+                                        68</a>, RFC 5234, January 2008, &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc5234">https://www.rfc-editor.org/info/rfc5234</a>&gt;.
+                                </dd>
+                                <dt id="RFC7230">[<a href="#RFC7230" class="smpl">RFC7230</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Message Syntax and Routing</a>”, RFC 7230, June 2014.</dd>
+                                <dt id="RFC7231">[<a href="#RFC7231" class="smpl">RFC7231</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7231.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Semantics and Content</a>”, RFC 7231, June 2014.</dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section>
+                        <div id="rfc.references.2">
+                            <h3 id="rfc.section.7.2"><a href="#rfc.section.7.2">7.2.</a> 비규범적 참고문헌</h3>
+                            <dl class="dl-horizontal">
+                                <dt id="RFC5023">[<a href="#RFC5023" class="smpl">RFC5023</a>]</dt>
+                                <dd>Gregorio, J., Ed. and B. de hOra, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc5023.html">The Atom Publishing
+                                        Protocol</a>”, RFC 5023, October 2007, &lt;<a
+                                        href="https://www.rfc-editor.org/info/rfc5023">https://www.rfc-editor.org/info/rfc5023</a>&gt;.
+                                </dd>
+                            </dl>
+                        </div>
+                    </section>
+                </section>
+                <section id="rfc.authors" class="avoidbreakinside">
+                    <h2><a href="#rfc.authors">저자 주소</a></h2>
+                    <address><b>James M Snell</b><br>Email: <a href="mailto:jasnell@gmail.com">jasnell@gmail.com</a>
+                    </address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
