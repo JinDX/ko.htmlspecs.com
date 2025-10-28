@@ -262,3 +262,59 @@ HTML 및 관련 API, CSS 표준 시리즈.
 - [CSS Layout API Level 1](https://ko.htmlspecs.com/css/css-layout-api-1)（[Source](https://www.w3.org/TR/2018/WD-css-layout-api-1-20180412/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Properties and Values API Level 1](https://ko.htmlspecs.com/css/css-properties-values-api-1)（[Source](https://www.w3.org/TR/2024/WD-css-properties-values-api-1-20240326/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
+## HTTP
+- [index](https://ko.htmlspecs.com/http/)（[Source](https://httpwg.org/specs/)）
+
+### 핵심 명세
+- [HTTP Semantics (RFC 9110)](https://ko.htmlspecs.com/http/rfc9110.html)（[Source](https://httpwg.org/specs/rfc9110.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP Caching](https://ko.htmlspecs.com/http/rfc9111.html)（[Source](https://httpwg.org/specs/rfc9111.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP/1.1](https://ko.htmlspecs.com/http/rfc9112.html)（[Source](https://httpwg.org/specs/rfc9112.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP/2](https://ko.htmlspecs.com/http/rfc9113.html)（[Source](https://httpwg.org/specs/rfc9113.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP/3](https://ko.htmlspecs.com/http/rfc9114.html)（[Source](https://httpwg.org/specs/rfc9114.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HPACK: Header Compression for HTTP/2](https://ko.htmlspecs.com/http/rfc7541.html)（[Source](https://httpwg.org/specs/rfc7541.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [QPACK: Field Compression for HTTP/3](https://ko.htmlspecs.com/http/rfc9204.html)（[Source](https://httpwg.org/specs/rfc9204.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Structured Field Values for HTTP](https://ko.htmlspecs.com/http/rfc9651.html)（[Source](https://httpwg.org/specs/rfc9651.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Building Protocols with HTTP](https://ko.htmlspecs.com/http/rfc9205.html)（[Source](https://httpwg.org/specs/rfc9205.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
+### 메서드
+- [PATCH Method for HTTP](https://ko.htmlspecs.com/http/rfc5789.html)（[Source](https://httpwg.org/specs/rfc5789.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
+### 상태 코드
+- [Additional HTTP Status Codes](https://ko.htmlspecs.com/http/rfc6585.html)（[Source](https://httpwg.org/specs/rfc6585.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [An HTTP Status Code to Report Legal Obstacles](https://ko.htmlspecs.com/http/rfc7725.html)（[Source](https://httpwg.org/specs/rfc7725.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [An HTTP Status Code for Indicating Hints](https://ko.htmlspecs.com/http/rfc8297.html)（[Source](https://httpwg.org/specs/rfc8297.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
+### 캐싱 확장
+- [HTTP Cache-Control Extensions for Stale Content](https://ko.htmlspecs.com/http/rfc5861.html)（[Source](https://httpwg.org/specs/rfc5861.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP Immutable Responses](https://ko.htmlspecs.com/http/rfc8246.html)（[Source](https://httpwg.org/specs/rfc8246.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The Cache-Status HTTP Response Header Field](https://ko.htmlspecs.com/http/rfc9211.html)（[Source](https://httpwg.org/specs/rfc9211.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Targeted HTTP Cache Control](https://ko.htmlspecs.com/http/rfc9213.html)（[Source](https://httpwg.org/specs/rfc9213.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
+### 콘텐츠 관련 확장
+- [HTTP State Management Mechanism](https://ko.htmlspecs.com/http/rfc6265.html)（[Source](https://httpwg.org/specs/rfc6265.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Use of the Content-Disposition Header Field in the Hypertext Transfer Protocol (HTTP)](https://ko.htmlspecs.com/http/rfc6266.html)（[Source](https://httpwg.org/specs/rfc6266.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Hypertext Transfer Protocol (HTTP) Client-Initiated Content-Encoding](https://ko.htmlspecs.com/http/rfc7694.html)（[Source](https://httpwg.org/specs/rfc7694.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Prefer Header for HTTP](https://ko.htmlspecs.com/http/rfc7240.html)（[Source](https://httpwg.org/specs/rfc7240.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Web Linking](https://ko.htmlspecs.com/http/rfc8288.html)（[Source](https://httpwg.org/specs/rfc8288.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Compression Dictionary Transport](https://ko.htmlspecs.com/http/rfc9842.html)（[Source](https://httpwg.org/specs/rfc9842.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
+### 연결 및 중개자 확장
+- [The ALPN HTTP Header Field](https://ko.htmlspecs.com/http/rfc7639.html)（[Source](https://httpwg.org/specs/rfc7639.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP Alternative Services](https://ko.htmlspecs.com/http/rfc7838.html)（[Source](https://httpwg.org/specs/rfc7838.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The ORIGIN HTTP/2 Frame](https://ko.htmlspecs.com/http/rfc8336.html)（[Source](https://httpwg.org/specs/rfc8336.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Bootstrapping WebSockets with HTTP/2](https://ko.htmlspecs.com/http/rfc8441.html)（[Source](https://httpwg.org/specs/rfc8441.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The Proxy-Status HTTP Response Header Field](https://ko.htmlspecs.com/http/rfc9209.html)（[Source](https://httpwg.org/specs/rfc9209.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Extensible Prioritization Scheme for HTTP](https://ko.htmlspecs.com/http/rfc9218.html)（[Source](https://httpwg.org/specs/rfc9218.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Bootstrapping WebSockets with HTTP/3](https://ko.htmlspecs.com/http/rfc9220.html)（[Source](https://httpwg.org/specs/rfc9220.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Proxying UDP in HTTP](https://ko.htmlspecs.com/http/rfc9298.html)（[Source](https://www.rfc-editor.org/rfc/rfc9298) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The ORIGIN Extension in HTTP/3](https://ko.htmlspecs.com/http/rfc9412.html)（[Source](https://httpwg.org/specs/rfc9412.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Client-Cert HTTP Header Field](https://ko.htmlspecs.com/http/rfc9440.html)（[Source](https://httpwg.org/specs/rfc9440.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
+### 보안 관련 확장
+- [HTTP Digest Access Authentication](https://ko.htmlspecs.com/http/rfc7616.html)（[Source](https://httpwg.org/specs/rfc7616.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Encrypted Content-Encoding for HTTP](https://ko.htmlspecs.com/http/rfc8188.html)（[Source](https://httpwg.org/specs/rfc8188.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Using Early Data in HTTP](https://ko.htmlspecs.com/http/rfc8470.html)（[Source](https://httpwg.org/specs/rfc8470.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP Message Signatures](https://ko.htmlspecs.com/http/rfc9421.html)（[Source](https://httpwg.org/specs/rfc9421.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Digest Fields](https://ko.htmlspecs.com/http/rfc9530.html)（[Source](https://httpwg.org/specs/rfc9530.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The Concealed HTTP Authentication Scheme](https://ko.htmlspecs.com/http/rfc9729.html)（[Source](https://httpwg.org/specs/rfc9729.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
