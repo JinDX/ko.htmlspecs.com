@@ -1,0 +1,2081 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 7616 - HTTP 다이제스트 액세스 인증</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC7616">
+    <meta property="og:description" content="HTTP Digest Access Authentication">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc7616.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 Syntax Convention" href="#rfc.section.2">
+    <link rel="Chapter" title="3 Digest Access Authentication Scheme" href="#rfc.section.3">
+    <link rel="Chapter" title="4 Internationalization Considerations" href="#rfc.section.4">
+    <link rel="Chapter" title="5 Security Considerations" href="#rfc.section.5">
+    <link rel="Chapter" title="6 IANA Considerations" href="#rfc.section.6">
+    <link rel="Chapter" title="7 References" href="#rfc.section.7">
+    <link rel="Appendix" title="A Changes from RFC 2617" href="#rfc.section.A">
+    <link rel="Appendix" title="B Acknowledgments" href="#rfc.section.B">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc7616.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="http://www.rfc-editor.org/info/rfc7616">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="HTTP, authentication scheme">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Shekh-Yusef, R.">
+    <meta name="dcterms.creator" content="Ahrens, D.">
+    <meta name="dcterms.creator" content="Bremer, S.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:7616">
+    <meta name="dcterms.issued" content="2015-09">
+    <meta name="dct.replaces" content="urn:ietf:rfc:2617">
+    <meta name="dcterms.abstract"
+        content="The Hypertext Transfer Protocol (HTTP) provides a simple challenge-response authentication mechanism that may be used by a server to challenge a client request and by a client to provide authentication information. This document defines the HTTP Digest Authentication scheme that can be used with the HTTP authentication mechanism.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="The Hypertext Transfer Protocol (HTTP) provides a simple challenge-response authentication mechanism that may be used by a server to challenge a client request and by a client to provide authentication information. This document defines the HTTP Digest Authentication scheme that can be used with the HTTP authentication mechanism.">
+</head>
+
+<body onload="getMeta(7616,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>7616</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#terminology">용어</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#syntax.convention">구문
+                                        규약</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#examples">예시</a></li>
+                                        <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#abnf">ABNF</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#digest.access.authentication.scheme">다이제스트 액세스 인증 방식</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#overall.operation">전체 동작</a></li>
+                                        <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#representation.of.digest.values">다이제스트 값의 표현</a></li>
+                                        <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#www-authenticate.response.header">WWW-Authenticate 응답 헤더 필드</a>
+                                        </li>
+                                        <li><a href="#rfc.section.3.4">3.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#authorization.request.header.field">Authorization 헤더 필드</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.3.4.1">3.4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#response">응답</a></li>
+                                                <li><a href="#rfc.section.3.4.2">3.4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#a1">A1</a></li>
+                                                <li><a href="#rfc.section.3.4.3">3.4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#rfc.section.3.4.3">A2</a></li>
+                                                <li><a href="#rfc.section.3.4.4">3.4.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#username.hashing">사용자 이름 해싱</a></li>
+                                                <li><a href="#rfc.section.3.4.5">3.4.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#rfc.section.3.4.5">매개변수 값 및 인용 문자열</a>
+                                                </li>
+                                                <li><a href="#rfc.section.3.4.6">3.4.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#rfc.section.3.4.6">여러 고려사항</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.3.5">3.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#authenticaion-info.header.field">Authentication-Info 및
+                                                Proxy-Authentication-Info 헤더 필드</a></li>
+                                        <li><a href="#rfc.section.3.6">3.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#digest.operation">다이제스트 동작</a></li>
+                                        <li><a href="#rfc.section.3.7">3.7.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.3.7">보안 프로토콜 협상</a></li>
+                                        <li><a href="#rfc.section.3.8">3.8.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#proxy-auth">Proxy-Authenticate 및 Proxy-Authorization</a></li>
+                                        <li><a href="#rfc.section.3.9">3.9.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.3.9">예시</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.3.9.1">3.9.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#rfc.section.3.9.1">SHA-256 및 MD5 예시</a></li>
+                                                <li><a href="#rfc.section.3.9.2">3.9.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#rfc.section.3.9.2">SHA-512-256, 문자 집합 및 Userhash 예시</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.4">국제화
+                                        고려사항</a></li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#security.considerations">보안 고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.5.1">5.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.1">제한사항</a></li>
+                                        <li><a href="#rfc.section.5.2">5.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.2">비밀번호 저장</a></li>
+                                        <li><a href="#rfc.section.5.3">5.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.3">다이제스트 인증을 사용하는 클라이언트의 인증</a></li>
+                                        <li><a href="#rfc.section.5.4">5.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.4">제한적 사용 논스 값</a></li>
+                                        <li><a href="#rfc.section.5.5">5.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#replay_attacks">재생 공격</a></li>
+                                        <li><a href="#rfc.section.5.6">5.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.6">다중 인증 방식으로 인한 약점</a></li>
+                                        <li><a href="#rfc.section.5.7">5.7.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#online.dictionary.attacks">온라인 사전 공격</a></li>
+                                        <li><a href="#rfc.section.5.8">5.8.</a>&nbsp;&nbsp;&nbsp;<a href="#mitm">중간자
+                                                공격</a></li>
+                                        <li><a href="#rfc.section.5.9">5.9.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.9">선택 평문 공격</a></li>
+                                        <li><a href="#rfc.section.5.10">5.10.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.10">사전(미리 계산된) 공격</a></li>
+                                        <li><a href="#rfc.section.5.11">5.11.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.11">일괄 무차별 대입 공격</a></li>
+                                        <li><a href="#rfc.section.5.12">5.12.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.12">매개변수 무작위성</a></li>
+                                        <li><a href="#rfc.section.5.13">5.13.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.5.13">요약</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#iana.considerations">IANA
+                                        고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.6.1">HTTP 다이제스트 인증을 위한 해시 알고리즘</a></li>
+                                        <li><a href="#rfc.section.6.2">6.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.6.2">다이제스트 스킴 등록</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고 문헌</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.1">규범 참조</a></li>
+                                        <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">정보 참조</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.A">Appendix A.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc2617.changes">부록 A. RFC 2617에서의 변경사항</a></li>
+                                <li><a href="#rfc.section.B">Appendix B.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.B">부록 B. 감사의 글</a></li>
+                                <li><a href="#rfc.authors">Authors' Addresses</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">인터넷 엔지니어링 태스크 포스 (IETF)</td>
+                                <td class="text-right">R. Shekh-Yusef, 편집자</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">요청 의견(Request for Comments): 7616</td>
+                                <td class="text-right">Avaya</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Obsoletes: <a href="#RFC2617">2617</a></td>
+                                <td class="text-right">D. Ahrens</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">분류: 표준 트랙</td>
+                                <td class="text-right">독립</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right">S. Bremer</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left"></td>
+                                <td class="text-right">Netzkonform</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left"></td>
+                                <td class="text-right">2015년 9월</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>HTTP 다이제스트 액세스 인증</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">초록</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>하이퍼텍스트 전송 프로토콜(HTTP)은 서버가 클라이언트 요청에 대해 챌린지-응답 방식의 인증을 요구할 수 있고, 클라이언트가 인증 정보를 제공할 수 있도록 하는
+                            간단한 챌린지-응답 인증 메커니즘을 제공합니다. 이 문서는 HTTP 인증 메커니즘과 함께 사용할 수 있는 HTTP 다이제스트 인증 스킴을 정의합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 메모의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 문서입니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물입니다. 이는 IETF 커뮤니티의 합의를 반영합니다. 이 문서는 공개 검토를 거쳤고 인터넷 엔지니어링 운영
+                            그룹(IESG)에 의해 게재 승인을 받았습니다. 인터넷 표준에 대한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc5741.html#section-2">RFC 5741의 섹션 2</a>에서 확인할 수
+                            있습니다.
+                        </p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 현재 상태, 정정 사항(errata), 및 피드백 제공 방법에 대한 정보는 <a
+                                href="http://www.rfc-editor.org/info/rfc7616">http://www.rfc-editor.org/info/rfc7616</a>에서
+                            확인할 수 있습니다.
+                        </p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2015 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in
+                            effect on the date of publication of this document. Please review these documents carefully,
+                            as they describe your rights and restrictions with respect to this document. Code Components
+                            extracted from this document must include Simplified BSD License text as described in
+                            Section 4.e of the Trust Legal Provisions and are provided without warranty as described in
+                            the Simplified BSD License.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.3">
+                        <p>This document may contain material from IETF Documents or IETF Contributions published or
+                            made publicly available before November 10, 2008. The person(s) controlling the copyright in
+                            some of this material may not have granted the IETF Trust the right to allow modifications
+                            of such material outside the IETF Standards Process. Without obtaining an adequate license
+                            from the person(s) controlling the copyright in such materials, this document may not be
+                            modified outside the IETF Standards Process, and derivative works of it may not be created
+                            outside the IETF Standards Process, except to format it for publication as an RFC or to
+                            translate it into languages other than English.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a href="#terminology">용어</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a href="#syntax.convention">구문 규약</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a href="#examples">예시</a></li>
+                                <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a href="#abnf">ABNF</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#digest.access.authentication.scheme">다이제스트 액세스 인증 방식</a>
+                            <ul>
+                                <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a href="#overall.operation">전체
+                                        동작</a></li>
+                                <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#representation.of.digest.values">다이제스트 값의 표현</a></li>
+                                <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#www-authenticate.response.header">WWW-Authenticate 응답 헤더 필드</a></li>
+                                <li><a href="#rfc.section.3.4">3.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#authorization.request.header.field">Authorization 헤더 필드</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.4.1">3.4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#response">응답</a></li>
+                                        <li><a href="#rfc.section.3.4.2">3.4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#a1">A1</a></li>
+                                        <li><a href="#rfc.section.3.4.3">3.4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.3.4.3">A2</a></li>
+                                        <li><a href="#rfc.section.3.4.4">3.4.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#username.hashing">사용자 이름 해싱</a></li>
+                                        <li><a href="#rfc.section.3.4.5">3.4.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.3.4.5">매개변수 값 및 인용 문자열</a></li>
+                                        <li><a href="#rfc.section.3.4.6">3.4.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.3.4.6">여러 고려사항</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3.5">3.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#authenticaion-info.header.field">Authentication-Info 및
+                                        Proxy-Authentication-Info 헤더 필드</a></li>
+                                <li><a href="#rfc.section.3.6">3.6.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#digest.operation">다이제스트 동작</a></li>
+                                <li><a href="#rfc.section.3.7">3.7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.3.7">보안
+                                        프로토콜 협상</a></li>
+                                <li><a href="#rfc.section.3.8">3.8.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#proxy-auth">Proxy-Authenticate 및 Proxy-Authorization</a></li>
+                                <li><a href="#rfc.section.3.9">3.9.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.3.9">예시</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.9.1">3.9.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.3.9.1">SHA-256 및 MD5 예시</a></li>
+                                        <li><a href="#rfc.section.3.9.2">3.9.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.section.3.9.2">SHA-512-256, 문자 집합 및 Userhash 예시</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.4">국제화 고려사항</a></li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#security.considerations">보안
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.5.1">5.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.5.1">제한사항</a></li>
+                                <li><a href="#rfc.section.5.2">5.2.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.5.2">비밀번호
+                                        저장</a></li>
+                                <li><a href="#rfc.section.5.3">5.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.5.3">다이제스트 인증을 사용하는 클라이언트의 인증</a></li>
+                                <li><a href="#rfc.section.5.4">5.4.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.5.4">제한적
+                                        사용 논스 값</a></li>
+                                <li><a href="#rfc.section.5.5">5.5.</a>&nbsp;&nbsp;&nbsp;<a href="#replay_attacks">재생
+                                        공격</a></li>
+                                <li><a href="#rfc.section.5.6">5.6.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.5.6">다중
+                                        인증 방식으로 인한 약점</a>
+                                </li>
+                                <li><a href="#rfc.section.5.7">5.7.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#online.dictionary.attacks">온라인 사전 공격</a></li>
+                                <li><a href="#rfc.section.5.8">5.8.</a>&nbsp;&nbsp;&nbsp;<a href="#mitm">중간자 공격</a></li>
+                                <li><a href="#rfc.section.5.9">5.9.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.5.9">선택
+                                        평문 공격</a></li>
+                                <li><a href="#rfc.section.5.10">5.10.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.5.10">사전(미리 계산된) 공격</a></li>
+                                <li><a href="#rfc.section.5.11">5.11.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.5.11">일괄 무차별 대입 공격</a></li>
+                                <li><a href="#rfc.section.5.12">5.12.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.5.12">매개변수 무작위성</a></li>
+                                <li><a href="#rfc.section.5.13">5.13.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.5.13">요약</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#iana.considerations">IANA
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.6.1">HTTP
+                                        다이제스트 인증을 위한 해시 알고리즘 </a></li>
+                                <li><a href="#rfc.section.6.2">6.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.section.6.2">다이제스트 스킴 등록</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고 문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.1">규범
+                                        참조</a></li>
+                                <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.2">정보
+                                        참조</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.A">Appendix A.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc2617.changes">RFC
+                                2617에서의 변경사항</a></li>
+                        <li><a href="#rfc.section.B">Appendix B.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.section.B">감사의 글</a>
+                        </li>
+                        <li><a href="#rfc.authors">저자 주소</a></li>
+                    </ul>
+                </div>
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>HTTP는 서버가 클라이언트 요청에 대해 챌린지-응답 방식의 인증을 요구할 수 있고, 클라이언트가 인증 정보를 제공할 수 있도록 하는 간단한 챌린지-응답 인증
+                            메커니즘을 제공합니다. 이 문서는 HTTP 인증 메커니즘과 함께 사용할 수 있는 HTTP 다이제스트 인증 스킴을 정의합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <p>이 문서는 <a href="#RFC2617"><cite
+                                    title="HTTP Authentication: Basic and Digest Access Authentication">[RFC2617]</cite></a>를
+                            확장하지만 일반적으로 하위 호환성을 유지합니다. 이 명세가 도입한 새로운 기능은 <a href="#rfc2617.changes"
+                                title="Changes from RFC 2617">부록 A</a>를 참조하십시오.</p>
+                    </div>
+                    <div id="rfc.section.1.p.3">
+                        <p>챌린지-응답 인증 메커니즘의 세부사항은 "Hypertext Transfer Protocol (HTTP/1.1): Authentication" <a
+                                href="#RFC7235"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Authentication">[RFC7235]</cite></a>에
+                            지정되어 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.4">
+                        <p>이 문서와 "Basic" 인증 스킴의 정의(<a href="#RFC7617"><cite
+                                    title="The 'Basic' HTTP Authentication Scheme">[RFC7617]</cite></a>), "HTTP
+                            Authentication-Info and Proxy-Authentication-Info Response Header Fields"(<a
+                                href="#RFC7615"><cite
+                                    title="HTTP Authentication-Info and Proxy-Authentication-Info Response Header Fields">[RFC7615]</cite></a>),
+                            및 "Hypertext Transfer Protocol (HTTP/1.1): Authentication"(<a href="#RFC7235"><cite
+                                    title="Hypertext Transfer Protocol (HTTP/1.1): Authentication">[RFC7235]</cite></a>)을
+                            결합하면 <a href="#RFC2617"><cite
+                                    title="HTTP Authentication: Basic and Digest Access Authentication">[RFC2617]</cite></a>를
+                            폐기합니다.</p>
+                    </div>
+                    <section id="terminology">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a href="#terminology">용어</a>
+                        </h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>이 문서에서 키워드 "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
+                                "RECOMMENDED", "NOT RECOMMENDED", "MAY" 및 "OPTIONAL"은 <a href="#RFC2119"><cite
+                                        title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>에
+                                설명된 대로 해석되어야 합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="syntax.convention">
+                    <h2 id="rfc.section.2"><a href="#rfc.section.2">2.</a>&nbsp;<a href="#syntax.convention">구문 규약</a>
+                    </h2>
+                    <section id="examples">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a href="#examples">예시</a>
+                        </h3>
+                        <div id="rfc.section.2.1.p.1">
+                            <p>명확성과 가독성을 위해, 이 문서의 예시에서 확장된 매개변수나 헤더 필드 및 매개변수는 여러 줄로 나뉘어 표시될 수 있습니다. 이 문서에서 들여쓰기된 모든 줄은
+                                앞선 줄의 연속입니다.</p>
+                        </div>
+                    </section>
+                    <section id="abnf">
+                        <h3 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a>&nbsp;<a href="#abnf">ABNF</a></h3>
+                        <div id="rfc.section.2.2.p.1">
+                            <p>이 명세는 <a href="#RFC5234"><cite
+                                        title="Augmented BNF for Syntax Specifications: ABNF">[RFC5234]</cite></a>의 확장된
+                                Backus-Naur 형식(ABNF) 표기법과 <a href="#RFC7230"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing">[RFC7230]</cite></a>의
+                                ABNF List 확장을 사용합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="digest.access.authentication.scheme">
+                    <h2 id="rfc.section.3"><a href="#rfc.section.3">3.</a>&nbsp;<a
+                            href="#digest.access.authentication.scheme">다이제스트 액세스 인증 방식</a></h2>
+                    <section id="overall.operation">
+                        <h3 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a>&nbsp;<a
+                                href="#overall.operation">전체 동작</a></h3>
+                        <div id="rfc.section.3.1.p.1">
+                            <p>다이제스트 스킴은 간단한 챌린지-응답 패러다임에 기반합니다. 다이제스트 스킴은 논스(nonce) 값을 사용하여 챌린지하고, 사용자 이름 해싱이 지원되는지 나타낼
+                                수 있습니다. 유효한 응답은 사용자 이름, 비밀번호, 주어진 논스 값, HTTP 메소드 및 요청된 URI의 비키드(unkeyed) 다이제스트를 포함합니다.
+                                이렇게 하면 비밀번호가 평문으로 전송되지 않으며, 서버에서 받은 표시(서버의 지시에 따라)대로 사용자 이름을 해시할 수 있습니다. 사용자 이름과 비밀번호는 본
+                                문서에서 다루지 않는 방식으로 사전에 합의되어 있어야 합니다.</p>
+                        </div>
+                    </section>
+                    <section id="representation.of.digest.values">
+                        <h3 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a>&nbsp;<a
+                                href="#representation.of.digest.values">다이제스트 값의 표현</a></h3>
+                        <div id="rfc.section.3.2.p.1">
+                            <p>서버가 비키드 다이제스트 또는 다이제스트를 생성하는 데 사용한 알고리즘을 지정할 수 있도록 선택적 헤더 필드가 허용됩니다. 이 문서는 SHA-256 및
+                                SHA-512/256 알고리즘을 추가합니다. <a href="#RFC2617"><cite
+                                        title="HTTP Authentication: Basic and Digest Access Authentication">[RFC2617]</cite></a>와의
+                                하위 호환성을 유지하기 위해 MD5 알고리즘은 여전히 지원되지만 <em class="bcp14">권장되지 않습니다</em>.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.2">
+                            <p>다이제스트의 크기는 사용된 알고리즘에 따라 다릅니다. 다이제스트의 비트는 가장 상위 비트에서 최하위 비트로, 4비트씩 잘라 다음과 같이 ASCII 표현으로
+                                변환됩니다. 4비트의 각 시퀀스는 익숙한 16진 표기(문자 0123456789abcdef)로 표현됩니다. 즉, 이진 0000은 문자 '0'으로, 0001은
+                                '1'로, 1111은 'f'로 표현됩니다. MD5 알고리즘이 사용된 경우 MD5 다이제스트는 32개의 16진 문자로 표현되며, SHA-256 및
+                                SHA-512/256은 64개의 16진 문자로 표현됩니다.</p>
+                        </div>
+                    </section>
+                    <section id="www-authenticate.response.header">
+                        <h3 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a>&nbsp;<a
+                                href="#www-authenticate.response.header">WWW-Authenticate 응답 헤더 필드</a>
+                        </h3>
+                        <div id="rfc.section.3.3.p.1" class="avoidbreakafter">
+                            <p>서버가 접근 보호된 객체에 대한 요청을 수신했으나 허용 가능한 Authorization 헤더 필드가 전송되지 않은 경우, 서버는 "401
+                                Unauthorized" 상태 코드와 함께 위에 정의된 프레임워크에 따른 Digest 스킴을 사용하는 WWW-Authenticate 헤더 필드로 응답합니다.
+                                헤더 필드의 값은 다음 목록의 매개변수를 포함할 수 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.2">
+                            <p>realm </p>
+                            <ul class="empty">
+                                <li>사용자에게 표시되어 어느 사용자 이름과 비밀번호를 사용할지 알 수 있게 하는 문자열입니다. 이 문자열은 인증을 수행하는 호스트의 이름을 최소한 포함해야
+                                    하며, 추가로 접근 가능한 사용자 집합을 나타낼 수도 있습니다. 예시로는 "registered_users@example.com"이 있습니다. (자세한
+                                    내용은 <a href="https://www.rfc-editor.org/rfc/rfc7235.html#section-2.2">RFC7235 섹션
+                                        2.2</a> 참조.)</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.3">
+                            <p>domain </p>
+                            <ul class="empty">
+                                <li>보호 공간을 정의하는, 인용된 공백으로 구분된 URI 목록입니다(URI 문법은 <a href="#RFC3986"><cite
+                                            title="Uniform Resource Identifier (URI): Generic Syntax">[RFC3986]</cite></a>
+                                    참조). 만약 URI가 경로-절대(path-absolute)라면 정규화된 루트 URL에 상대적입니다. 이 목록의 절대-URI는 웹-오리진과 다른 서버를
+                                    가리킬 수 있습니다. 클라이언트는 이 목록을 사용하여 동일한 인증 정보를 보낼 수 있는 URI 집합을 결정할 수 있습니다: 이 목록의 어떤 URI가
+                                    접두사인(둘 다 절대화된 후) 모든 URI는 동일한 보호 공간에 속한다고 <em class="bcp14">간주할 수 있습니다</em>. 이 매개변수가
+                                    생략되거나 값이 비어 있으면, 클라이언트는 보호 공간이 웹-오리진의 모든 URI로 구성된다고 <em class="bcp14">가정해야 합니다</em>.
+                                </li>
+                                <li>이 매개변수는 항상 프록시 전체가 보호 공간인 Proxy-Authenticate 헤더 필드에는 의미가 없습니다; 만약 존재하면 <em
+                                        class="bcp14">무시되어야 합니다</em>.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.4">
+                            <p>nonce </p>
+                            <ul class="empty">
+                                <li>서버가 지정하는 문자열로, 401 응답이 만들어질 때마다 고유하게 생성되는 것이 바람직합니다. 이 문자열은 Base64 또는 16진 데이터일 것을
+                                    권장합니다. 구체적으로 이 문자열은 인용 문자열로 헤더 필드 라인에 전달되므로, 큰따옴표 문자(")는 적절히 이스케이프되지 않는 한 허용되지 않습니다.
+                                </li>
+                                <li>논스의 내용은 구현에 따라 다릅니다. 구현의 품질은 적절한 선택에 달려 있습니다. 예를 들어 논스는 다음을 Base64로 인코딩한 형태로 구성될 수
+                                    있습니다: <span id="rfc.figure.u.1"><span>
+                                            <pre class="text">
+         timestamp H(timestamp ":" ETag ":" secret-data)
+</pre>
+                                        </span></span> </li>
+                                <li>여기서 timestamp는 서버가 생성한 시간으로 마이크로초나 나노초 또는 기타 반복되지 않는 값을 포함하는 것이 바람직합니다; ETag는 요청된
+                                    엔터티와 연관된 HTTP ETag 헤더 필드의 값이며; secret-data는 서버만 알고 있는 데이터입니다. 이러한 형태의 논스를 사용하면, 서버는
+                                    클라이언트로부터 받은 인증 헤더 필드를 수신한 후 해시 부분을 재계산하고 헤더 필드의 논스와 일치하지 않거나 timestamp 값이 충분히 최신이
+                                    아니면 요청을 거부할 수 있습니다. 이렇게 하여 서버는 논스의 유효 기간을 제한할 수 있습니다. ETag 포함은 리소스가 갱신된 경우에 대한 재생
+                                    요청을 방지합니다. 논스에 클라이언트의 IP 주소를 포함시키면 논스 재사용을 원래 클라이언트를 동일하게 제한할 수 있을 것 같지만, 단일 사용자의
+                                    요청이 다른 프록시를 통해 가는 경우가 많아 이는 실패합니다. 또한 IP 주소 스푸핑이 어렵지 않습니다.</li>
+                                <li>구현체는 재생 공격을 방지하기 위해 이전에 사용된 논스나 이전에 사용된 다이제스트를 수락하지 않기로 선택할 수 있습니다. 또는 구현체는 POST나
+                                    PUT 요청에 대해 일회용 논스나 다이제스트를 사용하고 GET 요청에는 타임스탬프를 사용할 수 있습니다. 관련 문제에 대한 상세 내용은 이 문서의 <a
+                                        href="#security.considerations" title="Security Considerations">섹션 5</a>를
+                                    참조하십시오.</li>
+                                <li>논스는 클라이언트에게 불투명합니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.5">
+                            <p>opaque </p>
+                            <ul class="empty">
+                                <li>서버가 지정하는 데이터 문자열로, 동일한 보호 공간의 URI에 대한 후속 요청의 Authorization 헤더 필드에서 클라이언트가 변경하지 않고
+                                    반환해야 하는 값입니다. 이 문자열은 Base64나 16진 데이터일 것을 권장합니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.6">
+                            <p>stale </p>
+                            <ul class="empty">
+                                <li>이전 클라이언트 요청이 논스 값이 오래되어(replay 또는 만료) 거부되었음을 나타내는 대소문자 구분 없는 플래그입니다. 만약 stale이
+                                    true라면, 클라이언트는 사용자에게 새 사용자 이름과 비밀번호를 요구하지 않고 새 암호화된 응답으로 단순히 재시도할 수 있습니다. 서버는 논스가
+                                    유효하지 않은 요청을 수신한 경우에만 stale을 true로 설정해야 합니다. stale이 false이거나 true가 아닌 다른 값이거나 stale
+                                    매개변수가 없으면 사용자 이름 및/또는 비밀번호가 유효하지 않으며 새 값을 받아야 합니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.7">
+                            <p>algorithm </p>
+                            <ul class="empty">
+                                <li>다이제스트와 비키드 다이제스트를 생성하는 데 사용된 알고리즘을 나타내는 문자열입니다. 이 매개변수가 없으면 기본값은 "MD5"로 간주됩니다. 알고리즘을
+                                    이해하지 못하면 챌린지를 <em class="bcp14">무시해야 합니다</em>(그리고 여러 챌린지가 있다면 다른 챌린지를 사용해야 합니다).
+                                </li>
+                                <li>다이제스트 메커니즘과 함께 사용될 때, 각 알고리즘은 세션 변형과 비세션 변형의 두 가지 변형을 가집니다. 비세션 변형은
+                                    "&lt;algorithm&gt;"으로 표기되며 예: "SHA-256", 세션 변형은 "&lt;algorithm&gt;-sess"로 표기되며 예:
+                                    "SHA-256-sess"입니다.</li>
+                                <li>이 문서에서는 데이터 "data"에 대해 다이제스트 알고리즘을 적용한 결과 문자열을 H(data)로 표기하고, 비키드 다이제스트 알고리즘을 적용한
+                                    결과를 KD(secret, data)로 표기합니다. KD는 Keyed Digest를 의미하며, 표기법 unq(X)는 인용 문자열 X에서 둘러싼
+                                    인용부호를 제거하고 이스케이프 슬래시를 제거한 값을 의미합니다. <span id="rfc.figure.u.2"><span>
+                                            <pre class="inline">
+     For "&lt;algorithm&gt;" and "&lt;algorithm&gt;-sess"
+
+         H(data) = &lt;algorithm&gt;(data)
+
+     and
+
+         KD(secret, data) = H(concat(secret, ":", data))
+</pre>
+                                        </span></span>
+                                </li>
+                                <li>예를 들어: <span id="rfc.figure.u.3"><span>
+                                            <pre class="inline">
+     For the "SHA-256" and "SHA-256-sess" algorithms
+
+         H(data) = SHA-256(data)
+</pre>
+                                        </span></span> </li>
+                                <li>즉, 다이제스트는 secret과 ":" 그리고 data를 연결한 것에 대해 "&lt;algorithm&gt;"을 적용한 것입니다.
+                                    "&lt;algorithm&gt;-sess"는 효율적인 제3자 인증 서버 사용을 허용하기 위한 것이며, 사용상의 차이는 <a href="#a1"
+                                        title="A1">섹션 3.4.2</a>의 설명을 참조하십시오.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.8">
+                            <p>qop </p>
+                            <ul class="empty">
+                                <li>이 매개변수는 모든 구현체에서 <em class="bcp14">사용되어야 합니다</em>. 이는 서버가 지원하는 "protection의
+                                    품질(quality of protection)" 값들을 나타내는 하나 이상의 토큰으로 된 인용 문자열입니다. 값 "auth"는 인증을, 값
+                                    "auth-int"는 무결성 보호를 동반한 인증을 나타냅니다. 이 선택의 적용을 위한 response 매개변수 계산에 대한 설명은 아래를 참조하십시오.
+                                    인식하지 못하는 옵션은 <em class="bcp14">무시되어야 합니다</em>.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.9">
+                            <p>charset </p>
+                            <ul class="empty">
+                                <li>서버가 지원하는 인코딩 스킴을 나타내기 위해 사용하는 <em class="bcp14">선택적</em> 매개변수입니다. 허용되는 유일한 값은
+                                    "UTF-8"입니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.10">
+                            <p>userhash </p>
+                            <ul class="empty">
+                                <li>서버가 사용자 이름 해싱을 지원함을 나타내기 위해 사용하는 <em class="bcp14">선택적</em> 매개변수입니다. 유효한 값은 "true"
+                                    또는 "false"이며 기본값은 "false"입니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.11">
+                            <p>역사적 이유로, 송신자는 다음 매개변수들에 대해서만 인용 문자열(quoted string) 문법을 생성해야 합니다: realm, domain, nonce,
+                                opaque, 및 qop.</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.12">
+                            <p>역사적 이유로, 송신자는 다음 매개변수들에 대해 인용 문자열 문법을 생성해서는 안 됩니다: stale 및 algorithm.</p>
+                        </div>
+                    </section>
+                    <section id="authorization.request.header.field">
+                        <h3 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a>&nbsp;<a
+                                href="#authorization.request.header.field">Authorization 헤더 필드</a></h3>
+                        <div id="rfc.section.3.4.p.1">
+                            <p>클라이언트는 요청을 재시도할 때 Digest 스킴을 사용하는 Authorization 헤더 필드를 포함하여 전송해야 합니다. opaque 및 algorithm
+                                필드의 값은 요청 대상 엔터티에 대한 WWW-Authenticate 응답 헤더 필드에서 제공된 값이어야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.4.p.2" class="avoidbreakafter">
+                            <p>요청은 다음 목록의 매개변수를 포함할 수 있습니다:</p>
+                        </div>
+                        <div id="rfc.section.3.4.p.3">
+                            <p>response </p>
+                            <ul class="empty">
+                                <li>아래에 정의된 대로 계산된 16진 숫자 문자열입니다; 이는 사용자가 비밀번호를 알고 있음을 증명합니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.4">
+                            <p>username </p>
+                            <ul class="empty">
+                                <li>지정된 realm에서의 사용자 이름입니다. 인용 문자열은 평문 사용자 이름 또는 16진 표기된 해시 코드를 포함합니다. 만약 사용자 이름에 ABNF
+                                    quoted-string 생산식 안에서 허용되지 않는 문자가 포함되어 있다면 username* 매개변수를 사용할 수 있습니다. 동일한 헤더 옵션에서
+                                    username과 username*을 동시에 보내는 것은 <em class="bcp14">오류로 처리되어야 합니다</em>.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.5">
+                            <p>username* </p>
+                            <ul class="empty">
+                                <li>userhash 매개변수 값이 "false"로 설정되어 있고 사용자 이름에 ABNF quoted-string에서 허용되지 않는 문자가 포함된 경우,
+                                    사용자는 이 매개변수를 사용하여 <a href="#RFC5987"><cite
+                                            title="Character Set and Language Encoding for Hypertext Transfer Protocol (HTTP) Header Field Parameters">[RFC5987]</cite></a>에
+                                    정의된 확장 표기법으로 사용자 이름을 보낼 수 있습니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.6">
+                            <p>realm </p>
+                            <ul class="empty">
+                                <li>"realm" 정의는 <a href="#www-authenticate.response.header"
+                                        title="The WWW-Authenticate Response Header Field">섹션 3.3</a>를 참조하십시오.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.7">
+                            <p>uri </p>
+                            <ul class="empty">
+                                <li>HTTP 요청의 유효한 요청 URI(Effective Request URI, <a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230.html#section-5.5">RFC7230 섹션
+                                        5.5</a>)입니다; 이는 프록시가 전송 중에 요청 대상("request-target", <a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230.html#section-3.1.1">RFC7230 섹션
+                                        3.1.1</a>)을 변경할 수 있기 때문에 중복 표시됩니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.8">
+                            <p>qop </p>
+                            <ul class="empty">
+                                <li>클라이언트가 메시지에 적용한 "protection의 품질"을 나타냅니다. 그 값은 WWW-Authenticate 헤더 필드에서 서버가 지원한다고 표시한
+                                    대안 중 하나여야 합니다. 이 값들은 response 계산에 영향을 줍니다. 이는 단일 토큰이며 WWW-Authenticate에서의 인용된 대안 목록이
+                                    아님에 유의하십시오.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.9">
+                            <p>cnonce </p>
+                            <ul class="empty">
+                                <li>이 매개변수는 모든 구현체에서 <em class="bcp14">사용되어야 합니다</em>. cnonce 값은 클라이언트가 제공하는 불투명한 인용된
+                                    ASCII 전용 문자열로, 선택 평문 공격을 피하고 상호 인증을 제공하며 일부 메시지 무결성 보호를 제공하기 위해 클라이언트와 서버 둘 다에서
+                                    사용됩니다. rspauth 및 response 값의 계산에 대한 설명을 참조하십시오.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.10">
+                            <p>nc </p>
+                            <ul class="empty">
+                                <li>이 매개변수는 모든 구현체에서 <em class="bcp14">사용되어야 합니다</em>. nc는 "nonce count"를 의미합니다. nc 값은 이
+                                    요청에 사용된 논스 값으로 클라이언트가 전송한 요청의 수(현재 요청 포함)를 16진수로 카운트한 값입니다. 예를 들어 주어진 논스 값에 대한 첫 번째
+                                    요청에서는 클라이언트가 "nc=00000001"을 전송합니다. 이 매개변수의 목적은 서버가 자체 카운트를 유지함으로써 요청 재생을 탐지하기 위함입니다
+                                    -- 동일한 nc 값이 두 번 보이면 요청은 재생입니다. response 값 구성에 대한 설명을 참조하십시오.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.11"><br></div>
+                        <div id="rfc.section.3.4.p.12">
+                            <p>userhash </p>
+                            <ul class="empty">
+                                <li>이 <em class="bcp14">선택적</em> 매개변수는 클라이언트가 사용자 이름을 해시했음을 나타내기 위해 사용됩니다. 유효한 값은 "true"
+                                    또는 "false"이며 기본값은 "false"입니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.4.p.13">
+                            <p>역사적 이유로, 송신자는 다음 매개변수들에 대해서만 인용 문자열 문법을 생성해야 합니다: username, realm, nonce, uri, response,
+                                cnonce, 및 opaque.</p>
+                        </div>
+                        <div id="rfc.section.3.4.p.14">
+                            <p>역사적 이유로, 송신자는 다음 매개변수들에 대해 인용 문자열 문법을 생성해서는 안 됩니다: algorithm, qop, 및 nc.</p>
+                        </div>
+                        <div id="rfc.section.3.4.p.15">
+                            <p>매개변수나 그 값이 부적절하거나 필수 매개변수가 누락된 경우, 적절한 응답은 4xx 오류 코드입니다. 응답이 유효하지 않으면 로그인 실패를 기록해야
+                                합니다(<em class="bcp14">권장</em>), 단일 클라이언트로부터 반복적인 로그인 실패는 공격자가 비밀번호를 추측하려는 시도로 보일 수 있습니다.
+                                서버 구현체는 로그에 평문 비밀번호(예: username 필드에 입력된)를 남기지 않도록 기록하는 정보에 주의해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.4.p.16">
+                            <p>위의 response 정의는 그 값의 인코딩을 나타냅니다. 다음 정의는 값이 어떻게 계산되는지를 보여줍니다.</p>
+                        </div>
+                        <section id="response">
+                            <h4 id="rfc.section.3.4.1"><a href="#rfc.section.3.4.1">3.4.1.</a>&nbsp;<a
+                                    href="#response">응답</a></h4>
+                            <div id="rfc.section.3.4.1.p.1" class="avoidbreakafter">
+                                <p>qop 값이 "auth" 또는 "auth-int"인 경우:</p>
+                            </div>
+                            <div id="rfc.figure.u.4">
+                                <div>
+                                    <pre class="inline">
+      response = &lt;"&gt; &lt; KD ( H(A1), unq(nonce)
+                                   ":" nc
+                                   ":" unq(cnonce)
+                                   ":" unq(qop)
+                                   ":" H(A2)
+                          ) &lt;"&gt;
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.1.p.2">
+                                <p>A1 및 A2의 정의는 아래를 참조하십시오.</p>
+                            </div>
+                        </section>
+                        <section id="a1">
+                            <h4 id="rfc.section.3.4.2"><a href="#rfc.section.3.4.2">3.4.2.</a>&nbsp;<a href="#a1">A1</a>
+                            </h4>
+                            <div id="rfc.section.3.4.2.p.1" class="avoidbreakafter">
+                                <p>algorithm 매개변수의 값이 "&lt;algorithm&gt;"인 경우, 예: <span class="nobr">"SHA-256",</span>
+                                    A1은 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.5">
+                                <div>
+                                    <pre class="inline">
+      A1       = unq(username) ":" unq(realm) ":" passwd
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.2.p.2">
+                                <p>여기서</p>
+                            </div>
+                            <div id="rfc.figure.u.6">
+                                <div>
+                                    <pre class="inline">
+      passwd   = &lt; user's password &gt;
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.2.p.3" class="avoidbreakafter">
+                                <p>algorithm 매개변수의 값이 "&lt;algorithm&gt;-sess"인 경우, 예: "SHA-256-sess", A1은 서버의 챌린지에서 제공된
+                                    논스 값과 클라이언트가 챌린지를 수신한 후 응답 요청에서 제공한 cnonce 값을 사용하여 계산됩니다. 이때 서버 챌린지의 논스를
+                                    nonce-prime이라 하고 응답의 클라이언트 논스를 cnonce-prime이라 부르며 A1을 다음과 같이 구성합니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.7">
+                                <div>
+                                    <pre class="inline">
+      A1       = H( unq(username) ":" unq(realm) ":" passwd )
+                     ":" unq(nonce-prime) ":" unq(cnonce-prime)
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.2.p.4">
+                                <p>이는 각 "인증 세션"마다 다른 인증을 위한 "세션 키"를 생성하여 어느 한 키로 해시되는 자료의 양을 제한합니다. (참고: 인증 세션에 대한 추가
+                                    논의는 <a href="#digest.operation" title="Digest Operation">섹션 3.6</a> 참조.) 서버는 A1 값을
+                                    생성하기 위해 사용자 자격증명의 해시만 필요로 하므로, 이 구성은 제3자 인증 서비스와 함께 사용되어 웹 서버가 실제 비밀번호 값을 알 필요가 없게 할
+                                    수 있습니다. 이러한 프로토콜의 명세는 본 명세의 범위를 벗어납니다.</p>
+                            </div>
+                        </section>
+                        <section id="n-a2">
+                            <h4 id="rfc.section.3.4.3"><a href="#rfc.section.3.4.3">3.4.3.</a>&nbsp;<a
+                                    href="#n-a2">A2</a></h4>
+                            <div id="rfc.section.3.4.3.p.1" class="avoidbreakafter">
+                                <p>qop 매개변수의 값이 "auth"이거나 지정되지 않은 경우, A2는 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.8">
+                                <div>
+                                    <pre class="inline">
+      A2       = Method ":" request-uri
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.3.p.2" class="avoidbreakafter">
+                                <p>qop 값이 "auth-int"인 경우, A2는 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.9">
+                                <div>
+                                    <pre class="inline">
+      A2       = Method ":" request-uri ":" H(entity-body)
+</pre>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="username.hashing">
+                            <h4 id="rfc.section.3.4.4"><a href="#rfc.section.3.4.4">3.4.4.</a>&nbsp;<a
+                                    href="#username.hashing">사용자 이름 해싱</a></h4>
+                            <div id="rfc.section.3.4.4.p.1">
+                                <p>클라이언트에서 서버로의 사용자 이름 전송을 보호하기 위해, 서버는 WWW-Authenticate 헤더 필드에 userhash 매개변수를 "true"로
+                                    설정하는 것이 <em class="bcp14">권장됩니다</em>.</p>
+                            </div>
+                            <div id="rfc.section.3.4.4.p.2">
+                                <p>클라이언트가 userhash 매개변수를 지원하고 WWW-Authenticate 헤더 필드의 userhash 값이 "true"로 설정된 경우, 클라이언트는
+                                    사용자 자격증명을 해시하는 데 사용된 것과 동일한 알고리즘을 사용하여 사용자 이름의 해시를 계산하고 Authorization 헤더 필드에
+                                    userhash 매개변수와 값 "true"를 포함해야 합니다(<em class="bcp14">MUST</em>). 클라이언트가 사용자 이름을 해시
+                                    값으로 제공하지 않거나 userhash 매개변수에 "true"를 제공하지 않으면 서버는 요청을 거부할 수 있습니다(<em
+                                        class="bcp14">MAY</em>).</p>
+                            </div>
+                            <div id="rfc.section.3.4.4.p.3" class="avoidbreakafter">
+                                <p>다음은 클라이언트가 자격증명 해시에 사용된 것과 동일한 알고리즘을 사용하여 사용자 이름을 해시하기 위해 수행할 연산입니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.10">
+                                <div>
+                                    <pre class="inline">
+   username = H( unq(username) ":" unq(realm) )
+</pre>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="n-parameter-values-and-quoted-string">
+                            <h4 id="rfc.section.3.4.5"><a href="#rfc.section.3.4.5">3.4.5.</a>&nbsp;<a
+                                    href="#n-parameter-values-and-quoted-string">매개변수 값 및 인용 문자열</a>
+                            </h4>
+                            <div id="rfc.section.3.4.5.p.1">
+                                <p>username 값과 같은 많은 매개변수의 값이 "quoted-string"으로 정의되어 있다는 점에 유의하십시오. 그러나 "unq" 표기법은 A1
+                                    문자열을 형성할 때 둘러싼 인용부호가 제거된다는 것을 나타냅니다. 따라서 Authorization 헤더 필드에 다음과 같은 필드들이 포함되어 있다면
+                                </p>
+                            </div>
+                            <div id="rfc.figure.u.11">
+                                <div>
+                                    <pre class="text">
+   username="Mufasa", realm="myhost@example.com"
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.5.p.2">
+                                <p>그리고 사용자 Mufasa의 비밀번호가 "Circle Of Life"라면, H(A1)는 소화된 문자열에서 인용부호 없이
+                                    H(Mufasa:myhost@example.com:Circle Of Life)가 됩니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.5.p.3">
+                                <p>다이제스트 함수 H()가 적용되는 문자열에는, 그 공백이 다이제스트될 문자열을 구성하는 인용 문자열이나 엔터티 본문에 존재하지 않는 한 공백이 허용되지
+                                    않습니다. 예를 들어 위에 예시된 A1 문자열은 다음과 같아야 합니다</p>
+                            </div>
+                            <div id="rfc.figure.u.12">
+                                <div>
+                                    <pre class="text">
+   Mufasa:myhost@example.com:Circle Of Life
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.4.5.p.4">
+                                <p>콜론 양쪽에는 공백이 없어야 하지만, 비밀번호 값에 사용된 단어들 사이의 공백은 포함됩니다. 마찬가지로 H()로 다이제스트되는 다른 문자열들도 필드를
+                                    구분하는 콜론 양쪽에 공백이 있어서는 안 되며, 그 공백이 인용 문자열이나 다이제스트되는 엔터티 본문 안에 있었던 경우를 제외합니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.5.p.5">
+                                <p>또한 무결성 보호가 적용된 경우(qop=auth-int), H(entity-body)는 메시지 본문이 아니라 엔터티 본문의 해시임에 유의하십시오 — 이는
+                                    송신자가 어떤 전송 인코딩도 적용하기 전에 계산되며 수신자가 전송 인코딩을 제거한 이후에 계산됩니다. 이에는 multipart 경계와 모든
+                                    multipart 콘텐츠 타입의 각 부분에 포함된 임베디드 헤더 필드도 포함됩니다.</p>
+                            </div>
+                        </section>
+                        <section id="n-various-considerations">
+                            <h4 id="rfc.section.3.4.6"><a href="#rfc.section.3.4.6">3.4.6.</a>&nbsp;<a
+                                    href="#n-various-considerations">여러 고려사항</a></h4>
+                            <div id="rfc.section.3.4.6.p.1">
+                                <p>"Method" 값은 <a href="https://www.rfc-editor.org/rfc/rfc7230.html#section-3.1.1">RFC
+                                        7230의 Section 3.1.1</a>에 규정된 바와 같이 US-ASCII 문자로 된 HTTP 요청 메소드입니다.
+                                    "request-target" 값은 <a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230.html#section-3.1.1">RFC 7230의
+                                        Section 3.1.1</a>에 규정된 요청 라인에서의 request-target입니다. 이 값은 <em
+                                        class="bcp14">MAY</em> "*"이거나, RFC 7230의 <a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230.html#section-2.7">Section 2.7</a>에
+                                    규정된 "absolute-URI" 또는 "absolute-path"일 수 있으나, request-target과 일치해야 합니다(<em
+                                        class="bcp14">MUST</em>). 특히 request-target이 "absolute-URI"인 경우에는 이 값도
+                                    "absolute-URI"이어야 합니다(<em class="bcp14">MUST</em>). cnonce 값은 선택 평문 공격을 방지하기 위해
+                                    클라이언트가 선택하는 값입니다.
+                                </p>
+                            </div>
+                            <div id="rfc.section.3.4.6.p.2">
+                                <p>인증 서버는 "uri" 매개변수로 지정된 리소스가 Request-Line에 지정된 리소스와 동일함을 보장해야 합니다(<em
+                                        class="bcp14">MUST</em>); 동일하지 않다면 서버는 400 Bad Request 오류를 반환하는 것이 권장됩니다(<em
+                                        class="bcp14">SHOULD</em>). (이는 공격의 징후일 수 있으므로 서버 구현자는 그러한 오류를 로깅하는 것을 고려할 수
+                                    있습니다.) 요청 URL에서 이 필드로 정보를 중복해서 포함하는 목적은 중간 프록시가 클라이언트의 Request-Line을 변경할 가능성에 대처하기
+                                    위함입니다. 변경된(그러나 의미상 동등한 것으로 보이는) 요청은 클라이언트가 계산한 것과 동일한 다이제스트를 생성하지 않을 것입니다.</p>
+                            </div>
+                            <div id="rfc.section.3.4.6.p.3">
+                                <p>구현자는 인증된 트랜잭션이 공유 캐시와 어떻게 상호작용해야 하는지에 유의해야 합니다(참조: <a href="#RFC7234"><cite
+                                            title="Hypertext Transfer Protocol (HTTP/1.1): Caching">RFC7234</cite></a>).
+                                </p>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="authenticaion-info.header.field">
+                        <h3 id="rfc.section.3.5"><a href="#rfc.section.3.5">3.5.</a>&nbsp;<a
+                                href="#authenticaion-info.header.field">Authentication-Info 및 Proxy-Authentication-Info
+                                헤더 필드</a></h3>
+                        <div id="rfc.section.3.5.p.1">
+                            <p>Authentication-Info 헤더 필드와 Proxy-Authentication-Info 헤더 필드(<a href="#RFC7615"><cite
+                                        title="HTTP Authentication-Info and Proxy-Authentication-Info Response Header Fields">RFC7615</cite></a>)는
+                                서버가 클라이언트 응답의 성공적인 인증과 관련된 정보를 전달하는 데 사용할 수 있는 일반적인 필드입니다(<em class="bcp14">MAY</em>).
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.5.p.2" class="avoidbreakafter">
+                            <p>Digest 인증 스킴은 확인 응답에서 Authentication-Info 헤더 필드를 추가하고 다음 목록의 매개변수를 포함할 수 있습니다(<em
+                                    class="bcp14">MAY</em>):</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.3">
+                            <p>nextnonce </p>
+                            <ul class="empty">
+                                <li>nextnonce 매개변수의 값은 서버가 클라이언트가 이후의 인증 응답에 사용하기를 원하는 논스입니다. 서버는 일회용 논스 구현이나 기타 방식으로
+                                    논스를 변경하기 위해 Authentication-Info 헤더 필드를 nextnonce 필드와 함께 보낼 수 있습니다(<em
+                                        class="bcp14">MAY</em>). 만약 nextnonce 필드가 존재하면, 클라이언트는 차기 요청의 Authorization 헤더를
+                                    구성할 때 이를 사용하는 것이 <em class="bcp14">SHOULD</em>입니다. 클라이언트가 이를 사용하지 않으면 서버가
+                                    "stale=true"로 재인증을 요구할 수 있습니다(<em class="bcp14">MAY</em>).
+                                    <ul class="empty">
+                                        <li>서버 구현자는 이 메커니즘 사용의 성능 영향에 대해 신중히 고려해야 합니다; 모든 응답이 다음 요청에서 반드시 사용되어야 하는
+                                            nextnonce를 포함하면 파이프라인된 요청은 불가능해집니다. 요청 파이프라이닝을 허용하기 위해 오래된 논스 값을 일정 기간 허용하는
+                                            것의 보안과 성능 상의 절충을 고려해야 합니다. nc 매개변수의 사용은 새 서버 논스가 주는 대부분의 보안 이점을 유지하면서
+                                            파이프라이닝에 미치는 악영향을 줄일 수 있습니다.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.5.p.4">
+                            <p>qop </p>
+                            <ul class="empty">
+                                <li>서버가 응답에 적용한 "protection의 품질" 옵션을 나타냅니다. 값 "auth"는 인증을, 값 "auth-int"는 무결성 보호를 동반한 인증을
+                                    나타냅니다. 서버는 응답에서 qop 매개변수에 대해 요청에서 클라이언트가 보낸 값과 동일한 값을 사용하는 것이 <em
+                                        class="bcp14">SHOULD</em>입니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.5.p.5">
+                            <p>rspauth </p>
+                            <ul class="empty">
+                                <li>rspauth 매개변수의 선택적 응답 다이제스트는 상호 인증을 지원합니다 — 서버는 사용자의 비밀을 알고 있음을 증명하며, qop=auth-int인
+                                    경우 응답에 대한 제한된 무결성 보호도 제공합니다. rspauth 값은 Authorization 헤더 필드의 response 계산과 동일하게
+                                    계산되지만, 요청의 Authorization 헤더 필드에서 qop가 "auth"로 설정되었거나 지정되지 않은 경우 A2는</li>
+                                <li><span id="rfc.figure.u.13"><span>
+                                            <pre class="inline">
+      A2       = ":" request-uri
+</pre>
+                                        </span></span>이고, "qop=auth-int"인 경우에는 A2가 <span id="rfc.figure.u.14"><span>
+                                            <pre class="inline">
+      A2       = ":" request-uri ":" H(entity-body)
+</pre>
+                                        </span></span>입니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.5.p.6">
+                            <p>cnonce and nc </p>
+                            <ul class="empty">
+                                <li>cnonce 값과 nc 값은 이 메시지가 응답하는 클라이언트 요청에 대한 것과 동일해야 합니다(<em class="bcp14">MUST</em>).
+                                    rspauth, cnonce, 및 nc 매개변수는 "qop=auth" 또는 "qop=auth-int"가 지정된 경우 반드시 포함되어야 합니다(<em
+                                        class="bcp14">MUST</em>).</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.5.p.7">
+                            <p>Authentication-Info 헤더 필드는 청크 전송 인코딩을 통해 전송된 HTTP 메시지의 트레일러에 허용됩니다.</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.8">
+                            <p>역사적 이유로, 송신자는 다음 매개변수들에 대해서만 인용 문자열 문법을 생성해야 합니다: nextnonce, rspauth, 및 cnonce(<em
+                                    class="bcp14">MUST</em>).</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.9">
+                            <p>역사적 이유로, 송신자는 다음 매개변수들에 대해 인용 문자열 문법을 생성해서는 안 됩니다: qop 및 nc(<em class="bcp14">MUST
+                                    NOT</em>).</p>
+                        </div>
+                        <div id="rfc.section.3.5.p.10">
+                            <p>역사적 이유로, nc 값은 정확히 8개의 16진 숫자여야 합니다(<em class="bcp14">MUST</em>).</p>
+                        </div>
+                    </section>
+                    <section id="digest.operation">
+                        <h3 id="rfc.section.3.6"><a href="#rfc.section.3.6">3.6.</a>&nbsp;<a
+                                href="#digest.operation">다이제스트 동작</a></h3>
+                        <div id="rfc.section.3.6.p.1">
+                            <p>서버는 Authorization 헤더 필드를 수신하면 제출된 username에 해당하는 비밀번호를 조회하여 그 유효성을 확인할 수 있습니다(<em
+                                    class="bcp14">MAY</em>). 그런 다음 서버는 클라이언트가 수행한 것과 동일한 다이제스트 연산(예: MD5, SHA-256)을 수행하고
+                                그 결과를 주어진 response 값과 비교해야 합니다(<em class="bcp14">MUST</em>).</p>
+                        </div>
+                        <div id="rfc.section.3.6.p.2">
+                            <p>HTTP 서버는 실제로 사용자의 평문 비밀번호를 알 필요가 없다는 점에 유의하십시오. 서버가 H(A1)를 알고 있는 한 Authorization 헤더 필드의
+                                유효성을 검증할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.3.6.p.3">
+                            <p>클라이언트의 WWW-Authenticate 챌린지에 대한 응답은 해당 보호 공간과의 인증 세션을 시작합니다. 인증 세션은 클라이언트가 보호 공간 내의 어떤
+                                서버로부터든 다른 WWW-Authenticate 챌린지를 받을 때까지 지속됩니다. 클라이언트는 인증 세션과 관련된 username, password,
+                                nonce, nonce count, opaque 값을 기억하여 해당 보호 공간 내의 향후 요청에서 Authorization 헤더 필드를 구성하는 데 사용하는
+                                것이 <em class="bcp14">SHOULD</em>입니다. Authorization 헤더 필드는 사전 전송(preemptive)으로 포함될 수 있으며,
+                                이는 서버 효율성을 향상시키고 추가 챌린지 왕복을 피합니다(<em class="bcp14">MAY</em>). 서버는 nonce 값이 신선하지 않을 수
+                                있음에도 불구하고 오래된 Authorization 헤더 정보를 수락할 수 있습니다(<em class="bcp14">MAY</em>). 또는 서버는
+                                WWW-Authenticate 헤더 필드에 새 nonce 값을 담아 401 응답을 반환하여 클라이언트가 요청을 재시도하게 할 수 있으며, 이 응답에
+                                "stale=true"를 지정하면 서버는 클라이언트에게 새 nonce로 재시도하되 새 사용자 이름과 비밀번호를 다시 묻지 않도록 지시합니다(<em
+                                    class="bcp14">MAY</em>).</p>
+                        </div>
+                        <div id="rfc.section.3.6.p.4">
+                            <p>클라이언트가 세션 동안 서버가 제공한 opaque 매개변수의 값을 반환해야 하기 때문에, opaque 데이터는 인증 세션 상태 정보를 전달하는 데 사용할 수
+                                있습니다. (그러나 이러한 용도는 논스에 상태를 포함시키는 것이 더 쉽고 안전하게 달성될 수 있습니다.) 예를 들어, 서버는 첫 401 응답에 domain
+                                매개변수를 포함하여 두 번째 서버의 URI를 값으로 포함시키고, opaque 매개변수에 상태 정보를 넣을 수 있습니다. 클라이언트는 요청을 재시도할 것이고,
+                                그 시점에 서버는 두 번째 서버의 URI를 가리키는 HTTP 리디렉션을 응답으로 보낼 수 있습니다. 클라이언트는 리디렉션을 따라가며 그 요청에 opaque
+                                데이터를 포함한 Authorization 헤더 필드를 전달할 것입니다.</p>
+                        </div>
+                        <div id="rfc.section.3.6.p.5">
+                            <p>프록시는 Digest 액세스 인증 방식에서 완전히 투명해야 합니다(<em class="bcp14">MUST</em>). 즉, 프록시는
+                                WWW-Authenticate, Authentication-Info 및 Authorization 헤더 필드를 변경하지 않고 전달해야 합니다(<em
+                                    class="bcp14">MUST</em>). 프록시가 서버로 요청을 전달하기 전에 클라이언트를 인증하려는 경우에는 아래 <a
+                                    href="#proxy-auth" title="Proxy-Authenticate and Proxy-Authorization">섹션 3.8</a>에
+                                설명된 Proxy-Authenticate 및 Proxy-Authorization 헤더 필드를 사용하여 수행할 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-security-protocol-negotiation">
+                        <h3 id="rfc.section.3.7"><a href="#rfc.section.3.7">3.7.</a>&nbsp;<a
+                                href="#n-security-protocol-negotiation">보안 프로토콜 협상</a></h3>
+                        <div id="rfc.section.3.7.p.1">
+                            <p>서버가 클라이언트가 처리할 수 있는 보안 스킴을 알 수 있는 것은 유용합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.7.p.2">
+                            <p>서버가 Digest를 인증 방법으로 요구하고 싶지만 클라이언트가 이를 지원하는지 모를 수도 있습니다. 클라이언트는 서버가 자신이 처리할 수 없는 인증 스킴만
+                                지정한 경우에도 우아하게 실패하는 것이 권장됩니다.</p>
+                        </div>
+                        <div id="rfc.section.3.7.p.3">
+                            <p>서버가 리소스에 대한 접근 요청을 수신하면, 서버는 "401 Unauthorized" 응답으로 하나 이상의 WWW-Authenticate 헤더 필드를 포함하여
+                                클라이언지를 챌린지할 수 있습니다. 서버가 여러 챌린지를 응답에 포함하면 각 챌린지는 서로 다른 다이제스트 알고리즘을 사용해야 합니다(<em
+                                    class="bcp14">MUST</em>). 서버는 우선순위가 높은 알고리즘부터 시작하여 덜 선호되는 알고리즘 순서로 이러한 챌린지를 응답에 추가해야
+                                합니다(<em class="bcp14">MUST</em>).</p>
+                        </div>
+                        <div id="rfc.section.3.7.p.4">
+                            <p>이 명세는 다음 알고리즘들을 정의합니다: </p>
+                            <ul>
+                                <li>SHA2-256 (구현 필수)</li>
+                                <li>SHA2-512/256 (백업 알고리즘)</li>
+                                <li>MD5 (하위 호환성용)</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.7.p.5">
+                            <p>클라이언트가 첫 번째 챌린지를 수신하면, 로컬 정책이 달리 지시하지 않는 한 클라이언트는 자신이 지원하는 첫 번째 챌린지를 사용하는 것이 <em
+                                    class="bcp14">SHOULD</em>입니다.</p>
+                        </div>
+                    </section>
+                    <section id="proxy-auth">
+                        <h3 id="rfc.section.3.8"><a href="#rfc.section.3.8">3.8.</a>&nbsp;<a
+                                href="#proxy-auth">Proxy-Authenticate 및 Proxy-Authorization</a></h3>
+                        <div id="rfc.section.3.8.p.1">
+                            <p>Digest 인증 스킴은 Proxy-Authenticate 및 Proxy-Authorization 헤더 필드를 사용하여 프록시-사용자, 프록시-프록시 또는
+                                프록시-오리진 서버 간의 인증에도 사용할 수 있습니다. 이 헤더 필드들은 HTTP/1.1 규격의 <a
+                                    href="https://www.rfc-editor.org/rfc/rfc7235.html#section-4.3">Section 4.3</a> 및 <a
+                                    href="https://www.rfc-editor.org/rfc/rfc7235.html#section-4.4">Section 4.4</a>에 규정된
+                                Proxy-Authenticate 및 Proxy-Authorization 헤더 필드의 사례이며, 그 동작은 해당 문서에서 설명된 제한을 따릅니다. 프록시
+                                인증을 위한 트랜잭션은 위에서 이미 설명한 것과 매우 유사합니다. 인증이 필요한 요청을 수신하면 프록시/서버는 "407 Proxy Authentication
+                                Required" 응답과 함께 "Proxy-Authenticate" 헤더 필드를 발행해야 합니다. Proxy-Authenticate 헤더 필드에 사용된
+                                다이제스트 챌린지는 위의 <a href="#www-authenticate.response.header"
+                                    title="The WWW-Authenticate Response Header Field">섹션 3.3</a>에서 정의한
+                                WWW-Authenticate의 다이제스트 챌린지와 동일합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.8.p.2">
+                            <p>클라이언트/프록시는 그런 다음 요청을 Proxy-Authorization 헤더 필드와 함께 재전송해야 하며, 해당 매개변수는 위의 <a
+                                    href="#authorization.request.header.field" title="The Authorization Header Field">섹션
+                                    3.4</a>에 지정된 Authorization 헤더 필드의 매개변수와 동일해야 합니다(<em class="bcp14">MUST</em>).</p>
+                        </div>
+                        <div id="rfc.section.3.8.p.3">
+                            <p>후속 응답에서 서버는 Authentication-Info 헤더 필드와 동일한 매개변수를 갖는 Proxy-Authentication-Info를 전송합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.8.p.4">
+                            <p>원칙적으로 클라이언트가 프록시와 최종 서버 둘 다에 대해 인증하라는 요청을 받을 수 있지만, 동일한 응답에서 두 인증을 요구받는 일은 없습니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-examples">
+                        <h3 id="rfc.section.3.9"><a href="#rfc.section.3.9">3.9.</a>&nbsp;<a href="#n-examples">예시</a>
+                        </h3>
+                        <section id="n-example-with-sha-256-and-md5">
+                            <h4 id="rfc.section.3.9.1"><a href="#rfc.section.3.9.1">3.9.1.</a>&nbsp;<a
+                                    href="#n-example-with-sha-256-and-md5">SHA-256 및 MD5 예시</a></h4>
+                            <div id="rfc.section.3.9.1.p.1">
+                                <p>다음 예시는 GET 요청을 통해 보호된 문서를 서버에 요청한다고 가정합니다. 문서의 URI는
+                                    "http://www.example.org/dir/index.html"입니다. 클라이언트와 서버는 이 문서에 대한 username이 "Mufasa"이고
+                                    비밀번호가 "Circle of Life"(세 단어 사이에 한 칸씩 공백)임을 알고 있습니다.</p>
+                            </div>
+                            <div id="rfc.section.3.9.1.p.2" class="avoidbreakafter">
+                                <p>클라이언트가 문서를 처음 요청할 때 Authorization 헤더 필드가 전송되지 않으므로 서버는 다음과 같이 응답합니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.15">
+                                <div>
+                                    <pre class="text">
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Digest
+    realm="http-auth@example.org",
+    qop="auth, auth-int",
+    algorithm=SHA-256,
+    nonce="7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v",
+    opaque="FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS"
+WWW-Authenticate: Digest
+    realm="http-auth@example.org",
+    qop="auth, auth-int",
+    algorithm=MD5,
+    nonce="7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v",
+    opaque="FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS"
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.9.1.p.3" class="avoidbreakafter">
+                                <p>클라이언트는 사용자에게 username과 password를 묻고, 클라이언트가 MD5 다이제스트를 선택하면 다음과 같은 Authorization 헤더
+                                    필드를 포함한 새 요청으로 응답합니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.16">
+                                <div>
+                                    <pre class="text">
+Authorization: Digest username="Mufasa",
+    realm="http-auth@example.org",
+    uri="/dir/index.html",
+    algorithm=MD5,
+    nonce="7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v",
+    nc=00000001,
+    cnonce="f2/wE4q74E6zIJEtWaHKaf5wv/H5QzzpXusqGemxURZJ",
+    qop=auth,
+    response="8ca523f5e9506fed4657c9700eebdbec",
+    opaque="FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS"
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.9.1.p.4" class="avoidbreakafter">
+                                <p>클라이언트가 response 계산에 SHA-256 알고리즘을 사용하기로 선택하면, 클라이언트는 다음과 같은 Authorization 헤더 필드를 포함한
+                                    새 요청으로 응답합니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.17">
+                                <div>
+                                    <pre class="text">
+Authorization: Digest username="Mufasa",
+    realm="http-auth@example.org",
+    uri="/dir/index.html",
+    algorithm=SHA-256,
+    nonce="7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v",
+    nc=00000001,
+    cnonce="f2/wE4q74E6zIJEtWaHKaf5wv/H5QzzpXusqGemxURZJ",
+    qop=auth,
+    response="753927fa0e85d155564e2e272a28d1802ca10daf449
+       6794697cf8db5856cb6c1",
+    opaque="FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS"
+</pre>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="n-example-with-sha-512-256--charset--and-userhash">
+                            <h4 id="rfc.section.3.9.2"><a href="#rfc.section.3.9.2">3.9.2.</a>&nbsp;<a
+                                    href="#n-example-with-sha-512-256--charset--and-userhash">SHA-512-256, 문자 인코딩 및
+                                    Userhash 예시</a></h4>
+                            <div id="rfc.section.3.9.2.p.1" class="avoidbreakafter">
+                                <p>다음 예시는 GET 요청을 통해 보호된 문서를 요청한다고 가정합니다. 요청의 URI는 "http://api.example.org/doe.json"입니다.
+                                    클라이언트와 서버는 username의 해시(userhash)를 알고 있으며 UTF-8 문자 인코딩을 지원하고 SHA-512-256 알고리즘을
+                                    사용합니다. 요청에 사용되는 사용자 이름은 "Jason Doe"의 변형으로, 'a'는 실제로 유니코드 코드 포인트 U+00E4("LATIN SMALL
+                                    LETTER A WITH DIAERESIS")이고 첫 번째 'o'는 U+00F8("LATIN SMALL LETTER O WITH STROKE")로,
+                                    UTF-8 인코딩을 사용한 옥텟 시퀀스는 다음과 같습니다:</p>
+                            </div>
+                            <div id="rfc.section.3.9.2.p.2"><span id="rfc.figure.u.18"><span>
+                                        <pre class="text">
+   J  U+00E4 s  U+00F8 n      D  o  e
+   4A C3A4   73 C3B8   6E 20 44  6F 65
+</pre>
+                                    </span></span></div>
+                            <div id="rfc.section.3.9.2.p.3">
+                                <p>비밀번호는 "Secret, or not?"입니다.</p>
+                            </div>
+                            <div id="rfc.section.3.9.2.p.4" class="avoidbreakafter">
+                                <p>클라이언트가 문서를 처음 요청할 때 Authorization 헤더 필드가 전송되지 않으므로 서버는 다음과 같이 응답합니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.19">
+                                <div>
+                                    <pre class="text">
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Digest
+    realm="api@example.org",
+    qop="auth",
+    algorithm=SHA-512-256,
+    nonce="5TsQWLVdgBdmrQ0XsxbDODV+57QdFR34I9HAbC/RVvkK",
+    opaque="HRPCssKJSGjCrkzDg8OhwpzCiGPChXYjwrI2QmXDnsOS",
+    charset=UTF-8,
+    userhash=true
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.9.2.p.5" class="avoidbreakafter">
+                                <p>클라이언트는 필요한 자격증명을 사용자에게 묻고 다음과 같은 Authorization 헤더 필드를 포함한 새 요청을 보낼 수 있습니다:</p>
+                            </div>
+                            <div id="rfc.figure.u.20">
+                                <div>
+                                    <pre class="text">
+Authorization: Digest
+    username="488869477bf257147b804c45308cd62ac4e25eb717
+       b12b298c79e62dcea254ec",
+    realm="api@example.org",
+    uri="/doe.json",
+    algorithm=SHA-512-256,
+    nonce="5TsQWLVdgBdmrQ0XsxbDODV+57QdFR34I9HAbC/RVvkK",
+    nc=00000001,
+    cnonce="NTg6RKcb9boFIAS3KrFK9BGeh+iDa/sm6jUMp2wds69v",
+    qop=auth,
+    response="ae66e67d6b427bd3f120414a82e4acff38e8ecd9101d
+       6c861229025f607a79dd",
+    opaque="HRPCssKJSGjCrkzDg8OhwpzCiGPChXYjwrI2QmXDnsOS",
+    userhash=true
+</pre>
+                                </div>
+                            </div>
+                            <div id="rfc.section.3.9.2.p.6" class="avoidbreakafter">
+                                <p>클라이언트가 어떤 이유로든 해시된 사용자 이름을 제공할 수 없다면, 다음과 같은 Authorization 헤더 필드를 사용해 요청을 시도할 수 있습니다:
+                                </p>
+                            </div>
+                            <div id="rfc.figure.u.21">
+                                <div>
+                                    <pre class="text">
+Authorization: Digest
+    username*=UTF-8''J%C3%A4s%C3%B8n%20Doe,
+    realm="api@example.org",
+    uri="/doe.json",
+    algorithm=SHA-512-256,
+    nonce="5TsQWLVdgBdmrQ0XsxbDODV+57QdFR34I9HAbC/RVvkK",
+    nc=00000001,
+    cnonce="NTg6RKcb9boFIAS3KrFK9BGeh+iDa/sm6jUMp2wds69v",
+    qop=auth,
+    response="ae66e67d6b427bd3f120414a82e4acff38e8ecd9101d
+       6c861229025f607a79dd",
+    opaque="HRPCssKJSGjCrkzDg8OhwpzCiGPChXYjwrI2QmXDnsOS",
+    userhash=false
+</pre>
+                                </div>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+                <section id="n-internationalization-considerations">
+                    <h2 id="rfc.section.4"><a href="#rfc.section.4">4.</a>&nbsp;<a
+                            href="#n-internationalization-considerations">국제화 고려사항</a></h2>
+                    <div id="rfc.section.4.p.1">
+                        <p>챌린지에서 서버는 A1 생성 시(참조: <a href="#a1" title="A1">Section 3.4.2</a>) 및 사용자 이름 해싱 시(참조: <a
+                                href="#username.hashing" title="Username Hashing">Section 3.4.4</a>) 사용자 에이전트가 사용하기를
+                            기대하는 문자 인코딩을 표현하기 위해 대소문자 구분 없이 "charset" 인증 매개변수(<em class="bcp14">SHOULD</em>)를 사용해야 합니다.
+                        </p>
+                    </div>
+                    <div id="rfc.section.4.p.2">
+                        <p>허용되는 유일한 값은 대소문자를 구분하지 않고 일치시키는 "UTF-8"이며(참조: <a
+                                href="https://www.rfc-editor.org/rfc/rfc2978.html#section-2.3">RFC2978 섹션 2.3</a>) 이는
+                            서버가 사용자 이름과 비밀번호를 유니코드 정규화 형식 C("NFC", 참조: <a
+                                href="https://www.rfc-editor.org/rfc/rfc5198.html#section-3">RFC5198 섹션 3</a>)으로 변환한 다음
+                            UTF-8 문자 인코딩 스킴으로 옥텟으로 인코딩할 것으로 기대함을 나타냅니다(참조: <a href="#RFC3629"><cite
+                                    title="UTF-8, a transformation format of ISO 10646">RFC3629</cite></a>).</p>
+                    </div>
+                    <div id="rfc.section.4.p.3">
+                        <p>사용자 이름의 경우 수신자는 <a href="https://www.rfc-editor.org/rfc/rfc7613.html#section-3.3">RFC7613 섹션
+                                3.3</a>에 정의된 "UsernameCasePreserved" 프로파일에 정의된 모든 문자를 지원해야 하며(<em
+                                class="bcp14">MUST</em>) 단, 콜론(" : ") 문자는 예외로 합니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.4">
+                        <p>비밀번호의 경우 수신자는 <a href="https://www.rfc-editor.org/rfc/rfc7613.html#section-4.2">RFC7613 섹션
+                                4.2</a>에 정의된 "OpaqueString" 프로파일에 정의된 모든 문자를 지원해야 합니다(<em class="bcp14">MUST</em>).</p>
+                    </div>
+                    <div id="rfc.section.4.p.5">
+                        <p>사용자 에이전트가 서버가 표시한 인코딩을 지원하지 않으면 요청을 실패시킬 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.6">
+                        <p>사용자 이름을 해시된 형태로 보낼 수 없고 비-ASCII 문자를 포함하는 경우, 클라이언트는 대신 username* 매개변수를 포함할 수 있습니다(값 인코딩은 <a
+                                href="#RFC5987"><cite
+                                    title="Character Set and Language Encoding for Hypertext Transfer Protocol (HTTP) Header Field Parameters">RFC5987</cite></a>에
+                            정의된 방식을 사용).</p>
+                    </div>
+                </section>
+                <section id="security.considerations">
+                    <h2 id="rfc.section.5"><a href="#rfc.section.5">5.</a>&nbsp;<a href="#security.considerations">보안
+                            고려사항</a></h2>
+                    <section id="n-limitations">
+                        <h3 id="rfc.section.5.1"><a href="#rfc.section.5.1">5.1.</a>&nbsp;<a
+                                href="#n-limitations">제한사항</a></h3>
+                        <div id="rfc.section.5.1.p.1">
+                            <p>사람이 기억하기 쉬운 비밀번호와 함께 사용할 때 HTTP 다이제스트 인증은 사전 공격(dictionary attack)에 취약합니다. 이러한 공격은 더 이상
+                                안전하다고 간주되지 않는 알고리즘을 포함하여 널리 사용되는 어떤 암호학적 알고리즘에 대한 공격보다 훨씬 쉽습니다. 다시 말해, 알고리즘의 유연성만으로는 이러한
+                                사용을 더 안전하게 만들지 못합니다.</p>
+                        </div>
+                        <div id="rfc.section.5.1.p.2">
+                            <p>따라서 다이제스트 인증은 합리적 수준의 엔트로피를 가진 비밀번호(예: 128비트 이상)와 함께만 사용되어야 합니다(<em
+                                    class="bcp14">SHOULD</em>). 이러한 비밀번호는 일반적으로 사람이 암기할 수는 없지만 자동화된 웹 서비스에는 사용될 수 있습니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.5.1.p.3">
+                            <p>다이제스트 인증을 사용하는 경우 이는 HTTPS와 같은 안전한 채널을 통해 수행되어야 합니다(<em class="bcp14">SHOULD</em>, 참조: <a
+                                    href="#RFC2818"><cite title="HTTP Over TLS">RFC2818</cite></a>).</p>
+                        </div>
+                    </section>
+                    <section id="n-storing-passwords">
+                        <h3 id="rfc.section.5.2"><a href="#rfc.section.5.2">5.2.</a>&nbsp;<a
+                                href="#n-storing-passwords">비밀번호 저장</a></h3>
+                        <div id="rfc.section.5.2.p.1">
+                            <p>다이제스트 인증은 인증 주체(보통 서버)가 주어진 realm과 연관된 "비밀번호 파일"에 사용자 이름과 비밀번호에서 파생된 일부 데이터를 저장하도록 요구합니다.
+                                일반적으로 여기에는 username과 H(A1)의 쌍이 포함될 수 있으며, H(A1)는 앞에서 설명한 대로 사용자 이름, realm, 비밀번호의 다이제스트
+                                값입니다.</p>
+                        </div>
+                        <div id="rfc.section.5.2.p.2">
+                            <p>이것의 보안적 함의는 비밀번호 파일이 유출되면 공격자는 해당 realm의 서버 문서에 즉시 접근할 수 있게 된다는 점입니다. 표준 UNIX 비밀번호 파일과
+                                달리, 이 정보는 서버 realm의 문서에 접근하기 위해 복호화될 필요가 없습니다. 반면에 사용자의 비밀번호를 얻기 위해서는 복호화 또는 더 가능성이 높은
+                                무차별 대입 공격이 필요합니다. 이것이 비밀번호 파일에 realm이 포함되어 저장되는 이유입니다. 즉, 하나의 다이제스트 인증 비밀번호 파일이 유출되더라도
+                                동일한 사용자 이름과 비밀번호를 가진 다른 파일들이 자동으로 손상되는 것은 아니지만(단, 무차별 대입 공격에 노출됩니다).</p>
+                        </div>
+                        <div id="rfc.section.5.2.p.3">
+                            <p>이로 인해 두 가지 중요한 보안 결과가 있습니다. 첫째로, 비밀번호 파일은 암호화되지 않은 비밀번호를 포함하고 있는 것처럼 보호되어야 합니다. 왜냐하면 그
+                                파일은 그 realm의 문서 접근 목적상 사실상 평문 비밀번호와 동일하게 작동하기 때문입니다.</p>
+                        </div>
+                        <div id="rfc.section.5.2.p.4">
+                            <p>둘째로, realm 문자열은 단일 사용자가 사용할 가능성이 있는 모든 realm 사이에서 고유해야 합니다(<em
+                                    class="bcp14">SHOULD</em>). 특히 realm 문자열에는 인증을 수행하는 호스트의 이름을 포함하는 것이 <em
+                                    class="bcp14">SHOULD</em>됩니다. 클라이언트가 서버를 인증하지 못한다는 점은 다이제스트 인증의 약점입니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-authentication-of-clients-using-digest-authentication">
+                        <h3 id="rfc.section.5.3"><a href="#rfc.section.5.3">5.3.</a>&nbsp;<a
+                                href="#n-authentication-of-clients-using-digest-authentication">다이제스트 인증을 사용하는 클라이언트의
+                                인증</a></h3>
+                        <div id="rfc.section.5.3.p.1">
+                            <p>다이제스트 인증은 예컨대 공개키 기반 메커니즘과 비교했을 때 강력한 인증 메커니즘을 제공하지 않습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.3.p.2">
+                            <p>그러나 다이제스트 인증은 LDAP에 제안되었던 CRAM-MD5보다 상당히 강력합니다(참조: <a href="#RFC4513"><cite
+                                        title="Lightweight Directory Access Protocol (LDAP): Authentication Methods and Security Mechanisms">RFC4513</cite></a>
+                                및 <a href="#RFC2195"><cite
+                                        title="IMAP/POP AUTHorize Extension for Simple Challenge/Response">RFC2195</cite></a>).
+                                이는 훨씬 더 약한 Basic 메커니즘을 대체하기 위해 고안되었습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.3.p.3">
+                            <p>다이제스트 인증은 실제 사용자 이름과 비밀번호 보호 외에는 기밀성 보호를 제공하지 않습니다. 요청과 응답의 나머지 부분은 도청자에게 노출될 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.3.p.4">
+                            <p>다이제스트 인증은 양방향 메시지에 대해 제한된 무결성 보호만 제공합니다. "qop=auth-int" 메커니즘을 사용하면 WWW-Authenticate 및
+                                Authorization 헤더 필드의 response 매개변수 값을 계산하는 데 사용되는 메시지의 일부가 보호됩니다(참조: <a
+                                    href="#representation.of.digest.values"
+                                    title="Representation of Digest Values">Section 3.2</a>). 그러나 대부분의 헤더 필드와 그 값은 중간자
+                                공격의 일환으로 수정될 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.3.p.5">
+                            <p>보안 HTTP 트랜잭션에 대한 많은 요구사항은 다이제스트 인증으로 충족될 수 없습니다. 이러한 경우에는 TLS가 더 적절한 프로토콜입니다. 특히, 기밀성 보호가
+                                필요한 트랜잭션에는 다이제스트 인증을 사용할 수 없습니다. 그럼에도 불구하고 다이제스트 인증은 유용하고 적합한 많은 용도를 제공합니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-limited-use-nonce-values">
+                        <h3 id="rfc.section.5.4"><a href="#rfc.section.5.4">5.4.</a>&nbsp;<a
+                                href="#n-limited-use-nonce-values">제한적 사용 논스 값</a></h3>
+                        <div id="rfc.section.5.4.p.1">
+                            <p>다이제스트 스킴은 응답 값 생성을 시드하기 위해 서버가 지정한 논스 값을 사용합니다(참조: <a href="#response"
+                                    title="Response">Section 3.4.1</a>). 예시 논스(참조: <a
+                                    href="#www-authenticate.response.header"
+                                    title="The WWW-Authenticate Response Header Field">Section 3.3</a>)에서 보이듯 서버는 논스를 특정
+                                클라이언트, 특정 리소스, 제한된 기간 또는 사용 횟수 등으로 사용을 제한하도록 구성할 수 있으며(<em class="bcp14">MAY</em>), 이는
+                                재생 공격에 대한 보호를 강화합니다(참조: <a href="#replay_attacks" title="Replay Attacks">Section
+                                    5.5</a>). 그러나 논스를 생성하고 검사하는 방법은 성능 및 자원 영향이 있습니다. 예를 들어, 서버는 발행된 각 논스가 반환되었는지 여부를
+                                기록하고 모든 응답의 Authentication-Info 헤더 필드에 next-nonce 매개변수를 보내 각 논스 값을 한 번만 사용하도록 허용할 수
+                                있습니다. 이는 즉각적인 재생 공격을 방지하지만 논스 값 검사의 비용이 높고 파이프라인된 요청에서는 인증 실패를 일으킬 수 있습니다(아마도 stale 논스
+                                표시를 반환). 또한 ETag와 같은 요청 특정 요소를 포함하면 논스 사용을 해당 리소스 버전으로 제한하고 파이프라인을 방해합니다. 따라서 부작용이 있는
+                                메서드에는 유용할 수 있으나 그렇지 않은 경우 성능상 허용 불가능할 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="replay_attacks">
+                        <h3 id="rfc.section.5.5"><a href="#rfc.section.5.5">5.5.</a>&nbsp;<a href="#replay_attacks">재생
+                                공격</a></h3>
+                        <div id="rfc.section.5.5.p.1">
+                            <p>다이제스트 인증에 대한 재생 공격은 단순한 GET 요청의 경우 보통 무의미합니다. 도청자가 재생으로 얻을 수 있는 유일한 문서는 이미 보았기 때문입니다. 이는
+                                요청된 문서의 URI가 클라이언트 요청에서 다이제스트화되며 서버는 그 문서만 전달하기 때문입니다. 반면 Basic 인증에서는 도청자가 사용자의 비밀번호를
+                                얻으면 그 비밀번호로 보호된 모든 문서에 접근할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.5.p.2">
+                            <p>따라서 일부 목적에서는 재생 공격에 대비할 필요가 있습니다. 좋은 다이제스트 구현은 여러 방법으로 이를 완화할 수 있습니다. 서버가 생성한 논스 값은 구현에
+                                따라 다르지만, 만약 논스에 클라이언트 IP, 타임스탬프, 리소스 ETag 및 서버 비밀 키의 다이제스트를 포함한다면 재생 공격은 간단하지 않습니다. 공격자는
+                                서버가 요청을 보낼 것으로 믿는 주소와 다른 주소로 문서를 전달하도록 서버를 속여야 하며, 타임스탬프가 만료되기 전의 기간에만 공격이 성공할 수 있습니다.
+                                논스에 클라이언트 IP와 타임스탬프를 포함하면 상태를 유지하지 않는 구현이 가능해집니다.</p>
+                        </div>
+                        <div id="rfc.section.5.5.p.3">
+                            <p>재생 공격을 전혀 허용해서는 안 되는 응용에서는 서버가 일회용 논스 값을 사용하여 두 번째 사용을 허용하지 않도록 할 수 있습니다. 이는 서버가 논스
+                                타임스탬프(및 그와 함께 구성된 다이제스트)가 만료될 때까지 사용된 논스 값을 기억해야 하는 오버헤드를 요구하지만 재생 공격으로부터 효과적으로 보호합니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.5.5.p.4">
+                            <p>구현은 POST 및 PUT 요청에서의 재생 공격 가능성에 특별한 주의를 기울여야 합니다. 서버가 일회용 또는 제한적 사용 논스를 사용하거나
+                                "qop=auth-int"의 무결성 보호 사용을 요구하지 않는 한 공격자는 성공한 요청의 유효한 자격증명을 위조된 데이터나 다른 메시지 본문으로 재생할 수
+                                있습니다. 무결성 보호를 사용하더라도 대부분의 헤더 필드 메타데이터는 보호되지 않습니다. 적절한 논스 생성 및 검사로 이전에 사용된 유효 자격증명의 재생에
+                                대해 어느 정도 보호를 제공할 수 있지만, <a href="#mitm" title="Man-in-the-Middle Attacks">섹션 5.8</a>를
+                                참조하십시오.</p>
+                        </div>
+                    </section>
+                    <section id="n-weakness-created-by-multiple-authentication-schemes">
+                        <h3 id="rfc.section.5.6"><a href="#rfc.section.5.6">5.6.</a>&nbsp;<a
+                                href="#n-weakness-created-by-multiple-authentication-schemes">다중 인증 방식으로 인한 약점</a></h3>
+                        <div id="rfc.section.5.6.p.1">
+                            <p>HTTP/1.1 서버는 401(Authenticate) 응답에 여러 챌린지를 반환할 수 있으며(<em class="bcp14">MAY</em>) 각 챌린지는
+                                서로 다른 인증 스킴을 사용할 수 있습니다. 사용자 에이전트는 이해하는 가장 강력한 인증 스킴을 선택하고 그 챌린지를 기반으로 사용자에게 자격증명을 요청해야
+                                합니다(<em class="bcp14">MUST</em>).</p>
+                        </div>
+                        <div id="rfc.section.5.6.p.2">
+                            <p>서버가 WWW-Authenticate 헤더 필드를 통해 인증 스킴의 선택지를 제공할 때, 최종 인증의 강도는 제공된 인증 스킴들 중 가장 약한 것의 강도에 의해
+                                좌우됩니다. 다중 인증 스킴을 악용하는 특정 공격 시나리오에 대해서는 아래의 <a href="#online.dictionary.attacks"
+                                    title="Online Dictionary Attacks">섹션 5.7</a>을 참조하십시오.</p>
+                        </div>
+                    </section>
+                    <section id="online.dictionary.attacks">
+                        <h3 id="rfc.section.5.7"><a href="#rfc.section.5.7">5.7.</a>&nbsp;<a
+                                href="#online.dictionary.attacks">온라인 사전 공격</a></h3>
+                        <div id="rfc.section.5.7.p.1">
+                            <p>공격자가 도청할 수 있다면, 도청한 논스/응답 쌍을 공통 단어 목록과 대조하여 테스트할 수 있습니다. 이러한 목록은 보통 가능한 모든 비밀번호 수보다 훨씬
+                                작습니다. 각 비밀번호에 대해 응답을 계산하는 비용은 챌린지마다 한 번씩만 발생합니다.</p>
+                        </div>
+                        <div id="rfc.section.5.7.p.2">
+                            <p>서버는 사용자가 사전에 있는 비밀번호를 선택하지 못하도록 하여 이 공격을 완화할 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="mitm">
+                        <h3 id="rfc.section.5.8"><a href="#rfc.section.5.8">5.8.</a>&nbsp;<a href="#mitm">중간자 공격</a>
+                        </h3>
+                        <div id="rfc.section.5.8.p.1">
+                            <p>다이제스트 인증은 악의적이거나 손상된 프록시와 같은 중간자(MITM) 공격에 취약합니다. 이는 도청의 모든 문제를 야기할 뿐만 아니라 공격자에게 추가 기회를
+                                제공합니다.</p>
+                        </div>
+                        <div id="rfc.section.5.8.p.2">
+                            <p>가능한 MITM 공격 중 하나는 선택지에 약한 인증 스킴을 추가하여 클라이언트가 사용자 자격증명을 노출시키는 스킴을 사용하도록 유도하는 것입니다. 이러한 이유로
+                                클라이언트는 제공된 선택지 중 자신이 이해하는 가장 강력한 스킴을 항상 사용해야 합니다(<em class="bcp14">SHOULD</em>).</p>
+                        </div>
+                        <div id="rfc.section.5.8.p.3">
+                            <p>더 악질적인 MITM 공격은 제공된 모든 선택지를 제거하고 Basic 인증만 요청하는 챌린지로 대체한 다음, 얻은 평문 자격증명을 사용해 원래 서버에 대해 더
+                                강한 스킴으로 인증하는 것입니다. 특히 공격자가 '무료' 프록시 캐싱 서비스를 제공하여 이용자를 속이는 방식이 위험합니다.</p>
+                        </div>
+                        <div id="rfc.section.5.8.p.4">
+                            <p>사용자 에이전트는 자격증명 요청 시 어떤 인증 스킴이 사용되는지 시각적으로 표시하거나, 서버가 요청한 가장 강력한 인증 스킴을 기억해 약한 스킴 사용 전에
+                                경고를 표시하는 등의 조치를 고려해야 합니다. 특정 사이트나 일반적으로 다이제스트 인증을 요구하도록 구성하는 것도 좋은 방안일 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.8.p.5">
+                            <p>또는 악의적 프록시는 클라이언트를 공격자가 원한 요청이 아니라 다른 요청을 하도록 위조할 수 있습니다. 물론 이는 Basic 인증에 대한 유사 공격보다 여전히
+                                더 어렵습니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-chosen-plaintext-attacks">
+                        <h3 id="rfc.section.5.9"><a href="#rfc.section.5.9">5.9.</a>&nbsp;<a
+                                href="#n-chosen-plaintext-attacks">선택 평문 공격</a></h3>
+                        <div id="rfc.section.5.9.p.1">
+                            <p>다이제스트 인증에서는 MITM이나 악의적 서버가 클라이언트가 응답을 계산할 때 사용할 논스를 임의로 선택할 수 있습니다. 이를 "선택 평문" 공격이라 부릅니다.
+                                논스를 선택할 수 있는 능력은 암호분석을 훨씬 쉽게 만듭니다.</p>
+                        </div>
+                        <div id="rfc.section.5.9.p.2">
+                            <p>그러나 선택 평문을 사용하여 다이제스트에서 사용된 일방향 함수들을 분석하는 방법은 현재 알려져 있지 않습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.9.p.3">
+                            <p>이 공격에 대한 대응책은 클라이언트가 cnonce 매개변수를 사용하는 것입니다; 이렇게 하면 클라이언트가 해시에 대한 입력을 공격자가 선택하지 못하는 방식으로
+                                변화시킬 수 있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-precomputed-dictionary-attacks">
+                        <h3 id="rfc.section.5.10"><a href="#rfc.section.5.10">5.10.</a>&nbsp;<a
+                                href="#n-precomputed-dictionary-attacks">사전(미리 계산된) 공격</a></h3>
+                        <div id="rfc.section.5.10.p.1">
+                            <p>다이제스트 인증에서 공격자가 선택 평문 공격을 실행할 수 있다면, 공격자는 자신의 선택에 따른 논스에 대해 많은 일반 단어들의 응답을 미리 계산하고
+                                응답/비밀번호 쌍의 사전을 저장할 수 있습니다. 이러한 미리 계산은 종종 여러 대의 기계에서 병렬로 수행될 수 있습니다. 그런 다음 공격자는 선택 평문 공격을
+                                사용해 해당 챌린지에 대응하는 응답을 획득하고 단순히 사전에서 비밀번호를 찾아낼 수 있습니다. 대부분의 비밀번호가 사전에 없더라도 일부는 있을 수 있습니다.
+                                공격자가 챌린지를 선택할 수 있기 때문에, 목록의 각 비밀번호에 대한 응답 계산 비용을 많은 비밀번호들에 대해 분산시킬 수 있습니다. 1억 개의 비밀번호/응답
+                                쌍을 가진 사전은 약 3.2GB의 디스크 저장 공간을 필요로 합니다.</p>
+                        </div>
+                        <div id="rfc.section.5.10.p.2">
+                            <p>이 공격에 대한 대응책은 클라이언트가 cnonce 매개변수를 사용하는 것입니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-batch-brute-force-attacks">
+                        <h3 id="rfc.section.5.11"><a href="#rfc.section.5.11">5.11.</a>&nbsp;<a
+                                href="#n-batch-brute-force-attacks">일괄 무차별 대입 공격</a></h3>
+                        <div id="rfc.section.5.11.p.1">
+                            <p>다이제스트 인증에서 MITM은 선택 평문 공격을 실행하여 동일한 논스에 대해 여러 사용자의 응답을 수집할 수 있습니다. 그런 다음 단일 패스에서 해당 논스/응답
+                                쌍들 가운데 하나를 생성하는 모든 비밀번호의 부분집합을 찾을 수 있습니다. 또한 첫 번째 비밀번호를 찾는 시간을 수집한 논스/응답 쌍의 개수만큼 줄일 수
+                                있습니다. 이 비밀번호 공간 탐색은 종종 여러 기계에서 병렬로 수행될 수 있으며, 심지어 단일 기계도 여섯 글자 이하의 모든 비밀번호를 몇 시간 내에 검색할
+                                수 있다는 보고가 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.11.p.2">
+                            <p>이 공격에 대한 대응책은 클라이언트가 cnonce 매개변수를 사용하는 것입니다.</p>
+                        </div>
+                    </section>
+                    <section id="n-parameter-randomness">
+                        <h3 id="rfc.section.5.12"><a href="#rfc.section.5.12">5.12.</a>&nbsp;<a
+                                href="#n-parameter-randomness">매개변수 무작위성</a></h3>
+                        <div id="rfc.section.5.12.p.1">
+                            <p>이 프로토콜의 보안은 클라이언트 및 서버 논스와 같은 임의로 선택된 매개변수의 무작위성에 크게 의존합니다. 이러한 값들은 강력한 랜덤 소스 또는 적절히 시드된
+                                의사난수 소스에 의해 생성되어야 합니다(참조: <a href="#RFC4086"><cite
+                                        title="Randomness Requirements for Security">RFC4086</cite></a>).</p>
+                        </div>
+                    </section>
+                    <section id="n-summary">
+                        <h3 id="rfc.section.5.13"><a href="#rfc.section.5.13">5.13.</a>&nbsp;<a href="#n-summary">요약</a>
+                        </h3>
+                        <div id="rfc.section.5.13.p.1">
+                            <p>현대 암호학적 기준으로 볼 때 다이제스트 인증은 약합니다. 그러나 광범위한 목적에 대해 Basic 인증을 대체하는 유용한 수단입니다. Basic 인증의 일부
+                                약점을 완화하지만 모든 약점을 해결하지는 못합니다. 그 강도는 구현에 따라 달라질 수 있습니다. 특히 논스의 구조(서버 구현에 따라 다름)는 재생 공격을
+                                시도하기의 난이도에 영향을 줄 수 있습니다. 일부 구현은 재생 가능성을 제거하기 위해 일회용 논스나 다이제스트를 사용하는 서버 오버헤드를 감수할 수 있고,
+                                다른 구현은 앞에서 권장한 것과 유사한 제한된 논스를 사용하거나 제한된 수명으로 만족할 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.5.13.p.2">
+                            <p>결론적으로, 어떤 준수 구현이라도 암호학적 기준으로는 상대적으로 약하지만, 어떤 준수 구현이든 Basic 인증보다 훨씬 우수합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <section id="iana.considerations">
+                    <h2 id="rfc.section.6"><a href="#rfc.section.6">6.</a>&nbsp;<a href="#iana.considerations">IANA
+                            고려사항</a></h2>
+                    <section id="n-hash-algorithms-for-http-digest-authentication">
+                        <h3 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a>&nbsp;<a
+                                href="#n-hash-algorithms-for-http-digest-authentication">HTTP 다이제스트 인증을 위한 해시 알고리즘</a>
+                        </h3>
+                        <div id="rfc.section.6.1.p.1">
+                            <p>이 명세는 기존의 "Hypertext Transfer Protocol (HTTP) Digest Algorithm Values" 범주 아래에 "Hash
+                                Algorithms for HTTP Digest Authentication"이라는 새로운 IANA 레지스트리를 생성합니다. 이 레지스트리는 HTTP 다이제스트
+                                인증에서 사용할 수 있는 해시 알고리즘을 나열합니다.</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.2" class="avoidbreakafter">
+                            <p>새 해시 알고리즘을 등록할 때 다음 정보는 제공되어야 합니다(<em class="bcp14">MUST</em>):</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.3">
+                            <p>Hash Algorithm </p>
+                            <ul class="empty">
+                                <li>해시 알고리즘의 텍스트 이름.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.6.1.p.4">
+                            <p>Digest Size </p>
+                            <ul class="empty">
+                                <li>알고리즘 출력의 크기(비트).</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.6.1.p.5">
+                            <p>Reference </p>
+                            <ul class="empty">
+                                <li>이 레지스트리에 알고리즘을 추가하는 명세에 대한 참조.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.6.1.p.6">
+                            <p>이 레지스트리의 업데이트 정책은 Specification Required입니다(참조: <a href="#RFC5226"><cite
+                                        title="Guidelines for Writing an IANA Considerations Section in RFCs">RFC5226</cite></a>).
+                            </p>
+                        </div>
+                        <div id="rfc.section.6.1.p.7" class="avoidbreakafter">
+                            <p>초기 레지스트리는 다음 항목들을 포함합니다:</p>
+                        </div>
+                        <div id="rfc.table.u.1" class="table table-condensed table-striped">
+                            <table class="table table-condensed table-striped full text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Hash Algorithm</th>
+                                        <th>Digest Size</th>
+                                        <th>Reference</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-left">"MD5"</td>
+                                        <td class="text-left">128</td>
+                                        <td class="text-left">RFC 7616</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">"SHA-512-256"</td>
+                                        <td class="text-left">256</td>
+                                        <td class="text-left">RFC 7616</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">"SHA-256"</td>
+                                        <td class="text-left">256</td>
+                                        <td class="text-left">RFC 7616</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="rfc.section.6.1.p.8">
+                            <p>레지스트리에 정의된 각 알고리즘은 예를 들면 MD5-sess, SHA-256-sess 등과 같이 "-sess" 변형을 가질 수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.9">
+                            <p>기존의 "HTTP Digest Algorithm Values" 레지스트리의 목적을 명확히 하고 두 레지스트리 간의 혼동을 피하기 위해, IANA는 기존
+                                레지스트리에 다음 설명을 추가했습니다:</p>
+                            <ul class="empty">
+                                <li>이 레지스트리는 RFC 3230에 명시된 바와 같이 HTTP 메시지 본문의 다이제스트를 생성할 때 사용할 수 있는 알고리즘들을 나열합니다.</li>
+                            </ul>
+                        </div>
+                    </section>
+                    <section id="n-digest-scheme-registration">
+                        <h3 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a>&nbsp;<a
+                                href="#n-digest-scheme-registration">다이제스트 스킴 등록</a></h3>
+                        <div id="rfc.section.6.2.p.1">
+                            <p>이 명세는 "Hypertext Transfer Protocol (HTTP) Authentication Scheme Registry"의 Digest 스킴 기존
+                                항목을 업데이트하고 이 명세에 대한 새 참조를 추가합니다.</p>
+                        </div>
+                        <div id="rfc.section.6.2.p.2">
+                            <ul class="empty">
+                                <li>Authentication Scheme Name: Digest</li>
+                                <li>Pointer to specification text: RFC 7616</li>
+                            </ul>
+                        </div>
+                    </section>
+                </section>
+                <section id="rfc.references">
+                    <h2 id="rfc.section.7"><a href="#rfc.section.7">7.</a> 참고 문헌</h2>
+                    <section>
+                        <div id="rfc.references.1">
+                            <h3 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a> 규범 참조</h3>
+                            <dl class="dl-horizontal">
+                                <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">Key words for
+                                        use in RFCs to Indicate Requirement Levels</a>”, <a
+                                        href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 2119, <a
+                                        href="https://dx.doi.org/10.17487/RFC2119">DOI 10.17487/RFC2119</a>, March 1997,
+                                    &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>&gt;.
+                                </dd>
+                                <dt id="RFC2978">[<a href="#RFC2978" class="smpl">RFC2978</a>]</dt>
+                                <dd>Freed, N. and J. Postel, “<a href="https://www.rfc-editor.org/rfc/rfc2978.html">IANA
+                                        Charset Registration Procedures</a>”, <a
+                                        href="https://www.rfc-editor.org/info/bcp19">BCP 19</a>, RFC 2978, <a
+                                        href="https://dx.doi.org/10.17487/RFC2978">DOI 10.17487/RFC2978</a>, October
+                                    2000, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc2978">http://www.rfc-editor.org/info/rfc2978</a>&gt;.
+                                </dd>
+                                <dt id="RFC3629">[<a href="#RFC3629" class="smpl">RFC3629</a>]</dt>
+                                <dd>Yergeau, F., “<a href="https://www.rfc-editor.org/rfc/rfc3629.html">UTF-8, a
+                                        transformation format of ISO 10646</a>”, <a
+                                        href="https://www.rfc-editor.org/info/std63">STD 63</a>, RFC 3629, <a
+                                        href="https://dx.doi.org/10.17487/RFC3629">DOI 10.17487/RFC3629</a>, November
+                                    2003, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc3629">http://www.rfc-editor.org/info/rfc3629</a>&gt;.
+                                </dd>
+                                <dt id="RFC3986">[<a href="#RFC3986" class="smpl">RFC3986</a>]</dt>
+                                <dd>Berners-Lee, T., Fielding, R., and L. Masinter, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc3986.html">Uniform Resource Identifier
+                                        (URI): Generic Syntax</a>”, <a href="https://www.rfc-editor.org/info/std66">STD
+                                        66</a>, RFC 3986, <a href="https://dx.doi.org/10.17487/RFC3986">DOI
+                                        10.17487/RFC3986</a>, January 2005, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc3986">http://www.rfc-editor.org/info/rfc3986</a>&gt;.
+                                </dd>
+                                <dt id="RFC4086">[<a href="#RFC4086" class="smpl">RFC4086</a>]</dt>
+                                <dd>Eastlake 3rd, D., Schiller, J., and S. Crocker, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc4086.html">Randomness Requirements for
+                                        Security</a>”, <a href="https://www.rfc-editor.org/info/bcp106">BCP 106</a>, RFC
+                                    4086, <a href="https://dx.doi.org/10.17487/RFC4086">DOI 10.17487/RFC4086</a>, June
+                                    2005, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc4086">http://www.rfc-editor.org/info/rfc4086</a>&gt;.
+                                </dd>
+                                <dt id="RFC5198">[<a href="#RFC5198" class="smpl">RFC5198</a>]</dt>
+                                <dd>Klensin, J. and M. Padlipsky, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc5198.html">Unicode Format for Network
+                                        Interchange</a>”, RFC 5198, <a href="https://dx.doi.org/10.17487/RFC5198">DOI
+                                        10.17487/RFC5198</a>, March 2008, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc5198">http://www.rfc-editor.org/info/rfc5198</a>&gt;.
+                                </dd>
+                                <dt id="RFC5234">[<a href="#RFC5234" class="smpl">RFC5234</a>]</dt>
+                                <dd>Crocker, D., Ed. and P. Overell, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc5234.html">Augmented BNF for Syntax
+                                        Specifications: ABNF</a>”, <a href="https://www.rfc-editor.org/info/std68">STD
+                                        68</a>, RFC 5234, <a href="https://dx.doi.org/10.17487/RFC5234">DOI
+                                        10.17487/RFC5234</a>, January 2008, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc5234">http://www.rfc-editor.org/info/rfc5234</a>&gt;.
+                                </dd>
+                                <dt id="RFC5987">[<a href="#RFC5987" class="smpl">RFC5987</a>]</dt>
+                                <dd>Reschke, J., “<a href="https://www.rfc-editor.org/rfc/rfc5987.html">Character Set
+                                        and Language Encoding for Hypertext Transfer Protocol (HTTP) Header Field
+                                        Parameters</a>”, RFC 5987, <a href="https://dx.doi.org/10.17487/RFC5987">DOI
+                                        10.17487/RFC5987</a>, August 2010, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc5987">http://www.rfc-editor.org/info/rfc5987</a>&gt;.
+                                </dd>
+                                <dt id="RFC6454">[<a href="#RFC6454" class="smpl">RFC6454</a>]</dt>
+                                <dd>Barth, A., “<a href="https://www.rfc-editor.org/rfc/rfc6454.html">The Web Origin
+                                        Concept</a>”, RFC 6454, <a href="https://dx.doi.org/10.17487/RFC6454">DOI
+                                        10.17487/RFC6454</a>, December 2011, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc6454">http://www.rfc-editor.org/info/rfc6454</a>&gt;.
+                                </dd>
+                                <dt id="RFC7230">[<a href="#RFC7230" class="smpl">RFC7230</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Message Syntax and Routing</a>”, RFC 7230, <a
+                                        href="https://dx.doi.org/10.17487/RFC7230">DOI 10.17487/RFC7230</a>, June 2014,
+                                    &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc7230">http://www.rfc-editor.org/info/rfc7230</a>&gt;.
+                                </dd>
+                                <dt id="RFC7231">[<a href="#RFC7231" class="smpl">RFC7231</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7231.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Semantics and Content</a>”, RFC 7231, <a
+                                        href="https://dx.doi.org/10.17487/RFC7231">DOI 10.17487/RFC7231</a>, June 2014,
+                                    &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc7231">http://www.rfc-editor.org/info/rfc7231</a>&gt;.
+                                </dd>
+                                <dt id="RFC7234">[<a href="#RFC7234" class="smpl">RFC7234</a>]</dt>
+                                <dd>Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7234.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Caching</a>”, RFC 7234, <a
+                                        href="https://dx.doi.org/10.17487/RFC7234">DOI 10.17487/RFC7234</a>, June 2014,
+                                    &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc7234">http://www.rfc-editor.org/info/rfc7234</a>&gt;.
+                                </dd>
+                                <dt id="RFC7235">[<a href="#RFC7235" class="smpl">RFC7235</a>]</dt>
+                                <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7235.html">Hypertext Transfer Protocol
+                                        (HTTP/1.1): Authentication</a>”, RFC 7235, <a
+                                        href="https://dx.doi.org/10.17487/RFC7235">DOI 10.17487/RFC7235</a>, June 2014,
+                                    &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc7235">http://www.rfc-editor.org/info/rfc7235</a>&gt;.
+                                </dd>
+                                <dt id="RFC7613">[<a href="#RFC7613" class="smpl">RFC7613</a>]</dt>
+                                <dd>Saint-Andre, P. and A. Melnikov, “<a
+                                        href="https://www.rfc-editor.org/rfc/rfc7613.html">Preparation, Enforcement, and
+                                        Comparison of Internationalized Strings Representing Usernames and
+                                        Passwords</a>”, RFC 7613, <a href="https://dx.doi.org/10.17487/RFC7613">DOI
+                                        10.17487/RFC7613</a>, August 2015, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc7613">http://www.rfc-editor.org/info/rfc7613</a>&gt;.
+                                </dd>
+                                <dt id="RFC7615">[<a href="#RFC7615" class="smpl">RFC7615</a>]</dt>
+                                <dd>Reschke, J., “<a href="https://www.rfc-editor.org/rfc/rfc7615.html">HTTP
+                                        Authentication-Info and Proxy-Authentication-Info Response Header Fields</a>”,
+                                    RFC 7615, <a href="https://dx.doi.org/10.17487/RFC7615">DOI 10.17487/RFC7615</a>,
+                                    September 2015, &lt;<a
+                                        href="http://www.rfc-editor.org/info/rfc7615">http://www.rfc-editor.org/info/rfc7615</a>&gt;.
+                                </dd>
+                            </dl>
+                        </div>
+                    </section>
+                </section>
+                <section id="rfc2617.changes">
+                    <h2 id="rfc.section.A" class="np"><a href="#rfc.section.A">Appendix A.</a>&nbsp;<a
+                            href="#rfc2617.changes">RFC 2617에서의 변경사항</a></h2>
+                    <div id="rfc.section.A.p.1">
+                        <p>이 문서는 다음과 같은 변경사항을 도입합니다: </p>
+                        <ul>
+                            <li>두 개의 새로운 알고리즘 지원 추가: SHA2-256(필수 구현) 및 SHA2-512/256(백업), 그리고 적절한 알고리즘 협상 정의. 문서는 하위 호환성을
+                                위해 MD5 알고리즘 지원을 유지합니다.</li>
+                            <li>개인정보 보호를 위해 사용자 이름 해싱 기능 및 관련 매개변수 도입.</li>
+                            <li>A1 계산과 사용자 이름 및 비밀번호 인코딩에 영향을 주는 다양한 국제화 고려사항 추가.</li>
+                            <li>HTTP 다이제스트 인증에서 사용할 수 있는 해시 알고리즘을 나열하는 새로운 IANA 레지스트리 "Hash Algorithms for HTTP Digest
+                                Authentication" 도입.</li>
+                            <li>RFC 2069과의 하위 호환성 폐기.</li>
+                        </ul>
+                    </div>
+                </section>
+                <section id="n-acknowledgments">
+                    <h2 id="rfc.section.B"><a href="#rfc.section.B">Appendix B.</a>&nbsp;<a
+                            href="#n-acknowledgments">감사의 글</a></h2>
+                    <div id="rfc.section.B.p.1">
+                        <p>다이제스트 메커니즘과 그 동작에 대한 완전한 설명을 제공하기 위해, 이 문서는 많은 부분을 <a href="#RFC2617"><cite
+                                    title="HTTP Authentication: Basic and Digest Access Authentication">RFC2617</cite></a>에서
+                            차용했습니다. 이 문서의 저자들은 해당 명세 작업에 기여한 John Franks, Phillip <span class="nobr">M.
+                                Hallam-Baker,</span> Jeffery <span class="nobr">L. Hostetler,</span> Scott <span
+                                class="nobr">D. Lawrence,</span> Paul <span class="nobr">J. Leach,</span> Ari Luotonen,
+                            그리고 Lawrence <span class="nobr">C. Stewart</span>에게 감사를 표합니다.</p>
+                    </div>
+                    <div id="rfc.section.B.p.2">
+                        <p>특별히 이 문서의 여러 부분에 대해 많은 검토, 의견, 제안 및 텍스트를 제공한 Julian Reschke에게 감사드립니다.</p>
+                    </div>
+                    <div id="rfc.section.B.p.3">
+                        <p>저자들은 또한 Stephen Farrell, Yoav Nir, Phillip Hallam-Baker, Manu Sporny, Paul Hoffman, Yaron
+                            Sheffer, Sean Turner, Geoff Baskwill, Eric Cooper, Bjoern Hoehrmann, Martin Durst, Peter
+                            Saint-Andre, Michael Sweet, Daniel Stenberg, Brett Tate, Paul Leach, Ilari Liusvaara, Gary
+                            Mort, Alexey Melnikov, Benjamin Kaduk, Kathleen Moriarty, Francis Dupont, Hilarie Orman, 및
+                            Ben Campbell에게 정성 어린 검토와 의견에 대해 감사를 표합니다.</p>
+                    </div>
+                    <div id="rfc.section.B.p.4">
+                        <p>저자들은 또한 이 문서의 다양한 측면을 논의할 때 메일링 리스트에서 의견을 준 Jonathan Stoke, Nico Williams, Harry Halpin, 및
+                            Phil Hunt에게 감사를 표합니다.</p>
+                    </div>
+                    <div id="rfc.section.B.p.5">
+                        <p>저자들은 또한 이 문서의 일부 측면에 대한 신중한 검토와 피드백을 준 Paul Kyzivat 및 Dale Worley에게 감사를 표합니다.</p>
+                    </div>
+                    <div id="rfc.section.B.p.6">
+                        <p>저자들은 레지스트리 관련 도움을 준 Barry Leiba에게 감사를 표합니다.</p>
+                    </div>
+                </section>
+                <section id="rfc.authors" class="avoidbreakinside">
+                    <h2><a href="#rfc.authors">저자 주소</a></h2>
+                    <address><b>Rifaat Shekh-Yusef</b> (editor)<br>Avaya<br>250 Sidney Street<br>Belleville,
+                        Ontario<br>Canada<br>Phone: <a href="tel:+1-613-967-5267">+1-613-967-5267</a><br>EMail: <a
+                            href="mailto:rifaat.ietf@gmail.com">rifaat.ietf@gmail.com</a></address>
+                    <address><b>David Ahrens</b><br>Independent<br>California<br>United States<br>EMail: <a
+                            href="mailto:ahrensdc@gmail.com">ahrensdc@gmail.com</a></address>
+                    <address><b>Sophie Bremer</b><br>Netzkonform<br>Germany<br>EMail: <a
+                            href="mailto:sophie.bremer@netzkonform.de">sophie.bremer@netzkonform.de</a></address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>

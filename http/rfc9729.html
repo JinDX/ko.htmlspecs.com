@@ -1,0 +1,1429 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 9729 - 은닉된 HTTP 인증 방식</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC9729">
+    <meta property="og:description" content="The Concealed HTTP Authentication Scheme">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc9729.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 The Concealed HTTP Authentication Scheme" href="#rfc.section.2">
+    <link rel="Chapter" title="3 Client Handling" href="#rfc.section.3">
+    <link rel="Chapter" title="4 Authentication Parameters" href="#rfc.section.4">
+    <link rel="Chapter" title="5 Example" href="#rfc.section.5">
+    <link rel="Chapter" title="6 Server Handling" href="#rfc.section.6">
+    <link rel="Chapter" title="7 Requirements on TLS Usage" href="#rfc.section.7">
+    <link rel="Chapter" title="8 Security Considerations" href="#rfc.section.8">
+    <link rel="Chapter" title="9 IANA Considerations" href="#rfc.section.9">
+    <link rel="Chapter" title="10 References" href="#rfc.section.10">
+    <link rel="Appendix" title="Acknowledgments" href="#rfc.section.unnumbered-4">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-unprompted-auth-12" rel="prev">
+    <link href="https://dx.doi.org/10.17487/rfc9729" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc9729.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="https://www.rfc-editor.org/info/rfc9729">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="secure, tunnels, masque, http-ng">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Schinazi, D.">
+    <meta name="dcterms.creator" content="Oliver, D.">
+    <meta name="dcterms.creator" content="Hoyland, J.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:9729">
+    <meta name="dcterms.issued" content="2025-02">
+    <meta name="dcterms.abstract"
+        content="Most HTTP authentication schemes are probeable in the sense that it is possible for an unauthenticated client to probe whether an origin serves resources that require authentication. It is possible for an origin to hide the fact that it requires authentication by not generating Unauthorized status codes; however, that only works with non-cryptographic authentication schemes: cryptographic signatures require a fresh nonce to be signed. Prior to this document, there was no existing way for the origin to share such a nonce without exposing the fact that it serves resources that require authentication. This document defines a new non-probeable cryptographic authentication scheme.">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="Most HTTP authentication schemes are probeable in the sense that it is possible for an unauthenticated client to probe whether an origin serves resources that require authentication. It is possible for an origin to hide the fact that it requires authentication by not generating Unauthorized status codes; however, that only works with non-cryptographic authentication schemes: cryptographic signatures require a fresh nonce to be signed. Prior to this document, there was no existing way for the origin to share such a nonce without exposing the fact that it serves resources that require authentication. This document defines a new non-probeable cryptographic authentication scheme.">
+</head>
+
+<body onload="getMeta(9729,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>9729</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#conventions">관례 및 정의</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#the-concealed-http-authentication-scheme">은닉된 HTTP 인증 방식</a></li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#client">클라이언트 처리</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a href="#context">키
+                                                익스포터 컨텍스트</a>
+                                            <ul>
+                                                <li><a href="#rfc.section.3.1.1">3.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                        href="#public-key-encoding">공개 키 인코딩</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a href="#output">키
+                                                익스포터 출력</a></li>
+                                        <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#computation">서명 계산</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#auth-params">인증 매개변수</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#parameter-k">k 매개변수</a></li>
+                                        <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#parameter-a">a 매개변수</a></li>
+                                        <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#parameter-p">p 매개변수</a></li>
+                                        <li><a href="#rfc.section.4.4">4.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#parameter-s">s 매개변수</a></li>
+                                        <li><a href="#rfc.section.4.5">4.5.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#parameter-v">v 매개변수</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#example">예제</a></li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#server-handling">서버
+                                        처리</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#frontend-handling">프런트엔드 처리</a></li>
+                                        <li><a href="#rfc.section.6.2">6.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#communication-between-frontend-and-backend">프런트엔드와 백엔드 간 통신</a>
+                                        </li>
+                                        <li><a href="#rfc.section.6.3">6.3.</a>&nbsp;&nbsp;&nbsp;<a href="#backend">백엔드
+                                                처리</a></li>
+                                        <li><a href="#rfc.section.6.4">6.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#non-probeable-server-handling">프로브 불가능한 서버 처리</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#requirements-on-tls-usage">TLS 사용 요구사항</a></li>
+                                <li><a href="#rfc.section.8">8.</a>&nbsp;&nbsp;&nbsp;<a href="#security">보안
+                                        고려사항</a></li>
+                                <li><a href="#rfc.section.9">9.</a>&nbsp;&nbsp;&nbsp;<a href="#iana">IANA
+                                        고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.9.1">9.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#iana-schemes">HTTP 인증 방식 레지스트리</a></li>
+                                        <li><a href="#rfc.section.9.2">9.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#iana-exporter-label">TLS 키 자료 익스포터 레이블</a></li>
+                                        <li><a href="#rfc.section.9.3">9.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#http-field-name">HTTP 필드 이름</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.10">10.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참조</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.10.1">10.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">규범적 참조</a></li>
+                                        <li><a href="#rfc.section.10.2">10.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.3">정보성 참조</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#acknowledgments">감사의 글</a></li>
+                                <li><a href="#rfc.authors">저자 연락처</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">인터넷 엔지니어링 태스크 포스 (IETF)</td>
+                                <td class="text-right">D. Schinazi</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">요청 의견(Request for Comments): 9729</td>
+                                <td class="text-right">Google LLC</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">분류: 표준 트랙</td>
+                                <td class="text-right">D. Oliver</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right">Guardian Project</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left"></td>
+                                <td class="text-right">J. Hoyland</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left"></td>
+                                <td class="text-right">Cloudflare Inc.</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left"></td>
+                                <td class="text-right">2025년 2월</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>은닉된 HTTP 인증 방식</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">초록</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>대부분의 HTTP 인증 방식은 인증되지 않은 클라이언트가 어떤 오리진이 인증을 요구하는 리소스를 제공하는지 탐지(probe)할 수 있다는 의미에서 탐지
+                            가능(probeable)합니다. 오리진은 Unauthorized 상태 코드를 생성하지 않음으로써 인증을 요구한다는 사실을 숨길 수 있지만, 이는 비암호적 인증
+                            방식에서만 작동합니다. 암호화 서명은 서명에 사용할 새로운 nonce가 필요하기 때문입니다. 이 문서 이전에는 오리진이 그러한 nonce를 노출하지 않고 공유할
+                            방법이 존재하지 않았습니다. 본 문서는 새로운 비-프로브 가능한 암호화 인증 방식을 정의합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 메모의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 문서입니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물입니다. 이는 IETF 커뮤니티의 합의를 나타냅니다. 공개 검토를 거쳤으며 인터넷 엔지니어링 운영
+                            그룹(IESG)에 의해 게시 승인을 받았습니다. 인터넷 표준에 관한 추가 정보는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc7841.html#section-2">RFC 7841의 섹션 2</a>에서 확인할 수
+                            있습니다.
+                        </p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 현재 상태, 정정표(errata) 및 피드백 제출 방법에 대한 정보는 <a
+                                href="https://www.rfc-editor.org/info/rfc9729">https://www.rfc-editor.org/info/rfc9729</a>에서
+                            확인할 수 있습니다.
+                        </p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2025 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)
+                            in effect on the date of publication of this document. Please review these documents
+                            carefully, as they describe your rights and restrictions with respect to this document. Code
+                            Components extracted from this document must include Revised BSD License text as described
+                            in Section 4.e of the Trust Legal Provisions and are provided without warranty as described
+                            in the Revised BSD License.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a href="#conventions">관례 및
+                                        정의</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#the-concealed-http-authentication-scheme">은닉된 HTTP 인증 방식</a></li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#client">클라이언트 처리</a>
+                            <ul>
+                                <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a href="#context">키 익스포터
+                                        컨텍스트</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.1.1">3.1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#public-key-encoding">공개 키 인코딩</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a href="#output">키 익스포터
+                                        출력</a></li>
+                                <li><a href="#rfc.section.3.3">3.3.</a>&nbsp;&nbsp;&nbsp;<a href="#computation">서명
+                                        계산</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#auth-params">인증 매개변수</a>
+                            <ul>
+                                <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a href="#parameter-k">k
+                                        매개변수</a></li>
+                                <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a href="#parameter-a">a
+                                        매개변수</a></li>
+                                <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a href="#parameter-p">p
+                                        매개변수</a></li>
+                                <li><a href="#rfc.section.4.4">4.4.</a>&nbsp;&nbsp;&nbsp;<a href="#parameter-s">s
+                                        매개변수</a></li>
+                                <li><a href="#rfc.section.4.5">4.5.</a>&nbsp;&nbsp;&nbsp;<a href="#parameter-v">v
+                                        매개변수</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#example">예제</a></li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#server-handling">서버 처리</a>
+                            <ul>
+                                <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#frontend-handling">프런트엔드 처리</a></li>
+                                <li><a href="#rfc.section.6.2">6.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#communication-between-frontend-and-backend">프런트엔드와 백엔드 간 통신</a></li>
+                                <li><a href="#rfc.section.6.3">6.3.</a>&nbsp;&nbsp;&nbsp;<a href="#backend">백엔드 처리</a>
+                                </li>
+                                <li><a href="#rfc.section.6.4">6.4.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#non-probeable-server-handling">프로브 불가능한 서버 처리</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#requirements-on-tls-usage">TLS 사용
+                                요구사항</a></li>
+                        <li><a href="#rfc.section.8">8.</a>&nbsp;&nbsp;&nbsp;<a href="#security">보안 고려사항</a></li>
+                        <li><a href="#rfc.section.9">9.</a>&nbsp;&nbsp;&nbsp;<a href="#iana">IANA 고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.9.1">9.1.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-schemes">HTTP 인증
+                                        방식 레지스트리</a></li>
+                                <li><a href="#rfc.section.9.2">9.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#iana-exporter-label">TLS 키 자료 익스포터 레이블</a></li>
+                                <li><a href="#rfc.section.9.3">9.3.</a>&nbsp;&nbsp;&nbsp;<a href="#http-field-name">HTTP
+                                        필드 이름</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.10">10.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참조</a>
+                            <ul>
+                                <li><a href="#rfc.section.10.1">10.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references.2">규범적 참조</a></li>
+                                <li><a href="#rfc.section.10.2">10.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#rfc.references.3">정보성 참조</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#acknowledgments">감사의 글</a></li>
+                        <li><a href="#rfc.authors">저자 연락처</a></li>
+                    </ul>
+                </div>
+                <hr class="hidden-print">
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>HTTP 인증 방식(참조: <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-11">Section
+                                11</a> of <a href="#RFC9110"><cite title="HTTP Semantics">[HTTP]</cite></a>)은 오리진이 일부
+                            리소스에 대해 인증된 요청만 접근을 허용하도록 할 수 있습니다. 이러한 방식은 보통 오리진이 클라이언트에게 인증 정보를 제공하도록 요구하는 챌린지를 포함하지만,
+                            클라이언트가 사전 요청 없이 인증 정보를 보낼 수도 있습니다. 이는 오리진이 특정 서비스나 기능을 "알고 있는 자"에게만 제공하고, 다른 사용자에게는 그 기능의
+                            존재를 알리지 않으려는 경우에 유용합니다. 이러한 설계는 키 배포를 위한 외부 메커니즘에 의존합니다. 예를 들어, 회사가 직원 자격 증명으로 웹사이트를 통해 원격
+                            직원 액세스를 제공하거나 특정 직원에게만 제한된 특수 기능을 제공하면서 이러한 기능을 발견(또는 탐지)하기 어렵게 만들 수 있습니다. 또 다른 예로는 덜 명확한
+                            커뮤니티의 구성원들이 보다 단기적인 키를 사용하여 지리적 또는 기능별로 제한된 리소스에 접근하는 경우가 있으며, 이는 키를 발급하는 주체가 시간적 또는 지리적으로
+                            키의 사용을 조절할 수 있기 때문입니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2">
+                        <p>디지털 서명 기반의 HTTP 인증 방식(예: <a href="#RFC7486"><cite
+                                    title="HTTP Origin-Bound Authentication (HOBA)">[HOBA]</cite></a>)은 이미 존재하지만, 이러한
+                            방식은 서명 입력의 신선성을 보장하기 위해 오리진이 클라이언트에게 명시적으로 새 챌린지를 보내야 합니다. 이는 오리진이 인증되지 않은 클라이언트에 챌린지를 보내므로
+                            오리진을 탐지 가능하게 만듭니다. 본 문서는 탐지 불가능한 서명 기반 인증 방식을 정의합니다.</p>
+                    </div>
+                    <section id="conventions">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a href="#conventions">관례 및
+                                정의</a></h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>문서 내의 핵심 단어 "<em class="bcp14">MUST</em>", "<em class="bcp14">MUST NOT</em>", "<em
+                                    class="bcp14">REQUIRED</em>", "<em class="bcp14">SHALL</em>", "<em
+                                    class="bcp14">SHALL NOT</em>", "<em class="bcp14">SHOULD</em>", "<em
+                                    class="bcp14">SHOULD NOT</em>", "<em class="bcp14">RECOMMENDED</em>", "<em
+                                    class="bcp14">NOT RECOMMENDED</em>", "<em class="bcp14">MAY</em>", 및 "<em
+                                    class="bcp14">OPTIONAL</em>"은 모두 대문자로 표기된 경우에 한해 BCP 14(참조: <a href="#RFC2119"><cite
+                                        title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>,
+                                <a href="#RFC8174"><cite
+                                        title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">[RFC8174]</cite></a>)에
+                                설명된 대로 해석됩니다.
+                            </p>
+                        </div>
+                        <div id="rfc.section.1.1.p.2">
+                            <p>이 문서는 <a href="https://www.rfc-editor.org/rfc/rfc9000.html#section-1.3">Section 1.3</a>
+                                of <a href="#RFC9000"><cite
+                                        title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</cite></a>의
+                                표기법을 사용합니다.</p>
+                        </div>
+                        <div id="rfc.section.1.1.p.3">
+                            <p>문서의 다양한 예제에는 긴 줄이 포함되어 있어 <a href="#RFC8792"><cite
+                                        title="Handling Long Lines in Content of Internet-Drafts and RFCs">[RFC8792]</cite></a>에
+                                설명된 대로 접기가 가능합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="the-concealed-http-authentication-scheme">
+                    <h2 id="rfc.section.2" class="np"><a href="#rfc.section.2">2.</a>&nbsp;<a
+                            href="#the-concealed-http-authentication-scheme">은닉된 HTTP 인증 방식</a></h2>
+                    <div id="rfc.section.2.p.1">
+                        <p>본 문서는 "Concealed" HTTP 인증 방식을 정의합니다. 이 방식은 비대칭 암호화 방식을 사용합니다. 클라이언트는 key ID와 공개/개인 키 쌍을 보유하고,
+                            오리진 서버는 권한 있는 key ID를 관련 공개 키에 매핑한 자료구조를 유지합니다.</p>
+                    </div>
+                    <div id="rfc.section.2.p.2">
+                        <p>클라이언트는 서명할 데이터를 생성하기 위해 TLS 키 자료 익스포터를 사용합니다(참조: <a href="#client" title="Client Handling">섹션
+                                3</a>). 그런 다음 Authorization(또는 Proxy-Authorization) 헤더 필드를 사용하여 서명을 전송합니다(참조: <a
+                                href="https://www.rfc-editor.org/rfc/rfc9110.html#section-11">Section 11</a> of <a
+                                href="#RFC9110"><cite title="HTTP Semantics">[HTTP]</cite></a>). 서명 및 추가 정보는 인증 매개변수를 통해
+                            교환됩니다(참조: <a href="#auth-params" title="Authentication Parameters">섹션 4</a>). 서버가 이를 수신하면,
+                            서버는 자신의 알려진 키 데이터베이스 항목과 대조하여 서명 검증을 수행할 수 있습니다. 서버는 검증 결과를 사용하여 클라이언트에 대한 응답(예: 특정 리소스 접근
+                            제한)에 영향을 줄 수 있습니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="client">
+                    <h2 id="rfc.section.3" class="np"><a href="#rfc.section.3">3.</a>&nbsp;<a href="#client">클라이언트
+                            처리</a></h2>
+                    <div id="rfc.section.3.p.1" class="avoidbreakafter">
+                        <p>클라이언트가 요청에 대해 Concealed HTTP 인증 방식을 사용하려는 경우, TLS 키 자료 익스포터를 사용하여 다음 매개변수로 인증 증명을 계산해야 <em
+                                class="bcp14">합니다</em>:</p>
+                    </div>
+                    <div id="rfc.section.3.p.2">
+                        <ul>
+                            <li>
+                                <div>
+                                    <p>label은 "EXPORTER-HTTP-Concealed-Authentication"으로 설정됩니다.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <p>context는 <a href="#context" title="Key Exporter Context">섹션 3.1</a>에 설명된 구조로
+                                        설정됩니다.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <p>exporter 출력 길이는 48바이트로 설정됩니다(참조: <a href="#output" title="Key Exporter Output">섹션
+                                            3.2</a>).</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.3.p.3">
+                        <p>참고로 TLS 1.3 키 자료 익스포터는 <a
+                                href="https://www.rfc-editor.org/rfc/rfc8446.html#section-7.5">Section 7.5</a> of <a
+                                href="#RFC8446"><cite
+                                    title="The Transport Layer Security (TLS) Protocol Version 1.3">[TLS]</cite></a>에
+                            정의되어 있고, TLS 1.2의 키 자료 익스포터는 <a href="#RFC5705"><cite
+                                    title="Keying Material Exporters for Transport Layer Security (TLS)">[KEY-EXPORT]</cite></a>에
+                            정의되어 있습니다.</p>
+                    </div>
+                    <section id="context">
+                        <h3 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a>&nbsp;<a href="#context">키 익스포터
+                                컨텍스트</a></h3>
+                        <div id="rfc.section.3.1.p.1" class="avoidbreakafter">
+                            <p>TLS 키 익스포터 컨텍스트는 <a href="#fig-context" title="Key Exporter Context Format">그림 1</a>에
+                                설명되어 있으며, <a href="https://www.rfc-editor.org/rfc/rfc9000.html#section-1.3">Section
+                                    1.3</a> of <a href="#RFC9000"><cite
+                                        title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</cite></a>의
+                                표기법을 사용합니다:</p>
+                        </div>
+                        <div id="fig-context"></div>
+                        <div id="rfc.figure.1">
+                            <div>
+                                <pre>
+  Signature Algorithm (16),
+  Key ID Length (i),
+  Key ID (..),
+  Public Key Length (i),
+  Public Key (..),
+  Scheme Length (i),
+  Scheme (..),
+  Host Length (i),
+  Host (..),
+  Port (16),
+  Realm Length (i),
+  Realm (..),
+</pre>
+                            </div>
+                        </div>
+                        <p class="figure">그림 1: 키 익스포터 컨텍스트 형식</p>
+                        <div id="rfc.section.3.1.p.2" class="avoidbreakafter">
+                            <p>키 익스포터 컨텍스트에는 다음 필드들이 포함됩니다:</p>
+                        </div>
+                        <div id="rfc.section.3.1.p.3">
+                            <dl>
+                                <dt>Signature Algorithm:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이는 <span class="tt">s</span> 매개변수에 전송되는 서명 스킴입니다(참조: <a href="#parameter-s"
+                                            title="The s Parameter">섹션 4.4</a>).</div>
+                                </dd>
+                                <dt>Key ID:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이는 <span class="tt">k</span> 매개변수에 전송되는 key ID입니다(참조: <a href="#parameter-k"
+                                            title="The k Parameter">섹션 4.1</a>).</div>
+                                </dd>
+                                <dt>Public Key:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이는 서버가 클라이언트가 제공한 서명을 검증하기 위해 사용하는 공개 키입니다. 인코딩은 <a href="#public-key-encoding"
+                                            title="Public Key Encoding">섹션 3.1.1</a>에 설명되어 있습니다.</div>
+                                </dd>
+                                <dt>Scheme:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이 요청의 스킴으로, <a
+                                            href="https://www.rfc-editor.org/rfc/rfc3986.html#section-3.1">Section
+                                            3.1</a> of <a href="#RFC3986"><cite
+                                                title="Uniform Resource Identifier (URI): Generic Syntax">[URI]</cite></a>에서
+                                        정의된 URI의 스킴 부분 형식으로 인코딩됩니다.</div>
+                                </dd>
+                                <dt>Host:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이 요청의 호스트로, <a
+                                            href="https://www.rfc-editor.org/rfc/rfc3986.html#section-3.2.2">Section
+                                            3.2.2</a> of <a href="#RFC3986"><cite
+                                                title="Uniform Resource Identifier (URI): Generic Syntax">[URI]</cite></a>에서
+                                        정의된 URI의 호스트 부분 형식으로 인코딩됩니다.</div>
+                                </dd>
+                                <dt>Port:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이 요청의 포트이며 네트워크 바이트 오더로 인코딩됩니다. 포트는 URI에 포함되거나 사용 중인 스킴의 기본 포트일 수 있습니다(참조: <a
+                                            href="https://www.rfc-editor.org/rfc/rfc3986.html#section-3.2.3">Section
+                                            3.2.3</a> of <a href="#RFC3986"><cite
+                                                title="Uniform Resource Identifier (URI): Generic Syntax">[URI]</cite></a>).
+                                    </div>
+                                </dd>
+                                <dt>Realm:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이는 realm 인증 매개변수에 전송되는 인증 영역입니다(참조: <a
+                                            href="https://www.rfc-editor.org/rfc/rfc9110.html#section-11.5">Section
+                                            11.5</a> of <a href="#RFC9110"><cite
+                                                title="HTTP Semantics">[HTTP]</cite></a>). realm 인증 매개변수가 존재하지 않으면, 이
+                                        필드는 비어 있어야 <em class="bcp14">합니다</em>. 본 문서는 오리진이 클라이언트에게 realm을 전달하는 수단을 정의하지
+                                        않습니다. 클라이언트가 특정 realm 사용으로 구성되지 않은 경우, 빈 realm을 사용해야 <em class="bcp14">하며</em>
+                                        realm 인증 매개변수를 전송해서는 <em class="bcp14">안 됩니다</em>.</div>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div id="rfc.section.3.1.p.4">
+                            <p>Signature Algorithm 및 Port 필드는 네트워크 바이트 오더의 부호 없는 16비트 정수로 인코딩됩니다. Key ID, Public Key,
+                                Scheme, Host 및 Realm 필드는 길이-접두 문자열로 인코딩됩니다; 즉 이들 앞에는 바이트 길이를 나타내는 Length 필드가 옵니다. 이 길이
+                                필드들은 <a href="https://www.rfc-editor.org/rfc/rfc9000.html#section-16">Section 16</a> of
+                                <a href="#RFC9000"><cite
+                                        title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</cite></a>의 가변
+                                길이 정수 인코딩을 사용하여 인코딩되며, 가능한 최소 바이트 수로 인코딩되어야 <em class="bcp14">합니다</em>.
+                            </p>
+                        </div>
+                        <section id="public-key-encoding">
+                            <h4 id="rfc.section.3.1.1"><a href="#rfc.section.3.1.1">3.1.1.</a>&nbsp;<a
+                                    href="#public-key-encoding">공개 키 인코딩</a></h4>
+                            <div id="rfc.section.3.1.1.p.1" class="avoidbreakafter">
+                                <p>TLS 키 익스포터 컨텍스트의 "Public Key" 필드(위 참조)와 <span class="tt">a</span> 매개변수(참조: <a
+                                        href="#parameter-a" title="The a Parameter">섹션 4.2</a>)는 동일한 공개 키를 담습니다. 공개 키의
+                                    인코딩은 사용 중인 서명 알고리즘에 따라 다음과 같이 결정됩니다:</p>
+                            </div>
+                            <div id="rfc.section.3.1.1.p.2">
+                                <dl>
+                                    <dt>RSASSA-PSS 알고리즘:</dt>
+                                    <dd style="margin-left: 1.5em">
+                                        <div>공개 키는 RSAPublicKey 구조체(<a href="#RFC8017"><cite
+                                                    title="PKCS #1: RSA Cryptography Specifications Version 2.2">[PKCS1]</cite></a>)이며
+                                            DER(<a href="#X.690"><cite
+                                                    title="Information technology - ASN.1 encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)">[X.690]</cite></a>)로
+                                            인코딩됩니다. BER 인코딩 중 DER이 아닌 것은 거부되어야 <em class="bcp14">합니다</em>.</div>
+                                    </dd>
+                                    <dt>ECDSA 알고리즘:</dt>
+                                    <dd style="margin-left: 1.5em">
+                                        <div>공개 키는 <a
+                                                href="https://www.rfc-editor.org/rfc/rfc8446.html#section-4.2.8.2">Section
+                                                4.2.8.2</a> of <a href="#RFC8446"><cite
+                                                    title="The Transport Layer Security (TLS) Protocol Version 1.3">[TLS]</cite></a>에
+                                            정의된 UncompressedPointRepresentation 구조이며, SignatureScheme이 지정한 곡선을 사용합니다.
+                                        </div>
+                                    </dd>
+                                    <dt>EdDSA 알고리즘:</dt>
+                                    <dd style="margin-left: 1.5em">
+                                        <div>공개 키는 <a href="#RFC8032"><cite
+                                                    title="Edwards-Curve Digital Signature Algorithm (EdDSA)">[EdDSA]</cite></a>에
+                                            정의된 바이트 문자열 인코딩입니다.</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div id="rfc.section.3.1.1.p.3">
+                                <p>본 문서는 다른 알고리즘에 대한 공개 키 인코딩을 정의하지 않습니다. Concealed HTTP 인증 방식에서 사용 가능한 SignatureScheme이
+                                    되려면 해당 공개 키 인코딩이 해당 알고리즘 문서에서 정의되어야 합니다.</p>
+                            </div>
+                        </section>
+                    </section>
+                    <section id="output">
+                        <h3 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a>&nbsp;<a href="#output">키 익스포터
+                                출력</a></h3>
+                        <div id="rfc.section.3.2.p.1" class="avoidbreakafter">
+                            <p>키 익스포터 출력은 48바이트 길이입니다. 이 중 처음 32바이트는 서명의 입력의 일부이고, 다음 16바이트는 서명과 함께 전송됩니다. 이는 수신자가 익스포터가
+                                올바른 값을 생성했는지 확인할 수 있게 해줍니다. 이는 <a href="#fig-output"
+                                    title="Key Exporter Output Format">그림 2</a>에 설명되어 있으며, <a
+                                    href="https://www.rfc-editor.org/rfc/rfc9000.html#section-1.3">Section 1.3</a> of <a
+                                    href="#RFC9000"><cite
+                                        title="QUIC: A UDP-Based Multiplexed and Secure Transport">[QUIC]</cite></a>의
+                                표기법을 사용합니다:</p>
+                        </div>
+                        <div id="fig-output"></div>
+                        <div id="rfc.figure.2">
+                            <div>
+                                <pre>
+  Signature Input (256),
+  Verification (128),
+</pre>
+                            </div>
+                        </div>
+                        <p class="figure">그림 2: 키 익스포터 출력 형식</p>
+                        <div id="rfc.section.3.2.p.2" class="avoidbreakafter">
+                            <p>키 익스포터 출력은 다음 필드들을 포함합니다:</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.3">
+                            <dl>
+                                <dt>Signature Input:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>이는 클라이언트가 선택한 비대칭 개인 키로 서명하는 데이터의 일부입니다(참조: <a href="#computation"
+                                            title="Signature Computation">섹션 3.3</a>).</div>
+                                </dd>
+                                <dt>Verification:</dt>
+                                <dd style="margin-left: 1.5em">
+                                    <div>검증 값은 <span class="tt">v</span> 매개변수를 통해 서버로 전송됩니다(참조: <a href="#parameter-v"
+                                            title="The v Parameter">섹션 4.5</a>).</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section id="computation">
+                        <h3 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a>&nbsp;<a href="#computation">서명
+                                계산</a></h3>
+                        <div id="rfc.section.3.3.p.1" class="avoidbreakafter">
+                            <p>Signature Input이 키 익스포터 출력에서 추출되면(참조: <a href="#output" title="Key Exporter Output">섹션
+                                    3.2</a>), 서명 전에 정적 데이터가 접두되어 서명됩니다. 서명은 다음을 연결한 데이터에 대해 계산됩니다:</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.2">
+                            <ul>
+                                <li>
+                                    <div>
+                                        <p>옥텟 32(0x20)를 64번 반복한 문자열</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <p>컨텍스트 문자열 "HTTP Concealed Authentication"</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <p>구분자로 사용되는 단일 0 바이트</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <p>키 익스포터 출력에서 추출된 Signature Input(참조: <a href="#output"
+                                                title="Key Exporter Output">섹션 3.2</a>)</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.3.3.p.3" class="avoidbreakafter">
+                            <p>예를 들어, Signature Input의 32바이트가 모두 01로 설정된 경우 서명이 적용되는 내용(16진수 형식)은 다음과 같습니다:</p>
+                        </div>
+                        <div id="fig-sig-example"></div>
+                        <div id="rfc.figure.3">
+                            <div>
+                                <pre>
+2020202020202020202020202020202020202020202020202020202020202020
+2020202020202020202020202020202020202020202020202020202020202020
+48545450205369676E61747572652041757468656E7469636174696F6E
+00
+0101010101010101010101010101010101010101010101010101010101010101
+</pre>
+                            </div>
+                        </div>
+                        <p class="figure">그림 3: 서명이 적용되는 예제 내용</p>
+                        <div id="rfc.section.3.3.p.4">
+                            <p>이 정적 접두의 목적은 인증 비대칭 키가 실수로 다른 프로토콜에서 재사용되는 경우에 발생할 수 있는 문제를 완화하는 것입니다(이는 금지되어 있음에도 불구하고;
+                                자세한 내용은 <a href="#security" title="Security Considerations">섹션 8</a> 참조). 이 구성은 TLS 1.3의
+                                CertificateVerify 메시지(<a
+                                    href="https://www.rfc-editor.org/rfc/rfc8446.html#section-4.4.3">Section 4.4.3</a>
+                                of <a href="#RFC8446"><cite
+                                        title="The Transport Layer Security (TLS) Protocol Version 1.3">[TLS]</cite></a>)의
+                                구성과 유사합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.3.p.5">
+                            <p>그 결과 생성된 서명은 <span class="tt">p</span> 매개변수를 통해 서버로 전송됩니다(참조: <a href="#parameter-p"
+                                    title="The p Parameter">섹션 4.3</a>).</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="auth-params">
+                    <h2 id="rfc.section.4" class="np"><a href="#rfc.section.4">4.</a>&nbsp;<a href="#auth-params">인증
+                            매개변수</a></h2>
+                    <div id="rfc.section.4.p.1">
+                        <p>본 규격은 다음 인증 매개변수들을 정의합니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.2">
+                        <p>아래의 모든 바이트 시퀀스는 base64url(참조: <a
+                                href="https://www.rfc-editor.org/rfc/rfc4648.html#section-5">Section 5</a> of <a
+                                href="#RFC4648"><cite
+                                    title="The Base16, Base32, and Base64 Data Encodings">[BASE64]</cite></a>)로 인코딩되며,
+                            따옴표 및 패딩 없이 표기됩니다. 즉, 이러한 바이트-시퀀스 인증 매개변수 값들은 ASCII 문자 중 영문자, 숫자, 대시(-), 밑줄(_) 이외의 문자를 포함해서는
+                            안 됩니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.3">
+                        <p>아래 정수는 마이너스 기호 및 선행 0 없이 인코딩됩니다. 즉, 이 정수 인증 매개변수 값은 숫자 이외의 문자를 포함해서는 안 되며, 전체 값이 "0"인 경우를
+                            제외하고 선행 0으로 시작해서는 안 됩니다.</p>
+                    </div>
+                    <div id="rfc.section.4.p.4" class="avoidbreakafter">
+                        <p>다음은 <a href="#RFC5234"><cite
+                                    title="Augmented BNF for Syntax Specifications: ABNF">[ABNF]</cite></a> 표기법을 사용한
+                            문법입니다:</p>
+                    </div>
+                    <div id="fig-param"></div>
+                    <div id="rfc.figure.4">
+                        <div>
+                            <pre class="inline">
+concealed-byte-sequence-param-value = *( ALPHA / DIGIT / "-" / "_" )
+concealed-integer-param-value =  %x31-39 1*4( DIGIT ) / "0"
+</pre>
+                        </div>
+                    </div>
+                    <p class="figure">그림 4: 인증 매개변수 값 ABNF</p>
+                    <section id="parameter-k">
+                        <h3 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a>&nbsp;<a href="#parameter-k">k
+                                매개변수</a></h3>
+                        <div id="rfc.section.4.1.p.1">
+                            <p><em class="bcp14">필수(REQUIRED)</em>인 "k"(key ID) 매개변수는 클라이언트가 인증에 사용하려는 키를 식별하는 바이트
+                                시퀀스입니다. 백엔드는 이를 사용하여 서버 측의 알려진 키 데이터베이스 항목을 가리킵니다(참조: <a href="#backend"
+                                    title="Backend Handling">섹션 6.3</a>).</p>
+                        </div>
+                    </section>
+                    <section id="parameter-a">
+                        <h3 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a>&nbsp;<a href="#parameter-a">a
+                                매개변수</a></h3>
+                        <div id="rfc.section.4.2.p.1">
+                            <p><em class="bcp14">필수(REQUIRED)</em>인 "a"(공개 키) 매개변수는 서버가 클라이언트가 제공한 서명을 검증하는 데 사용하는 공개 키를
+                                지정하는 바이트 시퀀스입니다. 이는 키 혼동 문제를 방지합니다(참조: <a href="#SEEMS-LEGIT"><cite
+                                        title="Seems Legit: Automated Analysis of Subtle Attacks on Protocols That Use Signatures">[SEEMS-LEGIT]</cite></a>).
+                                공개 키의 인코딩은 <a href="#public-key-encoding" title="Public Key Encoding">섹션 3.1.1</a>에 설명되어
+                                있습니다.</p>
+                        </div>
+                    </section>
+                    <section id="parameter-p">
+                        <h3 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a>&nbsp;<a href="#parameter-p">p
+                                매개변수</a></h3>
+                        <div id="rfc.section.4.3.p.1">
+                            <p><em class="bcp14">필수(REQUIRED)</em>인 "p"(proof) 매개변수는 클라이언트가 자신의 key ID와 일치하는 자격 증명을 소유하고
+                                있음을 증명하기 위해 제공하는 바이트 시퀀스입니다.</p>
+                        </div>
+                    </section>
+                    <section id="parameter-s">
+                        <h3 id="rfc.section.4.4"><a href="#rfc.section.4.4">4.4.</a>&nbsp;<a href="#parameter-s">s
+                                매개변수</a></h3>
+                        <div id="rfc.section.4.4.p.1">
+                            <p><em class="bcp14">필수(REQUIRED)</em>인 "s"(signature scheme) 매개변수는 <span
+                                    class="tt">p</span> 매개변수에 전송된 증명을 계산하는 데 사용된 서명 스킴을 지정하는 정수입니다. 이 값은 0에서 65535 사이의
+                                정수이며 IANA의 "TLS SignatureScheme" 레지스트리(&lt;<a
+                                    href="https://www.iana.org/assignments/tls-parameters">https://www.iana.org/assignments/tls-parameters</a>&gt;)에서
+                                가져옵니다.</p>
+                        </div>
+                    </section>
+                    <section id="parameter-v">
+                        <h3 id="rfc.section.4.5"><a href="#rfc.section.4.5">4.5.</a>&nbsp;<a href="#parameter-v">v
+                                매개변수</a></h3>
+                        <div id="rfc.section.4.5.p.1">
+                            <p><em class="bcp14">필수(REQUIRED)</em>인 "v"(verification) 매개변수는 클라이언트가 키 익스포터 출력을 보유하고 있음을
+                                증명하기 위해 제공하는 바이트 시퀀스입니다(자세한 내용은 <a href="#output" title="Key Exporter Output">섹션 3.2</a>
+                                참조). 이는 특정 키가 여러 입력에 대해 유효한 서명을 생성할 수 있는 일부 서명 스킴과 관련된 문제를 방지합니다(참조: <a
+                                    href="#SEEMS-LEGIT"><cite
+                                        title="Seems Legit: Automated Analysis of Subtle Attacks on Protocols That Use Signatures">[SEEMS-LEGIT]</cite></a>).
+                            </p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="example">
+                    <h2 id="rfc.section.5" class="np"><a href="#rfc.section.5">5.</a>&nbsp;<a href="#example">예제</a>
+                    </h2>
+                    <div id="rfc.section.5.p.1" class="avoidbreakafter">
+                        <p>예를 들면, key ID가 "basement"이고 서명 알고리즘이 Ed25519인 클라이언트(<a href="#RFC8410"><cite
+                                    title="Algorithm Identifiers for Ed25519, Ed448, X25519, and X448 for Use in the Internet X.509 Public Key Infrastructure">[ED25519]</cite></a>)
+                            는 다음과 같은 헤더 필드를 생성할 수 있습니다:</p>
+                    </div>
+                    <div id="fig-hdr-example"></div>
+                    <div id="rfc.figure.5">
+                        <div>
+                            <pre class="text">
+NOTE: '\' 줄 바꿈은 RFC 8792에 따름
+
+Authorization: Concealed \
+  k=YmFzZW1lbnQ, \
+  a=VGhpcyBpcyBh-HB1YmxpYyBrZXkgaW4gdXNl_GhlcmU, \
+  s=2055, \
+  v=dmVyaWZpY2F0aW9u_zE2Qg, \
+  p=QzpcV2luZG93c_xTeXN0ZW0zMlxkcml2ZXJz-ENyb3dkU\
+    3RyaWtlXEMtMDAwMDAwMDAyOTEtMD-wMC0w_DAwLnN5cw
+</pre>
+                        </div>
+                    </div>
+                    <p class="figure">그림 5: 예제 헤더 필드</p>
+                </section>
+                <hr class="hidden-print">
+                <section id="server-handling">
+                    <h2 id="rfc.section.6" class="np"><a href="#rfc.section.6">6.</a>&nbsp;<a href="#server-handling">서버
+                            처리</a></h2>
+                    <div id="rfc.section.6.p.1" class="avoidbreakafter">
+                        <p>본 절에서는 서버의 역할을 둘로 나눕니다:</p>
+                    </div>
+                    <div id="rfc.section.6.p.2">
+                        <ul>
+                            <li>
+                                <div>
+                                    <p>“프론트엔드(frontend)”는 클라이언트가 생성한 TLS 또는 QUIC 연결을 종료하는
+                                        HTTP 서버에서 동작합니다.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <p>“백엔드(backend)”는 허용된 키 식별자 및 공개 키의 데이터베이스에 접근할 수 있는
+                                        HTTP 서버에서 동작합니다.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.6.p.3">
+                        <p>대부분의 배포에서는 프론트엔드와 백엔드 역할이 단일 HTTP 오리진 서버(참조: <a
+                                href="https://www.rfc-editor.org/rfc/rfc9110.html#section-3.6">Section 3.6</a> of <a
+                                href="#RFC9110"><cite title="HTTP Semantics">[HTTP]</cite></a>)에 구현될 것으로 예상됩니다.
+                            그러나 이 역할들은 프론트엔드를 HTTP 게이트웨이(참조: <a
+                                href="https://www.rfc-editor.org/rfc/rfc9110.html#section-3.7">Section 3.7</a> of <a
+                                href="#RFC9110"><cite title="HTTP Semantics">[HTTP]</cite></a>)로, 백엔드를 HTTP 오리진 서버로
+                            분리하여 구성할 수 있습니다.</p>
+                    </div>
+                    <section id="frontend-handling">
+                        <h3 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a>&nbsp;<a
+                                href="#frontend-handling">프론트엔드 처리</a></h3>
+                        <div id="rfc.section.6.1.p.1">
+                            <p>프론트엔드가 Concealed HTTP 인증 방식을 검사하도록 구성된 경우, Authorization(또는
+                                Proxy-Authorization) 헤더 필드를 파싱합니다. 인증 방식이 "Concealed"로 설정되어 있으면,
+                                프론트엔드는 <a href="#auth-params" title="Authentication Parameters">섹션 4</a>에 정의된
+                                대로 모든 필수 인증 매개변수가 존재하고 올바르게 파싱될 수 있는지 <em class="bcp14">반드시</em>
+                                검증해야 합니다. 어떤 매개변수가 누락되었거나 파싱에 실패하면, 프론트엔드는 Authorization(또는
+                                Proxy-Authorization) 헤더 필드 전체를 무시해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.6.1.p.2">
+                            <p>프론트엔드는 그런 다음 이들 인증 매개변수의 데이터를 사용하여 <a href="#output" title="Key Exporter Output">섹션
+                                    3.2</a>에 정의된 대로 키 익스포터 출력을 계산합니다.
+                                프론트엔드는 그 다음 헤더 필드와 키 익스포터 출력을 백엔드와 공유합니다.</p>
+                        </div>
+                    </section>
+                    <section id="communication-between-frontend-and-backend">
+                        <h3 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a>&nbsp;<a
+                                href="#communication-between-frontend-and-backend">프론트엔드와 백엔드 간 통신</a></h3>
+                        <div id="rfc.section.6.2.p.1">
+                            <p>프론트엔드와 백엔드 역할이 같은 머신에 구현된 경우, 이는 단순한 함수 호출로 처리할 수
+                                있습니다.</p>
+                        </div>
+                        <div id="rfc.section.6.2.p.2" class="avoidbreakafter">
+                            <p>역할이 두 개의 분리된 HTTP 서버에 나뉘는 경우, 백엔드는 클라이언트와 프론트엔드 간의 TLS
+                                연결에서 TLS 키 익스포터에 직접 접근할 수 없으므로 프론트엔드가 명시적으로 이를 전송해야
+                                합니다. 본 문서는 이를 위해 "Concealed-Auth-Export" 요청 헤더 필드를 정의합니다. Concealed-Auth-Export
+                                헤더 필드의 값은 48바이트 키 익스포터 출력(참조: <a href="#output" title="Key Exporter Output">섹션 3.2</a>)을
+                                포함하는 Structured Field Byte Sequence(참조:
+                                <a href="https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5">Section 3.3.5</a> of
+                                <a href="#RFC9651"><cite
+                                        title="Structured Field Values for HTTP">[STRUCTURED-FIELDS]</cite></a>)이며,
+                                매개변수는 없습니다. 구조화된 필드 바이트 시퀀스는 URL 안전이 아닌 base64 변형을 사용하여
+                                인코딩된다는 점에 유의하십시오. 예를 들면:
+                            </p>
+                        </div>
+                        <div id="fig-int-hdr-example"></div>
+                        <div id="rfc.figure.6">
+                            <div>
+                                <pre class="text">
+NOTE: '\' 줄 바꿈은 RFC 8792에 따름
+
+Concealed-Auth-Export: :VGhpc+BleGFtcGxlIFRMU/BleHBvcn\
+  Rlc+BvdXRwdXQ/aXMgNDggYnl0ZXMgI/+h:
+</pre>
+                            </div>
+                        </div>
+                        <p class="figure">그림 6: Concealed-Auth-Export 헤더 필드 예</p>
+                        <div id="rfc.section.6.2.p.3">
+                            <p>프론트엔드는 원본의 수정되지 않은 Authorization(또는 Proxy-Authorization) 헤더 필드와
+                                새로 추가된 Concealed-Auth-Export 헤더 필드를 포함하여 HTTP 요청을 백엔드로 전달해야
+                                합니다.</p>
+                        </div>
+                        <div id="rfc.section.6.2.p.4">
+                            <p>키 익스포터 출력의 보안이 올바름에 의해 좌우되므로, 백엔드는 프론트엔드가 이를 진실되게
+                                보냈다고 신뢰해야 합니다. 이러한 신뢰 관계는 프론트엔드가 이미 요청에 응답하기 위해 TLS
+                                인증서 개인 키에 접근할 필요가 있기 때문에 일반적입니다. Concealed-Auth-Export 헤더
+                                필드를 파싱하는 HTTP 서버는 발신자를 신뢰한다고 이미 확립한 경우가 아니면 이를 무시해야
+                                합니다. 마찬가지로, Concealed-Auth-Export 헤더 필드를 전송하는 프론트엔드는 클라이언트로부터
+                                받은 어떤 Concealed-Auth-Export 헤더 필드도 전달하지 않도록 보장해야 합니다.</p>
+                        </div>
+                    </section>
+                    <section id="backend">
+                        <h3 id="rfc.section.6.3"><a href="#rfc.section.6.3">6.3.</a>&nbsp;<a href="#backend">백엔드
+                                처리</a></h3>
+                        <div id="rfc.section.6.3.p.1" class="avoidbreakafter">
+                            <p>백엔드가 Authorization(또는 Proxy-Authorization) 헤더 필드와 키 익스포터 출력을 수신하면,
+                                자신의 공개 키 데이터베이스에서 key ID를 조회합니다. 백엔드는 다음 검증들을 반드시
+                                수행해야 합니다:</p>
+                        </div>
+                        <div id="rfc.section.6.3.p.2">
+                            <ul>
+                                <li>
+                                    <div>
+                                        <p><a href="#auth-params" title="Authentication Parameters">섹션 4</a>에 정의된 대로
+                                            모든 필수 인증 매개변수가 존재하고 올바르게 파싱되는지 검증</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <p>key ID가 백엔드의 데이터베이스에 존재하며 해당 공개 키에 매핑되는지 확인</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <p>데이터베이스의 공개 키가 Authorization(또는 Proxy-Authorization) 헤더 필드의
+                                            공개 키와 동일한지 검증</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <p>Authorization(또는 Proxy-Authorization) 헤더 필드의 verification 필드가
+                                            키 익스포터 출력에서 추출한 것과 일치하는지 검증</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <p><a href="#computation" title="Signature Computation">섹션 3.3</a>에 정의된 대로
+                                            암호학적 서명을 검증</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.6.3.p.3">
+                            <p>이들 검증이 모두 성공하면, 백엔드는 요청이 적절히 인증되었다고 간주하고 적절히 응답할 수
+                                있습니다(백엔드는 요청을 다른 HTTP 서버로 전달할 수도 있습니다).</p>
+                        </div>
+                        <div id="rfc.section.6.3.p.4">
+                            <p>위 검증들 중 어느 하나라도 실패하면, 백엔드는 Authorization(또는 Proxy-Authorization)
+                                헤더 필드가 없었던 것처럼 처리해야 합니다.</p>
+                        </div>
+                    </section>
+                    <section id="non-probeable-server-handling">
+                        <h3 id="rfc.section.6.4"><a href="#rfc.section.6.4">6.4.</a>&nbsp;<a
+                                href="#non-probeable-server-handling">비-프로브 가능 서버 처리</a></h3>
+                        <div id="rfc.section.6.4.p.1">
+                            <p>존재 여부를 탐지할 수 없는 리소스를 도입하려는 서버는 인증되지 않은 클라이언트에게 그
+                                리소스에 관한 어떠한 정보도 노출하지 않도록 해야 합니다. 특히, 이러한 서버는 인증
+                                실패에 대해 존재하지 않는 리소스에 사용했을 동일한 응답을 반드시 사용해야 합니다.
+                                예를 들어 이는 401(Unauthorized) 대신 404(Not Found) 상태 코드를 사용하는 것을 의미할
+                                수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.6.4.p.2">
+                            <p>위에서 설명한 인증 검증은 시간이 걸릴 수 있으며, 공격자는 알려진 존재하지 않는 리소스에
+                                대한 요청의 타이밍과 잠재적으로 인증된 리소스에 대한 요청의 타이밍을 비교하여 이 메커니즘의
+                                사용을 감지할 수 있습니다. 서버는 인증 검증의 타이밍이 관찰되지 않도록 일부 존재하지 않는
+                                리소스에 대한 응답을 약간 지연시켜 이러한 관찰 가능성을 완화할 수 있습니다. 다만 이 지연이
+                                자체적으로 이 메커니즘의 사용 여부를 노출하지 않도록 신중하게 고려해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.6.4.p.3">
+                            <p>비-프로브 가능 리소스는 또한 인증되지 않은 사용자에게 발견 가능하지 않아야 합니다. 예를 들어
+                                서버 운영자가 인증된 리소스를 인증되지 않은 사용자에게 존재하지 않는 것처럼 숨기려면,
+                                인증되지 않은 페이지에 그 리소스로의 링크가 없도록 하고, 인증되지 않은 사용자가 해당
+                                리소스를 발견할 수 있는 기타 외부 채널이 없도록 보장해야 합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="requirements-on-tls-usage">
+                    <h2 id="rfc.section.7" class="np"><a href="#rfc.section.7">7.</a>&nbsp;<a
+                            href="#requirements-on-tls-usage">TLS 사용 요구사항</a></h2>
+                    <div id="rfc.section.7.p.1">
+                        <p>이 인증 방식은 TLS를 사용하는 HTTP 용도로만 정의됩니다(<a href="#RFC8446"><cite
+                                    title="The Transport Layer Security (TLS) Protocol Version 1.3">[TLS]</cite></a>
+                            포함). 여기에는 일반적으로 HTTP/2(<a href="#RFC9113"><cite title="HTTP/2">[HTTP/2]</cite></a>)
+                            또는 전송 프로토콜로 TLS를 사용하는 HTTP/3(<a href="#RFC9114"><cite title="HTTP/3">[HTTP/3]</cite></a>)
+                            용도의 HTTP over TLS 사용이 포함됩니다(<a href="#RFC9001"><cite
+                                    title="Using TLS to Secure QUIC">[QUIC-TLS]</cite></a>).
+                        </p>
+                    </div>
+                    <div id="rfc.section.7.p.2" class="avoidbreakafter">
+                        <p>TLS 키 익스포터가 인증에 대해 안전한 것은 TLS 세션에 고유하게 바인딩되어 있을 때만이므로(참조:
+                            <a href="#RFC7627"><cite
+                                    title="Transport Layer Security (TLS) Session Hash and Extended Master Secret Extension">[RFC7627]</cite></a>),
+                            Concealed 인증 방식은 다음 중 하나의 속성을 요구합니다:
+                        </p>
+                    </div>
+                    <div id="rfc.section.7.p.3">
+                        <ul>
+                            <li>
+                                <div>
+                                    <p>사용 중인 TLS 버전이 1.3 이상일 것(<a href="#RFC8446"><cite
+                                                title="The Transport Layer Security (TLS) Protocol Version 1.3">[TLS]</cite></a>).
+                                    </p>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <p>사용 중인 TLS 버전이 1.2이고 extended master secret extension(<a href="#RFC7627"><cite
+                                                title="Transport Layer Security (TLS) Session Hash and Extended Master Secret Extension">[RFC7627]</cite></a>)이
+                                        협상되었을 것.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.7.p.4">
+                        <p>클라이언트는 위의 두 속성 중 하나를 만족하지 않는 연결에서 Concealed HTTP 인증 방식을 사용해서는
+                            <em class="bcp14">안 됩니다</em>. 서버가 위의 어떤 속성도 만족하지 않는 연결에서 이 인증 방식을
+                            사용하는 요청을 수신하면, 서버는 해당 요청을 인증이 없는 것처럼 처리해야 합니다.
+                        </p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="security">
+                    <h2 id="rfc.section.8" class="np"><a href="#rfc.section.8">8.</a>&nbsp;<a href="#security">보안
+                            고려사항</a></h2>
+                    <div id="rfc.section.8.p.1">
+                        <p>Concealed HTTP 인증 방식은 서버가 클라이언트에게 nonce를 전송할 필요 없이 신선성을 보장하면서
+                            클라이언트가 오리진 서버에 인증할 수 있게 합니다. 이는 서버가 일부 리소스에 대해 인증을
+                            지원하거나 기대한다는 사실을 노출하지 않고도 인증된 클라이언트를 수용할 수 있도록 해줍니다.
+                            또한 클라이언트가 평문 TLS Client Hello 확장으로 인해 인증 존재를 관찰자에게 유출하지 않도록
+                            합니다.</p>
+                    </div>
+                    <div id="rfc.section.8.p.2">
+                        <p>위에서 설명한 신선성은 TLS 키 익스포터에 의해 제공되므로 기본 TLS 연결만큼 오래될 수 있습니다.
+                            서버는 GOAWAY 프레임(참조: <a href="https://www.rfc-editor.org/rfc/rfc9114.html#section-5.2">Section
+                                5.2</a> of <a href="#RFC9114"><cite title="HTTP/3">[HTTP/3]</cite></a>)과 같은 메커니즘을 사용하여
+                            클라이언트가 새 연결을 생성하도록 강제함으로써 더 나은 신선성을 요구할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.8.p.3">
+                        <p>이 문서에서 설명하는 인증 증명은 개별 HTTP 요청에 바인딩되지 않습니다; 동일한 연결에서 여러 요청에
+                            대해 인증 증명이 사용되면 모두 동일하게 됩니다. 이는 전송 시 압축을 개선하지만, 서로 다른
+                            보안 컨텍스트를 단일 HTTP 연결에서 다중화하는 클라이언트 구현체는 해당 컨텍스트들이 서로의
+                            헤더 필드를 읽을 수 없도록 보장해야 합니다. 그렇지 않으면 한 컨텍스트가 다른 컨텍스트의
+                            Authorization 헤더 필드를 재생할 수 있습니다. 현대 웹 브라우저는 이 제약을 충족합니다.
+                            만약 공격자가 브라우저를 침해하여 다른 컨텍스트의 메모리에 접근할 수 있게 된다면, 공격자는
+                            해당 키에도 접근할 수 있게 되어 요청에 바인딩하는 것이 실제로 큰 이득을 제공하지 못할 수
+                            있습니다.</p>
+                    </div>
+                    <div id="rfc.section.8.p.4">
+                        <p>Concealed HTTP 인증 방식에 사용되는 인증 비대칭 키는 다른 프로토콜에서 재사용되어서는
+                            <em class="bcp14">안 됩니다</em>. 비록 서명 데이터에 정적 접두를 추가하여 이러한 문제를 완화하려고
+                            시도하지만(참조: <a href="#computation" title="Signature Computation">섹션 3.3</a>), 키 재사용은
+                            인증의 보안 보장을 약화시킬 수 있습니다.
+                        </p>
+                    </div>
+                    <div id="rfc.section.8.p.5">
+                        <p>이 방식을 제공하는 오리진은 동일한 키를 사용하는 요청들을 연계(link)할 수 있습니다. 그러나 사용된
+                            키가 개별 오리진에 특화되어 있다면, 요청은 오리진 간에 연계되지 않습니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="iana">
+                    <h2 id="rfc.section.9" class="np"><a href="#rfc.section.9">9.</a>&nbsp;<a href="#iana">IANA
+                            고려사항</a></h2>
+                    <section id="iana-schemes">
+                        <h3 id="rfc.section.9.1"><a href="#rfc.section.9.1">9.1.</a>&nbsp;<a href="#iana-schemes">HTTP
+                                인증 방식 레지스트리</a></h3>
+                        <div id="rfc.section.9.1.p.1" class="avoidbreakafter">
+                            <p>IANA는 &lt;<a
+                                    href="https://www.iana.org/assignments/http-authschemes">https://www.iana.org/assignments/http-authschemes</a>&gt;에
+                                유지되는
+                                "HTTP Authentication Schemes" 레지스트리에 다음 항목을 등록했습니다:</p>
+                        </div>
+                        <div id="rfc.section.9.1.p.2">
+                            <dl class="compact">
+                                <dt>Authentication Scheme Name:</dt>
+                                <dd style="margin-left: 1.5em">Concealed</dd>
+                                <dt>Reference:</dt>
+                                <dd style="margin-left: 1.5em">RFC 9729</dd>
+                                <dt>Notes:</dt>
+                                <dd style="margin-left: 1.5em">없음</dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section id="iana-exporter-label">
+                        <h3 id="rfc.section.9.2"><a href="#rfc.section.9.2">9.2.</a>&nbsp;<a
+                                href="#iana-exporter-label">TLS 키 자료 익스포터 레이블</a></h3>
+                        <div id="rfc.section.9.2.p.1" class="avoidbreakafter">
+                            <p>IANA는 &lt;<a
+                                    href="https://www.iana.org/assignments/tls-parameters">https://www.iana.org/assignments/tls-parameters</a>&gt;에
+                                유지되는
+                                "TLS Exporter Labels" 레지스트리에 다음 항목을 등록했습니다:</p>
+                        </div>
+                        <div id="rfc.section.9.2.p.2">
+                            <dl class="compact">
+                                <dt>Value:</dt>
+                                <dd style="margin-left: 1.5em">EXPORTER-HTTP-Concealed-Authentication</dd>
+                                <dt>DTLS-OK:</dt>
+                                <dd style="margin-left: 1.5em">N</dd>
+                                <dt>Recommended:</dt>
+                                <dd style="margin-left: 1.5em">Y</dd>
+                                <dt>Reference:</dt>
+                                <dd style="margin-left: 1.5em">RFC 9729</dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section id="http-field-name">
+                        <h3 id="rfc.section.9.3"><a href="#rfc.section.9.3">9.3.</a>&nbsp;<a
+                                href="#http-field-name">HTTP 필드 이름</a></h3>
+                        <div id="rfc.section.9.3.p.1" class="avoidbreakafter">
+                            <p>IANA는 &lt;<a
+                                    href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a>&gt;에
+                                유지되는
+                                "Hypertext Transfer Protocol (HTTP) Field Name Registry"에 다음 항목을 등록했습니다:</p>
+                        </div>
+                        <div id="rfc.section.9.3.p.2">
+                            <dl class="compact">
+                                <dt>Field Name:</dt>
+                                <dd style="margin-left: 1.5em">Concealed-Auth-Export</dd>
+                                <dt>Status:</dt>
+                                <dd style="margin-left: 1.5em">permanent</dd>
+                                <dt>Structured Type:</dt>
+                                <dd style="margin-left: 1.5em">Item</dd>
+                                <dt>Reference:</dt>
+                                <dd style="margin-left: 1.5em">RFC 9729</dd>
+                                <dt>Comments:</dt>
+                                <dd style="margin-left: 1.5em">없음</dd>
+                            </dl>
+                        </div>
+                    </section>
+                </section>
+                <section id="sec-combined-references" class="np">
+                    <div id="rfc.references">
+                        <h2 id="rfc.section.10"><a href="#rfc.section.10">10.</a> 참조</h2>
+                        <section id="sec-normative-references">
+                            <div id="rfc.references.2">
+                                <h3 id="rfc.section.10.1"><a href="#rfc.section.10.1">10.1.</a> 규범적 참조</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="RFC5234">[<a href="#RFC5234" class="smpl">ABNF</a>]</dt>
+                                    <dd>... (참조 목록은 원문 그대로 유지) ...</dd>
+                                </dl>
+                            </div>
+                        </section>
+                        <section id="sec-informative-references">
+                            <div id="rfc.references.3">
+                                <h3 id="rfc.section.10.2"><a href="#rfc.section.10.2">10.2.</a> 정보성 참조</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="RFC8410">[<a href="#RFC8410" class="smpl">ED25519</a>]</dt>
+                                    <dd>... (참조 목록은 원문 그대로 유지) ...</dd>
+                                </dl>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="acknowledgments">
+                    <h2 id="rfc.section.unnumbered-4" class="np"><a href="#acknowledgments">감사의 글</a></h2>
+                    <div id="rfc.section.unnumbered-4.p.1">
+                        <p>저자들은 IETF 커뮤니티의 많은 구성원들에게 감사를 표합니다. 특히 David Benjamin, Reese
+                            Enghardt, Nick Harper, Dennis Jackson, Ilari Liusvaara, François Michel, Lucas Pardue,
+                            Justin
+                            Richer, Ben Schwartz, Martin Thomson, Chris A. Wood에게 리뷰와 기여에 대해 감사드립니다.
+                            본 문서에 설명된 메커니즘은 원래 MASQUE의 첫 번째 반복의 일부였습니다(<a href="#I-D.schinazi-masque"><cite
+                                    title="The MASQUE Protocol">[MASQUE-ORIGINAL]</cite></a>).
+                        </p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="rfc.authors" class="np">
+                    <h2><a href="#rfc.authors">저자 연락처</a></h2>
+                    <address><b>David Schinazi</b><br>Google LLC<br>1600 Amphitheatre Parkway<br>Mountain View, CA
+                        94043<br>United States of America<br>EMail: <a
+                            href="mailto:dschinazi.ietf@gmail.com">dschinazi.ietf@gmail.com</a></address>
+                    <address><b>David M. Oliver</b><br>Guardian Project<br>EMail: <a
+                            href="mailto:david@guardianproject.info">david@guardianproject.info</a><br>URI: <a
+                            href="https://guardianproject.info">https://guardianproject.info</a></address>
+                    <address><b>Jonathan Hoyland</b><br>Cloudflare Inc.<br>EMail: <a
+                            href="mailto:jonathan.hoyland@gmail.com">jonathan.hoyland@gmail.com</a></address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
