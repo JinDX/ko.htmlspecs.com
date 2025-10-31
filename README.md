@@ -187,6 +187,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Gap Decorations Module Level 1](https://ko.htmlspecs.com/css/css-gaps-1)（[Source](https://www.w3.org/TR/2025/WD-css-gaps-1-20250417/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Anchor Positioning Module Level 1](https://ko.htmlspecs.com/css/css-anchor-position-1)（[Source](https://www.w3.org/TR/2025/WD-css-anchor-position-1-20251007/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Anchor Positioning Module Level 2](https://ko.htmlspecs.com/css/css-anchor-position-2)（[Source](https://www.w3.org/TR/2025/WD-css-anchor-position-2-20251021/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [CSS Paged Media Module Level 3](https://ko.htmlspecs.com/css/css-page-3)（[Source](https://www.w3.org/TR/2023/WD-css-page-3-20230914/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 내비게이션
 - [CSS Spatial Navigation Level 1](https://ko.htmlspecs.com/css/css-nav-1)（[Source](https://www.w3.org/TR/2019/WD-css-nav-1-20191126/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
