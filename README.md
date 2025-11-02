@@ -174,6 +174,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Box Model Level 4](https://ko.htmlspecs.com/css/css-box-4)（[Source](https://www.w3.org/TR/2024/WD-css-box-4-20240804/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Geometry Module Level 1](https://ko.htmlspecs.com/css/geometry-1)（[Source](https://www.w3.org/TR/2018/CR-geometry-1-20181204/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [CSS Display Module Level 3](https://ko.htmlspecs.com/css/css-display-3)（[Source](https://www.w3.org/TR/2023/CR-css-display-3-20230330/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
+- [CSS Display Module Level 4](https://ko.htmlspecs.com/css/css-display-4)（[Source](https://www.w3.org/TR/2024/WD-css-display-4-20241219/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [CSS Flexible Box Layout Module Level 1](https://ko.htmlspecs.com/css/css-flexbox-1)（[Source](https://www.w3.org/TR/2025/CRD-css-flexbox-1-20251014/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [CSS Grid Layout Module Level 1](https://ko.htmlspecs.com/css/css-grid-1)（[Source](https://www.w3.org/TR/2025/CRD-css-grid-1-20250326/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [CSS Grid Layout Module Level 2](https://ko.htmlspecs.com/css/css-grid-2)（[Source](https://www.w3.org/TR/2025/CRD-css-grid-2-20250326/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
