@@ -181,6 +181,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Grid Layout Module Level 3](https://ko.htmlspecs.com/css/css-grid-3)（[Source](https://www.w3.org/TR/2025/WD-css-grid-3-20250917/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Inline Layout Module Level 3](https://ko.htmlspecs.com/css/css-inline-3)（[Source](https://www.w3.org/TR/2024/WD-css-inline-3-20241218/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Multi-column Layout Module Level 1](https://ko.htmlspecs.com/css/css-multicol-1)（[Source](https://www.w3.org/TR/2024/CR-css-multicol-1-20240516/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
+- [CSS Multi-column Layout Module Level 2](https://ko.htmlspecs.com/css/css-multicol-2)（[Source](https://www.w3.org/TR/2024/WD-css-multicol-2-20241219/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Shapes Module Level 1](https://ko.htmlspecs.com/css/css-shapes-1)（[Source](https://www.w3.org/TR/2025/CRD-css-shapes-1-20250612/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [CSS Positioned Layout Module Level 3](https://ko.htmlspecs.com/css/css-position-3)（[Source](https://www.w3.org/TR/2025/WD-css-position-3-20251007/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Positioned Layout Module Level 4](https://ko.htmlspecs.com/css/css-position-4)（[Source](https://www.w3.org/TR/2025/WD-css-position-4-20251007/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
