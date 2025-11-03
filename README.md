@@ -53,6 +53,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 디바이스 및 하드웨어 접근
 - [Pointer Events](https://ko.htmlspecs.com/pointerevents2)（[Source](https://www.w3.org/TR/2019/REC-pointerevents2-20190404/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Serial API](https://ko.htmlspecs.com/serial)（[Source](https://wicg.github.io/serial/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Screen Orientation](https://ko.htmlspecs.com/screen-orientation)（[Source](https://www.w3.org/TR/2023/WD-screen-orientation-20251016/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Screen Wake Lock](https://ko.htmlspecs.com/screen-wake-lock)（[Source](https://www.w3.org/TR/2024/WD-screen-wake-lock-20241024/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Idle Detection API](https://ko.htmlspecs.com/idle-detection)（[Source](https://wicg.github.io/idle-detection/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
