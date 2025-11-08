@@ -310,6 +310,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [HTTP Immutable Responses](https://ko.htmlspecs.com/http/rfc8246.html)（[Source](https://httpwg.org/specs/rfc8246.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [The Cache-Status HTTP Response Header Field](https://ko.htmlspecs.com/http/rfc9211.html)（[Source](https://httpwg.org/specs/rfc9211.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Targeted HTTP Cache Control](https://ko.htmlspecs.com/http/rfc9213.html)（[Source](https://httpwg.org/specs/rfc9213.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP Cache Groups](https://ko.htmlspecs.com/http/rfc9875.html)（[Source](https://httpwg.org/specs/rfc9875.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### 콘텐츠 관련 확장
 - [HTTP State Management Mechanism](https://ko.htmlspecs.com/http/rfc6265.html)（[Source](https://httpwg.org/specs/rfc6265.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
