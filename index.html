@@ -34,7 +34,7 @@
         src=https://resources.whatwg.org/logo.svg height=100></a>
     <hgroup>
       <h1 class=allcaps>HTML</h1>
-      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2025년 11월 4일</span>
+      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2025년 11월 13일</span>
     </hgroup>
 
     <nav>
@@ -63,7 +63,7 @@
         <a href=https://github.com/whatwg/html/commits class=changes><span><strong>커밋</strong>
             <code>on GitHub</code></span></a>
         <a id=commit-snapshot-link
-          href=https://html.spec.whatwg.org/commit-snapshots/0e5e7c9eee4f02e2c43dfbccedd798b692f35a0c/
+          href=https://html.spec.whatwg.org/commit-snapshots/d76b15c1893f7c792034df96ee75d5469dd3dde6/
           class=changes><span><strong>스냅샷</strong> <code>as of this commit</code></span></a>
         <a href=https://twitter.com/htmlstandard class=changes><span><strong>트위터 업데이트</strong>
             <code>@htmlstandard</code></span></a>
@@ -192158,70 +192158,110 @@ newPort<c- p>.</c->postMessage<c- p>(</c-><c- t>&apos;ready!&apos;</c-><c- p>);<
     </ol>
   </div>
 
+  <div id="note-worker-lifetime-terminology-relationships" class="note"><a
+      href="#note-worker-lifetime-terminology-relationships" class="self-link"></a>
+    <p>다음 관계는 이 용어들 사이에 성립합니다:</p>
+
+    <ul>
+      <li>
+        <p><code
+            id="the-worker's-lifetime:workerglobalscope-7"><a href="#workerglobalscope">WorkerGlobalScope</a></code>가 <a
+            href="#active-needed-worker" id="the-worker's-lifetime:active-needed-worker-3">적극적으로 필요</a>하거나 <a
+            href="#protected-worker" id="the-worker's-lifetime:protected-worker">보호됨</a> 상태이면 <a
+            href="#permissible-worker" id="the-worker's-lifetime:permissible-worker">허용됨</a> 상태입니다.</p>
+      </li>
+      <li>
+        <p><code
+            id="the-worker's-lifetime:workerglobalscope-8"><a href="#workerglobalscope">WorkerGlobalScope</a></code>가 <a
+            href="#protected-worker" id="the-worker's-lifetime:protected-worker-2">보호됨</a> 상태이면 <a
+            href="#active-needed-worker" id="the-worker's-lifetime:active-needed-worker-4">적극적으로 필요</a> 상태입니다.</p>
+      </li>
+    </ul>
+
+    <p>하지만 역은 항상 성립하지 않습니다:</p>
+
+    <ul>
+      <li>
+        <p><code
+            id="the-worker's-lifetime:workerglobalscope-9"><a href="#workerglobalscope">WorkerGlobalScope</a></code>가 <a
+            href="#active-needed-worker" id="the-worker's-lifetime:active-needed-worker-5">적극적으로 필요</a>하지만 <a
+            href="#protected-worker" id="the-worker's-lifetime:protected-worker-3">보호됨</a>은 아닐 수 있습니다. 예를 들어, 완전히 활성 상태의
+          소유자를 위해 아직 연산을 수행하고 있지만 outstanding async 작업이 없는 전용 워커이고, 해당 <code
+            id="the-worker's-lifetime:worker"><a href="#worker">Worker</a></code> 객체가 가비지 컬렉션된 경우입니다. <a
+            href="#ports-and-garbage-collection">가비지 컬렉션 때문</a>에 <a href="#the-worker's-ports"
+            id="the-worker's-lifetime:the-worker's-ports-2">ports</a> 컬렉션이 비어 있으므로 더 이상 보호되지 않습니다.
+          하지만 그 이벤트 루프가 아직 <a href="#step-empty-worker-global-scope-owner-set">owner set을 비우는 절차</a>를 실행하지 않았으므로 여전히
+          적극적으로 필요 상태로 남아 있습니다.</p>
+      </li>
+      <li>
+        <p><code
+            id="the-worker's-lifetime:workerglobalscope-10"><a href="#workerglobalscope">WorkerGlobalScope</a></code>가
+          <a href="#permissible-worker" id="the-worker's-lifetime:permissible-worker-2">허용됨</a>이지만 <a
+            href="#protected-worker" id="the-worker's-lifetime:protected-worker-4">보호됨</a> 또는 <a
+            href="#active-needed-worker" id="the-worker's-lifetime:active-needed-worker-6">적극적으로 필요</a>는 아닐 수 있습니다. 예를
+          들어, 해당 트랜지티브 오너 집합 내의 모든 <code id="the-worker's-lifetime:document-2"><a href="#document">Document</a></code>가
+          <a href="#note-bfcache">bfcache</a>에 있거나, 혹은 <code
+            id="the-worker's-lifetime:sharedworkerglobalscope-3"><a href="#sharedworkerglobalscope">SharedWorkerGlobalScope</a></code>인데
+          현재 오너가 없고 <a href="#between-loads-shared-worker-timeout"
+            id="the-worker's-lifetime:between-loads-shared-worker-timeout-3">between-loads shared worker timeout</a> 동안만
+          살아 있는 경우입니다.
+        </p>
+      </li>
+    </ul>
+  </div>
+
+  <p id="note-between-loads-shared-worker-timeout-lifetime" class="note"><a
+      href="#note-between-loads-shared-worker-timeout-lifetime" class="self-link"></a><a
+      href="#between-loads-shared-worker-timeout"
+      id="the-worker's-lifetime:between-loads-shared-worker-timeout-4">between-loads shared worker timeout</a>은 <a
+      href="#permissible-worker" id="the-worker's-lifetime:permissible-worker-3">허용됨</a>의 정의에만 영향을 미치며, <a
+      href="#protected-worker" id="the-worker's-lifetime:protected-worker-5">보호됨</a>에는 영향을 주지 않습니다. 따라서 구현체는 해당 타임아웃 기간
+    동안 shared worker를 반드시 살아 있게 유지하지 않아도 됩니다. 대신, 반드시 해당 타임아웃이 지나면 shared worker를 종료해야 합니다.</p>
+
   <div data-algorithm="">
-    <p><code id="the-worker's-lifetime:workerglobalscope-7"><a href=#workerglobalscope>WorkerGlobalScope</a></code>
-      <var>global</var>은 다음 알고리즘이 true를 반환하면 <dfn id=suspendable-worker>중단 가능</dfn> 상태입니다:
+    <p><code id="the-worker's-lifetime:workerglobalscope-11"><a href="#workerglobalscope">WorkerGlobalScope</a></code>
+      <var>global</var>이 아래 알고리즘이 true를 반환하면 <dfn id="suspendable-worker">일시 정지 가능</dfn> 상태입니다:
     </p>
 
     <ol>
       <li>
-        <p><var>global</var>이 <a href=#active-needed-worker id="the-worker's-lifetime:active-needed-worker-3">실제로
-            필요함</a> 상태라면,
-          false를 반환합니다.
+        <p>만약 <var>global</var>이 <a href="#active-needed-worker" id="the-worker's-lifetime:active-needed-worker-7">적극적으로
+            필요</a>하다면
+          false를 반환합니다.</p>
+      </li>
       <li>
-        <p><var>global</var>이 <a href=#permissible-worker id="the-worker's-lifetime:permissible-worker">허용됨</a>
-          상태라면,
-          true를 반환합니다.
+        <p>만약 <var>global</var>이 <a href="#permissible-worker"
+            id="the-worker's-lifetime:permissible-worker-4">허용됨</a>이라면
+          true를 반환합니다.</p>
+      </li>
       <li>
-        <p>false를 반환합니다.
+        <p>false를 반환합니다.</p>
+      </li>
     </ol>
   </div>
 
-  <div id=note-worker-lifetime-terminology class=note><a href=#note-worker-lifetime-terminology class=self-link></a>
-    <p>이 개념들은 명세의 규범적인 요구사항에서 다음과 같이 사용됩니다:</p>
+  <div id="note-worker-lifetime-terminology" class="note"><a href="#note-worker-lifetime-terminology"
+      class="self-link"></a>
+    <p>이 개념들은 스펙의 다른 규범적 요구에서 다음과 같이 사용됩니다:</p>
 
     <ul>
       <li>
-        <p>워커는 <a href=#protected-worker id="the-worker's-lifetime:protected-worker">보호됨</a> 상태를 잃고 <a
-            href=#permissible-worker id="the-worker's-lifetime:permissible-worker-2">허용됨</a> 상태를 잃는 사이에 <a
-            href=#step-closing-orphan-workers>고아로 종료됨</a> 처리됩니다.
+        <p>Worker는 <a href="#protected-worker" id="the-worker's-lifetime:protected-worker-6">보호됨</a> 상태가 끝나고 <a
+            href="#permissible-worker" id="the-worker's-lifetime:permissible-worker-5">허용됨</a> 상태가 끝나기 사이에 <a
+            href="#step-closing-orphan-workers">orphan으로 닫힙니다</a>.</p>
+      </li>
       <li>
-        <p>워커는 <a href=#suspendable-worker id="the-worker's-lifetime:suspendable-worker">중단 가능</a> 상태에 따라 <a
-            href=#step-suspending-workers>중단 또는 재개</a> 처리됩니다.
+        <p>종료된 후에도 계속 실행 중인 worker는, <a href="#active-needed-worker"
+            id="the-worker's-lifetime:active-needed-worker-8">적극적으로 필요</a> 상태가 아니게 되면, 사용자 에이전트의 재량에 의해 <a
+            href="#terminate-rampant-workers">종료될 수 있습니다</a>.</p>
+      </li>
       <li>
-        <p>종료되었지만 계속 실행되는 워커는 <a href=#active-needed-worker id="the-worker's-lifetime:active-needed-worker-4">실제로
-            필요함</a> 상태를 잃으면 사용자 에이전트가 <a href=#terminate-rampant-workers>종료</a>할 수 있습니다.
+        <p>Worker들은 <a href="#suspendable-worker" id="the-worker's-lifetime:suspendable-worker">일시 정지 가능</a>한지에 따라 <a
+            href="#step-suspending-workers">일시 정지 또는 해제</a>됩니다.
+        </p>
+      </li>
     </ul>
-
-    <p>모든 <code id="the-worker's-lifetime:workerglobalscope-8"><a href=#workerglobalscope>WorkerGlobalScope</a></code>가
-      <a href=#active-needed-worker id="the-worker's-lifetime:active-needed-worker-5">실제로 필요함</a> 상태라면 <a
-        href=#protected-worker id="the-worker's-lifetime:protected-worker-2">보호됨</a> 상태이고, 모든
-      <code id="the-worker's-lifetime:workerglobalscope-9"><a href=#workerglobalscope>WorkerGlobalScope</a></code>가
-      <a href=#protected-worker id="the-worker's-lifetime:protected-worker-3">보호됨</a> 상태라면 <a href=#permissible-worker
-        id="the-worker's-lifetime:permissible-worker-3">허용됨</a> 상태입니다. (반대의 경우는 성립하지
-      않습니다.)
-    </p>
-
-    <p><a href=#protected-worker id="the-worker's-lifetime:protected-worker-4">보호됨</a>과 <a href=#permissible-worker
-        id="the-worker's-lifetime:permissible-worker-4">허용됨</a>의 중요한 차이점은, <code
-        id="the-worker's-lifetime:workerglobalscope-10"><a href=#workerglobalscope>WorkerGlobalScope</a></code>가
-      <a href=#protected-worker id="the-worker's-lifetime:protected-worker-5">보호됨</a> 상태가 되려면 그 소유자 집합의 추이적 집합에
-      적어도 하나 이상의 <a href=#fully-active id="the-worker's-lifetime:fully-active-2">완전히 활성화된</a> <code
-        id="the-worker's-lifetime:document-2"><a href=#document>Document</a></code>가 포함되어야 하며, <code
-        id="the-worker's-lifetime:workerglobalscope-11"><a href=#workerglobalscope>WorkerGlobalScope</a></code>는
-      모든 <code id="the-worker's-lifetime:document-3"><a href=#document>Document</a></code>가 <a
-        href=#note-bfcache>bfcache</a>에 있더라도 <a href=#permissible-worker
-        id="the-worker's-lifetime:permissible-worker-5">허용됨</a> 상태가 될 수 있습니다.
-    </p>
   </div>
-
-  <p id=note-between-loads-shared-worker-timeout-lifetime class=note><a
-      href=#note-between-loads-shared-worker-timeout-lifetime class=self-link></a><a
-      href=#between-loads-shared-worker-timeout id="the-worker's-lifetime:between-loads-shared-worker-timeout-3">페이지
-      로드
-      사이 공유 워커 타임아웃</a>은 <a href=#permissible-worker id="the-worker's-lifetime:permissible-worker-6">허용됨</a>의 정의에만 영향을
-    주며, <a href=#protected-worker id="the-worker's-lifetime:protected-worker-6">보호됨</a>에는 영향을 주지 않습니다. 따라서 구현체는 해당 기간
-    동안 공유 워커를 반드시 유지하지 않아도 되며, 타임아웃이 도달하면 공유 워커를 종료해야 합니다.</p>
 
 
 
