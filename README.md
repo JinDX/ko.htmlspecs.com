@@ -104,7 +104,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Deprecation Reporting](https://ko.htmlspecs.com/deprecation-reporting/)（[Source](https://wicg.github.io/deprecation-reporting/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Page Lifecycle](https://ko.htmlspecs.com/page-lifecycle/)（[Source](https://wicg.github.io/page-lifecycle/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Server Timing](https://ko.htmlspecs.com/server-timing/)（[Source](https://www.w3.org/TR/2023/WD-server-timing-20230411/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2025/WD-paint-timing-20251020/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2025/WD-paint-timing-20251119/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2025/WD-event-timing-20251017/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 보안 및 인증
