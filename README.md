@@ -236,7 +236,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Animations Level 1](https://ko.htmlspecs.com/css/css-animations-1/)（[Source](https://www.w3.org/TR/2023/WD-css-animations-1-20230302/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Animations Level 2](https://ko.htmlspecs.com/css/css-animations-2/)（[Source](https://www.w3.org/TR/2023/WD-css-animations-2-20230602/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Web Animations](https://ko.htmlspecs.com/css/web-animations-1/)（[Source](https://www.w3.org/TR/2023/WD-web-animations-1-20230605/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Web Animations Module Level 2](https://ko.htmlspecs.com/css/web-animations-2/)（[Source](https://www.w3.org/TR/2025/WD-web-animations-2-20251115/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Web Animations Module Level 2](https://ko.htmlspecs.com/css/web-animations-2/)（[Source](https://www.w3.org/TR/2025/WD-web-animations-2-20251120/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Motion Path Module Level 1](https://ko.htmlspecs.com/css/motion-1/)（[Source](https://www.w3.org/TR/2024/WD-motion-1-20241105/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS View Transitions Module Level 1](https://ko.htmlspecs.com/css/css-view-transitions-1/)（[Source](https://www.w3.org/TR/2024/CRD-css-view-transitions-1-20240328/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [CSS View Transitions Module Level 2](https://ko.htmlspecs.com/css/css-view-transitions-2/)（[Source](https://www.w3.org/TR/2024/WD-css-view-transitions-2-20241113/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
