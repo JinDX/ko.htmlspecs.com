@@ -52,6 +52,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Storage](https://ko.htmlspecs.com/storage/)（[Source](https://storage.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [File API](https://ko.htmlspecs.com/FileAPI/)（[Source](https://www.w3.org/TR/2024/WD-FileAPI-20241204/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [File System](https://ko.htmlspecs.com/fs/)（[Source](https://fs.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
+- [File System Access API](https://ko.htmlspecs.com/file-system-access/)（[Source](https://wicg.github.io/file-system-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)（[Source](https://cookiestore.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [File and Directory Entries API](https://ko.htmlspecs.com/entries-api/)（[Source](https://wicg.github.io/entries-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Web Locks API](https://ko.htmlspecs.com/web-locks/)（[Source](https://www.w3.org/TR/2025/WD-web-locks-20250924/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
