@@ -43,6 +43,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Payment Request API](https://ko.htmlspecs.com/payment-request/)（[Source](https://www.w3.org/TR/2025/CRD-payment-request-20250930/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Payment Handler API](https://ko.htmlspecs.com/payment-handler/)（[Source](https://www.w3.org/TR/2025/WD-payment-handler-20250927/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Background Fetch](https://ko.htmlspecs.com/background-fetch/)（[Source](https://wicg.github.io/background-fetch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Periodic Background Sync](https://ko.htmlspecs.com/periodic-background-sync/)（[Source](https://wicg.github.io/periodic-background-sync/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [User-Agent Client Hints](https://ko.htmlspecs.com/ua-client-hints/)（[Source](https://wicg.github.io/ua-client-hints/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Beacon](https://ko.htmlspecs.com/beacon/)（[Source](https://www.w3.org/TR/2022/CRD-beacon-20220803/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 
