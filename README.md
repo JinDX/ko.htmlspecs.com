@@ -17,6 +17,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [MIME Sniffing](https://ko.htmlspecs.com/mimesniff/)（[Source](https://mimesniff.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Infra](https://ko.htmlspecs.com/infra/)（[Source](https://infra.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Web Application Manifest](https://ko.htmlspecs.com/appmanifest/)（[Source](https://www.w3.org/TR/2025/WD-appmanifest-20251127/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Web App Manifest - Application Information](https://ko.htmlspecs.com/manifest-app-info/)（[Source](https://www.w3.org/TR/2023/NOTE-manifest-app-info-20230821/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Compatibility](https://ko.htmlspecs.com/compat/)（[Source](https://compat.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Web Platform Design Principles](https://ko.htmlspecs.com/design-principles/)（[Source](https://www.w3.org/TR/2025/NOTE-design-principles-20251029/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Compression](https://ko.htmlspecs.com/compression/)（[Source](https://compression.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
@@ -38,6 +39,8 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebSockets](https://ko.htmlspecs.com/websockets/)（[Source](https://websockets.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [WebSub](https://ko.htmlspecs.com/websub/)（[Source](https://www.w3.org/TR/2018/REC-websub-20180123/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [ActivityPub](https://ko.htmlspecs.com/activitypub/)（[Source](https://www.w3.org/TR/2018/REC-activitypub-20180123/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Activity Streams 2.0](https://ko.htmlspecs.com/activitystreams-core/)（[Source](https://www.w3.org/TR/2017/REC-activitystreams-core-20170523/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Linked Data Notifications](https://ko.htmlspecs.com/ldn/)（[Source](https://www.w3.org/TR/2017/REC-ldn-20170502/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Webmention](https://ko.htmlspecs.com/webmention/)（[Source](https://www.w3.org/TR/2017/REC-webmention-20170112/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Micropub](https://ko.htmlspecs.com/micropub/)（[Source](https://www.w3.org/TR/2017/REC-micropub-20170523/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [WebTransport](https://ko.htmlspecs.com/webtransport/)（[Source](https://www.w3.org/TR/2025/WD-webtransport-20251118/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
