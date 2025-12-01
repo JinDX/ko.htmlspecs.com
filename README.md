@@ -301,6 +301,12 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Layout API Level 1](https://ko.htmlspecs.com/css/css-layout-api-1/)（[Source](https://www.w3.org/TR/2018/WD-css-layout-api-1-20180412/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Properties and Values API Level 1](https://ko.htmlspecs.com/css/css-properties-values-api-1/)（[Source](https://www.w3.org/TR/2024/WD-css-properties-values-api-1-20240326/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
+### 디자인 토큰
+- [Design Tokens Technical Reports 2025.10](https://ko.htmlspecs.com/css/design-tokens/)（[Source](https://www.designtokens.org/tr/2025.10/) ![Community Group Final Report](https://img.shields.io/badge/CG--FINAL-ffcc00)）
+- [Design Tokens Format Module 2025.10](https://ko.htmlspecs.com/css/design-tokens-format/)（[Source](https://www.designtokens.org/tr/2025.10/format/) ![Community Group Final Report](https://img.shields.io/badge/CG--FINAL-ffcc00)）
+- [Design Tokens Color Module 2025.10](https://ko.htmlspecs.com/css/design-tokens-color/)（[Source](https://www.designtokens.org/tr/2025.10/color/) ![Community Group Final Report](https://img.shields.io/badge/CG--FINAL-ffcc00)）
+- [Design Tokens Resolver Module 2025.10](https://ko.htmlspecs.com/css/design-tokens-resolver/)（[Source](https://www.designtokens.org/tr/2025.10/resolver/) ![Community Group Final Report](https://img.shields.io/badge/CG--FINAL-ffcc00)）
+
 ## HTTP
 - [index](https://ko.htmlspecs.com/http/)（[Source](https://httpwg.org/specs/)）
 
