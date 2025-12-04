@@ -57,7 +57,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 저장 및 데이터
 - [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB/)（[Source](https://www.w3.org/TR/2025/WD-IndexedDB-3-20250813/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Storage](https://ko.htmlspecs.com/storage/)（[Source](https://storage.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
-- [File API](https://ko.htmlspecs.com/FileAPI/)（[Source](https://www.w3.org/TR/2024/WD-FileAPI-20241204/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [File API](https://ko.htmlspecs.com/FileAPI/)（[Source](https://www.w3.org/TR/2025/WD-FileAPI-20251203/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [File System](https://ko.htmlspecs.com/fs/)（[Source](https://fs.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [File System Access API](https://ko.htmlspecs.com/file-system-access/)（[Source](https://wicg.github.io/file-system-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Cookie Store API](https://ko.htmlspecs.com/cookiestore/)（[Source](https://cookiestore.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
