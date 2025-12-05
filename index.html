@@ -146342,37 +146342,39 @@ forwardButton<c- p>.</c->disabled <c- o>=</c-> <c- o>!</c->navigation<c- p>.</c-
 
         <div id="note-suppress-microtasks-during-navigation-events" class="note"><a
             href="#note-suppress-microtasks-during-navigation-events" class="self-link"></a>
-          <p>이 단계는 <a id="navigate-event-firing:javascript-execution-context-stack"
+          <p>이 작업은 <a id="navigate-event-firing:javascript-execution-context-stack"
               href="https://tc39.es/ecma262/#execution-context-stack"
-              data-x-internal="javascript-execution-context-stack">JavaScript 실행 컨텍스트 스택</a>이
-            <a href="#url-and-history-update-steps" id="navigate-event-firing:url-and-history-update-steps">URL 및 히스토리
-              업데이트 단계</a> 이후 <code
+              data-x-internal="javascript-execution-context-stack">JavaScript 실행 컨텍스트 스택</a>이 <code
               id="navigate-event-firing:event-currententrychange"><a href="#event-currententrychange">currententrychange</a></code>
-            이벤트 핸들러가 실행된 직후 비워지는 것을 방지한다. 이때 스택이 비워진다면 즉시 <a href="#perform-a-microtask-checkpoint"
-              id="navigate-event-firing:perform-a-microtask-checkpoint">마이크로태스크
-              체크포인트</a>가 수행되어, 다양한 프로미스 이행 핸들러가 이벤트 핸들러들과 인터리브되며
-            <code
+            이벤트
+            핸들러가 <a href="#url-and-history-update-steps" id="navigate-event-firing:url-and-history-update-steps">URL 및
+              히스토리 업데이트 단계</a>의 결과로 실행된 직후에 비게 되는 것을 방지하기 위해 수행됩니다. 만약 그 시점에 스택이 비게 된다면 즉시 <a
+              href="#perform-a-microtask-checkpoint" id="navigate-event-firing:perform-a-microtask-checkpoint">마이크로태스크
+              체크포인트 수행</a>이 일어나, 다양한 프로미스 이행 핸들러들이 이벤트 핸들러와
+            교차되어 실행되거나 <code
+              id="navigate-event-firing:dom-navigateevent-intercept"><a href="#dom-navigateevent-intercept">navigateEvent.intercept()</a></code>
+            에 전달된 핸들러들보다 먼저 실행될 수 있습니다.
+            이는 바람직하지 않습니다.
+            왜냐하면 프로미스 핸들러의 실행 순서와 <code
               id="navigate-event-firing:event-currententrychange-2"><a href="#event-currententrychange">currententrychange</a></code>
-            이벤트 핸들러나 <code
+            이벤트 핸들러 실행 순서, <code
               id="navigate-event-firing:dom-navigateevent-intercept-2"><a href="#dom-navigateevent-intercept">intercept()</a></code>
-            핸들러보다 먼저 실행될 수 있다.
-            이는 내비게이션이 사용자에 의해 발생한 경우(스택이 비어있음)와 자바스크립트 API 호출로 발생한 경우(스택이 안 비어있음)에 따라
-            프로미스 핸들러, <code id="navigate-event-firing:event-currententrychange-2">currententrychange</code>
-            이벤트 핸들러, <code id="navigate-event-firing:dom-navigateevent-intercept-2">intercept()</code>
-            핸들러의 실행 순서가 달라지므로 바람직하지 않다.
-          </p>
+            핸들러 실행 순서가
+            내비게이션이 빈 <a id="navigate-event-firing:javascript-execution-context-stack-2"
+              href="https://tc39.es/ecma262/#execution-context-stack"
+              data-x-internal="javascript-execution-context-stack">JavaScript 실행 컨텍스트 스택</a>에서 발생하는지(예: 사용자가 내비게이션을 직접
+            수행한 경우), 아니면 비어 있지 않은 스택에서 발생하는지(예: JavaScript API 호출로 인한 경우)에 따라 달라질 수 있기 때문입니다.</p>
 
-          <p>이 단계에서 굳이 필요하지 않은 <a id="navigate-event-firing:javascript-execution-context"
+          <p>이 단계에서 불필요한 <a id="navigate-event-firing:javascript-execution-context"
               href="https://tc39.es/ecma262/#sec-execution-contexts"
-              data-x-internal="javascript-execution-context">JavaScript 실행 컨텍스트</a>를 스택에 올려두면,
-            <a href="#perform-a-microtask-checkpoint"
-              id="navigate-event-firing:perform-a-microtask-checkpoint-2">마이크로태스크 체크포인트</a>
-            알고리즘 실행이 미뤄져, 항상 <code
+              data-x-internal="javascript-execution-context">JavaScript 실행 컨텍스트</a>를 스택에 삽입함으로써 <a
+              href="#perform-a-microtask-checkpoint" id="navigate-event-firing:perform-a-microtask-checkpoint-2">마이크로태스크
+              체크포인트 수행</a>
+            알고리즘을 나중으로 미루게 되어, 항상 다음과 같은 순서가 유지됩니다: <code
               id="navigate-event-firing:event-currententrychange-3"><a href="#event-currententrychange">currententrychange</a></code>
-            이벤트 핸들러 → <code
+            이벤트 핸들러가 먼저 실행되고, 그 다음 <code
               id="navigate-event-firing:dom-navigateevent-intercept-3"><a href="#dom-navigateevent-intercept">intercept()</a></code>
-            핸들러 → 프로미스 핸들러 순서를 보장할 수 있다.
-          </p>
+            핸들러가 실행되며, 마지막으로 프로미스 핸들러가 실행됩니다.</p>
         </div>
       </li>
       <li>
