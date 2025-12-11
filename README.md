@@ -32,6 +32,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.2](https://ko.htmlspecs.com/wai-aria/)（[Source](https://www.w3.org/TR/2023/REC-wai-aria-1.2-20230606/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [ARIA in HTML](https://ko.htmlspecs.com/html-aria/)（[Source](https://www.w3.org/TR/2025/REC-html-aria-20250805/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname-1.1/)（[Source](https://www.w3.org/TR/2018/REC-accname-1.1-20181218/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Accessibility Conformance Testing (ACT) Rules Format 1.1](https://ko.htmlspecs.com/act-rules-format/)（[Source](https://www.w3.org/TR/2025/CR-act-rules-format-1.1-20250819/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 
 ### 네트워크와 통신
 - [Fetch](https://ko.htmlspecs.com/fetch/)（[Source](https://fetch.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
