@@ -138,6 +138,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Mixed Content](https://ko.htmlspecs.com/mixed-content/)（[Source](https://www.w3.org/TR/2023/CRD-mixed-content-20230223/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1/)（[Source](https://www.w3.org/TR/2025/WD-credential-management-1-20251028/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Federated Credential Management API (FedCM)](https://ko.htmlspecs.com/fedcm/)（[Source](https://www.w3.org/TR/2024/WD-fedcm-1-20240820/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Private State Token API](https://ko.htmlspecs.com/trust-token-api/)（[Source](https://wicg.github.io/trust-token-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 미디어 및 그래픽
 - [WebGPU](https://ko.htmlspecs.com/webgpu/)（[Source](https://www.w3.org/TR/2025/CRD-webgpu-20251205/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
