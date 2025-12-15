@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        창 제어 오버레이
+    </title>
+    <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
+    <script class="remove">
+        // All config options at https://respec.org/docs/
+        var respecConfig = {
+            mdn: true,
+            specStatus: "CG-DRAFT",
+            editors: [{
+                name: "Diego González",
+                url: "https://twitter.com/diekus",
+                company: "Microsoft",
+                companyURL: "https://www.microsoft.com"
+            }],
+            github: "WICG/window-controls-overlay",
+            shortName: "window-controls-overlay",
+            xref: {
+                profile: "web-platform",
+                specs: [
+                    "appmanifest",
+                    "cssom-view",
+                    "geometry-1",
+                    "manifest-incubations",
+                    "MEDIAQUERIES-5"
+                ]
+            },
+            group: "wicg",
+
+        };
+    </script>
+</head>
+
+<body>
+    <section id="abstract">
+        <p>
+            이 문서는 데스크톱 환경에서 실행되는 설치된 웹 애플리케이션에서 일반적으로 제목 표시줄이 차지하는 영역을 제어할 수 있게 해주는 일련의 기술들을 명시한다. 이러한 기술들은 (<abbr
+                title="창 제어 오버레이">WCO</abbr>)로 알려져 있다.
+        </p>
+    </section>
+    <section id="sotd">
+        <p>
+            이 초안은 WCO의 표준화 과정을 위한 출발점 역할을 하기 위한 것이며, 여기서 설명한 기술들은 다른 워킹 그룹의 다른 명세로 이전될 수 있다.
+        </p>
+    </section>
+    <section class="informative">
+        <h2>
+            소개
+        </h2>
+        <p>
+            비모바일 장치를 대상으로 하는 애플리케이션은 일반적으로 제목 표시줄을 가진 프레임 내에서 호스팅된다. 제목 표시줄은 보통 창 상단의 가로 막대로 표현되는 UI 요소로, 활성 프로그램의 이름 또는
+            현재 활성 문서의 이름과 [=window controls=]를 표시한다. 최신 애플리케이션은 더 나은 UX를 만들기 위해 제목 표시줄 영역의 공간을 사용하여 UI 콘텐츠를 표시할 수 있다.
+        </p>
+        <p>
+            UA 프레임 내에서 호스팅되는 설치된 웹 앱의 경우, 어떤 형태로든 프레임의 맞춤화를 얻기 위해 선호되는 디스플레이 모드를 선언하는 것이 가능하다. 개발자는 [=manifest=] 파일의
+            `display` 멤버를 통해 애플리케이션의 요구에 가장 적합한 모드를 선택할 수 있다. 그러나 이러한 모드들은 제한적이며 제목 표시줄에 대한 동일한 수준의 제어를 제공하지 못하므로, 설치된
+            애플리케이션에 대해 몰입형의 네이티브 유사 제목 표시줄을 만들고자 하는 개발자는 앞서 언급한 멤버만으로는 이를 달성할 수 없다. 대신 클라이언트 영역은 예약된 제목 표시줄 영역 바로 아래에서
+            시작하므로, 작은 화면을 가진 휴대용 장치에서는 애플리케이션 공간이 좁아질 수 있다.
+        </p>
+        <p>
+            WCO는 프레임 위에 [=window controls=]만 [=overlaid=] 되도록 하여 웹 콘텐츠가 이전에 제목 표시줄이 차지했던 영역으로 흐를 수 있게 함으로써 맞춤형 제목 표시줄
+            UI를 만들 수 있도록 한다.
+        </p><img src="https://wicg.github.io/window-controls-overlay/spec-wco.png"
+            alt="Blank window frame showing the controls area.">
+        <section>
+            <h3>
+                예시
+            </h3>
+            <aside class="example">
+                <p>
+                    제목 표시줄 영역에 div 배치하기
+                </p>
+                <pre class="css">
+            .titleBar {
+              position: fixed;
+              left: env(titlebar-area-x, 0);
+              top: env(titlebar-area-y, 0);
+              width: env(titlebar-area-width, 100%);
+              height: env(titlebar-area-height, 40px);
+              app-region: drag;
+          }
+          </pre>
+                <pre>
+            &lt;div class="titlebar"&gt;
+              This is web content in the title bar region!
+            &lt;div&gt;
+          </pre>
+            </aside>
+        </section>
+        <aside class="note">
+            <p>
+                WCO 기능은 애플리케이션을 수용하기 위해 창 패러다임을 사용하는 환경에서 유용하다. 노치, 불규칙한 형태의 뷰포트 또는 하드웨어 제약 주위의 콘텐츠 배치는 이 명세의 범위에 포함되지
+                않는다.
+            </p>
+            <p>
+                데스크톱과 유사한 환경에서의 창 패러다임은 수십 년에 걸쳐 정보 구조를 관리하는 데 효과적인 것으로 입증된 UX이다. 이 패러다임은 계속 진화하고 있으며, 이 진화의 일부는 최신 앱이
+                이전에 제목 표시줄을 위해 예약된 창 영역을 제어할 수 있게 하는 것이다. WCO는 네이티브 기술로 작성된 앱들이 오늘날 활용할 수 있는 방식과 동일한 방식으로 이를 가능하게 한다.
+            </p>
+            <p>
+                <strong>노치 및 기타 하드웨어 요소는 어떤 플랫폼에서든 어떤 앱 창의 제목 표시줄 영역을 방해하지 않는다</strong>. 이들은 상태 표시나 메뉴 영역과 같은 OS의 일부를
+                가로지를 수 있으며, 이는 전적으로 호스트 운영체제에서 처리한다. WCO 기능은 노치가 교차할 수 있는 어떠한 영역도 다루지 않는다.
+            </p>
+            <p>
+                노치는 작업할 수 있는 여유 공간을 많이 남기지 않으며, 임의의 위치에 있을 수 있고 반드시 직사각형일 필요도 없다. 또한, 화면 대비 비율을 극대화하기 위해 노치를 구현하는 공급업체들의
+                대부분 GUI 지침은 노치 주변에 콘텐츠를 배치하지 않을 것을 권장한다.
+            </p>
+        </aside>
+    </section>
+    <section>
+        <h2>
+            개념
+        </h2>
+        <ul>
+            <li>
+                <dfn>Window Controls Overlay</dfn>: 데스크톱이 아닌 환경에서 실행되는 설치된 웹 애플리케이션이 JS 및 CSS를 사용하여 뷰포트를 [=title bar
+                area=] 위로 확장할 수 있게 하는 기능.
+            </li>
+            <li>
+                <dfn>Title bar area</dfn>: WCO가 활성화되면, 이는 [=overlay=]에 해당하는 영역(창의 [=controls of the window=]를 수용하는)을 제외한
+                제목 표시줄이 차지하는 창 프레임의 영역이다.
+            </li>
+            <li>
+                <dfn data-lt="controls of the window">Window controls</dfn>:
+                운영체제가 애플리케이션 전반에 걸쳐 일관되게 사용하는 인터페이스 요소로, 사용자가 애플리케이션을 제어하기 위한 특정 동작을 수행할 수 있게 한다. [=window controls=]의
+                일반적인 동작에는 최소화, 최대화/복원, 닫기 버튼 등이 포함된다.
+            </li>
+            <li>
+                <dfn data-lt="overlaid">Overlay</dfn> of [=window controls=]: [=window controls=]를 수용하며 뷰포트 위에 오버레이된 영역.
+            </li><img src="https://wicg.github.io/window-controls-overlay/spec-wco-areas.png"
+                alt="Window frame with window controls circled.">
+        </ul>
+    </section>
+    <section>
+        <h2>
+            `Navigator` 인터페이스에 대한 확장
+        </h2>
+        <p>
+            [[HTML]] 명세는 <dfn>Navigator</dfn> 인터페이스를 정의하며, 이 명세는 이를 확장한다:
+        </p>
+        <pre class="idl">
+        [SecureContext, Exposed=(Window)]
+        partial interface Navigator {
+          [SameObject] readonly attribute WindowControlsOverlay windowControlsOverlay;
+        };
+      </pre>
+    </section>
+    <section>
+        <h2>
+            `Window` 인터페이스에 대한 확장
+        </h2>
+        <section>
+            <h3>
+                내부 슬롯
+            </h3>
+            <table class="simple">
+                <thead>
+                    <tr>
+                        <th>
+                            Internal slot
+                        </th>
+                        <th>
+                            Initial value
+                        </th>
+                        <th>
+                            Description
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <dfn data-dfn-for="Window">[[\TitleBarArea]]</dfn>
+                        </td>
+                        <td>
+                            Empty [=struct=] for the title bar region.
+                        </td>
+                        <td>
+                            제목 표시줄 영역을 정의하는 값들(`x`, `y`, `width`, `height`)을 저장하는 [=struct=].
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </section>
+    <section data-dfn-for='WindowControlsOverlay' data-link-for='WindowControlsOverlay'>
+        <h2>
+            <dfn>WindowControlsOverlay</dfn> 인터페이스
+        </h2>
+        <pre class='idl' data-cite="DOM HTML">
+        [Exposed=Window]
+        interface WindowControlsOverlay : EventTarget {
+          readonly attribute boolean visible;
+          DOMRect getTitlebarAreaRect();
+          attribute EventHandler ongeometrychange;
+        };
+
+        [Exposed=Window]
+        interface WindowControlsOverlayGeometryChangeEvent : Event {
+          constructor(DOMString type, WindowControlsOverlayGeometryChangeEventInit eventInitDict);
+          [SameObject] readonly attribute DOMRect titlebarAreaRect;
+          readonly attribute boolean visible;
+        };
+
+        dictionary WindowControlsOverlayGeometryChangeEventInit : EventInit {
+          required DOMRect titlebarAreaRect;
+          boolean visible = false;
+        };
+      </pre>
+        <section>
+            <h3>
+                <dfn>visible</dfn> 속성
+            </h3>
+            <p>
+                `visible` 속성은 {{Window/window}}.[[\TitleBarArea]]의 값들이 0이 아닐 때 `true`를 반환하는 [=boolean=]이다.
+            </p>
+        </section>
+        <section>
+            <h3>
+                <dfn>getTitlebarAreaRect</dfn> 메서드
+            </h3>
+            <p>
+                `getTitlebarAreaRect()` 메서드는 웹 콘텐츠를 표시할 수 있는 사용 가능한 영역을 나타내는 DOMRect를 반환한다. 이 사용 가능한 제목 표시줄 영역은 [=window
+                controls=] [=overlay=] 아래의 영역을 포함하지 않는다.
+            </p><img src="https://wicg.github.io/window-controls-overlay/spec-wco-gbr.png"
+                alt="depiction of the area returned by the getTitlebarAreaRect method">
+            <aside class="note">
+                <p>
+                    클라이언트 뷰포트는 WCO 기능이 활성화된 상태에서 콘텐츠를 렌더링할 때 특별한 고려를 하지 않는다. 콘텐츠는 브라우저 창 내에서 표시되는 것과 동일한 방식으로 표시된다.
+                    [=window controls=]가 [=overlaid=] 되는 영역에 의해 콘텐츠가 가려지는 것을 피하려면, 개발자는 `getTitlebarAreaRect` 메서드 또는
+                    [=title bar area env variables=]를 사용해야 한다.
+                </p>
+            </aside>
+            <aside class="note">
+                <p>
+                    사용자 에이전트가 WCO를 지원하지 않는 경우, 개발자는 [=manifest/display_override=]와 CSS 변수 및 JS 객체에 대해 합리적인 대체 수단을 사용할 수
+                    있다.
+                </p>
+            </aside>
+        </section>
+        <section>
+            <h3>
+                <dfn>ongeometrychange</dfn> 속성
+            </h3>
+            <p>
+                `ongeometrychange` 속성은 해당 이벤트 핸들러 이벤트 타입이 "change"인 이벤트 핸들러이다.
+            </p>
+        </section>
+    </section>
+    <section>
+        <h2>
+            새로운 [=display mode/window-controls-overlay=] [=display mode=]의 추가
+            </code>
+        </h2>
+        <p>
+            이 명세는 다음과 같은 [=display mode=]를 정의한다:
+        </p>
+        <dl>
+            <dt>
+                <dfn data-export="" data-dfn-for="display mode">
+                    window-controls-overlay
+                </dfn>
+            </dt>
+            <dd>
+                웹 애플리케이션은 네이티브 OS 창 컨트롤이 보이는 상태로 열리지만 웹 콘텐츠는 제목 표시줄 영역의 나머지 부분까지 확장된다. 앱은 또한 웹 콘텐츠 내에서 [=draggable
+                region=]를 지정하여 맞춤형 제목 표시줄을 만들 수 있다.
+            </dd>
+        </dl>
+        <p>
+            <code>[=display mode/window-controls-overlay=]</code>
+            [=display mode=]는 매니페스트의
+            <code>[=manifest/display_override=]</code> 멤버에 지정될 수 있다.
+        </p>
+        <aside class="issue">
+            <p>
+                TO DO: 이 텍스트는 다른 명세에 속할 수 있는 기능들을 위한 초안 텍스트이다. 이 문서는 이 초안에 명시된 일부 작업의 최종 장소가 아닐 수 있다. (manifest/manifest
+                incubations)
+            </p>
+        </aside>
+    </section>
+    <section>
+        <h2>
+            <dfn>제목 표시줄 영역 환경 변수</dfn>
+        </h2>
+        <aside class="issue">
+            <p>
+                TO DO: 이 텍스트는 다른 명세에 속할 수 있는 기능들을 위한 초안 텍스트이다. 이 문서는 이 초안에 명시된 일부 작업의 최종 장소가 아닐 수 있다. (CSS)
+            </p>
+        </aside>
+        <section>
+            <h3>
+                <dfn>제목 표시줄 영역 env 변수</dfn>
+            </h3>
+            <table dfn-type="value" dfn-for="env()">
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Value
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <dfn>`titlebar-area-x`</dfn>
+                    </td>
+                    <td>
+                        <a href="https://drafts.csswg.org/css-values-3/#length-value">length</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <dfn>`titlebar-area-y`</dfn>
+                    </td>
+                    <td>
+                        <a href="https://drafts.csswg.org/css-values-3/#length-value">length</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <dfn>`titlebar-area-width`</dfn>
+                    </td>
+                    <td>
+                        <a href="https://drafts.csswg.org/css-values-3/#length-value">length</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <dfn>`titlebar-area-height`</dfn>
+                    </td>
+                    <td>
+                        <a href="https://drafts.csswg.org/css-values-3/#length-value">length</a>
+                    </td>
+                </tr>
+            </table>
+            <p>
+                [=title bar area environmental variables=]는 시작 지점에서의 너비와 높이로 사각형을 정의하는 네 개의 env 변수이다. 이 영역은 제목 표시줄의 사용
+                가능한 영역에 해당하며, 그 경계 내에서 동적 웹 콘텐츠를 배치할 수 있게 한다.
+            </p>
+        </section>
+    </section>
+    <section>
+        <h2>
+            CSSOM과의 통합
+        </h2>
+        <p>
+            이 명세는 <a href="https://www.w3.org/TR/cssom-view-1/#run-the-resize-steps">아래 알고리즘</a>을 패치함으로써 [[cssom-view]]
+            명세와 통합된다:
+        </p>
+        <p>
+            뷰포트 [=Window/resize=] 알고리즘에서, 1단계 이후에 [=resize the title bar area=]를 실행한다.
+        </p>
+    </section>
+    <section>
+        <h2>
+            알고리즘
+        </h2>
+        <section>
+            <h3>
+                제목 표시줄 영역 크기 조정
+            </h3>
+            <p>
+                창 |win|에 대해 <dfn data-lt="title bar region resizes">제목 표시줄 영역의 크기를 조정</dfn>하려면, 다음 단계를 실행한다:
+            </p>
+            <ol>
+                <li>If |win|'s [=overlay=] has had its width or height changed (e.g.
+                    as a result of the user resizing the browser window, or changing the
+                    page zoom factor, or other UI appearing or disappearing on the
+                    [=overlay=]), since the last time these steps were run, [=fire an
+                    event=] named `ongeometrychange` at the {{Window/window}} object and
+                    [=update the overlay area information=].
+                </li>
+            </ol>
+        </section>
+        <section>
+            <h3>
+                오버레이 영역 정보 업데이트
+            </h3>
+            <p>
+                오버레이 영역 정보를 업데이트하려면, 다음 단계를 실행한다:
+            </p>
+            <ol class="algorithm">
+                <li>Let |ovls| be a [=list=] of regions defined by the [=overlays=]
+                    that house the [=window controls=] on the the window frame.
+                </li>
+                <li>Let |tba| be an empty {{DOMRect}} object representing the
+                    available title bar area.
+                    <ol>
+                        <li>If there is only one overlay region in |ovls|, set |tba| as a
+                            {{DOMRect}} that encompasses the area from the edge of the frame
+                            to the innermost edge of the |ovls|.
+                        </li>
+                        <li>If there is more than one overlay region in |ovls|, set |tba|
+                            to a {{DOMRect}} that encompasses the area between the
+                            intersection of the regions in |ovls| and the [=document=]'s
+                            <a href="https://drafts.csswg.org/css2/#viewport">viewport</a>.
+                        </li>
+                        <li>|tba|'s height should be the same as the height of the
+                            regions in |ovls|.
+                        </li>
+                    </ol>
+                </li>
+                <li>Make {{Window/window}}.[[\TitleBarArea]] equal to |tba|.
+                </li>
+                <li>Update the [=title bar area env variables=] with information from
+                    {{Window/window}}.[[\TitleBarArea]].
+                </li>
+            </ol>
+        </section>
+    </section>
+    <section>
+        <h2>
+            보안 및 개인정보 보호 고려사항
+        </h2>
+        <section>
+            <h3>
+                보안
+            </h3>
+            <section>
+                <h4>
+                    스푸핑 위험
+                </h4>
+                <p>
+                    프레임이 없는 창에 설치된 웹 앱을 표시하면 개발자가 이전에는 신뢰되던 UA 제어 영역에 콘텐츠를 스푸핑할 여지가 생긴다.
+                </p>
+                <p>
+                    현재 Chromium 브라우저에서는 `standalone` 모드에 제목 표시줄이 포함되며, 초기 실행 시 왼쪽에는 웹페이지의 제목이, 오른쪽에는 페이지의 출처(origin)가
+                    표시된다(그 뒤로 "설정 및 추가" 버튼과 창 컨트롤이 따른다). 몇 초 후에 출처 텍스트는 사라진다.
+                </p>
+                <p>
+                    RTL 구성된 브라우저에서는 이 레이아웃이 뒤집혀 출처 텍스트가 왼쪽에 있게 된다. 이는 오버레이의 오른쪽 가장자리와 출처 사이에 패딩이 충분하지 않으면 오버레이가 출처를 스푸핑할
+                    수 있게 한다. 예를 들어, 출처 "evil.ltd"가 신뢰할 수 있는 사이트 "google.com"으로 이어붙여져 사용자가 출처를 신뢰할 수 있다고 믿게 만들 수 있다.
+                </p>
+            </section>
+            <section>
+                <h4>
+                    범위를 벗어난 탐색(Out-of-scope Navigation)
+                </h4>
+                <p>
+                    설치된 웹 앱에 대한 또 다른 기존 보안 기능은 사용자가 앱의 선언된 범위를 벗어났을 때의 표시이다. 사용자가 범위를 벗어나면 제목 표시줄과 웹 콘텐츠 사이에 검은색 막대가
+                    나타나며, 다음 정보를 포함한다:
+                </p>
+                <ul>
+                    <li>사용자가 쉽게 범위 내로 다시 이동할 수 있도록 하는 닫기 버튼
+                    </li>
+                    <li>클릭 시 보안 정보 팝업을 여는 보안 아이콘
+                    </li>
+                    <li>사이트의 출처(origin) 및 제목
+                    </li>
+                </ul>
+                <p>
+                    창 컨트롤 오버레이가 활성화된 경우, 사용자가 범위를 벗어나면 오버레이는 일시적으로 독립 실행형 제목 표시줄로 대체된다. 사용자가 범위 내로 다시 이동하면 독립 실행형 제목
+                    표시줄은 다시 숨겨지고 오버레이가 표시된다.
+                </p>
+            </section>
+        </section>
+        <section>
+            <h3>
+                개인정보
+            </h3>
+            <p>
+                Window Controls Overlay를 활성화하면 오버레이의 크기가 운영체제, 텍스트 배율, OS 글꼴 크기, OS 줌 인자 및 웹 콘텐츠의 줌 인자에 따라 달라질 수 있으므로 지문
+                추적(fingerprinting) 면에서 표면적이 증가한다.
+            </p>
+            <p>
+                이는 잠재적 지문 추적 문제이긴 하지만, 설치된 데스크톱 웹 앱에서 window controls overlay 기능을 사용하는 경우에만 적용되며 일반 브라우저 사용에는 적용되지 않는다.
+                또한 windowControlsOverlay API는 설치된 웹 앱에 포함된 iframe에는 제공되지 않는다.
+            </p>
+        </section>
+    </section>
+    <section class="appendix informative" id="acknowledgments">
+        <h2>
+            감사의 글
+        </h2>
+        <p>
+            이 작업에 기여한 Amanda Baker, Joshua Bell 및 Yoav Weiss에게 큰 감사를 드린다.
+        </p>
+    </section>
+    <section id="conformance"></section>
+</body>
+
+</html>
