@@ -93,6 +93,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Notifications API](https://ko.htmlspecs.com/notifications/)（[Source](https://notifications.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Badging API](https://ko.htmlspecs.com/badging/)（[Source](https://www.w3.org/TR/2025/WD-badging-20251006/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Virtual Keyboard](https://ko.htmlspecs.com/virtual-keyboard/)（[Source](https://www.w3.org/TR/2022/WD-virtual-keyboard-20220505/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Window Controls Overlay](https://ko.htmlspecs.com/window-controls-overlay/)（[Source](https://wicg.github.io/window-controls-overlay/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Web Share API](https://ko.htmlspecs.com/web-share/)（[Source](https://www.w3.org/TR/2023/REC-web-share-20230530/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Audio API](https://ko.htmlspecs.com/webaudio/)（[Source](https://www.w3.org/TR/2024/WD-webaudio-1.1-20241105/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Geolocation API](https://ko.htmlspecs.com/geolocation/)（[Source](https://www.w3.org/TR/2025/REC-geolocation-20251029/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
@@ -136,6 +137,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Global Privacy Control (GPC)](https://ko.htmlspecs.com/gpc/)（[Source](https://www.w3.org/TR/2025/WD-gpc-20251125/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Secure Contexts](https://ko.htmlspecs.com/secure-contexts/)（[Source](https://www.w3.org/TR/2023/CRD-secure-contexts-20231110/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Referrer Policy](https://ko.htmlspecs.com/referrer-policy/)（[Source](https://www.w3.org/TR/2017/CR-referrer-policy-20170126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
+- [Fetch Metadata Request Headers](https://ko.htmlspecs.com/fetch-metadata/)（[Source](https://www.w3.org/TR/2025/WD-fetch-metadata-20250401/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Mixed Content](https://ko.htmlspecs.com/mixed-content/)（[Source](https://www.w3.org/TR/2023/CRD-mixed-content-20230223/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1/)（[Source](https://www.w3.org/TR/2025/WD-credential-management-1-20251028/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Federated Credential Management API (FedCM)](https://ko.htmlspecs.com/fedcm/)（[Source](https://www.w3.org/TR/2024/WD-fedcm-1-20240820/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
@@ -149,6 +151,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Presentation API](https://ko.htmlspecs.com/presentation-api/)（[Source](https://www.w3.org/TR/2025/CRD-presentation-api-20250212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Scroll-driven Animations](https://ko.htmlspecs.com/scroll-animations-1/)（[Source](https://www.w3.org/TR/2023/WD-scroll-animations-1-20230606/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Media Capture and Streams](https://ko.htmlspecs.com/mediacapture-streams/)（[Source](https://www.w3.org/TR/2025/CRD-mediacapture-streams-20251009/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [Media Stream Recording](https://ko.htmlspecs.com/media-stream-recording/)（[Source](https://www.w3.org/TR/2025/WD-mediastream-recording-20250417/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Media Source Extensions](https://ko.htmlspecs.com/media-source-2/)（[Source](https://www.w3.org/TR/2025/WD-media-source-2-20251104/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebCodecs](https://ko.htmlspecs.com/webcodecs/)（[Source](https://www.w3.org/TR/2025/WD-webcodecs-20251124/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Media Session](https://ko.htmlspecs.com/mediasession/)（[Source](https://www.w3.org/TR/2025/WD-mediasession-20250919/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
