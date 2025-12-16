@@ -120,6 +120,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [User Timing Level 2](https://ko.htmlspecs.com/user-timing-2/)（[Source](https://www.w3.org/TR/2019/REC-user-timing-2-20190226/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Observable](https://ko.htmlspecs.com/observable/)（[Source](https://wicg.github.io/observable/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Long Tasks API](https://ko.htmlspecs.com/longtasks-1/)（[Source](https://www.w3.org/TR/2024/WD-longtasks-1-20240524/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Prioritized Task Scheduling](https://ko.htmlspecs.com/scheduling-apis/)（[Source](https://wicg.github.io/scheduling-apis/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Reporting API](https://ko.htmlspecs.com/reporting-1/)（[Source](https://www.w3.org/TR/2025/WD-reporting-1-20250611/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Deprecation Reporting](https://ko.htmlspecs.com/deprecation-reporting/)（[Source](https://wicg.github.io/deprecation-reporting/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Page Lifecycle](https://ko.htmlspecs.com/page-lifecycle/)（[Source](https://wicg.github.io/page-lifecycle/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
