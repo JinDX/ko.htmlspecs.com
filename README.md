@@ -173,7 +173,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Color Module Level 3](https://ko.htmlspecs.com/css/css-color-3/)（[Source](https://www.w3.org/TR/2022/REC-css-color-3-20220118/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [CSS Color Module Level 4](https://ko.htmlspecs.com/css/css-color-4/)（[Source](https://www.w3.org/TR/2025/CRD-css-color-4-20250424/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [CSS Color Module Level 5](https://ko.htmlspecs.com/css/css-color-5/)（[Source](https://www.w3.org/TR/2025/WD-css-color-5-20250318/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [CSS Color Adjustment Module Level 1](https://ko.htmlspecs.com/css/css-color-adjust-1/)（[Source](https://www.w3.org/TR/2025/CRD-css-color-adjust-1-20250812/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [CSS Color Adjustment Module Level 1](https://ko.htmlspecs.com/css/css-color-adjust-1/)（[Source](https://www.w3.org/TR/2025/CR-css-color-adjust-1-20251216/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [CSS Color HDR Module Level 1](https://ko.htmlspecs.com/css/css-color-hdr-1/)（[Source](https://www.w3.org/TR/2025/WD-css-color-hdr-1-20251202/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Filter Effects Module Level 1](https://ko.htmlspecs.com/css/filter-effects-1/)（[Source](https://www.w3.org/TR/2018/WD-filter-effects-1-20181218/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Compositing and Blending Level 1](https://ko.htmlspecs.com/css/compositing-1/)（[Source](https://www.w3.org/TR/2024/CRD-compositing-1-20240321/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
