@@ -183,7 +183,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Conditional Rules Module Level 5](https://ko.htmlspecs.com/css/css-conditional-5/)（[Source](https://www.w3.org/TR/2025/WD-css-conditional-5-20251030/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Backgrounds and Borders Level 3](https://ko.htmlspecs.com/css/css-backgrounds-3/)（[Source](https://www.w3.org/TR/2024/CRD-css-backgrounds-3-20240311/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [CSS Backgrounds Module Level 4](https://ko.htmlspecs.com/css/css-backgrounds-4/)（[Source](https://www.w3.org/TR/2025/WD-css-backgrounds-4-20251125/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [CSS Borders and Box Decorations Module Level 4](https://ko.htmlspecs.com/css/css-borders-4/)（[Source](https://www.w3.org/TR/2025/WD-css-borders-4-20250722/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [CSS Borders and Box Decorations Module Level 4](https://ko.htmlspecs.com/css/css-borders-4/)（[Source](https://www.w3.org/TR/2025/WD-css-borders-4-20251216/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Custom Highlight API Module Level 1](https://ko.htmlspecs.com/css/css-highlight-api-1/)（[Source](https://www.w3.org/TR/2021/WD-css-highlight-api-1-20211215/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 글꼴
