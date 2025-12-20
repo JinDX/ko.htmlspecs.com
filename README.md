@@ -128,6 +128,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2025/WD-paint-timing-20251119/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Largest Contentful Paint](https://ko.htmlspecs.com/largest-contentful-paint/)（[Source](https://www.w3.org/TR/2025/WD-largest-contentful-paint-20250911/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2025/WD-event-timing-20251017/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Prefetch](https://ko.htmlspecs.com/prefetch/)（[Source](https://wicg.github.io/nav-speculation/prefetch.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 보안 및 인증
 - [Web Authentication: An API for accessing Public Key Credentials Level 2](https://ko.htmlspecs.com/webauthn-2/)（[Source](https://www.w3.org/TR/2021/REC-webauthn-2-20210408/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
