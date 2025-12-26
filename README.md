@@ -48,6 +48,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Linked Data Notifications](https://ko.htmlspecs.com/ldn/)（[Source](https://www.w3.org/TR/2017/REC-ldn-20170502/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Webmention](https://ko.htmlspecs.com/webmention/)（[Source](https://www.w3.org/TR/2017/REC-webmention-20170112/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Micropub](https://ko.htmlspecs.com/micropub/)（[Source](https://www.w3.org/TR/2017/REC-micropub-20170523/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Web Annotation Data Model](https://ko.htmlspecs.com/annotation-model/)（[Source](https://www.w3.org/TR/2017/REC-annotation-model-20170223/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [WebTransport](https://ko.htmlspecs.com/webtransport/)（[Source](https://www.w3.org/TR/2025/WD-webtransport-20251217/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Service Workers Nightly](https://ko.htmlspecs.com/service-workers/)（[Source](https://www.w3.org/TR/2025/CRD-service-workers-20251212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Push API](https://ko.htmlspecs.com/push-api/)（[Source](https://www.w3.org/TR/2025/WD-push-api-20251201/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
@@ -55,6 +56,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Payment Request API](https://ko.htmlspecs.com/payment-request/)（[Source](https://www.w3.org/TR/2025/CRD-payment-request-20250930/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Payment Handler API](https://ko.htmlspecs.com/payment-handler/)（[Source](https://www.w3.org/TR/2025/WD-payment-handler-20250927/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Goods API](https://ko.htmlspecs.com/digital-goods/)（[Source](https://wicg.github.io/digital-goods/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Secure Payment Confirmation](https://ko.htmlspecs.com/secure-payment-confirmation/)（[Source](https://www.w3.org/TR/2025/CRD-secure-payment-confirmation-20251209/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Background Fetch](https://ko.htmlspecs.com/background-fetch/)（[Source](https://wicg.github.io/background-fetch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Periodic Background Sync](https://ko.htmlspecs.com/periodic-background-sync/)（[Source](https://wicg.github.io/periodic-background-sync/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [User-Agent Client Hints](https://ko.htmlspecs.com/ua-client-hints/)（[Source](https://wicg.github.io/ua-client-hints/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
