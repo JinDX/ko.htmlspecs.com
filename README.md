@@ -110,6 +110,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebOTP API](https://ko.htmlspecs.com/web-otp/)（[Source](https://wicg.github.io/web-otp/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Device Posture API](https://ko.htmlspecs.com/device-posture/)（[Source](https://www.w3.org/TR/2024/CR-device-posture-20241126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light/)（[Source](https://www.w3.org/TR/2025/WD-ambient-light-20250212/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Proximity Sensor](https://ko.htmlspecs.com/proximity/)（[Source](https://www.w3.org/TR/2025/WD-proximity-20250212/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Generic Sensor API](https://ko.htmlspecs.com/generic-sensor/)（[Source](https://www.w3.org/TR/2025/CRD-generic-sensor-20251211/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Battery Status API](https://ko.htmlspecs.com/battery-status/)（[Source](https://www.w3.org/TR/2024/WD-battery-status-20241024/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Vibration API](https://ko.htmlspecs.com/vibration/)（[Source](https://www.w3.org/TR/2025/CRD-vibration-20250212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
@@ -169,6 +170,8 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [MediaStream Image Capture](https://ko.htmlspecs.com/image-capture/)（[Source](https://www.w3.org/TR/2025/WD-image-capture-20250423/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Encrypted Media Extensions](https://ko.htmlspecs.com/encrypted-media-2/)（[Source](https://www.w3.org/TR/2025/WD-encrypted-media-2-20251126/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebXR Device API](https://ko.htmlspecs.com/webxr/)（[Source](https://www.w3.org/TR/2025/CRD-webxr-20251001/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebXR Augmented Reality Module - Level 1](https://ko.htmlspecs.com/webxr-ar-module-1/)（[Source](https://www.w3.org/TR/2025/CRD-webxr-ar-module-1-20250425/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebXR Hand Input Module - Level 1](https://ko.htmlspecs.com/webxr-hand-input-1/)（[Source](https://www.w3.org/TR/2024/WD-webxr-hand-input-1-20240605/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Portable Network Graphics (PNG) 3](https://ko.htmlspecs.com/png-3/)（[Source](https://www.w3.org/TR/2025/REC-png-3-20250624/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 
 ### 개발자 도구
