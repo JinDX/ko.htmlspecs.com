@@ -173,6 +173,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebXR Device API](https://ko.htmlspecs.com/webxr/)（[Source](https://www.w3.org/TR/2025/CRD-webxr-20251001/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebXR Augmented Reality Module - Level 1](https://ko.htmlspecs.com/webxr-ar-module-1/)（[Source](https://www.w3.org/TR/2025/CRD-webxr-ar-module-1-20250425/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebXR Hand Input Module - Level 1](https://ko.htmlspecs.com/webxr-hand-input-1/)（[Source](https://www.w3.org/TR/2024/WD-webxr-hand-input-1-20240605/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [WebXR Gamepads Module - Level 1](https://ko.htmlspecs.com/webxr-gamepads-module-1/)（[Source](https://www.w3.org/TR/2025/WD-webxr-gamepads-module-1-20250707/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Portable Network Graphics (PNG) 3](https://ko.htmlspecs.com/png-3/)（[Source](https://www.w3.org/TR/2025/REC-png-3-20250624/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 
 ### 개발자 도구
