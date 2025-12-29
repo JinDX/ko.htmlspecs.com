@@ -88,6 +88,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Bluetooth API](https://ko.htmlspecs.com/web-bluetooth/)（[Source](https://webbluetoothcg.github.io/web-bluetooth/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Web NFC API](https://ko.htmlspecs.com/web-nfc/)（[Source](https://w3c.github.io/web-nfc/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Handwriting Recognition API](https://ko.htmlspecs.com/handwriting-recognition/)（[Source](https://wicg.github.io/handwriting-recognition/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Accelerated Shape Detection in Images](https://ko.htmlspecs.com/shape-detection-api/)（[Source](https://wicg.github.io/shape-detection-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Screen Orientation](https://ko.htmlspecs.com/screen-orientation/)（[Source](https://www.w3.org/TR/2025/WD-screen-orientation-20251021/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Screen Wake Lock](https://ko.htmlspecs.com/screen-wake-lock/)（[Source](https://www.w3.org/TR/2024/WD-screen-wake-lock-20241024/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Idle Detection API](https://ko.htmlspecs.com/idle-detection/)（[Source](https://wicg.github.io/idle-detection/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
