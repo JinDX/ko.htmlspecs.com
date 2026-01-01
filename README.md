@@ -10,6 +10,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebAssembly JavaScript Interface](https://ko.htmlspecs.com/wasm-js-api-2/)（[Source](https://www.w3.org/TR/2025/CRD-wasm-js-api-2-20251122/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebAssembly Web API](https://ko.htmlspecs.com/wasm-web-api-2/)（[Source](https://www.w3.org/TR/2025/CRD-wasm-web-api-2-20251122/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [DOM](https://ko.htmlspecs.com/dom/)（[Source](https://dom.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
+- [EditContext API](https://ko.htmlspecs.com/edit-context/)（[Source](https://www.w3.org/TR/2025/WD-edit-context-20251112/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [URL](https://ko.htmlspecs.com/url/)（[Source](https://url.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [URL Pattern](https://ko.htmlspecs.com/urlpattern/)（[Source](https://urlpattern.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Scroll To Text Fragment](https://ko.htmlspecs.com/scroll-to-text-fragment/)（[Source](https://wicg.github.io/scroll-to-text-fragment/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
@@ -37,6 +38,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [ARIA in HTML](https://ko.htmlspecs.com/html-aria/)（[Source](https://www.w3.org/TR/2025/REC-html-aria-20250805/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname-1.1/)（[Source](https://www.w3.org/TR/2018/REC-accname-1.1-20181218/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessibility Conformance Testing (ACT) Rules Format 1.1](https://ko.htmlspecs.com/act-rules-format/)（[Source](https://www.w3.org/TR/2025/CR-act-rules-format-1.1-20250819/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
+- [Using ARIA](https://ko.htmlspecs.com/using-aria/)（[Source](https://www.w3.org/TR/2018/WD-using-aria-20180927/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 네트워크와 통신
 - [Fetch](https://ko.htmlspecs.com/fetch/)（[Source](https://fetch.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
@@ -58,7 +60,6 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Payment Request API](https://ko.htmlspecs.com/payment-request/)（[Source](https://www.w3.org/TR/2025/CRD-payment-request-20250930/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Payment Handler API](https://ko.htmlspecs.com/payment-handler/)（[Source](https://www.w3.org/TR/2025/WD-payment-handler-20250927/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Goods API](https://ko.htmlspecs.com/digital-goods/)（[Source](https://wicg.github.io/digital-goods/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [Secure Payment Confirmation](https://ko.htmlspecs.com/secure-payment-confirmation/)（[Source](https://www.w3.org/TR/2025/CRD-secure-payment-confirmation-20251209/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Background Fetch](https://ko.htmlspecs.com/background-fetch/)（[Source](https://wicg.github.io/background-fetch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Periodic Background Sync](https://ko.htmlspecs.com/periodic-background-sync/)（[Source](https://wicg.github.io/periodic-background-sync/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [User-Agent Client Hints](https://ko.htmlspecs.com/ua-client-hints/)（[Source](https://wicg.github.io/ua-client-hints/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
@@ -98,6 +99,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Fullscreen](https://ko.htmlspecs.com/fullscreen/)（[Source](https://fullscreen.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Screen Capture](https://ko.htmlspecs.com/screen-capture/)（[Source](https://www.w3.org/TR/2025/WD-screen-capture-20250717/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [UI Events](https://ko.htmlspecs.com/uievents/)（[Source](https://www.w3.org/TR/2024/WD-uievents-20240907/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [UI Events KeyboardEvent code Values](https://ko.htmlspecs.com/uievents-code/)（[Source](https://www.w3.org/TR/2025/REC-uievents-code-20250422/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Contact Picker API](https://ko.htmlspecs.com/contact-picker/)（[Source](https://www.w3.org/TR/2024/WD-contact-picker-20240708/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Notifications API](https://ko.htmlspecs.com/notifications/)（[Source](https://notifications.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Badging API](https://ko.htmlspecs.com/badging/)（[Source](https://www.w3.org/TR/2025/WD-badging-20251006/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
@@ -150,6 +152,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 보안 및 인증
 - [Web Authentication: An API for accessing Public Key Credentials Level 2](https://ko.htmlspecs.com/webauthn-2/)（[Source](https://www.w3.org/TR/2021/REC-webauthn-2-20210408/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Authentication: An API for accessing Public Key Credentials Level 3](https://ko.htmlspecs.com/webauthn-3/)（[Source](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Secure Payment Confirmation](https://ko.htmlspecs.com/secure-payment-confirmation/)（[Source](https://www.w3.org/TR/2025/CRD-secure-payment-confirmation-20251209/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api/)（[Source](https://wicg.github.io/sanitizer-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Subresource Integrity (SRI)](https://ko.htmlspecs.com/sri/)（[Source](https://www.w3.org/TR/2016/REC-SRI-20160623/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3/)（[Source](https://www.w3.org/TR/2025/WD-CSP3-20251106/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
