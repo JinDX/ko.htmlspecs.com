@@ -1,0 +1,1031 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="ko">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>RFC 8942 - HTTP 클라이언트 힌트</title>
+    <script>
+        function getMeta(rfcno, container) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.rfc-editor.org/rfc/rfc" + rfcno + ".json", true);
+            xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.response);
+
+                        var cont = document.getElementById(container);
+                        // empty the container
+                        while (cont.firstChild) {
+                            cont.removeChild(myNode.firstChild);
+                        }
+
+                        var c = data.status;
+                        if (c) {
+                            var bld = newElementWithText("b", c);
+                            cont.appendChild(bld);
+                        } else {
+                            cont.appendChild(newElementWithText("i", "(document status unknown)"));
+                        }
+
+                        c = data.updated_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Updated by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.obsoleted_by;
+                        if (c && c.length > 0 && c[0] !== null && c[0].length > 0) {
+                            cont.appendChild(newElement("br"));
+                            cont.appendChild(newText("Obsoleted by: "));
+                            appendRfcLinks(cont, c);
+                        }
+
+                        c = data.errata_url;
+                        if (c) {
+                            cont.appendChild(newElement("br"));
+                            var link = newElementWithText("a", "errata");
+                            link.setAttribute("href", c);
+                            var errata = newElementWithText("i", "This document has ");
+                            errata.appendChild(link);
+                            errata.appendChild(newText("."));
+                            cont.appendChild(errata);
+                        }
+
+                        cont.style.display = "block";
+                    } else {
+                        console.error(xhr.statusText);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.status + " " + xhr.statusText);
+            };
+            xhr.send(null);
+        }
+        function appendRfcLinks(parent, updates) {
+            var template = "https://www.rfc-editor.org/rfc/rfc{rfc}.html";
+            for (var i = 0; i < updates.length; i++) {
+                var rfc = updates[i].trim().toLowerCase();
+                if (rfc.substring(0, 3) == "rfc") {
+                    var no = parseInt(rfc.substring(3), 10);
+
+                    var link = newElement("a");
+                    link.setAttribute("href", template.replace("{rfc}", no));
+                    link.appendChild(newText(no));
+                    parent.appendChild(link);
+                } else {
+                    parent.appendChild(newText(rfc));
+                }
+                if (i != updates.length - 1) {
+                    parent.appendChild(newText(", "));
+                }
+            }
+        }
+
+        // DOM helpers
+        function newElement(name) {
+            return document.createElement(name);
+        }
+        function newElementWithText(name, txt) {
+            var e = document.createElement(name);
+            e.appendChild(newText(txt));
+            return e;
+        }
+        function newText(text) {
+            return document.createTextNode(text);
+        }
+    </script>
+    <script>
+        function anchorRewrite() {
+            map = {};
+            if (window.location.hash.length >= 1) {
+                var fragid = window.location.hash.substr(1);
+                if (fragid) {
+                    if (!document.getElementById(fragid)) {
+                        var prefix = "rfc.";
+                        var mapped = map[fragid];
+                        if (mapped) {
+                            window.location.hash = mapped;
+                        } else if (fragid.indexOf("section-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(8).replace("-", ".p.");
+                        } else if (fragid.indexOf("appendix-") == 0) {
+                            window.location.hash = prefix + "section." + fragid.substring(9).replace("-", ".p.");
+                        } else if (fragid.indexOf("s-") == 0) {
+                            var postfix = fragid.substring(2);
+                            if (postfix.startsWith("abstract")) {
+                                window.location.hash = prefix + postfix;
+                            } else if (postfix.startsWith("note-")) {
+                                window.location.hash = prefix + "note." + postfix.substring(5).replace("-", ".p.");
+                            } else {
+                                window.location.hash = prefix + "section." + postfix.replace("-", ".p.");
+                            }
+                        } else if (fragid.indexOf("p-") == 0) {
+                            var r = fragid.substring(2);
+                            var p = r.indexOf("-");
+                            if (p >= 0) {
+                                window.location.hash = prefix + "section." + r.substring(0, p) + ".p." + r.substring(p + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        window.addEventListener('hashchange', anchorRewrite);
+        window.addEventListener('DOMContentLoaded', anchorRewrite);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RFC8942">
+    <meta property="og:description" content="HTTP Client Hints">
+    <meta property="og:url" content="https://httpwg.org/specs/rfc8942.html">
+    <meta property="og:site_name" content="IETF HTTP Working Group Specifications">
+    <meta property="og:image" content="https://httpwg.org/assets/favicon/apple-icon-180x180.png">
+    <link rel="stylesheet" type="text/css"
+        href="https://httpwg.org/assets/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .table.header th,
+        .table.header td {
+            border-top: none;
+            padding: 0;
+        }
+
+        #sidebar {
+            margin-top: -10px;
+            height: 90%;
+            overflow-y: auto;
+            font-size: 90%;
+        }
+
+        #rfc\.meta {
+            width: 40%;
+            float: right
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .filename {
+            color: rgb(119, 119, 119);
+            font-size: 23px;
+            font-weight: normal;
+            height: auto;
+            line-height: 23px;
+        }
+
+        dl {
+            margin-left: 1em;
+        }
+
+        dl.dl-horizontal {
+            margin-left: 0;
+        }
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.nohang>dt {
+            float: none;
+        }
+
+        dl>dd {
+            margin-bottom: .5em;
+        }
+
+        dl.compact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        ul.empty {
+            list-style-type: none;
+        }
+
+        ul.empty li {
+            margin-top: .5em;
+        }
+
+        td.reference {
+            padding-right: 1em;
+            vertical-align: top;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .fbbutton {
+            margin-left: 5px;
+        }
+
+        h1 a,
+        h2 a,
+        h3 a,
+        h4 a,
+        h5 a,
+        h6 a {
+            color: rgb(51, 51, 51);
+        }
+
+        span.tt {
+            font: 11pt consolas, monospace;
+            font-size-adjust: none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://httpwg.org/assets/site.css">
+    <link rel="Contents" href="#rfc.toc">
+    <link rel="Author" href="#rfc.authors">
+    <link rel="License" href="#rfc.copyrightnotice">
+    <link rel="Chapter" title="1 Introduction" href="#rfc.section.1">
+    <link rel="Chapter" title="2 Client Hints Request Header Fields" href="#rfc.section.2">
+    <link rel="Chapter" title="3 Advertising Server Support" href="#rfc.section.3">
+    <link rel="Chapter" title="4 Security Considerations" href="#rfc.section.4">
+    <link rel="Chapter" title="5 Cost of Sending Hints" href="#rfc.section.5">
+    <link rel="Chapter" title="6 IANA Considerations" href="#rfc.section.6">
+    <link rel="Chapter" title="7 References" href="#rfc.section.7">
+    <link rel="Appendix" title="Acknowledgements" href="#rfc.section.unnumbered-4">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-client-hints-15" rel="prev">
+    <link href="https://dx.doi.org/10.17487/rfc8942" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link rel="Alternate" title="Plain Text Version" href="http://www.ietf.org/rfc/rfc8942.txt">
+    <link rel="Help" title="RFC-Editor's Status Page" href="https://www.rfc-editor.org/info/rfc8942">
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="generator"
+        content="https://github.com/mnot/RFCBootstrap XSLT vendor: Saxonica http://www.saxonica.com/">
+    <meta name="keywords" content="Content Negotiation">
+    <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
+    <meta name="dcterms.creator" content="Grigorik, I.">
+    <meta name="dcterms.creator" content="Weiss, Y.">
+    <meta name="dcterms.identifier" content="urn:ietf:rfc:8942">
+    <meta name="dcterms.issued" content="2021-02">
+    <meta name="dcterms.abstract"
+        content="HTTP defines proactive content negotiation to allow servers to select the appropriate response for a given request, based upon the user agent's characteristics, as expressed in request headers. In practice, user agents are often unwilling to send those request headers, because it is not clear whether they will be used, and sending them impacts both performance and privacy.This document defines an Accept-CH response header that servers can use to advertise their use of request headers for proactive content negotiation, along with a set of guidelines for the creation of such headers, colloquially known as 'Client Hints.'">
+    <meta name="dcterms.isPartOf" content="urn:issn:2070-1721">
+    <meta name="description"
+        content="HTTP defines proactive content negotiation to allow servers to select the appropriate response for a given request, based upon the user agent's characteristics, as expressed in request headers. In practice, user agents are often unwilling to send those request headers, because it is not clear whether they will be used, and sending them impacts both performance and privacy.This document defines an Accept-CH response header that servers can use to advertise their use of request headers for proactive content negotiation, along with a set of guidelines for the creation of such headers, colloquially known as 'Client Hints.'">
+</head>
+
+<body onload="getMeta(8942,'rfc.meta');">
+    <nav class="navbar navbar-dark bg-dark d-print-none navbar-expand-lg fixed-top ps-3 pe-3" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="https://httpwg.org/"><img src="https://httpwg.org/assets/http.svg"
+                    height="23"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-item ms-1 text-white" href="https://httpwg.org/specs/">📄 Documentation</a>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Work in
+                        Progress</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/http-extensions/">HTTP Extensions</a></li>
+                        <li class="dropdown-item"><a
+                                href="https://github.com/httpwg/admin/issues?q=is%3Aissue+is%3Aopen+label%3Aadoption">Future
+                                Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown ms-4">
+                    <a href="#" class="nav-item dropdown-toggle text-white" data-bs-toggle="dropdown">Participate</a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="https://httpwg.org/about/">About the HTTP Working Group</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/CONTRIBUTING.html">Contribution Policy</a>
+                        </li>
+                        <li class="dropdown-item"><a href="http://datatracker.ietf.org/wg/httpbis/charter/">WG
+                                Charter</a></li>
+                        <li class="dropdown-item"><a href="http://lists.w3.org/Archives/Public/ietf-http-wg/">Group
+                                Mailing List 📨</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/wg-materials/">Meeting Materials</a></li>
+                        <li class="dropdown-item"><a href="https://httpwg.org/admin/editors/">Document Editor
+                                Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container" id="top">
+        <div class="row">
+            <div class="col-lg-4 order-last d-none d-lg-block" id="sidebar" role="navigation">
+                <div class="navbar">
+                    <div class="navbar-brand"><a href="#top"><strong>RFC </strong>8942</a></div><br clear="all">
+                    <div class="">
+                        <div class="toc ">
+                            <ul>
+                                <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#notational-conventions">표기 규약</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#client-hint-request-header-fields">클라이언트 힌트 요청 헤더 필드</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#sending-client-hints">클라이언트 힌트 전송</a></li>
+                                        <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#server-processing-of-client-hints">서버의 클라이언트 힌트 처리</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#advertising-server-support">서버 지원 광고</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#accept-ch">Accept-CH 응답 헤더 필드</a></li>
+                                        <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#interaction-with-caches">캐시와의 상호작용</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#security-considerations">보안 고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#information-exposure">정보 노출</a></li>
+                                        <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#deployment-and-security-risks">배포 및 보안 위험</a>
+                                        </li>
+                                        <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#abuse-detection">남용 탐지</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#cost-of-sending-hints">힌트
+                                        전송 비용</a></li>
+                                <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                        고려사항</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#iana-accept-ch">Accept-CH</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                                    <ul>
+                                        <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.2">규범적 참조문헌</a></li>
+                                        <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                                href="#rfc.references.3">정보 제공 참조문헌</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#acknowledgements">감사의 말</a></li>
+                                <li><a href="#rfc.authors">저자 연락처</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-first main" role="main">
+                <header>
+                    <table class="table table-condensed header" id="rfc.headerblock">
+                        <tbody>
+                            <tr>
+                                <td class="text-left">Internet Engineering Task Force (IETF)</td>
+                                <td class="text-right">I. Grigorik</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Request for Comments: 8942</td>
+                                <td class="text-right">Y. Weiss</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Category: Experimental</td>
+                                <td class="text-right">Google</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ISSN: 2070-1721</td>
+                                <td class="text-right">February 2021</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="rfc.title">
+                        <h1>HTTP 클라이언트 힌트</h1>
+                    </div>
+                </header>
+                <hr>
+                <h2 id="rfc.abstract"><a href="#rfc.abstract">요약</a></h2>
+                <div class="lead">
+                    <div id="rfc.abstract.p.1">
+                        <p>HTTP는 요청 헤더에 표현된 사용자 에이전트의 특성에 기초하여 서버가 특정 요청에 적합한 응답을 선택할 수 있도록 선제적인 콘텐츠 협상(proactive
+                            content negotiation)을 정의합니다. 실제로 사용자 에이전트는 이러한 요청 헤더가 사용될지 불분명하고, 헤더 전송이 성능과 개인정보에 영향을 미치기
+                            때문에 종종 해당 요청 헤더 전송을 꺼립니다.</p>
+                    </div>
+                    <div id="rfc.abstract.p.2">
+                        <p>이 문서는 서버가 선제적 콘텐츠 협상을 위해 요청 헤더의 사용을 광고하는 데 사용할 수 있는 Accept-CH 응답 헤더와, 일반적으로 "클라이언트 힌트(Client
+                            Hints)"로 알려진 이러한 헤더의 생성에 대한 일련의 지침을 정의합니다.</p>
+                    </div>
+                </div>
+                <aside id="rfc.meta" class="alert alert-info"></aside>
+                <section id="rfc.status">
+                    <h2><a href="#rfc.status">이 문서의 상태</a></h2>
+                    <div id="rfc.boilerplate.1.p.1">
+                        <p>이 문서는 인터넷 표준 트랙 사양이 아니며, 검토, 실험적 구현 및 평가를 위해 게시됩니다.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.2">
+                        <p>이 문서는 인터넷 커뮤니티를 위한 실험적 프로토콜을 정의합니다. 이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물이며 IETF 커뮤니티의 합의를 나타냅니다.
+                            공개 검토를 거쳤고 인터넷 엔지니어링 운영 그룹(IESG)에 의해 출판이 승인되었습니다. 모든 IESG 승인 문서가 인터넷 표준의 후보가 되는 것은 아닙니다; 자세한
+                            내용은 <a href="https://www.rfc-editor.org/rfc/rfc7841.html#section-2">RFC 7841 섹션 2</a>를
+                            참조하십시오.</p>
+                    </div>
+                    <div id="rfc.boilerplate.1.p.3">
+                        <p>이 문서의 현재 상태, 정오표 또는 피드백 제출 방법에 대한 정보는 <a
+                                href="https://www.rfc-editor.org/info/rfc8942">https://www.rfc-editor.org/info/rfc8942</a>에서
+                            확인할 수 있습니다.</p>
+                    </div>
+                </section>
+                <section id="rfc.copyrightnotice">
+                    <h2><a href="#rfc.copyrightnotice">Copyright Notice</a></h2>
+                    <div id="rfc.boilerplate.2.p.1">
+                        <p>Copyright (c) 2021 IETF Trust and the persons identified as the document authors. All rights
+                            reserved.</p>
+                    </div>
+                    <div id="rfc.boilerplate.2.p.2">
+                        <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF
+                            Documents (<a
+                                href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)
+                            in effect on the date of publication of this document. Please review these documents
+                            carefully, as they describe your rights and restrictions with respect to this document. Code
+                            Components extracted from this document must include Simplified BSD License text as
+                            described in Section 4.e of the Trust Legal Provisions and are provided without warranty as
+                            described in the Simplified BSD License.</p>
+                    </div>
+                </section>
+                <div class="toc d-lg-none">
+                    <ul>
+                        <li><a href="#rfc.section.1">1.</a>&nbsp;&nbsp;&nbsp;<a href="#introduction">소개</a>
+                            <ul>
+                                <li><a href="#rfc.section.1.1">1.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#notational-conventions">표기 규약</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.2">2.</a>&nbsp;&nbsp;&nbsp;<a
+                                href="#client-hint-request-header-fields">클라이언트 힌트 요청 헤더 필드</a>
+                            <ul>
+                                <li><a href="#rfc.section.2.1">2.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#sending-client-hints">클라이언트 힌트 전송</a></li>
+                                <li><a href="#rfc.section.2.2">2.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#server-processing-of-client-hints">서버의 클라이언트 힌트 처리</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.3">3.</a>&nbsp;&nbsp;&nbsp;<a href="#advertising-server-support">서버 지원
+                                광고</a>
+                            <ul>
+                                <li><a href="#rfc.section.3.1">3.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#accept-ch">Accept-CH</a></li>
+                                <li><a href="#rfc.section.3.2">3.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#interaction-with-caches">캐시와의 상호작용</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.4">4.</a>&nbsp;&nbsp;&nbsp;<a href="#security-considerations">보안
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.4.1">4.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#information-exposure">정보 노출</a></li>
+                                <li><a href="#rfc.section.4.2">4.2.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#deployment-and-security-risks">배포 및 보안 위험</a></li>
+                                <li><a href="#rfc.section.4.3">4.3.</a>&nbsp;&nbsp;&nbsp;<a href="#abuse-detection">남용
+                                        탐지</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.5">5.</a>&nbsp;&nbsp;&nbsp;<a href="#cost-of-sending-hints">힌트 전송
+                                비용</a></li>
+                        <li><a href="#rfc.section.6">6.</a>&nbsp;&nbsp;&nbsp;<a href="#iana-considerations">IANA
+                                고려사항</a>
+                            <ul>
+                                <li><a href="#rfc.section.6.1">6.1.</a>&nbsp;&nbsp;&nbsp;<a
+                                        href="#iana-accept-ch">Accept-CH</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#rfc.section.7">7.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references">참고문헌</a>
+                            <ul>
+                                <li><a href="#rfc.section.7.1">7.1.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.2">규범적
+                                        참조문헌</a></li>
+                                <li><a href="#rfc.section.7.2">7.2.</a>&nbsp;&nbsp;&nbsp;<a href="#rfc.references.3">정보
+                                        제공 참조문헌</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#acknowledgements">감사의 말</a></li>
+                        <li><a href="#rfc.authors">저자 연락처</a></li>
+                    </ul>
+                </div>
+                <hr class="hidden-print">
+                <section id="introduction">
+                    <h2 id="rfc.section.1" class="np"><a href="#rfc.section.1">1.</a>&nbsp;<a
+                            href="#introduction">소개</a></h2>
+                    <div id="rfc.section.1.p.1">
+                        <p>웹에 접속하는 수천 종의 다양한 장치들이 있으며, 각 장치는 서로 다른 장치 기능과 선호 정보를 가지고 있습니다. 이러한 장치 기능에는 하드웨어 및 소프트웨어 특성뿐만
+                            아니라 동적인 사용자 및 사용자 에이전트 선호도도 포함됩니다. 역사적으로 서버가 이러한 기능에 기반해 콘텐츠 전달 및 사용자 경험을 최적화하기를 원했던
+                            애플리케이션들은 수동 식별(예: <a
+                                href="https://www.rfc-editor.org/rfc/rfc7231.html#section-5.5.3">RFC7231 섹션 5.5.3</a>의
+                            User-Agent 헤더 필드를 기존의 사용자 에이전트 시그니처 데이터베이스와 매칭)이나 HTTP 쿠키 <a href="#RFC6265"><cite
+                                    title="HTTP State Management Mechanism">[RFC6265]</cite></a> 및 URL 매개변수를 사용하거나, 이러한
+                            메커니즘들의 조합을 사용해 임시적 콘텐츠 협상을 수행해야 했습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.2" class="avoidbreakafter">
+                        <p>이러한 기술들은 설정 및 유지 관리가 비용이 많이 들고 애플리케이션과 서버 전반에서 이식 가능하지 않습니다. 또한 협상 중 어떤 데이터가 필요하고 실제로 사용되는지
+                            사용자 에이전트와 서버 양쪽이 이해하기 어렵게 만듭니다:</p>
+                    </div>
+                    <div id="rfc.section.1.p.3">
+                        <ul>
+                            <li>사용자 에이전트 탐지는 모든 정적 변수를 신뢰성 있게 식별할 수 없고, 동적인 사용자 에이전트 선호를 추론할 수 없으며 외부 장치 데이터베이스가 필요하고 캐시
+                                친화적이지 않으며 수동 지문 표면(passive fingerprinting)에 의존합니다.</li>
+                            <li>쿠키 기반 접근법은 애플리케이션 및 서버 전반에서 이식 가능하지 않고, JavaScript 실행을 필요로 하여 클라이언트 측 지연을 추가하며 캐시 친화적이지
+                                않습니다.</li>
+                            <li>URL 매개변수는 쿠키 기반 접근법과 유사하게 이식성이 부족하고 각 리소스의 URL 내부에 콘텐츠 협상 데이터를 인코딩해야 하는 요구사항 때문에 배포가
+                                어렵습니다.</li>
+                        </ul>
+                    </div>
+                    <div id="rfc.section.1.p.4">
+                        <p>선제적 콘텐츠 협상(<a href="https://www.rfc-editor.org/rfc/rfc7231.html#section-3.4.1">RFC7231 섹션
+                                3.4.1</a>)은 대안적 접근을 제공합니다. 사용자 에이전트는 지정된 명확한 요청 헤더를 사용하여 자신의 기능과 특성을 광고하고, 서버는 이러한 요청
+                            헤더(또는 다른 암묵적 특성)에 기초하여 적절한 응답을 선택(또는 구성)할 수 있습니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.5">
+                        <p>그러나 전통적인 선제적 콘텐츠 협상 기술은 종종 사용자 에이전트가 이러한 요청 헤더를 과도하게 전송하게 만듭니다. 이는 요청의 '부피'를 늘려 성능 문제를 일으키고,
+                            또한 수동적으로 이러한 정보를 제공함으로써 서버가 사용자에 대해 은밀하게 지문을 수집(fingerprinting)할 수 있게 되어 개인정보 문제를 야기합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.6">
+                        <p>이 문서는 서버가 특정 선제적 콘텐츠 협상 기능에 옵트인(opt-in)하도록 허용하여 그에 따라 콘텐츠를 조정할 수 있게 하는 프레임워크인 Client Hints를
+                            정의하며, 이러한 프레임워크를 사용하는 콘텐츠 협상 메커니즘에 대한 지침도 제공합니다. 또한 이 문서는 원본 서버가 이후 요청에서 사용자 에이전트가 이러한 헤더를
+                            전송하도록 명시적으로 요청할 수 있게 하는 새로운 응답 헤더인 Accept-CH를 정의합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.7">
+                        <p>Client Hints는 사용자 에이전트가 실제로 사용될 때만 요청 헤더를 전송하도록 보장함으로써 성능 문제를 완화하고, 서버가 데이터를 수동적으로 수집하는 것을 막기
+                            위해 서버가 요구하는 헤더를 Accept-CH 응답 헤더를 통해 명시적으로 옵트인하도록 요구함으로써 수동 지문 수집 벡터를 능동적(active)인 벡터로 전환시켜
+                            개인정보 문제를 완화합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.8">
+                        <p>이 문서는 Client Hints의 특정 사용법을 정의하지 않습니다. 그러한 사용법은 각기 해당하는 사양에서 정의되어야 합니다.</p>
+                    </div>
+                    <div id="rfc.section.1.p.9">
+                        <p>그러한 사용법의 예로는 User-Agent Client Hints <a href="#UA-CH"><cite
+                                    title="User-Agent Client Hints">[UA-CH]</cite></a>가 있습니다.</p>
+                    </div>
+                    <section id="notational-conventions">
+                        <h3 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a>&nbsp;<a
+                                href="#notational-conventions">표기 규약</a></h3>
+                        <div id="rfc.section.1.1.p.1">
+                            <p>이 문서에서의 핵심 단어 "<em class="bcp14">MUST</em>", "<em class="bcp14">MUST NOT</em>", "<em
+                                    class="bcp14">REQUIRED</em>", "<em class="bcp14">SHALL</em>", "<em
+                                    class="bcp14">SHALL NOT</em>", "<em class="bcp14">SHOULD</em>", "<em
+                                    class="bcp14">SHOULD NOT</em>", "<em class="bcp14">RECOMMENDED</em>", "<em
+                                    class="bcp14">NOT RECOMMENDED</em>", "<em class="bcp14">MAY</em>", 및 "<em
+                                    class="bcp14">OPTIONAL</em>"은 모두 대문자로 표시될 때에만 <span class="nobr">BCP 14</span>의 설명대로
+                                해석되어야 합니다. 자세한 내용은 <a href="#RFC2119"><cite
+                                        title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</cite></a>
+                                및 <a href="#RFC8174"><cite
+                                        title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">[RFC8174]</cite></a>를
+                                참조하십시오.</p>
+                        </div>
+                        <div id="rfc.section.1.1.p.2">
+                            <p>이 문서는 Augmented Backus-Naur Form(ABNF) 표기법을 사용합니다(참조: <a href="#RFC5234"><cite
+                                        title="Augmented BNF for Syntax Specifications: ABNF">[RFC5234]</cite></a>).</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="client-hint-request-header-fields">
+                    <h2 id="rfc.section.2" class="np"><a href="#rfc.section.2">2.</a>&nbsp;<a
+                            href="#client-hint-request-header-fields">클라이언트 힌트 요청 헤더 필드</a></h2>
+                    <div id="rfc.section.2.p.1">
+                        <p>Client Hints 요청 헤더 필드는 서버가 적절한 응답을 선택하는 데 사용할 수 있는 데이터를 표시하기 위해 HTTP 사용자 에이전트가 사용하는 HTTP 헤더
+                            필드입니다. 각 헤더는 서버가 응답을 조정하고 최적화하는 데 사용할 수 있는 사용자 에이전트의 선호를 전달합니다.</p>
+                    </div>
+                    <section id="sending-client-hints">
+                        <h3 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a>&nbsp;<a
+                                href="#sending-client-hints">클라이언트 힌트 전송</a></h3>
+                        <div id="rfc.section.2.1.p.1">
+                            <p>사용자 에이전트는 기본 설정, 사용자 구성 및 서버가 <span class="tt">Accept-CH</span>에 표현한 선호에 근거하여 요청에서 어떤
+                                Client Hints를 보낼지 선택합니다. 사용자 에이전트와 서버는 아래에 설명된 옵트인 메커니즘을 사용하여 효율적인 콘텐츠 적응을 위해 어떤 헤더 필드를
+                                전송해야 하는지를 협상할 수 있으며, 선택적으로 추가 메커니즘(예: <a href="#CLIENT-HINTS-INFRASTRUCTURE"><cite
+                                        title="Client Hints Infrastructure">[CLIENT-HINTS-INFRASTRUCTURE]</cite></a>에
+                                설명된 것)을 사용하여 제3자가 동일한 헤더 필드에 접근하는 권한을 제어하는 위임 정책을 협상할 수 있습니다. 사용자 에이전트는 낮은 엔트로피로 간주되지 않는
+                                힌트를 전송하기 위해 옵트인을 요구해야 합니다(EMPHASIS: <em class="bcp14">SHOULD</em>). 낮은 엔트로피 힌트의 예는 <a
+                                    href="#CLIENT-HINTS-INFRASTRUCTURE"><cite
+                                        title="Client Hints Infrastructure">[CLIENT-HINTS-INFRASTRUCTURE]</cite></a>의 표를
+                                참조하십시오.</p>
+                        </div>
+                        <div id="rfc.section.2.1.p.2">
+                            <p>구현자는 Client Hints 지원을 구현할 때 지문 수집(fingerprinting) 영향에 대해 인지하고 이 문서의 보안 고려사항 섹션(섹션 4)을
+                                준수해야 합니다.</p>
+                        </div>
+                    </section>
+                    <section id="server-processing-of-client-hints">
+                        <h3 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a>&nbsp;<a
+                                href="#server-processing-of-client-hints">서버의 클라이언트 힌트 처리</a></h3>
+                        <div id="rfc.section.2.2.p.1">
+                            <p>하나 이상의 Client Hints 헤더 필드를 포함하는 요청이 제시되면, 서버는 그 안의 정보를 기반으로 응답을 최적화할 수 있습니다. 그렇게 할 때, 그리고
+                                리소스가 캐시 가능하다면, 서버는 어떤 힌트가 선택된 응답에 영향을 줄 수 있고 선택된 응답이 이후 요청에 적합한지 여부를 나타내기 위해 Vary 응답 헤더
+                                필드(<a href="https://www.rfc-editor.org/rfc/rfc7231.html#section-7.1.4">RFC7231 섹션
+                                    7.1.4</a>)를 생성해야 합니다(EMPHASIS: <em class="bcp14">MUST</em>).</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.2">
+                            <p>서버는 자신이 이해하거나 지원하지 않는 힌트를 무시해야 합니다(EMPHASIS: <em class="bcp14">MUST</em>). 무시된 힌트를 사용자
+                                에이전트에 알리는 메커니즘은 없습니다.</p>
+                        </div>
+                        <div id="rfc.section.2.2.p.3">
+                            <p>또한 서버는 클라이언트 처리를 돕기 위해(해당 힌트에 의해 지정된 대로) 관련 값을 전달하는 추가 응답 헤더 필드를 생성할 수 있습니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="advertising-server-support">
+                    <h2 id="rfc.section.3" class="np"><a href="#rfc.section.3">3.</a>&nbsp;<a
+                            href="#advertising-server-support">서버 지원 광고</a></h2>
+                    <div id="rfc.section.3.p.1">
+                        <p>서버는 아래에 설명된 메커니즘을 사용하여 Client Hints에 대한 지원을 광고할 수 있습니다.</p>
+                    </div>
+                    <section id="accept-ch">
+                        <h3 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a>&nbsp;<a href="#accept-ch">Accept-CH
+                                응답 헤더 필드</a></h3>
+                        <div id="rfc.section.3.1.p.1">
+                            <p>Accept-CH 응답 헤더 필드는 그 값에 표시된 힌트들에 대한 서버의 지원을 나타냅니다. 사용자 에이전트 정보를 Client Hints를 통해 수신하기를
+                                원하는 서버는 가능한 한 빨리 응답에 Accept-CH 응답 헤더를 추가해야 합니다(EMPHASIS: <em class="bcp14">SHOULD</em>).
+                            </p>
+                        </div>
+                        <div id="rfc.section.3.1.p.2" class="avoidbreakafter">
+                            <p>Accept-CH는 Structured Header입니다(<a href="#RFC8941"><cite
+                                        title="Structured Field Values for HTTP">[RFC8941]</cite></a>). 그 값은 sf-list여야
+                                하며(EMPHASIS: <em class="bcp14">MUST</em>), 멤버는 Tokens입니다. ABNF는 다음과 같습니다:</p>
+                        </div>
+                        <div id="rfc.section.3.1.p.3">
+                            <pre class="inline">
+  Accept-CH = sf-list
+</pre>
+                        </div>
+                        <div id="rfc.section.3.1.p.4" class="avoidbreakafter">
+                            <p>예를 들면:</p>
+                        </div>
+                        <div id="rfc.section.3.1.p.5">
+                            <pre class="text">
+Accept-CH: Sec-CH-Example, Sec-CH-Example-2
+</pre>
+                        </div>
+                        <div id="rfc.section.3.1.p.6">
+                            <p>사용자 에이전트가 <span class="tt">Accept-CH</span>를 포함한 HTTP 응답을 수신하면, 이는 해당 원본(origin)이 이후 동일
+                                출처(same-origin) 요청들에 대해 표시된 요청 헤더 필드들을 수신하도록 옵트인했음을 나타냅니다. 옵트인은 비보안 전송(HTTPS가 아닌 스킴을
+                                사용하는 경우)으로 전달된 경우 무시되어야 합니다(EMPHASIS: <em class="bcp14">MUST</em>). 옵트인은 지속되어야 하며 사용자
+                                에이전트가 정의하는 세션 기간 동안 원본에 바인딩되어 이후 요청에서 Client Hints를 전달할 수 있어야 합니다(EMPHASIS: <em
+                                    class="bcp14">SHOULD</em>). 새로운 옵트인은 이전에 지속된 옵트인 값을 덮어쓰며 대신 지속되어야 합니다(EMPHASIS: <em
+                                    class="bcp14">SHOULD</em>).</p>
+                        </div>
+                        <div id="rfc.section.3.1.p.7">
+                            <p>위의 Accept-CH 예는 사용자 에이전트가 "https://site.example"로 네비게이션한 응답으로 수신되었고 안전한 전송으로 전달되었다고 가정하면,
+                                지속된 Accept-CH 선호는 "https://site.example"에 바인딩됩니다. 이후 예를 들어
+                                "https://site.example/foobar.html"로의 네비게이션에 대해서는 사용되지만, 예를 들어
+                                "https://foobar.site.example/"에는 사용되지 않습니다. 또한 네비게이션 응답으로 구성된 페이지에서 시작된 동일 출처 리소스 요청(예:
+                                "https://site.example/image.jpg")에는 이 선호를 사용하지만, 교차 출처 리소스 요청(예:
+                                "https://thirdparty.example/resource.js")에는 사용하지 않습니다. 이 선호는 다른 출처에서
+                                "https://site.example"로 시작된 리소스 요청(예: "https://other.example/"로의 네비게이션에서 시작된 요청)으로 확장되지
+                                않습니다.</p>
+                        </div>
+                    </section>
+                    <section id="interaction-with-caches">
+                        <h3 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a>&nbsp;<a
+                                href="#interaction-with-caches">캐시와의 상호작용</a></h3>
+                        <div id="rfc.section.3.2.p.1">
+                            <p>하나 이상의 Client Hints에 따라 응답을 선택할 때, 그리고 리소스가 캐시 가능하다면 서버는 어떤 힌트가 선택된 응답에 영향을 줄 수 있고 선택된
+                                응답이 이후 요청에 적합한지 여부를 나타내기 위해 Vary 응답 헤더 필드(<a href="#RFC7234"><cite
+                                        title="Hypertext Transfer Protocol (HTTP/1.1): Caching">[RFC7234]</cite></a>)를
+                                생성해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.2">
+                            <pre class="text">
+Vary: Sec-CH-Example
+</pre>
+                        </div>
+                        <div id="rfc.section.3.2.p.3">
+                            <p>위 예시는 캐시 키에 Sec-CH-Example 헤더 필드를 포함해야 함을 나타냅니다.</p>
+                        </div>
+                        <div id="rfc.section.3.2.p.4">
+                            <pre class="text">
+Vary: Sec-CH-Example, Sec-CH-Example-2
+</pre>
+                        </div>
+                        <div id="rfc.section.3.2.p.5">
+                            <p>위 예시는 캐시 키에 Sec-CH-Example 및 Sec-CH-Example-2 헤더 필드를 포함해야 함을 나타냅니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="security-considerations">
+                    <h2 id="rfc.section.4" class="np"><a href="#rfc.section.4">4.</a>&nbsp;<a
+                            href="#security-considerations">보안 고려사항</a></h2>
+                    <section id="information-exposure">
+                        <h3 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a>&nbsp;<a
+                                href="#information-exposure">정보 노출</a></h3>
+                        <div id="rfc.section.4.1.p.1">
+                            <p>이 문서에 의존하는 기능에서 사용되는 요청 헤더 필드는 개인정보를 보호하는 선제적 콘텐츠 협상을 가능하게 하고 수동적 지문 수집 벡터를 노출하지 않기 위해
+                                사용자의 환경에 대한 정보를 노출합니다. 그러나 구현자는 최악의 경우 통제되지 않고 모니터링되지 않은 능동적 지문 수집이 수동적 지문 수집보다 나을 수 없다는
+                                점을 염두에 두어야 합니다. 사용자에게 개인정보 이점을 제공하려면 사용자 에이전트는 Client Hints를 사용하는 기능이 노출하는 정보를 남용하지 못하도록
+                                추가 정책을 적용해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.2">
+                            <p>기능이 노출하는 정보는 사용자에 대해 새로운 정보를 드러낼 수 있으므로 구현자는 다음의 고려사항, 권장 사항 및 모범 사례를 고려해야 합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.3">
+                            <p>기본 가정은 요청 헤더로 사용자의 정보를 노출하는 것이 보안 관점에서 애플리케이션이 다른 수단으로 해당 정보를 얻는 것(예: JavaScript API를 통해
+                                접근하여 서버로 전송하는 경우)과 동등하다는 것입니다.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.4">
+                            <p>Client Hints는 명시적 옵트인 메커니즘이므로, 사용자 환경에 대한 정보에 접근하기를 원하는 서버는 이를 적극적으로 요청해야 하며, 이는 클라이언트와
+                                개인정보 연구원들이 어떤 원본이 해당 데이터를 수집하는지 추적하고 잠재적으로 대응할 수 있게 합니다. 헤더 기반 옵트인은 수동적 지문 수집 벡터의 제거를
+                                가능하게 합니다. 예를 들어, 사용자 에이전트는 User-Agent 문자열로 노출되는 정보를 줄이는 대신 User-Agent Client Hints를 통해
+                                해당 정보에 대한 능동적 접근을 가능하게 할 수 있습니다. 또는 사용자는 이미 스크립트를 통해 사용할 수 있는 정보를(예: Save-Data Client
+                                Hints &lt;<a
+                                    href="https://wicg.github.io/savedata/#save-data-request-header-field">https://wicg.github.io/savedata/#save-data-request-header-field</a>&gt;)
+                                헤더로 노출하되 수동적 지문 표면을 증가시키지 않을 수 있습니다. Client Hints 기능을 지원하는 사용자 에이전트는 특정 정보가 옵트인한 서버로 전송될
+                                때 동등한 정보를 수동적으로 전송하지 않도록 해야 합니다(EMPHASIS: <em class="bcp14">SHOULD</em>).</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.5">
+                            <p>따라서 이 문서에 의존하여 Client Hint 헤더를 정의하는 기능은 애플리케이션에 사용자 에이전트를 통해 이미 제공되지 않는 새로운 정보를 제공해서는 안
+                                됩니다(예: 기존 요청 헤더, HTML, CSS 또는 JavaScript에서 제공되는 정보). 이는 금지되어야 합니다(EMPHASIS: <em
+                                    class="bcp14">MUST NOT</em>).</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.6" class="avoidbreakafter">
+                            <p>이러한 기능은 노출 정보의 다음 측면을 고려해야 합니다:</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.7">
+                            <dl>
+                                <dt>엔트로피:</dt>
+                                <dd style="margin-left: 1.5em">매우 세분화된 데이터를 노출하면 서로 다른 원본에 대한 여러 요청에서 사용자를 식별하는 데 사용될 수
+                                    있습니다. 표현될 수 있는 헤더 필드 값의 집합을 줄이거나, 광고된 값이 현재 값을 정확히 나타내지 않고 근사치가 되도록 열거형 범위로 제한하면
+                                    프라이버시를 개선하고 링크 가능성(linkability) 위험을 줄일 수 있습니다.</dd>
+                                <dt>민감도:</dt>
+                                <dd style="margin-left: 1.5em">기능은 사용자 민감 정보를 노출해서는 안 됩니다(EMPHASIS: <em
+                                        class="bcp14">SHOULD NOT</em>). 예를 들어 특정 사용자 행위(권한 프롬프트나 사용자 활성화 등)에 의해 제공되는 정보는
+                                    Client Hint로 노출되어서는 안 됩니다(EMPHASIS: <em class="bcp14">SHOULD NOT</em>).</dd>
+                                <dt>시간에 따른 변경:</dt>
+                                <dd style="margin-left: 1.5em">기능은 시간이 지남에 따라 변경되는 사용자 정보를 노출해서는 안 됩니다(EMPHASIS: <em
+                                        class="bcp14">SHOULD NOT</em>), 단 상태 변경 자체가 또한 노출되는 경우(예: JavaScript 콜백을 통해)에는
+                                    예외일 수 있습니다.</dd>
+                            </dl>
+                        </div>
+                        <div id="rfc.section.4.1.p.8">
+                            <p>다양한 기능은 낮은 엔트로피·비민감·정적 정보(예: 사용자 에이전트 정보)와 높은 엔트로피·민감·동적 정보(예: 지리 위치) 사이의 스펙트럼에서 서로 다른
+                                위치에 놓일 것입니다. 사용자 에이전트는 특정 기능이 제공하는 가치와 이러한 고려사항을 비교하여 기능별 또는 다른 세분화된 기준에 따라 서로 다른 정책을 가질
+                                수 있습니다.</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.9" class="avoidbreakafter">
+                            <p>구현자는 어떤 Client Hints 헤더 필드가 광고되는지를 제어하기 위해 사용자 및 서버 제어 메커니즘과 정책을 모두 고려해야 합니다:</p>
+                        </div>
+                        <div id="rfc.section.4.1.p.10">
+                            <ul>
+                                <li>구현자는 일부 또는 모든 Client Hints 헤더 필드의 제공을 옵트인된(origin) 원본에만 제한해야 합니다(EMPHASIS: <em
+                                        class="bcp14">SHOULD</em>), 단 옵트인 원본이 명시적으로 다른 원본에 Client Hints 헤더 필드를 요청할 권한을
+                                    위임한 경우는 예외입니다.</li>
+                                <li>개인정보와 대역폭 제한을 균형있게 고려할 수 있도록 사용자 선택 메커니즘을 제공하는 구현자는 수동적 지문 수집의 위험과 같은 개인정보 영향에 대해
+                                    사용자가 이해하도록 설명하는 것이 어렵거나 실용적이지 않을 수 있음을 고려해야 합니다.</li>
+                                <li>특정 사용 사례나 위협 모델에 특화된 구현은 일부 또는 모든 Client Hints 헤더 필드의 전송을 피할 수 있습니다(MAY). 예를 들어 링크
+                                    가능성(linkability) 위험이 더 높은 헤더 필드의 전송을 회피할 수 있습니다.</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.4.1.p.11">
+                            <p>사용자 에이전트는 사이트 데이터, 브라우징 캐시, 쿠키 또는 유사 항목이 지워질 때 지속된 옵트인 선호를 반드시 지워야 합니다(EMPHASIS: <em
+                                    class="bcp14">MUST</em>).</p>
+                        </div>
+                    </section>
+                    <section id="deployment-and-security-risks">
+                        <h3 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a>&nbsp;<a
+                                href="#deployment-and-security-risks">배포 및 보안 위험</a></h3>
+                        <div id="rfc.section.4.2.p.1" class="avoidbreakafter">
+                            <p>새 요청 헤더를 배포할 때는 몇 가지 고려사항이 필요합니다:</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.2">
+                            <ul>
+                                <li>헤더 필드 이름의 기존 사용과 인한 잠재적 충돌</li>
+                                <li>헤더 필드 값으로 전달되는 데이터의 속성</li>
+                            </ul>
+                        </div>
+                        <div id="rfc.section.4.2.p.3">
+                            <p>새로운 Client Hints의 작성자는 클라이언트 측 콘텐츠(예: 스크립트)에 의해 추가될 필요가 있는지, 아니면 Client Hints가 사용자 에이전트에
+                                의해 독점적으로 설정되어야 하는지를 신중히 고려해야 합니다. 후자의 경우 헤더 필드 이름에 Sec- 접두사를 사용하면 스크립트 및 다른 애플리케이션 콘텐츠가
+                                사용자 에이전트에서 이를 설정하는 것을 방지하는 효과가 있습니다. "Sec-" 접두사를 사용하면 헤더 값이 사용자 에이전트에 의해 생성되었음을 서버에 신호로
+                                보냅니다. 자세한 내용은 <a href="#FETCH"><cite title="Fetch - Living Standard">[FETCH]</cite></a>를
+                                참조하십시오.</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.4">
+                            <p>관례상 Client Hints인 요청 헤더는 이 프레임워크를 사용함을 더 쉽게 식별하기 위해 CH- 접두사를 사용하도록 권장됩니다. 예: CH-Foo 또는
+                                "Sec-" 접두사를 포함한 Sec-CH-Foo. 이렇게 하면 프로그래밍 방식으로 식별하기 쉬워져(예: 프라이버시 필터가 인식되지 않은 힌트를 요청에서
+                                제거하는 경우) 유용합니다.</p>
+                        </div>
+                        <div id="rfc.section.4.2.p.5">
+                            <p>Accept-CH 옵트인 메커니즘으로 협상된 Client Hints 요청 헤더는 필드 이름이 sf-token과 일치해야 합니다(EMPHASIS: <em
+                                    class="bcp14">MUST</em>).</p>
+                        </div>
+                    </section>
+                    <section id="abuse-detection">
+                        <h3 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a>&nbsp;<a href="#abuse-detection">남용
+                                탐지</a></h3>
+                        <div id="rfc.section.4.3.p.1">
+                            <p>능동적 지문 수집 정보에 대한 접근을 추적하는 사용자 에이전트는 Client Hints 헤더의 발신을 동등한 API 접근으로 간주하는 것을 고려해야
+                                합니다(EMPHASIS: <em class="bcp14">SHOULD</em>).</p>
+                        </div>
+                        <div id="rfc.section.4.3.p.2">
+                            <p>Client Hints의 남용 연구는 Client Hints를 포함한 요청에 대한 HTTP 응답이 다른 값 또는 값이 없는 경우의 응답과 어떻게 다른지를 조사할
+                                수 있습니다. 이는 어떤 Client Hints가 사용되는지를 밝히는 데 사용되어 연구자들이 추가 분석을 수행할 수 있게 합니다.</p>
+                        </div>
+                    </section>
+                </section>
+                <hr class="hidden-print">
+                <section id="cost-of-sending-hints">
+                    <h2 id="rfc.section.5" class="np"><a href="#rfc.section.5">5.</a>&nbsp;<a
+                            href="#cost-of-sending-hints">힌트 전송 비용</a></h2>
+                    <div id="rfc.section.5.p.1">
+                        <p>서버로 Client Hints를 전송하면 요청 바이트 크기가 증가합니다. 이 증가의 일부는 HTTP 헤더 압축 스킴으로 완화될 수 있지만, 전송되는 각 새로운 힌트는
+                            여전히 대역폭 사용량을 어느 정도 증가시킵니다. 서버는 Client Hints 수신을 옵트인할 때 이를 고려해야 하며, 콘텐츠 적응 목적에 사용되지 않는 한 힌트
+                            수신에 옵트인하지 않아야 합니다(EMPHASIS: <em class="bcp14">SHOULD NOT</em>).</p>
+                    </div>
+                    <div id="rfc.section.5.p.2">
+                        <p>요청 바이트 크기 증가로 인해, 이 문서에 의존하여 Client Hints를 정의하는 기능은 해당 힌트의 전송을 특정 요청 목적지로 제한하는 것을 고려할 수
+                            있습니다(MAY), 이러한 목적지에서 힌트가 더 유용할 가능성이 높기 때문입니다(참조: <a href="#FETCH"><cite
+                                    title="Fetch - Living Standard">[FETCH]</cite></a>).</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="iana-considerations">
+                    <h2 id="rfc.section.6" class="np"><a href="#rfc.section.6">6.</a>&nbsp;<a
+                            href="#iana-considerations">IANA 고려사항</a></h2>
+                    <div id="rfc.section.6.p.1">
+                        <p>이 문서에 의존하는 기능들은 추가된 요청 헤더 필드를 "Permanent Message Header Field Names" 레지스트리에 등록할 것으로 예상됩니다(참조:
+                            <a href="#RFC3864"><cite
+                                    title="Registration Procedures for Message Header Fields">[RFC3864]</cite></a>).
+                        </p>
+                    </div>
+                    <div id="rfc.section.6.p.2">
+                        <p>이 문서는 "Accept-CH" HTTP 응답 헤더 필드를 정의하며, IANA는 이를 동일한 레지스트리에 등록했습니다.</p>
+                    </div>
+                    <section id="iana-accept-ch">
+                        <h3 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a>&nbsp;<a
+                                href="#iana-accept-ch">Accept-CH</a></h3>
+                        <div id="rfc.section.6.1.p.1">
+                            <dl>
+                                <dt>헤더 필드 이름:</dt>
+                                <dd style="margin-left: 1.5em">Accept-CH</dd>
+                                <dt>적용 프로토콜:</dt>
+                                <dd style="margin-left: 1.5em">HTTP</dd>
+                                <dt>상태:</dt>
+                                <dd style="margin-left: 1.5em">experimental</dd>
+                                <dt>작성자/변경 컨트롤러:</dt>
+                                <dd style="margin-left: 1.5em">IETF</dd>
+                                <dt>명세 문서:</dt>
+                                <dd style="margin-left: 1.5em"><a href="#accept-ch"
+                                        title="The Accept-CH Response Header Field">이 RFC의 섹션 3.1</a></dd>
+                                <dt>관련 정보:</dt>
+                                <dd style="margin-left: 1.5em">Client Hints 관련</dd>
+                            </dl>
+                        </div>
+                    </section>
+                </section>
+                <section class="np">
+                    <div id="rfc.references">
+                        <h2 id="rfc.section.7"><a href="#rfc.section.7">7.</a> 참고문헌</h2>
+                        <section>
+                            <div id="rfc.references.2">
+                                <h3 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a> 규범적 참조문헌</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="RFC2119">[<a href="#RFC2119" class="smpl">RFC2119</a>]</dt>
+                                    <dd>Bradner, S., “<a href="https://www.rfc-editor.org/rfc/rfc2119.html">Key words
+                                            for use in RFCs to Indicate Requirement Levels</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 2119, <a
+                                            href="https://dx.doi.org/10.17487/RFC2119">DOI 10.17487/RFC2119</a>, March
+                                        1997, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC3864">[<a href="#RFC3864" class="smpl">RFC3864</a>]</dt>
+                                    <dd>Klyne, G., Nottingham, M., and J. Mogul, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc3864.html">Registration Procedures
+                                            for Message Header Fields</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp90">BCP 90</a>, RFC 3864, <a
+                                            href="https://dx.doi.org/10.17487/RFC3864">DOI 10.17487/RFC3864</a>,
+                                        September 2004, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc3864">https://www.rfc-editor.org/info/rfc3864</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC5234">[<a href="#RFC5234" class="smpl">RFC5234</a>]</dt>
+                                    <dd>Crocker, D., Ed. and P. Overell, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc5234.html">Augmented BNF for Syntax
+                                            Specifications: ABNF</a>”, <a
+                                            href="https://www.rfc-editor.org/info/std68">STD 68</a>, RFC 5234, <a
+                                            href="https://dx.doi.org/10.17487/RFC5234">DOI 10.17487/RFC5234</a>, January
+                                        2008, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc5234">https://www.rfc-editor.org/info/rfc5234</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7231">[<a href="#RFC7231" class="smpl">RFC7231</a>]</dt>
+                                    <dd>Fielding, R., Ed. and J. Reschke, Ed., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7231.html">Hypertext Transfer
+                                            Protocol (HTTP/1.1): Semantics and Content</a>”, RFC 7231, <a
+                                            href="https://dx.doi.org/10.17487/RFC7231">DOI 10.17487/RFC7231</a>, June
+                                        2014, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7231">https://www.rfc-editor.org/info/rfc7231</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC7234">[<a href="#RFC7234" class="smpl">RFC7234</a>]</dt>
+                                    <dd>Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc7234.html">Hypertext Transfer
+                                            Protocol (HTTP/1.1): Caching</a>”, RFC 7234, <a
+                                            href="https://dx.doi.org/10.17487/RFC7234">DOI 10.17487/RFC7234</a>, June
+                                        2014, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc7234">https://www.rfc-editor.org/info/rfc7234</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8174">[<a href="#RFC8174" class="smpl">RFC8174</a>]</dt>
+                                    <dd>Leiba, B., “<a href="https://www.rfc-editor.org/rfc/rfc8174.html">Ambiguity of
+                                            Uppercase vs Lowercase in RFC 2119 Key Words</a>”, <a
+                                            href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>, RFC 8174, <a
+                                            href="https://dx.doi.org/10.17487/RFC8174">DOI 10.17487/RFC8174</a>, May
+                                        2017, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC8941">[<a href="#RFC8941" class="smpl">RFC8941</a>]</dt>
+                                    <dd>Nottingham, M. and P-H. Kamp, “<a
+                                            href="https://www.rfc-editor.org/rfc/rfc8941.html">Structured Field Values
+                                            for HTTP</a>”, RFC 8941, <a href="https://dx.doi.org/10.17487/RFC8941">DOI
+                                            10.17487/RFC8941</a>, February 2021, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc8941">https://www.rfc-editor.org/info/rfc8941</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                        <section>
+                            <div id="rfc.references.3">
+                                <h3 id="rfc.section.7.2"><a href="#rfc.section.7.2">7.2.</a> 정보 제공 참조문헌</h3>
+                                <dl class="dl-horizontal">
+                                    <dt id="CLIENT-HINTS-INFRASTRUCTURE">[<a href="#CLIENT-HINTS-INFRASTRUCTURE"
+                                            class="smpl">CLIENT-HINTS-INFRASTRUCTURE</a>]</dt>
+                                    <dd>Weiss, Y., “<a href="https://wicg.github.io/client-hints-infrastructure/">Client
+                                            Hints Infrastructure</a>”, July 2020, &lt;<a
+                                            href="https://wicg.github.io/client-hints-infrastructure/">https://wicg.github.io/client-hints-infrastructure/</a>&gt;.
+                                    </dd>
+                                    <dt id="FETCH">[<a href="#FETCH" class="smpl">FETCH</a>]</dt>
+                                    <dd>WHATWG, “<a href="https://fetch.spec.whatwg.org/">Fetch - Living Standard</a>”,
+                                        &lt;<a
+                                            href="https://fetch.spec.whatwg.org/">https://fetch.spec.whatwg.org/</a>&gt;.
+                                    </dd>
+                                    <dt id="RFC6265">[<a href="#RFC6265" class="smpl">RFC6265</a>]</dt>
+                                    <dd>Barth, A., “<a href="https://www.rfc-editor.org/rfc/rfc6265.html">HTTP State
+                                            Management Mechanism</a>”, RFC 6265, <a
+                                            href="https://dx.doi.org/10.17487/RFC6265">DOI 10.17487/RFC6265</a>, April
+                                        2011, &lt;<a
+                                            href="https://www.rfc-editor.org/info/rfc6265">https://www.rfc-editor.org/info/rfc6265</a>&gt;.
+                                    </dd>
+                                    <dt id="UA-CH">[<a href="#UA-CH" class="smpl">UA-CH</a>]</dt>
+                                    <dd>West, M. and Y. Weiss, “<a
+                                            href="https://wicg.github.io/ua-client-hints/">User-Agent Client Hints</a>”,
+                                        August 2020, &lt;<a
+                                            href="https://wicg.github.io/ua-client-hints/">https://wicg.github.io/ua-client-hints/</a>&gt;.
+                                    </dd>
+                                </dl>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="acknowledgements">
+                    <h2 id="rfc.section.unnumbered-4" class="np"><a href="#acknowledgements">감사의 말</a></h2>
+                    <div id="rfc.section.unnumbered-4.p.1">
+                        <p>Mark Nottingham, Julian Reschke, Chris Bentzel, Ben Greenstein, Tarun Bansal, Roy
+                            Fielding, Vasiliy Faronov, Ted Hardie, Jonas Sicking, Martin Thomson 및 IETF HTTP 작업 그룹의 수많은
+                            기타 구성원들에게 귀중한 도움과 피드백에 대해 감사드립니다.</p>
+                    </div>
+                </section>
+                <hr class="hidden-print">
+                <section id="rfc.authors" class="np">
+                    <h2><a href="#rfc.authors">저자 연락처</a></h2>
+                    <address><b>Ilya Grigorik</b><br>Google<br>EMail: <a
+                            href="mailto:ilya@igvita.com">ilya@igvita.com</a><br>URI: <a
+                            href="https://www.igvita.com/">https://www.igvita.com/</a></address>
+                    <address><b>Yoav Weiss</b><br>Google<br>EMail: <a
+                            href="mailto:yoav@yoav.ws">yoav@yoav.ws</a><br>URI: <a
+                            href="https://blog.yoav.ws/">https://blog.yoav.ws/</a></address>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://httpwg.org/assets/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://httpwg.org/assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
