@@ -1,0 +1,3682 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="robots" content="index,follow" />
+    <meta name="creator" content="rfchandler version 0.2" />
+      <meta name="citation_author" content="M. Jones"/>
+      <meta name="citation_author" content="J. Bradley"/>
+      <meta name="citation_author" content="N. Sakimura"/>
+      <meta name="citation_publication_date" content="May, 2015"/>
+      <meta name="citation_title" content="JSON Web Signature (JWS)"/>
+      <meta name="citation_doi" content="10.17487/RFC7515"/>
+      <meta name="citation_issn" content="2070-1721"/>
+      <meta name="citation_technical_report_number" content="rfc7515"/>
+      <meta name="citation_pdf_url" content="https://www.rfc-editor.org/rfc/pdfrfc/rfc7515.txt.pdf"/>
+<title>RFC 7515: JSON 웹 서명 (JWS)</title>    
+        
+
+        <style type="text/css">
+	@media only screen 
+	  and (min-width: 992px)
+	  and (max-width: 1199px) {
+	    body { font-size: 14pt; }
+            div.content { width: 96ex; margin: 0 auto; }
+        }
+	@media only screen 
+	  and (min-width: 768px)
+	  and (max-width: 991px) {
+            body { font-size: 14pt; }
+            div.content { width: 96ex; margin: 0 auto; }
+        }
+	@media only screen 
+	  and (min-width: 480px)
+	  and (max-width: 767px) {
+            body { font-size: 11pt; }
+            div.content { width: 96ex; margin: 0 auto; }
+        }
+	@media only screen 
+	  and (max-width: 479px) {
+            body { font-size: 8pt; }
+            div.content { width: 96ex; margin: 0 auto; }
+        }
+	@media only screen 
+	  and (min-device-width : 375px) 
+	  and (max-device-width : 667px) {
+            body { font-size: 9.5pt; }
+            div.content { width: 96ex; margin: 0; }
+        }
+	@media only screen 
+	  and (min-device-width: 1200px) {
+            body { font-size: 10pt; margin: 0 4em; }
+            div.content { width: 96ex; margin: 0; }
+        }
+        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+	    font-weight: bold;
+           /* line-height: 0pt; */
+            display: inline;
+            white-space: pre;
+            font-family: monospace;
+            font-size: 1em;
+	    font-weight: bold;
+        }
+        pre {
+            font-size: 1em;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+	.pre {
+	    white-space: pre;
+	    font-family: monospace;
+	}
+	.header{
+	    font-weight: bold;
+	}
+        .newpage {
+            page-break-before: always;
+        }
+        .invisible {
+            text-decoration: none;
+            color: white;
+        }
+        a.selflink {
+          color: black;
+          text-decoration: none;
+        }
+        @media print {
+            body {
+                font-family: monospace;
+                font-size: 10.5pt;
+            }
+            h1, h2, h3, h4, h5, h6 {
+                font-size: 1em;
+            }
+        
+            a:link, a:visited {
+                color: inherit;
+                text-decoration: none;
+            }
+            .noprint {
+                display: none;
+            }
+        }
+	@media screen {
+	    .grey, .grey a:link, .grey a:visited {
+		color: #777;
+	    }
+            .docinfo {
+                background-color: #EEE;
+            }
+            .top {
+                border-top: 7px solid #EEE;
+            }
+            .bgwhite  { background-color: white; }
+            .bgred    { background-color: #F44; }
+            .bggrey   { background-color: #666; }
+            .bgbrown  { background-color: #840; }            
+            .bgorange { background-color: #FA0; }
+            .bgyellow { background-color: #EE0; }
+            .bgmagenta{ background-color: #F4F; }
+            .bgblue   { background-color: #66F; }
+            .bgcyan   { background-color: #4DD; }
+            .bggreen  { background-color: #4F4; }
+
+            .legend   { font-size: 90%; }
+            .cplate   { font-size: 70%; border: solid grey 1px; }
+	}
+    </style>
+    <!--[if IE]>
+    <style>
+    body {
+       font-size: 13px;
+       margin: 10px 10px;
+    }
+    </style>
+    <![endif]-->    <script type="text/javascript"><!--
+    function addHeaderTags() {
+        var spans = document.getElementsByTagName("span");
+        for (var i=0; i < spans.length; i++) {
+            var elem = spans[i];
+            if (elem) {
+                var level = elem.getAttribute("class");
+                if (level == "h1" || level == "h2" || level == "h3" || level == "h4" || level == "h5" || level == "h6") {
+                    elem.innerHTML = "<"+level+">"+elem.innerHTML+"</"+level+">";               
+                }
+            }
+        }
+    }
+    var legend_html = "Colour legend:<br />      <table>         <tr><td>Unknown:</td>                   <td><span class='cplate bgwhite'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Draft:</td>                     <td><span class='cplate bgred'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Informational:</td>             <td><span class='cplate bgorange'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Experimental:</td>              <td><span class='cplate bgyellow'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Best Common Practice:</td>      <td><span class='cplate bgmagenta'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Proposed Standard:</td>         <td><span class='cplate bgblue'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Draft Standard (old designation):</td> <td><span class='cplate bgcyan'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Internet Standard:</td>         <td><span class='cplate bggreen'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Historic:</td>                  <td><span class='cplate bggrey'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>         <tr><td>Obsolete:</td>                  <td><span class='cplate bgbrown'>&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>     </table>";
+    function showElem(id) {
+        var elem = document.getElementById(id);
+        elem.innerHTML = eval(id+"_html");
+        elem.style.visibility='visible';
+    }
+    function hideElem(id) {
+        var elem = document.getElementById(id);
+        elem.style.visibility='hidden';        
+        elem.innerHTML = "";
+    }
+    // -->
+    </script></head>
+<body>
+<span class="pre noprint docinfo">[<a href="https://www.rfc-editor.org" title="RFC Editor">RFC Home</a>] [<a href="/rfc/rfc7515.txt">TEXT</a>|<a href="/rfc/pdfrfc/rfc7515.txt.pdf">PDF</a>|<a href="/rfc/rfc7515.html">HTML</a>] [<a href='https://datatracker.ietf.org/doc/rfc7515' title='IETF Datatracker information for this document'>Tracker</a>] [<a href="https://datatracker.ietf.org/ipr/search/?rfc=7515&amp;submit=rfc" title="IPR disclosures related to this document">IPR</a>] [<a class="boldtext" href="/errata/rfc7515" target="_blank">Errata</a>] [<a href='https://www.rfc-editor.org/info/rfc7515' title='Info page'>Info page</a>]         </span><br/><span class="pre noprint docinfo">                                                                        </span><br /><span class="pre noprint docinfo">                                                       PROPOSED STANDARD</span><br /><span class="pre noprint docinfo">                                                            <span style='color: #C00;'>Errata Exist</span></span><pre>Internet Engineering Task Force (IETF)                          M. Jones
+Request for Comments: 7515                                     Microsoft
+Category: Standards Track                                     J. Bradley
+ISSN: 2070-1721                                            Ping Identity
+                                                             N. Sakimura
+                                                                     NRI
+                                                                May 2015
+
+
+                        <span class="h1">JSON 웹 서명 (JWS)</span>
+
+요약
+
+   JSON 웹 서명(JWS)은 JSON 기반 데이터 구조를 사용하여 디지털
+   서명 또는 메시지 인증 코드(MAC)로 보호된 콘텐츠를 나타낸다.
+   이 명세와 함께 사용하기 위한 암호 알고리즘과 식별자는 별도의
+   JSON 웹 알고리즘(JWA) 명세와 해당 명세에서 정의된 IANA 레지스트리에
+   기술되어 있다. 관련된 암호화 기능은 별도의 JSON 웹 암호화(JWE)
+   명세에 기술되어 있다.
+
+이 메모의 상태
+
+   본 문서는 인터넷 표준 트랙 문서이다.
+
+   본 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 공개 검토를 거쳤으며
+   인터넷 엔지니어링 스티어링 그룹(IESG)에 의해 출판 승인을
+   받았다. 인터넷 표준에 대한 추가 정보는
+   <a href="./rfc5741#section-2">RFC 5741의 섹션&nbsp;2</a>에서 확인할 수 있다.
+
+   본 문서의 현재 상태, 정오표, 그리고 이에 대한 피드백 제공 방법에
+   대한 정보는 다음에서 확인할 수 있다.
+   <a href="https://www.rfc-editor.org/info/rfc7515">http://www.rfc-editor.org/info/rfc7515</a>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+Copyright Notice
+
+   Copyright (c) 2015 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+목차
+
+   <a href="#section-1">1</a>. 서론 ....................................................<a href="#page-4">4</a>
+      <a href="#section-1.1">1.1</a>. 표기 규약 .....................................<a href="#page-4">4</a>
+   <a href="#section-2">2</a>. 용어 .....................................................<a href="#page-5">5</a>
+   <a href="#section-3">3</a>. JSON 웹 서명(JWS) 개요 ...............................<a href="#page-7">7</a>
+      <a href="#section-3.1">3.1</a>. JWS Compact 직렬화 개요 .........................<a href="#page-7">7</a>
+      <a href="#section-3.2">3.2</a>. JWS JSON 직렬화 개요 ............................<a href="#page-8">8</a>
+      <a href="#section-3.3">3.3</a>. JWS 예제 ................................................<a href="#page-8">8</a>
+   <a href="#section-4">4</a>. JOSE 헤더 .....................................................<a href="#page-9">9</a>
+      <a href="#section-4.1">4.1</a>. 등록된 헤더 매개변수 이름 .........................<a href="#page-10">10</a>
+           <a href="#section-4.1.1">4.1.1</a>. "alg"(알고리즘) 헤더 매개변수 .................<a href="#page-10">10</a>
+           <a href="#section-4.1.2">4.1.2</a>. "jku"(JWK 세트 URL) 헤더 매개변수 ...............<a href="#page-10">10</a>
+           <a href="#section-4.1.3">4.1.3</a>. "jwk"(JSON 웹 키) 헤더 매개변수 ..............<a href="#page-11">11</a>
+           <a href="#section-4.1.4">4.1.4</a>. "kid"(키 ID) 헤더 매개변수 ....................<a href="#page-11">11</a>
+           <a href="#section-4.1.5">4.1.5</a>. "x5u"(X.509 URL) 헤더 매개변수 .................<a href="#page-11">11</a>
+           <a href="#section-4.1.6">4.1.6</a>. "x5c"(X.509 인증서 체인) 헤더 매개변수 ...<a href="#page-11">11</a>
+           4.1.7. "x5t"(X.509 인증서 SHA-1 지문)
+                  헤더 매개변수 ...................................<a href="#page-12">12</a>
+           4.1.8. "x5t#S256"(X.509 인증서 SHA-256
+                  지문) 헤더 매개변수 .......................<a href="#page-12">12</a>
+           <a href="#section-4.1.9">4.1.9</a>. "typ"(타입) 헤더 매개변수 ......................<a href="#page-12">12</a>
+           <a href="#section-4.1.10">4.1.10</a>. "cty"(콘텐츠 타입) 헤더 매개변수 .............<a href="#page-13">13</a>
+           <a href="#section-4.1.11">4.1.11</a>. "crit"(중요) 헤더 매개변수 ................<a href="#page-14">14</a>
+      <a href="#section-4.2">4.2</a>. 공개 헤더 매개변수 이름 .............................<a href="#page-14">14</a>
+      <a href="#section-4.3">4.3</a>. 개인 헤더 매개변수 이름 ............................<a href="#page-14">14</a>
+   <a href="#section-5">5</a>. JWS 생성 및 소비 ...................................<a href="#page-15">15</a>
+      <a href="#section-5.1">5.1</a>. 메시지 서명 또는 MAC 계산 ......................<a href="#page-15">15</a>
+      <a href="#section-5.2">5.2</a>. 메시지 서명 또는 MAC 검증 .......................<a href="#page-16">16</a>
+      <a href="#section-5.3">5.3</a>. 문자열 비교 규칙 ...................................<a href="#page-17">17</a>
+   <a href="#section-6">6</a>. 키 식별 .............................................<a href="#page-18">18</a>
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   <a href="#section-7">7</a>. 직렬화 .................................................<a href="#page-19">19</a>
+      <a href="#section-7.1">7.1</a>. JWS Compact 직렬화 .................................<a href="#page-19">19</a>
+      <a href="#section-7.2">7.2</a>. JWS JSON 직렬화 ....................................<a href="#page-19">19</a>
+           <a href="#section-7.2.1">7.2.1</a>. 일반 JWS JSON 직렬화 구문 ..............<a href="#page-20">20</a>
+           <a href="#section-7.2.2">7.2.2</a>. 평탄화된 JWS JSON 직렬화 구문 ............<a href="#page-21">21</a>
+   <a href="#section-8">8</a>. TLS 요구사항 ...............................................<a href="#page-22">22</a>
+   <a href="#section-9">9</a>. IANA 고려사항 ............................................<a href="#page-22">22</a>
+      9.1. JSON 웹 서명 및 암호화 헤더
+           매개변수 레지스트리 .......................................<a href="#page-23">23</a>
+           <a href="#section-9.1.1">9.1.1</a>. 등록 템플릿 ..............................<a href="#page-23">23</a>
+           <a href="#section-9.1.2">9.1.2</a>. 초기 레지스트리 내용 ..........................<a href="#page-24">24</a>
+      <a href="#section-9.2">9.2</a>. 미디어 타입 등록 ...................................<a href="#page-26">26</a>
+           <a href="#section-9.2.1">9.2.1</a>. 레지스트리 내용 ..................................<a href="#page-26">26</a>
+   <a href="#section-10">10</a>. 보안 고려사항 .......................................<a href="#page-27">27</a>
+      <a href="#section-10.1">10.1</a>. 키 엔트로피 및 난수 값 ............................<a href="#page-27">27</a>
+      <a href="#section-10.2">10.2</a>. 키 보호 ...........................................<a href="#page-28">28</a>
+      <a href="#section-10.3">10.3</a>. 키 출처 인증 ................................<a href="#page-28">28</a>
+      <a href="#section-10.4">10.4</a>. 암호 민첩성 ....................................<a href="#page-28">28</a>
+      <a href="#section-10.5">10.5</a>. 디지털 서명과 MAC 간의 차이 ..........<a href="#page-28">28</a>
+      <a href="#section-10.6">10.6</a>. 알고리즘 검증 .....................................<a href="#page-29">29</a>
+      <a href="#section-10.7">10.7</a>. 알고리즘 보호 .....................................<a href="#page-29">29</a>
+      <a href="#section-10.8">10.8</a>. 선택 평문 공격 .................................<a href="#page-30">30</a>
+      <a href="#section-10.9">10.9</a>. 타이밍 공격 ...........................................<a href="#page-30">30</a>
+      <a href="#section-10.10">10.10</a>. 재생 공격 방지 .......................................<a href="#page-30">30</a>
+      <a href="#section-10.11">10.11</a>. SHA-1 인증서 지문 ...........................<a href="#page-30">30</a>
+      <a href="#section-10.12">10.12</a>. JSON 보안 고려사항 ............................<a href="#page-31">31</a>
+      <a href="#section-10.13">10.13</a>. 유니코드 비교 보안 고려사항 ..............<a href="#page-31">31</a>
+   <a href="#section-11">11</a>. 참고문헌 ....................................................<a href="#page-32">32</a>
+      <a href="#section-11.1">11.1</a>. 규범적 참고문헌 .....................................<a href="#page-32">32</a>
+      <a href="#section-11.2">11.2</a>. 정보 제공 참고문헌 ...................................<a href="#page-34">34</a>
+   <a href="#appendix-A">부록 A</a>.  JWS 예제 .........................................<a href="#page-36">36</a>
+     <a href="#appendix-A.1">A.1</a>.  HMAC SHA-256을 사용하는 JWS 예제 ............................<a href="#page-36">36</a>
+       <a href="#appendix-A.1.1">A.1.1</a>.  인코딩 ..............................................<a href="#page-36">36</a>
+       <a href="#appendix-A.1.2">A.1.2</a>.  검증 ............................................<a href="#page-38">38</a>
+     <a href="#appendix-A.2">A.2</a>.  RSASSA-PKCS1-v1_5 SHA-256을 사용하는 JWS 예제 ...............<a href="#page-38">38</a>
+       <a href="#appendix-A.2.1">A.2.1</a>.  인코딩 ..............................................<a href="#page-38">38</a>
+       <a href="#appendix-A.2.2">A.2.2</a>.  검증 ............................................<a href="#page-42">42</a>
+     <a href="#appendix-A.3">A.3</a>.  ECDSA P-256 SHA-256을 사용하는 JWS 예제 .....................<a href="#page-42">42</a>
+       <a href="#appendix-A.3.1">A.3.1</a>.  인코딩 ..............................................<a href="#page-42">42</a>
+       <a href="#appendix-A.3.2">A.3.2</a>.  검증 ............................................<a href="#page-44">44</a>
+     <a href="#appendix-A.4">A.4</a>.  ECDSA P-521 SHA-512를 사용하는 JWS 예제 .....................<a href="#page-45">45</a>
+       <a href="#appendix-A.4.1">A.4.1</a>.  인코딩 ..............................................<a href="#page-45">45</a>
+       <a href="#appendix-A.4.2">A.4.2</a>.  검증 ............................................<a href="#page-47">47</a>
+     <a href="#appendix-A.5">A.5</a>.  서명되지 않은 JWS 예제 .....................................<a href="#page-47">47</a>
+     <a href="#appendix-A.6">A.6</a>.  일반 JWS JSON 직렬화를 사용하는 JWS 예제 ..........<a href="#page-48">48</a>
+       <a href="#appendix-A.6.1">A.6.1</a>.  서명별 보호된 JWS 헤더 ...................<a href="#page-48">48</a>
+       <a href="#appendix-A.6.2">A.6.2</a>.  서명별 비보호 JWS 헤더 .................<a href="#page-49">49</a>
+       <a href="#appendix-A.6.3">A.6.3</a>.  완전한 JOSE 헤더 값 ...........................<a href="#page-49">49</a>
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+       <a href="#appendix-A.6.4">A.6.4</a>.  완전한 JWS JSON 직렬화 표현 ........<a href="#page-50">50</a>
+     <a href="#appendix-A.7">A.7</a>.  평탄화된 JWS JSON 직렬화를 사용하는 JWS 예제 ........<a href="#page-51">51</a>
+   <a href="#appendix-B">부록 B</a>.  "x5c"(X.509 인증서 체인) 예제 ..............<a href="#page-52">52</a>
+   <a href="#appendix-C">부록 C</a>.  패딩 없는 base64url 인코딩 구현에 대한 참고 사항
+                ..............................................<a href="#page-54">54</a>
+   <a href="#appendix-D">부록 D</a>.  키 선택에 대한 참고 사항 ...............................<a href="#page-55">55</a>
+   <a href="#appendix-E">부록 E</a>.  "crit" 헤더 매개변수에 대한 부정 테스트 케이스 .......<a href="#page-57">57</a>
+   <a href="#appendix-F">부록 F</a>.  분리된 콘텐츠 .....................................<a href="#page-57">57</a>
+   감사의 글 ..................................................<a href="#page-58">58</a>
+   저자 주소 ................................................<a href="#page-58">58</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  서론</span>
+
+   JSON 웹 서명(JWS)은 JSON 기반
+   [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>] 데이터 구조를 사용하여 디지털
+   서명 또는 메시지 인증 코드(MAC)로 보호된 콘텐츠를 나타낸다.
+   JWS 암호 메커니즘은 임의의 옥텟 시퀀스에 대해 무결성 보호를 제공한다.
+   디지털 서명과 MAC 간의 차이에 대한 논의는
+   <a href="#section-10.5">섹션 10.5</a>를 참조하라.
+
+   JWS에 대해 두 가지의 밀접하게 관련된 직렬화 형식이 정의되어 있다.
+   JWS Compact 직렬화는 HTTP Authorization 헤더나
+   URI 쿼리 매개변수와 같은 공간 제약 환경을 위한
+   간결하고 URL 안전한 표현이다.
+   JWS JSON 직렬화는 JWS를 JSON 객체로 표현하며,
+   동일한 콘텐츠에 대해 여러 서명 및/또는 MAC을 적용할 수 있게 한다.
+   두 형식은 동일한 암호학적 기반을 공유한다.
+
+   본 명세와 함께 사용하기 위한 암호 알고리즘과 식별자는
+   별도의 JSON 웹 알고리즘(JWA)
+   [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>] 명세와
+   해당 명세에서 정의된 IANA 레지스트리에 기술되어 있다.
+   관련된 암호화 기능은 별도의 JSON 웹 암호화(JWE)
+   [<a href="#ref-JWE" title="&quot;JSON Web Encryption (JWE)&quot;">JWE</a>] 명세에 기술되어 있다.
+
+   본 명세에서 정의된 이름들이 짧은 이유는,
+   결과 표현이 간결해지는 것을 핵심 목표로 하기 때문이다.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  표기 규약</span>
+
+   본 문서에서 "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY",
+   "OPTIONAL"이라는 핵심 단어는
+   RFC에서 요구 수준을 나타내기 위해 사용하는 키워드에 관한 문서
+   [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]에
+   기술된 대로 해석되어야 한다.
+   이러한 해석은 해당 용어가 모두 대문자로 표시된 경우에만 적용된다.
+
+   BASE64URL(OCTETS)는
+   <a href="#section-2">섹션 2</a>에 따라 OCTETS의 base64url 인코딩을 의미한다.
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   UTF8(STRING)는 STRING의 UTF-8
+   [<a href="./rfc3629" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">RFC3629</a>]
+   표현에 해당하는 옥텟을 의미하며,
+   여기서 STRING은 0개 이상의 유니코드
+   [<a href="#ref-UNICODE" title="&quot;The Unicode Standard&quot;">UNICODE</a>]
+   문자로 이루어진 시퀀스이다.
+
+   ASCII(STRING)는 STRING의 ASCII
+   [<a href="./rfc20" title="&quot;ASCII format for Network Interchange&quot;">RFC20</a>]
+   표현에 해당하는 옥텟을 의미하며,
+   여기서 STRING은 0개 이상의 ASCII
+   문자로 이루어진 시퀀스이다.
+
+   두 값 A와 B의 연결은 A || B로 표기한다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  용어</span>
+
+   다음 용어는 본 명세에서 정의된다:
+
+   JSON Web Signature (JWS)
+      디지털 서명되었거나 MAC 처리된 메시지를 나타내는 데이터 구조.
+
+   JOSE Header
+      사용된 암호 연산 및 매개변수를 설명하는 매개변수를 포함하는
+      JSON 객체.
+      JOSE(JSON Object Signing and Encryption) 헤더는
+      헤더 매개변수들의 집합으로 구성된다.
+
+   JWS Payload
+      보호되어야 할 옥텟 시퀀스 — 즉 메시지.
+      페이로드는 임의의 옥텟 시퀀스를 포함할 수 있다.
+
+   JWS Signature
+      JWS 보호된 헤더와 JWS 페이로드에 대한
+      디지털 서명 또는 MAC.
+
+   Header Parameter
+      JOSE 헤더의 구성원인 이름/값 쌍.
+
+   JWS Protected Header
+      JWS 서명 디지털 서명 또는 MAC 연산에 의해
+      무결성 보호되는 헤더 매개변수를 포함하는 JSON 객체.
+      JWS Compact 직렬화의 경우,
+      이는 전체 JOSE 헤더를 구성한다.
+      JWS JSON 직렬화의 경우,
+      이는 JOSE 헤더의 한 구성 요소이다.
+
+   JWS Unprotected Header
+      무결성 보호되지 않는 헤더 매개변수를 포함하는 JSON 객체.
+      이는 JWS JSON 직렬화를 사용하는 경우에만 존재할 수 있다.
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Base64url 인코딩
+      <a href="./rfc4648#section-5">RFC 4648의 섹션&nbsp;5</a> [<a href="./rfc4648" title="&quot;The Base16, Base32, and Base64 Data Encodings&quot;">RFC4648</a>]에 정의된
+      URL 및 파일명에 안전한 문자 집합을 사용하는 Base64 인코딩으로,
+      ( <a href="#section-3.2">섹션 3.2</a>에서 허용된 대로) 모든 뒤따르는 '=' 문자를
+      생략하고, 줄 바꿈, 공백 또는 기타 추가 문자를 포함하지 않는다.
+      빈 옥텟 시퀀스의 base64url 인코딩은 빈 문자열임에 유의하라.
+      (패딩 없이 base64url 인코딩을 구현하는 데 대한 참고 사항은
+      <a href="#appendix-C">부록 C</a>를 참조하라.)
+
+   JWS 서명 입력(JWS Signing Input)
+      디지털 서명 또는 MAC 계산에 대한 입력.
+      그 값은
+      ASCII(BASE64URL(UTF8(JWS 보호된 헤더)) || '.' ||
+      BASE64URL(JWS 페이로드))이다.
+
+   JWS Compact 직렬화
+      JWS를 간결하고 URL-안전한 문자열로 표현한 것.
+
+   JWS JSON 직렬화
+      JWS를 JSON 객체로 표현한 것.
+      JWS Compact 직렬화와 달리, JWS JSON 직렬화는
+      동일한 콘텐츠에 대해 여러 개의 디지털 서명 및/또는 MAC을
+      적용할 수 있게 한다.
+      이 표현은 간결성에 최적화되어 있지 않으며 URL-안전하지도 않다.
+
+   보안되지 않은 JWS(Unsecured JWS)
+      무결성 보호를 제공하지 않는 JWS.
+      보안되지 않은 JWS는 "alg" 값으로 "none"을 사용한다.
+
+   충돌 방지 이름(Collision-Resistant Name)
+      다른 이름과 충돌할 가능성이 매우 낮도록
+      이름을 할당할 수 있게 하는 네임스페이스 내의 이름.
+      충돌 방지 네임스페이스의 예로는 도메인 이름,
+      ITU-T X.660 및 X.670 권고 시리즈에 정의된 객체 식별자(OID),
+      그리고 전역 고유 식별자(UUID)
+      [<a href="./rfc4122" title="&quot;A Universally Unique IDentifier (UUID) URN Namespace&quot;">RFC4122</a>]가 있다.
+      관리적으로 위임된 네임스페이스를 사용하는 경우,
+      이름을 정의하는 주체는 자신이 이름을 정의하는 데 사용하는
+      네임스페이스의 부분을 통제하고 있음을 보장하기 위해
+      합리적인 예방 조치를 취할 필요가 있다.
+
+   StringOrURI
+      JSON 문자열 값으로,
+      임의의 문자열 값을 사용할 수 있으나,
+      ":" 문자를 포함하는 모든 값은 반드시 URI
+      [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]여야 한다는 추가 요구사항이 있다.
+      StringOrURI 값은 어떠한 변환이나 정규화도 적용하지 않고
+      대소문자를 구분하는 문자열로 비교된다.
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   "JSON Web Encryption (JWE)", "JWE Compact Serialization",
+   및 "JWE JSON Serialization"이라는 용어는
+   JWE 사양
+   [<a href="#ref-JWE" title="&quot;JSON Web Encryption (JWE)&quot;">JWE</a>]에 의해 정의된다.
+
+   "디지털 서명(Digital Signature)"과
+   "메시지 인증 코드(Message Authentication Code, MAC)"라는 용어는
+   “Internet Security Glossary, Version 2”
+   [<a href="./rfc4949" title="&quot;Internet Security Glossary, Version 2&quot;">RFC4949</a>]에 의해 정의된다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  JSON Web Signature (JWS) 개요</span>
+
+   JWS는 JSON 데이터 구조와 base64url 인코딩을 사용하여
+   디지털 서명되었거나 MAC이 적용된 콘텐츠를 표현한다.
+   이러한 JSON 데이터 구조는
+   <a href="./rfc7159#section-2">RFC 7159의 섹션&nbsp;2</a>
+   [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]에 따라,
+   JSON 값이나 구조 문자 앞이나 뒤에 공백 및/또는 줄 바꿈을
+   포함할 수 있다.
+   JWS는 다음의 논리적 값들을 표현한다
+   (각각은 <a href="#section-2">섹션 2</a>에 정의되어 있다):
+
+   o  JOSE 헤더
+   o  JWS 페이로드
+   o  JWS 서명
+
+   JWS의 경우, JOSE 헤더의 멤버는
+   다음 값들의 멤버들의 합집합이다
+   (각각은 <a href="#section-2">섹션 2</a>에 정의되어 있다):
+
+   o  JWS 보호된 헤더
+   o  JWS 비보호 헤더
+
+   이 문서는 JWS에 대해 두 가지 직렬화를 정의한다:
+   JWS Compact 직렬화라고 불리는
+   간결하고 URL-안전한 직렬화와,
+   JWS JSON 직렬화라고 불리는 JSON 직렬화이다.
+   두 직렬화 모두에서,
+   JSON은 임의의 옥텟 시퀀스를 직접 표현하는 방법이 없기 때문에,
+   JWS 보호된 헤더, JWS 페이로드, JWS 서명은
+   base64url로 인코딩된다.
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  JWS Compact 직렬화 개요</span>
+
+   JWS Compact 직렬화에서는
+   JWS 비보호 헤더를 사용하지 않는다.
+   이 경우 JOSE 헤더와 JWS 보호된 헤더는 동일하다.
+
+   JWS Compact 직렬화에서,
+   JWS는 다음을 연결한 것으로 표현된다:
+
+      BASE64URL(UTF8(JWS 보호된 헤더)) || '.' ||
+      BASE64URL(JWS 페이로드) || '.' ||
+      BASE64URL(JWS 서명)
+
+   JWS Compact 직렬화에 대한 추가 정보는
+   <a href="#section-7.1">섹션 7.1</a>을 참조하라.
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a>.  JWS JSON 직렬화 개요</span>
+
+   JWS JSON 직렬화에서는
+   JWS 보호된 헤더와 JWS 비보호 헤더 중
+   하나 또는 둘 모두가 반드시 존재해야 한다.
+   이 경우 JOSE 헤더의 멤버는,
+   존재하는 JWS 보호된 헤더와
+   JWS 비보호 헤더 값의 멤버들의 합집합이다.
+
+   JWS JSON 직렬화에서,
+   JWS는 다음 네 가지 멤버 중
+   일부 또는 전부를 포함하는 JSON 객체로 표현된다:
+
+   o  "protected": 값은 BASE64URL(UTF8(JWS 보호된 헤더))
+   o  "header": 값은 JWS 비보호 헤더
+   o  "payload": 값은 BASE64URL(JWS 페이로드)
+   o  "signature": 값은 BASE64URL(JWS 서명)
+
+   base64url로 인코딩된 세 개의 결과 문자열과
+   JWS 비보호 헤더 값은
+   JSON 객체의 멤버로 표현된다.
+   이러한 값들 중 일부의 포함은 선택 사항이다.
+   JWS JSON 직렬화는
+   하나만이 아니라 여러 개의 서명 및/또는 MAC 값을
+   표현할 수도 있다.
+   JWS JSON 직렬화에 대한 추가 정보는
+   <a href="#section-7.2">섹션 7.2</a>를 참조하라.
+
+<span class="h3"><a class="selflink" id="section-3.3" href="#section-3.3">3.3</a>.  JWS 예제</span>
+
+   이 절에서는 JWS의 예제를 제공한다.
+   그 계산 과정은,
+   사용된 JSON 값들을 표현하는 정확한 옥텟 시퀀스와
+   사용된 키 값을 포함하여,
+   <a href="#appendix-A.1">부록 A.1</a>에 더 자세히 설명되어 있다.
+
+   다음 예제의 JWS 보호된 헤더는,
+   인코딩된 객체가 JSON Web Token임을 선언하며
+   [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>],
+   JWS 보호된 헤더와 JWS 페이로드가
+   HMAC SHA-256
+   [<a href="./rfc2104" title="&quot;HMAC: Keyed-Hashing for Message Authentication&quot;">RFC2104</a>]
+   [<a href="#ref-SHS" title="&quot;Secure Hash Standard (SHS)&quot;">SHS</a>]
+   알고리즘을 사용하여 보호됨을 나타낸다:
+
+     {"typ":"JWT",
+      "alg":"HS256"}
+
+   이 JWS 보호된 헤더를
+   BASE64URL(UTF8(JWS 보호된 헤더))로 인코딩하면
+   다음 값을 얻는다:
+
+     eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9
+
+   다음 JSON 객체의 UTF-8 표현이
+   JWS 페이로드로 사용된다.
+   (페이로드는 어떤 콘텐츠든 될 수 있으며,
+   반드시 JSON 객체의 표현일 필요는 없다.)
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+     {"iss":"joe",
+      "exp":1300819380,
+      "http://example.com/is_root":true}
+
+   이 JWS 페이로드를
+   BASE64URL(JWS 페이로드)로 인코딩하면
+   다음 값을 얻는다
+   (표시 목적상 줄 바꿈이 포함되어 있다):
+
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+
+   <a href="#appendix-A.1">부록 A.1</a>에 지정된 키를 사용하여
+   HMAC SHA-256 알고리즘으로
+   JWS 서명 입력
+   ASCII(BASE64URL(UTF8(JWS 보호된 헤더)) || '.' || BASE64URL(JWS 페이로드))
+   에 대한 HMAC을 계산하고,
+   그 결과를 base64url로 인코딩하면
+   다음 BASE64URL(JWS 서명) 값을 얻는다:
+
+     dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+   이러한 값들을
+   Header.Payload.Signature 순서로,
+   각 부분 사이에 마침표('.') 문자를 두고 연결하면,
+   다음과 같은
+   JWS Compact 직렬화를 사용하는
+   완전한 JWS 표현을 얻게 된다
+   (표시 목적상 줄 바꿈이 포함되어 있다):
+
+     eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+     .
+     dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+   JWS JSON 직렬화를 사용하는 예제를 포함한
+   추가 예제는
+   <a href="#appendix-A">부록 A</a>를 참조하라
+   (섹션 A.6 및 A.7 참조).
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  JOSE 헤더</span>
+
+   JWS의 경우,
+   JOSE 헤더를 표현하는 JSON 객체의 멤버들은,
+   JWS 보호된 헤더와 JWS 페이로드에 적용된
+   디지털 서명 또는 MAC과,
+   선택적으로 JWS의 추가 속성들을 설명한다.
+   JOSE 헤더 내의 헤더 파라미터 이름은 반드시 고유해야 하며,
+   JWS 파서는
+   중복된 헤더 파라미터 이름을 가진 JWS를 거부하거나,
+   ECMAScript 5.1
+   [<a href="#ref-ECMAScript" title="&quot;ECMAScript Language Specification, 5.1 Edition&quot;">ECMAScript</a>]
+   의
+   <a href="#section-15.12">섹션 15.12</a>
+   (“JSON 객체”)에 명시된 대로,
+   사전적으로 마지막에 나타난 중복 멤버 이름만을 반환하는
+   JSON 파서를 사용해야 한다.
+
+   구현은,
+   이 사양에서
+   “반드시 이해되어야 함(MUST be understood)”으로
+   지정된 특정 헤더 파라미터를 이해하고,
+   이 사양에 정의된 방식으로 처리해야 한다.
+   이 사양에 정의된 다른 모든 헤더 파라미터 중,
+   그러한 지정이 없는 것들은,
+   이해되지 않을 경우 반드시 무시되어야 한다.
+
+<span class="grey">Jones, et al.                Standards Track                    [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   <a href="#section-4.1.11">섹션 4.1.11</a>에 따라
+   중요한(critical) 헤더 파라미터로 나열되지 않는 한,
+   이 사양에 정의되지 않은 모든 헤더 파라미터는,
+   이해되지 않을 경우 반드시 무시되어야 한다.
+
+   헤더 파라미터 이름에는
+   세 가지 분류가 있다:
+   등록된 헤더 파라미터 이름,
+   공개 헤더 파라미터 이름,
+   그리고 개인 헤더 파라미터 이름이다.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  등록된 헤더 파라미터 이름</span>
+
+   JWS에서 사용하기 위한 다음 헤더 파라미터 이름들은,
+   <a href="#section-9.1">섹션 9.1</a>에 의해 설정된
+   IANA “JSON Web Signature and Encryption Header Parameters”
+   레지스트리에 등록되어 있으며,
+   그 의미는 아래의 하위 절들에 정의되어 있다.
+
+   공통 레지스트리에 표시된 바와 같이,
+   JWS와 JWE는 공통의 헤더 파라미터 공간을 공유한다.
+   하나의 파라미터가 두 사양 모두에서 사용되는 경우,
+   그 사용 방식은 두 사양 간에 호환되어야 한다.
+
+<span class="h4"><a class="selflink" id="section-4.1.1" href="#section-4.1.1">4.1.1</a>.  "alg"(알고리즘) 헤더 파라미터</span>
+
+   "alg"(알고리즘) 헤더 파라미터는
+   JWS를 보호하는 데 사용된
+   암호학적 알고리즘을 식별한다.
+   "alg" 값이 지원되는 알고리즘을 나타내지 않거나,
+   해당 알고리즘을 사용하기 위한 키가
+   콘텐츠를 디지털 서명하거나 MAC 처리한 주체와
+   연관되어 있지 않은 경우,
+   JWS 서명 값은 유효하지 않다.
+   "alg" 값은
+   [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>]에 의해 설정된
+   IANA “JSON Web Signature and Encryption Algorithms”
+   레지스트리에 등록되거나,
+   충돌 방지 이름을 포함하는 값이어야 한다.
+   "alg" 값은
+   StringOrURI 값을 포함하는,
+   대소문자를 구분하는 ASCII 문자열이다.
+   이 헤더 파라미터는 반드시 존재해야 하며,
+   구현에 의해 반드시 이해되고 처리되어야 한다.
+
+   이 용도를 위해 정의된 "alg" 값의 목록은,
+   [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>]에 의해 설정된
+   IANA “JSON Web Signature and Encryption Algorithms”
+   레지스트리에서 찾을 수 있으며,
+   이 레지스트리의 초기 내용은
+   [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>]의
+   섹션 3.1에 정의된 값들이다.
+
+<span class="h4"><a class="selflink" id="section-4.1.2" href="#section-4.1.2">4.1.2</a>.  "jku"(JWK 세트 URL) 헤더 파라미터</span>
+
+   "jku"(JWK 세트 URL) 헤더 파라미터는,
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는,
+   JSON으로 인코딩된 공개 키들의 집합을 위한 리소스를
+   가리키는 URI이다
+   [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>].
+   키들은 반드시 JWK 세트로 인코딩되어야 한다
+   [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>].
+   해당 리소스를 획득하는 데 사용되는 프로토콜은
+   무결성 보호를 제공해야 하며,
+   JWK 세트를 검색하기 위한 HTTP GET 요청은
+   전송 계층 보안(Transport Layer Security)을 사용해야 한다.
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   (TLS) [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>] [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]; 그리고 서버의 신원은
+   <a href="./rfc6125#section-6">RFC 6125의 섹션&nbsp;6</a>
+   [<a href="./rfc6125" title="&quot;Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)&quot;">RFC6125</a>]에 따라
+   반드시 검증되어야 한다. 또한 TLS 요구 사항에 대해서는
+   <a href="#section-8">섹션 8</a>을 참조하라. 이 헤더 파라미터의 사용은
+   선택 사항이다.
+
+<span class="h4"><a class="selflink" id="section-4.1.3" href="#section-4.1.3">4.1.3</a>.  "jwk" (JSON Web Key) 헤더 파라미터</span>
+
+   "jwk"(JSON Web Key) 헤더 파라미터는
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는 공개 키이다.
+   이 키는 JSON Web Key로 표현된다
+   [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>].
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+<span class="h4"><a class="selflink" id="section-4.1.4" href="#section-4.1.4">4.1.4</a>.  "kid" (키 ID) 헤더 파라미터</span>
+
+   "kid"(키 ID) 헤더 파라미터는
+   JWS를 보호하는 데 사용된 키가 무엇인지를 나타내는 힌트이다.
+   이 파라미터는 발신자가 수신자에게
+   키 변경을 명시적으로 알릴 수 있게 한다.
+   "kid" 값의 구조는 지정되어 있지 않다.
+   그 값은 대소문자를 구분하는 문자열이어야 한다.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+   JWK와 함께 사용될 경우,
+   "kid" 값은 JWK의 "kid" 파라미터 값과 매칭하는 데 사용된다.
+
+<span class="h4"><a class="selflink" id="section-4.1.5" href="#section-4.1.5">4.1.5</a>.  "x5u" (X.509 URL) 헤더 파라미터</span>
+
+   "x5u"(X.509 URL) 헤더 파라미터는,
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는
+   X.509 공개 키 인증서 또는 인증서 체인을 위한 리소스를
+   가리키는 URI이다
+   [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>].
+   식별된 리소스는
+   <a href="./rfc5280">RFC 5280</a>
+   [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>]을 준수하는,
+   PEM 인코딩 형식의 인증서 또는 인증서 체인 표현을
+   반드시 제공해야 하며,
+   각 인증서는
+   <a href="./rfc4945#section-6.1">RFC 4945의 섹션&nbsp;6.1</a>
+   [<a href="./rfc4945" title="&quot;The Internet IP Security PKI Profile of IKEv1/ISAKMP, IKEv2, and PKIX&quot;">RFC4945</a>]에 명시된 대로 구분되어야 한다.
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는 공개 키를
+   포함하는 인증서는 반드시 첫 번째 인증서여야 한다.
+   그 뒤에 추가 인증서가 올 수 있으며,
+   각 후속 인증서는 이전 인증서를 인증하는 데 사용된
+   인증서여야 한다.
+   해당 리소스를 획득하는 데 사용되는 프로토콜은
+   무결성 보호를 제공해야 하며,
+   인증서를 검색하기 위한 HTTP GET 요청은
+   TLS
+   [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>]
+   [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]를
+   반드시 사용해야 한다.
+   또한 서버의 신원은
+   <a href="./rfc6125#section-6">RFC 6125의 섹션&nbsp;6</a>
+   [<a href="./rfc6125" title="&quot;Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)&quot;">RFC6125</a>]에 따라
+   반드시 검증되어야 한다.
+   TLS 요구 사항에 대해서는
+   <a href="#section-8">섹션 8</a>도 참조하라.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+<span class="h4"><a class="selflink" id="section-4.1.6" href="#section-4.1.6">4.1.6</a>.  "x5c" (X.509 인증서 체인) 헤더 파라미터</span>
+
+   "x5c"(X.509 인증서 체인) 헤더 파라미터는,
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는
+   X.509 공개 키 인증서 또는 인증서 체인을 포함한다
+   [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>].
+   인증서 또는 인증서 체인은
+   인증서 값 문자열들의 JSON 배열로 표현된다.
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   배열 내의 각 문자열은
+   base64로 인코딩된
+   (<a href="./rfc4648#section-4">[RFC4648]의 섹션&nbsp;4</a> -- base64url 인코딩 아님)
+   DER
+   [<a href="#ref-ITU.X690.2008">ITU.X690.2008</a>]
+   PKIX 인증서 값이다.
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는 공개 키를
+   포함하는 인증서는 반드시 첫 번째 인증서여야 한다.
+   그 뒤에 추가 인증서가 올 수 있으며,
+   각 후속 인증서는 이전 인증서를 인증하는 데 사용된
+   인증서여야 한다.
+   수신자는
+   <a href="./rfc5280">RFC 5280</a>
+   [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>]에 따라
+   인증서 체인을 검증해야 하며,
+   검증 실패가 발생할 경우
+   해당 인증서 또는 인증서 체인을
+   유효하지 않은 것으로 간주해야 한다.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+   "x5c" 값의 예제는
+   <a href="#appendix-B">부록 B</a>를 참조하라.
+
+<span class="h4"><a class="selflink" id="section-4.1.7" href="#section-4.1.7">4.1.7</a>.  "x5t" (X.509 인증서 SHA-1 지문) 헤더 파라미터</span>
+
+   "x5t"(X.509 인증서 SHA-1 지문) 헤더 파라미터는,
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는
+   X.509 인증서의 DER 인코딩에 대한
+   base64url로 인코딩된 SHA-1 지문
+   (일명 다이제스트)이다
+   [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>].
+   인증서 지문은
+   인증서 핑거프린트라고도 불린다.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+<span class="h4"><a class="selflink" id="section-4.1.8" href="#section-4.1.8">4.1.8</a>.  "x5t#S256" (X.509 인증서 SHA-256 지문) 헤더</span>
+<span class="h4">        파라미터</span>
+
+   "x5t#S256"(X.509 인증서 SHA-256 지문) 헤더 파라미터는,
+   JWS를 디지털 서명하는 데 사용된 키에 대응하는
+   X.509 인증서의 DER 인코딩에 대한
+   base64url로 인코딩된 SHA-256 지문
+   (일명 다이제스트)이다
+   [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>].
+   인증서 지문은
+   인증서 핑거프린트라고도 불린다.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+<span class="h4"><a class="selflink" id="section-4.1.9" href="#section-4.1.9">4.1.9</a>.  "typ" (타입) 헤더 파라미터</span>
+
+   "typ"(타입) 헤더 파라미터는,
+   JWS 애플리케이션이
+   이 완전한 JWS의 미디어 타입을 선언하는 데 사용된다
+   [<a href="#ref-IANA.MediaTypes">IANA.MediaTypes</a>].
+   이는 JWS를 포함할 수 있는 애플리케이션 데이터 구조 내에
+   하나 이상의 객체 종류가 존재할 수 있는 경우에,
+   애플리케이션이 서로 다른 객체 종류를
+   구분할 수 있도록 하기 위한 것이다.
+   객체의 종류가 이미 알려져 있는 경우에는,
+   일반적으로 애플리케이션에서 사용되지 않는다.
+   이 파라미터는 JWS 구현에서는 무시되며,
+   이 파라미터에 대한 모든 처리는
+   JWS 애플리케이션에 의해 수행된다.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+   <a href="./rfc2045">RFC 2045</a>
+   [<a href="./rfc2045" title="&quot;Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies&quot;">RFC2045</a>]에 따라,
+   모든 미디어 타입 값, 서브타입 값, 그리고
+   파라미터 이름은 대소문자를 구분하지 않는다.
+   그러나 파라미터 값은,
+   특정 파라미터에 대해 달리 지정되지 않는 한,
+   대소문자를 구분한다.
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 12]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   일반적인 상황에서 메시지를 간결하게 유지하기 위해,
+   미디어 타입 값에 '/' 문자가 더 이상 나타나지 않는 경우에는,
+   "typ" 헤더 파라미터에서
+   미디어 타입 값의 "application/" 접두어를
+   생략하는 것이 권장된다.
+   미디어 타입 값을 사용하는 수신자는,
+   '/'를 포함하지 않는 모든 "typ" 값 앞에
+   "application/"이 붙어 있는 것처럼
+   처리해야 한다.
+   예를 들어,
+   "typ" 값 "example"은
+   "application/example" 미디어 타입을
+   표현하는 데 사용되어야 한다.
+   반면,
+   미디어 타입 "application/example;part="1/2""는
+   "example;part="1/2""로
+   축약될 수 없다.
+
+   "typ" 값 "JOSE"는,
+   이 객체가
+   JWS Compact 직렬화 또는
+   JWE Compact 직렬화를 사용하는
+   JWS 또는 JWE임을 나타내는 데
+   애플리케이션에서 사용할 수 있다.
+   "typ" 값 "JOSE+JSON"은,
+   이 객체가
+   JWS JSON 직렬화 또는
+   JWE JSON 직렬화를 사용하는
+   JWS 또는 JWE임을 나타내는 데
+   애플리케이션에서 사용할 수 있다.
+   그 밖의 타입 값들도
+   애플리케이션에서 사용할 수 있다.
+
+<span class="h4"><a class="selflink" id="section-4.1.10" href="#section-4.1.10">4.1.10</a>.  "cty" (콘텐츠 타입) 헤더 파라미터</span>
+
+   "cty"(콘텐츠 타입) 헤더 파라미터는,
+   JWS 애플리케이션이
+   보호된 콘텐츠(페이로드)의
+   미디어 타입을 선언하는 데 사용된다
+   [<a href="#ref-IANA.MediaTypes">IANA.MediaTypes</a>].
+   이는 JWS 페이로드에
+   하나 이상의 객체 종류가 존재할 수 있는 경우에,
+   애플리케이션이 서로 다른 객체 종류를
+   구분할 수 있도록 하기 위한 것이다.
+   객체의 종류가 이미 알려져 있는 경우에는,
+   일반적으로 애플리케이션에서 사용되지 않는다.
+   이 파라미터는 JWS 구현에서는 무시되며,
+   이 파라미터에 대한 모든 처리는
+   JWS 애플리케이션에 의해 수행된다.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+
+   <a href="./rfc2045">RFC 2045</a>
+   [<a href="./rfc2045" title="&quot;Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies&quot;">RFC2045</a>]에 따라,
+   모든 미디어 타입 값, 서브타입 값, 그리고
+   파라미터 이름은 대소문자를 구분하지 않는다.
+   그러나 파라미터 값은,
+   특정 파라미터에 대해 달리 지정되지 않는 한,
+   대소문자를 구분한다.
+
+   일반적인 상황에서 메시지를 간결하게 유지하기 위해,
+   미디어 타입 값에 '/' 문자가 더 이상 나타나지 않는 경우에는,
+   "cty" 헤더 파라미터에서
+   미디어 타입 값의 "application/" 접두어를
+   생략하는 것이 권장된다.
+   미디어 타입 값을 사용하는 수신자는,
+   '/'를 포함하지 않는 모든 "cty" 값 앞에
+   "application/"이 붙어 있는 것처럼
+   처리해야 한다.
+   예를 들어,
+   "cty" 값 "example"은
+   "application/example" 미디어 타입을
+   표현하는 데 사용되어야 한다.
+   반면,
+   미디어 타입 "application/example;part="1/2""는
+   "example;part="1/2""로
+   축약될 수 없다.
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 13]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h4"><a class="selflink" id="section-4.1.11" href="#section-4.1.11">4.1.11</a>.  "crit" (중요) 헤더 파라미터</span>
+
+   "crit"(중요) 헤더 파라미터는,
+   이 사양 및/또는
+   [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>]에 대한 확장이 사용되고 있으며,
+   반드시 이해되고 처리되어야 함을 나타낸다.
+   그 값은,
+   이러한 확장을 사용하는
+   JOSE 헤더 내에 존재하는
+   헤더 파라미터 이름들의 배열이다.
+   나열된 확장 헤더 파라미터 중
+   어느 하나라도 수신자가 이해하거나 지원하지 못할 경우,
+   해당 JWS는 유효하지 않다.
+   생성자는,
+   이 사양 또는
+   [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>]에서
+   JWS와 함께 사용하도록 정의된 헤더 파라미터 이름,
+   중복된 이름,
+   또는 JOSE 헤더 내에서
+   헤더 파라미터 이름으로 존재하지 않는 이름을
+   "crit" 목록에 포함해서는 안 된다.
+   생성자는 "crit" 값으로
+   빈 목록 "[]"을 사용해서는 안 된다.
+   수신자는,
+   중요 목록에
+   이 사양 또는
+   [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>]에서
+   JWS와 함께 사용하도록 정의된
+   헤더 파라미터 이름이 포함되어 있거나,
+   그 사용에 대한 다른 제약 조건이 위반된 경우,
+   해당 JWS를 유효하지 않은 것으로
+   간주할 수 있다.
+   이 헤더 파라미터가 사용되는 경우,
+   무결성 보호가 반드시 적용되어야 하므로,
+   반드시 JWS 보호된 헤더 내에만
+   존재해야 한다.
+   이 헤더 파라미터의 사용은 선택 사항이다.
+   이 헤더 파라미터는
+   구현에 의해 반드시 이해되고 처리되어야 한다.
+
+   가상의 "exp"(만료 시간) 필드를 포함한
+   사용 예시는 다음과 같다:
+
+     {"alg":"ES256",
+      "crit":["exp"],
+      "exp":1363284000
+     }
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  공개 헤더 파라미터 이름</span>
+
+   JWS를 사용하는 이들은
+   추가적인 헤더 파라미터 이름을 정의할 수 있다.
+   그러나 충돌을 방지하기 위해,
+   새로운 헤더 파라미터 이름은
+   <a href="#section-9.1">섹션 9.1</a>에 의해 설정된
+   IANA “JSON Web Signature and Encryption Header Parameters”
+   레지스트리에 등록되거나,
+   공개 이름
+   (충돌 방지 이름을 포함하는 값)이어야 한다.
+   각 경우에,
+   이름 또는 값을 정의하는 이는,
+   헤더 파라미터 이름을 정의하는 데 사용하는
+   네임스페이스의 부분을
+   자신이 통제하고 있음을 보장하기 위해
+   합리적인 예방 조치를 취해야 한다.
+
+   새로운 헤더 파라미터는,
+   상호 운용되지 않는 JWS를 초래할 수 있으므로,
+   신중하게 도입되어야 한다.
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  개인 헤더 파라미터 이름</span>
+
+   JWS의 생성자와 소비자는,
+   등록된 헤더 파라미터 이름이 아닌
+   개인 이름
+   (<a href="#section-4.1">섹션 4.1</a>에 정의된 등록된 헤더 파라미터 이름이 아닌 이름)
+   또는 공개 헤더 파라미터 이름
+   (<a href="#section-4.2">섹션 4.2</a>)을
+   사용하기로 합의할 수 있다.
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 14]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   공개 헤더 파라미터 이름과 달리,
+   개인 헤더 파라미터 이름은
+   충돌이 발생할 수 있으므로
+   주의하여 사용해야 한다.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  JWS 생성 및 소비</span>
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>.  메시지 서명 또는 MAC 계산</span>
+
+   JWS를 생성하기 위해,
+   다음 단계들이 수행된다.
+   입력과 출력 간에 의존성이 없는 경우,
+   단계들의 순서는 중요하지 않다.
+
+   1.  JWS 페이로드로 사용할 콘텐츠를 생성한다.
+
+   2.  인코딩된 페이로드 값
+       BASE64URL(JWS 페이로드)를 계산한다.
+
+   3.  원하는 헤더 파라미터 집합을 포함하는
+       JSON 객체를 생성한다.
+       이 객체들은 함께
+       JOSE 헤더
+       (JWS 보호된 헤더 및/또는 JWS 비보호 헤더)를
+       구성한다.
+
+   4.  인코딩된 헤더 값
+       BASE64URL(UTF8(JWS 보호된 헤더))를 계산한다.
+       JWS 보호된 헤더가 존재하지 않는 경우
+       (이는 JWS JSON 직렬화를 사용하면서
+       "protected" 멤버가 존재하지 않는 경우에만 발생할 수 있다),
+       이 값은 빈 문자열로 한다.
+
+   5.  사용 중인 특정 알고리즘에 대해 정의된 방식으로,
+       JWS 서명 입력
+       ASCII(BASE64URL(UTF8(JWS 보호된 헤더)) || '.' ||
+       BASE64URL(JWS 페이로드))
+       에 대해
+       JWS 서명을 계산한다.
+       "alg"(알고리즘) 헤더 파라미터는
+       JOSE 헤더에 반드시 존재해야 하며,
+       그 알고리즘 값은
+       JWS 서명을 생성하는 데 사용된 알고리즘을
+       정확하게 나타내야 한다.
+
+   6.  인코딩된 서명 값
+       BASE64URL(JWS 서명)을 계산한다.
+
+   7.  JWS JSON 직렬화를 사용하는 경우,
+       수행되는 각 디지털 서명 또는 MAC 연산에 대해
+       이 과정(단계 3-6)을 반복한다.
+
+   8.  원하는 직렬화된 출력을 생성한다.
+       이 결과의 JWS Compact 직렬화는
+       BASE64URL(UTF8(JWS 보호된 헤더)) || '.' ||
+       BASE64URL(JWS 페이로드) || '.' ||
+       BASE64URL(JWS 서명)이다.
+       JWS JSON 직렬화는
+       <a href="#section-7.2">섹션 7.2</a>에 설명되어 있다.
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 15]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  메시지 서명 또는 MAC 검증</span>
+
+   JWS를 검증할 때 다음 단계들이 수행된다.  단계들의 순서는
+   단계들의 입력과 출력 사이에 의존성이 없는 경우에는 중요하지 않다.
+   나열된 단계 중 하나라도 실패하면, 서명 또는 MAC은
+   검증될 수 없다.
+
+   여러 개의 JWS 서명 값이 있는 경우, 어떤 JWS 서명 값이
+   성공적으로 검증되어야 JWS를 수용할 것인지는 애플리케이션의
+   결정 사항이다.  어떤 경우에는 모두 성공적으로 검증되어야 하며,
+   그렇지 않으면 JWS는 유효하지 않은 것으로 간주된다.
+   다른 경우에는 특정 JWS 서명 값 하나만 성공적으로
+   검증되면 된다.  그러나 모든 경우에 최소한 하나의
+   JWS 서명 값은 반드시 성공적으로 검증되어야 하며,
+   그렇지 않으면 JWS는 반드시 유효하지 않은 것으로 간주되어야 한다.
+
+   1.  JWS 표현을 파싱하여 JWS 구성 요소들의 직렬화된 값을
+       추출한다.  JWS Compact 직렬화를 사용하는 경우,
+       이러한 구성 요소들은 JWS 보호된 헤더, JWS 페이로드,
+       그리고 JWS 서명의 base64url-인코딩된 표현이다.
+       JWS JSON 직렬화를 사용하는 경우에는,
+       이러한 구성 요소들에 인코딩되지 않은
+       JWS 비보호 헤더 값도 포함된다.
+       JWS Compact 직렬화를 사용하는 경우,
+       JWS 보호된 헤더, JWS 페이로드, 그리고 JWS 서명은
+       그 순서대로 base64url-인코딩된 값으로 표현되며,
+       각 값은 단일 마침표 문자('.')로 구분된다.
+       그 결과 정확히 두 개의 구분 마침표 문자가 사용된다.
+       JWS JSON 직렬화는 <a href="#section-7.2">섹션 7.2</a>에 설명되어 있다.
+
+   2.  JWS 보호된 헤더의 인코딩된 표현을 base64url-디코딩한다.
+       이때 줄 바꿈, 공백 또는 기타 추가 문자가
+       사용되지 않았다는 제한을 따른다.
+
+   3.  결과로 얻은 옥텟 시퀀스가
+       <a href="./rfc7159">RFC 7159</a> [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]에
+       부합하는 완전히 유효한 JSON 객체의 UTF-8 인코딩된 표현인지
+       검증한다.  이 JSON 객체를 JWS 보호된 헤더로 둔다.
+
+   4.  JWS Compact 직렬화를 사용하는 경우,
+       JOSE 헤더를 JWS 보호된 헤더로 둔다.
+       그렇지 않고 JWS JSON 직렬화를 사용하는 경우에는,
+       JOSE 헤더를 해당 JWS 보호된 헤더와
+       JWS 비보호 헤더의 멤버들의 합집합으로 둔다.
+       이들 모두는 완전히 유효한 JSON 객체여야 한다.
+       이 단계에서 결과로 생성된 JOSE 헤더에
+       중복된 헤더 매개변수 이름이 포함되어 있지 않은지
+       검증한다.  JWS JSON 직렬화를 사용하는 경우,
+       이 제한에는 JOSE 헤더를 구성하는 서로 다른 JSON 객체 값들에
+       동일한 헤더 매개변수 이름이
+       동시에 존재해서는 안 된다는 것도 포함된다.
+
+   5.  구현이 이 사양에 의해 요구되는 필드,
+       사용 중인 알고리즘에 의해 요구되는 필드,
+       또는 "crit" 헤더 매개변수 값에 의해 요구되는 필드
+       모두를 이해하고 처리할 수 있는지,
+       그리고 해당 매개변수들의 값 또한
+       이해되고 지원되는지 검증한다.
+
+   6.  JWS 페이로드의 인코딩된 표현을 base64url-디코딩한다.
+       이때 줄 바꿈, 공백 또는 기타 추가 문자가
+       사용되지 않았다는 제한을 따른다.
+
+   7.  JWS 서명의 인코딩된 표현을 base64url-디코딩한다.
+       이때 줄 바꿈, 공백 또는 기타 추가 문자가
+       사용되지 않았다는 제한을 따른다.
+
+   8.  JWS 서명을
+       ASCII(BASE64URL(UTF8(JWS 보호된 헤더)) || '.' ||
+       BASE64URL(JWS 페이로드))
+       라는 JWS 서명 입력에 대해,
+       사용 중인 알고리즘에 대해 정의된 방식으로 검증한다.
+       이 알고리즘은 반드시 "alg"(알고리즘) 헤더 매개변수 값으로
+       정확히 표현되어야 하며, 해당 매개변수는 반드시 존재해야 한다.
+       알고리즘 검증에 대한 보안 고려사항은
+       <a href="#section-10.6">섹션 10.6</a>을 참조하라.
+       검증이 성공했는지 여부를 기록한다.
+
+   9.  JWS JSON 직렬화를 사용하는 경우,
+       표현에 포함된 각 디지털 서명 또는 MAC 값에 대해
+       이 과정(단계 4-8)을 반복한다.
+
+   10. 단계 9의 검증들 중 어느 것도 성공하지 못한 경우,
+       JWS는 반드시 유효하지 않은 것으로 간주되어야 한다.
+       그렇지 않은 경우, JWS JSON 직렬화의 경우에는
+       어떤 검증이 성공했고 실패했는지를
+       애플리케이션에 반환한다.
+       JWS Compact 직렬화의 경우에는,
+       JWS가 성공적으로 검증되었는지 여부만
+       표시하면 된다.
+
+   마지막으로, 어떤 알고리즘을 특정 문맥에서 사용할 수 있는지는
+   애플리케이션의 결정 사항임에 유의하라.
+   JWS가 성공적으로 검증될 수 있더라도,
+   JWS에 사용된 알고리즘이 애플리케이션에 의해
+   허용되지 않는 경우에는,
+   JWS를 유효하지 않은 것으로 간주해야 한다(SHOULD).
+
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  문자열 비교 규칙</span>
+
+   JWS 처리는 필연적으로 알려진 문자열을
+   JSON 객체의 멤버 및 값과 비교하는 작업을 필요로 한다.
+   예를 들어, 사용 중인 알고리즘을 확인할 때,
+   유니코드 문자열 "alg"는 JOSE 헤더의 멤버 이름들과
+   비교되어 일치하는 헤더 매개변수 이름이 있는지
+   확인된다.
+
+   JSON에서 멤버 이름 비교를 수행하는 규칙은
+   <a href="./rfc7159#section-8.3">RFC 7159의 섹션&nbsp;8.3</a>
+   [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]에
+   설명되어 있다.  수행되는 문자열 비교 연산은
+   동일성 및 비동일성 비교뿐이므로,
+   동일한 규칙을 멤버 이름과 멤버 값 모두를
+   알려진 문자열과 비교하는 데 사용할 수 있다.
+
+   이러한 비교 규칙은,
+   멤버의 정의에서 해당 멤버 값에 대해
+   다른 비교 규칙을 사용해야 함을
+   명시적으로 호출한 경우를 제외하고,
+   모든 JSON 문자열 비교에 반드시 사용되어야 한다.
+   이 사양에서 정의된 멤버 값 중
+   "typ"과 "cty"만이 이 비교 규칙을 사용하지 않는다.
+
+   일부 애플리케이션은 대소문자를 구분하는 값 안에
+   대소문자를 구분하지 않는 정보를 포함할 수 있는데,
+   예를 들어 "kid"(키 ID) 값의 일부로 DNS 이름을
+   포함하는 경우가 그러하다.
+   이러한 경우, 둘 이상의 당사자가
+   동일한 값을 생성해야 비교가 가능한 상황이라면,
+   대소문자를 구분하지 않는 부분을 표현하기 위한
+   정규화된 대소문자 규칙(예: 소문자로 변환)을
+   애플리케이션이 정의할 필요가 있을 수 있다.
+   (그러나 다른 모든 당사자가
+   생성자가 출력한 값을 그대로 소비하고,
+   독립적으로 생성한 값과 비교하려 하지 않는다면,
+   생성자가 사용한 대소문자는 중요하지 않다.)
+
+   또한 <a href="#section-10.12">섹션 10.12</a>의 JSON 보안 고려사항과
+   <a href="#section-10.13">섹션 10.13</a>의 유니코드 보안 고려사항을
+   참조하라.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  키 식별</span>
+
+   JWS의 수신자는 디지털 서명 또는 MAC 연산에
+   사용된 키를 결정할 수 있어야 한다.
+   사용된 키는 <a href="#section-4.1">섹션 4.1</a>에 설명된
+   헤더 매개변수 방법을 사용하여 식별할 수 있으며,
+   또는 이 사양의 범위를 벗어나는 방법을
+   사용하여 식별할 수도 있다.
+   구체적으로, "jku", "jwk", "kid", "x5u", "x5c", "x5t",
+   그리고 "x5t#S256" 헤더 매개변수를 사용하여
+   사용된 키를 식별할 수 있다.
+   이러한 헤더 매개변수들이 전달하는 정보가
+   신뢰 결정에 사용되는 경우에는
+   반드시 무결성 보호가 되어야 한다.
+   그러나 신뢰 결정에 사용되는 유일한 정보가 키인 경우에는,
+   이 매개변수들이 무결성 보호될 필요는 없다.
+   왜냐하면 이들을 변경하여 다른 키가 사용되게 만들면,
+   검증이 실패하게 되기 때문이다.
+
+   애플리케이션이 사용된 키를 결정하기 위한
+   다른 수단이나 관례를 사용하지 않는 한,
+   생성자는 사용된 키를 식별하기에 충분한 정보를
+   헤더 매개변수에 포함해야 한다(SHOULD).
+   알고리즘이 키를 요구하는 경우
+   (이는 "none"을 제외한 모든 알고리즘에 해당한다)
+   사용된 키를 결정할 수 없으면,
+   서명 또는 MAC 검증은 실패한다.
+
+   공유 대칭 키를 교환하는 방법은
+   이 사양의 범위를 벗어난다.
+
+   또한 가능한 키 선택 알고리즘에 대한 참고 사항은
+   <a href="#appendix-D">부록 D</a>를 참조하라.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  직렬화</span>
+
+   JWS는 두 가지 직렬화 중 하나를 사용한다.
+   JWS Compact 직렬화 또는 JWS JSON 직렬화이다.
+   이 사양을 사용하는 애플리케이션은
+   어떤 직렬화와 어떤 직렬화 기능을
+   해당 애플리케이션에서 사용하는지를
+   명시해야 한다.
+   예를 들어, 애플리케이션은
+   JWS JSON 직렬화만을 사용한다거나,
+   단일 서명 또는 MAC 값에 대한
+   JWS JSON 직렬화 지원만을 사용한다거나,
+   여러 개의 서명 및/또는 MAC 값에 대한
+   지원을 사용한다고 명시할 수 있다.
+   JWS 구현은 자신이 지원하도록 설계된
+   애플리케이션에 필요한 기능만
+   구현하면 된다.
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  JWS Compact 직렬화</span>
+
+   JWS Compact 직렬화는
+   디지털 서명되거나 MAC이 적용된 콘텐츠를
+   간결하고 URL-안전한 문자열로 표현한다.
+   이 문자열은 다음과 같다:
+
+      BASE64URL(UTF8(JWS 보호된 헤더)) || '.' ||
+      BASE64URL(JWS 페이로드) || '.' ||
+      BASE64URL(JWS 서명)
+
+   JWS Compact 직렬화는
+   하나의 서명/MAC만을 지원하며,
+   JWS 비보호 헤더 값을
+   표현하기 위한 구문을 제공하지 않는다.
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  JWS JSON 직렬화</span>
+
+   JWS JSON 직렬화는
+   디지털 서명되거나 MAC이 적용된 콘텐츠를
+   JSON 객체로 표현한다.
+   이 표현은 간결성에 최적화되어 있지 않으며
+   URL-안전하지도 않다.
+
+   JWS JSON 직렬화에는
+   두 가지 밀접하게 관련된 구문이 정의되어 있다:
+   하나는 하나 이상의 디지털 서명 및/또는
+   MAC 연산으로 콘텐츠를 보호할 수 있는
+   완전 일반 구문이고,
+   다른 하나는 단일 디지털 서명 또는 MAC의 경우에
+   최적화된 평탄화된 구문이다.
+
+<span class="h4"><a class="selflink" id="section-7.2.1" href="#section-7.2.1">7.2.1</a>.  일반 JWS JSON 직렬화 구문</span>
+
+   다음 멤버들은
+   완전 일반 JWS JSON 직렬화 구문에 사용되는
+   최상위 JSON 객체에서 사용되도록 정의된다:
+
+   payload
+      "payload" 멤버는 반드시 존재해야 하며,
+      BASE64URL(JWS 페이로드) 값을 포함해야 한다.
+
+   signatures
+      "signatures" 멤버 값은 반드시
+      JSON 객체의 배열이어야 한다.
+      각 객체는 JWS 페이로드와
+      JWS 보호된 헤더에 대한
+      서명 또는 MAC을 나타낸다.
+
+   다음 멤버들은
+   "signatures" 배열의 요소인
+   JSON 객체에서 사용되도록 정의된다:
+
+   protected
+      JWS 보호된 헤더 값이 비어 있지 않은 경우,
+      "protected" 멤버는 반드시 존재해야 하며
+      BASE64URL(UTF8(JWS 보호된 헤더)) 값을 포함해야 한다.
+      그렇지 않은 경우에는 반드시 존재하지 않아야 한다.
+      이러한 헤더 매개변수 값들은 무결성 보호된다.
+
+   header
+      JWS 비보호 헤더 값이 비어 있지 않은 경우,
+      "header" 멤버는 반드시 존재해야 하며
+      JWS 비보호 헤더 값을 포함해야 한다.
+      그렇지 않은 경우에는 반드시 존재하지 않아야 한다.
+      이 값은 문자열이 아니라
+      인코딩되지 않은 JSON 객체로 표현된다.
+      이러한 헤더 매개변수 값들은 무결성 보호되지 않는다.
+
+   signature
+      "signature" 멤버는 반드시 존재해야 하며
+      BASE64URL(JWS 서명) 값을 포함해야 한다.
+
+   각 서명/MAC 계산에 대해,
+   "alg" 헤더 매개변수 값이 전달되도록 하기 위해,
+   "protected"와 "header" 멤버 중
+   최소 하나는 반드시 존재해야 한다.
+
+   위에서 정의된 JSON 객체들에는
+   추가적인 멤버들이 존재할 수 있다.
+   구현이 이를 이해하지 못하는 경우에는,
+   반드시 무시해야 한다.
+
+   개별 서명 또는 MAC 값을 생성하거나 검증할 때
+   사용되는 헤더 매개변수 값들은,
+   존재할 수 있는 두 집합의
+   헤더 매개변수 값들의 합집합이다:
+   (1) 서명/MAC의 배열 요소에 있는
+       "protected" 멤버로 표현된
+       JWS 보호된 헤더,
+   (2) 서명/MAC의 배열 요소에 있는
+       "header" 멤버의 JWS 비보호 헤더.
+
+   이 두 집합의 합집합이
+   JOSE 헤더를 구성한다.
+   두 위치에 있는 헤더 매개변수 이름들은
+   반드시 서로 겹치지 않아야 한다.
+
+   각 JWS 서명 값은
+   JWS Compact 직렬화에서와 동일한 방식으로,
+   해당 JOSE 헤더 값의 매개변수들을 사용하여
+   계산된다.
+   이로 인해,
+   "signatures" 배열에 표현된 각 JWS 서명 값은,
+   해당 서명/MAC 계산에 사용된
+   JWS 보호된 헤더 값이
+   JWS Compact 직렬화에서 사용된 것과
+   일치하는 경우,
+   JWS Compact 직렬화에서
+   동일한 매개변수에 대해
+   계산되었을 값과
+   동일하다는 바람직한 속성을 갖는다.
+
+   요약하면,
+   일반 JWS JSON 직렬화를 사용하는
+   JWS의 구문은 다음과 같다:
+
+     {
+      "payload":"&lt;payload contents&gt;",
+      "signatures":[
+       {"protected":"&lt;integrity-protected header 1 contents&gt;",
+        "header":&lt;non-integrity-protected header 1 contents&gt;,
+        "signature":"&lt;signature 1 contents&gt;"},
+       ...
+       {"protected":"&lt;integrity-protected header N contents&gt;",
+        "header":&lt;non-integrity-protected header N contents&gt;,
+        "signature":"&lt;signature N contents&gt;"}]
+     }
+
+   일반 JWS JSON 직렬화 구문을 사용하는
+   JWS의 예는 <a href="#appendix-A.6">부록 A.6</a>을 참조하라.
+
+<span class="h4"><a class="selflink" id="section-7.2.2" href="#section-7.2.2">7.2.2</a>.  평탄화된 JWS JSON 직렬화 구문</span>
+
+   평탄화된 JWS JSON 직렬화 구문은
+   일반 구문을 기반으로 하되,
+   단일 디지털 서명/MAC 경우에 최적화하기 위해
+   이를 평탄화한 것이다.
+   이는 "signatures" 멤버를 제거하고,
+   대신 "signatures" 배열에서 사용되도록 정의된
+   멤버들("protected", "header", "signature")을
+   최상위 JSON 객체에서
+   "payload" 멤버와 동일한 수준에 배치함으로써
+   이루어진다.
+
+   이 구문을 사용할 때는
+   "signatures" 멤버가
+   반드시 존재해서는 안 된다.
+   이 구문 차이를 제외하면,
+   평탄화된 구문을 사용하는
+   JWS JSON 직렬화 객체는
+   일반 구문을 사용하는 객체와
+   동일하게 처리된다.
+
+   요약하면,
+   평탄화된 JWS JSON 직렬화를 사용하는
+   JWS의 구문은 다음과 같다:
+
+     {
+      "payload":"&lt;payload contents&gt;",
+      "protected":"&lt;integrity-protected header contents&gt;",
+      "header":&lt;non-integrity-protected header contents&gt;,
+      "signature":"&lt;signature contents&gt;"
+     }
+
+   평탄화된 JWS JSON 직렬화 구문을 사용하는
+   JWS의 예는 <a href="#appendix-A.7">부록 A.7</a>을 참조하라.
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  TLS 요구사항</span>
+
+   "jku" 및/또는 "x5u" 헤더 매개변수를 지원하는
+   구현은 반드시 TLS를 지원해야 한다.
+   어떤 TLS 버전을 구현해야 하는지는
+   시간에 따라 달라지며,
+   구현 시점에서의 광범위한 배포 상태와
+   알려진 보안 취약성에 따라 달라진다.
+   이 문서를 작성하는 시점에서,
+   TLS 버전 1.2
+   [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]가
+   가장 최신 버전이다.
+
+   정보 공개와 변조를 방지하기 위해,
+   기밀성 보호는 반드시
+   기밀성과 무결성 보호를 제공하는
+   암호군을 사용하는 TLS를 통해
+   적용되어야 한다.
+   현재 적절하다고 간주되는 암호군에 대한
+   지침은 <a href="./rfc6176">RFC</a>
+   <a href="./rfc6176">6176</a>
+   [<a href="./rfc6176" title="&quot;Prohibiting Secure Sockets Layer (SSL) Version 2.0&quot;">RFC6176</a>]을 포함하여,
+   IETF TLS 작업 그룹의
+   최신 출판물을 참조하라.
+   또한 TLS를 사용하는 소프트웨어와 서비스의
+   보안을 향상시키기 위한 권고사항은
+   “Recommendations for Secure Use of
+   Transport Layer Security (TLS) and
+   Datagram Transport Layer Security (DTLS)”
+   [<a href="./rfc7525" title="&quot;Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)&quot;">RFC7525</a>]를
+   참조하라.
+
+   TLS가 사용될 때마다,
+   TLS 서버 인증서에 인코딩된
+   서비스 제공자의 신원은
+   <a href="./rfc6125#section-6">RFC 6125의 섹션&nbsp;6</a>
+   [<a href="./rfc6125" title="&quot;Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)&quot;">RFC6125</a>]에
+   설명된 절차를 사용하여
+   반드시 검증되어야 한다.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  IANA 고려사항</span>
+
+   이 사양에 의해 설정된 모든 레지스트리에는
+   다음 등록 절차가 사용된다.
+
+   값은 jose-reg-review@ietf.org 메일링 리스트에서의
+   3주간의 검토 기간 이후,
+   하나 이상의 지정 전문가의 조언에 따라
+   사양 필요(Specification Required)
+   [<a href="./rfc5226" title="">RFC5226</a>] 기준으로
+   등록된다.
+   그러나 출판 이전에 값 할당을 허용하기 위해,
+   지정 전문가들은 해당 사양이 출판될 것임을
+   충분히 만족하는 경우,
+   등록을 승인할 수 있다.
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 22]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Registration requests sent to the mailing list for review should use
+   an appropriate subject (e.g., "Request to register header parameter:
+   example").
+
+   Within the review period, the Designated Experts will either approve
+   or deny the registration request, communicating this decision to the
+   review list and IANA.  Denials should include an explanation and, if
+   applicable, suggestions as to how to make the request successful.
+   Registration requests that are undetermined for a period longer than
+   21 days can be brought to the IESG's attention (using the
+   iesg@ietf.org mailing list) for resolution.
+
+   Criteria that should be applied by the Designated Experts includes
+   determining whether the proposed registration duplicates existing
+   functionality, whether it is likely to be of general applicability or
+   useful only for a single application, and whether the registration
+   description is clear.
+
+   IANA must only accept registry updates from the Designated Experts
+   and should direct all requests for registration to the review mailing
+   list.
+
+   It is suggested that multiple Designated Experts be appointed who are
+   able to represent the perspectives of different applications using
+   this specification, in order to enable broadly informed review of
+   registration decisions.  In cases where a registration decision could
+   be perceived as creating a conflict of interest for a particular
+   Expert, that Expert should defer to the judgment of the other
+   Experts.
+
+<span class="h3"><a class="selflink" id="section-9.1" href="#section-9.1">9.1</a>.  JSON Web Signature and Encryption Header Parameters Registry</span>
+
+   This specification establishes the IANA "JSON Web Signature and
+   Encryption Header Parameters" registry for Header Parameter names.
+   The registry records the Header Parameter name and a reference to the
+   specification that defines it.  The same Header Parameter name can be
+   registered multiple times, provided that the parameter usage is
+   compatible between the specifications.  Different registrations of
+   the same Header Parameter name will typically use different Header
+   Parameter Usage Locations values.
+
+<span class="h4"><a class="selflink" id="section-9.1.1" href="#section-9.1.1">9.1.1</a>.  Registration Template</span>
+
+   Header Parameter Name:
+      The name requested (e.g., "kid").  Because a core goal of this
+      specification is for the resulting representations to be compact,
+      it is RECOMMENDED that the name be short -- not to exceed 8
+      characters without a compelling reason to do so.  This name is
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 23]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+      case sensitive.  Names may not match other registered names in a
+      case-insensitive manner unless the Designated Experts state that
+      there is a compelling reason to allow an exception.
+
+   Header Parameter Description:
+      Brief description of the Header Parameter (e.g., "Key ID").
+
+   Header Parameter Usage Location(s):
+      The Header Parameter usage locations, which should be one or more
+      of the values "JWS" or "JWE".
+
+   Change Controller:
+      For Standards Track RFCs, list the "IESG".  For others, give the
+      name of the responsible party.  Other details (e.g., postal
+      address, email address, home page URI) may also be included.
+
+   Specification Document(s):
+      Reference to the document or documents that specify the parameter,
+      preferably including URIs that can be used to retrieve copies of
+      the documents.  An indication of the relevant sections may also be
+      included but is not required.
+
+<span class="h4"><a class="selflink" id="section-9.1.2" href="#section-9.1.2">9.1.2</a>.  Initial Registry Contents</span>
+
+   This section registers the Header Parameter names defined in
+   <a href="#section-4.1">Section 4.1</a> in this registry.
+
+   o  Header Parameter Name: "alg"
+   o  Header Parameter Description: Algorithm
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.1">Section&nbsp;4.1.1 of RFC 7515</a>
+
+   o  Header Parameter Name: "jku"
+   o  Header Parameter Description: JWK Set URL
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.2">Section&nbsp;4.1.2 of RFC 7515</a>
+
+   o  Header Parameter Name: "jwk"
+   o  Header Parameter Description: JSON Web Key
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.3">Section&nbsp;4.1.3 of RFC 7515</a>
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 24]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   o  Header Parameter Name: "kid"
+   o  Header Parameter Description: Key ID
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.4">Section&nbsp;4.1.4 of RFC 7515</a>
+
+   o  Header Parameter Name: "x5u"
+   o  Header Parameter Description: X.509 URL
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.5">Section&nbsp;4.1.5 of RFC 7515</a>
+
+   o  Header Parameter Name: "x5c"
+   o  Header Parameter Description: X.509 Certificate Chain
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.6">Section&nbsp;4.1.6 of RFC 7515</a>
+
+   o  Header Parameter Name: "x5t"
+   o  Header Parameter Description: X.509 Certificate SHA-1 Thumbprint
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.7">Section&nbsp;4.1.7 of RFC 7515</a>
+
+   o  Header Parameter Name: "x5t#S256"
+   o  Header Parameter Description: X.509 Certificate SHA-256 Thumbprint
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.8">Section&nbsp;4.1.8 of RFC 7515</a>
+
+   o  Header Parameter Name: "typ"
+   o  Header Parameter Description: Type
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.9">Section&nbsp;4.1.9 of RFC 7515</a>
+
+   o  Header Parameter Name: "cty"
+   o  Header Parameter Description: Content Type
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.10">Section&nbsp;4.1.10 of RFC 7515</a>
+
+   o  Header Parameter Name: "crit"
+   o  Header Parameter Description: Critical
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): <a href="./rfc7515#section-4.1.11">Section&nbsp;4.1.11 of RFC 7515</a>
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 25]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-26" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h3"><a class="selflink" id="section-9.2" href="#section-9.2">9.2</a>.  Media Type Registration</span>
+
+<span class="h4"><a class="selflink" id="section-9.2.1" href="#section-9.2.1">9.2.1</a>.  Registry Contents</span>
+
+   This section registers the "application/jose" media type [<a href="./rfc2046" title="&quot;Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types&quot;">RFC2046</a>] in
+   the "Media Types" registry [<a href="#ref-IANA.MediaTypes">IANA.MediaTypes</a>] in the manner described
+   in <a href="./rfc6838">RFC 6838</a> [<a href="./rfc6838" title="&quot;Media Type Specifications and Registration Procedures&quot;">RFC6838</a>], which can be used to indicate that the content
+   is a JWS or JWE using the JWS Compact Serialization or the JWE
+   Compact Serialization.  This section also registers the "application/
+   jose+json" media type in the "Media Types" registry, which can be
+   used to indicate that the content is a JWS or JWE using the JWS JSON
+   Serialization or the JWE JSON Serialization.
+
+   o  Type name: application
+   o  Subtype name: jose
+   o  Required parameters: n/a
+   o  Optional parameters: n/a
+   o  Encoding considerations: 8bit; application/jose values are encoded
+      as a series of base64url-encoded values (some of which may be the
+      empty string), each separated from the next by a single period
+      ('.') character.
+   o  Security considerations: See the Security Considerations section
+      of <a href="./rfc7515">RFC 7515</a>.
+   o  Interoperability considerations: n/a
+   o  Published specification: <a href="./rfc7515">RFC 7515</a>
+   o  Applications that use this media type: OpenID Connect, Mozilla
+      Persona, Salesforce, Google, Android, Windows Azure, Xbox One,
+      Amazon Web Services, and numerous others that use JWTs
+   o  Fragment identifier considerations: n/a
+   o  Additional information:
+
+         Magic number(s): n/a
+         File extension(s): n/a
+         Macintosh file type code(s): n/a
+
+   o  Person &amp; email address to contact for further information:
+      Michael B. Jones, mbj@microsoft.com
+   o  Intended usage: COMMON
+   o  Restrictions on usage: none
+   o  Author: Michael B. Jones, mbj@microsoft.com
+   o  Change Controller: IESG
+   o  Provisional registration?  No
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 26]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-27" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   o  Type name: application
+   o  Subtype name: jose+json
+   o  Required parameters: n/a
+   o  Optional parameters: n/a
+   o  Encoding considerations: 8bit; application/jose+json values are
+      represented as a JSON Object; UTF-8 encoding SHOULD be employed
+      for the JSON object.
+   o  Security considerations: See the Security Considerations section
+      of <a href="./rfc7515">RFC 7515</a>
+   o  Interoperability considerations: n/a
+   o  Published specification: <a href="./rfc7515">RFC 7515</a>
+   o  Applications that use this media type: Nimbus JOSE + JWT library
+   o  Fragment identifier considerations: n/a
+   o  Additional information:
+
+         Magic number(s): n/a
+         File extension(s): n/a
+         Macintosh file type code(s): n/a
+
+   o  Person &amp; email address to contact for further information:
+      Michael B. Jones, mbj@microsoft.com
+   o  Intended usage: COMMON
+   o  Restrictions on usage: none
+   o  Author: Michael B. Jones, mbj@microsoft.com
+   o  Change Controller: IESG
+   o  Provisional registration?  No
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  Security Considerations</span>
+
+   All of the security issues that are pertinent to any cryptographic
+   application must be addressed by JWS/JWE/JWK agents.  Among these
+   issues are protecting the user's asymmetric private and symmetric
+   secret keys and employing countermeasures to various attacks.
+
+   All the security considerations in "XML Signature Syntax and
+   Processing Version 2.0" [<a href="#ref-W3C.NOTE-xmldsig-core2-20130411">W3C.NOTE-xmldsig-core2-20130411</a>], also apply
+   to this specification, other than those that are XML specific.
+   Likewise, many of the best practices documented in "XML Signature
+   Best Practices" [<a href="#ref-W3C.NOTE-xmldsig-bestpractices-20130411">W3C.NOTE-xmldsig-bestpractices-20130411</a>] also apply
+   to this specification, other than those that are XML specific.
+
+<span class="h3"><a class="selflink" id="section-10.1" href="#section-10.1">10.1</a>.  Key Entropy and Random Values</span>
+
+   Keys are only as strong as the amount of entropy used to generate
+   them.  A minimum of 128 bits of entropy should be used for all keys,
+   and depending upon the application context, more may be required.
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 27]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-28" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Implementations must randomly generate public/private key pairs, MAC
+   keys, and padding values.  The use of inadequate pseudorandom number
+   generators (PRNGs) to generate cryptographic keys can result in
+   little or no security.  An attacker may find it much easier to
+   reproduce the PRNG environment that produced the keys, searching the
+   resulting small set of possibilities rather than brute-force
+   searching the whole key space.  The generation of quality random
+   numbers is difficult.  <a href="./rfc4086">RFC 4086</a> [<a href="./rfc4086" title="&quot;Randomness Requirements for Security&quot;">RFC4086</a>] offers important guidance
+   in this area.
+
+<span class="h3"><a class="selflink" id="section-10.2" href="#section-10.2">10.2</a>.  Key Protection</span>
+
+   Implementations must protect the signer's private key.  Compromise of
+   the signer's private key permits an attacker to masquerade as the
+   signer.
+
+   Implementations must protect the MAC key.  Compromise of the MAC key
+   may result in undetectable modification of the authenticated content.
+
+<span class="h3"><a class="selflink" id="section-10.3" href="#section-10.3">10.3</a>.  Key Origin Authentication</span>
+
+   The key management technique employed to obtain public keys must
+   authenticate the origin of the key; otherwise, it is unknown what
+   party signed the message.
+
+   Likewise, the key management technique employed to distribute MAC
+   keys must provide data origin authentication; otherwise, the contents
+   are delivered with integrity from an unknown source.
+
+<span class="h3"><a class="selflink" id="section-10.4" href="#section-10.4">10.4</a>.  Cryptographic Agility</span>
+
+   See Section 8.1 of [<a href="#ref-JWA" title="&quot;JSON Web Algorithms (JWA)&quot;">JWA</a>] for security considerations on cryptographic
+   agility.
+
+<span class="h3"><a class="selflink" id="section-10.5" href="#section-10.5">10.5</a>.  Differences between Digital Signatures and MACs</span>
+
+   While MACs and digital signatures can both be used for integrity
+   checking, there are some significant differences between the security
+   properties that each of them provides.  These need to be taken into
+   consideration when designing protocols and selecting the algorithms
+   to be used in protocols.
+
+   Both signatures and MACs provide for integrity checking -- verifying
+   that the message has not been modified since the integrity value was
+   computed.  However, MACs provide for origination identification only
+   under specific circumstances.  It can normally be assumed that a
+   private key used for a signature is only in the hands of a single
+   entity (although perhaps a distributed entity, in the case of
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 28]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-29" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   replicated servers); however, a MAC key needs to be in the hands of
+   all the entities that use it for integrity computation and checking.
+   Validation of a MAC only provides corroboration that the message was
+   generated by one of the parties that knows the symmetric MAC key.
+   This means that origination can only be determined if a MAC key is
+   known only to two entities and the recipient knows that it did not
+   create the message.  MAC validation cannot be used to prove
+   origination to a third party.
+
+<span class="h3"><a class="selflink" id="section-10.6" href="#section-10.6">10.6</a>.  Algorithm Validation</span>
+
+   The digital signature representations for some algorithms include
+   information about the algorithm used inside the signature value.  For
+   instance, signatures produced with RSASSA-PKCS1-v1_5 [<a href="./rfc3447" title="&quot;Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1&quot;">RFC3447</a>] encode
+   the hash function used, and many libraries actually use the hash
+   algorithm specified inside the signature when validating the
+   signature.  When using such libraries, as part of the algorithm
+   validation performed, implementations MUST ensure that the algorithm
+   information encoded in the signature corresponds to that specified
+   with the "alg" Header Parameter.  If this is not done, an attacker
+   could claim to have used a strong hash algorithm while actually using
+   a weak one represented in the signature value.
+
+<span class="h3"><a class="selflink" id="section-10.7" href="#section-10.7">10.7</a>.  Algorithm Protection</span>
+
+   In some usages of JWS, there is a risk of algorithm substitution
+   attacks, in which an attacker can use an existing digital signature
+   value with a different signature algorithm to make it appear that a
+   signer has signed something that it has not.  These attacks have been
+   discussed in detail in the context of Cryptographic Message Syntax
+   (CMS) [<a href="./rfc6211" title="&quot;Cryptographic Message Syntax (CMS) Algorithm Identifier Protection Attribute&quot;">RFC6211</a>].  This risk arises when all of the following are
+   true:
+
+   o  Verifiers of a signature support multiple algorithms.
+
+   o  Given an existing signature, an attacker can find another payload
+      that produces the same signature value with a different algorithm.
+
+   o  The payload crafted by the attacker is valid in the application
+      context.
+
+   There are several ways for an application to mitigate algorithm
+   substitution attacks:
+
+   o  Use only digital signature algorithms that are not vulnerable to
+      substitution attacks.  Substitution attacks are only feasible if
+      an attacker can compute pre-images for a hash function accepted by
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 29]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-30" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+      the recipient.  All JWA-defined signature algorithms use SHA-2
+      hashes, for which there are no known pre-image attacks, as of the
+      time of this writing.
+
+   o  Require that the "alg" Header Parameter be carried in the JWS
+      Protected Header.  (This is always the case when using the JWS
+      Compact Serialization and is the approach taken by CMS [<a href="./rfc6211" title="&quot;Cryptographic Message Syntax (CMS) Algorithm Identifier Protection Attribute&quot;">RFC6211</a>].)
+
+   o  Include a field containing the algorithm in the application
+      payload, and require that it be matched with the "alg" Header
+      Parameter during verification.  (This is the approach taken by
+      PKIX [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>].)
+
+<span class="h3"><a class="selflink" id="section-10.8" href="#section-10.8">10.8</a>.  Chosen Plaintext Attacks</span>
+
+   Creators of JWSs should not allow third parties to insert arbitrary
+   content into the message without adding entropy not controlled by the
+   third party.
+
+<span class="h3"><a class="selflink" id="section-10.9" href="#section-10.9">10.9</a>.  Timing Attacks</span>
+
+   When cryptographic algorithms are implemented in such a way that
+   successful operations take a different amount of time than
+   unsuccessful operations, attackers may be able to use the time
+   difference to obtain information about the keys employed.  Therefore,
+   such timing differences must be avoided.
+
+<span class="h3"><a class="selflink" id="section-10.10" href="#section-10.10">10.10</a>.  Replay Protection</span>
+
+   While not directly in scope for this specification, note that
+   applications using JWS (or JWE) objects can thwart replay attacks by
+   including a unique message identifier as integrity-protected content
+   in the JWS (or JWE) message and having the recipient verify that the
+   message has not been previously received or acted upon.
+
+<span class="h3"><a class="selflink" id="section-10.11" href="#section-10.11">10.11</a>.  SHA-1 Certificate Thumbprints</span>
+
+   A SHA-1 hash is used when computing "x5t" (X.509 certificate SHA-1
+   thumbprint) values, for compatibility reasons.  Should an effective
+   means of producing SHA-1 hash collisions be developed and should an
+   attacker wish to interfere with the use of a known certificate on a
+   given system, this could be accomplished by creating another
+   certificate whose SHA-1 hash value is the same and adding it to the
+   certificate store used by the intended victim.  A prerequisite to
+   this attack succeeding is the attacker having write access to the
+   intended victim's certificate store.
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 30]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-31" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Alternatively, the "x5t#S256" (X.509 certificate SHA-256 thumbprint)
+   Header Parameter could be used instead of "x5t".  However, at the
+   time of this writing, no development platform is known to support
+   SHA-256 certificate thumbprints.
+
+<span class="h3"><a class="selflink" id="section-10.12" href="#section-10.12">10.12</a>.  JSON Security Considerations</span>
+
+   Strict JSON [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>] validation is a security requirement.  If
+   malformed JSON is received, then the intent of the producer is
+   impossible to reliably discern.  Ambiguous and potentially
+   exploitable situations could arise if the JSON parser used does not
+   reject malformed JSON syntax.  In particular, any JSON inputs not
+   conforming to the JSON-text syntax defined in <a href="./rfc7159">RFC 7159</a> MUST be
+   rejected in their entirety by JSON parsers.
+
+   <a href="#section-4">Section 4</a> of "The JavaScript Object Notation (JSON) Data Interchange
+   Format" [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>] states, "The names within an object SHOULD be
+   unique", whereas this specification states that
+
+      The Header Parameter names within the JOSE Header MUST be unique;
+      JWS parsers MUST either reject JWSs with duplicate Header
+      Parameter names or use a JSON parser that returns only the
+      lexically last duplicate member name, as specified in
+      <a href="#section-15.12">Section 15.12</a> ("The JSON Object") of ECMAScript 5.1 [<a href="#ref-ECMAScript" title="&quot;ECMAScript Language Specification, 5.1 Edition&quot;">ECMAScript</a>].
+
+   Thus, this specification requires that the "SHOULD" in <a href="./rfc7159#section-4">Section&nbsp;4 of
+   [RFC7159]</a> be treated as a "MUST" by producers and that it be either
+   treated as a "MUST" or treated in the manner specified in ECMAScript
+   5.1 by consumers.  Ambiguous and potentially exploitable situations
+   could arise if the JSON parser used does not enforce the uniqueness
+   of member names or returns an unpredictable value for duplicate
+   member names.
+
+   Some JSON parsers might not reject input that contains extra
+   significant characters after a valid input.  For instance, the input
+   "{"tag":"value"}ABCD" contains a valid JSON-text object followed by
+   the extra characters "ABCD".  Implementations MUST consider JWSs
+   containing such input to be invalid.
+
+<span class="h3"><a class="selflink" id="section-10.13" href="#section-10.13">10.13</a>.  Unicode Comparison Security Considerations</span>
+
+   Header Parameter names and algorithm names are Unicode strings.  For
+   security reasons, the representations of these names must be compared
+   verbatim after performing any escape processing (as per <a href="./rfc7159#section-8.3">Section&nbsp;8.3
+   of RFC 7159</a> [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]).  This means, for instance, that these JSON
+   strings must compare as being equal ("sig", "\u0073ig"), whereas
+   these must all compare as being not equal to the first set or to each
+   other ("SIG", "Sig", "si\u0047").
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 31]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-32" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   JSON strings can contain characters outside the Unicode Basic
+   Multilingual Plane.  For instance, the G clef character (U+1D11E) may
+   be represented in a JSON string as "\uD834\uDD1E".  Ideally, JWS
+   implementations SHOULD ensure that characters outside the Basic
+   Multilingual Plane are preserved and compared correctly;
+   alternatively, if this is not possible due to these characters
+   exercising limitations present in the underlying JSON implementation,
+   then input containing them MUST be rejected.
+
+<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>.  References</span>
+
+<span class="h3"><a class="selflink" id="section-11.1" href="#section-11.1">11.1</a>.  Normative References</span>
+
+   [<a id="ref-ECMAScript">ECMAScript</a>] Ecma International, "ECMAScript Language Specification,
+                5.1 Edition", ECMA 262, June 2011,
+                &lt;<a href="http://www.ecma-international.org/ecma-262/5.1/ECMA-262.pdf">http://www.ecma-international.org/ecma-262/5.1/</a>
+                <a href="http://www.ecma-international.org/ecma-262/5.1/ECMA-262.pdf">ECMA-262.pdf</a>&gt;.
+
+   [<a id="ref-IANA.MediaTypes">IANA.MediaTypes</a>]
+                IANA, "Media Types",
+                &lt;<a href="http://www.iana.org/assignments/media-types">http://www.iana.org/assignments/media-types</a>&gt;.
+
+   [<a id="ref-ITU.X690.2008">ITU.X690.2008</a>]
+                International Telecommunications Union, "Information
+                Technology - ASN.1 encoding rules: Specification of
+                Basic Encoding Rules (BER), Canonical Encoding Rules
+                (CER) and Distinguished Encoding Rules (DER)", ITU-T
+                Recommendation X.690, 2008.
+
+   [<a id="ref-JWA">JWA</a>]        Jones, M., "JSON Web Algorithms (JWA)", <a href="./rfc7518">RFC 7518</a>,
+                DOI 10.17487/RFC7518, May 2015,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc7518">http://www.rfc-editor.org/info/rfc7518</a>&gt;.
+
+   [<a id="ref-JWK">JWK</a>]        Jones, M., "JSON Web Key (JWK)", <a href="./rfc7517">RFC 7517</a>,
+                DOI 10.17487/RFC7517, May 2015,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc7517">http://www.rfc-editor.org/info/rfc7517</a>&gt;.
+
+   [<a id="ref-RFC20">RFC20</a>]      Cerf, V., "ASCII format for Network Interchange",
+                STD 80, <a href="./rfc20">RFC 20</a>, DOI 10.17487/RFC0020, October 1969,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc20">http://www.rfc-editor.org/info/rfc20</a>&gt;.
+
+   [<a id="ref-RFC2045">RFC2045</a>]    Freed, N. and N. Borenstein, "Multipurpose Internet Mail
+                Extensions (MIME) Part One: Format of Internet Message
+                Bodies", <a href="./rfc2045">RFC 2045</a>, DOI 10.17487/RFC2045, November 1996,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc2045">http://www.rfc-editor.org/info/rfc2045</a>&gt;.
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 32]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-33" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   [<a id="ref-RFC2046">RFC2046</a>]    Freed, N. and N. Borenstein, "Multipurpose Internet Mail
+                Extensions (MIME) Part Two: Media Types", <a href="./rfc2046">RFC 2046</a>,
+                DOI 10.17487/RFC2046, November 1996,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc2046">http://www.rfc-editor.org/info/rfc2046</a>&gt;.
+
+   [<a id="ref-RFC2119">RFC2119</a>]    Bradner, S., "Key words for use in RFCs to Indicate
+                Requirement Levels", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>,
+                DOI 10.17487/RFC2119, March 1997,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>&gt;.
+
+   [<a id="ref-RFC2818">RFC2818</a>]    Rescorla, E., "HTTP Over TLS", <a href="./rfc2818">RFC 2818</a>,
+                DOI 10.17487/RFC2818, May 2000,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc2818">http://www.rfc-editor.org/info/rfc2818</a>&gt;.
+
+   [<a id="ref-RFC3629">RFC3629</a>]    Yergeau, F., "UTF-8, a transformation format of ISO
+                10646", STD 63, <a href="./rfc3629">RFC 3629</a>, DOI 10.17487/RFC3629, November
+                2003, &lt;<a href="https://www.rfc-editor.org/info/rfc3629">http://www.rfc-editor.org/info/rfc3629</a>&gt;.
+
+   [<a id="ref-RFC3986">RFC3986</a>]    Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+                Resource Identifier (URI): Generic Syntax", STD 66,
+                <a href="./rfc3986">RFC 3986</a>, DOI 10.17487/RFC3986, January 2005,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc3986">http://www.rfc-editor.org/info/rfc3986</a>&gt;.
+
+   [<a id="ref-RFC4648">RFC4648</a>]    Josefsson, S., "The Base16, Base32, and Base64 Data
+                Encodings", <a href="./rfc4648">RFC 4648</a>, DOI 10.17487/RFC4648, October
+                2006, &lt;<a href="https://www.rfc-editor.org/info/rfc4648">http://www.rfc-editor.org/info/rfc4648</a>&gt;.
+
+   [<a id="ref-RFC4945">RFC4945</a>]    Korver, B., "The Internet IP Security PKI Profile of
+                IKEv1/ISAKMP, IKEv2, and PKIX", <a href="./rfc4945">RFC 4945</a>,
+                DOI 10.17487/RFC4945, August 2007,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc4945">http://www.rfc-editor.org/info/rfc4945</a>&gt;.
+
+   [<a id="ref-RFC4949">RFC4949</a>]    Shirey, R., "Internet Security Glossary, Version 2",
+                FYI 36, <a href="./rfc4949">RFC 4949</a>, DOI 10.17487/RFC4949, August 2007,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc4949">http://www.rfc-editor.org/info/rfc4949</a>&gt;.
+
+   [<a id="ref-RFC5246">RFC5246</a>]    Dierks, T. and E. Rescorla, "The Transport Layer
+                Security (TLS) Protocol Version 1.2", <a href="./rfc5246">RFC 5246</a>,
+                DOI 10.17487/RFC5246, August 2008,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc5246">http://www.rfc-editor.org/info/rfc5246</a>&gt;.
+
+   [<a id="ref-RFC5280">RFC5280</a>]    Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+                Housley, R., and W. Polk, "Internet X.509 Public Key
+                Infrastructure Certificate and Certificate Revocation
+                List (CRL) Profile", <a href="./rfc5280">RFC 5280</a>, DOI 10.17487/RFC5280, May
+                2008, &lt;<a href="https://www.rfc-editor.org/info/rfc5280">http://www.rfc-editor.org/info/rfc5280</a>&gt;.
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 33]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-34" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   [<a id="ref-RFC6125">RFC6125</a>]    Saint-Andre, P. and J. Hodges, "Representation and
+                Verification of Domain-Based Application Service
+                Identity within Internet Public Key Infrastructure Using
+                X.509 (PKIX) Certificates in the Context of Transport
+                Layer Security (TLS)", <a href="./rfc6125">RFC 6125</a>, DOI 10.17487/RFC6125,
+                March 2011, &lt;<a href="https://www.rfc-editor.org/info/rfc6125">http://www.rfc-editor.org/info/rfc6125</a>&gt;.
+
+   [<a id="ref-RFC6176">RFC6176</a>]    Turner, S. and T. Polk, "Prohibiting Secure Sockets
+                Layer (SSL) Version 2.0", <a href="./rfc6176">RFC 6176</a>,
+                DOI 10.17487/RFC6176, March 2011,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc6176">http://www.rfc-editor.org/info/rfc6176</a>&gt;.
+
+   [<a id="ref-RFC7159">RFC7159</a>]    Bray, T., Ed., "The JavaScript Object Notation (JSON)
+                Data Interchange Format", <a href="./rfc7159">RFC 7159</a>,
+                DOI 10.17487/RFC7159, March 2014,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc7159">http://www.rfc-editor.org/info/rfc7159</a>&gt;.
+
+   [<a id="ref-UNICODE">UNICODE</a>]    The Unicode Consortium, "The Unicode Standard",
+                &lt;<a href="http://www.unicode.org/versions/latest/">http://www.unicode.org/versions/latest/</a>&gt;.
+
+<span class="h3"><a class="selflink" id="section-11.2" href="#section-11.2">11.2</a>.  Informative References</span>
+
+   [<a id="ref-CanvasApp">CanvasApp</a>]  Facebook, "Canvas Applications",
+                &lt;<a href="https://developers.facebook.com/docs/authentication/canvas">http://developers.facebook.com/docs/authentication/</a>
+                <a href="https://developers.facebook.com/docs/authentication/canvas">canvas</a>&gt;.
+
+   [<a id="ref-JSS">JSS</a>]        Bradley, J. and N. Sakimura, Ed., "JSON Simple Sign",
+                September 2010, &lt;<a href="http://jsonenc.info/jss/1.0/">http://jsonenc.info/jss/1.0/</a>&gt;.
+
+   [<a id="ref-JWE">JWE</a>]        Jones, M. and J. Hildebrand, "JSON Web Encryption
+                (JWE)", <a href="./rfc7516">RFC 7516</a>, DOI 10.17487/RFC7516, May 2015,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc7516">http://www.rfc-editor.org/info/rfc7516</a>&gt;.
+
+   [<a id="ref-JWT">JWT</a>]        Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+                (JWT)", <a href="./rfc7519">RFC 7519</a>, DOI 10.17487/RFC7519, May 2015,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc7519">http://www.rfc-editor.org/info/rfc7519</a>&gt;.
+
+   [<a id="ref-MagicSignatures">MagicSignatures</a>]
+                Panzer, J., Ed., Laurie, B., and D. Balfanz, "Magic
+                Signatures", January 2011,
+                &lt;<a href="https://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html">http://salmon-protocol.googlecode.com/svn/trunk/</a>
+                <a href="https://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html">draft-panzer-magicsig-01.html</a>&gt;.
+
+   [<a id="ref-RFC2104">RFC2104</a>]    Krawczyk, H., Bellare, M., and R. Canetti, "HMAC:
+                Keyed-Hashing for Message Authentication", <a href="./rfc2104">RFC 2104</a>,
+                DOI 10.17487/RFC2104, February 1997,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc2104">http://www.rfc-editor.org/info/rfc2104</a>&gt;.
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 34]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-35" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   [<a id="ref-RFC3447">RFC3447</a>]    Jonsson, J. and B. Kaliski, "Public-Key Cryptography
+                Standards (PKCS) #1: RSA Cryptography Specifications
+                Version 2.1", <a href="./rfc3447">RFC 3447</a>, DOI 10.17487/RFC3447, February
+                2003, &lt;<a href="https://www.rfc-editor.org/info/rfc3447">http://www.rfc-editor.org/info/rfc3447</a>&gt;.
+
+   [<a id="ref-RFC4086">RFC4086</a>]    Eastlake 3rd, D., Schiller, J., and S. Crocker,
+                "Randomness Requirements for Security", <a href="https://www.rfc-editor.org/bcp/bcp106">BCP 106</a>,
+                <a href="./rfc4086">RFC 4086</a>, DOI 10.17487/RFC4086, June 2005,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc4086">http://www.rfc-editor.org/info/rfc4086</a>&gt;.
+
+   [<a id="ref-RFC4122">RFC4122</a>]    Leach, P., Mealling, M., and R. Salz, "A Universally
+                Unique IDentifier (UUID) URN Namespace", <a href="./rfc4122">RFC 4122</a>,
+                DOI 10.17487/RFC4122, July 2005,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc4122">http://www.rfc-editor.org/info/rfc4122</a>&gt;.
+
+   [<a id="ref-RFC5226">RFC5226</a>]    Narten, T. and H. Alvestrand, "Guidelines for Writing an
+                IANA Considerations Section in RFCs", <a href="https://www.rfc-editor.org/bcp/bcp26">BCP 26</a>, <a href="./rfc5226">RFC 5226</a>,
+                DOI 10.17487/RFC5226, May 2008,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc5226">http://www.rfc-editor.org/info/rfc5226</a>&gt;.
+
+   [<a id="ref-RFC6211">RFC6211</a>]    Schaad, J., "Cryptographic Message Syntax (CMS)
+                Algorithm Identifier Protection Attribute", <a href="./rfc6211">RFC 6211</a>,
+                DOI 10.17487/RFC6211, April 2011,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc6211">http://www.rfc-editor.org/info/rfc6211</a>&gt;.
+
+   [<a id="ref-RFC6838">RFC6838</a>]    Freed, N., Klensin, J., and T. Hansen, "Media Type
+                Specifications and Registration Procedures", <a href="https://www.rfc-editor.org/bcp/bcp13">BCP 13</a>,
+                <a href="./rfc6838">RFC 6838</a>, DOI 10.17487/RFC6838, January 2013,
+                &lt;<a href="https://www.rfc-editor.org/info/rfc6838">http://www.rfc-editor.org/info/rfc6838</a>&gt;.
+
+   [<a id="ref-RFC7525">RFC7525</a>]    Sheffer, Y., Holz, R., and P. Saint-Andre,
+                "Recommendations for Secure Use of Transport Layer
+                Security (TLS) and Datagram Transport Layer Security
+                (DTLS)", <a href="https://www.rfc-editor.org/bcp/bcp195">BCP 195</a>, <a href="./rfc7525">RFC 7525</a>, DOI 10.17487/RFC7525, May
+                2015, &lt;<a href="https://www.rfc-editor.org/info/rfc7525">http://www.rfc-editor.org/info/rfc7525</a>&gt;.
+
+   [<a id="ref-SHS">SHS</a>]        National Institute of Standards and Technology, "Secure
+                Hash Standard (SHS)", FIPS PUB 180-4, March 2012,
+                &lt;<a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">http://csrc.nist.gov/publications/fips/fips180-4/</a>
+                <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">fips-180-4.pdf</a>&gt;.
+
+   [<a id="ref-W3C.NOTE-xmldsig-bestpractices-20130411">W3C.NOTE-xmldsig-bestpractices-20130411</a>]
+                Hirsch, F. and P. Datta, "XML Signature Best Practices",
+                World Wide Web Consortium Note
+                NOTE-xmldsig-bestpractices-20130411, April 2013,
+                &lt;<a href="http://www.w3.org/TR/2013/NOTE-xmldsig-bestpractices-20130411/">http://www.w3.org/TR/2013/</a>
+                <a href="http://www.w3.org/TR/2013/NOTE-xmldsig-bestpractices-20130411/">NOTE-xmldsig-bestpractices-20130411/</a>&gt;.
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 35]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-36" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   [<a id="ref-W3C.NOTE-xmldsig-core2-20130411">W3C.NOTE-xmldsig-core2-20130411</a>]
+                Eastlake, D., Reagle, J., Solo, D., Hirsch, F.,
+                Roessler, T., Yiu, K., Datta, P., and S. Cantor, "XML
+                Signature Syntax and Processing Version 2.0", World Wide
+                Web Consortium Note NOTE-xmldsig-core2-20130411, April
+                2013,
+                &lt;<a href="http://www.w3.org/TR/2013/NOTE-xmldsig-core2-20130411/">http://www.w3.org/TR/2013/NOTE-xmldsig-core2-20130411/</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 36]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-37" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">Appendix A</a>.  JWS Examples</span>
+
+   This section provides several examples of JWSs.  While the first
+   three examples all represent JSON Web Tokens (JWTs) [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>], the
+   payload can be any octet sequence, as shown in <a href="#appendix-A.4">Appendix A.4</a>.
+
+<span class="h3"><a class="selflink" id="appendix-A.1" href="#appendix-A.1">A.1</a>.  Example JWS Using HMAC SHA-256</span>
+
+<span class="h4"><a class="selflink" id="appendix-A.1.1" href="#appendix-A.1.1">A.1.1</a>.  Encoding</span>
+
+   The following example JWS Protected Header declares that the data
+   structure is a JWT [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>] and the JWS Signing Input is secured using
+   the HMAC SHA-256 algorithm.
+
+     {"typ":"JWT",
+      "alg":"HS256"}
+
+   To remove potential ambiguities in the representation of the JSON
+   object above, the actual octet sequence representing UTF8(JWS
+   Protected Header) used in this example is also included below.  (Note
+   that ambiguities can arise due to differing platform representations
+   of line breaks (CRLF versus LF), differing spacing at the beginning
+   and ends of lines, whether the last line has a terminating line break
+   or not, and other causes.  In the representation used in this
+   example, the first line has no leading or trailing spaces, a CRLF
+   line break (13, 10) occurs between the first and second lines, the
+   second line has one leading space (32) and no trailing spaces, and
+   the last line does not have a terminating line break.)  The octets
+   representing UTF8(JWS Protected Header) in this example (using JSON
+   array notation) are:
+
+   [123, 34, 116, 121, 112, 34, 58, 34, 74, 87, 84, 34, 44, 13, 10, 32,
+   34, 97, 108, 103, 34, 58, 34, 72, 83, 50, 53, 54, 34, 125]
+
+   Encoding this JWS Protected Header as BASE64URL(UTF8(JWS Protected
+   Header)) gives this value:
+
+     eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9
+
+   The JWS Payload used in this example is the octets of the UTF-8
+   representation of the JSON object below.  (Note that the payload can
+   be any base64url-encoded octet sequence and need not be a base64url-
+   encoded JSON object.)
+
+     {"iss":"joe",
+      "exp":1300819380,
+      "http://example.com/is_root":true}
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 37]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-38" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   The following octet sequence, which is the UTF-8 representation used
+   in this example for the JSON object above, is the JWS Payload:
+
+   [123, 34, 105, 115, 115, 34, 58, 34, 106, 111, 101, 34, 44, 13, 10,
+   32, 34, 101, 120, 112, 34, 58, 49, 51, 48, 48, 56, 49, 57, 51, 56,
+   48, 44, 13, 10, 32, 34, 104, 116, 116, 112, 58, 47, 47, 101, 120, 97,
+   109, 112, 108, 101, 46, 99, 111, 109, 47, 105, 115, 95, 114, 111,
+   111, 116, 34, 58, 116, 114, 117, 101, 125]
+
+   Encoding this JWS Payload as BASE64URL(UTF8(JWS Payload)) gives this
+   value (with line breaks for display purposes only):
+
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+
+   Combining these as BASE64URL(UTF8(JWS Protected Header)) || '.' ||
+   BASE64URL(JWS Payload) gives this string (with line breaks for
+   display purposes only):
+
+     eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+
+   The resulting JWS Signing Input value, which is the ASCII
+   representation of above string, is the following octet sequence
+   (using JSON array notation):
+
+   [101, 121, 74, 48, 101, 88, 65, 105, 79, 105, 74, 75, 86, 49, 81,
+   105, 76, 65, 48, 75, 73, 67, 74, 104, 98, 71, 99, 105, 79, 105, 74,
+   73, 85, 122, 73, 49, 78, 105, 74, 57, 46, 101, 121, 74, 112, 99, 51,
+   77, 105, 79, 105, 74, 113, 98, 50, 85, 105, 76, 65, 48, 75, 73, 67,
+   74, 108, 101, 72, 65, 105, 79, 106, 69, 122, 77, 68, 65, 52, 77, 84,
+   107, 122, 79, 68, 65, 115, 68, 81, 111, 103, 73, 109, 104, 48, 100,
+   72, 65, 54, 76, 121, 57, 108, 101, 71, 70, 116, 99, 71, 120, 108, 76,
+   109, 78, 118, 98, 83, 57, 112, 99, 49, 57, 121, 98, 50, 57, 48, 73,
+   106, 112, 48, 99, 110, 86, 108, 102, 81]
+
+   HMACs are generated using keys.  This example uses the symmetric key
+   represented in JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] format below (with line breaks
+   within values for display purposes only):
+
+     {"kty":"oct",
+      "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75
+           aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"
+     }
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 38]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-39" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Running the HMAC SHA-256 algorithm on the JWS Signing Input with this
+   key yields this JWS Signature octet sequence:
+
+   [116, 24, 223, 180, 151, 153, 224, 37, 79, 250, 96, 125, 216, 173,
+   187, 186, 22, 212, 37, 77, 105, 214, 191, 240, 91, 88, 5, 88, 83,
+   132, 141, 121]
+
+   Encoding this JWS Signature as BASE64URL(JWS Signature) gives this
+   value:
+
+     dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+   Concatenating these values in the order Header.Payload.Signature with
+   period ('.') characters between the parts yields this complete JWS
+   representation using the JWS Compact Serialization (with line breaks
+   for display purposes only):
+
+     eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+     .
+     dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+<span class="h4"><a class="selflink" id="appendix-A.1.2" href="#appendix-A.1.2">A.1.2</a>.  Validating</span>
+
+   Since the "alg" Header Parameter is "HS256", we validate the HMAC
+   SHA-256 value contained in the JWS Signature.
+
+   To validate the HMAC value, we repeat the previous process of using
+   the correct key and the JWS Signing Input (which is the initial
+   substring of the JWS Compact Serialization representation up until
+   but not including the second period character) as input to the HMAC
+   SHA-256 function and then taking the output and determining if it
+   matches the JWS Signature (which is base64url decoded from the value
+   encoded in the JWS representation).  If it matches exactly, the HMAC
+   has been validated.
+
+<span class="h3"><a class="selflink" id="appendix-A.2" href="#appendix-A.2">A.2</a>.  Example JWS Using RSASSA-PKCS1-v1_5 SHA-256</span>
+
+<span class="h4"><a class="selflink" id="appendix-A.2.1" href="#appendix-A.2.1">A.2.1</a>.  Encoding</span>
+
+   The JWS Protected Header in this example is different from the
+   previous example in two ways.  First, because a different algorithm
+   is being used, the "alg" value is different.  Second, for
+   illustration purposes only, the optional "typ" (type) Header
+   Parameter is not used.  (This difference is not related to the
+   algorithm employed.)  The JWS Protected Header used is:
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 39]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-40" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+     {"alg":"RS256"}
+
+   The octets representing UTF8(JWS Protected Header) in this example
+   (using JSON array notation) are:
+
+   [123, 34, 97, 108, 103, 34, 58, 34, 82, 83, 50, 53, 54, 34, 125]
+
+   Encoding this JWS Protected Header as BASE64URL(UTF8(JWS Protected
+   Header)) gives this value:
+
+     eyJhbGciOiJSUzI1NiJ9
+
+   The JWS Payload used in this example, which follows, is the same as
+   in the previous example.  Since the BASE64URL(JWS Payload) value will
+   therefore be the same, its computation is not repeated here.
+
+     {"iss":"joe",
+      "exp":1300819380,
+      "http://example.com/is_root":true}
+
+   Combining these as BASE64URL(UTF8(JWS Protected Header)) || '.' ||
+   BASE64URL(JWS Payload) gives this string (with line breaks for
+   display purposes only):
+
+     eyJhbGciOiJSUzI1NiJ9
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+
+   The resulting JWS Signing Input value, which is the ASCII
+   representation of above string, is the following octet sequence:
+
+   [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 83, 85, 122, 73,
+   49, 78, 105, 74, 57, 46, 101, 121, 74, 112, 99, 51, 77, 105, 79, 105,
+   74, 113, 98, 50, 85, 105, 76, 65, 48, 75, 73, 67, 74, 108, 101, 72,
+   65, 105, 79, 106, 69, 122, 77, 68, 65, 52, 77, 84, 107, 122, 79, 68,
+   65, 115, 68, 81, 111, 103, 73, 109, 104, 48, 100, 72, 65, 54, 76,
+   121, 57, 108, 101, 71, 70, 116, 99, 71, 120, 108, 76, 109, 78, 118,
+   98, 83, 57, 112, 99, 49, 57, 121, 98, 50, 57, 48, 73, 106, 112, 48,
+   99, 110, 86, 108, 102, 81]
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 40]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-41" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   This example uses the RSA key represented in JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>]
+   format below (with line breaks within values for display purposes
+   only):
+
+     {"kty":"RSA",
+      "n":"ofgWCuLjybRlzo0tZWJjNiuSfb4p4fAkd_wWJcyQoTbji9k0l8W26mPddx
+           HmfHQp-Vaw-4qPCJrcS2mJPMEzP1Pt0Bm4d4QlL-yRT-SFd2lZS-pCgNMs
+           D1W_YpRPEwOWvG6b32690r2jZ47soMZo9wGzjb_7OMg0LOL-bSf63kpaSH
+           SXndS5z5rexMdbBYUsLA9e-KXBdQOS-UTo7WTBEMa2R2CapHg665xsmtdV
+           MTBQY4uDZlxvb3qCo5ZwKh9kG4LT6_I5IhlJH7aGhyxXFvUK-DWNmoudF8
+           NAco9_h9iaGNj8q2ethFkMLs91kzk2PAcDTW9gb54h4FRWyuXpoQ",
+      "e":"AQAB",
+      "d":"Eq5xpGnNCivDflJsRQBXHx1hdR1k6Ulwe2JZD50LpXyWPEAeP88vLNO97I
+           jlA7_GQ5sLKMgvfTeXZx9SE-7YwVol2NXOoAJe46sui395IW_GO-pWJ1O0
+           BkTGoVEn2bKVRUCgu-GjBVaYLU6f3l9kJfFNS3E0QbVdxzubSu3Mkqzjkn
+           439X0M_V51gfpRLI9JYanrC4D4qAdGcopV_0ZHHzQlBjudU2QvXt4ehNYT
+           CBr6XCLQUShb1juUO1ZdiYoFaFQT5Tw8bGUl_x_jTj3ccPDVZFD9pIuhLh
+           BOneufuBiB4cS98l2SR_RQyGWSeWjnczT0QU91p1DhOVRuOopznQ",
+      "p":"4BzEEOtIpmVdVEZNCqS7baC4crd0pqnRH_5IB3jw3bcxGn6QLvnEtfdUdi
+           YrqBdss1l58BQ3KhooKeQTa9AB0Hw_Py5PJdTJNPY8cQn7ouZ2KKDcmnPG
+           BY5t7yLc1QlQ5xHdwW1VhvKn-nXqhJTBgIPgtldC-KDV5z-y2XDwGUc",
+      "q":"uQPEfgmVtjL0Uyyx88GZFF1fOunH3-7cepKmtH4pxhtCoHqpWmT8YAmZxa
+           ewHgHAjLYsp1ZSe7zFYHj7C6ul7TjeLQeZD_YwD66t62wDmpe_HlB-TnBA
+           -njbglfIsRLtXlnDzQkv5dTltRJ11BKBBypeeF6689rjcJIDEz9RWdc",
+      "dp":"BwKfV3Akq5_MFZDFZCnW-wzl-CCo83WoZvnLQwCTeDv8uzluRSnm71I3Q
+           CLdhrqE2e9YkxvuxdBfpT_PI7Yz-FOKnu1R6HsJeDCjn12Sk3vmAktV2zb
+           34MCdy7cpdTh_YVr7tss2u6vneTwrA86rZtu5Mbr1C1XsmvkxHQAdYo0",
+      "dq":"h_96-mK1R_7glhsum81dZxjTnYynPbZpHziZjeeHcXYsXaaMwkOlODsWa
+           7I9xXDoRwbKgB719rrmI2oKr6N3Do9U0ajaHF-NKJnwgjMd2w9cjz3_-ky
+           NlxAr2v4IKhGNpmM5iIgOS1VZnOZ68m6_pbLBSp3nssTdlqvd0tIiTHU",
+      "qi":"IYd7DHOhrWvxkwPQsRM2tOgrjbcrfvtQJipd-DlcxyVuuM9sQLdgjVk2o
+           y26F0EmpScGLq2MowX7fhd_QJQ3ydy5cY7YIBi87w93IKLEdfnbJtoOPLU
+           W0ITrJReOgo1cq9SbsxYawBgfp_gh6A5603k2-ZQwVK0JKSHuLFkuQ3U"
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 41]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-42" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   The RSA private key is then passed to the RSA signing function, which
+   also takes the hash type, SHA-256, and the JWS Signing Input as
+   inputs.  The result of the digital signature is an octet sequence,
+   which represents a big-endian integer.  In this example, it is:
+
+   [112, 46, 33, 137, 67, 232, 143, 209, 30, 181, 216, 45, 191, 120, 69,
+   243, 65, 6, 174, 27, 129, 255, 247, 115, 17, 22, 173, 209, 113, 125,
+   131, 101, 109, 66, 10, 253, 60, 150, 238, 221, 115, 162, 102, 62, 81,
+   102, 104, 123, 0, 11, 135, 34, 110, 1, 135, 237, 16, 115, 249, 69,
+   229, 130, 173, 252, 239, 22, 216, 90, 121, 142, 232, 198, 109, 219,
+   61, 184, 151, 91, 23, 208, 148, 2, 190, 237, 213, 217, 217, 112, 7,
+   16, 141, 178, 129, 96, 213, 248, 4, 12, 167, 68, 87, 98, 184, 31,
+   190, 127, 249, 217, 46, 10, 231, 111, 36, 242, 91, 51, 187, 230, 244,
+   74, 230, 30, 177, 4, 10, 203, 32, 4, 77, 62, 249, 18, 142, 212, 1,
+   48, 121, 91, 212, 189, 59, 65, 238, 202, 208, 102, 171, 101, 25, 129,
+   253, 228, 141, 247, 127, 55, 45, 195, 139, 159, 175, 221, 59, 239,
+   177, 139, 93, 163, 204, 60, 46, 176, 47, 158, 58, 65, 214, 18, 202,
+   173, 21, 145, 18, 115, 160, 95, 35, 185, 232, 56, 250, 175, 132, 157,
+   105, 132, 41, 239, 90, 30, 136, 121, 130, 54, 195, 212, 14, 96, 69,
+   34, 165, 68, 200, 242, 122, 122, 45, 184, 6, 99, 209, 108, 247, 202,
+   234, 86, 222, 64, 92, 178, 33, 90, 69, 178, 194, 85, 102, 181, 90,
+   193, 167, 72, 160, 112, 223, 200, 163, 42, 70, 149, 67, 208, 25, 238,
+   251, 71]
+
+   Encoding the signature as BASE64URL(JWS Signature) produces this
+   value (with line breaks for display purposes only):
+
+     cC4hiUPoj9Eetdgtv3hF80EGrhuB__dzERat0XF9g2VtQgr9PJbu3XOiZj5RZmh7
+     AAuHIm4Bh-0Qc_lF5YKt_O8W2Fp5jujGbds9uJdbF9CUAr7t1dnZcAcQjbKBYNX4
+     BAynRFdiuB--f_nZLgrnbyTyWzO75vRK5h6xBArLIARNPvkSjtQBMHlb1L07Qe7K
+     0GarZRmB_eSN9383LcOLn6_dO--xi12jzDwusC-eOkHWEsqtFZESc6BfI7noOPqv
+     hJ1phCnvWh6IeYI2w9QOYEUipUTI8np6LbgGY9Fs98rqVt5AXLIhWkWywlVmtVrB
+     p0igcN_IoypGlUPQGe77Rw
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 42]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-43" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Concatenating these values in the order Header.Payload.Signature with
+   period ('.') characters between the parts yields this complete JWS
+   representation using the JWS Compact Serialization (with line breaks
+   for display purposes only):
+
+     eyJhbGciOiJSUzI1NiJ9
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+     .
+     cC4hiUPoj9Eetdgtv3hF80EGrhuB__dzERat0XF9g2VtQgr9PJbu3XOiZj5RZmh7
+     AAuHIm4Bh-0Qc_lF5YKt_O8W2Fp5jujGbds9uJdbF9CUAr7t1dnZcAcQjbKBYNX4
+     BAynRFdiuB--f_nZLgrnbyTyWzO75vRK5h6xBArLIARNPvkSjtQBMHlb1L07Qe7K
+     0GarZRmB_eSN9383LcOLn6_dO--xi12jzDwusC-eOkHWEsqtFZESc6BfI7noOPqv
+     hJ1phCnvWh6IeYI2w9QOYEUipUTI8np6LbgGY9Fs98rqVt5AXLIhWkWywlVmtVrB
+     p0igcN_IoypGlUPQGe77Rw
+
+<span class="h4"><a class="selflink" id="appendix-A.2.2" href="#appendix-A.2.2">A.2.2</a>.  Validating</span>
+
+   Since the "alg" Header Parameter is "RS256", we validate the RSASSA-
+   PKCS1-v1_5 SHA-256 digital signature contained in the JWS Signature.
+
+   Validating the JWS Signature is a bit different from the previous
+   example.  We pass the public key (n, e), the JWS Signature (which is
+   base64url decoded from the value encoded in the JWS representation),
+   and the JWS Signing Input (which is the initial substring of the JWS
+   Compact Serialization representation up until but not including the
+   second period character) to an RSASSA-PKCS1-v1_5 signature verifier
+   that has been configured to use the SHA-256 hash function.
+
+<span class="h3"><a class="selflink" id="appendix-A.3" href="#appendix-A.3">A.3</a>.  Example JWS Using ECDSA P-256 SHA-256</span>
+
+<span class="h4"><a class="selflink" id="appendix-A.3.1" href="#appendix-A.3.1">A.3.1</a>.  Encoding</span>
+
+   The JWS Protected Header for this example differs from the previous
+   example because a different algorithm is being used.  The JWS
+   Protected Header used is:
+
+     {"alg":"ES256"}
+
+   The octets representing UTF8(JWS Protected Header) in this example
+   (using JSON array notation) are:
+
+   [123, 34, 97, 108, 103, 34, 58, 34, 69, 83, 50, 53, 54, 34, 125]
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 43]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-44" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Encoding this JWS Protected Header as BASE64URL(UTF8(JWS Protected
+   Header)) gives this value:
+
+     eyJhbGciOiJFUzI1NiJ9
+
+   The JWS Payload used in this example, which follows, is the same as
+   in the previous examples.  Since the BASE64URL(JWS Payload) value
+   will therefore be the same, its computation is not repeated here.
+
+     {"iss":"joe",
+      "exp":1300819380,
+      "http://example.com/is_root":true}
+
+   Combining these as BASE64URL(UTF8(JWS Protected Header)) || '.' ||
+   BASE64URL(JWS Payload) gives this string (with line breaks for
+   display purposes only):
+
+     eyJhbGciOiJFUzI1NiJ9
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+
+   The resulting JWS Signing Input value, which is the ASCII
+   representation of above string, is the following octet sequence:
+
+   [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 70, 85, 122, 73,
+   49, 78, 105, 74, 57, 46, 101, 121, 74, 112, 99, 51, 77, 105, 79, 105,
+   74, 113, 98, 50, 85, 105, 76, 65, 48, 75, 73, 67, 74, 108, 101, 72,
+   65, 105, 79, 106, 69, 122, 77, 68, 65, 52, 77, 84, 107, 122, 79, 68,
+   65, 115, 68, 81, 111, 103, 73, 109, 104, 48, 100, 72, 65, 54, 76,
+   121, 57, 108, 101, 71, 70, 116, 99, 71, 120, 108, 76, 109, 78, 118,
+   98, 83, 57, 112, 99, 49, 57, 121, 98, 50, 57, 48, 73, 106, 112, 48,
+   99, 110, 86, 108, 102, 81]
+
+   This example uses the Elliptic Curve key represented in JSON Web Key
+   [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] format below:
+
+     {"kty":"EC",
+      "crv":"P-256",
+      "x":"f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
+      "y":"x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
+      "d":"jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI"
+     }
+
+   The Elliptic Curve Digital Signature Algorithm (ECDSA) private part d
+   is then passed to an ECDSA signing function, which also takes the
+   curve type, P-256, the hash type, SHA-256, and the JWS Signing Input
+   as inputs.  The result of the digital signature is the Elliptic Curve
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 44]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-45" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   (EC) point (R, S), where R and S are unsigned integers.  In this
+   example, the R and S values, given as octet sequences representing
+   big-endian integers are:
+
+   +--------+----------------------------------------------------------+
+   | Result | Value                                                    |
+   | Name   |                                                          |
+   +--------+----------------------------------------------------------+
+   | R      | [14, 209, 33, 83, 121, 99, 108, 72, 60, 47, 127, 21, 88, |
+   |        | 7, 212, 2, 163, 178, 40, 3, 58, 249, 124, 126, 23, 129,  |
+   |        | 154, 195, 22, 158, 166, 101]                             |
+   | S      | [197, 10, 7, 211, 140, 60, 112, 229, 216, 241, 45, 175,  |
+   |        | 8, 74, 84, 128, 166, 101, 144, 197, 242, 147, 80, 154,   |
+   |        | 143, 63, 127, 138, 131, 163, 84, 213]                    |
+   +--------+----------------------------------------------------------+
+
+   The JWS Signature is the value R || S.  Encoding the signature as
+   BASE64URL(JWS Signature) produces this value (with line breaks for
+   display purposes only):
+
+     DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSA
+     pmWQxfKTUJqPP3-Kg6NU1Q
+
+   Concatenating these values in the order Header.Payload.Signature with
+   period ('.') characters between the parts yields this complete JWS
+   representation using the JWS Compact Serialization (with line breaks
+   for display purposes only):
+
+     eyJhbGciOiJFUzI1NiJ9
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+     .
+     DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSA
+     pmWQxfKTUJqPP3-Kg6NU1Q
+
+<span class="h4"><a class="selflink" id="appendix-A.3.2" href="#appendix-A.3.2">A.3.2</a>.  Validating</span>
+
+   Since the "alg" Header Parameter is "ES256", we validate the ECDSA
+   P-256 SHA-256 digital signature contained in the JWS Signature.
+
+   Validating the JWS Signature is a bit different from the previous
+   examples.  We need to split the 64 member octet sequence of the JWS
+   Signature (which is base64url decoded from the value encoded in the
+   JWS representation) into two 32 octet sequences, the first
+   representing R and the second S.  We then pass the public key (x, y),
+   the signature (R, S), and the JWS Signing Input (which is the initial
+   substring of the JWS Compact Serialization representation up until
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 45]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-46" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   but not including the second period character) to an ECDSA signature
+   verifier that has been configured to use the P-256 curve with the
+   SHA-256 hash function.
+
+<span class="h3"><a class="selflink" id="appendix-A.4" href="#appendix-A.4">A.4</a>.  Example JWS Using ECDSA P-521 SHA-512</span>
+
+<span class="h4"><a class="selflink" id="appendix-A.4.1" href="#appendix-A.4.1">A.4.1</a>.  Encoding</span>
+
+   The JWS Protected Header for this example differs from the previous
+   example because different ECDSA curves and hash functions are used.
+   The JWS Protected Header used is:
+
+     {"alg":"ES512"}
+
+   The octets representing UTF8(JWS Protected Header) in this example
+   (using JSON array notation) are:
+
+   [123, 34, 97, 108, 103, 34, 58, 34, 69, 83, 53, 49, 50, 34, 125]
+
+   Encoding this JWS Protected Header as BASE64URL(UTF8(JWS Protected
+   Header)) gives this value:
+
+     eyJhbGciOiJFUzUxMiJ9
+
+   The JWS Payload used in this example is the ASCII string "Payload".
+   The representation of this string is the following octet sequence:
+
+   [80, 97, 121, 108, 111, 97, 100]
+
+   Encoding this JWS Payload as BASE64URL(JWS Payload) gives this value:
+
+     UGF5bG9hZA
+
+   Combining these as BASE64URL(UTF8(JWS Protected Header)) || '.' ||
+   BASE64URL(JWS Payload) gives this string:
+
+     eyJhbGciOiJFUzUxMiJ9.UGF5bG9hZA
+
+   The resulting JWS Signing Input value, which is the ASCII
+   representation of above string, is the following octet sequence:
+
+   [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 70, 85, 122, 85,
+   120, 77, 105, 74, 57, 46, 85, 71, 70, 53, 98, 71, 57, 104, 90, 65]
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 46]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-47" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   This example uses the Elliptic Curve key represented in JSON Web Key
+   [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] format below (with line breaks within values for display
+   purposes only):
+
+     {"kty":"EC",
+      "crv":"P-521",
+      "x":"AekpBQ8ST8a8VcfVOTNl353vSrDCLLJXmPk06wTjxrrjcBpXp5EOnYG_
+           NjFZ6OvLFV1jSfS9tsz4qUxcWceqwQGk",
+      "y":"ADSmRA43Z1DSNx_RvcLI87cdL07l6jQyyBXMoxVg_l2Th-x3S1WDhjDl
+           y79ajL4Kkd0AZMaZmh9ubmf63e3kyMj2",
+      "d":"AY5pb7A0UFiB3RELSD64fTLOSV_jazdF7fLYyuTw8lOfRhWg6Y6rUrPA
+           xerEzgdRhajnu0ferB0d53vM9mE15j2C"
+     }
+
+   The ECDSA private part d is then passed to an ECDSA signing function,
+   which also takes the curve type, P-521, the hash type, SHA-512, and
+   the JWS Signing Input as inputs.  The result of the digital signature
+   is the EC point (R, S), where R and S are unsigned integers.  In this
+   example, the R and S values, given as octet sequences representing
+   big-endian integers are:
+
+   +--------+----------------------------------------------------------+
+   | Result | Value                                                    |
+   | Name   |                                                          |
+   +--------+----------------------------------------------------------+
+   | R      | [1, 220, 12, 129, 231, 171, 194, 209, 232, 135, 233,     |
+   |        | 117, 247, 105, 122, 210, 26, 125, 192, 1, 217, 21, 82,   |
+   |        | 91, 45, 240, 255, 83, 19, 34, 239, 71, 48, 157, 147,     |
+   |        | 152, 105, 18, 53, 108, 163, 214, 68, 231, 62, 153, 150,  |
+   |        | 106, 194, 164, 246, 72, 143, 138, 24, 50, 129, 223, 133, |
+   |        | 206, 209, 172, 63, 237, 119, 109]                        |
+   | S      | [0, 111, 6, 105, 44, 5, 41, 208, 128, 61, 152, 40, 92,   |
+   |        | 61, 152, 4, 150, 66, 60, 69, 247, 196, 170, 81, 193,     |
+   |        | 199, 78, 59, 194, 169, 16, 124, 9, 143, 42, 142, 131,    |
+   |        | 48, 206, 238, 34, 175, 83, 203, 220, 159, 3, 107, 155,   |
+   |        | 22, 27, 73, 111, 68, 68, 21, 238, 144, 229, 232, 148,    |
+   |        | 188, 222, 59, 242, 103]                                  |
+   +--------+----------------------------------------------------------+
+
+   The JWS Signature is the value R || S.  Encoding the signature as
+   BASE64URL(JWS Signature) produces this value (with line breaks for
+   display purposes only):
+
+     AdwMgeerwtHoh-l192l60hp9wAHZFVJbLfD_UxMi70cwnZOYaRI1bKPWROc-mZZq
+     wqT2SI-KGDKB34XO0aw_7XdtAG8GaSwFKdCAPZgoXD2YBJZCPEX3xKpRwcdOO8Kp
+     EHwJjyqOgzDO7iKvU8vcnwNrmxYbSW9ERBXukOXolLzeO_Jn
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 47]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-48" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Concatenating these values in the order Header.Payload.Signature with
+   period ('.') characters between the parts yields this complete JWS
+   representation using the JWS Compact Serialization (with line breaks
+   for display purposes only):
+
+     eyJhbGciOiJFUzUxMiJ9
+     .
+     UGF5bG9hZA
+     .
+     AdwMgeerwtHoh-l192l60hp9wAHZFVJbLfD_UxMi70cwnZOYaRI1bKPWROc-mZZq
+     wqT2SI-KGDKB34XO0aw_7XdtAG8GaSwFKdCAPZgoXD2YBJZCPEX3xKpRwcdOO8Kp
+     EHwJjyqOgzDO7iKvU8vcnwNrmxYbSW9ERBXukOXolLzeO_Jn
+
+<span class="h4"><a class="selflink" id="appendix-A.4.2" href="#appendix-A.4.2">A.4.2</a>.  Validating</span>
+
+   Since the "alg" Header Parameter is "ES512", we validate the ECDSA
+   P-521 SHA-512 digital signature contained in the JWS Signature.
+
+   Validating this JWS Signature is very similar to the previous
+   example.  We need to split the 132-member octet sequence of the JWS
+   Signature into two 66-octet sequences, the first representing R and
+   the second S.  We then pass the public key (x, y), the signature (R,
+   S), and the JWS Signing Input to an ECDSA signature verifier that has
+   been configured to use the P-521 curve with the SHA-512 hash
+   function.
+
+<span class="h3"><a class="selflink" id="appendix-A.5" href="#appendix-A.5">A.5</a>.  Example Unsecured JWS</span>
+
+   The following example JWS Protected Header declares that the encoded
+   object is an Unsecured JWS:
+
+     {"alg":"none"}
+
+   Encoding this JWS Protected Header as BASE64URL(UTF8(JWS Protected
+   Header)) gives this value:
+
+     eyJhbGciOiJub25lIn0
+
+   The JWS Payload used in this example, which follows, is the same as
+   in the previous examples.  Since the BASE64URL(JWS Payload) value
+   will therefore be the same, its computation is not repeated here.
+
+     {"iss":"joe",
+      "exp":1300819380,
+      "http://example.com/is_root":true}
+
+   The JWS Signature is the empty octet string and BASE64URL(JWS
+   Signature) is the empty string.
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 48]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-49" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Concatenating these values in the order Header.Payload.Signature with
+   period ('.') characters between the parts yields this complete JWS
+   representation using the JWS Compact Serialization (with line breaks
+   for display purposes only):
+
+     eyJhbGciOiJub25lIn0
+     .
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+     .
+
+<span class="h3"><a class="selflink" id="appendix-A.6" href="#appendix-A.6">A.6</a>.  Example JWS Using General JWS JSON Serialization</span>
+
+   This section contains an example using the general JWS JSON
+   Serialization syntax.  This example demonstrates the capability for
+   conveying multiple digital signatures and/or MACs for the same
+   payload.
+
+   The JWS Payload used in this example is the same as that used in the
+   examples in <a href="#appendix-A.2">Appendix A.2</a> and <a href="#appendix-A.3">Appendix A.3</a> (with line breaks for
+   display purposes only):
+
+     eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
+     cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
+
+   Two digital signatures are used in this example: the first using
+   RSASSA-PKCS1-v1_5 SHA-256 and the second using ECDSA P-256 SHA-256.
+   For the first, the JWS Protected Header and key are the same as in
+   <a href="#appendix-A.2">Appendix A.2</a>, resulting in the same JWS Signature value; therefore,
+   its computation is not repeated here.  For the second, the JWS
+   Protected Header and key are the same as in <a href="#appendix-A.3">Appendix A.3</a>, resulting
+   in the same JWS Signature value; therefore, its computation is not
+   repeated here.
+
+<span class="h4"><a class="selflink" id="appendix-A.6.1" href="#appendix-A.6.1">A.6.1</a>.  JWS Per-Signature Protected Headers</span>
+
+   The JWS Protected Header value used for the first signature is:
+
+     {"alg":"RS256"}
+
+   Encoding this JWS Protected Header as BASE64URL(UTF8(JWS Protected
+   Header)) gives this value:
+
+     eyJhbGciOiJSUzI1NiJ9
+
+   The JWS Protected Header value used for the second signature is:
+
+     {"alg":"ES256"}
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 49]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-50" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   Encoding this JWS Protected Header as BASE64URL(UTF8(JWS Protected
+   Header)) gives this value:
+
+     eyJhbGciOiJFUzI1NiJ9
+
+<span class="h4"><a class="selflink" id="appendix-A.6.2" href="#appendix-A.6.2">A.6.2</a>.  JWS Per-Signature Unprotected Headers</span>
+
+   Key ID values are supplied for both keys using per-signature Header
+   Parameters.  The two JWS Unprotected Header values used to represent
+   these key IDs are:
+
+     {"kid":"2010-12-29"}
+
+   and
+
+     {"kid":"e9bc097a-ce51-4036-9562-d2ade882db0d"}
+
+<span class="h4"><a class="selflink" id="appendix-A.6.3" href="#appendix-A.6.3">A.6.3</a>.  Complete JOSE Header Values</span>
+
+   Combining the JWS Protected Header and JWS Unprotected Header values
+   supplied, the JOSE Header values used for the first and second
+   signatures, respectively, are:
+
+     {"alg":"RS256",
+      "kid":"2010-12-29"}
+
+   and
+
+     {"alg":"ES256",
+      "kid":"e9bc097a-ce51-4036-9562-d2ade882db0d"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 50]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-51" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h4"><a class="selflink" id="appendix-A.6.4" href="#appendix-A.6.4">A.6.4</a>.  Complete JWS JSON Serialization Representation</span>
+
+   The complete JWS JSON Serialization for these values is as follows
+   (with line breaks within values for display purposes only):
+
+     {
+      "payload":
+       "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGF
+        tcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",
+      "signatures":[
+       {"protected":"eyJhbGciOiJSUzI1NiJ9",
+        "header":
+         {"kid":"2010-12-29"},
+        "signature":
+         "cC4hiUPoj9Eetdgtv3hF80EGrhuB__dzERat0XF9g2VtQgr9PJbu3XOiZj5RZ
+          mh7AAuHIm4Bh-0Qc_lF5YKt_O8W2Fp5jujGbds9uJdbF9CUAr7t1dnZcAcQjb
+          KBYNX4BAynRFdiuB--f_nZLgrnbyTyWzO75vRK5h6xBArLIARNPvkSjtQBMHl
+          b1L07Qe7K0GarZRmB_eSN9383LcOLn6_dO--xi12jzDwusC-eOkHWEsqtFZES
+          c6BfI7noOPqvhJ1phCnvWh6IeYI2w9QOYEUipUTI8np6LbgGY9Fs98rqVt5AX
+          LIhWkWywlVmtVrBp0igcN_IoypGlUPQGe77Rw"},
+       {"protected":"eyJhbGciOiJFUzI1NiJ9",
+        "header":
+         {"kid":"e9bc097a-ce51-4036-9562-d2ade882db0d"},
+        "signature":
+         "DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8IS
+          lSApmWQxfKTUJqPP3-Kg6NU1Q"}]
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 51]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-52" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h3"><a class="selflink" id="appendix-A.7" href="#appendix-A.7">A.7</a>.  Example JWS Using Flattened JWS JSON Serialization</span>
+
+   This section contains an example using the flattened JWS JSON
+   Serialization syntax.  This example demonstrates the capability for
+   conveying a single digital signature or MAC in a flattened JSON
+   structure.
+
+   The values in this example are the same as those in the second
+   signature of the previous example in <a href="#appendix-A.6">Appendix A.6</a>.
+
+   The complete JWS JSON Serialization for these values is as follows
+   (with line breaks within values for display purposes only):
+
+     {
+      "payload":
+       "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGF
+        tcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",
+      "protected":"eyJhbGciOiJFUzI1NiJ9",
+      "header":
+       {"kid":"e9bc097a-ce51-4036-9562-d2ade882db0d"},
+      "signature":
+       "DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8IS
+        lSApmWQxfKTUJqPP3-Kg6NU1Q"
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 52]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-53" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-B" href="#appendix-B">Appendix B</a>.  "x5c" (X.509 Certificate Chain) Example</span>
+
+   The JSON array below is an example of a certificate chain that could
+   be used as the value of an "x5c" (X.509 certificate chain) Header
+   Parameter, per <a href="#section-4.1.6">Section 4.1.6</a> (with line breaks within values for
+   display purposes only):
+
+     ["MIIE3jCCA8agAwIBAgICAwEwDQYJKoZIhvcNAQEFBQAwYzELMAkGA1UEBhMCVVM
+       xITAfBgNVBAoTGFRoZSBHbyBEYWRkeSBHcm91cCwgSW5jLjExMC8GA1UECxMoR2
+       8gRGFkZHkgQ2xhc3MgMiBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0wNjExM
+       TYwMTU0MzdaFw0yNjExMTYwMTU0MzdaMIHKMQswCQYDVQQGEwJVUzEQMA4GA1UE
+       CBMHQXJpem9uYTETMBEGA1UEBxMKU2NvdHRzZGFsZTEaMBgGA1UEChMRR29EYWR
+       keS5jb20sIEluYy4xMzAxBgNVBAsTKmh0dHA6Ly9jZXJ0aWZpY2F0ZXMuZ29kYW
+       RkeS5jb20vcmVwb3NpdG9yeTEwMC4GA1UEAxMnR28gRGFkZHkgU2VjdXJlIENlc
+       nRpZmljYXRpb24gQXV0aG9yaXR5MREwDwYDVQQFEwgwNzk2OTI4NzCCASIwDQYJ
+       KoZIhvcNAQEBBQADggEPADCCAQoCggEBAMQt1RWMnCZM7DI161+4WQFapmGBWTt
+       wY6vj3D3HKrjJM9N55DrtPDAjhI6zMBS2sofDPZVUBJ7fmd0LJR4h3mUpfjWoqV
+       Tr9vcyOdQmVZWt7/v+WIbXnvQAjYwqDL1CBM6nPwT27oDyqu9SoWlm2r4arV3aL
+       GbqGmu75RpRSgAvSMeYddi5Kcju+GZtCpyz8/x4fKL4o/K1w/O5epHBp+YlLpyo
+       7RJlbmr2EkRTcDCVw5wrWCs9CHRK8r5RsL+H0EwnWGu1NcWdrxcx+AuP7q2BNgW
+       JCJjPOq8lh8BJ6qf9Z/dFjpfMFDniNoW1fho3/Rb2cRGadDAW/hOUoz+EDU8CAw
+       EAAaOCATIwggEuMB0GA1UdDgQWBBT9rGEyk2xF1uLuhV+auud2mWjM5zAfBgNVH
+       SMEGDAWgBTSxLDSkdRMEXGzYcs9of7dqGrU4zASBgNVHRMBAf8ECDAGAQH/AgEA
+       MDMGCCsGAQUFBwEBBCcwJTAjBggrBgEFBQcwAYYXaHR0cDovL29jc3AuZ29kYWR
+       keS5jb20wRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NlcnRpZmljYXRlcy5nb2
+       RhZGR5LmNvbS9yZXBvc2l0b3J5L2dkcm9vdC5jcmwwSwYDVR0gBEQwQjBABgRVH
+       SAAMDgwNgYIKwYBBQUHAgEWKmh0dHA6Ly9jZXJ0aWZpY2F0ZXMuZ29kYWRkeS5j
+       b20vcmVwb3NpdG9yeTAOBgNVHQ8BAf8EBAMCAQYwDQYJKoZIhvcNAQEFBQADggE
+       BANKGwOy9+aG2Z+5mC6IGOgRQjhVyrEp0lVPLN8tESe8HkGsz2ZbwlFalEzAFPI
+       UyIXvJxwqoJKSQ3kbTJSMUA2fCENZvD117esyfxVgqwcSeIaha86ykRvOe5GPLL
+       5CkKSkB2XIsKd83ASe8T+5o0yGPwLPk9Qnt0hCqU7S+8MxZC9Y7lhyVJEnfzuz9
+       p0iRFEUOOjZv2kWzRaJBydTXRE4+uXR21aITVSzGh6O1mawGhId/dQb8vxRMDsx
+       uxN89txJx9OjxUUAiKEngHUuHqDTMBqLdElrRhjZkAzVvb3du6/KFUJheqwNTrZ
+       EjYx8WnM25sgVjOuH0aBsXBTWVU+4=",
+      "MIIE+zCCBGSgAwIBAgICAQ0wDQYJKoZIhvcNAQEFBQAwgbsxJDAiBgNVBAcTG1Z
+       hbGlDZXJ0IFZhbGlkYXRpb24gTmV0d29yazEXMBUGA1UEChMOVmFsaUNlcnQsIE
+       luYy4xNTAzBgNVBAsTLFZhbGlDZXJ0IENsYXNzIDIgUG9saWN5IFZhbGlkYXRpb
+       24gQXV0aG9yaXR5MSEwHwYDVQQDExhodHRwOi8vd3d3LnZhbGljZXJ0LmNvbS8x
+       IDAeBgkqhkiG9w0BCQEWEWluZm9AdmFsaWNlcnQuY29tMB4XDTA0MDYyOTE3MDY
+       yMFoXDTI0MDYyOTE3MDYyMFowYzELMAkGA1UEBhMCVVMxITAfBgNVBAoTGFRoZS
+       BHbyBEYWRkeSBHcm91cCwgSW5jLjExMC8GA1UECxMoR28gRGFkZHkgQ2xhc3MgM
+       iBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTCCASAwDQYJKoZIhvcNAQEBBQADggEN
+       ADCCAQgCggEBAN6d1+pXGEmhW+vXX0iG6r7d/+TvZxz0ZWizV3GgXne77ZtJ6XC
+       APVYYYwhv2vLM0D9/AlQiVBDYsoHUwHU9S3/Hd8M+eKsaA7Ugay9qK7HFiH7Eux
+       6wwdhFJ2+qN1j3hybX2C32qRe3H3I2TqYXP2WYktsqbl2i/ojgC95/5Y0V4evLO
+       tXiEqITLdiOr18SPaAIBQi2XKVlOARFmR6jYGB0xUGlcmIbYsUfb18aQr4CUWWo
+       riMYavx4A6lNf4DD+qta/KFApMoZFv6yyO9ecw3ud72a9nmYvLEHZ6IVDd2gWMZ
+       Eewo+YihfukEHU1jPEX44dMX4/7VpkI+EdOqXG68CAQOjggHhMIIB3TAdBgNVHQ
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 53]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-54" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+       4EFgQU0sSw0pHUTBFxs2HLPaH+3ahq1OMwgdIGA1UdIwSByjCBx6GBwaSBvjCBu
+       zEkMCIGA1UEBxMbVmFsaUNlcnQgVmFsaWRhdGlvbiBOZXR3b3JrMRcwFQYDVQQK
+       Ew5WYWxpQ2VydCwgSW5jLjE1MDMGA1UECxMsVmFsaUNlcnQgQ2xhc3MgMiBQb2x
+       pY3kgVmFsaWRhdGlvbiBBdXRob3JpdHkxITAfBgNVBAMTGGh0dHA6Ly93d3cudm
+       FsaWNlcnQuY29tLzEgMB4GCSqGSIb3DQEJARYRaW5mb0B2YWxpY2VydC5jb22CA
+       QEwDwYDVR0TAQH/BAUwAwEB/zAzBggrBgEFBQcBAQQnMCUwIwYIKwYBBQUHMAGG
+       F2h0dHA6Ly9vY3NwLmdvZGFkZHkuY29tMEQGA1UdHwQ9MDswOaA3oDWGM2h0dHA
+       6Ly9jZXJ0aWZpY2F0ZXMuZ29kYWRkeS5jb20vcmVwb3NpdG9yeS9yb290LmNybD
+       BLBgNVHSAERDBCMEAGBFUdIAAwODA2BggrBgEFBQcCARYqaHR0cDovL2NlcnRpZ
+       mljYXRlcy5nb2RhZGR5LmNvbS9yZXBvc2l0b3J5MA4GA1UdDwEB/wQEAwIBBjAN
+       BgkqhkiG9w0BAQUFAAOBgQC1QPmnHfbq/qQaQlpE9xXUhUaJwL6e4+PrxeNYiY+
+       Sn1eocSxI0YGyeR+sBjUZsE4OWBsUs5iB0QQeyAfJg594RAoYC5jcdnplDQ1tgM
+       QLARzLrUc+cb53S8wGd9D0VmsfSxOaFIqII6hR8INMqzW/Rn453HWkrugp++85j
+       09VZw==",
+      "MIIC5zCCAlACAQEwDQYJKoZIhvcNAQEFBQAwgbsxJDAiBgNVBAcTG1ZhbGlDZXJ
+       0IFZhbGlkYXRpb24gTmV0d29yazEXMBUGA1UEChMOVmFsaUNlcnQsIEluYy4xNT
+       AzBgNVBAsTLFZhbGlDZXJ0IENsYXNzIDIgUG9saWN5IFZhbGlkYXRpb24gQXV0a
+       G9yaXR5MSEwHwYDVQQDExhodHRwOi8vd3d3LnZhbGljZXJ0LmNvbS8xIDAeBgkq
+       hkiG9w0BCQEWEWluZm9AdmFsaWNlcnQuY29tMB4XDTk5MDYyNjAwMTk1NFoXDTE
+       5MDYyNjAwMTk1NFowgbsxJDAiBgNVBAcTG1ZhbGlDZXJ0IFZhbGlkYXRpb24gTm
+       V0d29yazEXMBUGA1UEChMOVmFsaUNlcnQsIEluYy4xNTAzBgNVBAsTLFZhbGlDZ
+       XJ0IENsYXNzIDIgUG9saWN5IFZhbGlkYXRpb24gQXV0aG9yaXR5MSEwHwYDVQQD
+       ExhodHRwOi8vd3d3LnZhbGljZXJ0LmNvbS8xIDAeBgkqhkiG9w0BCQEWEWluZm9
+       AdmFsaWNlcnQuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDOOnHK5a
+       vIWZJV16vYdA757tn2VUdZZUcOBVXc65g2PFxTXdMwzzjsvUGJ7SVCCSRrCl6zf
+       N1SLUzm1NZ9WlmpZdRJEy0kTRxQb7XBhVQ7/nHk01xC+YDgkRoKWzk2Z/M/VXwb
+       P7RfZHM047QSv4dk+NoS/zcnwbNDu+97bi5p9wIDAQABMA0GCSqGSIb3DQEBBQU
+       AA4GBADt/UG9vUJSZSWI4OB9L+KXIPqeCgfYrx+jFzug6EILLGACOTb2oWH+heQ
+       C1u+mNr0HZDzTuIYEZoDJJKPTEjlbVUjP9UNV+mWwD5MlM/Mtsq2azSiGM5bUMM
+       j4QssxsodyamEwCW/POuZ6lcg5Ktz885hZo+L7tdEy8W9ViH0Pd"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 54]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-55" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-C" href="#appendix-C">Appendix C</a>.  Notes on Implementing base64url Encoding without Padding</span>
+
+   This appendix describes how to implement base64url encoding and
+   decoding functions without padding based upon standard base64
+   encoding and decoding functions that do use padding.
+
+   To be concrete, example C# code implementing these functions is shown
+   below.  Similar code could be used in other languages.
+
+     static string base64urlencode(byte [] arg)
+     {
+       string s = Convert.ToBase64String(arg); // Regular base64 encoder
+       s = s.Split('=')[0]; // Remove any trailing '='s
+       s = s.Replace('+', '-'); // 62nd char of encoding
+       s = s.Replace('/', '_'); // 63rd char of encoding
+       return s;
+     }
+
+     static byte [] base64urldecode(string arg)
+     {
+       string s = arg;
+       s = s.Replace('-', '+'); // 62nd char of encoding
+       s = s.Replace('_', '/'); // 63rd char of encoding
+       switch (s.Length % 4) // Pad with trailing '='s
+       {
+         case 0: break; // No pad chars in this case
+         case 2: s += "=="; break; // Two pad chars
+         case 3: s += "="; break; // One pad char
+         default: throw new System.Exception(
+           "Illegal base64url string!");
+       }
+       return Convert.FromBase64String(s); // Standard base64 decoder
+     }
+
+   As per the example code above, the number of '=' padding characters
+   that needs to be added to the end of a base64url-encoded string
+   without padding to turn it into one with padding is a deterministic
+   function of the length of the encoded string.  Specifically, if the
+   length mod 4 is 0, no padding is added; if the length mod 4 is 2, two
+   '=' padding characters are added; if the length mod 4 is 3, one '='
+   padding character is added; if the length mod 4 is 1, the input is
+   malformed.
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 55]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-56" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+   An example correspondence between unencoded and encoded values
+   follows.  The octet sequence below encodes into the string below,
+   which when decoded, reproduces the octet sequence.
+
+   3 236 255 224 193
+   A-z_4ME
+
+<span class="h2"><a class="selflink" id="appendix-D" href="#appendix-D">Appendix D</a>.  Notes on Key Selection</span>
+
+   This appendix describes a set of possible algorithms for selecting
+   the key to be used to validate the digital signature or MAC of a JWS
+   or for selecting the key to be used to decrypt a JWE.  This guidance
+   describes a family of possible algorithms rather than a single
+   algorithm, because in different contexts, not all the sources of keys
+   will be used, they can be tried in different orders, and sometimes
+   not all the collected keys will be tried; hence, different algorithms
+   will be used in different application contexts.
+
+   The steps below are described for illustration purposes only;
+   specific applications can and are likely to use different algorithms
+   or perform some of the steps in different orders.  Specific
+   applications will frequently have a much simpler method of
+   determining the keys to use, as there may be one or two key selection
+   methods that are profiled for the application's use.  This appendix
+   supplements the normative information on key location in <a href="#section-6">Section 6</a>.
+
+   These algorithms include the following steps.  Note that the steps
+   can be performed in any order and do not need to be treated as
+   distinct.  For example, keys can be tried as soon as they are found,
+   rather than collecting all the keys before trying any.
+
+   1.  Collect the set of potentially applicable keys.  Sources of keys
+       may include:
+
+       *  Keys supplied by the application protocol being used.
+
+       *  Keys referenced by the "jku" (JWK Set URL) Header Parameter.
+
+       *  The key provided by the "jwk" (JSON Web Key) Header Parameter.
+
+       *  The key referenced by the "x5u" (X.509 URL) Header Parameter.
+
+       *  The key provided by the "x5c" (X.509 certificate chain) Header
+          Parameter.
+
+       *  Other applicable keys available to the application.
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 56]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-57" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+       The order for collecting and trying keys from different key
+       sources is typically application dependent.  For example,
+       frequently, all keys from a one set of locations, such as local
+       caches, will be tried before collecting and trying keys from
+       other locations.
+
+   2.  Filter the set of collected keys.  For instance, some
+       applications will use only keys referenced by "kid" (key ID) or
+       "x5t" (X.509 certificate SHA-1 thumbprint) parameters.  If the
+       application uses the JWK "alg" (algorithm), "use" (public key
+       use), or "key_ops" (key operations) parameters, keys with
+       inappropriate values of those parameters would be excluded.
+       Additionally, keys might be filtered to include or exclude keys
+       with certain other member values in an application-specific
+       manner.  For some applications, no filtering will be applied.
+
+   3.  Order the set of collected keys.  For instance, keys referenced
+       by "kid" (key ID) or "x5t" (X.509 certificate SHA-1 thumbprint)
+       parameters might be tried before keys with neither of these
+       values.  Likewise, keys with certain member values might be
+       ordered before keys with other member values.  For some
+       applications, no ordering will be applied.
+
+   4.  Make trust decisions about the keys.  Signatures made with keys
+       not meeting the application's trust criteria would not be
+       accepted.  Such criteria might include, but is not limited to,
+       the source of the key, whether the TLS certificate validates for
+       keys retrieved from URLs, whether a key in an X.509 certificate
+       is backed by a valid certificate chain, and other information
+       known by the application.
+
+   5.  Attempt signature or MAC validation for a JWS or decryption of a
+       JWE with some or all of the collected and possibly filtered and/
+       or ordered keys.  A limit on the number of keys to be tried might
+       be applied.  This process will normally terminate following a
+       successful validation or decryption.
+
+   Note that it is reasonable for some applications to perform signature
+   or MAC validation prior to making a trust decision about a key, since
+   keys for which the validation fails need no trust decision.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 57]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-58" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-E" href="#appendix-E">Appendix E</a>.  Negative Test Case for "crit" Header Parameter</span>
+
+   Conforming implementations must reject input containing critical
+   extensions that are not understood or cannot be processed.  The
+   following JWS must be rejected by all implementations, because it
+   uses an extension Header Parameter name "<a href="http://example.invalid/UNDEFINED">http://example.invalid/</a>
+   <a href="http://example.invalid/UNDEFINED">UNDEFINED</a>" that they do not understand.  Any other similar input, in
+   which the use of the value "<a href="http://example.invalid/UNDEFINED">http://example.invalid/UNDEFINED</a>" is
+   substituted for any other Header Parameter name not understood by the
+   implementation, must also be rejected.
+
+   The JWS Protected Header value for this JWS is:
+
+     {"alg":"none",
+      "crit":["<a href="http://example.invalid/UNDEFINED">http://example.invalid/UNDEFINED</a>"],
+      "<a href="http://example.invalid/UNDEFINED">http://example.invalid/UNDEFINED</a>":true
+     }
+
+   The complete JWS that must be rejected is as follows (with line
+   breaks for display purposes only):
+
+     eyJhbGciOiJub25lIiwNCiAiY3JpdCI6WyJodHRwOi8vZXhhbXBsZS5jb20vVU5ERU
+     ZJTkVEIl0sDQogImh0dHA6Ly9leGFtcGxlLmNvbS9VTkRFRklORUQiOnRydWUNCn0.
+     RkFJTA.
+
+<span class="h2"><a class="selflink" id="appendix-F" href="#appendix-F">Appendix F</a>.  Detached Content</span>
+
+   In some contexts, it is useful to integrity-protect content that is
+   not itself contained in a JWS.  One way to do this is to create a JWS
+   in the normal fashion using a representation of the content as the
+   payload but then delete the payload representation from the JWS and
+   send this modified object to the recipient rather than the JWS.  When
+   using the JWS Compact Serialization, the deletion is accomplished by
+   replacing the second field (which contains BASE64URL(JWS Payload))
+   value with the empty string; when using the JWS JSON Serialization,
+   the deletion is accomplished by deleting the "payload" member.  This
+   method assumes that the recipient can reconstruct the exact payload
+   used in the JWS.  To use the modified object, the recipient
+   reconstructs the JWS by re-inserting the payload representation into
+   the modified object and uses the resulting JWS in the usual manner.
+   Note that this method needs no support from JWS libraries, as
+   applications can use this method by modifying the inputs and outputs
+   of standard JWS libraries.
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                Standards Track                   [Page 58]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-59" ></span>
+<span class="grey"><a href="./rfc7515">RFC 7515</a>                JSON Web Signature (JWS)                May 2015</span>
+
+
+Acknowledgements
+
+   Solutions for signing JSON content were previously explored by Magic
+   Signatures [<a href="#ref-MagicSignatures">MagicSignatures</a>], JSON Simple Sign [<a href="#ref-JSS" title="&quot;JSON Simple Sign&quot;">JSS</a>], and Canvas
+   Applications [<a href="#ref-CanvasApp" title="&quot;Canvas Applications&quot;">CanvasApp</a>], all of which influenced this document.
+
+   Thanks to Axel Nennker for his early implementation and feedback on
+   the JWS and JWE specifications.
+
+   This specification is the work of the JOSE working group, which
+   includes dozens of active and dedicated participants.  In particular,
+   the following individuals contributed ideas, feedback, and wording
+   that influenced this specification:
+
+   Dirk Balfanz, Richard Barnes, Brian Campbell, Alissa Cooper, Breno de
+   Medeiros, Stephen Farrell, Yaron Y. Goland, Dick Hardt, Joe
+   Hildebrand, Jeff Hodges, Russ Housley, Edmund Jay, Tero Kivinen, Ben
+   Laurie, Ted Lemon, James Manger, Matt Miller, Kathleen Moriarty, Tony
+   Nadalin, Hideki Nara, Axel Nennker, John Panzer, Ray Polk, Emmanuel
+   Raviart, Eric Rescorla, Pete Resnick, Jim Schaad, Paul Tarjan, Hannes
+   Tschofenig, and Sean Turner.
+
+   Jim Schaad and Karen O'Donoghue chaired the JOSE working group and
+   Sean Turner, Stephen Farrell, and Kathleen Moriarty served as
+   Security Area Directors during the creation of this specification.
+
+Authors' Addresses
+
+   Michael B. Jones
+   Microsoft
+
+   EMail: mbj@microsoft.com
+   URI:   <a href="http://self-issued.info/">http://self-issued.info/</a>
+
+
+   John Bradley
+   Ping Identity
+
+   EMail: ve7jtb@ve7jtb.com
+   URI:   <a href="http://www.thread-safe.com/">http://www.thread-safe.com/</a>
+
+
+   Nat Sakimura
+   Nomura Research Institute
+
+   EMail: n-sakimura@nri.co.jp
+   URI:   <a href="http://nat.sakimura.org/">http://nat.sakimura.org/</a>
+
+
+
+
+Jones, et al.                Standards Track                   [Page 59]
+</pre>
+
+</body>
+</html>
+
