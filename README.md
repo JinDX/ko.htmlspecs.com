@@ -124,7 +124,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Device Posture API](https://ko.htmlspecs.com/device-posture/)（[Source](https://www.w3.org/TR/2024/CR-device-posture-20241126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light/)（[Source](https://www.w3.org/TR/2025/WD-ambient-light-20250212/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Proximity Sensor](https://ko.htmlspecs.com/proximity/)（[Source](https://www.w3.org/TR/2025/WD-proximity-20250212/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Generic Sensor API](https://ko.htmlspecs.com/generic-sensor/)（[Source](https://www.w3.org/TR/2025/CRD-generic-sensor-20251211/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [Generic Sensor API](https://ko.htmlspecs.com/generic-sensor/)（[Source](https://www.w3.org/TR/2026/CRD-generic-sensor-20260121/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Battery Status API](https://ko.htmlspecs.com/battery-status/)（[Source](https://www.w3.org/TR/2024/WD-battery-status-20241024/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Vibration API](https://ko.htmlspecs.com/vibration/)（[Source](https://www.w3.org/TR/2025/CRD-vibration-20250212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Accelerometer](https://ko.htmlspecs.com/accelerometer/)（[Source](https://www.w3.org/TR/2025/CRD-accelerometer-20250212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
