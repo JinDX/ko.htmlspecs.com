@@ -180,6 +180,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [JSON Web Encryption (JWE)](https://ko.htmlspecs.com/jwe/)（[Source](https://www.rfc-editor.org/rfc/rfc7516) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON Web Key (JWK)](https://ko.htmlspecs.com/jwk/)（[Source](https://www.rfc-editor.org/rfc/rfc7517) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON Web Algorithms (JWA)](https://ko.htmlspecs.com/jwa/)（[Source](https://www.rfc-editor.org/rfc/rfc7518) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [JWT Best Current Practices](https://ko.htmlspecs.com/jwt-bcp/)（[Source](https://www.rfc-editor.org/rfc/rfc8725) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### 미디어 및 그래픽
 - [WebGPU](https://ko.htmlspecs.com/webgpu/)（[Source](https://www.w3.org/TR/2026/CRD-webgpu-20260112/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
