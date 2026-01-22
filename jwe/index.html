@@ -1099,40 +1099,43 @@ Copyright Notice
      || '.' || BASE64URL(JWE 인증 태그)입니다. JWE JSON 직렬화는 <a href="#section-7.2">섹션 7.2</a>에서 설명됩니다.
 
 
-<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  Message Decryption</span>
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  메시지 복호화</span>
 
-   The message decryption process is the reverse of the encryption
-   process.  The order of the steps is not significant in cases where
-   there are no dependencies between the inputs and outputs of the
-   steps.  If any of these steps fail, the encrypted content cannot be
-   validated.
+   메시지 복호화 프로세스는 암호화
+   프로세스의 역순이다.  단계들의 순서는 입력과 출력 간에
+   의존성이 없는 경우에는 중요하지 않다.
+   단계들 중 하나라도 실패하면 암호화된 내용은
+   검증될 수 없다.
 
-   When there are multiple recipients, it is an application decision
-   which of the recipients' encrypted content must successfully validate
-   for the JWE to be accepted.  In some cases, encrypted content for all
-   recipients must successfully validate or the JWE will be considered
-   invalid.  In other cases, only the encrypted content for a single
-   recipient needs to be successfully validated.  However, in all cases,
-   the encrypted content for at least one recipient MUST successfully
-   validate or the JWE MUST be considered invalid.
+   수신자가 여러 명인 경우, 수신자의 암호화된
+   내용을 검증해야 JWE가 수락될 것인지에 대한
+   결정은 애플리케이션에 달려 있다.  어떤 경우에는
+   모든 수신자의 암호화된 내용을 검증해야 하며,
+   그렇지 않으면 JWE가 무효로 간주된다.  다른 경우에는
+   단일 수신자의 암호화된 내용만 검증에 성공하면 된다.
+   하지만 모든 경우에 있어서, 적어도 한 명의 수신자에
+   대한 암호화된 내용은 반드시(MUST) 검증이
+   성공해야 하며, 그렇지 않으면 JWE는 반드시 무효로
+   간주되어야(MUST) 한다.
 
-   1.   Parse the JWE representation to extract the serialized values
-        for the components of the JWE.  When using the JWE Compact
-        Serialization, these components are the base64url-encoded
-        representations of the JWE Protected Header, the JWE Encrypted
-        Key, the JWE Initialization Vector, the JWE Ciphertext, and the
-        JWE Authentication Tag, and when using the JWE JSON
-        Serialization, these components also include the base64url-
-        encoded representation of the JWE AAD and the unencoded JWE
-        Shared Unprotected Header and JWE Per-Recipient Unprotected
-        Header values.  When using the JWE Compact Serialization, the
-        JWE Protected Header, the JWE Encrypted Key, the JWE
-        Initialization Vector, the JWE Ciphertext, and the JWE
-        Authentication Tag are represented as base64url-encoded values
-        in that order, with each value being separated from the next by
-        a single period ('.') character, resulting in exactly four
-        delimiting period characters being used.  The JWE JSON
-        Serialization is described in <a href="#section-7.2">Section 7.2</a>.
+   1.   JWE 표현을 구문 분석하여 JWE 구성 요소의
+        직렬화된 값을 추출한다.  JWE Compact
+        Serialization을 사용하는 경우, 이러한 구성 요소들은
+        JWE Protected Header, JWE Encrypted Key,
+        JWE Initialization Vector, JWE Ciphertext, 
+        JWE Authentication Tag의 base64url로
+        인코딩된 표현이며, JWE JSON Serialization을
+        사용하는 경우에는 여기에는 JWE AAD의 base64url로
+        인코딩된 표현과 JWE Shared Unprotected Header 및
+        JWE Per-Recipient Unprotected Header 값도 포함된다.
+        JWE Compact Serialization을 사용하는 경우,
+        JWE Protected Header, JWE Encrypted Key,
+        JWE Initialization Vector, JWE Ciphertext, 
+        JWE Authentication Tag는 그 순서대로 base64url로
+        인코딩된 값으로 표현되며, 각 값은 점('.')
+        문자로 구분되며, 정확히 네 개의 구분용
+        점 문자가 사용된다.  JWE JSON Serialization은
+        <a href="#section-7.2">7.2절</a>에 설명되어 있다.
 
 
 
@@ -1142,109 +1145,96 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   2.   Base64url decode the encoded representations of the JWE
-        Protected Header, the JWE Encrypted Key, the JWE Initialization
-        Vector, the JWE Ciphertext, the JWE Authentication Tag, and the
-        JWE AAD, following the restriction that no line breaks,
-        whitespace, or other additional characters have been used.
+   2.   JWE Protected Header, JWE Encrypted Key, JWE Initialization
+        Vector, JWE Ciphertext, JWE Authentication Tag 및
+        JWE AAD의 인코딩된 표현을 base64url로
+        디코딩한다.  이때 줄바꿈, 공백, 기타
+        추가 문자가 사용되지 않았다는 제한을 따른다.
 
-   3.   Verify that the octet sequence resulting from decoding the
-        encoded JWE Protected Header is a UTF-8-encoded representation
-        of a completely valid JSON object conforming to <a href="./rfc7159">RFC 7159</a>
-        [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]; let the JWE Protected Header be this JSON object.
+   3.   디코딩된 JWE Protected Header에서 나온 옥텟
+        시퀀스가 <a href="./rfc7159">RFC 7159</a>에 따라 완전하고 
+        유효한 JSON 객체의 UTF-8로 인코드된
+        표현인지 확인하고, JWE Protected Header를
+        이 JSON 객체로 간주한다.
 
-   4.   If using the JWE Compact Serialization, let the JOSE Header be
-        the JWE Protected Header.  Otherwise, when using the JWE JSON
-        Serialization, let the JOSE Header be the union of the members
-        of the JWE Protected Header, the JWE Shared Unprotected Header
-        and the corresponding JWE Per-Recipient Unprotected Header, all
-        of which must be completely valid JSON objects.  During this
-        step, verify that the resulting JOSE Header does not contain
-        duplicate Header Parameter names.  When using the JWE JSON
-        Serialization, this restriction includes that the same Header
-        Parameter name also MUST NOT occur in distinct JSON object
-        values that together comprise the JOSE Header.
+   4.   JWE Compact Serialization을 사용하는 경우,
+        JOSE Header는 JWE Protected Header로 둔다.
+        JWE JSON Serialization을 사용하는 경우에는,
+        JOSE Header는 JWE Protected Header,
+        JWE Shared Unprotected Header, JWE Per-Recipient
+        Unprotected Header 구성원들의 합집합으로 둔다.
+        이 단계에서, JOSE Header가 중복된 Header Parameter
+        이름을 갖고 있지 않은지 검증한다.  JWE JSON Serialization을
+        사용하는 경우, JOSE Header를 구성하는 별도의 JSON 객체
+        값에서 동일한 Header Parameter 이름이 나타나지 않아야 함을
+        포함한다.
 
-   5.   Verify that the implementation understands and can process all
-        fields that it is required to support, whether required by this
-        specification, by the algorithms being used, or by the "crit"
-        Header Parameter value, and that the values of those parameters
-        are also understood and supported.
+   5.   구현체가 이 명세에서 요구하거나 사용 중인
+        알고리즘, 또는 "crit" Header Parameter 값에 의해
+        지원해야 하는 모든 필드를 처리하고 이해할 수 있는지
+        확인하며, 해당 매개변수 값들도 이해되고
+        지원되는지 확인한다.
 
-   6.   Determine the Key Management Mode employed by the algorithm
-        specified by the "alg" (algorithm) Header Parameter.
+   6.   "alg" (알고리즘) Header Parameter에 의해
+        지정된 알고리즘이 사용하는 키 관리 모드를
+        결정한다.
 
-   7.   Verify that the JWE uses a key known to the recipient.
+   7.   JWE가 수신자가 알고 있는 키를 사용하는지
+        확인한다.
 
-   8.   When Direct Key Agreement or Key Agreement with Key Wrapping are
-        employed, use the key agreement algorithm to compute the value
-        of the agreed upon key.  When Direct Key Agreement is employed,
-        let the CEK be the agreed upon key.  When Key Agreement with Key
-        Wrapping is employed, the agreed upon key will be used to
-        decrypt the JWE Encrypted Key.
+   8.   Direct Key Agreement 또는 Key Agreement with Key Wrapping이
+        사용되는 경우, 키 합의 알고리즘을 사용하여 합의된 키 값을
+        계산한다. Direct Key Agreement가 사용되는 경우,
+        CEK를 이 합의된 키로 설정한다. Key Agreement with Key Wrapping이
+        사용되는 경우, 이 합의된 키가 JWE Encrypted Key를
+        복호화하는 데 사용된다.
 
-   9.   When Key Wrapping, Key Encryption, or Key Agreement with Key
-        Wrapping are employed, decrypt the JWE Encrypted Key to produce
-        the CEK.  The CEK MUST have a length equal to that required for
-        the content encryption algorithm.  Note that when there are
-        multiple recipients, each recipient will only be able to decrypt
-        JWE Encrypted Key values that were encrypted to a key in that
-        recipient's possession.  It is therefore normal to only be able
+   9.   Key Wrapping, Key Encryption, 또는 Key Agreement with Key Wrapping이
+        사용되는 경우, JWE Encrypted Key를 복호화하여 CEK를 생성한다.
+        CEK의 길이는 콘텐츠 암호화 알고리즘에서 요구되는
+        길이와 동일해야 한다(MUST). 수신자가 여러 명인 경우,
+        각 수신자는 자신의 소유한 키로 암호화된 JWE Encrypted Key만
+        복호화할 수 있다. 따라서 수신자별 JWE Encrypted Key 값 중에서
+        하나만 복호화하여 CEK 값을 얻는 것이 정상이다.
+        타이밍 공격에 대한 보안 고려 사항은 <a href="#section-11.5">11.5절</a>을
+        참조하라.
 
+   10.  Direct Key Agreement 또는 Direct Encryption이 사용되는 경우,
+        JWE Encrypted Key 값이 빈 옥텟 시퀀스인지 확인한다.
 
+   11.  Direct Encryption이 사용되는 경우, CEK를 공유 대칭 키로 설정한다.
 
-<span class="grey">Jones &amp; Hildebrand           Standards Track                   [Page 18]</span></pre>
-<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-19" ></span>
-<span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
+   12.  이 수신자에 대해 CEK가 성공적으로 결정되었는지 여부를
+        기록한다.
 
+   13.  JWE JSON Serialization이 사용되는 경우, 표현에 포함된 각
+        수신자에 대해 단계 4~12를 반복한다.
 
-        to decrypt one of the per-recipient JWE Encrypted Key values to
-        obtain the CEK value.  Also, see <a href="#section-11.5">Section 11.5</a> for security
-        considerations on mitigating timing attacks.
+   14.  Encoded Protected Header 값을 BASE64URL(UTF8(JWE Protected Header))로
+        계산한다. JWE Protected Header가 존재하지 않는 경우
+        (이는 JWE JSON Serialization에서 "protected" 멤버가 없을 때만 발생),
+        이 값을 빈 문자열로 설정한다.
 
-   10.  When Direct Key Agreement or Direct Encryption are employed,
-        verify that the JWE Encrypted Key value is an empty octet
-        sequence.
+   15.  추가 인증 데이터(Additional Authenticated Data) 암호화 매개변수를 
+        ASCII(Encoded Protected Header)로 설정한다. 그러나 JWE AAD 값이
+        존재하는 경우(이는 JWE JSON Serialization에서만 발생할 수 있음),
+        추가 인증 데이터를 ASCII(Encoded Protected Header || '.' ||
+        BASE64URL(JWE AAD))로 설정한다.
 
-   11.  When Direct Encryption is employed, let the CEK be the shared
-        symmetric key.
+   16.  지정된 콘텐츠 암호화 알고리즘을 사용하여 CEK, JWE Initialization Vector,
+        추가 인증 데이터 값 및 JWE Authentication Tag를 입력으로 하여
+        JWE Ciphertext를 복호화한다. 복호화된 평문을 반환하고,
+        알고리즘에 지정된 방식으로 JWE Authentication Tag를 검증하며,
+        JWE Authentication Tag가 올바르지 않은 경우 복호화된 출력을
+        내보내지 않고 입력을 거부해야 한다.
 
-   12.  Record whether the CEK could be successfully determined for this
-        recipient or not.
+   17.  "zip" 매개변수가 포함된 경우, 복호화된 평문을 지정된
+        압축 알고리즘을 사용하여 압축 해제한다.
 
-   13.  If the JWE JSON Serialization is being used, repeat this process
-        (steps 4-12) for each recipient contained in the representation.
-
-   14.  Compute the Encoded Protected Header value BASE64URL(UTF8(JWE
-        Protected Header)).  If the JWE Protected Header is not present
-        (which can only happen when using the JWE JSON Serialization and
-        no "protected" member is present), let this value be the empty
-        string.
-
-   15.  Let the Additional Authenticated Data encryption parameter be
-        ASCII(Encoded Protected Header).  However, if a JWE AAD value is
-        present (which can only be the case when using the JWE JSON
-        Serialization), instead let the Additional Authenticated Data
-        encryption parameter be ASCII(Encoded Protected Header || '.' ||
-        BASE64URL(JWE AAD)).
-
-   16.  Decrypt the JWE Ciphertext using the CEK, the JWE Initialization
-        Vector, the Additional Authenticated Data value, and the JWE
-        Authentication Tag (which is the Authentication Tag input to the
-        calculation) using the specified content encryption algorithm,
-        returning the decrypted plaintext and validating the JWE
-        Authentication Tag in the manner specified for the algorithm,
-        rejecting the input without emitting any decrypted output if the
-        JWE Authentication Tag is incorrect.
-
-   17.  If a "zip" parameter was included, uncompress the decrypted
-        plaintext using the specified compression algorithm.
-
-   18.  If there was no recipient for which all of the decryption steps
-        succeeded, then the JWE MUST be considered invalid.  Otherwise,
-        output the plaintext.  In the JWE JSON Serialization case, also
-        return a result to the application indicating for which of the
-        recipients the decryption succeeded and failed.
+   18.  모든 복호화 단계가 어느 누구에게도 성공하지 않은 경우,
+        JWE는 반드시(MUST) 무효로 간주되어야 한다. 그렇지 않다면
+        평문을 출력한다. JWE JSON Serialization일 경우, 복호화가 성공과 실패한
+        수신자의 결과를 애플리케이션으로 반환한다.
 
 
 
@@ -1254,38 +1244,37 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   Finally, note that it is an application decision which algorithms may
-   be used in a given context.  Even if a JWE can be successfully
-   decrypted, unless the algorithms used in the JWE are acceptable to
-   the application, it SHOULD consider the JWE to be invalid.
+   마지막으로, 특정 컨텍스트에서 사용할 수 있는 알고리즘에 대한 결정은
+   애플리케이션에 달려 있음을 유의하라. JWE가 성공적으로 복호화될 수 있다
+   하더라도, JWE에 사용된 알고리즘이 애플리케이션에서 허용되지 않은 경우, 
+   이를 무효화해야 한다(SHOULD).
 
-<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  String Comparison Rules</span>
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  문자열 비교 규칙</span>
 
-   The string comparison rules for this specification are the same as
-   those defined in Section 5.3 of [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>].
+   이 명세의 문자열 비교 규칙은 [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>]
+   5.3절에 정의된 규칙과 동일하다.
 
-<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  Key Identification</span>
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  키 식별</span>
 
-   The key identification methods for this specification are the same as
-   those defined in Section 6 of [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>], except that the key being
-   identified is the public key to which the JWE was encrypted.
+   이 명세의 키 식별 방법은 [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>]
+   6절에 정의된 방법과 동일하지만, 식별되는 키는 JWE가 암호화된
+   공개 키라는 점이 다르다.
 
-<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  Serializations</span>
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  직렬화</span>
 
-   JWEs use one of two serializations: the JWE Compact Serialization or
-   the JWE JSON Serialization.  Applications using this specification
-   need to specify what serialization and serialization features are
-   used for that application.  For instance, applications might specify
-   that only the JWE JSON Serialization is used, that only JWE JSON
-   Serialization support for a single recipient is used, or that support
-   for multiple recipients is used.  JWE implementations only need to
-   implement the features needed for the applications they are designed
-   to support.
+   JWE는 두 가지 직렬화 방식을 사용한다: JWE Compact Serialization 또는
+   JWE JSON Serialization. 이 명세를 사용하는 애플리케이션은
+   해당 애플리케이션에서 사용하는 직렬화 방식과 직렬화 기능을
+   지정해야 한다. 예를 들어, 애플리케이션은 JWE JSON Serialization만
+   사용하거나 단일 수신자에 대한 JWE JSON Serialization 지원만
+   사용하도록 지정하거나 다중 수신자에 대한 지원을 지정할 수 있다.
+   JWE 구현체는 자신이 지원하도록 설계된 애플리케이션에
+   필요한 기능만 구현하면 된다.
 
 <span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  JWE Compact Serialization</span>
 
-   The JWE Compact Serialization represents encrypted content as a
-   compact, URL-safe string.  This string is:
+   JWE Compact Serialization은 암호화된 콘텐츠를 간결하고,
+   URL-안전 문자열로 표현한다. 이 문자열은 다음과 같다:
 
       BASE64URL(UTF8(JWE Protected Header)) || '.' ||
       BASE64URL(JWE Encrypted Key) || '.' ||
@@ -1293,15 +1282,15 @@ Copyright Notice
       BASE64URL(JWE Ciphertext) || '.' ||
       BASE64URL(JWE Authentication Tag)
 
-   Only one recipient is supported by the JWE Compact Serialization and
-   it provides no syntax to represent JWE Shared Unprotected Header, JWE
-   Per-Recipient Unprotected Header, or JWE AAD values.
+   JWE Compact Serialization은 단일 수신자만 지원하며, JWE 공유 비보호
+   헤더, JWE 수신자별 비보호 헤더 또는 JWE AAD 값을
+   표현하기 위한 구문을 제공하지 않는다.
 
 <span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  JWE JSON Serialization</span>
 
-   The JWE JSON Serialization represents encrypted content as a JSON
-   object.  This representation is neither optimized for compactness nor
-   URL safe.
+   JWE JSON Serialization은 암호화된 콘텐츠를 JSON 객체로
+   표현한다. 이 표현은 간결성에 최적화되어 있지 않으며
+   URL-안전하지도 않다.
 
 
 
@@ -1310,54 +1299,57 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   Two closely related syntaxes are defined for the JWE JSON
-   Serialization: a fully general syntax, with which content can be
-   encrypted to more than one recipient, and a flattened syntax, which
-   is optimized for the single-recipient case.
+   JWE JSON Serialization을 위해 두 가지 밀접하게 관련된
+   구문이 정의되어 있다: 다중 수신자가 암호화될 수 있는
+   완전 일반 구문, 그리고 단일 수신자 구문으로 최적화된
+   평탄화 구문.
 
-<span class="h4"><a class="selflink" id="section-7.2.1" href="#section-7.2.1">7.2.1</a>.  General JWE JSON Serialization Syntax</span>
+<span class="h4"><a class="selflink" id="section-7.2.1" href="#section-7.2.1">7.2.1</a>.  일반 JWE JSON 직렬화 구문</span>
 
-   The following members are defined for use in top-level JSON objects
-   used for the fully general JWE JSON Serialization syntax:
+   완전 일반 JWE JSON 직렬화 구문에서 최상위
+   JSON 객체에 대해 다음 구성원이 정의되어 있다:
 
    protected
-      The "protected" member MUST be present and contain the value
-      BASE64URL(UTF8(JWE Protected Header)) when the JWE Protected
-      Header value is non-empty; otherwise, it MUST be absent.  These
-      Header Parameter values are integrity protected.
+      "protected" 구성원은 반드시 존재해야 하며(MUST), JWE
+      Protected Header 값이 비어있지 않을 경우, 
+      BASE64URL(UTF8(JWE Protected Header)) 값을 포함해야 한다. 
+      그렇지 않은 경우에는 존재해서는 안 된다(MUST NOT). 
+      이 헤더 매개변수 값은 무결성 보호를 받는다.
 
    unprotected
-      The "unprotected" member MUST be present and contain the value JWE
-      Shared Unprotected Header when the JWE Shared Unprotected Header
-      value is non-empty; otherwise, it MUST be absent.  This value is
-      represented as an unencoded JSON object, rather than as a string.
-      These Header Parameter values are not integrity protected.
+      "unprotected" 구성원은 반드시 존재해야 하며(MUST), JWE
+      Shared Unprotected Header 값이 비어있지 않을 경우, 
+      해당 값을 포함해야 한다. 그렇지 않은 경우에는 존재해서는 안 된다.
+      이 값은 문자열이 아닌 인코딩되지 않은 JSON 객체로 표현된다.
+      이 헤더 매개변수 값은 무결성 보호를 받지 않는다.
 
    iv
-      The "iv" member MUST be present and contain the value
-      BASE64URL(JWE Initialization Vector) when the JWE Initialization
-      Vector value is non-empty; otherwise, it MUST be absent.
+      "iv" 구성원은 반드시 존재해야 하며(MUST), JWE Initialization 
+      Vector 값이 비어있지 않을 경우, BASE64URL(JWE Initialization 
+      Vector) 값을 포함해야 한다. 그렇지 않은 경우에는 존재해서는 
+      안 된다.
 
    aad
-      The "aad" member MUST be present and contain the value
-      BASE64URL(JWE AAD)) when the JWE AAD value is non-empty;
-      otherwise, it MUST be absent.  A JWE AAD value can be included to
-      supply a base64url-encoded value to be integrity protected but not
-      encrypted.
+      "aad" 구성원은 반드시 존재해야 하며(MUST), JWE AAD 값이 비어있지
+      않을 경우, BASE64URL(JWE AAD) 값을 포함해야 한다. 그렇지 않은
+      경우에는 존재해서는 안 된다. JWE AAD 값은 무결성을 보호받도록
+      포함될 수 있지만 암호화되지 않은 상태로 base64url-인코딩된 값을
+      제공한다.
 
    ciphertext
-      The "ciphertext" member MUST be present and contain the value
-      BASE64URL(JWE Ciphertext).
+      "ciphertext" 구성원은 반드시 존재해야 하며(MUST), BASE64URL(JWE 
+      Ciphertext) 값을 포함해야 한다.
 
    tag
-      The "tag" member MUST be present and contain the value
-      BASE64URL(JWE Authentication Tag) when the JWE Authentication Tag
-      value is non-empty; otherwise, it MUST be absent.
+      "tag" 구성원은 JWE Authentication Tag 값이 비어있지 않을 경우,
+      반드시 BASE64URL(JWE Authentication Tag) 값을 포함해야 한다. 
+      그렇지 않은 경우에는 존재해서는 안 된다.
 
    recipients
-      The "recipients" member value MUST be an array of JSON objects.
-      Each object contains information specific to a single recipient.
-      This member MUST be present with exactly one array element per
+      "recipients" 구성원 값은 반드시 JSON 객체의 배열이어야 하며(MUST),
+      각 객체에는 한 명의 특정 수신자 정보를 포함해야 한다.
+      이 구성원은 반드시 존재해야 하며(MUST), 각 수신자마다 정확히
+      하나의 배열 요소를 포함해야 한다.
 
 
 
@@ -1366,54 +1358,42 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-      recipient, even if some or all of the array element values are the
-      empty JSON object "{}" (which can happen when all Header Parameter
-      values are shared between all recipients and when no encrypted key
-      is used, such as when doing Direct Encryption).
+      수신자가 일부 또는 모든 배열 요소 값에 대해 비어 있는 JSON 객체 "{}"를 사용하는 경우(모든 헤더 매개변수 값이
+      모든 수신자 간에 공유되고 암호화된 키가 사용되지 않는 경우와 같이), 이를 허용합니다.
 
-   The following members are defined for use in the JSON objects that
-   are elements of the "recipients" array:
+   "recipients" 배열의 JSON 객체에서 사용할 수 있는 다음 구성원을 정의합니다:
 
    header
-      The "header" member MUST be present and contain the value JWE Per-
-      Recipient Unprotected Header when the JWE Per-Recipient
-      Unprotected Header value is non-empty; otherwise, it MUST be
-      absent.  This value is represented as an unencoded JSON object,
-      rather than as a string.  These Header Parameter values are not
-      integrity protected.
+      JWE 개별 수신자 보호되지 않은 헤더 값이 비어 있지 않은 경우, "header" 구성원은 JWE 개별 수신자
+      보호되지 않은 헤더의 값을 포함하고 반드시 존재해야 합니다. 그렇지 않으면
+      제외되어야 합니다. 이 값은 문자열이 아니라 인코딩되지 않은 JSON 객체로 표현됩니다.
+      이러한 헤더 매개변수 값은 무결성 보호를 받지 않습니다.
 
    encrypted_key
-      The "encrypted_key" member MUST be present and contain the value
-      BASE64URL(JWE Encrypted Key) when the JWE Encrypted Key value is
-      non-empty; otherwise, it MUST be absent.
+      "encrypted_key" 구성원은 JWE 암호화 키 값이 비어 있지 않은 경우, BASE64URL(JWE
+      Encrypted Key)를 포함하고 반드시 존재해야 합니다. 그렇지 않으면 제외되어야 합니다.
 
-   At least one of the "header", "protected", and "unprotected" members
-   MUST be present so that "alg" and "enc" Header Parameter values are
-   conveyed for each recipient computation.
+   "header", "protected", "unprotected" 구성원 중 하나 이상은 반드시 존재해야 합니다.
+   수신자 계산을 위한 "alg" 및 "enc" 헤더 매개변수 값을 전달할 수 있도록 보장합니다.
 
-   Additional members can be present in both the JSON objects defined
-   above; if not understood by implementations encountering them, they
-   MUST be ignored.
+   위에서 정의된 JSON 객체에는 추가 구성원이 존재할수 있습니다. 구현이
+   이를 이해하지 못한 경우 무시해야 합니다.
 
-   Some Header Parameters, including the "alg" parameter, can be shared
-   among all recipient computations.  Header Parameters in the JWE
-   Protected Header and JWE Shared Unprotected Header values are shared
-   among all recipients.
+   일부 헤더 매개변수(예: "alg" 매개변수)는 모든 수신자 계산에서 공유될 수 있습니다.
+   JWE 보호된 헤더와 JWE 공유되지 않은 보호 헤더 값에서 헤더 매개변수가
+   모든 수신자 간에 공유됩니다.
 
-   The Header Parameter values used when creating or validating per-
-   recipient ciphertext and Authentication Tag values are the union of
-   the three sets of Header Parameter values that may be present: (1)
-   the JWE Protected Header represented in the "protected" member, (2)
-   the JWE Shared Unprotected Header represented in the "unprotected"
-   member, and (3) the JWE Per-Recipient Unprotected Header represented
-   in the "header" member of the recipient's array element.  The union
-   of these sets of Header Parameters comprises the JOSE Header.  The
-   Header Parameter names in the three locations MUST be disjoint.
+   개별 수신자 암호문 및 인증 태그 값을 생성하거나 검증할 때 사용되는
+   헤더 매개변수 값은 다음 세 가지 세트의 헤더 매개변수 값의 합집합으로 구성됩니다: (1)
+   "protected" 구성원에 나타나는 JWE 보호 헤더, (2) "unprotected" 구성원에 나타나는 JWE
+   공유되지 않은 보호 헤더 및 (3) 수신자의 배열 요소 내의 "header" 구성원에 나타나는
+   JWE 개별 수신자 보호되지 않은 헤더. 이러한 헤더 매개변수의
+   세트를 합친 값이 JOSE 헤더를 구성합니다. 세 가지 위치에서의 헤더 매개변수 이름은
+   반드시 겹치지 않아야 합니다.
 
-   Each JWE Encrypted Key value is computed using the parameters of the
-   corresponding JOSE Header value in the same manner as for the JWE
-   Compact Serialization.  This has the desirable property that each JWE
-   Encrypted Key value in the "recipients" array is identical to the
+   각 JWE 암호화 키 값은 동일한 매개변수를 사용하여 JWE 간략화 직렬화와 동일한 방식으로
+   생성됩니다. 이로 인해 "recipients" 배열 내의 각 JWE 암호화 키 값이 동일해지는
+   바람직한 결과를 가져옵니다.
 
 
 
@@ -1422,52 +1402,42 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   value that would have been computed for the same parameter in the JWE
-   Compact Serialization.  Likewise, the JWE Ciphertext and JWE
-   Authentication Tag values match those produced for the JWE Compact
-   Serialization, provided that the JWE Protected Header value (which
-   represents the integrity-protected Header Parameter values) matches
-   that used in the JWE Compact Serialization.
+   마찬가지로, JWE 암호문 및 JWE 인증 태그 값은 JWE 보호 헤더 값이 JWE
+   간략화 직렬화에서 사용된 값과 일치하는 경우, JWE 간략화 직렬화에 대해 생성된 값과
+   일치합니다(이는 무결성 보호된 헤더 매개변수 값을 나타냅니다).
 
-   All recipients use the same JWE Protected Header, JWE Initialization
-   Vector, JWE Ciphertext, and JWE Authentication Tag values, when
-   present, resulting in potentially significant space savings if the
-   message is large.  Therefore, all Header Parameters that specify the
-   treatment of the plaintext value MUST be the same for all recipients.
-   This primarily means that the "enc" (encryption algorithm) Header
-   Parameter value in the JOSE Header for each recipient and any
-   parameters of that algorithm MUST be the same.
+   모든 수신자는 동일한 JWE 보호 헤더, JWE 초기화 벡터, JWE 암호문 및 JWE 인증 태그 값을
+   사용하며, 이는 메시지가 클 경우 잠재적으로 큰 공간 절약을 제공합니다. 따라서,
+   평문 값의 처리를 지정하는 모든 헤더 매개변수는 모든 수신자에 대해 동일해야 합니다.
+   이는 주로 각 수신자에 대한 JOSE 헤더의 "enc"(암호화 알고리즘) 헤더 매개변수 값과 해당
+   알고리즘의 모든 매개변수가 동일해야 함을 의미합니다.
 
-   In summary, the syntax of a JWE using the general JWE JSON
-   Serialization is as follows:
+   요약하면, 일반 JWE JSON 직렬화를 사용하는 JWE의 구문은 다음과 같습니다:
 
      {
-      "protected":"&lt;integrity-protected shared header contents&gt;",
-      "unprotected":&lt;non-integrity-protected shared header contents&gt;,
+      "protected":"&lt;무결성 보호된 공유 헤더 내용&gt;",
+      "unprotected":&lt;무결성 보호되지 않은 공유 헤더 내용&gt;,
       "recipients":[
-       {"header":&lt;per-recipient unprotected header 1 contents&gt;,
-        "encrypted_key":"&lt;encrypted key 1 contents&gt;"},
+       {"header":&lt;수신자별 보호되지 않은 헤더 1 내용&gt;,
+        "encrypted_key":"&lt;암호화된 키 1 내용&gt;"},
        ...
-       {"header":&lt;per-recipient unprotected header N contents&gt;,
-        "encrypted_key":"&lt;encrypted key N contents&gt;"}],
-      "aad":"&lt;additional authenticated data contents&gt;",
-      "iv":"&lt;initialization vector contents&gt;",
-      "ciphertext":"&lt;ciphertext contents&gt;",
-      "tag":"&lt;authentication tag contents&gt;"
+       {"header":&lt;수신자별 보호되지 않은 헤더 N 내용&gt;,
+        "encrypted_key":"&lt;암호화된 키 N 내용&gt;"}],
+      "aad":"&lt;추가 인증된 데이터 내용&gt;",
+      "iv":"&lt;초기화 벡터 내용&gt;",
+      "ciphertext":"&lt;암호문 내용&gt;",
+      "tag":"&lt;인증 태그 내용&gt;"
      }
 
-   See <a href="#appendix-A.4">Appendix A.4</a> for an example JWE using the general JWE JSON
-   Serialization syntax.
+   일반 JWE JSON 직렬화 구문을 사용하는 JWE의 예는 <a href="#appendix-A.4">부록 A.4</a>에서
+   확인할 수 있습니다.
 
-<span class="h4"><a class="selflink" id="section-7.2.2" href="#section-7.2.2">7.2.2</a>.  Flattened JWE JSON Serialization Syntax</span>
+<span class="h4"><a class="selflink" id="section-7.2.2" href="#section-7.2.2">7.2.2</a>.  단일화된 JWE JSON 직렬화 구문</span>
 
-   The flattened JWE JSON Serialization syntax is based upon the general
-   syntax, but flattens it, optimizing it for the single-recipient case.
-   It flattens it by removing the "recipients" member and instead
-   placing those members defined for use in the "recipients" array (the
-   "header" and "encrypted_key" members) in the top-level JSON object
-   (at the same level as the "ciphertext" member).
-
+   단일화된 JWE JSON 직렬화 구문은 일반 구문을 기반으로 하며 단일 수신자
+   사례에 최적화하여 단일화합니다. "recipients" 구성원을 제거하고 대신
+   "recipients" 배열에서 사용하기로 정의된 구성원("header" 및 "encrypted_key" 구성원)을
+   최상위 JSON 객체(즉, "ciphertext" 구성원과 동일한 수준)에 배치합니다.
 
 
 
@@ -1478,53 +1448,49 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   The "recipients" member MUST NOT be present when using this syntax.
-   Other than this syntax difference, JWE JSON Serialization objects
-   using the flattened syntax are processed identically to those using
-   the general syntax.
+   이 구문을 사용할 때는 "recipients" 구성원이 존재해서는 안 됩니다. 이 구문 차이 외에는
+   단일화된 구문을 사용하는 JWE JSON 직렬화 객체를 일반 구문을 사용하는 객체와 동일한
+   방식으로 처리합니다.
 
-   In summary, the syntax of a JWE using the flattened JWE JSON
-   Serialization is as follows:
+   요약하면, 단일화된 JWE JSON 직렬화를 사용하는 JWE의 구문은 다음과 같습니다:
 
      {
-      "protected":"&lt;integrity-protected header contents&gt;",
-      "unprotected":&lt;non-integrity-protected header contents&gt;,
-      "header":&lt;more non-integrity-protected header contents&gt;,
-      "encrypted_key":"&lt;encrypted key contents&gt;",
-      "aad":"&lt;additional authenticated data contents&gt;",
-      "iv":"&lt;initialization vector contents&gt;",
-      "ciphertext":"&lt;ciphertext contents&gt;",
-      "tag":"&lt;authentication tag contents&gt;"
+      "protected":"&lt;무결성 보호된 헤더 내용&gt;",
+      "unprotected":&lt;무결성 보호되지 않은 헤더 내용&gt;,
+      "header":&lt;더 많은 무결성 보호되지 않은 헤더 내용&gt;,
+      "encrypted_key":"&lt;암호화된 키 내용&gt;",
+      "aad":"&lt;추가 인증된 데이터 내용&gt;",
+      "iv":"&lt;초기화 벡터 내용&gt;",
+      "ciphertext":"&lt;암호문 내용&gt;",
+      "tag":"&lt;인증 태그 내용&gt;"
      }
 
-   Note that when using the flattened syntax, just as when using the
-   general syntax, any unprotected Header Parameter values can reside in
-   either the "unprotected" member or the "header" member, or in both.
+   단일화된 구문을 사용할 때, 일반 구문을 사용할 때와 마찬가지로, 보호되지 않은 헤더
+   매개변수 값은 "unprotected" 구성원이나 "header" 구성원에 있거나 둘 다에 있을 수
+   있습니다.
 
-   See <a href="#appendix-A.5">Appendix A.5</a> for an example JWE using the flattened JWE JSON
-   Serialization syntax.
+   단일화된 JWE JSON 직렬화 구문을 사용하는 JWE의 예은 <a href="#appendix-A.5">부록 A.5</a>를
+   참고하십시오.
 
-<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  TLS Requirements</span>
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  TLS 요구사항</span>
 
-   The Transport Layer Security (TLS) requirements for this
-   specification are the same as those defined in Section 8 of [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>].
+   이 사양에 대한 전송 계층 보안(TLS) 요구사항은 [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>]의
+   섹션 8에 정의된 요구사항과 동일합니다.
 
-<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  Distinguishing between JWS and JWE Objects</span>
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  JWS와 JWE 객체 구별하기</span>
 
-   There are several ways of distinguishing whether an object is a JWS
-   or JWE.  All these methods will yield the same result for all legal
-   input values; they may yield different results for malformed inputs.
+   객체가 JWS인지 JWE인지 구별할 수 있는 몇 가지 방법이 있습니다. 이러한 모든
+   방법은 모든 유효한 입력값에 대해 동일한 결과를 산출합니다. 잘못된 입력값의
+   경우에는 다른 결과를 산출할 수 있습니다.
 
-   o  If the object is using the JWS Compact Serialization or the JWE
-      Compact Serialization, the number of base64url-encoded segments
-      separated by period ('.') characters differs for JWSs and JWEs.
-      JWSs have three segments separated by two period ('.') characters.
-      JWEs have five segments separated by four period ('.') characters.
+   o  객체가 JWS 간략화 직렬화 또는 JWE 간략화 직렬화를 사용하는 경우, 
+      JWS와 JWE의 base64url-encoded 세그먼트 개수는 다릅니다. JWS는 두 개의 마침표('.')
+      문자로 구분된 세 개의 세그먼트를 가지고, JWE는 네 개의 마침표('.') 문자로
+      구분된 다섯 개의 세그먼트를 가집니다.
 
-   o  If the object is using the JWS JSON Serialization or the JWE JSON
-      Serialization, the members used will be different.  JWSs have a
-      "payload" member and JWEs do not.  JWEs have a "ciphertext" member
-      and JWSs do not.
+   o  객체가 JWS JSON 직렬화 또는 JWE JSON 직렬화를 사용하는 경우, 사용된 구성원이 다릅니다.
+      JWS는 "payload" 구성원을 가지며 JWE는 가지지 않습니다. JWE는 "ciphertext" 구성원을 가지며
+      JWS는 가지지 않습니다.
 
 
 
@@ -1534,49 +1500,43 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   o  The JOSE Header for a JWS can be distinguished from the JOSE
-      Header for a JWE by examining the "alg" (algorithm) Header
-      Parameter value.  If the value represents a digital signature or
-      MAC algorithm, or is the value "none", it is for a JWS; if it
-      represents a Key Encryption, Key Wrapping, Direct Key Agreement,
-      Key Agreement with Key Wrapping, or Direct Encryption algorithm,
-      it is for a JWE.  (Extracting the "alg" value to examine is
-      straightforward when using the JWS Compact Serialization or the
-      JWE Compact Serialization and may be more difficult when using the
-      JWS JSON Serialization or the JWE JSON Serialization.)
+   o  JWS의 JOSE 헤더는 "alg"(알고리즘) 헤더 파라미터 값을 검토하여 JWE의 JOSE 헤더와 구분할 수 있습니다.
+      값이 디지털 서명 또는 MAC 알고리즘이거나 "none"일 경우 JWS용입니다.
+      값이 키 암호화, 키 래핑, 직접 키 합의, 키 래핑이 포함된 키 합의 또는 직접 암호화 알고리즘일 경우 JWE용입니다.
+      ("alg" 값을 추출해 검사하는 것은 JWS Compact Serialization 또는
+      JWE Compact Serialization을 사용할 때는 쉽고, JWS JSON Serialization이나
+      JWE JSON Serialization을 사용할 때는 더 어려울 수 있습니다.)
 
-   o  The JOSE Header for a JWS can also be distinguished from the JOSE
-      Header for a JWE by determining whether an "enc" (encryption
-      algorithm) member exists.  If the "enc" member exists, it is a
-      JWE; otherwise, it is a JWS.
+   o  JWS의 JOSE 헤더는 "enc"(암호화 알고리즘) 멤버 존재 여부로도 JWE의 JOSE 헤더와 구분할 수 있습니다.
+      "enc" 멤버가 있으면 JWE이고, 없으면 JWS입니다.
 
-<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  IANA Considerations</span>
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  IANA 고려사항</span>
 
-<span class="h3"><a class="selflink" id="section-10.1" href="#section-10.1">10.1</a>.  JSON Web Signature and Encryption Header Parameters Registration</span>
+<span class="h3"><a class="selflink" id="section-10.1" href="#section-10.1">10.1</a>.  JSON 웹 서명 및 암호화 헤더 파라미터 등록</span>
 
-   This section registers the Header Parameter names defined in
-   <a href="#section-4.1">Section 4.1</a> in the IANA "JSON Web Signature and Encryption Header
-   Parameters" registry established by [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>].
+   이 절에서는 <a href="#section-4.1">4.1절</a>에서 정의된 헤더 파라미터 이름을
+   [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>]에서 설정한 IANA "JSON Web Signature and Encryption Header
+   Parameters" 레지스트리에 등록합니다.
 
-<span class="h4"><a class="selflink" id="section-10.1.1" href="#section-10.1.1">10.1.1</a>.  Registry Contents</span>
+<span class="h4"><a class="selflink" id="section-10.1.1" href="#section-10.1.1">10.1.1</a>.  레지스트리 내용</span>
 
-   o  Header Parameter Name: "alg"
-   o  Header Parameter Description: Algorithm
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.1">Section&nbsp;4.1.1 of RFC 7516</a>
+   o  헤더 파라미터 이름: "alg"
+   o  헤더 파라미터 설명: 알고리즘
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.1">RFC 7516의 4.1.1절</a>
 
-   o  Header Parameter Name: "enc"
-   o  Header Parameter Description: Encryption Algorithm
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.2">Section&nbsp;4.1.2 of RFC 7516</a>
+   o  헤더 파라미터 이름: "enc"
+   o  헤더 파라미터 설명: 암호화 알고리즘
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.2">RFC 7516의 4.1.2절</a>
 
-   o  Header Parameter Name: "zip"
-   o  Header Parameter Description: Compression Algorithm
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.3">Section&nbsp;4.1.3 of RFC 7516</a>
+   o  헤더 파라미터 이름: "zip"
+   o  헤더 파라미터 설명: 압축 알고리즘
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.3">RFC 7516의 4.1.3절</a>
 
 
 
@@ -1590,54 +1550,54 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   o  Header Parameter Name: "jku"
-   o  Header Parameter Description: JWK Set URL
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.4">Section&nbsp;4.1.4 of RFC 7516</a>
+   o  헤더 파라미터 이름: "jku"
+   o  헤더 파라미터 설명: JWK 세트 URL
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.4">RFC 7516의 4.1.4절</a>
 
-   o  Header Parameter Name: "jwk"
-   o  Header Parameter Description: JSON Web Key
-   o  Header Parameter Usage Location(s): JWE
+   o  헤더 파라미터 이름: "jwk"
+   o  헤더 파라미터 설명: JSON 웹 키
+   o  헤더 파라미터 사용 위치: JWE
 
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.5">Section&nbsp;4.1.5 of RFC 7516</a>
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.5">RFC 7516의 4.1.5절</a>
 
-   o  Header Parameter Name: "kid"
-   o  Header Parameter Description: Key ID
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.6">Section&nbsp;4.1.6 of RFC 7516</a>
+   o  헤더 파라미터 이름: "kid"
+   o  헤더 파라미터 설명: 키 ID
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.6">RFC 7516의 4.1.6절</a>
 
-   o  Header Parameter Name: "x5u"
-   o  Header Parameter Description: X.509 URL
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.7">Section&nbsp;4.1.7 of RFC 7516</a>
+   o  헤더 파라미터 이름: "x5u"
+   o  헤더 파라미터 설명: X.509 URL
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.7">RFC 7516의 4.1.7절</a>
 
-   o  Header Parameter Name: "x5c"
-   o  Header Parameter Description: X.509 Certificate Chain
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.8">Section&nbsp;4.1.8 of RFC 7516</a>
+   o  헤더 파라미터 이름: "x5c"
+   o  헤더 파라미터 설명: X.509 인증서 체인
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.8">RFC 7516의 4.1.8절</a>
 
-   o  Header Parameter Name: "x5t"
-   o  Header Parameter Description: X.509 Certificate SHA-1 Thumbprint
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.9">Section&nbsp;4.1.9 of RFC 7516</a>
+   o  헤더 파라미터 이름: "x5t"
+   o  헤더 파라미터 설명: X.509 인증서 SHA-1 지문
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.9">RFC 7516의 4.1.9절</a>
 
-   o  Header Parameter Name: "x5t#S256"
-   o  Header Parameter Description: X.509 Certificate SHA-256 Thumbprint
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.10">Section&nbsp;4.1.10 of RFC 7516</a>
+   o  헤더 파라미터 이름: "x5t#S256"
+   o  헤더 파라미터 설명: X.509 인증서 SHA-256 지문
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.10">RFC 7516의 4.1.10절</a>
 
-   o  Header Parameter Name: "typ"
-   o  Header Parameter Description: Type
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.11">Section&nbsp;4.1.11 of RFC 7516</a>
+   o  헤더 파라미터 이름: "typ"
+   o  헤더 파라미터 설명: 타입
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.11">RFC 7516의 4.1.11절</a>
 
 
 
@@ -1646,48 +1606,45 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   o  Header Parameter Name: "cty"
-   o  Header Parameter Description: Content Type
-   o  Header Parameter Usage Location(s): JWE
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.12">Section&nbsp;4.1.12 of RFC 7516</a>
+   o  헤더 파라미터 이름: "cty"
+   o  헤더 파라미터 설명: 콘텐츠 타입
+   o  헤더 파라미터 사용 위치: JWE
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.12">RFC 7516의 4.1.12절</a>
 
-   o  Header Parameter Name: "crit"
-   o  Header Parameter Description: Critical
-   o  Header Parameter Usage Location(s): JWE
+   o  헤더 파라미터 이름: "crit"
+   o  헤더 파라미터 설명: 중요
+   o  헤더 파라미터 사용 위치: JWE
 
-   o  Change Controller: IESG
-   o  Specification Document(s): <a href="./rfc7516#section-4.1.13">Section&nbsp;4.1.13 of RFC 7516</a>
+   o  변경 제어자: IESG
+   o  명세 문서: <a href="./rfc7516#section-4.1.13">RFC 7516의 4.1.13절</a>
 
-<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>.  Security Considerations</span>
+<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>.  보안 고려사항</span>
 
-   All of the security issues that are pertinent to any cryptographic
-   application must be addressed by JWS/JWE/JWK agents.  Among these
-   issues are protecting the user's asymmetric private and symmetric
-   secret keys and employing countermeasures to various attacks.
+   모든 암호화 애플리케이션에 관련된 보안 이슈는 JWS/JWE/JWK 에이전트에서 반드시 해결해야 합니다.
+   여기에는 사용자의 비대칭 개인키 및 대칭 비밀키 보호,
+   다양한 공격에 대한 대응책 적용 등이 포함됩니다.
 
-   All the security considerations in the JWS specification also apply
-   to this specification.  Likewise, all the security considerations in
-   XML Encryption 1.1 [<a href="#ref-W3C.REC-xmlenc-core1-20130411">W3C.REC-xmlenc-core1-20130411</a>] also apply, other
-   than those that are XML specific.
+   JWS 명세의 모든 보안 고려사항은 이 명세에도 적용됩니다.
+   마찬가지로, XML Encryption 1.1 [<a href="#ref-W3C.REC-xmlenc-core1-20130411">W3C.REC-xmlenc-core1-20130411</a>]의
+   모든 보안 고려사항도, XML 특정 고려사항을 제외하고 적용됩니다.
 
-<span class="h3"><a class="selflink" id="section-11.1" href="#section-11.1">11.1</a>.  Key Entropy and Random Values</span>
+<span class="h3"><a class="selflink" id="section-11.1" href="#section-11.1">11.1</a>.  키 엔트로피 및 임의값</span>
 
-   See Section 10.1 of [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>] for security considerations on key entropy
-   and random values.  In addition to the uses of random values listed
-   there, note that random values are also used for Content Encryption
-   Keys (CEKs) and Initialization Vectors (IVs) when performing
-   encryption.
+   키 엔트로피 및 임의값에 대한 보안 고려사항은
+   [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>]의 10.1절을 참조하십시오.
+   거기 나열된 임의값의 사용 외에도, 암호화 수행시에는 콘텐츠 암호화 키(CEK)와
+   초기화 벡터(IV)에도 임의값이 사용됨을 유의하십시오.
 
-<span class="h3"><a class="selflink" id="section-11.2" href="#section-11.2">11.2</a>.  Key Protection</span>
+<span class="h3"><a class="selflink" id="section-11.2" href="#section-11.2">11.2</a>.  키 보호</span>
 
-   See Section 10.2 of [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>] for security considerations on key
-   protection.  In addition to the keys listed there that must be
-   protected, implementations performing encryption must protect the key
-   encryption key and the Content Encryption Key.  Compromise of the key
-   encryption key may result in the disclosure of all contents protected
-   with that key.  Similarly, compromise of the Content Encryption Key
-   may result in disclosure of the associated encrypted content.
+   키 보호에 대한 보안 고려사항은
+   [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>]의 10.2절을 참조하십시오.
+   거기서 보호해야 할 키 외에도, 암호화를 수행하는 구현체는
+   키 암호화 키와 콘텐츠 암호화 키를 보호해야 합니다.
+   키 암호화 키가 노출되면 해당 키로 보호된 모든 내용이
+   노출될 수 있습니다. 마찬가지로, 콘텐츠 암호화 키가 노출되어도
+   관련된 암호화 콘텐츠가 공개될 수 있습니다.
 
 
 
@@ -1702,46 +1659,39 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h3"><a class="selflink" id="section-11.3" href="#section-11.3">11.3</a>.  Using Matching Algorithm Strengths</span>
+<span class="h3"><a class="selflink" id="section-11.3" href="#section-11.3">11.3</a>.  일치하는 알고리즘 강도 사용</span>
 
-   Algorithms of matching strengths should be used together whenever
-   possible.  For instance, when AES Key Wrap is used with a given key
-   size, using the same key size is recommended when AES GCM is also
-   used.  If the key encryption and content encryption algorithms are
-   different, the effective security is determined by the weaker of the
-   two algorithms.
+   가능한 경우, 강도가 일치하는 알고리즘을 함께 사용해야 합니다.
+   예를 들어, AES 키 래핑을 특정 키 사이즈로 사용할 때,
+   AES GCM도 같은 키 사이즈로 사용하는 것이 권장됩니다.
+   키 암호화 알고리즘과 콘텐츠 암호화 알고리즘이 다르면,
+   실질적인 보안 강도는 두 알고리즘 중 더 약한 쪽에 의해 결정됩니다.
 
-   Also, see <a href="./rfc3766">RFC 3766</a> [<a href="./rfc3766" title="&quot;Determining Strengths For Public Keys Used For Exchanging Symmetric Keys&quot;">RFC3766</a>] for information on determining strengths
-   for public keys used for exchanging symmetric keys.
+   또한, 대칭 키 교환에 사용되는 공개키 강도 산정 관련 정보는
+   <a href="./rfc3766">RFC 3766</a> [<a href="./rfc3766" title="&quot;Determining Strengths For Public Keys Used For Exchanging Symmetric Keys&quot;">RFC3766</a>]를 참고하십시오.
 
-<span class="h3"><a class="selflink" id="section-11.4" href="#section-11.4">11.4</a>.  Adaptive Chosen-Ciphertext Attacks</span>
+<span class="h3"><a class="selflink" id="section-11.4" href="#section-11.4">11.4</a>.  적응형 선택-암호문 공격(CCA)</span>
 
-   When decrypting, particular care must be taken not to allow the JWE
-   recipient to be used as an oracle for decrypting messages.  <a href="./rfc3218">RFC 3218</a>
-   [<a href="./rfc3218" title="&quot;Preventing the Million Message Attack on Cryptographic Message Syntax&quot;">RFC3218</a>] should be consulted for specific countermeasures to attacks
-   on RSAES-PKCS1-v1_5.  An attacker might modify the contents of the
-   "alg" Header Parameter from "RSA-OAEP" to "RSA1_5" in order to
-   generate a formatting error that can be detected and used to recover
-   the CEK even if RSAES-OAEP was used to encrypt the CEK.  It is
-   therefore particularly important to report all formatting errors to
-   the CEK, Additional Authenticated Data, or ciphertext as a single
-   error when the encrypted content is rejected.
+   복호화 시, JWE 수신자가 메시지 복호화 오라클로 악용되지 않도록 특별히 주의해야 합니다.
+   <a href="./rfc3218">RFC 3218</a> [<a href="./rfc3218" title="&quot;Preventing the Million Message Attack on Cryptographic Message Syntax&quot;">RFC3218</a>]를 참조하여
+   RSAES-PKCS1-v1_5 공격에 대한 구체적 대응책을 확인하십시오.
+   공격자는 "alg" 헤더 파라미터 값을 "RSA-OAEP"에서 "RSA1_5"로 변경시켜,
+   포맷 오류를 발생시키고 이를 이용해 CEK를 복구하려 할 수 있습니다(비록 CEK는 RSAES-OAEP로 암호화되었더라도).
+   따라서, 암호화된 내용을 거부할 때 반드시 CEK, 추가 인증 데이터, 암호문 모두에 대해 단일 오류로 보고해야 합니다.
 
-   Additionally, this type of attack can be prevented by restricting the
-   use of a key to a limited set of algorithms -- usually one.  This
-   means, for instance, that if the key is marked as being for
-   "RSA-OAEP" only, any attempt to decrypt a message using the "RSA1_5"
-   algorithm with that key should fail immediately due to invalid use of
-   the key.
+   또한 특정 키를 제한된 알고리즘(일반적으로 하나)에서만 사용하도록 하면
+   이런 유형의 공격을 예방할 수 있습니다.
+   예를 들어, 키가 "RSA-OAEP" 용으로만 마킹되어 있으면
+   그 키로 "RSA1_5" 알고리즘 복호화 시도는
+   즉시 잘못된 키 사용임을 이유로 실패해야 합니다.
 
-<span class="h3"><a class="selflink" id="section-11.5" href="#section-11.5">11.5</a>.  Timing Attacks</span>
+<span class="h3"><a class="selflink" id="section-11.5" href="#section-11.5">11.5</a>.  타이밍 공격</span>
 
-   To mitigate the attacks described in <a href="./rfc3218">RFC 3218</a> [<a href="./rfc3218" title="&quot;Preventing the Million Message Attack on Cryptographic Message Syntax&quot;">RFC3218</a>], the
-   recipient MUST NOT distinguish between format, padding, and length
-   errors of encrypted keys.  It is strongly recommended, in the event
-   of receiving an improperly formatted key, that the recipient
-   substitute a randomly generated CEK and proceed to the next step, to
-   mitigate timing attacks.
+   <a href="./rfc3218">RFC 3218</a> [<a href="./rfc3218" title="&quot;Preventing the Million Message Attack on Cryptographic Message Syntax&quot;">RFC3218</a>]에 설명된 공격을 완화하기 위해,
+   수신자는 암호화된 키의 포맷, 패딩, 길이 오류를 구분해서는 안 됩니다.
+   잘못된 포맷의 키가 수신되면,
+   수신자가 임의로 생성한 CEK를 대체하여 다음 단계로 진행하는 것이
+   타이밍 공격 완화에 강력히 권장됩니다.
 
 
 
@@ -1758,52 +1708,52 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h2"><a class="selflink" id="section-12" href="#section-12">12</a>.  References</span>
+<span class="h2"><a class="selflink" id="section-12" href="#section-12">12</a>.  참조</span>
 
-<span class="h3"><a class="selflink" id="section-12.1" href="#section-12.1">12.1</a>.  Normative References</span>
+<span class="h3"><a class="selflink" id="section-12.1" href="#section-12.1">12.1</a>.  규범적 참조</span>
 
    [<a id="ref-JWA">JWA</a>]      Jones, M., "JSON Web Algorithms (JWA)", <a href="./rfc7518">RFC 7518</a>,
-              DOI 10.17487/RFC7518, May 2015,
+              DOI 10.17487/RFC7518, 2015년 5월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc7518">http://www.rfc-editor.org/info/rfc7518</a>&gt;.
 
    [<a id="ref-JWK">JWK</a>]      Jones, M., "JSON Web Key (JWK)", <a href="./rfc7517">RFC 7517</a>,
-              DOI 10.17487/RFC7517, May 2015,
+              DOI 10.17487/RFC7517, 2015년 5월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc7517">http://www.rfc-editor.org/info/rfc7517</a>&gt;.
 
    [<a id="ref-JWS">JWS</a>]      Jones, M., Bradley, J., and N. Sakimura, "JSON Web
-              Signature (JWS)", <a href="./rfc7515">RFC 7515</a>, DOI 10.17487/RFC7515, May
-              2015, &lt;<a href="https://www.rfc-editor.org/info/rfc7515">http://www.rfc-editor.org/info/rfc7515</a>&gt;.
+              Signature (JWS)", <a href="./rfc7515">RFC 7515</a>, DOI 10.17487/RFC7515, 2015년
+              5월, &lt;<a href="https://www.rfc-editor.org/info/rfc7515">http://www.rfc-editor.org/info/rfc7515</a>&gt;.
 
    [<a id="ref-RFC1951">RFC1951</a>]  Deutsch, P., "DEFLATE Compressed Data Format Specification
-              version 1.3", <a href="./rfc1951">RFC 1951</a>, DOI 10.17487/RFC1951, May 1996,
+              version 1.3", <a href="./rfc1951">RFC 1951</a>, DOI 10.17487/RFC1951, 1996년 5월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc1951">http://www.rfc-editor.org/info/rfc1951</a>&gt;.
 
    [<a id="ref-RFC20">RFC20</a>]    Cerf, V., "ASCII format for Network Interchange", STD 80,
-              <a href="./rfc20">RFC 20</a>, DOI 10.17487/RFC0020, October 1969,
+              <a href="./rfc20">RFC 20</a>, DOI 10.17487/RFC0020, 1969년 10월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc20">http://www.rfc-editor.org/info/rfc20</a>&gt;.
 
    [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>,
-              DOI 10.17487/RFC2119, March 1997,
+              DOI 10.17487/RFC2119, 1997년 3월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>&gt;.
 
    [<a id="ref-RFC3629">RFC3629</a>]  Yergeau, F., "UTF-8, a transformation format of ISO
-              10646", STD 63, <a href="./rfc3629">RFC 3629</a>, DOI 10.17487/RFC3629, November
-              2003, &lt;<a href="https://www.rfc-editor.org/info/rfc3629">http://www.rfc-editor.org/info/rfc3629</a>&gt;.
+              10646", STD 63, <a href="./rfc3629">RFC 3629</a>, DOI 10.17487/RFC3629, 2003년 11월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc3629">http://www.rfc-editor.org/info/rfc3629</a>&gt;.
 
    [<a id="ref-RFC4949">RFC4949</a>]  Shirey, R., "Internet Security Glossary, Version 2",
-              FYI 36, <a href="./rfc4949">RFC 4949</a>, DOI 10.17487/RFC4949, August 2007,
+              FYI 36, <a href="./rfc4949">RFC 4949</a>, DOI 10.17487/RFC4949, 2007년 8월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc4949">http://www.rfc-editor.org/info/rfc4949</a>&gt;.
 
    [<a id="ref-RFC5280">RFC5280</a>]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
-              (CRL) Profile", <a href="./rfc5280">RFC 5280</a>, DOI 10.17487/RFC5280, May 2008,
+              (CRL) Profile", <a href="./rfc5280">RFC 5280</a>, DOI 10.17487/RFC5280, 2008년 5월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc5280">http://www.rfc-editor.org/info/rfc5280</a>&gt;.
 
    [<a id="ref-RFC7159">RFC7159</a>]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
-              Interchange Format", <a href="./rfc7159">RFC 7159</a>, DOI 10.17487/RFC7159, March
-              2014, &lt;<a href="https://www.rfc-editor.org/info/rfc7159">http://www.rfc-editor.org/info/rfc7159</a>&gt;.
+              Interchange Format", <a href="./rfc7159">RFC 7159</a>, DOI 10.17487/RFC7159, 2014년 3월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7159">http://www.rfc-editor.org/info/rfc7159</a>&gt;.
 
 
 
@@ -1817,46 +1767,46 @@ Copyright Notice
    [<a id="ref-UNICODE">UNICODE</a>]  The Unicode Consortium, "The Unicode Standard",
               &lt;<a href="http://www.unicode.org/versions/latest/">http://www.unicode.org/versions/latest/</a>&gt;.
 
-<span class="h3"><a class="selflink" id="section-12.2" href="#section-12.2">12.2</a>.  Informative References</span>
+<span class="h3"><a class="selflink" id="section-12.2" href="#section-12.2">12.2</a>.  참고 문헌</span>
 
    [<a id="ref-AES">AES</a>]      National Institute of Standards and Technology (NIST),
               "Advanced Encryption Standard (AES)", FIPS PUB 197,
-              November 2001, &lt;<a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">http://csrc.nist.gov/publications/</a>
+              2001년 11월, &lt;<a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">http://csrc.nist.gov/publications/</a>
               <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">fips/fips197/fips-197.pdf</a>&gt;.
 
    [<a id="ref-JSE">JSE</a>]      Bradley, J. and N. Sakimura (editor), "JSON Simple
-              Encryption", September 2010,
+              Encryption", 2010년 9월,
               &lt;<a href="http://jsonenc.info/enc/1.0/">http://jsonenc.info/enc/1.0/</a>&gt;.
 
    [<a id="ref-JSMS">JSMS</a>]     Rescorla, E. and J. Hildebrand, "JavaScript Message
-              Security Format", Work in Progress,
-              <a href="./draft-rescorla-jsms-00">draft-rescorla-jsms-00</a>, March 2011.
+              Security Format", 진행 중인 작업,
+              <a href="./draft-rescorla-jsms-00">draft-rescorla-jsms-00</a>, 2011년 3월.
 
    [<a id="ref-NIST.800-38D">NIST.800-38D</a>]
               National Institute of Standards and Technology (NIST),
               "Recommendation for Block Cipher Modes of Operation:
               Galois/Counter Mode (GCM) and GMAC", NIST PUB 800-38D,
-              November 2007, &lt;<a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">http://csrc.nist.gov/publications/</a>
+              2007년 11월, &lt;<a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">http://csrc.nist.gov/publications/</a>
               <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">nistpubs/800-38D/SP-800-38D.pdf</a>&gt;.
 
    [<a id="ref-RFC3218">RFC3218</a>]  Rescorla, E., "Preventing the Million Message Attack on
               Cryptographic Message Syntax", <a href="./rfc3218">RFC 3218</a>,
-              DOI 10.17487/RFC3218, January 2002,
+              DOI 10.17487/RFC3218, 2002년 1월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc3218">http://www.rfc-editor.org/info/rfc3218</a>&gt;.
 
    [<a id="ref-RFC3447">RFC3447</a>]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
               Standards (PKCS) #1: RSA Cryptography Specifications
-              Version 2.1", <a href="./rfc3447">RFC 3447</a>, DOI 10.17487/RFC3447, February
-              2003, &lt;<a href="https://www.rfc-editor.org/info/rfc3447">http://www.rfc-editor.org/info/rfc3447</a>&gt;.
+              Version 2.1", <a href="./rfc3447">RFC 3447</a>, DOI 10.17487/RFC3447, 2003년 2월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc3447">http://www.rfc-editor.org/info/rfc3447</a>&gt;.
 
    [<a id="ref-RFC3766">RFC3766</a>]  Orman, H. and P. Hoffman, "Determining Strengths For
               Public Keys Used For Exchanging Symmetric Keys", <a href="https://www.rfc-editor.org/bcp/bcp86">BCP 86</a>,
-              <a href="./rfc3766">RFC 3766</a>, DOI 10.17487/RFC3766, April 2004,
+              <a href="./rfc3766">RFC 3766</a>, DOI 10.17487/RFC3766, 2004년 4월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc3766">http://www.rfc-editor.org/info/rfc3766</a>&gt;.
 
    [<a id="ref-RFC4086">RFC4086</a>]  Eastlake 3rd, D., Schiller, J., and S. Crocker,
               "Randomness Requirements for Security", <a href="https://www.rfc-editor.org/bcp/bcp106">BCP 106</a>, <a href="./rfc4086">RFC 4086</a>,
-              DOI 10.17487/RFC4086, June 2005,
+              DOI 10.17487/RFC4086, 2005년 6월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc4086">http://www.rfc-editor.org/info/rfc4086</a>&gt;.
 
 
@@ -1871,14 +1821,14 @@ Copyright Notice
 
 
    [<a id="ref-RFC5652">RFC5652</a>]  Housley, R., "Cryptographic Message Syntax (CMS)", STD 70,
-              <a href="./rfc5652">RFC 5652</a>, DOI 10.17487/RFC5652, September 2009,
+              <a href="./rfc5652">RFC 5652</a>, DOI 10.17487/RFC5652, 2009년 9월,
               &lt;<a href="https://www.rfc-editor.org/info/rfc5652">http://www.rfc-editor.org/info/rfc5652</a>&gt;.
 
    [<a id="ref-W3C.REC-xmlenc-core1-20130411">W3C.REC-xmlenc-core1-20130411</a>]
               Eastlake, D., Reagle, J., Hirsch, F., and T. Roessler,
               "XML Encryption Syntax and Processing Version 1.1", World
-              Wide Web Consortium Recommendation
-              REC-xmlenc-core1-20130411, April 2013,
+              Wide Web Consortium 권고안
+              REC-xmlenc-core1-20130411, 2013년 4월,
               &lt;<a href="http://www.w3.org/TR/2013/REC-xmlenc-core1-20130411/">http://www.w3.org/TR/2013/REC-xmlenc-core1-20130411/</a>&gt;.
 
 
@@ -1926,16 +1876,15 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">Appendix A</a>.  JWE Examples</span>
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">Appendix A</a>.  JWE 예제</span>
 
-   This section provides examples of JWE computations.
+   이 절에서는 JWE 계산의 예제를 제공합니다.
 
-<span class="h3"><a class="selflink" id="appendix-A.1" href="#appendix-A.1">A.1</a>.  Example JWE using RSAES-OAEP and AES GCM</span>
+<span class="h3"><a class="selflink" id="appendix-A.1" href="#appendix-A.1">A.1</a>.  예제: RSAES-OAEP 및 AES GCM을 사용하는 JWE</span>
 
-   This example encrypts the plaintext "The true sign of intelligence is
-   not knowledge but imagination." to the recipient using RSAES-OAEP for
-   key encryption and AES GCM for content encryption.  The
-   representation of this plaintext (using JSON array notation) is:
+   이 예제는 평문 "The true sign of intelligence is
+   not knowledge but imagination."을 수신자에게 RSAES-OAEP을 키 암호화에,
+   AES GCM을 내용 암호화에 사용하여 암호화합니다. 이 평문의 표현( JSON 배열 표기법 사용)은:
 
    [84, 104, 101, 32, 116, 114, 117, 101, 32, 115, 105, 103, 110, 32,
    111, 102, 32, 105, 110, 116, 101, 108, 108, 105, 103, 101, 110, 99,
@@ -1943,27 +1892,23 @@ Copyright Notice
    101, 100, 103, 101, 32, 98, 117, 116, 32, 105, 109, 97, 103, 105,
    110, 97, 116, 105, 111, 110, 46]
 
-<span class="h4"><a class="selflink" id="appendix-A.1.1" href="#appendix-A.1.1">A.1.1</a>.  JOSE Header</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.1" href="#appendix-A.1.1">A.1.1</a>.  JOSE 헤더</span>
 
-   The following example JWE Protected Header declares that:
+   다음 JWE 보호 헤더는 다음을 선언합니다:
 
-   o  The Content Encryption Key is encrypted to the recipient using the
-      RSAES-OAEP algorithm to produce the JWE Encrypted Key.
-   o  Authenticated encryption is performed on the plaintext using the
-      AES GCM algorithm with a 256-bit key to produce the ciphertext and
-      the Authentication Tag.
+   o  콘텐츠 암호화 키(CEK)가 수신자에게 RSAES-OAEP 알고리즘을 사용하여 암호화되어 JWE 암호화 키를 생성함.
+   o  인증된 암호화는 AES GCM 알고리즘과 256비트 키를 사용하여 평문을 암호화하고 암호문 및 인증 태그를 생성함.
 
      {"alg":"RSA-OAEP","enc":"A256GCM"}
 
-   Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
-   Header)) gives this value:
+   이 JWE 보호 헤더를 BASE64URL(UTF8(JWE Protected
+   Header))로 인코딩하면 다음 값이 됩니다:
 
      eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ
 
-<span class="h4"><a class="selflink" id="appendix-A.1.2" href="#appendix-A.1.2">A.1.2</a>.  Content Encryption Key (CEK)</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.2" href="#appendix-A.1.2">A.1.2</a>.  콘텐츠 암호화 키(CEK)</span>
 
-   Generate a 256-bit random CEK.  In this example, the value (using
-   JSON array notation) is:
+   256비트의 무작위 CEK를 생성합니다. 이 예제에서 값( JSON 배열 표기법 사용)은:
 
    [177, 161, 244, 128, 84, 143, 225, 115, 63, 180, 3, 255, 107, 154,
    212, 246, 138, 7, 110, 91, 112, 46, 34, 105, 47, 130, 203, 46, 122,
@@ -1982,12 +1927,9 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h4"><a class="selflink" id="appendix-A.1.3" href="#appendix-A.1.3">A.1.3</a>.  Key Encryption</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.3" href="#appendix-A.1.3">A.1.3</a>.  키 암호화</span>
 
-   Encrypt the CEK with the recipient's public key using the RSAES-OAEP
-   algorithm to produce the JWE Encrypted Key.  This example uses the
-   RSA key represented in JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] format below (with line
-   breaks within values for display purposes only):
+   수신자의 공개 키를 사용하여 RSAES-OAEP 알고리즘으로 CEK를 암호화하여 JWE 암호화 키를 생성합니다. 이 예제는 아래에 JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] 형식으로 표현된 RSA 키를 사용합니다(표시 목적으로 값 내 줄 바꿈이 포함되어 있음):
 
      {"kty":"RSA",
       "n":"oahUIoWw0K0usKNuOR6H4wkf4oBUXHTxRvgb48E-BVvxkeDNjbC4he8rUW
@@ -2038,7 +1980,7 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   The resulting JWE Encrypted Key value is:
+   결과 JWE 암호화 키 값은:
 
    [56, 163, 154, 192, 58, 53, 222, 4, 105, 218, 136, 218, 29, 94, 203,
    22, 150, 92, 129, 94, 211, 232, 53, 89, 41, 60, 138, 56, 196, 216,
@@ -2059,25 +2001,24 @@ Copyright Notice
    172, 99, 226, 233, 73, 37, 124, 42, 72, 49, 242, 35, 127, 184, 134,
    117, 114, 135, 206]
 
-   Encoding this JWE Encrypted Key as BASE64URL(JWE Encrypted Key) gives
-   this value (with line breaks for display purposes only):
+   이 JWE 암호화 키를 BASE64URL(JWE Encrypted Key)로 인코딩하면
+   다음 값이 됩니다(표시 목적의 줄 바꿈 포함):
 
      OKOawDo13gRp2ojaHV7LFpZcgV7T6DVZKTyKOMTYUmKoTCVJRgckCL9kiMT03JGe
      ipsEdY3mx_etLbbWSrFr05kLzcSr4qKAq7YN7e9jwQRb23nfa6c9d-StnImGyFDb
      Sv04uVuxIp5Zms1gNxKKK2Da14B8S4rzVRltdYwam_lDp5XnZAYpQdb76FdIKLaV
      mqgfwX7XWRxv2322i-vDxRfqNzo_tETKzpVLzfiwQyeyPGLBIO56YJ7eObdv0je8
      1860ppamavo35UgoRdbYaBcoh9QcfylQr66oc6vFWXRcZ_ZT2LawVCWTIy3brGPi
-     6UklfCpIMfIjf7iGdXKHzg
+     6UklfCpIMfIjf7iGdXKHzg.
 
-<span class="h4"><a class="selflink" id="appendix-A.1.4" href="#appendix-A.1.4">A.1.4</a>.  Initialization Vector</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.4" href="#appendix-A.1.4">A.1.4</a>.  초기화 벡터</span>
 
-   Generate a random 96-bit JWE Initialization Vector.  In this example,
-   the value is:
+   96비트의 무작위 JWE 초기화 벡터를 생성합니다. 이 예제에서 값은:
 
    [227, 197, 117, 252, 2, 219, 233, 68, 180, 225, 77, 219]
 
-   Encoding this JWE Initialization Vector as BASE64URL(JWE
-   Initialization Vector) gives this value:
+   이 JWE 초기화 벡터를 BASE64URL(JWE
+   Initialization Vector)로 인코딩하면 다음 값이 됩니다:
 
      48V1_ALb6US04U3b
 
@@ -2094,21 +2035,17 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h4"><a class="selflink" id="appendix-A.1.5" href="#appendix-A.1.5">A.1.5</a>.  Additional Authenticated Data</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.5" href="#appendix-A.1.5">A.1.5</a>.  추가 인증 데이터</span>
 
-   Let the Additional Authenticated Data encryption parameter be
-   ASCII(BASE64URL(UTF8(JWE Protected Header))).  This value is:
+   추가 인증 데이터 암호화 매개변수를 ASCII(BASE64URL(UTF8(JWE Protected Header)))로 둡니다. 이 값은:
 
    [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 83, 85, 48, 69,
    116, 84, 48, 70, 70, 85, 67, 73, 115, 73, 109, 86, 117, 89, 121, 73,
    54, 73, 107, 69, 121, 78, 84, 90, 72, 81, 48, 48, 105, 102, 81]
 
-<span class="h4"><a class="selflink" id="appendix-A.1.6" href="#appendix-A.1.6">A.1.6</a>.  Content Encryption</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.6" href="#appendix-A.1.6">A.1.6</a>.  내용 암호화</span>
 
-   Perform authenticated encryption on the plaintext with the AES GCM
-   algorithm using the CEK as the encryption key, the JWE Initialization
-   Vector, and the Additional Authenticated Data value above, requesting
-   a 128-bit Authentication Tag output.  The resulting ciphertext is:
+   CEK를 암호화 키로 사용하고, JWE 초기화 벡터 및 위의 추가 인증 데이터를 사용하여 AES GCM 알고리즘으로 평문에 대해 인증된 암호화를 수행합니다. 128비트 인증 태그 출력을 요청합니다. 결과 암호문은:
 
    [229, 236, 166, 241, 53, 191, 115, 196, 174, 43, 73, 109, 39, 122,
    233, 96, 140, 206, 120, 52, 51, 237, 48, 11, 190, 219, 186, 80, 111,
@@ -2116,19 +2053,19 @@ Copyright Notice
    123, 143, 168, 226, 73, 216, 176, 144, 138, 247, 106, 60, 16, 205,
    160, 109, 64, 63, 192]
 
-   The resulting Authentication Tag value is:
+   결과 인증 태그 값은:
 
    [92, 80, 104, 49, 133, 25, 161, 215, 173, 101, 219, 211, 136, 91,
    210, 145]
 
-   Encoding this JWE Ciphertext as BASE64URL(JWE Ciphertext) gives this
-   value (with line breaks for display purposes only):
+   이 JWE 암호문을 BASE64URL(JWE Ciphertext)로 인코딩하면 다음
+   값이 됩니다(표시 목적의 줄 바꿈 포함):
 
      5eym8TW_c8SuK0ltJ3rpYIzOeDQz7TALvtu6UG9oMo4vpzs9tX_EFShS8iB7j6ji
      SdiwkIr3ajwQzaBtQD_A
 
-   Encoding this JWE Authentication Tag as BASE64URL(JWE Authentication
-   Tag) gives this value:
+   이 JWE 인증 태그를 BASE64URL(JWE Authentication
+   Tag)로 인코딩하면 다음 값이 됩니다:
 
      XFBoMYUZodetZdvTiFvSkQ
 
@@ -2150,16 +2087,14 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h4"><a class="selflink" id="appendix-A.1.7" href="#appendix-A.1.7">A.1.7</a>.  Complete Representation</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.7" href="#appendix-A.1.7">A.1.7</a>.  완전한 표현</span>
 
-   Assemble the final representation: The Compact Serialization of this
-   result is the string BASE64URL(UTF8(JWE Protected Header)) || '.' ||
+   최종 표현을 조립합니다: 이 결과의 컴팩트 직렬화는 문자열 BASE64URL(UTF8(JWE Protected Header)) || '.' ||
    BASE64URL(JWE Encrypted Key) || '.' || BASE64URL(JWE Initialization
    Vector) || '.' || BASE64URL(JWE Ciphertext) || '.' || BASE64URL(JWE
-   Authentication Tag).
+   Authentication Tag) 입니다.
 
-   The final result in this example (with line breaks for display
-   purposes only) is:
+   이 예제의 최종 결과(표시 목적으로 줄 바꿈 포함)는:
 
      eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.
      OKOawDo13gRp2ojaHV7LFpZcgV7T6DVZKTyKOMTYUmKoTCVJRgckCL9kiMT03JGe
@@ -2173,23 +2108,15 @@ Copyright Notice
      SdiwkIr3ajwQzaBtQD_A.
      XFBoMYUZodetZdvTiFvSkQ
 
-<span class="h4"><a class="selflink" id="appendix-A.1.8" href="#appendix-A.1.8">A.1.8</a>.  Validation</span>
+<span class="h4"><a class="selflink" id="appendix-A.1.8" href="#appendix-A.1.8">A.1.8</a>.  검증</span>
 
-   This example illustrates the process of creating a JWE with
-   RSAES-OAEP for key encryption and AES GCM for content encryption.
-   These results can be used to validate JWE decryption implementations
-   for these algorithms.  Note that since the RSAES-OAEP computation
-   includes random values, the encryption results above will not be
-   completely reproducible.  However, since the AES GCM computation is
-   deterministic, the JWE Encrypted Ciphertext values will be the same
-   for all encryptions performed using these inputs.
+   이 예제는 키 암호화에 RSAES-OAEP를, 내용 암호화에 AES GCM을 사용하여 JWE를 생성하는 과정을 설명합니다.
+   이 결과들은 이러한 알고리즘에 대한 JWE 복호화 구현을 검증하는 데 사용할 수 있습니다. RSAES-OAEP 계산에는 무작위 값이 포함되므로 위의 암호화 결과는 완전히 재현 가능하지 않습니다. 하지만 AES GCM 계산은 결정적이므로, 이 입력들을 사용하여 수행된 모든 암호화에 대해 JWE 암호화된 암호문 값은 동일합니다.
 
-<span class="h3"><a class="selflink" id="appendix-A.2" href="#appendix-A.2">A.2</a>.  Example JWE using RSAES-PKCS1-v1_5 and AES_128_CBC_HMAC_SHA_256</span>
+<span class="h3"><a class="selflink" id="appendix-A.2" href="#appendix-A.2">A.2</a>.  예제: RSAES-PKCS1-v1_5 및 AES_128_CBC_HMAC_SHA_256을 사용하는 JWE</span>
 
-   This example encrypts the plaintext "Live long and prosper." to the
-   recipient using RSAES-PKCS1-v1_5 for key encryption and
-   AES_128_CBC_HMAC_SHA_256 for content encryption.  The representation
-   of this plaintext (using JSON array notation) is:
+   이 예제는 평문 "Live long and prosper."을 수신자에게 RSAES-PKCS1-v1_5를 키 암호화에,
+   AES_128_CBC_HMAC_SHA_256을 내용 암호화에 사용하여 암호화합니다. 이 평문의 표현( JSON 배열 표기법 사용)은:
 
    [76, 105, 118, 101, 32, 108, 111, 110, 103, 32, 97, 110, 100, 32,
    112, 114, 111, 115, 112, 101, 114, 46]
@@ -2206,31 +2133,27 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h4"><a class="selflink" id="appendix-A.2.1" href="#appendix-A.2.1">A.2.1</a>.  JOSE Header</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.1" href="#appendix-A.2.1">A.2.1</a>.  JOSE 헤더</span>
 
-   The following example JWE Protected Header declares that:
+   다음 JWE 보호 헤더는 다음을 선언합니다:
 
-   o  The Content Encryption Key is encrypted to the recipient using the
-      RSAES-PKCS1-v1_5 algorithm to produce the JWE Encrypted Key.
-   o  Authenticated encryption is performed on the plaintext using the
-      AES_128_CBC_HMAC_SHA_256 algorithm to produce the ciphertext and
-      the Authentication Tag.
+   o  콘텐츠 암호화 키가 수신자에게 RSAES-PKCS1-v1_5 알고리즘을 사용하여 암호화되어 JWE 암호화 키를 생성함.
+   o  인증된 암호화는 AES_128_CBC_HMAC_SHA_256 알고리즘을 사용하여 평문을 암호화하고 암호문 및 인증 태그를 생성함.
 
      {"alg":"RSA1_5","enc":"A128CBC-HS256"}
 
-   Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
-   Header)) gives this value:
+   이 JWE 보호 헤더를 BASE64URL(UTF8(JWE Protected
+   Header))로 인코딩하면 다음 값이 됩니다:
 
      eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0
 
-<span class="h4"><a class="selflink" id="appendix-A.2.2" href="#appendix-A.2.2">A.2.2</a>.  Content Encryption Key (CEK)</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.2" href="#appendix-A.2.2">A.2.2</a>.  콘텐츠 암호화 키(CEK)</span>
 
-   Generate a 256-bit random CEK.  In this example, the key value is:
+   256비트의 무작위 CEK를 생성합니다. 이 예제에서 키 값은:
 
    [4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
    206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156,
    44, 207]
-
 
 
 
@@ -2262,12 +2185,12 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h4"><a class="selflink" id="appendix-A.2.3" href="#appendix-A.2.3">A.2.3</a>.  Key Encryption</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.3" href="#appendix-A.2.3">A.2.3</a>.  키 암호화</span>
 
-   Encrypt the CEK with the recipient's public key using the
-   RSAES-PKCS1-v1_5 algorithm to produce the JWE Encrypted Key.  This
-   example uses the RSA key represented in JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] format
-   below (with line breaks within values for display purposes only):
+   수신자의 공개 키를 사용하여
+   RSAES-PKCS1-v1_5 알고리즘으로 CEK를 암호화하여 JWE 암호화 키를 생성합니다.  이
+   예제는 아래에 JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] 형식으로
+   표현된 RSA 키를 사용합니다(값 내의 줄 바꿈은 표시 용도일 뿐입니다):
 
      {"kty":"RSA",
       "n":"sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1Wl
@@ -2318,7 +2241,7 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   The resulting JWE Encrypted Key value is:
+   결과 JWE 암호화 키 값은:
 
    [80, 104, 72, 58, 11, 130, 236, 139, 132, 189, 255, 205, 61, 86, 151,
    176, 99, 40, 44, 233, 176, 189, 205, 70, 202, 169, 72, 40, 226, 181,
@@ -2339,8 +2262,8 @@ Copyright Notice
    101, 151, 125, 56, 112, 111, 248, 29, 232, 90, 29, 147, 110, 169,
    146, 114, 165, 204, 71, 136, 41, 252]
 
-   Encoding this JWE Encrypted Key as BASE64URL(JWE Encrypted Key) gives
-   this value (with line breaks for display purposes only):
+   이 JWE 암호화 키를 BASE64URL(JWE Encrypted Key)로 인코딩하면
+   다음 값이 됩니다(표시 목적의 줄 바꿈 포함):
 
      UGhIOguC7IuEvf_NPVaXsGMoLOmwvc1GyqlIKOK1nN94nHPoltGRhWhw7Zx0-kFm
      1NJn8LE9XShH59_i8J0PH5ZZyNfGy2xGdULU7sHNF6Gp2vPLgNZ__deLKxGHZ7Pc
@@ -2349,16 +2272,16 @@ Copyright Notice
      rkXds2vE4X-ncOIM8hAYHHi29NX0mcKiRaD0-D-ljQTP-cFPgwCp6X-nZZd9OHBv
      -B3oWh2TbqmScqXMR4gp_A
 
-<span class="h4"><a class="selflink" id="appendix-A.2.4" href="#appendix-A.2.4">A.2.4</a>.  Initialization Vector</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.4" href="#appendix-A.2.4">A.2.4</a>.  초기화 벡터</span>
 
-   Generate a random 128-bit JWE Initialization Vector.  In this
-   example, the value is:
+   무작위 128비트 JWE 초기화 벡터를 생성합니다.  이
+   예제에서 값은:
 
    [3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104,
    101]
 
-   Encoding this JWE Initialization Vector as BASE64URL(JWE
-   Initialization Vector) gives this value:
+   이 JWE 초기화 벡터를 BASE64URL(JWE
+   Initialization Vector)로 인코딩하면 다음 값이 됩니다:
 
      AxY8DCtDaGlsbGljb3RoZQ
 
@@ -2374,51 +2297,46 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h4"><a class="selflink" id="appendix-A.2.5" href="#appendix-A.2.5">A.2.5</a>.  Additional Authenticated Data</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.5" href="#appendix-A.2.5">A.2.5</a>.  추가 인증 데이터</span>
 
-   Let the Additional Authenticated Data encryption parameter be
-   ASCII(BASE64URL(UTF8(JWE Protected Header))).  This value is:
+   추가 인증 데이터 암호화 매개변수를
+   ASCII(BASE64URL(UTF8(JWE Protected Header)))로 둡니다.  이 값은:
 
    [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 83, 85, 48, 69,
    120, 88, 122, 85, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105,
    74, 66, 77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85,
    50, 73, 110, 48]
 
-<span class="h4"><a class="selflink" id="appendix-A.2.6" href="#appendix-A.2.6">A.2.6</a>.  Content Encryption</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.6" href="#appendix-A.2.6">A.2.6</a>.  내용 암호화</span>
 
-   Perform authenticated encryption on the plaintext with the
-   AES_128_CBC_HMAC_SHA_256 algorithm using the CEK as the encryption
-   key, the JWE Initialization Vector, and the Additional Authenticated
-   Data value above.  The steps for doing this using the values from
-   <a href="#appendix-A.3">Appendix A.3</a> are detailed in <a href="#appendix-B">Appendix B</a>.  The resulting ciphertext
-   is:
+   CEK를 암호화 키로 사용하고, JWE 초기화 벡터 및 위의 추가 인증
+   데이터를 사용하여 AES_128_CBC_HMAC_SHA_256 알고리즘으로 평문에 대해 인증된 암호화를 수행합니다.  <a href="#appendix-A.3">부록 A.3</a>의 값을 사용하여 이를 수행하는 단계는 <a href="#appendix-B">부록 B</a>에 자세히 설명되어 있습니다.  결과 암호문은:
 
    [40, 57, 83, 181, 119, 33, 133, 148, 198, 185, 243, 24, 152, 230, 6,
    75, 129, 223, 127, 19, 210, 82, 183, 230, 168, 33, 215, 104, 143,
    112, 56, 102]
 
-   The resulting Authentication Tag value is:
+   결과 인증 태그 값은:
 
    [246, 17, 244, 190, 4, 95, 98, 3, 231, 0, 115, 157, 242, 203, 100,
    191]
 
-   Encoding this JWE Ciphertext as BASE64URL(JWE Ciphertext) gives this
-   value:
+   이 JWE 암호문을 BASE64URL(JWE Ciphertext)로 인코딩하면 다음
+   값이 됩니다:
 
      KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY
 
-   Encoding this JWE Authentication Tag as BASE64URL(JWE Authentication
-   Tag) gives this value:
+   이 JWE 인증 태그를 BASE64URL(JWE Authentication
+   Tag)로 인코딩하면 다음 값이 됩니다:
 
      9hH0vgRfYgPnAHOd8stkvw
 
-<span class="h4"><a class="selflink" id="appendix-A.2.7" href="#appendix-A.2.7">A.2.7</a>.  Complete Representation</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.7" href="#appendix-A.2.7">A.2.7</a>.  완전한 표현</span>
 
-   Assemble the final representation: The Compact Serialization of this
-   result is the string BASE64URL(UTF8(JWE Protected Header)) || '.' ||
+   최종 표현을 조립합니다: 이 결과의 컴팩트 직렬화는 문자열 BASE64URL(UTF8(JWE Protected Header)) || '.' ||
    BASE64URL(JWE Encrypted Key) || '.' || BASE64URL(JWE Initialization
    Vector) || '.' || BASE64URL(JWE Ciphertext) || '.' || BASE64URL(JWE
-   Authentication Tag).
+   Authentication Tag) 입니다.
 
 
 
@@ -2430,8 +2348,7 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   The final result in this example (with line breaks for display
-   purposes only) is:
+   이 예제의 최종 결과(표시 목적의 줄 바꿈 포함)는:
 
      eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.
      UGhIOguC7IuEvf_NPVaXsGMoLOmwvc1GyqlIKOK1nN94nHPoltGRhWhw7Zx0-kFm
@@ -2444,38 +2361,24 @@ Copyright Notice
      KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY.
      9hH0vgRfYgPnAHOd8stkvw
 
-<span class="h4"><a class="selflink" id="appendix-A.2.8" href="#appendix-A.2.8">A.2.8</a>.  Validation</span>
+<span class="h4"><a class="selflink" id="appendix-A.2.8" href="#appendix-A.2.8">A.2.8</a>.  검증</span>
 
-   This example illustrates the process of creating a JWE with
-   RSAES-PKCS1-v1_5 for key encryption and AES_CBC_HMAC_SHA2 for content
-   encryption.  These results can be used to validate JWE decryption
-   implementations for these algorithms.  Note that since the
-   RSAES-PKCS1-v1_5 computation includes random values, the encryption
-   results above will not be completely reproducible.  However, since
-   the AES-CBC computation is deterministic, the JWE Encrypted
-   Ciphertext values will be the same for all encryptions performed
-   using these inputs.
+   이 예제는 키 암호화에 RSAES-PKCS1-v1_5를, 내용 암호화에 AES_CBC_HMAC_SHA2를 사용하여 JWE를 생성하는 과정을 설명합니다.  이러한 결과들은 이러한 알고리즘에 대한 JWE 복호화 구현을 검증하는 데 사용할 수 있습니다.  RSAES-PKCS1-v1_5 계산에는 무작위 값이 포함되므로 위의 암호화 결과는 완전히 재현 가능하지 않습니다.  그러나 AES-CBC 계산은 결정적이므로, 이 입력들을 사용하여 수행된 모든 암호화에 대해 JWE 암호화된 암호문 값은 동일합니다.
 
-<span class="h3"><a class="selflink" id="appendix-A.3" href="#appendix-A.3">A.3</a>.  Example JWE Using AES Key Wrap and AES_128_CBC_HMAC_SHA_256</span>
+<span class="h3"><a class="selflink" id="appendix-A.3" href="#appendix-A.3">A.3</a>.  예제: AES Key Wrap 및 AES_128_CBC_HMAC_SHA_256을 사용하는 JWE</span>
 
-   This example encrypts the plaintext "Live long and prosper." to the
-   recipient using AES Key Wrap for key encryption and
-   AES_128_CBC_HMAC_SHA_256 for content encryption.  The representation
-   of this plaintext (using JSON array notation) is:
+   이 예제는 평문 "Live long and prosper."을 수신자에게 AES Key Wrap을 키 암호화에,
+   AES_128_CBC_HMAC_SHA_256을 내용 암호화에 사용하여 암호화합니다. 이 평문의 표현( JSON 배열 표기법 사용)은:
 
    [76, 105, 118, 101, 32, 108, 111, 110, 103, 32, 97, 110, 100, 32,
    112, 114, 111, 115, 112, 101, 114, 46]
 
-<span class="h4"><a class="selflink" id="appendix-A.3.1" href="#appendix-A.3.1">A.3.1</a>.  JOSE Header</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.1" href="#appendix-A.3.1">A.3.1</a>.  JOSE 헤더</span>
 
-   The following example JWE Protected Header declares that:
+   다음 JWE 보호 헤더는 다음을 선언합니다:
 
-   o  The Content Encryption Key is encrypted to the recipient using the
-      AES Key Wrap algorithm with a 128-bit key to produce the JWE
-      Encrypted Key.
-   o  Authenticated encryption is performed on the plaintext using the
-      AES_128_CBC_HMAC_SHA_256 algorithm to produce the ciphertext and
-      the Authentication Tag.
+   o  콘텐츠 암호화 키(CEK)가 128비트 키를 사용하는 AES Key Wrap 알고리즘으로 수신자에게 암호화되어 JWE 암호화 키를 생성함.
+   o  인증된 암호화는 AES_128_CBC_HMAC_SHA_256 알고리즘을 사용하여 평문을 암호화하고 암호문 및 인증 태그를 생성함.
 
      {"alg":"A128KW","enc":"A128CBC-HS256"}
 
@@ -2486,50 +2389,48 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
-   Header)) gives this value:
+   이 JWE 보호 헤더를 BASE64URL(UTF8(JWE Protected
+   Header))로 인코딩하면 다음 값이 됩니다:
 
      eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0
 
-<span class="h4"><a class="selflink" id="appendix-A.3.2" href="#appendix-A.3.2">A.3.2</a>.  Content Encryption Key (CEK)</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.2" href="#appendix-A.3.2">A.3.2</a>.  콘텐츠 암호화 키(CEK)</span>
 
-   Generate a 256-bit random CEK.  In this example, the value is:
+   256비트의 무작위 CEK를 생성합니다.  이 예제에서 값은:
 
    [4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
    206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156,
    44, 207]
 
-<span class="h4"><a class="selflink" id="appendix-A.3.3" href="#appendix-A.3.3">A.3.3</a>.  Key Encryption</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.3" href="#appendix-A.3.3">A.3.3</a>.  키 암호화</span>
 
-   Encrypt the CEK with the shared symmetric key using the AES Key Wrap
-   algorithm to produce the JWE Encrypted Key.  This example uses the
-   symmetric key represented in JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] format below:
+   공유된 대칭 키를 사용하여 AES Key Wrap 알고리즘으로 CEK를 암호화하여 JWE 암호화 키를 생성합니다. 이 예제는 아래에 JSON Web Key [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] 형식으로 표현된 대칭 키를 사용합니다:
 
      {"kty":"oct",
       "k":"GawgguFyGrWKav7AX4VKUg"
      }
 
-   The resulting JWE Encrypted Key value is:
+   결과 JWE 암호화 키 값은:
 
    [232, 160, 123, 211, 183, 76, 245, 132, 200, 128, 123, 75, 190, 216,
    22, 67, 201, 138, 193, 186, 9, 91, 122, 31, 246, 90, 28, 139, 57, 3,
    76, 124, 193, 11, 98, 37, 173, 61, 104, 57]
 
-   Encoding this JWE Encrypted Key as BASE64URL(JWE Encrypted Key) gives
-   this value:
+   이 JWE 암호화 키를 BASE64URL(JWE Encrypted Key)로 인코딩하면
+   다음 값이 됩니다:
 
      6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ
 
-<span class="h4"><a class="selflink" id="appendix-A.3.4" href="#appendix-A.3.4">A.3.4</a>.  Initialization Vector</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.4" href="#appendix-A.3.4">A.3.4</a>.  초기화 벡터</span>
 
-   Generate a random 128-bit JWE Initialization Vector.  In this
-   example, the value is:
+   무작위 128비트 JWE 초기화 벡터를 생성합니다.  이
+   예제에서 값은:
 
    [3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104,
    101]
 
-   Encoding this JWE Initialization Vector as BASE64URL(JWE
-   Initialization Vector) gives this value:
+   이 JWE 초기화 벡터를 BASE64URL(JWE
+   Initialization Vector)로 인코딩하면 다음 값이 됩니다:
 
      AxY8DCtDaGlsbGljb3RoZQ
 
@@ -2542,51 +2443,46 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-<span class="h4"><a class="selflink" id="appendix-A.3.5" href="#appendix-A.3.5">A.3.5</a>.  Additional Authenticated Data</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.5" href="#appendix-A.3.5">A.3.5</a>.  추가 인증 데이터</span>
 
-   Let the Additional Authenticated Data encryption parameter be
-   ASCII(BASE64URL(UTF8(JWE Protected Header))).  This value is:
+   추가 인증 데이터 암호화 매개변수를
+   ASCII(BASE64URL(UTF8(JWE Protected Header)))로 둡니다.  이 값은:
 
    [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52,
    83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66,
    77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73,
    110, 48]
 
-<span class="h4"><a class="selflink" id="appendix-A.3.6" href="#appendix-A.3.6">A.3.6</a>.  Content Encryption</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.6" href="#appendix-A.3.6">A.3.6</a>.  내용 암호화</span>
 
-   Perform authenticated encryption on the plaintext with the
-   AES_128_CBC_HMAC_SHA_256 algorithm using the CEK as the encryption
-   key, the JWE Initialization Vector, and the Additional Authenticated
-   Data value above.  The steps for doing this using the values from
-   this example are detailed in <a href="#appendix-B">Appendix B</a>.  The resulting ciphertext
-   is:
+   CEK를 암호화 키로 사용하고, JWE 초기화 벡터 및 위의 추가 인증
+   데이터를 사용하여 AES_128_CBC_HMAC_SHA_256 알고리즘으로 평문에 대해 인증된 암호화를 수행합니다.  이 예제의 값을 사용하여 이를 수행하는 단계는 <a href="#appendix-B">부록 B</a>에 자세히 설명되어 있습니다.  결과 암호문은:
 
    [40, 57, 83, 181, 119, 33, 133, 148, 198, 185, 243, 24, 152, 230, 6,
    75, 129, 223, 127, 19, 210, 82, 183, 230, 168, 33, 215, 104, 143,
    112, 56, 102]
 
-   The resulting Authentication Tag value is:
+   결과 인증 태그 값은:
 
    [83, 73, 191, 98, 104, 205, 211, 128, 201, 189, 199, 133, 32, 38,
    194, 85]
 
-   Encoding this JWE Ciphertext as BASE64URL(JWE Ciphertext) gives this
-   value:
+   이 JWE 암호문을 BASE64URL(JWE Ciphertext)로 인코딩하면 다음
+   값이 됩니다:
 
      KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY
 
-   Encoding this JWE Authentication Tag as BASE64URL(JWE Authentication
-   Tag) gives this value:
+   이 JWE 인증 태그를 BASE64URL(JWE Authentication
+   Tag)로 인코딩하면 다음 값이 됩니다:
 
      U0m_YmjN04DJvceFICbCVQ
 
-<span class="h4"><a class="selflink" id="appendix-A.3.7" href="#appendix-A.3.7">A.3.7</a>.  Complete Representation</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.7" href="#appendix-A.3.7">A.3.7</a>.  완전한 표현</span>
 
-   Assemble the final representation: The Compact Serialization of this
-   result is the string BASE64URL(UTF8(JWE Protected Header)) || '.' ||
+   최종 표현을 조립합니다: 이 결과의 컴팩트 직렬화는 문자열 BASE64URL(UTF8(JWE Protected Header)) || '.' ||
    BASE64URL(JWE Encrypted Key) || '.' || BASE64URL(JWE Initialization
    Vector) || '.' || BASE64URL(JWE Ciphertext) || '.' || BASE64URL(JWE
-   Authentication Tag).
+   Authentication Tag) 입니다.
 
 
 
@@ -2598,8 +2494,7 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   The final result in this example (with line breaks for display
-   purposes only) is:
+   이 예제의 최종 결과(표시 목적의 줄 바꿈 포함)는:
 
      eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.
      6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ.
@@ -2607,34 +2502,21 @@ Copyright Notice
      KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY.
      U0m_YmjN04DJvceFICbCVQ
 
-<span class="h4"><a class="selflink" id="appendix-A.3.8" href="#appendix-A.3.8">A.3.8</a>.  Validation</span>
+<span class="h4"><a class="selflink" id="appendix-A.3.8" href="#appendix-A.3.8">A.3.8</a>.  검증</span>
 
-   This example illustrates the process of creating a JWE with AES Key
-   Wrap for key encryption and AES GCM for content encryption.  These
-   results can be used to validate JWE decryption implementations for
-   these algorithms.  Also, since both the AES Key Wrap and AES GCM
-   computations are deterministic, the resulting JWE value will be the
-   same for all encryptions performed using these inputs.  Since the
-   computation is reproducible, these results can also be used to
-   validate JWE encryption implementations for these algorithms.
+   이 예제는 키 암호화에 AES Key Wrap을, 내용 암호화에 AES GCM을 사용하여 JWE를 생성하는 과정을 설명합니다.  이러한 결과들은 이러한 알고리즘에 대한 JWE 복호화 구현을 검증하는 데 사용할 수 있습니다.  또한 AES Key Wrap과 AES GCM 계산은 둘 다 결정적이므로, 이 입력들을 사용하여 수행된 모든 암호화에 대해 생성되는 최종 JWE 값은 동일합니다.  계산이 재현 가능하므로, 이러한 결과들은 이러한 알고리즘에 대한 JWE 암호화 구현을 검증하는 데에도 사용할 수 있습니다.
 
-<span class="h3"><a class="selflink" id="appendix-A.4" href="#appendix-A.4">A.4</a>.  Example JWE Using General JWE JSON Serialization</span>
+<span class="h3"><a class="selflink" id="appendix-A.4" href="#appendix-A.4">A.4</a>.  일반 JWE JSON 직렬화 사용 예</span>
 
-   This section contains an example using the general JWE JSON
-   Serialization syntax.  This example demonstrates the capability for
-   encrypting the same plaintext to multiple recipients.
+   이 절에는 일반 JWE JSON 직렬화 구문을 사용하는 예제가 포함되어 있습니다.  이 예제는
+   동일한 평문을 여러 수신자에게 암호화할 수 있는 기능을 보여줍니다.
 
-   Two recipients are present in this example.  The algorithm and key
-   used for the first recipient are the same as that used in
-   <a href="#appendix-A.2">Appendix A.2</a>.  The algorithm and key used for the second recipient
-   are the same as that used in <a href="#appendix-A.3">Appendix A.3</a>.  The resulting JWE
-   Encrypted Key values are therefore the same; those computations are
-   not repeated here.
+   이 예제에는 두 개의 수신자가 있습니다.  첫 번째 수신자에게 사용된 알고리즘과 키는
+   <a href="#appendix-A.2">부록 A.2</a>에서 사용된 것과 동일합니다.  두 번째 수신자에게 사용된 알고리즘과 키는
+   <a href="#appendix-A.3">부록 A.3</a>에서 사용된 것과 동일합니다.  따라서 결과 JWE
+   암호화 키 값들도 동일합니다; 해당 계산들은 여기서 반복하지 않습니다.
 
-   The plaintext, the CEK, JWE Initialization Vector, and JWE Protected
-   Header are shared by all recipients (which must be the case, since
-   the ciphertext and Authentication Tag are also shared).
-
+   평문, CEK, JWE 초기화 벡터 및 JWE 보호 헤더는 암호문과 인증 태그도 공유되므로 모든 수신자에게 공유됩니다.
 
 
 
@@ -2656,46 +2538,44 @@ Copyright Notice
 
 <span class="h4"><a class="selflink" id="appendix-A.4.1" href="#appendix-A.4.1">A.4.1</a>.  JWE Per-Recipient Unprotected Headers</span>
 
-   The first recipient uses the RSAES-PKCS1-v1_5 algorithm to encrypt
-   the CEK.  The second uses AES Key Wrap to encrypt the CEK.  Key ID
-   values are supplied for both keys.  The two JWE Per-Recipient
-   Unprotected Header values used to represent these algorithms and key
-   IDs are:
+   첫 번째 수신자는 RSAES-PKCS1-v1_5 알고리즘을 사용하여
+   CEK를 암호화합니다.  두 번째 수신자는 CEK를 암호화하기 위해 AES Key Wrap을 사용합니다.  두 키
+   모두에 대해 Key ID 값이 제공됩니다.  이러한 알고리즘과 키를
+   나타내는 데 사용되는 두 개의 JWE 수신자별
+   비보호 헤더 값은 다음과 같습니다:
 
      {"alg":"RSA1_5","kid":"2011-04-29"}
 
-   and
+   그리고
 
      {"alg":"A128KW","kid":"7"}
 
 <span class="h4"><a class="selflink" id="appendix-A.4.2" href="#appendix-A.4.2">A.4.2</a>.  JWE Protected Header</span>
 
-   Authenticated encryption is performed on the plaintext using the
-   AES_128_CBC_HMAC_SHA_256 algorithm to produce the common JWE
-   Ciphertext and JWE Authentication Tag values.  The JWE Protected
-   Header value representing this is:
+   평문에 대해 AES_128_CBC_HMAC_SHA_256 알고리즘을 사용하여
+   인증된 암호화를 수행하여 공통 JWE
+   Ciphertext 및 JWE Authentication Tag 값을 생성합니다.  이를 나타내는 JWE 보호
+   헤더 값은 다음과 같습니다:
 
      {"enc":"A128CBC-HS256"}
 
-   Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
-   Header)) gives this value:
+   이 JWE 보호 헤더를 BASE64URL(UTF8(JWE Protected
+   Header))로 인코딩하면 다음 값이 됩니다:
 
      eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0
 
 <span class="h4"><a class="selflink" id="appendix-A.4.3" href="#appendix-A.4.3">A.4.3</a>.  JWE Shared Unprotected Header</span>
 
-   This JWE uses the "jku" Header Parameter to reference a JWK Set.
-   This is represented in the following JWE Shared Unprotected Header
-   value as:
+   이 JWE는 JWK 세트를 참조하기 위해 "jku" 헤더 매개변수를 사용합니다.
+   이는 다음 JWE 공유 비보호 헤더 값으로 표현됩니다:
 
      {"jku":"https://server.example.com/keys.jwks"}
 
 <span class="h4"><a class="selflink" id="appendix-A.4.4" href="#appendix-A.4.4">A.4.4</a>.  Complete JOSE Header Values</span>
 
-   Combining the JWE Per-Recipient Unprotected Header, JWE Protected
-   Header, and JWE Shared Unprotected Header values supplied, the JOSE
-   Header values used for the first and second recipient, respectively,
-   are:
+   제공된 JWE 수신자별 비보호 헤더, JWE 보호 헤더, 및 JWE 공유 비보호 헤더 값을 결합하면,
+   각각 첫 번째 및 두 번째 수신자에 대해 사용되는 JOSE
+   헤더 값은 다음과 같습니다:
 
      {"alg":"RSA1_5",
       "kid":"2011-04-29",
@@ -2719,37 +2599,34 @@ Copyright Notice
 
 <span class="h4"><a class="selflink" id="appendix-A.4.5" href="#appendix-A.4.5">A.4.5</a>.  Additional Authenticated Data</span>
 
-   Let the Additional Authenticated Data encryption parameter be
-   ASCII(BASE64URL(UTF8(JWE Protected Header))).  This value is:
+   추가 인증 데이터 암호화 매개변수를
+   ASCII(BASE64URL(UTF8(JWE Protected Header)))로 둡니다.  이 값은:
 
    [101, 121, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66, 77, 84, 73,
    52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73, 110, 48]
 
 <span class="h4"><a class="selflink" id="appendix-A.4.6" href="#appendix-A.4.6">A.4.6</a>.  Content Encryption</span>
 
-   Perform authenticated encryption on the plaintext with the
-   AES_128_CBC_HMAC_SHA_256 algorithm using the CEK as the encryption
-   key, the JWE Initialization Vector, and the Additional Authenticated
-   Data value above.  The steps for doing this using the values from
-   <a href="#appendix-A.3">Appendix A.3</a> are detailed in <a href="#appendix-B">Appendix B</a>.  The resulting ciphertext
-   is:
+   CEK를 암호화 키로 사용하고, JWE 초기화 벡터 및 위의 추가 인증
+   데이터를 사용하여 AES_128_CBC_HMAC_SHA_256 알고리즘으로 평문에 대해 인증된 암호화를 수행합니다.  <a href="#appendix-A.3">부록 A.3</a>의 값을 사용하여 이를 수행하는 단계는 <a href="#appendix-B">부록 B</a>에 자세히 설명되어 있습니다.  결과 암호문
+   은:
 
    [40, 57, 83, 181, 119, 33, 133, 148, 198, 185, 243, 24, 152, 230, 6,
    75, 129, 223, 127, 19, 210, 82, 183, 230, 168, 33, 215, 104, 143,
    112, 56, 102]
 
-   The resulting Authentication Tag value is:
+   결과 인증 태그 값은:
 
    [51, 63, 149, 60, 252, 148, 225, 25, 92, 185, 139, 245, 35, 2, 47,
    207]
 
-   Encoding this JWE Ciphertext as BASE64URL(JWE Ciphertext) gives this
-   value:
+   이 JWE 암호문을 BASE64URL(JWE Ciphertext)로 인코딩하면 다음
+   값이 됩니다:
 
      KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY
 
-   Encoding this JWE Authentication Tag as BASE64URL(JWE Authentication
-   Tag) gives this value:
+   이 JWE 인증 태그를 BASE64URL(JWE Authentication
+   Tag)로 인코딩하면 다음 값이 됩니다:
 
      Mz-VPPyU4RlcuYv1IwIvzw
 
@@ -2768,8 +2645,8 @@ Copyright Notice
 
 <span class="h4"><a class="selflink" id="appendix-A.4.7" href="#appendix-A.4.7">A.4.7</a>.  Complete JWE JSON Serialization Representation</span>
 
-   The complete JWE JSON Serialization for these values is as follows
-   (with line breaks within values for display purposes only):
+   이러한 값들에 대한 완전한 JWE JSON 직렬화는 다음과 같습니다
+   (값 내부의 줄 바꿈은 표시 목적입니다):
 
      {
       "protected":
@@ -2800,17 +2677,11 @@ Copyright Notice
 
 <span class="h3"><a class="selflink" id="appendix-A.5" href="#appendix-A.5">A.5</a>.  Example JWE Using Flattened JWE JSON Serialization</span>
 
-   This section contains an example using the flattened JWE JSON
-   Serialization syntax.  This example demonstrates the capability for
-   encrypting the plaintext to a single recipient in a flattened JSON
-   structure.
+   이 절에는 플래트닝된 JWE JSON 직렬화 구문을 사용하는 예제가 포함되어 있습니다.  이 예제는
+   평문을 단일 수신자에게 플래트닝된 JSON 구조로 암호화하는 기능을 보여줍니다.
 
-   The values in this example are the same as those for the second
-   recipient of the previous example in <a href="#appendix-A.4">Appendix A.4</a>.
-
-
-
-
+   이 예제의 값들은 이전 예제의 두 번째
+   수신자에 대한 값들과 동일합니다(<a href="#appendix-A.4">부록 A.4</a>).
 
 
 
@@ -2822,8 +2693,8 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   The complete JWE JSON Serialization for these values is as follows
-   (with line breaks within values for display purposes only):
+   이러한 값들에 대한 완전한 JWE JSON 직렬화는 다음과 같습니다
+   (값 내부의 줄 바꿈은 표시 목적입니다):
 
      {
       "protected":
@@ -2844,27 +2715,24 @@ Copyright Notice
 
 <span class="h2"><a class="selflink" id="appendix-B" href="#appendix-B">Appendix B</a>.  Example AES_128_CBC_HMAC_SHA_256 Computation</span>
 
-   This example shows the steps in the AES_128_CBC_HMAC_SHA_256
-   authenticated encryption computation using the values from the
-   example in <a href="#appendix-A.3">Appendix A.3</a>.  As described where this algorithm is
-   defined in Sections <a href="#section-5.2">5.2</a> and <a href="#section-5.2.3">5.2.3</a> of JWA, the AES_CBC_HMAC_SHA2
-   family of algorithms are implemented using Advanced Encryption
-   Standard (AES) in Cipher Block Chaining (CBC) mode with Public-Key
-   Cryptography Standards (PKCS) #7 padding to perform the encryption
-   and an HMAC SHA-2 function to perform the integrity calculation -- in
-   this case, HMAC SHA-256.
+   이 예제는 <a href="#appendix-A.3">부록 A.3</a>의 값을 사용하여 AES_128_CBC_HMAC_SHA_256
+   인증된 암호화 계산에서의 단계를 보여줍니다. JWA의 해당 알고리즘이
+   정의된 섹션 <a href="#section-5.2">5.2</a> 및 <a href="#section-5.2.3">5.2.3</a>에서 설명된 바와 같이,
+   AES_CBC_HMAC_SHA2 계열 알고리즘은 고급 암호 표준(AES)을 사용한
+   암호 블록 연결(CBC) 모드와 PKCS #7 패딩을 결합하여 암호화를 수행하고,
+   무결성 계산을 수행하기 위해 HMAC SHA-2 함수를 사용하는 방식으로 구현됩니다 — 이 경우 HMAC SHA-256입니다.
 
 <span class="h3"><a class="selflink" id="appendix-B.1" href="#appendix-B.1">B.1</a>.  Extract MAC_KEY and ENC_KEY from Key</span>
 
-   The 256 bit AES_128_CBC_HMAC_SHA_256 key K used in this example
-   (using JSON array notation) is:
+   이 예제에서 사용된 256비트 AES_128_CBC_HMAC_SHA_256 키 K는
+   (JSON 배열 표기법 사용) 다음과 같습니다:
 
    [4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
    206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156,
    44, 207]
 
-   Use the first 128 bits of this key as the HMAC SHA-256 key MAC_KEY,
-   which is:
+   이 키의 처음 128비트를 HMAC SHA-256 키인 MAC_KEY로 사용합니다.
+   그 값은 다음과 같습니다:
 
    [4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
    206]
@@ -2878,25 +2746,24 @@ Copyright Notice
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   Use the last 128 bits of this key as the AES-CBC key ENC_KEY, which
-   is:
+   이 키의 마지막 128비트를 AES-CBC 키인 ENC_KEY로 사용합니다. 그
+   값은 다음과 같습니다:
 
    [107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156, 44,
    207]
 
-   Note that the MAC key comes before the encryption key in the input
-   key K; this is in the opposite order of the algorithm names in the
-   identifiers "AES_128_CBC_HMAC_SHA_256" and "A128CBC-HS256".
+   MAC 키가 입력 키 K에서 암호화 키보다 먼저 온다는 점에 유의하십시오; 이는 식별자
+   "AES_128_CBC_HMAC_SHA_256" 및 "A128CBC-HS256"에 있는 알고리즘 이름의 순서와는 반대입니다.
 
 <span class="h3"><a class="selflink" id="appendix-B.2" href="#appendix-B.2">B.2</a>.  Encrypt Plaintext to Create Ciphertext</span>
 
-   Encrypt the plaintext with AES in CBC mode using PKCS #7 padding
-   using the ENC_KEY above.  The plaintext in this example is:
+   위의 ENC_KEY를 사용하여 PKCS #7 패딩을 적용한 AES CBC 모드로
+   평문을 암호화합니다. 이 예제의 평문은:
 
    [76, 105, 118, 101, 32, 108, 111, 110, 103, 32, 97, 110, 100, 32,
    112, 114, 111, 115, 112, 101, 114, 46]
 
-   The encryption result is as follows, which is the ciphertext output:
+   암호화 결과는 다음과 같으며, 이는 암호문 출력입니다:
 
    [40, 57, 83, 181, 119, 33, 133, 148, 198, 185, 243, 24, 152, 230, 6,
    75, 129, 223, 127, 19, 210, 82, 183, 230, 168, 33, 215, 104, 143,
@@ -2904,22 +2771,21 @@ Copyright Notice
 
 <span class="h3"><a class="selflink" id="appendix-B.3" href="#appendix-B.3">B.3</a>.  64-Bit Big-Endian Representation of AAD Length</span>
 
-   The Additional Authenticated Data (AAD) in this example is:
+   이 예제의 추가 인증 데이터(AAD)는 다음과 같습니다:
 
    [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52,
    83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66,
    77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73,
    110, 48]
 
-   This AAD is 51-bytes long, which is 408-bits long.  The octet string
-   AL, which is the number of bits in AAD expressed as a big-endian
-   64-bit unsigned integer is:
+   이 AAD는 51바이트이며, 이는 408비트입니다.  AAD의 비트 수를 빅엔디안
+   64비트 부호 없는 정수로 표현한 옥텟 문자열 AL은 다음과 같습니다:
 
    [0, 0, 0, 0, 0, 0, 1, 152]
 
 <span class="h3"><a class="selflink" id="appendix-B.4" href="#appendix-B.4">B.4</a>.  Initialization Vector Value</span>
 
-   The Initialization Vector value used in this example is:
+   이 예제에서 사용된 초기화 벡터 값은 다음과 같습니다:
 
    [3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104,
    101]
@@ -2936,8 +2802,7 @@ Copyright Notice
 
 <span class="h3"><a class="selflink" id="appendix-B.5" href="#appendix-B.5">B.5</a>.  Create Input to HMAC Computation</span>
 
-   Concatenate the AAD, the Initialization Vector, the ciphertext, and
-   the AL value.  The result of this concatenation is:
+   AAD, 초기화 벡터, 암호문, 및 AL 값을 연결합니다. 이 연결의 결과는:
 
    [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52,
    83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66,
@@ -2949,8 +2814,7 @@ Copyright Notice
 
 <span class="h3"><a class="selflink" id="appendix-B.6" href="#appendix-B.6">B.6</a>.  Compute HMAC Value</span>
 
-   Compute the HMAC SHA-256 of the concatenated value above.  This
-   result M is:
+   위에서 연결한 값의 HMAC SHA-256을 계산합니다. 이 결과 M은:
 
    [83, 73, 191, 98, 104, 205, 211, 128, 201, 189, 199, 133, 32, 38,
    194, 85, 9, 84, 229, 201, 219, 135, 44, 252, 145, 102, 179, 140, 105,
@@ -2958,30 +2822,25 @@ Copyright Notice
 
 <span class="h3"><a class="selflink" id="appendix-B.7" href="#appendix-B.7">B.7</a>.  Truncate HMAC Value to Create Authentication Tag</span>
 
-   Use the first half (128 bits) of the HMAC output M as the
-   Authentication Tag output T.  This truncated value is:
+   HMAC 출력 M의 앞 절반(128비트)을 인증 태그 출력 T로 사용합니다. 이 잘린 값은:
 
    [83, 73, 191, 98, 104, 205, 211, 128, 201, 189, 199, 133, 32, 38,
    194, 85]
 
 Acknowledgements
 
-   Solutions for encrypting JSON content were also explored by "JSON
-   Simple Encryption" [<a href="#ref-JSE" title="&quot;JSON Simple Encryption&quot;">JSE</a>] and "JavaScript Message Security Format"
-   [<a href="#ref-JSMS" title="&quot;JavaScript Message Security Format&quot;">JSMS</a>], both of which significantly influenced this document.  This
-   document attempts to explicitly reuse as many of the relevant
-   concepts from XML Encryption 1.1 [<a href="#ref-W3C.REC-xmlenc-core1-20130411">W3C.REC-xmlenc-core1-20130411</a>] and
-   <a href="./rfc5652">RFC 5652</a> [<a href="./rfc5652" title="&quot;Cryptographic Message Syntax (CMS)&quot;">RFC5652</a>] as possible, while utilizing simple, compact JSON-
-   based data structures.
+   JSON 콘텐츠 암호화에 대한 솔루션은 "JSON Simple Encryption"
+   [<a href="#ref-JSE" title="&quot;JSON Simple Encryption&quot;">JSE</a>] 및 "JavaScript Message
+   Security Format" [<a href="#ref-JSMS" title="&quot;JavaScript Message Security Format&quot;">JSMS</a>]에서도 탐구되었으며, 이들 모두는 본 문서에 상당한 영향을 주었습니다.  이
+   문서는 가능한 한 XML Encryption 1.1 [<a href="#ref-W3C.REC-xmlenc-core1-20130411">W3C.REC-xmlenc-core1-20130411</a>] 및
+   <a href="./rfc5652">RFC 5652</a> [<a href="./rfc5652" title="&quot;Cryptographic Message Syntax (CMS)&quot;">RFC5652</a>]의 관련 개념들을 명시적으로 재사용하려고 시도하면서,
+   단순하고 컴팩트한 JSON 기반 데이터 구조를 활용합니다.
 
-   Special thanks are due to John Bradley, Eric Rescorla, and Nat
-   Sakimura for the discussions that helped inform the content of this
-   specification; to Eric Rescorla and Joe Hildebrand for allowing the
-   reuse of text from [<a href="#ref-JSMS" title="&quot;JavaScript Message Security Format&quot;">JSMS</a>] in this document; and to Eric Rescorla for
-   co-authoring many drafts of this specification.
+   이 사양의 내용을 형성하는 데 도움을 준 논의에 대해 John Bradley, Eric Rescorla,
+   Nat Sakimura에게 특별히 감사드립니다; 본 문서에서 [<a href="#ref-JSMS" title="&quot;JavaScript Message Security Format&quot;">JSMS</a>]의 텍스트 재사용을 허용해 준 Eric Rescorla와 Joe Hildebrand에게도 감사드립니다; 그리고 이 사양의 많은 초안을 공동 저술한 Eric Rescorla에게도 감사드립니다.
 
-   Thanks to Axel Nennker, Emmanuel Raviart, Brian Campbell, and Edmund
-   Jay for validating the examples in this specification.
+   예제의 검증에 도움을 준 Axel Nennker, Emmanuel Raviart, Brian Campbell, 및 Edmund
+   Jay에게 감사드립니다.
 
 
 
@@ -2990,10 +2849,8 @@ Acknowledgements
 <span class="grey"><a href="./rfc7516">RFC 7516</a>                JSON Web Encryption (JWE)               May 2015</span>
 
 
-   This specification is the work of the JOSE working group, which
-   includes dozens of active and dedicated participants.  In particular,
-   the following individuals contributed ideas, feedback, and wording
-   that influenced this specification:
+   이 사양은 JOSE 작업 그룹의 산물이며, 수십 명의 활동적이고 헌신적인 참가자를 포함합니다. 특히,
+   다음 개인들은 이 사양에 아이디어, 피드백 및 문구적 기여를 했습니다:
 
    Richard Barnes, John Bradley, Brian Campbell, Alissa Cooper, Breno de
    Medeiros, Stephen Farrell, Dick Hardt, Jeff Hodges, Russ Housley,
@@ -3002,9 +2859,9 @@ Acknowledgements
    Nennker, Ray Polk, Emmanuel Raviart, Eric Rescorla, Pete Resnick, Nat
    Sakimura, Jim Schaad, Hannes Tschofenig, and Sean Turner.
 
-   Jim Schaad and Karen O'Donoghue chaired the JOSE working group and
-   Sean Turner, Stephen Farrell, and Kathleen Moriarty served as
-   Security Area Directors during the creation of this specification.
+   Jim Schaad 및 Karen O'Donoghue가 JOSE 작업 그룹을 의장했으며
+   Sean Turner, Stephen Farrell, 및 Kathleen Moriarty가 이 사양 작성 기간 동안
+   보안 영역 이사(Security Area Directors)로 봉사했습니다.
 
 Authors' Addresses
 
@@ -3040,9 +2897,9 @@ Authors' Addresses
 
 
 
-
 Jones &amp; Hildebrand           Standards Track                   [Page 51]
 </pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
 
 </body>
 </html>
