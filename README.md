@@ -176,6 +176,10 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Trusted Types](https://ko.htmlspecs.com/trusted-types/)（[Source](https://www.w3.org/TR/2025/WD-trusted-types-20251103/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Clear Site Data](https://ko.htmlspecs.com/clear-site-data/)（[Source](https://www.w3.org/TR/2017/WD-clear-site-data-20171130/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [JSON Web Token (JWT)](https://ko.htmlspecs.com/jwt/)（[Source](https://www.rfc-editor.org/rfc/rfc7519) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [JSON Web Signature (JWS)](https://ko.htmlspecs.com/jws/)（[Source](https://www.rfc-editor.org/rfc/rfc7515) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [JSON Web Encryption (JWE)](https://ko.htmlspecs.com/jwe/)（[Source](https://www.rfc-editor.org/rfc/rfc7516) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [JSON Web Key (JWK)](https://ko.htmlspecs.com/jwk/)（[Source](https://www.rfc-editor.org/rfc/rfc7517) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [JSON Web Algorithms (JWA)](https://ko.htmlspecs.com/jwa/)（[Source](https://www.rfc-editor.org/rfc/rfc7518) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### 미디어 및 그래픽
 - [WebGPU](https://ko.htmlspecs.com/webgpu/)（[Source](https://www.w3.org/TR/2026/CRD-webgpu-20260112/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
