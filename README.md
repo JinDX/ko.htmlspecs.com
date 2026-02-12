@@ -85,7 +85,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 디바이스 및 하드웨어 접근
 - [Pointer Events Level 2](https://ko.htmlspecs.com/pointerevents2/)（[Source](https://www.w3.org/TR/2019/REC-pointerevents2-20190404/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Pointer Events Level 3](https://ko.htmlspecs.com/pointerevents3/)（[Source](https://www.w3.org/TR/2026/CRD-pointerevents3-20260212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [Pointer Events Level 4](https://ko.htmlspecs.com/pointerevents4/)（[Source](https://www.w3.org/TR/2025/WD-pointerevents4-20251216/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Pointer Events Level 4](https://ko.htmlspecs.com/pointerevents4/)（[Source](https://www.w3.org/TR/2026/WD-pointerevents4-20260211/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Web Serial API](https://ko.htmlspecs.com/serial/)（[Source](https://wicg.github.io/serial/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebHID API](https://ko.htmlspecs.com/webhid/)（[Source](https://wicg.github.io/webhid/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebUSB API](https://ko.htmlspecs.com/webusb/)（[Source](https://wicg.github.io/webusb/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
