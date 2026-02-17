@@ -1,5 +1,5 @@
 # ko.htmlspecs.com
-HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡🇰🇷
+HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡🇰🇷🇰🇵
 
 ### 핵심 표준
 - [HTML](https://ko.htmlspecs.com/)（[Source](https://html.spec.whatwg.org/multipage/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
