@@ -34,7 +34,7 @@
         src=https://resources.whatwg.org/logo.svg height=100></a>
     <hgroup>
       <h1 class=allcaps>HTML</h1>
-      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 2월 17일</span>
+      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 2월 19일</span>
     </hgroup>
 
     <nav>
@@ -63,7 +63,7 @@
         <a href=https://github.com/whatwg/html/commits class=changes><span><strong>커밋</strong>
             <code>on GitHub</code></span></a>
         <a id=commit-snapshot-link
-          href=https://html.spec.whatwg.org/commit-snapshots/ca2c39f8b00af774bd9123a3284f6ab25dca35cb/
+          href=https://html.spec.whatwg.org/commit-snapshots/8708cf38e7d4a51e5d3afa0885fe8a51c4e6f139/
           class=changes><span><strong>스냅샷</strong> <code>as of this commit</code></span></a>
         <a href=https://twitter.com/htmlstandard class=changes><span><strong>트위터 업데이트</strong>
             <code>@htmlstandard</code></span></a>
@@ -281,13 +281,17 @@
       <ol>
         <li><a href=#documents><span class=secno>3.1</span> 문서</a>
           <ol>
-            <li><a href=#the-document-object><span class=secno>3.1.1</span> <code>Document</code> 객체</a>
-            <li><a href=#the-documentorshadowroot-interface><span class=secno>3.1.2</span>
-                <code>DocumentOrShadowRoot</code> 인터페이스</a>
-            <li><a href=#resource-metadata-management><span class=secno>3.1.3</span> 리소스 메타데이터 관리</a>
-            <li><a href=#reporting-document-loading-status><span class=secno>3.1.4</span> 문서 로딩 상태 보고</a>
-            <li><a href=#render-blocking-mechanism><span class=secno>3.1.5</span> 렌더 차단 메커니즘</a>
-            <li><a href=#dom-tree-accessors><span class=secno>3.1.6</span> DOM 트리 접근자</a>
+            <li><a href="#the-document-object"><span class="secno">3.1.1</span> <code>Document</code> 객체</a>
+            </li>
+            <li><a href="#the-documentorshadowroot-interface"><span class="secno">3.1.2</span>
+                <code>DocumentOrShadowRoot</code> 인터페이스</a></li>
+            <li><a href="#ancestor-origins"><span class="secno">3.1.3</span> 상위(origin) 출처</a></li>
+            <li><a href="#resource-metadata-management"><span class="secno">3.1.4</span> 리소스 메타데이터
+                관리</a></li>
+            <li><a href="#reporting-document-loading-status"><span class="secno">3.1.5</span> 문서 로딩
+                상태 보고</a></li>
+            <li><a href="#render-blocking-mechanism"><span class="secno">3.1.6</span> 렌더링 차단 메커니즘</a></li>
+            <li><a href="#dom-tree-accessors"><span class="secno">3.1.7</span> DOM 트리 접근자</a></li>
           </ol>
         <li><a href=#elements><span class=secno>3.2</span> 요소</a>
           <ol>
@@ -16907,18 +16911,132 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
   <c- b>readonly</c-> <c- b>attribute</c-> <a id='the-documentorshadowroot-interface:element' href='https://dom.spec.whatwg.org/#interface-element' data-x-internal='element'><c- n>Element</c-></a>? <a href='#dom-documentorshadowroot-activeelement' id='the-documentorshadowroot-interface:dom-documentorshadowroot-activeelement'><c- g>activeElement</c-></a>;
 };</code></pre>
 
-  <h4 id=resource-metadata-management><span class=secno>3.1.3</span> <dfn>리소스 메타데이터 관리</dfn><a
-      href=#resource-metadata-management class=self-link></a></h4>
+  <h4 id="ancestor-origins"><span class="secno">3.1.3</span> 상위 출처(ancestor origins)<a href="#ancestor-origins"
+      class="self-link"></a></h4>
 
-  <dl class=domintro>
-    <dt><code><var>document</var>.<a href=#dom-document-referrer id=dom-document-referrer-dev>referrer</a></code>
-      <div class="mdn-anno wrapped before"><button onclick=toggleStatus(this) class=mdn-anno-btn><b
-            title="모든 최신 엔진에서 지원됨." class=all-engines-flag>✔</b><span>MDN</span></button>
-        <div class=feature>
-          <p><a href=https://developer.mozilla.org/en-US/docs/Web/API/Document/referrer
-              title="Document.referrer 속성은 이 페이지에 연결된 페이지의 URI를 반환합니다.">Document/referrer</a>
-          <p class=all-engines-text>모든 최신 엔진에서 지원됨.
-          <div class=support><span class="firefox yes"><span>Firefox</span><span>1+</span></span><span
+  <div data-algorithm="">
+    <p><code id="ancestor-origins:document"><a href="#document">Document</a></code> 객체는 관련된 <dfn data-dfn-for="Document"
+        id="concept-document-internal-ancestor-origin-objects-list" data-export="">내부 상위 출처 객체
+        목록</dfn>을 가지며, 처음에는 null이다.</p>
+
+    <p><dfn id="internal-ancestor-origin-objects-list-creation-steps">내부 상위 출처 객체 목록 생성 단계</dfn>는
+      <code id="ancestor-origins:document-2"><a href="#document">Document</a></code> 객체
+      <var>innerDoc</var>이 주어졌을 때:
+    </p>
+
+    <ol>
+      <li>
+        <p><var>output</var>을 « »로 설정한다.</p>
+      </li>
+      <li>
+        <p><var>parentDoc</var>을 <var>innerDoc</var>의 <a href="#doc-container-document"
+            id="ancestor-origins:doc-container-document">컨테이너 문서</a>로 설정한다.</p>
+      </li>
+      <li>
+        <p><var>parentDoc</var>이 null이면 <var>output</var>을 반환한다.</p>
+      </li>
+      <li>
+        <p><a id="ancestor-origins:assert" href="https://infra.spec.whatwg.org/#assert" data-x-internal="assert">단언:</a>
+          <var>parentDoc</var>는 <a href="#fully-active" id="ancestor-origins:fully-active">완전히 활성화된</a> 상태이다.
+        </p>
+      </li>
+      <li>
+        <p><var>ancestorOrigins</var>를 <var>parentDoc</var>의 <a
+            href="#concept-document-internal-ancestor-origin-objects-list"
+            id="ancestor-origins:concept-document-internal-ancestor-origin-objects-list">내부 상위 출처 객체
+            목록</a>으로 설정한다.</p>
+      </li>
+      <li>
+        <p><a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append"
+            data-x-internal="list-append">추가</a>: <var>parentDoc</var>의 <a
+            href="https://dom.spec.whatwg.org/#concept-document-origin" id="ancestor-origins:concept-document-origin"
+            data-x-internal="concept-document-origin">origin</a>을 <var>output</var>에 추가한다.</p>
+      </li>
+      <li>
+        <p><a href="https://infra.spec.whatwg.org/#list-iterate" id="ancestor-origins:list-iterate"
+            data-x-internal="list-iterate">각</a> <var>ancestorOrigin</var>이
+          <var>ancestorOrigins</var>에 대해:
+        </p>
+
+        <ol>
+          <li>
+            <p><a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append-2"
+                data-x-internal="list-append">추가</a>:
+              <var>ancestorOrigin</var>을
+              <var>output</var>에 추가한다.
+            </p>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <p><var>output</var>을 반환한다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p><code id="ancestor-origins:document-3"><a href="#document">Document</a></code> 객체는 관련된 <dfn
+        data-dfn-for="Document" id="concept-document-ancestor-origins-list" data-export="">상위 출처 목록</dfn>을 가지며,
+      처음에는 null이다.</p>
+
+    <p><dfn id="ancestor-origins-list-creation-steps">상위 출처 목록 생성 단계</dfn>는 <code
+        id="ancestor-origins:document-4"><a href="#document">Document</a></code> 객체
+      <var>document</var>가 주어졌을 때:
+    </p>
+
+    <ol>
+      <li>
+        <p><var>ancestorOrigins</var>를 <var>document</var>의 <a
+            href="#concept-document-internal-ancestor-origin-objects-list"
+            id="ancestor-origins:concept-document-internal-ancestor-origin-objects-list-2">내부 상위 출처 객체
+            목록</a>으로 설정한다.</p>
+      </li>
+      <li>
+        <p><a id="ancestor-origins:assert-2" href="https://infra.spec.whatwg.org/#assert"
+            data-x-internal="assert">단언:</a> <var>ancestorOrigins</var>는 null이 아니다.</p>
+      </li>
+      <li>
+        <p><var>output</var>을 « »로 설정한다.</p>
+      </li>
+      <li>
+        <p><a href="https://infra.spec.whatwg.org/#list-iterate" id="ancestor-origins:list-iterate-2"
+            data-x-internal="list-iterate">각</a> <var>origin</var>이
+          <var>ancestorOrigins</var>에 대해:
+        </p>
+
+        <ol>
+          <li>
+            <p><a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append-3"
+                data-x-internal="list-append">추가</a>: <var>origin</var>의 <a href="#ascii-serialisation-of-an-origin"
+                id="ancestor-origins:ascii-serialisation-of-an-origin">직렬화(serialization)</a>를 <var>output</var>에
+              추가한다.
+            </p>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <p>관련된 목록이 <var>output</var>인 새로운 <code
+            id="ancestor-origins:domstringlist"><a href="#domstringlist">DOMStringList</a></code>
+          객체를 반환한다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+
+  <h4 id="resource-metadata-management"><span class="secno">3.1.4</span> <dfn>리소스 메타데이터 관리</dfn><a
+      href="#resource-metadata-management" class="self-link"></a></h4>
+
+  <dl class="domintro">
+    <dt><code><var>document</var>.<a href="#dom-document-referrer" id="dom-document-referrer-dev">referrer</a></code>
+      <div class="mdn-anno wrapped before"><button onclick="toggleStatus(this)" class="mdn-anno-btn"><b
+            title="Support in all current engines." class="all-engines-flag">✔</b><span>MDN</span></button>
+        <div class="feature">
+          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/referrer"
+              title="The Document.referrer property returns the URI of the page that linked to this page.">Document/referrer</a>
+          </p>
+          <p class="all-engines-text">모든 현재 엔진에서 지원됨.</p>
+          <div class="support"><span class="firefox yes"><span>Firefox</span><span>1+</span></span><span
               class="safari yes"><span>Safari</span><span>1+</span></span><span
               class="chrome yes"><span>Chrome</span><span>1+</span></span>
             <hr><span class="opera yes"><span>Opera</span><span>3+</span></span><span
@@ -16929,57 +17047,71 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
               class="safari_ios unknown"><span>Safari iOS</span><span>?</span></span><span
               class="chrome_android unknown"><span>Chrome Android</span><span>?</span></span><span
               class="webview_android unknown"><span>WebView Android</span><span>?</span></span><span
-              class="samsunginternet_android unknown"><span>Samsung
-                Internet</span><span>?</span></span><span class="opera_android yes"><span>Opera
-                Android</span><span>10.1+</span></span>
+              class="samsunginternet_android unknown"><span>Samsung Internet</span><span>?</span></span><span
+              class="opera_android yes"><span>Opera Android</span><span>10.1+</span></span>
           </div>
         </div>
       </div>
+    </dt>
     <dd>
-      <p>사용자가 이 문서로 이동한 출발지 문서의 <a href=https://dom.spec.whatwg.org/#concept-document-url
+      <p>사용자가 이 문서로 이동하기 전 방문했던 <a href="https://dom.spec.whatwg.org/#concept-document-url"
           id="resource-metadata-management:the-document's-address" data-x-internal="the-document's-address">URL</a>을
-        반환합니다. 다만, 차단되었거나 그런 문서가 없었던 경우에는 빈 문자열을 반환합니다.
-      </p>
+        반환한다. 차단되었거나 그런 문서가 없으면 빈 문자열을 반환한다.</p>
 
-      <p><code id=resource-metadata-management:link-type-noreferrer><a href=#link-type-noreferrer>noreferrer</a></code>
-        링크 유형을 사용하여 참조자를 차단할 수 있습니다.</p>
+      <p><code
+          id="resource-metadata-management:link-type-noreferrer"><a href="#link-type-noreferrer">noreferrer</a></code>
+        링크 타입을 사용하여
+        referrer를 차단할 수 있다.</p>
+    </dd>
   </dl>
 
+
+
   <div data-algorithm="">
-    <p><dfn data-dfn-for=Document id=dom-document-referrer data-dfn-type=attribute><code>referrer</code></dfn> 속성은 <a
-        href="#the-document's-referrer" id="resource-metadata-management:the-document's-referrer">문서의 참조자</a>를 반환해야
-      합니다.</p>
+    <p><dfn data-dfn-for="Document" id="dom-document-referrer" data-dfn-type="attribute"><code>referrer</code></dfn>
+      특성은 <a href="#the-document's-referrer" id="resource-metadata-management:the-document's-referrer">문서의 referrer</a>를
+      반환해야 한다.</p>
   </div>
+
+
 
   <hr>
 
-  <dl class=domintro>
+  <dl class="domintro">
     <dt>
-      <code><var>document</var>.<a href=#dom-document-cookie id=dom-document-cookie-dev>cookie</a> [ = <var>value</var> ]</code>
+      <code><var>document</var>.<a href="#dom-document-cookie" id="dom-document-cookie-dev">cookie</a> [ = <var>value</var> ]</code>
+    </dt>
     <dd>
-      <p><code id=resource-metadata-management:document-2><a href=#document>document</a></code>에 적용되는 HTTP 쿠키를
-        반환합니다.
-        쿠키가 없거나 이 리소스에 쿠키를 적용할 수 없는 경우 빈 문자열이 반환됩니다.</p>
+      <p><code id="resource-metadata-management:document-2"><a href="#document">Document</a></code>에 적용되는 HTTP 쿠키를 반환한다.
+        쿠키가 없거나
+        이 리소스에 쿠키를 적용할 수 없는 경우, 빈 문자열이 반환된다.</p>
 
-      <p>새 쿠키를 추가하기 위해 설정할 수 있습니다.</p>
+      <p>새로운 쿠키를 해당 요소의 HTTP 쿠키 집합에 추가하기 위해 설정할 수 있다.</p>
 
-      <p>내용이 <code id=resource-metadata-management:the-iframe-element><a href=#the-iframe-element>iframe</a></code>에
-        <code id=resource-metadata-management:attr-iframe-sandbox><a href=#attr-iframe-sandbox>sandbox</a></code>
-        속성을 사용하여 불투명한 출처로 샌드박스화된 경우 <a id=resource-metadata-management:securityerror
-          href=https://webidl.spec.whatwg.org/#securityerror
-          data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-          id=resource-metadata-management:domexception><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>이
-        발생합니다.
+      <p>내용이 <a href="#sandboxed-origin-browsing-context-flag"
+          id="resource-metadata-management:sandboxed-origin-browsing-context-flag">불투명 출처(opaque origin)</a>로
+        샌드박싱되어 있으면(예: <code
+          id="resource-metadata-management:the-iframe-element"><a href="#the-iframe-element">iframe</a></code>에서
+        <code id="resource-metadata-management:attr-iframe-sandbox"><a href="#attr-iframe-sandbox">sandbox</a></code>
+        특성이 있는 경우),
+        <a id="resource-metadata-management:securityerror" href="https://webidl.spec.whatwg.org/#securityerror"
+          data-x-internal="securityerror">"<code>SecurityError</code>"</a> <code
+          id="resource-metadata-management:domexception"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>이
+        발생한다.
       </p>
+    </dd>
   </dl>
 
-  <div class="mdn-anno wrapped before"><button onclick=toggleStatus(this) class=mdn-anno-btn><b title="모든 최신 엔진에서 지원됨."
-        class=all-engines-flag>✔</b><span>MDN</span></button>
-    <div class=feature>
-      <p><a href=https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
-          title="Document 속성 cookie는 문서와 관련된 쿠키를 읽고 쓸 수 있습니다. 실제 쿠키 값을 얻거나 설정하기 위한 getter 및 setter로 사용됩니다.">Document/cookie</a>
-      <p class=all-engines-text>모든 최신 엔진에서 지원됨.
-      <div class=support><span class="firefox yes"><span>Firefox</span><span>1+</span></span><span
+
+
+  <div class="mdn-anno wrapped before"><button onclick="toggleStatus(this)" class="mdn-anno-btn"><b
+        title="Support in all current engines." class="all-engines-flag">✔</b><span>MDN</span></button>
+    <div class="feature">
+      <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie"
+          title="The Document property cookie lets you read and write cookies associated with the document. It serves as a getter and setter for the actual values of the cookies.">Document/cookie</a>
+      </p>
+      <p class="all-engines-text">모든 현재 엔진에서 지원됨.</p>
+      <div class="support"><span class="firefox yes"><span>Firefox</span><span>1+</span></span><span
           class="safari yes"><span>Safari</span><span>1+</span></span><span
           class="chrome yes"><span>Chrome</span><span>1+</span></span>
         <hr><span class="opera yes"><span>Opera</span><span>3+</span></span><span
@@ -16995,32 +17127,31 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
       </div>
     </div>
   </div>
-
   <p><dfn data-dfn-for="Document" id="dom-document-cookie" data-dfn-type="attribute"><code>cookie</code></dfn>
-    속성은 문서의 <a href="https://dom.spec.whatwg.org/#concept-document-url"
+    특성은 문서의 <a href="https://dom.spec.whatwg.org/#concept-document-url"
       id="resource-metadata-management:the-document's-address-2" data-x-internal="the-document's-address">URL</a>로 식별되는
-    리소스의 쿠키를 나타냅니다.</p>
+    리소스의 쿠키를 나타낸다.</p>
 
   <p class="note">동기적인 <code
       id="resource-metadata-management:dom-document-cookie"><a href="#dom-document-cookie">document.cookie</a></code>
-    API를 사용하면 성능 문제의 원인이 될 수 있습니다. <cite>Cookie Store API</cite>를 대신 사용할 수 있으며,
-    이는 쿠키를 비동기적으로 처리하여 성능 문제를 방지할 수 있도록 합니다. 자세한 내용은 <a href="https://cookiestore.spec.whatwg.org/#intro">Cookie Store
-      API 소개</a>를 참고하세요. <a href="#refsCOOKIESTORE">[COOKIESTORE]</a></p>
+    API는 성능 문제의 원인이 될 수 있다. <cite>Cookie Store API</cite>를 대신 사용하면
+    비동기적으로 쿠키를 처리하여 성능 문제를 피할 수 있다. 자세한 내용은 <a href="https://cookiestore.spec.whatwg.org/#intro">Cookie Store API
+      소개</a>를 참고하라. <a href="#refsCOOKIESTORE">[COOKIESTORE]</a></p>
 
   <div data-algorithm="">
-    <p>다음 조건 중 하나에 해당하는 <code id=resource-metadata-management:document-3><a href=#document>document</a></code> 객체는 <dfn
-        id=cookie-averse-document-object>쿠키 비호환 <code>문서</code> 객체</dfn>입니다:
+    <p>아래 조건 중 하나에 해당하는 <code id="resource-metadata-management:document-3"><a href="#document">Document</a></code> 객체는
+      <dfn id="cookie-averse-document-object">쿠키 기피 <code>Document</code> 객체</dfn>이다:
     </p>
 
     <ul>
-      <li><a href=#concept-document-bc id=resource-metadata-management:concept-document-bc>탐색 맥락</a>이 null인 <code
-          id=resource-metadata-management:document-4><a href=#document>document</a></code> 객체.</li>
-      <li><a href=https://dom.spec.whatwg.org/#concept-document-url
+      <li><a href="#concept-document-bc" id="resource-metadata-management:concept-document-bc">탐색 컨텍스트</a>가 null인 <code
+          id="resource-metadata-management:document-4"><a href="#document">Document</a></code> 객체</li>
+      <li><a href="https://dom.spec.whatwg.org/#concept-document-url"
           id="resource-metadata-management:the-document's-address-3" data-x-internal="the-document's-address">URL</a>의
-        <a href=https://url.spec.whatwg.org/#concept-url-scheme id=resource-metadata-management:concept-url-scheme
-          data-x-internal=concept-url-scheme>스킴</a>이 <a id=resource-metadata-management:http(s)-scheme
-          href=https://fetch.spec.whatwg.org/#http-scheme data-x-internal=http(s)-scheme>HTTP(S) 스킴</a>이 아닌 <code
-          id=resource-metadata-management:document-5><a href=#document>document</a></code> 객체.
+        <a href="https://url.spec.whatwg.org/#concept-url-scheme" id="resource-metadata-management:concept-url-scheme"
+          data-x-internal="concept-url-scheme">스킴</a>이 <a id="resource-metadata-management:http(s)-scheme"
+          href="https://fetch.spec.whatwg.org/#http-scheme" data-x-internal="http(s)-scheme">HTTP(S) 스킴</a>이 아닌
+        <code id="resource-metadata-management:document-5"><a href="#document">Document</a></code>
       </li>
     </ul>
   </div>
@@ -17028,71 +17159,83 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
 
 
   <div data-algorithm="">
-    <p id=sandboxCookies>
-      <a id=resource-metadata-management:tracking-vector title="여기에 추적 벡터가 있습니다."
-        href=https://infra.spec.whatwg.org/#tracking-vector class=tracking-vector data-x-internal=tracking-vector><img
-          width=46 alt="(이것은 추적 벡터입니다.)" crossorigin="" class=darkmode-aware
-          src=https://resources.whatwg.org/tracking-vector.svg height=64></a>
-      가져올 때, 문서가 <a href=#cookie-averse-document-object id=resource-metadata-management:cookie-averse-document-object>쿠키
-        비호환 <code>문서</code> 객체</a>이면 사용자 에이전트는 빈
-      문자열을 반환해야 합니다. 그렇지 않은 경우 문서의 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-        id=resource-metadata-management:concept-document-origin data-x-internal=concept-document-origin>기원</a>이 <a
-        href=#concept-origin-opaque id=resource-metadata-management:concept-origin-opaque>불투명한 기원</a>이면 사용자 에이전트는 <a
-        id=resource-metadata-management:securityerror-2 href=https://webidl.spec.whatwg.org/#securityerror
-        data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-        id=resource-metadata-management:domexception-2><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-      발생시켜야 합니다. 그렇지 않으면 사용자 에이전트는 문서의 <a href=https://dom.spec.whatwg.org/#concept-document-url
-        id="resource-metadata-management:the-document's-address-4" data-x-internal="the-document's-address">URL</a>에
-      대한 "비-HTTP" API로 <a id=resource-metadata-management:cookie-string
-        href=https://httpwg.org/specs/rfc6265.html#sane-cookie-syntax data-x-internal=cookie-string>쿠키 문자열</a>을 반환해야
-      하며, <a id=resource-metadata-management:utf-8-decode-without-bom
-        href=https://encoding.spec.whatwg.org/#utf-8-decode-without-bom data-x-internal=utf-8-decode-without-bom>BOM
-        없이 UTF-8로 디코딩</a>하여 반환해야 합니다. <a href=#refsCOOKIES>[COOKIES]</a>
+    <p id="sandboxCookies">
+      <a id="resource-metadata-management:tracking-vector" title="There is a tracking vector here."
+        href="https://infra.spec.whatwg.org/#tracking-vector" class="tracking-vector"
+        data-x-internal="tracking-vector"><img width="46" alt="(This is a tracking vector.)" crossorigin=""
+          class="darkmode-aware" src="https://resources.whatwg.org/tracking-vector.svg" height="64"></a>
+      가져올 때, 문서가 <a href="#cookie-averse-document-object"
+        id="resource-metadata-management:cookie-averse-document-object">쿠키 기피 <code>Document</code> 객체</a>라면
+      사용자 에이전트는 빈 문자열을 반환해야 한다. 그렇지 않고 <code
+        id="resource-metadata-management:document-6"><a href="#document">Document</a></code>의 <a
+        href="https://dom.spec.whatwg.org/#concept-document-origin"
+        id="resource-metadata-management:concept-document-origin" data-x-internal="concept-document-origin">origin</a>이
+      <a href="#concept-origin-opaque" id="resource-metadata-management:concept-origin-opaque">불투명 출처</a>인 경우,
+      사용자 에이전트는 <a id="resource-metadata-management:securityerror-2"
+        href="https://webidl.spec.whatwg.org/#securityerror"
+        data-x-internal="securityerror">"<code>SecurityError</code>"</a>
+      <code
+        id="resource-metadata-management:domexception-2"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+      발생시켜야 한다.
+      그렇지 않으면, 사용자 에이전트는 문서의 <a id="resource-metadata-management:cookie-string"
+        href="https://httpwg.org/specs/rfc6265.html#sane-cookie-syntax"
+        data-x-internal="cookie-string">cookie-string</a>을
+      "non-HTTP" API를 위해 <a id="resource-metadata-management:utf-8-decode-without-bom"
+        href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom"
+        data-x-internal="utf-8-decode-without-bom">UTF-8 BOM 없이 디코딩</a>하여 반환해야 한다. <a href="#refsCOOKIES">[COOKIES]</a>
     </p>
   </div>
-
-
 
   <div data-algorithm="">
-    <p>설정할 때, 문서가 <a href=#cookie-averse-document-object
-        id=resource-metadata-management:cookie-averse-document-object-2>쿠키 비호환 <code>문서</code> 객체</a>이면 사용자 에이전트는
-      아무것도 하지 않아야 합니다. 그렇지 않은 경우 문서의 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-        id=resource-metadata-management:concept-document-origin-2 data-x-internal=concept-document-origin>기원</a>이 <a
-        href=#concept-origin-opaque id=resource-metadata-management:concept-origin-opaque-2>불투명한 기원</a>이면 사용자 에이전트는
-      <a id=resource-metadata-management:securityerror-3 href=https://webidl.spec.whatwg.org/#securityerror
-        data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-        id=resource-metadata-management:domexception-3><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-      발생시켜야 합니다. 그렇지 않으면 사용자 에이전트는 새 값을 포함하여 문서의 <a href=https://dom.spec.whatwg.org/#concept-document-url
+    <p>설정할 때, 문서가 <a href="#cookie-averse-document-object"
+        id="resource-metadata-management:cookie-averse-document-object-2">쿠키 기피 <code>Document</code>
+        객체</a>라면
+      사용자 에이전트는 아무 것도 하면 안 된다. 그렇지 않고 <code
+        id="resource-metadata-management:document-7"><a href="#document">Document</a></code>의 <a
+        href="https://dom.spec.whatwg.org/#concept-document-origin"
+        id="resource-metadata-management:concept-document-origin-2"
+        data-x-internal="concept-document-origin">origin</a>이
+      <a href="#concept-origin-opaque" id="resource-metadata-management:concept-origin-opaque-2">불투명 출처</a>인 경우,
+      사용자 에이전트는 <a id="resource-metadata-management:securityerror-3"
+        href="https://webidl.spec.whatwg.org/#securityerror"
+        data-x-internal="securityerror">"<code>SecurityError</code>"</a>
+      <code
+        id="resource-metadata-management:domexception-3"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+      발생시켜야 한다.
+      그렇지 않으면, 사용자 에이전트는 문서의 <a href="https://dom.spec.whatwg.org/#concept-document-url"
         id="resource-metadata-management:the-document's-address-5" data-x-internal="the-document's-address">URL</a>에
-      대해 "비-HTTP" API로 <a href=https://encoding.spec.whatwg.org/#utf-8-encode
-        id=resource-metadata-management:utf-8-encode data-x-internal=utf-8-encode>UTF-8로 인코딩된</a> set-cookie 문자열을
-      수신할 때처럼 작동해야 합니다. <a href=#refsCOOKIES>[COOKIES]</a> <a href=#refsENCODING>[ENCODING]</a>
+      대해 "non-HTTP" API로 <a href="https://httpwg.org/specs/rfc6265.html#storage-model"
+        id="resource-metadata-management:receives-a-set-cookie-string"
+        data-x-internal="receives-a-set-cookie-string">set-cookie-string을 받는 것과 같이</a> 새로운 값을 <a
+        href="https://encoding.spec.whatwg.org/#utf-8-encode" id="resource-metadata-management:utf-8-encode"
+        data-x-internal="utf-8-encode">UTF-8로 인코딩</a>하여 동작해야 한다. <a href="#refsCOOKIES">[COOKIES]</a> <a
+        href="#refsENCODING">[ENCODING]</a>
     </p>
-
   </div>
-  <p class=note><code
-      id=resource-metadata-management:dom-document-cookie-2><a href=#dom-document-cookie>cookie</a></code>
-    속성은 프레임 간
-    접근 가능하므로, 쿠키에 대한 경로 제한은 사이트의 어떤 부분에 쿠키를 전송할지 관리하기 위한 도구일 뿐, 보안 기능은 아닙니다.</p>
 
-  <p class=warning><code
-      id=resource-metadata-management:dom-document-cookie-3><a href=#dom-document-cookie>cookie</a></code> 속성의
-    getter와 setter는 공유 상태에 동기적으로 접근합니다. 잠금 메커니즘이 없기 때문에, 멀티프로세스 사용자 에이전트의 다른 탐색 맥락은 스크립트가 실행되는 동안 쿠키를 수정할 수 있습니다. 예를
-    들어, 사이트가 쿠키를 읽고 값을 증가시킨 다음 다시 기록하여 쿠키의 새 값을 세션의 고유 식별자로 사용하는 경우, 동일한 "고유" 식별자를 두 개의 다른 브라우저 창에서 동시에 두 번 사용할 수
-    있으며, 이는 잠재적으로 치명적인 영향을 미칠 수 있습니다.</p>
+  <p class="note"><code
+      id="resource-metadata-management:dom-document-cookie-2"><a href="#dom-document-cookie">cookie</a></code> 특성은 프레임 간
+    접근이 가능하므로, 쿠키의 경로 제한은 쿠키가 사이트의 어떤 부분에 전송될지 관리하는 도구일 뿐이며, 보안 기능은 아니다.</p>
+
+  <p class="warning"><code
+      id="resource-metadata-management:dom-document-cookie-3"><a href="#dom-document-cookie">cookie</a></code>
+    특성의 getter와 setter는 동기적으로 공유 상태에 접근한다. 잠금 메커니즘이 없기 때문에, 다중 프로세스 사용자 에이전트에서 다른 브라우징 컨텍스트가 스크립트 실행 중에 쿠키를 수정할 수 있다. 예를
+    들어, 사이트가 쿠키를 읽고 값을 증가시킨 뒤 다시 기록하고, 쿠키의 새로운 값을 세션의 고유 식별자로 사용하도록 설계했을 때, ��로 다른 브라우저 창에서 동시에 같은 작업을 하면 "고유" 식별자를 두
+    세션에서 동일하게 사용할 수 있으며, 이는 잠재적으로 심각한 문제를 유발할 수 있다.</p>
 
   <hr>
 
-  <dl class=domintro>
+  <dl class="domintro">
     <dt>
-      <code><var>document</var>.<a href=#dom-document-lastmodified id=dom-document-lastmodified-dev>lastModified</a></code>
-      <div class="mdn-anno wrapped before"><button onclick=toggleStatus(this) class=mdn-anno-btn><b
-            title="모든 최신 엔진에서 지원됨." class=all-engines-flag>✔</b><span>MDN</span></button>
-        <div class=feature>
-          <p><a href=https://developer.mozilla.org/en-US/docs/Web/API/Document/lastModified
-              title="Document 인터페이스의 lastModified 속성은 현재 문서가 마지막으로 수정된 날짜와 시간을 포함하는 문자열을 반환합니다.">Document/lastModified</a>
-          <p class=all-engines-text>모든 최신 엔진에서 지원됨.
-          <div class=support><span class="firefox yes"><span>Firefox</span><span>1+</span></span><span
+      <code><var>document</var>.<a href="#dom-document-lastmodified" id="dom-document-lastmodified-dev">lastModified</a></code>
+      <div class="mdn-anno wrapped before"><button onclick="toggleStatus(this)" class="mdn-anno-btn"><b
+            title="Support in all current engines." class="all-engines-flag">✔</b><span>MDN</span></button>
+        <div class="feature">
+          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/lastModified"
+              title="The lastModified property of the Document interface returns a string containing the date and time on which the current document was last modified.">Document/lastModified</a>
+          </p>
+          <p class="all-engines-text">모든 현재 엔진에서 지원됨.</p>
+          <div class="support"><span class="firefox yes"><span>Firefox</span><span>1+</span></span><span
               class="safari yes"><span>Safari</span><span>1+</span></span><span
               class="chrome yes"><span>Chrome</span><span>1+</span></span>
             <hr><span class="opera yes"><span>Opera</span><span>12.1+</span></span><span
@@ -17103,76 +17246,81 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
               class="safari_ios unknown"><span>Safari iOS</span><span>?</span></span><span
               class="chrome_android unknown"><span>Chrome Android</span><span>?</span></span><span
               class="webview_android unknown"><span>WebView Android</span><span>?</span></span><span
-              class="samsunginternet_android unknown"><span>Samsung
-                Internet</span><span>?</span></span><span class="opera_android yes"><span>Opera
-                Android</span><span>12.1+</span></span>
+              class="samsunginternet_android unknown"><span>Samsung Internet</span><span>?</span></span><span
+              class="opera_android yes"><span>Opera Android</span><span>12.1+</span></span>
           </div>
         </div>
       </div>
+    </dt>
     <dd>
-      <p>서버에서 보고한 대로 사용자의 로컬 시간대로 "<code>MM/DD/YYYY hh:mm:ss</code>" 형식으로 문서의 마지막 수정 날짜를 반환합니다.</p>
+      <p>서버가 보고한 문서의 마지막 수정 날짜를 "<code>MM/DD/YYYY&nbsp;hh:mm:ss</code>" 형식(사용자의 로컬 시간대)으로 반환한다.</p>
 
-      <p>마지막 수정 날짜를 알 수 없는 경우 현재 시간이 대신 반환됩니다.</p>
+      <p>마지막 수정 날짜를 알 수 없을 경우, 현재 시간을 반환한다.</p>
+    </dd>
   </dl>
+
+
+
   <div data-algorithm="">
-    <p><dfn data-dfn-for=Document id=dom-document-lastmodified data-dfn-type=attribute><code>lastModified</code></dfn>
-      속성은 사용자의 로컬 시간대로 <code id=resource-metadata-management:document-8><a href=#document>document</a></code> 소스 파일의
-      마지막 수정
-      날짜와 시간을 반환해야 합니다. 반환 형식은 다음과 같습니다:</p>
+    <p><dfn data-dfn-for="Document" id="dom-document-lastmodified"
+        data-dfn-type="attribute"><code>lastModified</code></dfn> 특성은 가져올 때
+      <code id="resource-metadata-management:document-8"><a href="#document">Document</a></code>의 소스 파일의 마지막 수정 날짜와 시간을
+      사용자의 로컬 시간대로, 다음 형식으로 반환해야 한다:
+    </p>
 
     <ol>
       <li>
-        <p>날짜의 월 구성 요소.</p>
+        <p>날짜의 월(month) 구성 요소</p>
       </li>
       <li>
-        <p>U+002F SOLIDUS 문자 (/).</p>
+        <p>U+002F SOLIDUS 문자 (/)</p>
       </li>
       <li>
-        <p>날짜의 일 구성 요소.</p>
+        <p>날짜의 일(day) 구성 요소</p>
       </li>
       <li>
-        <p>U+002F SOLIDUS 문자 (/).</p>
+        <p>U+002F SOLIDUS 문자 (/)</p>
       </li>
       <li>
-        <p>날짜의 년 구성 요소.</p>
+        <p>날짜의 연(year) 구성 요소</p>
       </li>
       <li>
-        <p>U+0020 SPACE 문자.</p>
+        <p>U+0020 SPACE 문자</p>
       </li>
       <li>
-        <p>시간의 시 구성 요소.</p>
+        <p>시간의 시(hour) 구성 요소</p>
       </li>
       <li>
-        <p>U+003A COLON 문자 (:).</p>
+        <p>U+003A COLON 문자 (:)</p>
       </li>
       <li>
-        <p>시간의 분 구성 요소.</p>
+        <p>시간의 분(minute) 구성 요소</p>
       </li>
       <li>
-        <p>U+003A COLON 문자 (:).</p>
+        <p>U+003A COLON 문자 (:)</p>
       </li>
       <li>
-        <p>시간의 초 구성 요소.</p>
+        <p>시간의 초(second) 구성 요소</p>
       </li>
     </ol>
 
-    <p>위의 모든 숫자 구성 요소는 년도를 제외하고는 필요할 경우 0으로 패딩하여 두 자리의 <a id=resource-metadata-management:ascii-digits
-        href=https://infra.spec.whatwg.org/#ascii-digit data-x-internal=ascii-digits>ASCII 숫자</a>로 주어져야 합니다. 년도는 필요할
-      경우 0으로 패딩된 네 자리 이상의 <a id=resource-metadata-management:ascii-digits-2
-        href=https://infra.spec.whatwg.org/#ascii-digit data-x-internal=ascii-digits>ASCII 숫자</a>로 주어져야 합니다.</p>
+    <p>위의 숫자 구성 요소(연도 제외)는 모두 필요에 따라 0으로 패딩하여 10진수의 <a id="resource-metadata-management:ascii-digits"
+        href="https://infra.spec.whatwg.org/#ascii-digit" data-x-internal="ascii-digits">ASCII
+        숫자</a> 두 자로 표현해야 한다. 연도는 필요에 따라 0으로 패딩하여 네 자 이상의 최단 문자열 <a id="resource-metadata-management:ascii-digits-2"
+        href="https://infra.spec.whatwg.org/#ascii-digit" data-x-internal="ascii-digits">ASCII 숫자</a>로 표현해야
+      한다.</p>
   </div>
 
-  <p><code id=resource-metadata-management:document-9><a href=#document>document</a></code> 소스 파일의 마지막 수정 날짜와 시간은 사용된
-    네트워킹
-    프로토콜의 관련 기능에서 파생되어야 합니다. 예를 들어, 문서의 HTTP `<code
-      id=resource-metadata-management:http-last-modified><a data-x-internal=http-last-modified href=https://httpwg.org/specs/rfc7232.html#header.last-modified>Last-Modified</a></code>`
-    헤더의 값 또는 로컬 파일의 파일 시스템 메타데이터에서 파생될 수 있습니다. 마지막 수정 날짜와 시간을 알 수 없는 경우 이 속성은 위의 형식으로 현재 날짜와 시간을 반환해야 합니다.</p>
+  <p><code id="resource-metadata-management:document-9"><a href="#document">Document</a></code>의 소스 파일 마지막 수정 일시를
+    네트워킹 프로토콜의 관련 기능(예: HTTP `<code
+      id="resource-metadata-management:http-last-modified"><a data-x-internal="http-last-modified" href="https://httpwg.org/specs/rfc7232.html#header.last-modified">Last-Modified</a></code>`
+    헤더 값 또는 로컬 파일의 파일 시스템 메타데이터)에서 파생되어야 한다. 마지막 수정 일시를 알 수 없으면 위와 같은 형식의 현재 일시를 반환해야 한다.</p>
 
 
 
 
 
-  <h4 id=reporting-document-loading-status><span class=secno>3.1.4</span> 문서 로딩 상태 보고<a
+  <h4 id=reporting-document-loading-status><span class=secno>3.1.5</span> 문서 로딩 상태 보고<a
       href=#reporting-document-loading-status class=self-link></a></h4>
 
   <dl class=domintro>
@@ -17371,7 +17519,7 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
 
 
 
-  <h4 id=render-blocking-mechanism><span class=secno>3.1.5</span> <dfn>렌더링 차단 메커니즘</dfn><a
+  <h4 id=render-blocking-mechanism><span class=secno>3.1.6</span> <dfn>렌더링 차단 메커니즘</dfn><a
       href=#render-blocking-mechanism class=self-link></a></h4>
 
   <p>각 <code id=render-blocking-mechanism:document><a href=#document>document</a></code>는 <dfn
@@ -17479,7 +17627,7 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
   </div>
 
 
-  <h4 id=dom-tree-accessors><span class=secno>3.1.6</span> <dfn>DOM 트리 접근자</dfn><a href=#dom-tree-accessors
+  <h4 id=dom-tree-accessors><span class=secno>3.1.7</span> <dfn>DOM 트리 접근자</dfn><a href=#dom-tree-accessors
       class=self-link></a></h4>
 
   <div data-algorithm="">
@@ -138246,7 +138394,7 @@ console<c- p="">.</c->assert<c- p="">(</c->iframeWindow<c- p="">.</c->frameEleme
   [<a id='the-location-interface:legacyunforgeable-13' href='https://webidl.spec.whatwg.org/#LegacyUnforgeable' data-x-internal='legacyunforgeable'><c- g>LegacyUnforgeable</c-></a>] <c- b>undefined</c-> <a href='#dom-location-replace' id='the-location-interface:dom-location-replace'><c- g>replace</c-></a>(<c- b>USVString</c-> <c- g>url</c->);
   [<a id='the-location-interface:legacyunforgeable-14' href='https://webidl.spec.whatwg.org/#LegacyUnforgeable' data-x-internal='legacyunforgeable'><c- g>LegacyUnforgeable</c-></a>] <c- b>undefined</c-> <a href='#dom-location-reload' id='the-location-interface:dom-location-reload'><c- g>reload</c-></a>();
 
-  [<a id='the-location-interface:legacyunforgeable-15' href='https://webidl.spec.whatwg.org/#LegacyUnforgeable' data-x-internal='legacyunforgeable'><c- g>LegacyUnforgeable</c-></a>, <c- g>SameObject</c->] <c- b>readonly</c-> <c- b>attribute</c-> <a href='#domstringlist' id='the-location-interface:domstringlist'><c- n>DOMStringList</c-></a> <a href='#dom-location-ancestororigins' id='the-location-interface:dom-location-ancestororigins'><c- g>ancestorOrigins</c-></a>;
+  [<a id="the-location-interface:legacyunforgeable-15" href="https://webidl.spec.whatwg.org/#LegacyUnforgeable" data-x-internal="legacyunforgeable"><c- g="">LegacyUnforgeable</c-></a>] <c- b="">readonly</c-> <c- b="">attribute</c-> <a href="#domstringlist" id="the-location-interface:domstringlist"><c- n="">DOMStringList</c-></a> <a href="#dom-location-ancestororigins" id="the-location-interface:dom-location-ancestororigins"><c- g="">ancestorOrigins</c-></a>;
 };</code></pre>
 
 
@@ -138810,70 +138958,15 @@ console<c- p="">.</c->assert<c- p="">(</c->iframeWindow<c- p="">.</c->frameEleme
   </div>
 
   <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:location-26><a href=#location>Location</a></code> 객체는
-      관련된 <dfn id=concept-location-ancestor-origins-list>조상 출처 목록</dfn>을 가지고 있습니다.
-      <code id=the-location-interface:location-27><a href=#location>Location</a></code> 객체가
-      생성될 때,
-      그
-      <a href=#concept-location-ancestor-origins-list
-        id=the-location-interface:concept-location-ancestor-origins-list>조상
-        출처 목록</a>은
-      다음
-      단계를 통해 생성된 문자열의 <a id=the-location-interface:list href=https://infra.spec.whatwg.org/#list
-        data-x-internal=list>목록</a>을
-      포함하는
-      <code id=the-location-interface:domstringlist-3><a href=#domstringlist>DOMStringList</a></code>
-      객체로 설정되어야 합니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><var>output</var>을 새로운 <a id=the-location-interface:list-2 href=https://infra.spec.whatwg.org/#list
-            data-x-internal=list>목록</a>으로 설정합니다.</p>
-      <li>
-        <p><var>current</var>을 <code id=the-location-interface:location-28><a href=#location>Location</a></code>
-          객체의
-          <a href=#relevant-document id=the-location-interface:relevant-document-3>관련된
-            <code>Document</code></a>로 설정합니다.
-        </p>
-      <li>
-        <p><var>current</var>의 <a href=#doc-container-document id=the-location-interface:doc-container-document>컨테이너
-            문서</a>가
-          null이
-          아닌 동안:</p>
-
-        <ol>
-          <li>
-            <p><var>current</var>을 <var>current</var>의 <a href=#doc-container-document
-                id=the-location-interface:doc-container-document-2>컨테이너 문서</a>로
-              설정합니다.</p>
-          <li>
-            <p><a href=https://infra.spec.whatwg.org/#list-append id=the-location-interface:list-append
-                data-x-internal=list-append>추가</a>
-              <var>current</var>의 <a href=#ascii-serialisation-of-an-origin
-                id=the-location-interface:ascii-serialisation-of-an-origin>출처의 직렬화</a>를
-              <var>output</var>에
-              추가합니다.
-            </p>
-        </ol>
-      <li>
-        <p><var>output</var>을 반환합니다.</p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn id=location-object-navigate><code>Location</code> 객체 탐색</dfn>으로
-      <code id=the-location-interface:location-29><a href=#location>Location</a></code> 객체의
-      <var>location</var>을 <a id=the-location-interface:url href=https://url.spec.whatwg.org/#concept-url
-        data-x-internal=url>URL</a>
-      <var>url</var>로,
-      선택적으로 <code
-        id=the-location-interface:navigationhistorybehavior><a href=#navigationhistorybehavior>NavigationHistoryBehavior</a></code>을
+    <p><dfn id="location-object-navigate"><code>Location</code> 객체로 이동</dfn>하기 위해 <code
+        id="the-location-interface:location-26"><a href="#location">Location</a></code> 객체
+      <var>location</var>을 <a id="the-location-interface:url" href="https://url.spec.whatwg.org/#concept-url"
+        data-x-internal="url">URL</a> <var>url</var>로 이동시키며, 선택적으로 <code
+        id="the-location-interface:navigationhistorybehavior"><a href="#navigationhistorybehavior">NavigationHistoryBehavior</a></code>
+      <var>historyHandling</var>
       (기본값 "<code
-        id=the-location-interface:navigationhistorybehavior-auto><a href=#navigationhistorybehavior-auto>auto</a></code>")
-      지정하여 탐색합니다:
+        id="the-location-interface:navigationhistorybehavior-auto"><a href="#navigationhistorybehavior-auto">auto</a></code>")를
+      제공할 수 있다:
     </p>
 
     <ol>
@@ -138888,7 +138981,7 @@ console<c- p="">.</c->assert<c- p="">(</c->iframeWindow<c- p="">.</c->frameEleme
             글로벌 객체</a>의 <a href=#concept-document-window id=the-location-interface:concept-document-window>연결된
             <code>Document</code></a>로 설정합니다.</p>
       <li>
-        <p><var>location</var>의 <a href=#relevant-document id=the-location-interface:relevant-document-4>관련된
+        <p><var>location</var>의 <a href=#relevant-document id=the-location-interface:relevant-document-3>관련된
             <code>Document</code></a>가
           아직
           <a href=#completely-loaded id=the-location-interface:completely-loaded>완전히 로드되지</a>
@@ -138917,43 +139010,70 @@ console<c- p="">.</c->assert<c- p="">(</c->iframeWindow<c- p="">.</c->frameEleme
   </div>
 
   <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-href-2><a href=#dom-location-href>href</a></code>
-      설정자
-      단계는 다음과 같습니다:
-    </p>
+    <p><dfn data-dfn-for="Location" id="dom-location-href" data-dfn-type="attribute"><code>href</code></dfn> getter
+      단계는 다음과 같다:</p>
 
     <ol>
       <li>
-        <p><a id=the-location-interface:this-6 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-6>관련된 <code>Document</code></a>가
-          null인
-          경우,
-          return합니다.
+        <p><a id="the-location-interface:this-4" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-4">관련 <code>Document</code></a>가 null이 아니고,
+          그 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#entry-settings-object" id="the-location-interface:entry-settings-object">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain">same origin-domain</a>이 아니라면,
+          <a id="the-location-interface:securityerror" href="https://webidl.spec.whatwg.org/#securityerror"
+            data-x-internal="securityerror">"<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          발생시킨다.
         </p>
+      </li>
       <li>
-        <p>주어진 값을 <a href=#entry-settings-object id=the-location-interface:entry-settings-object-2>엔트리 설정 객체</a>를
-          기준으로
-          <a href=#encoding-parsing-a-url id=the-location-interface:encoding-parsing-a-url>URL
-            인코딩-파싱</a>의
-          결과로
-          <var>url</var>을
-          설정합니다.
+        <p><a id="the-location-interface:this-5" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url">url</a>을
+          <a href="https://url.spec.whatwg.org/#concept-url-serializer"
+            id="the-location-interface:concept-url-serializer"
+            data-x-internal="concept-url-serializer">직렬화(serialized)</a> 하여 반환한다.
         </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p><code id="the-location-interface:dom-location-href-2"><a href="#dom-location-href">href</a></code> setter
+      단계는 다음과 같다:</p>
+
+    <ol>
       <li>
-        <p><var>url</var>이 실패라면, <a id=the-location-interface:syntaxerror
-            href=https://webidl.spec.whatwg.org/#syntaxerror data-x-internal=syntaxerror>"<code>SyntaxError</code>"</a>
+        <p><a id="the-location-interface:this-6" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-5">관련 <code>Document</code></a>가 null이면,
+          반환한다.</p>
+      </li>
+      <li>
+        <p>주어진 값을 <a href="#entry-settings-object" id="the-location-interface:entry-settings-object-2">entry settings
+            object</a> 기준으로 <a href="#encoding-parsing-a-url" id="the-location-interface:encoding-parsing-a-url">URL
+            인코딩-파싱</a>한 결과를 <var>url</var>로 설정한다.</p>
+      </li>
+      <li>
+        <p><var>url</var>이 실패(failure)라면,
+          <a id="the-location-interface:syntaxerror" href="https://webidl.spec.whatwg.org/#syntaxerror"
+            data-x-internal="syntaxerror">"<code>SyntaxError</code>"</a>
           <code
-            id=the-location-interface:domexception-2><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
+            id="the-location-interface:domexception-2"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          발생시킨다.
         </p>
+      </li>
       <li>
-        <p><a href=#location-object-navigate id=the-location-interface:location-object-navigate><code>Location</code>-객체
-            탐색</a> <a id=the-location-interface:this-7 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>를
-          <var>url</var>로
-          설정합니다.
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate"><code>Location</code> 객체로 이동</a>하여 <a
+            id="the-location-interface:this-7" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>를 <var>url</var>로 이동시킨다.
         </p>
+      </li>
     </ol>
   </div>
 
@@ -138963,782 +139083,766 @@ console<c- p="">.</c->assert<c- p="">(</c->iframeWindow<c- p="">.</c->frameEleme
   </p>
 
   <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-origin data-dfn-type=attribute><code>origin</code></dfn>
-      getter 단계는 다음과 같습니다:
-    </p>
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-origin" data-dfn-type="attribute"><code>origin</code></dfn> 게터
+      단계입니다:</p>
 
     <ol>
       <li>
-        <p><a id=the-location-interface:this-8 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-7>관련된 <code>Document</code></a>가
-          null이 아니고,
-          해당
-          <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-3 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-2>same
-            origin-domain</a>과 같지 않다면, <a href=#entry-settings-object
-            id=the-location-interface:entry-settings-object-3>entry
-            settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-2>origin</a>을
-          사용하여 <a id=the-location-interface:securityerror-2 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-3><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><a href=#ascii-serialisation-of-an-origin id=the-location-interface:ascii-serialisation-of-an-origin-2>ASCII
-            직렬화</a>를
-          반환합니다
-          <a id=the-location-interface:this-9 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-2>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-origin id=the-location-interface:concept-url-origin
-            data-x-internal=concept-url-origin>origin</a>.
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-protocol data-dfn-type=attribute><code>protocol</code></dfn>
-      getter 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-10 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-8>관련된 <code>Document</code></a>가
-          null이 아니고,
-          해당
-          <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-4 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-3>same
-            origin-domain</a>과 같지 않다면, <a href=#entry-settings-object
-            id=the-location-interface:entry-settings-object-4>entry
-            settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-3>origin</a>을
-          사용하여 <a id=the-location-interface:securityerror-3 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-4><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-11 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-3>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-scheme id=the-location-interface:concept-url-scheme
-            data-x-internal=concept-url-scheme>scheme</a>을
-          반환하고, 그 뒤에 "<code>:</code>"을
-          추가합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-protocol-2><a href=#dom-location-protocol>protocol</a></code>
-      설정자
-      단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-12 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-9>관련된 <code>Document</code></a>가
-          null인
-          경우,
-          return합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-13 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-10>관련된 <code>Document</code></a>의
-          <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-5 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-4>same
-            origin-domain</a>과 같지 않다면, <a href=#entry-settings-object
-            id=the-location-interface:entry-settings-object-5>entry
-            settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-4>origin</a>을
-          사용하여 <a id=the-location-interface:securityerror-4 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-5><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>을 <a id=the-location-interface:this-14 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-4>url</a>의
-          복사본으로 설정합니다.</p>
-      <li>
-        <p><var>possibleFailure</var>을 다음 값으로 <a href=https://url.spec.whatwg.org/#concept-basic-url-parser
-            id=the-location-interface:basic-url-parser data-x-internal=basic-url-parser>기본
-            URL
-            파싱</a>의
-          결과로 설정합니다. <var>copyURL</var>을 <a href=https://url.spec.whatwg.org/#basic-url-parser-url
-            id=the-location-interface:basic-url-parser-url data-x-internal=basic-url-parser-url><i>url</i></a>로
-          설정하고 <a id=the-location-interface:scheme-start-state href=https://url.spec.whatwg.org/#scheme-start-state
-            data-x-internal=scheme-start-state>scheme
-            시작 상태</a>로
-          설정합니다
-          <a href=https://url.spec.whatwg.org/#basic-url-parser-state-override
-            id=the-location-interface:basic-url-parser-state-override
-            data-x-internal=basic-url-parser-state-override><i>state override</i></a>.
-        </p>
-
-        <p class=note>URL 파서는 여러 개의 연속적인 콜론을 무시하기 때문에, "<code>https:</code>" (또는 "<code>https::::</code>") 값을 제공하는
-          것은 "<code>https</code>" 값을 제공하는 것과 동일합니다.</p>
-      <li>
-        <p><var>possibleFailure</var>이 실패라면, <a id=the-location-interface:syntaxerror-2
-            href=https://webidl.spec.whatwg.org/#syntaxerror data-x-internal=syntaxerror>"<code>SyntaxError</code>"</a>
-          <code
-            id=the-location-interface:domexception-6><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-scheme
-            id=the-location-interface:concept-url-scheme-2 data-x-internal=concept-url-scheme>scheme</a>이
-          <a id=the-location-interface:http(s)-scheme href=https://fetch.spec.whatwg.org/#http-scheme
-            data-x-internal=http(s)-scheme>HTTP(S) scheme</a>이
-          아니라면, 이 단계를 종료합니다.
-        </p>
-      <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-2><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-15 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>copyURL</var>로
-          설정합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-host data-dfn-type=attribute><code>host</code></dfn>
-      getter 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-16 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-11>관련된 <code>Document</code></a>가
-          null이 아니고,
-          해당
-          <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-6 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-5>same
-            origin-domain</a>과 같지 않다면, <a href=#entry-settings-object
-            id=the-location-interface:entry-settings-object-6>entry
-            settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-5>origin</a>을
-          사용하여 <a id=the-location-interface:securityerror-5 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-7><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>url</var>을 <a id=the-location-interface:this-17 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-5>url</a>로
-          설정합니다.</p>
-      <li>
-        <p><var>url</var>의 <a href=https://url.spec.whatwg.org/#concept-url-host
-            id=the-location-interface:concept-url-host data-x-internal=concept-url-host>host</a>가
-          null이라면, 빈
-          문자열을 반환합니다.</p>
-      <li>
-        <p><var>url</var>의 <a href=https://url.spec.whatwg.org/#concept-url-port
-            id=the-location-interface:concept-url-port data-x-internal=concept-url-port>port</a>가
-          null이라면, <var>url</var>의 <a href=https://url.spec.whatwg.org/#concept-url-host
-            id=the-location-interface:concept-url-host-2 data-x-internal=concept-url-host>host</a>를
-          반환합니다,
-          <a href=https://url.spec.whatwg.org/#concept-host-serializer id=the-location-interface:host-serializer
-            data-x-internal=host-serializer>직렬화된</a>
-          상태로.
-        </p>
-      <li>
-        <p><var>url</var>의 <a href=https://url.spec.whatwg.org/#concept-url-host
-            id=the-location-interface:concept-url-host-3 data-x-internal=concept-url-host>host</a>를
-          반환합니다,
-          <a href=https://url.spec.whatwg.org/#concept-host-serializer id=the-location-interface:host-serializer-2
-            data-x-internal=host-serializer>직렬화된</a>
-          상태로, 그
-          뒤에 "<code>:</code>"와
-          <var>url</var>의 <a href=https://url.spec.whatwg.org/#concept-url-port
-            id=the-location-interface:concept-url-port-2 data-x-internal=concept-url-port>port</a>를
-          추가합니다,
-          <a href=https://url.spec.whatwg.org/#serialize-an-integer id=the-location-interface:serialize-an-integer
-            data-x-internal=serialize-an-integer>직렬화된</a>
-          상태로.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-host-2><a href=#dom-location-host>host</a></code>
-      설정자 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-18 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-12>관련된 <code>Document</code></a>가
-          null인 경우, return합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-19 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-13>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-7 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-6>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-7>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-6>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-6 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-8><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>을 <a id=the-location-interface:this-20 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-6>url</a>의 복사본으로 설정합니다.</p>
-      <li>
-        <p><var>copyURL</var>에 <a id=the-location-interface:opaque-path
-            href=https://url.spec.whatwg.org/#url-opaque-path data-x-internal=opaque-path>opaque path</a>가
-          있다면, return합니다.</p>
-      <li>
-        <p><a href=https://url.spec.whatwg.org/#concept-basic-url-parser id=the-location-interface:basic-url-parser-2
-            data-x-internal=basic-url-parser>기본 URL
-            파싱</a>을 수행하고, <var>copyURL</var>을 <a href=https://url.spec.whatwg.org/#basic-url-parser-url
-            id=the-location-interface:basic-url-parser-url-2 data-x-internal=basic-url-parser-url><i>url</i></a>로
-          설정하며 <a id=the-location-interface:host-state href=https://url.spec.whatwg.org/#host-state
-            data-x-internal=host-state>host 상태</a>를 <a href=https://url.spec.whatwg.org/#basic-url-parser-state-override
-            id=the-location-interface:basic-url-parser-state-override-2
-            data-x-internal=basic-url-parser-state-override><i>state override</i></a>로 설정합니다.</p>
-      <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-3><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-21 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>copyURL</var>로 설정합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-hostname data-dfn-type=attribute><code>hostname</code></dfn>
-      getter 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-22 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-14>관련된 <code>Document</code></a>가
-          null이 아니고, 해당 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-8 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-7>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-8>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-7>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-7 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-9><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-23 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-7>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-host id=the-location-interface:concept-url-host-4
-            data-x-internal=concept-url-host>host</a>가 null이라면, 빈 문자열을 반환합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-24 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-8>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-host id=the-location-interface:concept-url-host-5
-            data-x-internal=concept-url-host>host</a>를 반환합니다, <a
-            href=https://url.spec.whatwg.org/#concept-host-serializer id=the-location-interface:host-serializer-3
-            data-x-internal=host-serializer>직렬화된</a>
-          상태로.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-hostname-2><a href=#dom-location-hostname>hostname</a></code>
-      설정자 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-25 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-15>관련된 <code>Document</code></a>가 null인
-          경우, return합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-26 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-16>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-9 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-8>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-9>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-8>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-8 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-10><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>을 <a id=the-location-interface:this-27 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-9>url</a>의 복사본으로 설정합니다.</p>
-      <li>
-        <p><var>copyURL</var>에 <a id=the-location-interface:opaque-path-2
-            href=https://url.spec.whatwg.org/#url-opaque-path data-x-internal=opaque-path>opaque path</a>가
-          있다면, return합니다.</p>
-      <li>
-        <p><a href=https://url.spec.whatwg.org/#concept-basic-url-parser id=the-location-interface:basic-url-parser-3
-            data-x-internal=basic-url-parser>기본 URL
-            파싱</a>을 수행하고, <var>copyURL</var>을 <a href=https://url.spec.whatwg.org/#basic-url-parser-url
-            id=the-location-interface:basic-url-parser-url-3 data-x-internal=basic-url-parser-url><i>url</i></a>로
-          설정하며 <a id=the-location-interface:hostname-state href=https://url.spec.whatwg.org/#hostname-state
-            data-x-internal=hostname-state>hostname 상태</a>를 <a
-            href=https://url.spec.whatwg.org/#basic-url-parser-state-override
-            id=the-location-interface:basic-url-parser-state-override-3
-            data-x-internal=basic-url-parser-state-override><i>state override</i></a>로 설정합니다.</p>
-      <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-4><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-28 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>copyURL</var>로 설정합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-port data-dfn-type=attribute><code>port</code></dfn> getter 단계는
-      다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-29 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-17>관련된 <code>Document</code></a>가
-          null이 아니고, 해당 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-10 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-9>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-10>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-9>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-9 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-11><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-30 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-10>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-port id=the-location-interface:concept-url-port-3
-            data-x-internal=concept-url-port>port</a>가 null이라면, 빈 문자열을 반환합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-31 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-11>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-port id=the-location-interface:concept-url-port-4
-            data-x-internal=concept-url-port>port</a>를 반환합니다, <a href=https://url.spec.whatwg.org/#serialize-an-integer
-            id=the-location-interface:serialize-an-integer-2 data-x-internal=serialize-an-integer>직렬화된</a>
-          상태로.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-port-2><a href=#dom-location-port>port</a></code> 설정자
-      단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-32 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-18>관련된 <code>Document</code></a>가 null인
-          경우, return합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-33 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-19>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-11 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-10>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-11>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-10>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-10 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-12><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>을 <a id=the-location-interface:this-34 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-12>url</a>의 복사본으로 설정합니다.</p>
-      <li>
-        <p><var>copyURL</var>이 <a id=the-location-interface:cannot-have-a-username/password/port
-            href=https://url.spec.whatwg.org/#cannot-have-a-username-password-port
-            data-x-internal=cannot-have-a-username/password/port>username/password/port를 가질 수 없다면</a>,
-          return합니다.</p>
-      <li>
-        <p>주어진 값이 빈 문자열인 경우, <var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-port
-            id=the-location-interface:concept-url-port-5 data-x-internal=concept-url-port>port</a>를
-          null로 설정합니다.</p>
-      <li>
-        <p>그렇지 않은 경우, <a href=https://url.spec.whatwg.org/#concept-basic-url-parser
-            id=the-location-interface:basic-url-parser-4 data-x-internal=basic-url-parser>기본 URL
-            파싱</a>을 수행하고, <var>copyURL</var>을 <a href=https://url.spec.whatwg.org/#basic-url-parser-url
-            id=the-location-interface:basic-url-parser-url-4 data-x-internal=basic-url-parser-url><i>url</i></a>로
-          설정하며 <a id=the-location-interface:port-state href=https://url.spec.whatwg.org/#port-state
-            data-x-internal=port-state>port 상태</a>를 <a href=https://url.spec.whatwg.org/#basic-url-parser-state-override
-            id=the-location-interface:basic-url-parser-state-override-4
-            data-x-internal=basic-url-parser-state-override><i>state override</i></a>로 설정합니다.</p>
-      <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-5><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-35 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>copyURL</var>로 설정합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-pathname data-dfn-type=attribute><code>pathname</code></dfn>
-      getter 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-36 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-20>관련된 <code>Document</code></a>가
-          null이 아니고, 해당 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-12 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-11>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-12>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-11>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-11 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-13><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><a href=https://url.spec.whatwg.org/#url-path-serializer id=the-location-interface:url-path-serializer
-            data-x-internal=url-path-serializer>URL
-            경로 직렬화</a>의 결과를 반환합니다. 이 <a href=#location id=the-location-interface:location-30><code>Location</code></a>
-          객체의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-13>url</a>을
-          사용합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-pathname-2><a href=#dom-location-pathname>pathname</a></code>
-      설정자 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-37 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-21>관련된 <code>Document</code></a>가 null인
-          경우, return합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-38 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-22>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-13 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-12>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-13>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-12>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-12 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-14><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>을 <a id=the-location-interface:this-39 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-14>url</a>의 복사본으로 설정합니다.</p>
-      <li>
-        <p><var>copyURL</var>에 <a id=the-location-interface:opaque-path-3
-            href=https://url.spec.whatwg.org/#url-opaque-path data-x-internal=opaque-path>opaque path</a>가
-          있다면, return합니다.</p>
-      <li>
-        <p><var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-path
-            id=the-location-interface:concept-url-path data-x-internal=concept-url-path>경로</a>를 빈
-          목록으로 설정합니다.</p>
-      <li>
-        <p><a href=https://url.spec.whatwg.org/#concept-basic-url-parser id=the-location-interface:basic-url-parser-5
-            data-x-internal=basic-url-parser>기본 URL
-            파싱</a>을 수행하고, <var>copyURL</var>을 <a href=https://url.spec.whatwg.org/#basic-url-parser-url
-            id=the-location-interface:basic-url-parser-url-5 data-x-internal=basic-url-parser-url><i>url</i></a>로
-          설정하며 <a id=the-location-interface:path-start-state href=https://url.spec.whatwg.org/#path-start-state
-            data-x-internal=path-start-state>경로 시작
-            상태</a>를 <a href=https://url.spec.whatwg.org/#basic-url-parser-state-override
-            id=the-location-interface:basic-url-parser-state-override-5
-            data-x-internal=basic-url-parser-state-override><i>state override</i></a>로 설정합니다.</p>
-      <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-6><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-40 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>copyURL</var>로 설정합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-search data-dfn-type=attribute><code>search</code></dfn> getter 단계는
-      다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-41 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-23>관련된 <code>Document</code></a>가 null이
-          아니고, 해당 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-14 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-13>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-14>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-13>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-13 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-15><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-42 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-15>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-query id=the-location-interface:concept-url-query
-            data-x-internal=concept-url-query>query</a>가 null이거나 빈 문자열인 경우, 빈 문자열을
-          반환합니다.
-        </p>
-      <li>
-        <p>"<code>?</code>"를 반환하고, 그 뒤에 <a id=the-location-interface:this-43 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-16>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-query id=the-location-interface:concept-url-query-2
-            data-x-internal=concept-url-query>query</a>를 반환합니다.</p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-search-2><a href=#dom-location-search>search</a></code>
-      설정자 단계는 다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-44 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-24>관련된 <code>Document</code></a>가 null인
-          경우, return합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-45 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-25>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-15 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-14>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-15>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-14>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-14 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-16><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>을 <a id=the-location-interface:this-46 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-17>url</a>의 복사본으로 설정합니다.</p>
-      <li>
-        <p>주어진 값이 빈 문자열인 경우, <var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-query
-            id=the-location-interface:concept-url-query-3 data-x-internal=concept-url-query>query</a>를
-          null로 설정합니다.</p>
-      <li>
-        <p>그렇지 않은 경우, 다음 하위 단계를 수행합니다:</p>
-        <ol>
-          <li>
-            <p>주어진 값에서 선행 "<code>?</code>"을 제거한 값을 <var>input</var>으로 설정합니다(있는
-              경우).</p>
-          <li>
-            <p><var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-query
-                id=the-location-interface:concept-url-query-4 data-x-internal=concept-url-query>query</a>를
-              빈 문자열로 설정합니다.</p>
-          <li>
-            <p><a href=https://url.spec.whatwg.org/#concept-basic-url-parser
-                id=the-location-interface:basic-url-parser-6 data-x-internal=basic-url-parser>기본 URL 구문
-                분석</a> <var>input</var>, null,
-              <a href=#relevant-document id=the-location-interface:relevant-document-26>해당
-                <code>Document</code></a>의 <a id="the-location-interface:document's-character-encoding"
-                href=https://dom.spec.whatwg.org/#concept-document-encoding
-                data-x-internal="document's-character-encoding">문서의 문자 인코딩</a>,
-              <var>copyURL</var>를 <a href=https://url.spec.whatwg.org/#basic-url-parser-url
-                id=the-location-interface:basic-url-parser-url-6 data-x-internal=basic-url-parser-url><i>url</i></a>로
-              사용하고,
-              <a id=the-location-interface:query-state href=https://url.spec.whatwg.org/#query-state
-                data-x-internal=query-state>쿼리 상태</a>를 <a
-                href=https://url.spec.whatwg.org/#basic-url-parser-state-override
-                id=the-location-interface:basic-url-parser-state-override-6
-                data-x-internal=basic-url-parser-state-override><i>상태
-                  오버라이드</i></a>로 사용하여 수행합니다.
-            </p>
-        </ol>
-      <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-7><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-47 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>copyURL</var>로 설정합니다.
-        </p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-hash data-dfn-type=attribute><code>hash</code></dfn> getter 단계는
-      다음과 같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-48 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-27>관련된 <code>Document</code></a>가
-          null이 아니고, 해당 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-16 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-15>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-16>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-15>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-15 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-17><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-49 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#concept-location-url id=the-location-interface:concept-location-url-18>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-fragment id=the-location-interface:concept-url-fragment
-            data-x-internal=concept-url-fragment>fragment</a>가
-          null이거나 빈 문자열인 경우, 빈 문자열을 반환합니다.
-        </p>
-      <li>
-        <p>"<code>#</code>"를 반환하고, 그 뒤에 <a id=the-location-interface:this-50 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-19>url</a>의 <a
-            href=https://url.spec.whatwg.org/#concept-url-fragment id=the-location-interface:concept-url-fragment-2
-            data-x-internal=concept-url-fragment>fragment</a>를
-          반환합니다.</p>
-    </ol>
-  </div>
-
-  <div data-algorithm="">
-    <p>
-      <code id=the-location-interface:dom-location-hash-2><a href=#dom-location-hash>hash</a></code> 설정자 단계는 다음과
-      같습니다:
-    </p>
-
-    <ol>
-      <li>
-        <p><a id=the-location-interface:this-51 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-28>관련된 <code>Document</code></a>가 null인
-          경우, return합니다.
-        </p>
-      <li>
-        <p><a id=the-location-interface:this-52 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-29>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-17 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-16>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-17>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-16>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-16 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-18><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
-        </p>
-      <li>
-        <p><var>copyURL</var>을 <a id=the-location-interface:this-53 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-url
-            id=the-location-interface:concept-location-url-20>url</a>의 복사본으로 설정합니다.</p>
-      <li>
-        <p><var>thisURLFragment</var>는 <var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-fragment
-            id=the-location-interface:concept-url-fragment-3 data-x-internal=concept-url-fragment>프래그먼트</a>가
-          null이 아니면 해당 프래그먼트이고, 그렇지 않으면 빈 문자열입니다.
+        <p>만약 <a id="the-location-interface:this-8" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-6">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-2" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-2">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-2">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-2">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-3"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
         </p>
       </li>
       <li>
-        <p>주어진 값에서 선행 "<code>#</code>"을 제거한 값을 <var>input</var>으로 설정합니다(있는 경우).</p>
+        <p>이 <a id="the-location-interface:this-9" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-2">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-origin" id="the-location-interface:concept-url-origin"
+            data-x-internal="concept-url-origin">origin</a>의 <a href="#ascii-serialisation-of-an-origin"
+            id="the-location-interface:ascii-serialisation-of-an-origin">직렬화</a>를 반환합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-protocol" data-dfn-type="attribute"><code>protocol</code></dfn>
+      게터 단계입니다:</p>
+
+    <ol>
       <li>
-        <p><var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-fragment
-            id=the-location-interface:concept-url-fragment-4 data-x-internal=concept-url-fragment>fragment</a>를
-          빈 문자열로 설정합니다.</p>
+        <p>만약 <a id="the-location-interface:this-10" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-7">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-3" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-3">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-3">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-3">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-4"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
       <li>
-        <p><a href=https://url.spec.whatwg.org/#concept-basic-url-parser id=the-location-interface:basic-url-parser-7
-            data-x-internal=basic-url-parser>기본 URL 파싱</a>을
-          수행하고, <var>copyURL</var>을 <a href=https://url.spec.whatwg.org/#basic-url-parser-url
-            id=the-location-interface:basic-url-parser-url-7 data-x-internal=basic-url-parser-url><i>url</i></a>로
-          설정하며 <a href=https://url.spec.whatwg.org/#fragment-state id=the-location-interface:fragment-state
-            data-x-internal=fragment-state>fragment
-            상태</a>를 <a href=https://url.spec.whatwg.org/#basic-url-parser-state-override
-            id=the-location-interface:basic-url-parser-state-override-7
-            data-x-internal=basic-url-parser-state-override><i>상태 재정의</i></a>로 설정합니다.</p>
+        <p><a id="the-location-interface:this-11" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-3">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-scheme" id="the-location-interface:concept-url-scheme"
+            data-x-internal="concept-url-scheme">scheme</a>에 이어 "<code>:</code>"를 반환합니다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <code
+        id="the-location-interface:dom-location-protocol-2"><a href="#dom-location-protocol">protocol</a></code> 세터
+      단계입니다:</p>
+
+    <ol>
       <li>
-        <p>만약 <var>copyURL</var>의 <a href=https://url.spec.whatwg.org/#concept-url-fragment
-            id=the-location-interface:concept-url-fragment-5 data-x-internal=concept-url-fragment>프래그먼트</a>가
-          <var>thisURLFragment</var>이면, 반환합니다.
+        <p>만약 <a id="the-location-interface:this-12" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-8">관련 <code>Document</code></a>가 null이면, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-13" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-9">관련 <code>Document</code></a>의
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-4" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-4">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-4">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-4">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-5"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>copyURL</var>를 <a id="the-location-interface:this-14" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-4">url</a>의 복사본으로 합니다.</p>
+      </li>
+      <li>
+        <p><var>possibleFailure</var>를 주어진 값에 "<code>:</code>"를 붙여 <a
+            href="https://url.spec.whatwg.org/#concept-basic-url-parser" id="the-location-interface:basic-url-parser"
+            data-x-internal="basic-url-parser">basic URL parsing</a>을 <var>copyURL</var>를 <a
+            href="https://url.spec.whatwg.org/#basic-url-parser-url" id="the-location-interface:basic-url-parser-url"
+            data-x-internal="basic-url-parser-url"><i>url</i></a>로 하고
+          <a id="the-location-interface:scheme-start-state" href="https://url.spec.whatwg.org/#scheme-start-state"
+            data-x-internal="scheme-start-state">scheme start state</a>를 <a
+            href="https://url.spec.whatwg.org/#basic-url-parser-state-override"
+            id="the-location-interface:basic-url-parser-state-override"
+            data-x-internal="basic-url-parser-state-override"><i>state override</i></a>로 하여 실행한 결과로 합니다.
         </p>
 
-        <p class=note>이 중단은 스크롤 시 <code>location.hash</code>를 중복으로 설정하는 <a
-            href="https://bugzilla.mozilla.org/show_bug.cgi?id=1733797#c2">배포된 컨텐츠와의 호환성을 위해</a>
-          필요합니다. 이 중단은 <code
-            id=the-location-interface:dom-location-href-4><a href=#dom-location-href>location.href</a></code>
-          설정자나 <code
-            id=the-location-interface:dom-location-assign-2><a href=#dom-location-assign>location.assign()</a></code>
-          같은 다른 프래그먼트 탐색 메커니즘에는 적용되지 않습니다.</p>
+        <p class="note">URL 파서는 연속된 콜론을 무시하므로, "<code>https:</code>"(또는 "<code>https::::</code>")를 제공하는 것은
+          "<code>https</code>"를 제공하는 것과 동일합니다.</p>
+      </li>
       <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-8><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-54 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>copyURL</var>로 설정합니다.
+        <p>만약 <var>possibleFailure</var>가 failure이면, "<code>SyntaxError</code>"</a> <code
+            id="the-location-interface:domexception-6"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
         </p>
+      </li>
+      <li>
+        <p>만약 <var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-scheme"
+            id="the-location-interface:concept-url-scheme-2" data-x-internal="concept-url-scheme">scheme</a>이 <a
+            id="the-location-interface:http(s)-scheme" href="https://fetch.spec.whatwg.org/#http-scheme"
+            data-x-internal="http(s)-scheme">HTTP(S) scheme</a>이 아니면,
+          이 단계를 종료합니다.
+        </p>
+      </li>
+      <li>
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-2"><code>Location</code>-object navigate</a>를 <a
+            id="the-location-interface:this-15" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>에서 <var>copyURL</var>로 수행합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-host" data-dfn-type="attribute"><code>host</code></dfn> 게터
+      단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-16" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-10">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-5" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-5">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-5">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-5">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-7"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>url</var>를 <a id="the-location-interface:this-17" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-5">url</a>로 합니다.</p>
+      </li>
+      <li>
+        <p>만약 <var>url</var>의 <a href="https://url.spec.whatwg.org/#concept-url-host"
+            id="the-location-interface:concept-url-host" data-x-internal="concept-url-host">host</a>가 null이면, 빈 문자열을
+          반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <var>url</var>의 <a href="https://url.spec.whatwg.org/#concept-url-port"
+            id="the-location-interface:concept-url-port" data-x-internal="concept-url-port">port</a>가 null이면,
+          <var>url</var>의 <a href="https://url.spec.whatwg.org/#concept-url-host"
+            id="the-location-interface:concept-url-host-2" data-x-internal="concept-url-host">host</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-host-serializer" id="the-location-interface:host-serializer"
+            data-x-internal="host-serializer">serialized</a>를 반환합니다.
+        </p>
+      </li>
+      <li>
+        <p><var>url</var>의 <a href="https://url.spec.whatwg.org/#concept-url-host"
+            id="the-location-interface:concept-url-host-3" data-x-internal="concept-url-host">host</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-host-serializer" id="the-location-interface:host-serializer-2"
+            data-x-internal="host-serializer">serialized</a>에 "<code>:</code>"와 <var>url</var>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-port" id="the-location-interface:concept-url-port-2"
+            data-x-internal="concept-url-port">port</a>의 <a href="https://url.spec.whatwg.org/#serialize-an-integer"
+            id="the-location-interface:serialize-an-integer" data-x-internal="serialize-an-integer">serialized</a>를 이어
+          붙여 반환합니다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <code id="the-location-interface:dom-location-host-2"><a href="#dom-location-host">host</a></code> 세터 단계입니다:
+    </p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-18" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-11">관련 <code>Document</code></a>가 null이면, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-19" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-12">관련 <code>Document</code></a>의
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-6" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-6">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-6">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-6">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-8"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>copyURL</var>를 <a id="the-location-interface:this-20" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-6">url</a>의 복사본으로 합니다.</p>
+      </li>
+      <li>
+        <p>만약 <var>copyURL</var>가 <a id="the-location-interface:opaque-path"
+            href="https://url.spec.whatwg.org/#url-opaque-path" data-x-internal="opaque-path">opaque path</a>를 가지면,
+          반환합니다.</p>
+      </li>
+      <li>
+        <p><a href="https://url.spec.whatwg.org/#concept-basic-url-parser"
+            id="the-location-interface:basic-url-parser-2" data-x-internal="basic-url-parser">Basic URL parse</a>를 주어진
+          값에 대해 실행하되,
+          <var>copyURL</var>를 <a href="https://url.spec.whatwg.org/#basic-url-parser-url"
+            id="the-location-interface:basic-url-parser-url-2" data-x-internal="basic-url-parser-url"><i>url</i></a>로 하고
+          <a id="the-location-interface:host-state" href="https://url.spec.whatwg.org/#host-state"
+            data-x-internal="host-state">host state</a>를 <a
+            href="https://url.spec.whatwg.org/#basic-url-parser-state-override"
+            id="the-location-interface:basic-url-parser-state-override-2"
+            data-x-internal="basic-url-parser-state-override"><i>state override</i></a>로 합니다.
+        </p>
+      </li>
+      <li>
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-3"><code>Location</code>-object navigate</a>를 <a
+            id="the-location-interface:this-21" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>에서 <var>copyURL</var>로 수행합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-hostname" data-dfn-type="attribute"><code>hostname</code></dfn>
+      게터 단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-22" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-13">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-7" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-7">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-7">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-7">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-9"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-23" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-7">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-host" id="the-location-interface:concept-url-host-4"
+            data-x-internal="concept-url-host">host</a>가 null이면, 빈 문자열을 반환합니다.</p>
+      </li>
+      <li>
+        <p><a id="the-location-interface:this-24" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-8">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-host" id="the-location-interface:concept-url-host-5"
+            data-x-internal="concept-url-host">host</a>의 <a href="https://url.spec.whatwg.org/#concept-host-serializer"
+            id="the-location-interface:host-serializer-3" data-x-internal="host-serializer">serialized</a>를 반환합니다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <code
+        id="the-location-interface:dom-location-hostname-2"><a href="#dom-location-hostname">hostname</a></code> 세터
+      단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-25" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-14">관련 <code>Document</code></a>가 null이면, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-26" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-15">관련 <code>Document</code></a>의
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-8" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-8">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-8">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-8">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-10"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>copyURL</var>를 <a id="the-location-interface:this-27" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-9">url</a>의 복사본으로 합니다.</p>
+      </li>
+      <li>
+        <p>만약 <var>copyURL</var>가 <a id="the-location-interface:opaque-path-2"
+            href="https://url.spec.whatwg.org/#url-opaque-path" data-x-internal="opaque-path">opaque path</a>를 가지면,
+          반환합니다.</p>
+      </li>
+      <li>
+        <p><a href="https://url.spec.whatwg.org/#concept-basic-url-parser"
+            id="the-location-interface:basic-url-parser-3" data-x-internal="basic-url-parser">Basic URL parse</a>를 주어진
+          값에 대해 실행하되,
+          <var>copyURL</var>를 <a href="https://url.spec.whatwg.org/#basic-url-parser-url"
+            id="the-location-interface:basic-url-parser-url-3" data-x-internal="basic-url-parser-url"><i>url</i></a>로 하고
+          <a id="the-location-interface:hostname-state" href="https://url.spec.whatwg.org/#hostname-state"
+            data-x-internal="hostname-state">hostname state</a>를 <a
+            href="https://url.spec.whatwg.org/#basic-url-parser-state-override"
+            id="the-location-interface:basic-url-parser-state-override-3"
+            data-x-internal="basic-url-parser-state-override"><i>state override</i></a>로 합니다.
+        </p>
+      </li>
+      <li>
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-4"><code>Location</code>-object navigate</a>를 <a
+            id="the-location-interface:this-28" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>에서 <var>copyURL</var>로 수행합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-port" data-dfn-type="attribute"><code>port</code></dfn> 게터
+      단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-29" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-16">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-9" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-9">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-9">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-9">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-11"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-30" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-10">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-port" id="the-location-interface:concept-url-port-3"
+            data-x-internal="concept-url-port">port</a>가 null이면, 빈 문자열을 반환합니다.</p>
+      </li>
+      <li>
+        <p><a id="the-location-interface:this-31" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-11">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-port" id="the-location-interface:concept-url-port-4"
+            data-x-internal="concept-url-port">port</a>의 <a href="https://url.spec.whatwg.org/#serialize-an-integer"
+            id="the-location-interface:serialize-an-integer-2" data-x-internal="serialize-an-integer">serialized</a>를
+          반환합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <code id="the-location-interface:dom-location-port-2"><a href="#dom-location-port">port</a></code> 세터 단계입니다:
+    </p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-32" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-17">관련 <code>Document</code></a>가 null이면, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-33" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-18">관련 <code>Document</code></a>의
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-10" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-10">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-10">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-10">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-12"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>copyURL</var>를 <a id="the-location-interface:this-34" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-12">url</a>의 복사본으로 합니다.</p>
+      </li>
+      <li>
+        <p>만약 <var>copyURL</var>가 <a id="the-location-interface:cannot-have-a-username/password/port"
+            href="https://url.spec.whatwg.org/#cannot-have-a-username-password-port"
+            data-x-internal="cannot-have-a-username/password/port">username/password/port를 가질 수 없다면</a>, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 주어진 값이 빈 문자열이면, <var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-port"
+            id="the-location-interface:concept-url-port-5" data-x-internal="concept-url-port">port</a>를 null로 설정합니다.</p>
+      </li>
+      <li>
+        <p>그렇지 않다면, <a href="https://url.spec.whatwg.org/#concept-basic-url-parser"
+            id="the-location-interface:basic-url-parser-4" data-x-internal="basic-url-parser">basic URL parse</a>를
+          주어진 값에 대해 실행하되, <var>copyURL</var>를 <a href="https://url.spec.whatwg.org/#basic-url-parser-url"
+            id="the-location-interface:basic-url-parser-url-4" data-x-internal="basic-url-parser-url"><i>url</i></a>로 하고
+          <a id="the-location-interface:port-state" href="https://url.spec.whatwg.org/#port-state"
+            data-x-internal="port-state">port state</a>를 <a
+            href="https://url.spec.whatwg.org/#basic-url-parser-state-override"
+            id="the-location-interface:basic-url-parser-state-override-4"
+            data-x-internal="basic-url-parser-state-override"><i>state override</i></a>로 합니다.
+        </p>
+      </li>
+      <li>
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-5"><code>Location</code>-object navigate</a>를 <a
+            id="the-location-interface:this-35" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>에서 <var>copyURL</var>로 수행합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-pathname" data-dfn-type="attribute"><code>pathname</code></dfn>
+      게터 단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-36" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-19">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-11" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-11">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-11">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-11">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-13"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p>이 <code id="the-location-interface:location-27"><a href="#location">Location</a></code> 객체의 <a
+            href="#concept-location-url" id="the-location-interface:concept-location-url-13">url</a>에 대해 <a
+            href="https://url.spec.whatwg.org/#url-path-serializer" id="the-location-interface:url-path-serializer"
+            data-x-internal="url-path-serializer">URL path serializing</a>의 결과를 반환합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <code
+        id="the-location-interface:dom-location-pathname-2"><a href="#dom-location-pathname">pathname</a></code> 세터
+      단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-37" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-20">관련 <code>Document</code></a>가 null이면, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-38" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-21">관련 <code>Document</code></a>의
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-12" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-12">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-12">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-12">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-14"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>copyURL</var>를 <a id="the-location-interface:this-39" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-14">url</a>의 복사본으로 합니다.</p>
+      </li>
+      <li>
+        <p>만약 <var>copyURL</var>가 <a id="the-location-interface:opaque-path-3"
+            href="https://url.spec.whatwg.org/#url-opaque-path" data-x-internal="opaque-path">opaque path</a>를 가지면,
+          반환합니다.</p>
+      </li>
+      <li>
+        <p><var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-path"
+            id="the-location-interface:concept-url-path" data-x-internal="concept-url-path">path</a>를 빈 리스트로 설정합니다.</p>
+      </li>
+      <li>
+        <p><a href="https://url.spec.whatwg.org/#concept-basic-url-parser"
+            id="the-location-interface:basic-url-parser-5" data-x-internal="basic-url-parser">Basic URL parse</a>를 주어진
+          값에 대해 실행하되,
+          <var>copyURL</var>를 <a href="https://url.spec.whatwg.org/#basic-url-parser-url"
+            id="the-location-interface:basic-url-parser-url-5" data-x-internal="basic-url-parser-url"><i>url</i></a>로 하고
+          <a id="the-location-interface:path-start-state" href="https://url.spec.whatwg.org/#path-start-state"
+            data-x-internal="path-start-state">path start state</a>를 <a
+            href="https://url.spec.whatwg.org/#basic-url-parser-state-override"
+            id="the-location-interface:basic-url-parser-state-override-5"
+            data-x-internal="basic-url-parser-state-override"><i>state override</i></a>로 합니다.
+        </p>
+      </li>
+      <li>
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-6"><code>Location</code>-object navigate</a>를 <a
+            id="the-location-interface:this-40" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>에서 <var>copyURL</var>로 수행합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-search" data-dfn-type="attribute"><code>search</code></dfn> 게터
+      단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-41" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-22">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-13" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-13">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-13">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-13">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-15"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-42" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-15">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-query" id="the-location-interface:concept-url-query"
+            data-x-internal="concept-url-query">query</a>가 null이거나 빈 문자열이면, 빈 문자열을 반환합니다.</p>
+      </li>
+      <li>
+        <p>"<code>?</code>"에 이어 <a id="the-location-interface:this-43" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-16">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-query" id="the-location-interface:concept-url-query-2"
+            data-x-internal="concept-url-query">query</a>를 반환합니다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <code id="the-location-interface:dom-location-search-2"><a href="#dom-location-search">search</a></code> 세터
+      단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-44" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-23">관련 <code>Document</code></a>가 null이면, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-45" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-24">관련 <code>Document</code></a>의
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-14" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-14">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-14">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-14">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-16"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>copyURL</var>를 <a id="the-location-interface:this-46" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-17">url</a>의 복사본으로 합니다.</p>
+      </li>
+      <li>
+        <p>만약 주어진 값이 빈 문자열이면, <var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-query"
+            id="the-location-interface:concept-url-query-3" data-x-internal="concept-url-query">query</a>를 null로 설정합니다.
+
+        </p>
+      </li>
+      <li>
+        <p>그렇지 않으면, 다음의 하위 단계를 실행합니다:</p>
+
+        <ol>
+          <li>
+            <p><var>input</var>을, 주어진 값에서 선행하는 한 개의 "<code>?</code>"를 제거한 값으로 합니다(있다면).</p>
+          </li>
+          <li>
+            <p><var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-query"
+                id="the-location-interface:concept-url-query-4" data-x-internal="concept-url-query">query</a>를 빈 문자열로
+              설정합니다.</p>
+          </li>
+          <li>
+            <p><a href="https://url.spec.whatwg.org/#concept-basic-url-parser"
+                id="the-location-interface:basic-url-parser-6" data-x-internal="basic-url-parser">Basic URL parse</a>를
+              <var>input</var>에 대해 실행하되, null과 <a href="#relevant-document"
+                id="the-location-interface:relevant-document-25">관련 <code>Document</code></a>의 <a
+                id="the-location-interface:document's-character-encoding"
+                href="https://dom.spec.whatwg.org/#concept-document-encoding"
+                data-x-internal="document's-character-encoding">문서 문자 인코딩</a>, <var>copyURL</var>를 <a
+                href="https://url.spec.whatwg.org/#basic-url-parser-url"
+                id="the-location-interface:basic-url-parser-url-6"
+                data-x-internal="basic-url-parser-url"><i>url</i></a>로 하고 <a id="the-location-interface:query-state"
+                href="https://url.spec.whatwg.org/#query-state" data-x-internal="query-state">query state</a>를 <a
+                href="https://url.spec.whatwg.org/#basic-url-parser-state-override"
+                id="the-location-interface:basic-url-parser-state-override-6"
+                data-x-internal="basic-url-parser-state-override"><i>state override</i></a>로 하여 실행합니다.
+            </p>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-7"><code>Location</code>-object navigate</a>를 <a
+            id="the-location-interface:this-47" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>에서 <var>copyURL</var>로 수행합니다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <dfn data-dfn-for="Location" id="dom-location-hash" data-dfn-type="attribute"><code>hash</code></dfn> 게터
+      단계입니다:</p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-48" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-26">관련 <code>Document</code></a>가 null이 아니고 그
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-15" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-15">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-15">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-15">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-17"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-49" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-18">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-fragment" id="the-location-interface:concept-url-fragment"
+            data-x-internal="concept-url-fragment">fragment</a>가 null이거나 빈 문자열이면, 빈 문자열을 반환합니다.</p>
+      </li>
+      <li>
+        <p>"<code>#</code>"에 이어 <a id="the-location-interface:this-50" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-19">url</a>의 <a
+            href="https://url.spec.whatwg.org/#concept-url-fragment" id="the-location-interface:concept-url-fragment-2"
+            data-x-internal="concept-url-fragment">fragment</a>를 반환합니다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
+    <p>다음은 <code id="the-location-interface:dom-location-hash-2"><a href="#dom-location-hash">hash</a></code> 세터 단계입니다:
+    </p>
+
+    <ol>
+      <li>
+        <p>만약 <a id="the-location-interface:this-51" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-27">관련 <code>Document</code></a>가 null이면, 반환합니다.</p>
+      </li>
+      <li>
+        <p>만약 <a id="the-location-interface:this-52" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-28">관련 <code>Document</code></a>의
+          <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-16" data-x-internal="concept-document-origin">origin</a>이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-16">entry settings object</a>의
+          <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-16">origin</a>과 <a href="#same-origin-domain"
+            id="the-location-interface:same-origin-domain-16">same origin-domain</a>이 아니면,
+          "<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-18"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
+      <li>
+        <p><var>copyURL</var>를 <a id="the-location-interface:this-53" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-url"
+            id="the-location-interface:concept-location-url-20">url</a>의 복사본으로 합니다.</p>
+      </li>
+      <li>
+        <p><var>thisURLFragment</var>를 <var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-fragment"
+            id="the-location-interface:concept-url-fragment-3" data-x-internal="concept-url-fragment">fragment</a>가
+          null이 아니면 그 값으로, 그렇지 않으면 빈 문자열로 합니다.</p>
+      </li>
+      <li>
+        <p><var>input</var>을 주어진 값에서 선행하는 한 개의 "<code>#</code>"를 제거한 값으로 합니다(있다면).</p>
+      </li>
+      <li>
+        <p><var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-fragment"
+            id="the-location-interface:concept-url-fragment-4" data-x-internal="concept-url-fragment">fragment</a>를 빈
+          문자열로 설정합니다.</p>
+      </li>
+      <li>
+        <p><a href="https://url.spec.whatwg.org/#concept-basic-url-parser"
+            id="the-location-interface:basic-url-parser-7" data-x-internal="basic-url-parser">Basic URL parse</a>를
+          <var>input</var>에 대해 실행하되, <var>copyURL</var>를 <a href="https://url.spec.whatwg.org/#basic-url-parser-url"
+            id="the-location-interface:basic-url-parser-url-7" data-x-internal="basic-url-parser-url"><i>url</i></a>로 하고
+          <a id="the-location-interface:fragment-state" href="https://url.spec.whatwg.org/#fragment-state"
+            data-x-internal="fragment-state">fragment state</a>를 <a
+            href="https://url.spec.whatwg.org/#basic-url-parser-state-override"
+            id="the-location-interface:basic-url-parser-state-override-7"
+            data-x-internal="basic-url-parser-state-override"><i>state override</i></a>로 하여 실행합니다.
+        </p>
+      </li>
+      <li>
+        <p>만약 <var>copyURL</var>의 <a href="https://url.spec.whatwg.org/#concept-url-fragment"
+            id="the-location-interface:concept-url-fragment-5" data-x-internal="concept-url-fragment">fragment</a>가
+          <var>thisURLFragment</var>와 같으면, 반환합니다.
+        </p>
+
+        <p class="note">이 예외 반환은 배포된 콘텐츠와의 호환성을 위해 필요합니다. 예를 들어 스크롤 시에 중복으로 <code>location.hash</code>를 설정하는 콘텐츠와의 호환성
+          문제 때문입니다. 이 동작은 <code
+            id="the-location-interface:dom-location-href-4"><a href="#dom-location-href">location.href</a></code> 세터나
+          <code
+            id="the-location-interface:dom-location-assign-2"><a href="#dom-location-assign">location.assign()</a></code>
+          같은 다른 조각(fragment) 내비게이션 메커니즘에는 적용되지 않습니다.
+        </p>
+      </li>
+      <li>
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-8"><code>Location</code>-object navigate</a>를 <a
+            id="the-location-interface:this-54" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>에서 <var>copyURL</var>로 수행합니다.
+        </p>
+      </li>
     </ol>
   </div>
 
@@ -139752,187 +139856,216 @@ console<c- p="">.</c->assert<c- p="">(</c->iframeWindow<c- p="">.</c->frameEleme
   <hr>
 
   <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-assign data-dfn-type=method><code>assign(<var>url</var>)</code></dfn>
-      메소드 단계는 다음과 같습니다:
-    </p>
+    <p><dfn data-dfn-for="Location" id="dom-location-assign"
+        data-dfn-type="method"><code>assign(<var>url</var>)</code></dfn> 메서드의 단계는 다음과 같습니다:</p>
 
     <ol>
       <li>
-        <p><a id=the-location-interface:this-55 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-30>관련된 <code>Document</code></a>가 null인
-          경우, return합니다.
-        </p>
+        <p>만약 <a id="the-location-interface:this-55" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-29">관련 <code>Document</code></a>가 null이면, 그렇다면 반환합니다.</p>
+      </li>
       <li>
-        <p><a id=the-location-interface:this-56 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-31>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-18 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-17>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-18>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-17>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-17 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-19><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
+        <p>만약 <a id="the-location-interface:this-56" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-30">관련 <code>Document</code></a>의 <a
+            href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-17" data-x-internal="concept-document-origin">origin</a>
+          이 <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-17">same origin-domain</a>
+          과 <a href="#entry-settings-object" id="the-location-interface:entry-settings-object-18">entry settings
+            object</a>의 <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-17">origin</a>과 동일하지 않다면, <a
+            id="the-location-interface:securityerror-17" href="https://webidl.spec.whatwg.org/#securityerror"
+            data-x-internal="securityerror">"<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-19"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
         </p>
+      </li>
       <li>
-        <p><var>urlRecord</var>을 <a href=#encoding-parsing-a-url id=the-location-interface:encoding-parsing-a-url-2>URL
-            인코딩 파싱</a>의 결과로 설정하고, <var>url</var>을
-          <a href=#entry-settings-object id=the-location-interface:entry-settings-object-19>entry settings
-            object</a>에 상대적으로 설정합니다.
+        <p><var>urlRecord</var>를 <a href="#encoding-parsing-a-url"
+            id="the-location-interface:encoding-parsing-a-url-2">encoding-parsing a URL</a> 연산을 <var>url</var>에 대해 수행한
+          결과로 정합니다. 기준은 <a href="#entry-settings-object" id="the-location-interface:entry-settings-object-19">entry
+            settings object</a>입니다.
         </p>
+      </li>
       <li>
-        <p><var>urlRecord</var>가 실패라면, <a id=the-location-interface:syntaxerror-3
-            href=https://webidl.spec.whatwg.org/#syntaxerror data-x-internal=syntaxerror>"<code>SyntaxError</code>"</a>
-          <code id=the-location-interface:domexception-20><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
+        <p>만약 <var>urlRecord</var>가 실패이면, <a id="the-location-interface:syntaxerror-3"
+            href="https://webidl.spec.whatwg.org/#syntaxerror"
+            data-x-internal="syntaxerror">"<code>SyntaxError</code>"</a>
+          <code
+            id="the-location-interface:domexception-20"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
         </p>
+      </li>
       <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-9><code>Location</code>-객체
-            탐색</a>을
-          <a id=the-location-interface:this-57 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>urlRecord</var>로 설정합니다.
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-9"><code>Location</code>-object navigate</a>가 <a
+            id="the-location-interface:this-57" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>를
+          <var>urlRecord</var>로 이동시킵니다.
         </p>
+      </li>
     </ol>
   </div>
 
   <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-replace data-dfn-type=method><code>replace(<var>url</var>)</code></dfn>
-      메소드 단계는 다음과 같습니다:
-    </p>
+    <p><dfn data-dfn-for="Location" id="dom-location-replace"
+        data-dfn-type="method"><code>replace(<var>url</var>)</code></dfn> 메서드의 단계는 다음과 같습니다:</p>
 
     <ol>
       <li>
-        <p><a id=the-location-interface:this-58 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-32>관련된 <code>Document</code></a>가 null인
-          경우, return합니다.
-        </p>
+        <p>만약 <a id="the-location-interface:this-58" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-31">관련 <code>Document</code></a>가 null이면, 그렇다면 반환합니다.</p>
+      </li>
       <li>
-        <p><var>urlRecord</var>을 <a href=#encoding-parsing-a-url id=the-location-interface:encoding-parsing-a-url-3>URL
-            인코딩 파싱</a>의 결과로 설정하고, <var>url</var>을
-          <a href=#entry-settings-object id=the-location-interface:entry-settings-object-20>entry settings
-            object</a>에 상대적으로 설정합니다.
+        <p><var>urlRecord</var>를 <a href="#encoding-parsing-a-url"
+            id="the-location-interface:encoding-parsing-a-url-3">encoding-parsing a URL</a> 연산을 <var>url</var>에 대해 수행한
+          결과로 정합니다. 기준은 <a href="#entry-settings-object" id="the-location-interface:entry-settings-object-20">entry
+            settings object</a>입니다.
         </p>
+      </li>
       <li>
-        <p><var>urlRecord</var>가 실패라면, <a id=the-location-interface:syntaxerror-4
-            href=https://webidl.spec.whatwg.org/#syntaxerror data-x-internal=syntaxerror>"<code>SyntaxError</code>"</a>
-          <code id=the-location-interface:domexception-21><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
+        <p>만약 <var>urlRecord</var>가 실패이면, <a id="the-location-interface:syntaxerror-4"
+            href="https://webidl.spec.whatwg.org/#syntaxerror"
+            data-x-internal="syntaxerror">"<code>SyntaxError</code>"</a>
+          <code
+            id="the-location-interface:domexception-21"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
         </p>
+      </li>
       <li>
-        <p><a href=#location-object-navigate
-            id=the-location-interface:location-object-navigate-10><code>Location</code>-객체 탐색</a>을
-          <a id=the-location-interface:this-59 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>에
-          <var>urlRecord</var>로 설정하고, "<code id=the-location-interface:navigationhistorybehavior-replace-2><a
-                    href=#navigationhistorybehavior-replace>replace</a></code>"로 설정합니다.
+        <p><a href="#location-object-navigate"
+            id="the-location-interface:location-object-navigate-10"><code>Location</code>-object navigate</a>가 <a
+            id="the-location-interface:this-59" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>를
+          <var>urlRecord</var>로 이동시키되, "<code
+            id="the-location-interface:navigationhistorybehavior-replace-2"><a href="#navigationhistorybehavior-replace">replace</a></code>"
+          동작을 지정합니다.
         </p>
+      </li>
     </ol>
   </div>
 
-  <p class=note>
-    <code id=the-location-interface:dom-location-replace-2><a href=#dom-location-replace>replace()</a></code>
-    메소드에는 의도적으로 보안 검사가 없습니다.
-  </p>
+  <p class="note"><code
+      id="the-location-interface:dom-location-replace-2"><a href="#dom-location-replace">replace()</a></code> 메서드는 의도적으로
+    보안 검사를 수행하지 않습니다.</p>
 
   <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-reload data-dfn-type=method><code>reload()</code></dfn> 메소드 단계는
-      다음과 같습니다:
-    </p>
+    <p><dfn data-dfn-for="Location" id="dom-location-reload" data-dfn-type="method"><code>reload()</code></dfn>
+      메서드의
+      단계는 다음과 같습니다:</p>
 
     <ol>
       <li>
-        <p><var>document</var>를 <a id=the-location-interface:this-60 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#relevant-document id=the-location-interface:relevant-document-33>관련된
-            <code>Document</code></a>로 설정합니다.</p>
+        <p><var>document</var>를 <a id="the-location-interface:this-60" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-32">관련
+            <code>Document</code></a>로 정합니다.</p>
+      </li>
       <li>
-        <p><var>document</var>가 null인 경우, return합니다.</p>
+        <p>만약 <var>document</var>가 null이면, 반환합니다.</p>
+      </li>
       <li>
-        <p><var>document</var>의 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-19 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-18>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-21>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-18>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-18 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-22><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.</p>
+        <p>만약 <var>document</var>의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-18" data-x-internal="concept-document-origin">origin</a>
+          이
+          <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-18">same origin-domain</a>이 아니면,
+          <a href="#entry-settings-object" id="the-location-interface:entry-settings-object-21">entry settings
+            object</a>의 <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-18">origin</a>과 비교하여, <a
+            id="the-location-interface:securityerror-18" href="https://webidl.spec.whatwg.org/#securityerror"
+            data-x-internal="securityerror">"<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-22"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
+        </p>
+      </li>
       <li>
-        <p><a href=#reload id=the-location-interface:reload-2>리로드</a> <var>document</var>의 <a href=#node-navigable
-            id=the-location-interface:node-navigable>노드 탐색 가능</a>를
-          설정합니다.</p>
+        <p><a href="#reload" id="the-location-interface:reload-2">Reload</a>가 <var>document</var>의 <a
+            href="#node-navigable" id="the-location-interface:node-navigable">node navigable</a>를 다시 로드합니다.</p>
+      </li>
     </ol>
   </div>
 
   <hr>
 
+  <p><code id="the-location-interface:location-28"><a href="#location">Location</a></code> 객체는 연관된
+    <dfn data-dfn-for="Location" id="concept-location-empty-domstringlist" data-export="">빈
+      <code>DOMStringList</code></dfn>을 가지며, 이는 연관된 목록이 빈 <a id="the-location-interface:list"
+      href="https://infra.spec.whatwg.org/#list" data-x-internal="list">list</a>인 <code
+      id="the-location-interface:domstringlist-3"><a href="#domstringlist">DOMStringList</a></code> 객체입니다.
+  </p>
+
+  <p class="note">이 객체는 관련 <a href="#relevant-document" id="the-location-interface:relevant-document-33">관련
+      <code>Document</code></a>가 없을 때만 반환되므로 내비게이션 간에 상태를 유지할 수 없습니다. 이 경우에는 탐색이 불가능하며 null이 아닌 <a
+      href="#relevant-document" id="the-location-interface:relevant-document-34">관련
+      <code>Document</code></a>로 돌아가는 것도 불가능합니다.</p>
+
   <div data-algorithm="">
-    <p>
-      <dfn data-dfn-for=Location id=dom-location-ancestororigins
-        data-dfn-type=attribute><code>ancestorOrigins</code></dfn>
-      getter 단계는 다음과 같습니다:
-    </p>
+    <p><dfn data-dfn-for="Location" id="dom-location-ancestororigins"
+        data-dfn-type="attribute"><code>ancestorOrigins</code></dfn> 게터의 단계는 다음과 같습니다:</p>
 
     <ol>
       <li>
-        <p><a id=the-location-interface:this-61 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-34>관련된 <code>Document</code></a>가 null인
-          경우, 빈 <a id=the-location-interface:list-3 href=https://infra.spec.whatwg.org/#list
-            data-x-internal=list>리스트</a>를
-          반환합니다.
+        <p>만약 <a id="the-location-interface:this-61" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-35">관련 <code>Document</code></a>가 null이면, <a
+            id="the-location-interface:this-62" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#concept-location-empty-domstringlist"
+            id="the-location-interface:concept-location-empty-domstringlist">빈
+            <code>DOMStringList</code></a>를 반환합니다.
         </p>
+      </li>
       <li>
-        <p><a id=the-location-interface:this-62 href=https://webidl.spec.whatwg.org/#this data-x-internal=this>this</a>의
-          <a href=#relevant-document id=the-location-interface:relevant-document-35>관련된 <code>Document</code></a>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-origin
-            id=the-location-interface:concept-document-origin-20 data-x-internal=concept-document-origin>origin</a>이 <a
-            href=#same-origin-domain id=the-location-interface:same-origin-domain-19>same origin-domain</a>과 같지 않다면, <a
-            href=#entry-settings-object id=the-location-interface:entry-settings-object-22>entry settings
-            object</a>의 <a href=#concept-settings-object-origin
-            id=the-location-interface:concept-settings-object-origin-19>origin</a>을 사용하여 <a
-            id=the-location-interface:securityerror-19 href=https://webidl.spec.whatwg.org/#securityerror
-            data-x-internal=securityerror>"<code>SecurityError</code>"</a> <code
-            id=the-location-interface:domexception-23><a data-x-internal=domexception
-                    href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>을
-          throw합니다.
+        <p>만약 <a id="the-location-interface:this-63" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-36">관련 <code>Document</code></a>의 <a
+            href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="the-location-interface:concept-document-origin-19" data-x-internal="concept-document-origin">origin</a>
+          이 <a href="#same-origin-domain" id="the-location-interface:same-origin-domain-19">same origin-domain</a>
+          이 아니면,
+          <a href="#entry-settings-object" id="the-location-interface:entry-settings-object-22">entry settings
+            object</a>의 <a href="#concept-settings-object-origin"
+            id="the-location-interface:concept-settings-object-origin-19">origin</a>과 비교하여, <a
+            id="the-location-interface:securityerror-19" href="https://webidl.spec.whatwg.org/#securityerror"
+            data-x-internal="securityerror">"<code>SecurityError</code>"</a> <code
+            id="the-location-interface:domexception-23"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          던집니다.
         </p>
+      </li>
       <li>
-        <p>그렇지 않으면, <a id=the-location-interface:this-63 href=https://webidl.spec.whatwg.org/#this
-            data-x-internal=this>this</a>의 <a href=#concept-location-ancestor-origins-list
-            id=the-location-interface:concept-location-ancestor-origins-list-2>ancestor origins
-            리스트</a>를 반환합니다.</p>
+        <p><a id="the-location-interface:assert" href="https://infra.spec.whatwg.org/#assert"
+            data-x-internal="assert">Assert</a>: <a id="the-location-interface:this-64"
+            href="https://webidl.spec.whatwg.org/#this" data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-37">관련 <code>Document</code></a>의 <a
+            href="#concept-document-ancestor-origins-list"
+            id="the-location-interface:concept-document-ancestor-origins-list">ancestor origins list</a>는 null이 아닙니다.
+        </p>
+      </li>
+      <li>
+        <p>그렇지 않으면, <a id="the-location-interface:this-65" href="https://webidl.spec.whatwg.org/#this"
+            data-x-internal="this">this</a>의 <a href="#relevant-document"
+            id="the-location-interface:relevant-document-38">관련 <code>Document</code></a>의 <a
+            href="#concept-document-ancestor-origins-list"
+            id="the-location-interface:concept-document-ancestor-origins-list-2">ancestor origins list</a>를 반환합니다.</p>
+      </li>
     </ol>
   </div>
 
-  <p class=warning>
-    <code
-      id=the-location-interface:dom-location-ancestororigins-2><a href=#dom-location-ancestororigins>ancestorOrigins</a></code>
-    속성이 작동하는 방식에 대한 세부 사항은 여전히 논란의 여지가 있으며 변경될 수 있습니다. 자세한 내용은 <a href=https://github.com/whatwg/html/issues/1918>이슈
-      #1918</a>를 참조합니다.
-  </p>
+  <p class="warning"><code
+      id="the-location-interface:dom-location-ancestororigins-2"><a href="#dom-location-ancestororigins">ancestorOrigins</a></code>
+    속성이 동작하는 방법의 세부사항은 여전히 논쟁 중이며 변경될 수 있습니다. 자세한 내용은 <a href="https://github.com/whatwg/html/issues/1918">issue
+      #1918</a>을 참조하십시오.</p>
 
   <hr>
 
-  <p id=location-internal-methods>
-    앞서 설명한 것처럼, <code id=the-location-interface:location-31><a href=#location>Location</a></code> 특이 객체에는
-    보안 목적을 위해 IDL 외에 추가 논리가 필요합니다. <code id=the-location-interface:location-32><a href=#location>Location</a></code>
-    객체는 명시적으로 다르게 지정된
-    경우를 제외하고 일반적인 내부 메서드를 사용해야 합니다.
-  </p>
+  <p id="location-internal-methods">앞서 설명한 바와 같이, <code
+      id="the-location-interface:location-29"><a href="#location">Location</a></code> exotic 객체는 보안 목적을 위해 IDL을 넘어서는 추가
+    로직을 필요로 합니다. <code id="the-location-interface:location-30"><a href="#location">Location</a></code> 객체는 아래에 달리 명시된
+    경우를 제외하고는 일반 내부 메서드를 사용해야 합니다.</p>
 
-  <p>
-    또한, 모든 <code id=the-location-interface:location-33><a href=#location>Location</a></code> 객체는 생성 시
-    자신의 속성을 나타내는 <dfn id=defaultproperties>[[DefaultProperties]]</dfn> 내부 슬롯을 가지고 있습니다.
-  </p>
+  <p>또한, 모든 <code id="the-location-interface:location-31"><a href="#location">Location</a></code> 객체는 생성 시점의 자신의 속성을
+    나타내는 <dfn id="defaultproperties">[[DefaultProperties]]</dfn> 내부 슬롯을 가지고 있습니다.</p>
 
 
   <div data-algorithm="">
@@ -150464,6 +150597,22 @@ forwardButton<c- p>.</c->disabled <c- o>=</c-> <c- o>!</c->navigation<c- p>.</c-
             객체입니다.
         </dl>
       <li>
+        <p><var>document</var>의 <a href="#concept-document-internal-ancestor-origin-objects-list"
+            id="creating-browsing-contexts:concept-document-internal-ancestor-origin-objects-list">internal ancestor
+            origin objects
+            list</a>을(를) 주어진 <var>document</var>에 대해 실행한 <a href="#internal-ancestor-origin-objects-list-creation-steps"
+            id="creating-browsing-contexts:internal-ancestor-origin-objects-list-creation-steps">internal ancestor
+            origin objects list creation
+            steps</a>의 결과로 설정합니다.</p>
+      </li>
+      <li>
+        <p><var>document</var>의 <a href="#concept-document-ancestor-origins-list"
+            id="creating-browsing-contexts:concept-document-ancestor-origins-list">ancestor
+            origins list</a>을(를) 주어진 <var>document</var>에 대해 실행한 <a href="#ancestor-origins-list-creation-steps"
+            id="creating-browsing-contexts:ancestor-origins-list-creation-steps">ancestor origins list creation
+            steps</a>의 결과로 설정합니다.</p>
+      </li>
+      <li>
         <p><var>creator</var>가 null이 아닌 경우 다음을 수행합니다:</p>
         <ol>
           <li>
@@ -160693,6 +160842,23 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
             id=shared-document-creation-infrastructure:concept-document-window>연관된
             <code>Document</code></a>를
           <var>document</var>로 설정합니다.
+      <li>
+        <p><var>document</var>의 <a href="#concept-document-internal-ancestor-origin-objects-list"
+            id="shared-document-creation-infrastructure:concept-document-internal-ancestor-origin-objects-list">내부
+            조상 출처 객체
+            목록</a>을 주어진 <var>document</var>에 대해 실행한 <a href="#internal-ancestor-origin-objects-list-creation-steps"
+            id="shared-document-creation-infrastructure:internal-ancestor-origin-objects-list-creation-steps">내부
+            조상 출처 객체 목록 생성
+            단계</a>의 결과로 설정합니다.</p>
+      </li>
+      <li>
+        <p><var>document</var>의 <a href="#concept-document-ancestor-origins-list"
+            id="shared-document-creation-infrastructure:concept-document-ancestor-origins-list">조상
+            출처 목록</a>을 주어진 <var>document</var>에 대해 실행한 <a href="#ancestor-origins-list-creation-steps"
+            id="shared-document-creation-infrastructure:ancestor-origins-list-creation-steps">조상 출처 목록
+            생성
+            단계</a>의 결과로 설정합니다.</p>
+      </li>
       <li>
         <p><a id=shared-document-creation-infrastructure:run-csp-initialization-for-a-document
             href=https://w3c.github.io/webappsec-csp/#run-document-csp-initialization
