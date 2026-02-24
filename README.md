@@ -150,7 +150,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Server Timing](https://ko.htmlspecs.com/server-timing/)（[Source](https://www.w3.org/TR/2023/WD-server-timing-20230411/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2026/WD-paint-timing-20260107/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Largest Contentful Paint](https://ko.htmlspecs.com/largest-contentful-paint/)（[Source](https://www.w3.org/TR/2026/WD-largest-contentful-paint-20260206/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2025/WD-event-timing-20251017/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2026/WD-event-timing-20260223/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Prefetch](https://ko.htmlspecs.com/prefetch/)（[Source](https://wicg.github.io/nav-speculation/prefetch.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Prerendering Revamped](https://ko.htmlspecs.com/prerendering/)（[Source](https://wicg.github.io/nav-speculation/prerendering.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Performance measure memory](https://wicg.github.io/performance-measure-memory/)（[Source](https://wicg.github.io/performance-measure-memory/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
