@@ -1636,21 +1636,21 @@ For darkmode:
                     src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
         <h1 class="p-name no-ref" id="title">이벤트 타이밍 API</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types/#WD">W3C 워킹 드래프트</a>, <time class="dt-updated"
-                datetime="2026-02-23">2026년 2월 23일</time></p>
+                datetime="2026-02-24">2026년 2월 24일</time></p>
         <details open>
             <summary>이 문서에 대한 자세한 정보</summary>
             <div data-fill-with="spec-metadata">
                 <dl>
                     <dt>이 버전:
                     <dd><a class="u-url"
-                            href="https://www.w3.org/TR/2026/WD-event-timing-20260223/">https://www.w3.org/TR/2026/WD-event-timing-20260223/</a>
+                            href="https://www.w3.org/TR/2026/WD-event-timing-20260224/">https://www.w3.org/TR/2026/WD-event-timing-20260224/</a>
                     <dt>최신 공개 버전:
                     <dd><a href="https://www.w3.org/TR/event-timing/">https://www.w3.org/TR/event-timing/</a>
                     <dt>에디터스 드래프트:
                     <dd><a href="https://w3c.github.io/event-timing/">https://w3c.github.io/event-timing/</a>
                     <dt>이전 버전:
-                    <dd><a href="https://www.w3.org/TR/2025/WD-event-timing-20251017/"
-                            rel="prev">https://www.w3.org/TR/2025/WD-event-timing-20251017/</a>
+                    <dd><a href="https://www.w3.org/TR/2026/WD-event-timing-20260223/"
+                            rel="prev">https://www.w3.org/TR/2026/WD-event-timing-20260223/</a>
                     <dt>히스토리:
                     <dd><a class="u-url"
                             href="https://www.w3.org/standards/history/event-timing/">https://www.w3.org/standards/history/event-timing/</a>
@@ -1821,11 +1821,14 @@ For darkmode:
                 하드웨어 타임스탬프에서 이벤트 핸들러 시작 시점의 타임스탬프를 빼면 개발자는 <b>입력 지연</b>—입력이 처리되기 시작하는 데 걸리는 시간—을 계산할 수 있습니다.
                 이벤트 핸들러 시작 시점의 타임스탬프와 끝 시점의 타임스탬프의 차이를 통해 개발자는 이벤트 핸들러에서 수행된 동기 작업의 양을 계산할 수 있습니다.
                 마지막으로 입력이 동기적으로 처리되는 경우, 이벤트가 처리된 후 다음 페인트까지의 기간은 사용자 경험 측정에 유용한 지표가 됩니다.</p>
-            <p>이 방식에는 몇 가지 근본적인 결함이 있습니다.
-                첫째, 이벤트 리스너가 필요하므로 페이지 로드 초기에 이벤트 지연을 측정할 수 없습니다. 그 시점에는 리스너가 등록되지 않았기 때문입니다.
-                둘째, 입력 지연만 관심 있는 개발자도 원래 리스너가 없던 이벤트에 새로운 리스너를 추가해야 할 수 있습니다.
-                이는 이벤트 지연 계산에 불필요한 성능 오버헤드를 발생시킵니다.
-                마지막으로, 이 방식으로는 이벤트로 인해 발생한 비동기 작업의 측정이 매우 어렵습니다.
+            <p>이 방식에는 여러 근본적인 문제가 있습니다.
+                첫째, 이벤트 리스너를 요구하면 페이지가 로드되는 아주 초기 단계에서
+                이벤트 지연 측정을 할 수 없습니다. 이때 리스너가 아직 등록되지 않았을 수 있습니다.
+                둘째, 입력 지연만 관심 있는 개발자도 원래 리스너가 없던 이벤트에
+                새 리스너를 추가해야 할 수 있습니다.
+                이는 이벤트 지연 계산에 불필요한 성능 오버헤드를 추가합니다.
+                마지막으로, 이 방식으로는 이벤트로 인해 발생한 비동기 작업을
+                측정하기 매우 어렵습니다.
             </p>
             <p>이 명세는 이러한 문제를 해결하는 이벤트 지연 모니터링의 대안을 제공합니다.
                 사용자 에이전트가 타임스탬프를 계산하므로, 성능 측정을 위해 이벤트 리스너가 필요하지 않습니다.
@@ -3106,7 +3109,7 @@ observer<c- p>.</c->observe<c- p>({</c-> type<c- o>:</c-> <c- t>'event'</c-><c- 
                         <li data-md>
                             <p><var>pendingPointerDowns</var>[<var>pointerId</var>]를 <var>timingEntry</var>로 설정한다.</p>
                         <li data-md>
-                            <p><var>window</var>의 <a data-link-type="dfn" href="#is-contextmenu-triggered"
+                            <p><var>relevantGlobal</var>의 <a data-link-type="dfn" href="#is-contextmenu-triggered"
                                     id="ref-for-is-contextmenu-triggered③">is contextmenu triggered</a>를 false로 설정한다.
                             </p>
                     </ol>
@@ -3147,13 +3150,14 @@ observer<c- p>.</c->observe<c- p>({</c-> type<c- o>:</c-> <c- t>'event'</c-><c- 
                                     <p><var>code</var>가 229가 아니라면:</p>
                                     <ol>
                                         <li data-md>
-                                            <p><var>window</var>의 <a data-link-type="dfn" href="#user-interaction-value"
+                                            <p><var>relevantGlobal</var>의 <a data-link-type="dfn"
+                                                    href="#user-interaction-value"
                                                     id="ref-for-user-interaction-value①⓪">user interaction value</a>
                                                 값을 UA가 선택한 작은 값만큼 증가시킨다.</p>
                                         <li data-md>
                                             <p><var>previousKeyDownEntry</var>의 <code
                                                     class="idl"><a data-link-type="idl" href="#dom-performanceeventtiming-interactionid" id="ref-for-dom-performanceeventtiming-interactionid①①">interactionId</a></code>
-                                                값을 <var>window</var>의 <a data-link-type="dfn"
+                                                값을 <var>relevantGlobal</var>의 <a data-link-type="dfn"
                                                     href="#user-interaction-value"
                                                     id="ref-for-user-interaction-value①①">user interaction value</a>로
                                                 설정한다.
@@ -3162,8 +3166,9 @@ observer<c- p>.</c->observe<c- p>({</c-> type<c- o>:</c-> <c- t>'event'</c-><c- 
                                     <p class="note" role="note"><span class="marker">참고:</span> 229는 IME 키보드 이벤트에 해당하는
                                         특수 케이스다. 때때로 사용자 에이전트가 이 이벤트를 여러 번 전송하는데, 이는 키를 반복해서 누르는 상황과는 다르다.</p>
                                 <li data-md>
-                                    <p><var>previousKeyDownEntry</var>를 <var>window</var>의 <a data-link-type="dfn"
-                                            href="#entries-to-be-queued" id="ref-for-entries-to-be-queued⑤">대기시킬
+                                    <p><var>previousKeyDownEntry</var>를 <var>relevantGlobal</var>의 <a
+                                            data-link-type="dfn" href="#entries-to-be-queued"
+                                            id="ref-for-entries-to-be-queued⑤">대기시킬
                                             entries</a>에 추가한다.</p>
                             </ol>
                         <li data-md>
@@ -3215,7 +3220,7 @@ observer<c- p>.</c->observe<c- p>({</c-> type<c- o>:</c-> <c- t>'event'</c-><c- 
                     </ol>
                 <li data-md>
                     <p><var>window</var>의 <a data-link-type="dfn" href="#entries-to-be-queued"
-                            id="ref-for-entries-to-be-queued⑧">entries to be queued</a>를 비운다.</p>
+                            id="ref-for-entries-to-be-queued⑧">대기할 entry 목록</a>을 빈 리스트로 설정한다.</p>
                 <li data-md>
                     <p><var>window</var>의 <a data-link-type="dfn" href="#pending-pointer-downs"
                             id="ref-for-pending-pointer-downs②">pending pointer downs</a>의 <a data-link-type="dfn"
@@ -3377,12 +3382,14 @@ observer<c- p>.</c->observe<c- p>({</c-> type<c- o>:</c-> <c- t>'event'</c-><c- 
         </p>
         <p><code
                 class="idl"><a data-link-type="idl" href="https://w3c.github.io/performance-timeline/#dom-performanceentry-duration" id="ref-for-dom-performanceentry-duration⑨">duration</a></code>
-            은 8밀리초 단위로 반올림되어 제공됩니다.
-            따라서 이 타임스탬프로 고해상도 타이머를 생성할 수 없습니다.
-            하지만 이 값은 웹 개발자가 쉽게 알 수 없는, 이벤트 처리 후 픽셀이 그려지는 시간이라는 새로운 정보를 제공합니다.
-            해당 타임스탬프 노출에 대해, 특히 그 정밀도에 비추어 볼 때 보안이나 프라이버시 측면의 우려는 발견되지 않았습니다.
-            유용한 새로운 정보를 최소한만 노출하기 위해 8밀리초 정밀도를 선택했습니다.
-            이는 120Hz 디스플레이에서도 비교적 정확한 타이밍 측정을 가능하게 합니다.</p>
+            값은 8밀리초 단위의 정밀도를 갖습니다(이렇게 반올림하여 계산됨).
+            따라서 이 타임스탬프로 고해상도 타이머를 만들 수는 없습니다.
+            하지만 이 값은 웹 개발자들이 쉽게 얻을 수 없는 새로운 정보를 제공합니다:
+            이벤트 처리 후 픽셀이 그려지는 시간입니다.
+            특히 이 정밀도를 감안할 때, 타임스탬프를 노출하는 것에 보안이나 프라이버시 문제가 있다고 생각하지 않습니다.
+            유용한 정보만 최소한으로 노출하고자,
+            우리는 8밀리초를 정밀도로 선택했습니다.
+            이는 120Hz 디스플레이에서도 비교적 정확한 타이밍을 제공할 수 있습니다.</p>
         <p><code
                 class="idl"><a data-link-type="idl" href="https://w3c.github.io/performance-timeline/#dom-performanceentry-duration" id="ref-for-dom-performanceentry-duration①⓪">duration</a></code>
             의 기본 컷오프 값으로 104ms를 선택한 것은 100ms보다 큰 첫 번째 8의 배수이기 때문입니다.
