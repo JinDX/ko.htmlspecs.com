@@ -147,7 +147,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Reporting API](https://ko.htmlspecs.com/reporting-1/)（[Source](https://www.w3.org/TR/2025/WD-reporting-1-20250611/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Deprecation Reporting](https://ko.htmlspecs.com/deprecation-reporting/)（[Source](https://wicg.github.io/deprecation-reporting/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Page Lifecycle](https://ko.htmlspecs.com/page-lifecycle/)（[Source](https://wicg.github.io/page-lifecycle/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [Server Timing](https://ko.htmlspecs.com/server-timing/)（[Source](https://www.w3.org/TR/2023/WD-server-timing-20230411/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Server Timing](https://ko.htmlspecs.com/server-timing/)（[Source](https://www.w3.org/TR/2026/WD-server-timing-20260309/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2026/WD-paint-timing-20260107/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Largest Contentful Paint](https://ko.htmlspecs.com/largest-contentful-paint/)（[Source](https://www.w3.org/TR/2026/WD-largest-contentful-paint-20260206/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2026/WD-event-timing-20260224/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
