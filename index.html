@@ -63,7 +63,7 @@
         <a href=https://github.com/whatwg/html/commits class=changes><span><strong>커밋</strong>
             <code>on GitHub</code></span></a>
         <a id=commit-snapshot-link
-          href=https://html.spec.whatwg.org/commit-snapshots/d59fb13c28c62d50f103a95577f15fc1e8bd7500/
+          href=https://html.spec.whatwg.org/commit-snapshots/e161310ae7951d27791f59123871c147541d6624/
           class=changes><span><strong>스냅샷</strong> <code>as of this commit</code></span></a>
         <a href=https://twitter.com/htmlstandard class=changes><span><strong>트위터 업데이트</strong>
             <code>@htmlstandard</code></span></a>
@@ -1273,7 +1273,9 @@
                 <li><a href=#embedder-policy-checks><span class=secno>7.1.4.2</span> 임베더 정책 확인</a>
               </ol>
             <li><a href=#sandboxing><span class=secno>7.1.5</span> 샌드박싱</a>
-            <li><a href=#policy-containers><span class=secno>7.1.6</span> 정책 컨테이너</a>
+            <li><a href="#iframe-element-referrer-policy"><span class="secno">7.1.6</span> <code>iframe</code> 요소
+                리퍼러 정책</a></li>
+            <li><a href=#policy-containers><span class=secno>7.1.7</span> 정책 컨테이너</a>
           </ol>
         <li><a href=#nav-traversal-apis><span class=secno>7.2</span> 탐색 및 세션 기록 관련 API</a>
           <ol>
@@ -5094,6 +5096,8 @@ a<c- p>.</c->setAttribute<c- p>(</c-><c- t>&apos;href&apos;</c-><c- p>,</c-> <c-
                 href=https://w3c.github.io/webappsec-mixed-content/#a-priori-authenticated-url><i>a
                   priori</i>
                 인증된 URL</a></dfn>
+          <li><dfn id="mixed-content"><a href="https://w3c.github.io/webappsec-mixed-content/#mixed-content">혼합
+                콘텐츠</a></dfn></li>
         </ul>
 
         <p>다음 용어는 <cite>Subresource Integrity</cite>에서 정의됩니다: <a href=#refsSRI>[SRI]</a></p>
@@ -16913,12 +16917,14 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
 
   <div data-algorithm="">
     <p><code id="ancestor-origins:document"><a href="#document">Document</a></code> 객체는 관련된 <dfn data-dfn-for="Document"
-        id="concept-document-internal-ancestor-origin-objects-list" data-export="">내부 상위 출처 객체
-        목록</dfn>을 가지며, 처음에는 null이다.</p>
+        id="concept-document-internal-ancestor-origin-objects-list" data-export="">내부
+        조상 origin 객체 리스트</dfn>를 가지며, 초기값은 null입니다.</p>
 
-    <p><dfn id="internal-ancestor-origin-objects-list-creation-steps">내부 상위 출처 객체 목록 생성 단계</dfn>는
-      <code id="ancestor-origins:document-2"><a href="#document">Document</a></code> 객체
-      <var>innerDoc</var>이 주어졌을 때:
+    <p><dfn id="internal-ancestor-origin-objects-list-creation-steps">내부 조상 origin 객체 리스트 생성
+        단계</dfn>는
+      <code id="ancestor-origins:document-2"><a href="#document">Document</a></code> 객체 <var>document</var>와 <a
+        id="ancestor-origins:referrer-policy" href="https://w3c.github.io/webappsec-referrer-policy/#referrer-policy"
+        data-x-internal="referrer-policy">리퍼러 정책</a> <var>referrerPolicy</var>가 주어졌을 때:
     </p>
 
     <ol>
@@ -16926,42 +16932,99 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
         <p><var>output</var>을 « »로 설정한다.</p>
       </li>
       <li>
-        <p><var>parentDoc</var>을 <var>innerDoc</var>의 <a href="#doc-container-document"
+        <p><var>parentDoc</var>을 <var>document</var>의 <a href="#doc-container-document"
             id="ancestor-origins:doc-container-document">컨테이너 문서</a>로 설정한다.</p>
       </li>
       <li>
-        <p><var>parentDoc</var>이 null이면 <var>output</var>을 반환한다.</p>
+        <p><var>parentDoc</var>이 null이면, <var>output</var>을 반환한다.</p>
       </li>
       <li>
-        <p><a id="ancestor-origins:assert" href="https://infra.spec.whatwg.org/#assert" data-x-internal="assert">단언:</a>
-          <var>parentDoc</var>는 <a href="#fully-active" id="ancestor-origins:fully-active">완전히 활성화된</a> 상태이다.
-        </p>
+        <p><a id="ancestor-origins:assert" href="https://infra.spec.whatwg.org/#assert"
+            data-x-internal="assert">Assert</a>: <var>parentDoc</var>은 <a href="#fully-active"
+            id="ancestor-origins:fully-active">완전히 활성화됨</a>.</p>
       </li>
       <li>
         <p><var>ancestorOrigins</var>를 <var>parentDoc</var>의 <a
             href="#concept-document-internal-ancestor-origin-objects-list"
-            id="ancestor-origins:concept-document-internal-ancestor-origin-objects-list">내부 상위 출처 객체
-            목록</a>으로 설정한다.</p>
+            id="ancestor-origins:concept-document-internal-ancestor-origin-objects-list">내부 조상 origin 객체 리스트</a>로 설정한다.
+        </p>
       </li>
       <li>
-        <p><a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append"
-            data-x-internal="list-append">추가</a>: <var>parentDoc</var>의 <a
-            href="https://dom.spec.whatwg.org/#concept-document-origin" id="ancestor-origins:concept-document-origin"
+        <p><var>container</var>를 <var>document</var>의 <a href="#node-navigable" id="ancestor-origins:node-navigable">노드
+            내비게이션</a>의 <a href="#nav-container" id="ancestor-origins:nav-container">컨테이너</a>로 설정한다.</p>
+      </li>
+      <li>
+        <p><var>masked</var>를 false로 설정한다.</p>
+      </li>
+      <li>
+        <p><var>referrerPolicy</var>가 "<code>no-referrer</code>"라면,
+          <var>masked</var>를 true로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p>그렇지 않고, <var>referrerPolicy</var>가 "<code>same-origin</code>"이고
+          <var>parentDoc</var>의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="ancestor-origins:concept-document-origin" data-x-internal="concept-document-origin">origin</a>이 <a
+            href="#same-origin" id="ancestor-origins:same-origin">동일
+            origin</a>이 아니고 <var>document</var>의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="ancestor-origins:concept-document-origin-2" data-x-internal="concept-document-origin">origin</a>과 다르다면
+          <var>masked</var>를 true로 설정한다.
+        </p>
+
+        <p class="note"><a id="ancestor-origins:mixed-content"
+            href="https://w3c.github.io/webappsec-mixed-content/#mixed-content" data-x-internal="mixed-content">혼합
+            콘텐츠</a> 검사로 인해 <a href="#non-secure-context" id="ancestor-origins:non-secure-context">비보안 컨텍스트</a>
+          <a href="#environment" id="ancestor-origins:environment">환경</a>이 <a href="#secure-context"
+            id="ancestor-origins:secure-context">보안 컨텍스트</a> <a href="#environment"
+            id="ancestor-origins:environment-2">환경</a>에서 방지되므로,
+          "<code>strict-origin</code>", "<code>strict-origin-when-cross-origin</code>",
+          "<code>no-referrer-when-downgrade</code>" 값에 대해
+          <a href="#secure-context" id="ancestor-origins:secure-context-2">보안 컨텍스트</a>를 추가로 확인할 필요가 없습니다.
+          "<code>origin</code>" 및 "<code>origin-when-cross-origin</code>" 값도 특별한 처리가 필요하지 않으며,
+          여기서는 최대한 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+            id="ancestor-origins:concept-document-origin-3" data-x-internal="concept-document-origin">origin</a>만 노출됩니다.
+        </p>
+      </li>
+      <li>
+        <p><var>masked</var>가 true라면 <a href="https://infra.spec.whatwg.org/#list-append"
+            id="ancestor-origins:list-append" data-x-internal="list-append">새로운</a> <a href="#concept-origin-opaque"
+            id="ancestor-origins:concept-origin-opaque">불투명 origin</a>을
+          <var>output</var>에 추가한다.
+        </p>
+      </li>
+      <li>
+        <p>그렇지 않으면 <a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append-2"
+            data-x-internal="list-append">append</a> <var>parentDoc</var>의 <a
+            href="https://dom.spec.whatwg.org/#concept-document-origin" id="ancestor-origins:concept-document-origin-4"
             data-x-internal="concept-document-origin">origin</a>을 <var>output</var>에 추가한다.</p>
       </li>
       <li>
         <p><a href="https://infra.spec.whatwg.org/#list-iterate" id="ancestor-origins:list-iterate"
-            data-x-internal="list-iterate">각</a> <var>ancestorOrigin</var>이
-          <var>ancestorOrigins</var>에 대해:
+            data-x-internal="list-iterate">각</a> <var>ancestorOrigin</var>을
+          <var>ancestorOrigins</var>에서 순회한다:
         </p>
 
         <ol>
           <li>
-            <p><a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append-2"
-                data-x-internal="list-append">추가</a>:
-              <var>ancestorOrigin</var>을
-              <var>output</var>에 추가한다.
+            <p><var>masked</var>가 true이고 <var>ancestorOrigin</var>이 <a href="#same-origin"
+                id="ancestor-origins:same-origin-2">동일 origin</a>이라면
+              <var>parentDoc</var>의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+                id="ancestor-origins:concept-document-origin-5" data-x-internal="concept-document-origin">origin</a>과,
+              <a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append-3"
+                data-x-internal="list-append">새로운</a> <a href="#concept-origin-opaque"
+                id="ancestor-origins:concept-origin-opaque-2">불투명 origin</a>을 <var>output</var>에 추가하고, <a
+                id="ancestor-origins:continue" href="https://infra.spec.whatwg.org/#iteration-continue"
+                data-x-internal="continue">continue</a>한다.
             </p>
+          </li>
+          <li>
+            <p><a href="https://infra.spec.whatwg.org/#list-append" id="ancestor-origins:list-append-4"
+                data-x-internal="list-append">append</a> <var>ancestorOrigin</var>을 <var>output</var>에 추가하고
+              <var>masked</var>를 false로 설정한다.
+            </p>
+
+            <p class="note">여기서 <var>masked</var>를 false로 설정한다고 해서 모든 이후 조상의 origin이 반드시 노출된다는 의미는 아닙니다.
+              조상 문서가 이 단계들을 실행했을 때 이전에 masked였을 수도 있고, 그 결과 리스트가 자식 문서 생성 시 시작점으로 사용됩니다 (위 5단계 참고).</p>
           </li>
         </ol>
       </li>
@@ -16970,6 +17033,7 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
       </li>
     </ol>
   </div>
+
 
   <div data-algorithm="">
     <p><code id="ancestor-origins:document-3"><a href="#document">Document</a></code> 객체는 관련된 <dfn
@@ -17018,6 +17082,152 @@ o<c- p>.</c->myself <c- o>=</c-> o<c- p>;</c-></code></pre>
         </p>
       </li>
     </ol>
+  </div>
+
+  <div class="example">
+    <p><a href="#top-level-browsing-context" id="ancestor-origins:top-level-browsing-context">최상위
+        브라우징 컨텍스트</a> 문서가 <code>https://a.example/top</code> URL을 가진 경우를 생각해봅시다:</p>
+
+    <pre><code class="html"><c- cp="">&lt;!doctype html&gt;</c->
+<c- p="">&lt;</c-><c- f="">title</c-><c- p="">&gt;</c->top<c- p="">&lt;/</c-><c- f="">title</c-><c- p="">&gt;</c->
+<c- p="">&lt;</c-><c- f="">iframe</c-> <c- e="">referrerpolicy</c-><c- o="">=</c-><c- s="">"no-referrer"</c-> <c- e="">src</c-><c- o="">=</c-><c- s="">"https://a.example/child"</c-><c- p="">&gt;&lt;/</c-><c- f="">iframe</c-><c- p="">&gt;</c-></code></pre>
+
+    <p>자식 문서:</p>
+
+    <pre><code class="html"><c- cp="">&lt;!doctype html&gt;</c->
+<c- p="">&lt;</c-><c- f="">title</c-><c- p="">&gt;</c->child<c- p="">&lt;/</c-><c- f="">title</c-><c- p="">&gt;</c->
+<c- p="">&lt;</c-><c- f="">iframe</c-> <c- e="">src</c-><c- o="">=</c-><c- s="">"https://b.example/grandchild"</c-><c- p="">&gt;&lt;/</c-><c- f="">iframe</c-><c- p="">&gt;</c->
+<c- p="">&lt;</c-><c- f="">script</c-><c- p="">&gt;</c->
+ console<c- p="">.</c->log<c- p="">([...</c->location<c- p="">.</c->ancestorOrigins<c- p="">]);</c->
+<c- p="">&lt;/</c-><c- f="">script</c-><c- p="">&gt;</c-></code></pre>
+
+    <p>손자 문서:</p>
+
+    <pre><code class="html"><c- cp="">&lt;!doctype html&gt;</c->
+<c- p="">&lt;</c-><c- f="">title</c-><c- p="">&gt;</c->grandchild<c- p="">&lt;/</c-><c- f="">title</c-><c- p="">&gt;</c->
+<c- p="">&lt;</c-><c- f="">script</c-><c- p="">&gt;</c->
+ console<c- p="">.</c->log<c- p="">([...</c->location<c- p="">.</c->ancestorOrigins<c- p="">]);</c->
+<c- p="">&lt;/</c-><c- f="">script</c-><c- p="">&gt;</c-></code></pre>
+
+    <p>자식의 <code id="ancestor-origins:document-5"><a href="#document">Document</a></code> 객체가
+      생성될 때, 부모의 origin은
+      <code id="ancestor-origins:the-iframe-element"><a href="#the-iframe-element">iframe</a></code>
+      요소의 <code
+        id="ancestor-origins:attr-iframe-referrerpolicy"><a href="#attr-iframe-referrerpolicy">referrerpolicy</a></code>
+      속성 값이 "<code>no-referrer</code>"이므로 가려집니다.
+      두 문서가 <a href="#same-origin" id="ancestor-origins:same-origin-3">동일 origin</a>이라도 값
+      로그는 « "<code>null</code>" » 입니다.
+    </p>
+
+    <p>손자의 <code id="ancestor-origins:document-6"><a href="#document">Document</a></code> 객체가
+      생성될 때, 자식의
+      <code id="ancestor-origins:document-7"><a href="#document">Document</a></code> 객체의 <a
+        href="#concept-document-internal-ancestor-origin-objects-list"
+        id="ancestor-origins:concept-document-internal-ancestor-origin-objects-list-3">내부 조상 origin 객체 리스트</a> (하나의 <a
+        href="#concept-origin-opaque" id="ancestor-origins:concept-origin-opaque-3">불투명 origin</a> 포함)
+      를 시작점으로 사용하고 자식의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+        id="ancestor-origins:concept-document-origin-6" data-x-internal="concept-document-origin">origin</a>
+      이 추가됩니다. 로그 값은 « "<code>https://a.example</code>",
+      "<code>null</code>" » 입니다.
+    </p>
+  </div>
+
+  <div class="example">
+    <p>이전 예시를 생각해보면 최상위 문서의 <code
+        id="ancestor-origins:the-iframe-element-2"><a href="#the-iframe-element">iframe</a></code> 요소에
+      <code
+        id="ancestor-origins:attr-iframe-referrerpolicy-2"><a href="#attr-iframe-referrerpolicy">referrerpolicy</a></code>
+      속성이 없고,
+      자식 문서의 <code id="ancestor-origins:the-iframe-element-3"><a href="#the-iframe-element">iframe</a></code> 요소에
+      <code>referrerpolicy="no-referrer"</code>
+      가 있는 경우입니다.
+    </p>
+
+    <p>이 경우, 최상위 문서의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+        id="ancestor-origins:concept-document-origin-7" data-x-internal="concept-document-origin">origin</a>이
+      자식의 <code id="ancestor-origins:document-8"><a href="#document">Document</a></code> 객체의 <a
+        href="#concept-document-internal-ancestor-origin-objects-list"
+        id="ancestor-origins:concept-document-internal-ancestor-origin-objects-list-4">내부 조상 origin 객체 리스트</a>에 추가됩니다.
+      로그 값은 « "<code>https://a.example</code>" »입니다.</p>
+
+    <p>손자 문서의 경우 자식의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+        id="ancestor-origins:concept-document-origin-8" data-x-internal="concept-document-origin">origin</a>은 <a
+        href="#concept-origin-opaque" id="ancestor-origins:concept-origin-opaque-4">불투명 origin</a>으로 가려집니다.
+      최상위 문서의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+        id="ancestor-origins:concept-document-origin-9" data-x-internal="concept-document-origin">origin</a>이 <a
+        href="#same-origin" id="ancestor-origins:same-origin-4">동일 origin</a>이지만 자식 문서의 <a
+        href="https://dom.spec.whatwg.org/#concept-document-origin" id="ancestor-origins:concept-document-origin-10"
+        data-x-internal="concept-document-origin">origin</a> 과 동일하기 때문에
+      역시 가려집니다. 로그 값은 « "<code>null</code>", "<code>null</code>" »입니다.</p>
+  </div>
+
+  <div class="example">
+    <p>이 예시에서는 중간에 교차 origin 문서가 있기 때문에 손자의 origin이 가려져도
+      최상위 문서의 origin은 가려지지 않는다는 것을 보여줍니다.</p>
+
+    <ul>
+      <li>
+        <p>최상위: URL <code>https://a.example/top</code></p>
+        <pre><code class="html"><c- p="">&lt;</c-><c- f="">iframe</c-> <c- e="">src</c-><c- o="">=</c-><c- s="">"https://b.example/child"</c-><c- p="">&gt;&lt;/</c-><c- f="">iframe</c-><c- p="">&gt;</c-></code></pre>
+        <p><a href="#concept-document-ancestor-origins-list"
+            id="ancestor-origins:concept-document-ancestor-origins-list">조상 origins 리스트</a>
+          관련 리스트는 « »입니다.</p>
+      </li>
+      <li>
+        <p>자식: URL <code>https://b.example/child</code></p>
+        <pre><code class="html"><c- p="">&lt;</c-><c- f="">iframe</c-> <c- e="">src</c-><c- o="">=</c-><c- s="">"https://a.example/grandchild"</c-><c- p="">&gt;&lt;/</c-><c- f="">iframe</c-><c- p="">&gt;</c-></code></pre>
+        <p><a href="#concept-document-ancestor-origins-list"
+            id="ancestor-origins:concept-document-ancestor-origins-list-2">조상 origins 리스트</a>
+          관련 리스트는 « "<code>https://a.example</code>" »입니다.</p>
+      </li>
+      <li>
+        <p>손자: URL <code>https://a.example/grandchild</code></p>
+        <pre><code class="html"><c- p="">&lt;</c-><c- f="">iframe</c-> <c- e="">src</c-><c- o="">=</c-><c- s="">"https://c.example/grandgrandchild"</c->
+     <c- e="">referrerpolicy</c-><c- o="">=</c-><c- s="">"no-referrer"</c-><c- p="">&gt;&lt;/</c-><c- f="">iframe</c-><c- p="">&gt;</c-></code></pre>
+        <p><a href="#concept-document-ancestor-origins-list"
+            id="ancestor-origins:concept-document-ancestor-origins-list-3">조상 origins 리스트</a> 관련 리스트는
+          « "<code>https://b.example</code>", "<code>https://a.example</code>" »입니다.</p>
+      </li>
+      <li>
+        <p>증손자: URL <code>https://c.example/grandgrandchild</code></p>
+        <p><a href="#concept-document-ancestor-origins-list"
+            id="ancestor-origins:concept-document-ancestor-origins-list-4">조상 origins 리스트</a>
+          관련 리스트는 « "<code>null</code>", "<code>https://b.example</code>",
+          "<code>https://a.example</code>" »입니다. 최상위 origin은 가려지지 않습니다.</p>
+      </li>
+    </ul>
+  </div>
+
+  <div class="example">
+    <p>이전 예시에서 최상위 문서의 <code id="ancestor-origins:the-iframe-element-4"><a href="#the-iframe-element">iframe</a></code>
+      역시
+      <code>referrerpolicy="no-referrer"</code>를 가진다고 가정하면, 각 문서의 <a href="#concept-document-ancestor-origins-list"
+        id="ancestor-origins:concept-document-ancestor-origins-list-5">조상 origins 리스트</a> 관련 리스트는 다음과 같습니다:
+    </p>
+
+    <ul>
+      <li>
+        <p>최상위: « »</p>
+      </li>
+      <li>
+        <p>자식: « "<code>null</code>" »</p>
+      </li>
+      <li>
+        <p>손자: « "<code>https://b.example</code>", "<code>null</code>"
+          »</p>
+      </li>
+      <li>
+        <p>증손자: « "<code>null</code>", "<code>https://b.example</code>", "<code>null</code>" »입니다.
+          최상위 origin은
+          자식 문서가 <a href="#internal-ancestor-origin-objects-list-creation-steps"
+            id="ancestor-origins:internal-ancestor-origin-objects-list-creation-steps">내부 조상 origin 객체 리스트 생성 단계</a> 를
+          수행할 때 가려졌으며,
+          그 결과가 손자 문서, 증손자 문서의 <a href="#internal-ancestor-origin-objects-list-creation-steps"
+            id="ancestor-origins:internal-ancestor-origin-objects-list-creation-steps-2">내부 조상 origin 객체 리스트 생성 단계</a>에
+          계속 전달됩니다.
+        </p>
+      </li>
+    </ul>
   </div>
 
 
@@ -49324,12 +49534,19 @@ The island of Shalott.<c- p>&lt;/</c-><c- f>p</c-><c- p>&gt;</c-></code></pre>
   <hr>
 
   <p><dfn data-dfn-for="iframe" id="attr-iframe-referrerpolicy"
-      data-dfn-type="element-attr"><code>referrerpolicy</code></dfn> 속성은 <a href="#referrer-policy-attribute"
-      id="the-iframe-element:referrer-policy-attribute">리퍼러 정책 속성</a>입니다. 이 속성의 목적은 <a
-      id="the-iframe-element:referrer-policy-3" href="https://w3c.github.io/webappsec-referrer-policy/#referrer-policy"
-      data-x-internal="referrer-policy">리퍼러 정책</a>을 설정하는 것으로, <a href="#process-the-iframe-attributes"
-      id="the-iframe-element:process-the-iframe-attributes-5">iframe 속성 처리</a> 시 사용됩니다. <a
-      href="#refsREFERRERPOLICY">[REFERRERPOLICY]</a></p>
+      data-dfn-type="element-attr"><code>referrerpolicy</code></dfn> 속성은
+    <a href="#referrer-policy-attribute" id="the-iframe-element:referrer-policy-attribute">리퍼러 정책
+      속성</a>입니다. 이 속성의 목적은 <a id="the-iframe-element:referrer-policy-3"
+      href="https://w3c.github.io/webappsec-referrer-policy/#referrer-policy" data-x-internal="referrer-policy">리퍼러
+      정책</a>을 설정하는 데 있으며,
+    <a href="#process-the-iframe-attributes" id="the-iframe-element:process-the-iframe-attributes-5"><code>iframe</code>
+      속성들을 처리할 때</a> 뿐만 아니라 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+      id="the-iframe-element:concept-document-origin-2" data-x-internal="concept-document-origin">origin</a>의 일부를
+    <a href="#internal-ancestor-origin-objects-list-creation-steps"
+      id="the-iframe-element:internal-ancestor-origin-objects-list-creation-steps">내부 조상 origin 객체 리스트 생성 단계</a>에서
+    마스킹할 수 있도록 허용합니다. <a href="#refsREFERRERPOLICY">[REFERRERPOLICY]</a>
+  </p>
+
 
   <p><dfn data-dfn-for="iframe" id="attr-iframe-loading" data-dfn-type="element-attr"><code>loading</code></dfn> 속성은
     <a href="#lazy-loading-attribute" id="the-iframe-element:lazy-loading-attribute">지연 로딩 속성</a>입니다. 이 속성의 목적은 뷰포트
@@ -134945,8 +135162,42 @@ interface <dfn id='datatransferitemlist' data-dfn-type='interface'>DataTransferI
     </ul>
   </div>
 
+  <h4 id="iframe-element-referrer-policy"><span class="secno">7.1.6</span> <code
+      id="iframe-element-referrer-policy:the-iframe-element"><a href="#the-iframe-element">iframe</a></code> 요소의
+    리퍼러 정책<a href="#iframe-element-referrer-policy" class="self-link"></a></h4>
 
-  <h4 id=policy-containers><span class=secno>7.1.6</span> 정책 컨테이너<a href=#policy-containers class=self-link></a></h4>
+  <div data-algorithm="">
+    <p>요소 또는 null인 <var>embedder</var>가 주어졌을 때
+      <dfn id="determining-the-iframe-element-referrer-policy"><code>iframe</code> 요소의 리퍼러 정책을 결정하는 방법</dfn>:
+    </p>
+
+    <ol>
+      <li>
+        <p><var>embedder</var>가 <code
+            id="iframe-element-referrer-policy:the-iframe-element-2"><a href="#the-iframe-element">iframe</a></code>
+          요소라면,
+          <var>embedder</var>의 <code
+            id="iframe-element-referrer-policy:attr-iframe-referrerpolicy"><a href="#attr-iframe-referrerpolicy">referrerpolicy</a></code>
+          속성 state에 해당하는 키워드를 반환한다.
+        </p>
+      </li>
+      <li>
+        <p>빈 문자열을 반환한다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <p class="note">이는 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+      id="iframe-element-referrer-policy:concept-document-origin" data-x-internal="concept-document-origin">origin</a>의
+    일부를
+    <a href="#internal-ancestor-origin-objects-list-creation-steps"
+      id="iframe-element-referrer-policy:internal-ancestor-origin-objects-list-creation-steps">내부 조상 origin 객체 리스트 생성
+      단계</a>에서
+    마스킹할 수 있도록 허용하는 데 사용됩니다.
+  </p>
+
+
+  <h4 id=policy-containers><span class=secno>7.1.7</span> 정책 컨테이너<a href=#policy-containers class=self-link></a></h4>
 
   <p><dfn id=policy-container data-export="">정책 컨테이너</dfn>는 <a id=policy-containers:struct
       href=https://infra.spec.whatwg.org/#struct data-x-internal=struct>구조체</a>로, <code
@@ -140171,11 +140422,6 @@ console<c- p="">.</c->assert<c- p="">(</c->iframeWindow<c- p="">.</c->frameEleme
       </li>
     </ol>
   </div>
-
-  <p class="warning"><code
-      id="the-location-interface:dom-location-ancestororigins-2"><a href="#dom-location-ancestororigins">ancestorOrigins</a></code>
-    속성이 동작하는 방법의 세부사항은 여전히 논쟁 중이며 변경될 수 있습니다. 자세한 내용은 <a href="https://github.com/whatwg/html/issues/1918">issue
-      #1918</a>을 참조하십시오.</p>
 
   <hr>
 
@@ -150595,222 +150841,291 @@ forwardButton<c- p>.</c->disabled <c- o>=</c-> <c- o>!</c->navigation<c- p>.</c-
       class=self-link></a></h5>
 
   <div data-algorithm="">
-    <p>다음과 같은 경우에 <dfn id=creating-a-new-browsing-context>새 브라우징 컨텍스트와 문서</dfn>를 생성합니다: null 또는 <code
-        id=creating-browsing-contexts:document><a href=#document>문서</a></code> 객체 <var>creator</var>, null 또는 엘리먼트
-      <var>embedder</var>, 그리고 <a href=#browsing-context-group id=creating-browsing-contexts:browsing-context-group>브라우징
-        컨텍스트 그룹</a> <var>group</var>을 제공하는 경우:
+    <p>null 또는
+      <code id="creating-browsing-contexts:document"><a href="#document">Document</a></code>
+      객체 <var>creator</var>,
+      null 또는 요소 <var>embedder</var>,
+      <a href="#browsing-context-group" id="creating-browsing-contexts:browsing-context-group">브라우징 컨텍스트 그룹</a>
+      <var>group</var>이 주어졌을 때,
+      <dfn id="creating-a-new-browsing-context">새 브라우징 컨텍스트와 문서를 생성하는 방법</dfn>:
     </p>
 
     <ol>
       <li>
-        <p><var>browsingContext</var>를 새로운 <a href=#browsing-context id=creating-browsing-contexts:browsing-context>브라우징
-            컨텍스트</a>로 설정합니다.</p>
+        <p><var>browsingContext</var>를 새 <a href="#browsing-context"
+            id="creating-browsing-contexts:browsing-context">브라우징 컨텍스트</a>로 설정한다.</p>
+      </li>
       <li>
-        <p><var>unsafeContextCreationTime</var>을 <a id=creating-browsing-contexts:unsafe-shared-current-time
-            href=https://w3c.github.io/hr-time/#dfn-unsafe-shared-current-time
-            data-x-internal=unsafe-shared-current-time>공유된 현재 시간(unsafe shared current time)</a>으로 설정합니다.</p>
+        <p><var>unsafeContextCreationTime</var>을
+          <a id="creating-browsing-contexts:unsafe-shared-current-time"
+            href="https://w3c.github.io/hr-time/#dfn-unsafe-shared-current-time"
+            data-x-internal="unsafe-shared-current-time">공유된 현재 위험 시간</a>으로 설정한다.
+        </p>
+      </li>
       <li>
-        <p><var>creatorOrigin</var>을 null로 설정합니다.</p>
+        <p><var>creatorOrigin</var>을 null로 설정한다.</p>
+      </li>
       <li>
-        <p><var>creatorBaseURL</var>을 null로 설정합니다.</p>
-      <li id=creator-browsing-context>
-        <p><var>creator</var>가 null이 아닌 경우 다음을 수행합니다:</p>
+        <p><var>creatorBaseURL</var>을 null로 설정한다.</p>
+      </li>
+      <li id="creator-browsing-context">
+        <p><var>creator</var>가 null이 아니면:</p>
+
         <ol>
           <li>
             <p><var>creatorOrigin</var>을 <var>creator</var>의 <a
-                href=https://dom.spec.whatwg.org/#concept-document-origin
-                id=creating-browsing-contexts:concept-document-origin
-                data-x-internal=concept-document-origin>origin</a>으로
-              설정합니다.</p>
+                href="https://dom.spec.whatwg.org/#concept-document-origin"
+                id="creating-browsing-contexts:concept-document-origin"
+                data-x-internal="concept-document-origin">origin</a>으로 설정한다.</p>
+          </li>
           <li>
-            <p><var>creatorBaseURL</var>을 <var>creator</var>의 <a href=#document-base-url
-                id=creating-browsing-contexts:document-base-url>문서 기본 URL</a>로 설정합니다.</p>
+            <p><var>creatorBaseURL</var>을 <var>creator</var>의 <a href="#document-base-url"
+                id="creating-browsing-contexts:document-base-url">문서 베이스
+                URL</a>로 설정한다.</p>
+          </li>
           <li>
-            <p><var>browsingContext</var>의 <a href=#virtual-browsing-context-group-id
-                id=creating-browsing-contexts:virtual-browsing-context-group-id>가상 브라우징 컨텍스트 그룹 ID</a>를
-              <var>creator</var>의 <a href=#concept-document-bc id=creating-browsing-contexts:concept-document-bc>브라우징
-                컨텍스트</a>의 <a href=#bc-tlbc id=creating-browsing-contexts:bc-tlbc>최상위 브라우징 컨텍스트</a>의 <a
-                href=#virtual-browsing-context-group-id
-                id=creating-browsing-contexts:virtual-browsing-context-group-id-2>가상 브라우징 컨텍스트 그룹 ID</a>로
-              설정합니다.
+            <p><var>browsingContext</var>의 <a href="#virtual-browsing-context-group-id"
+                id="creating-browsing-contexts:virtual-browsing-context-group-id">가상 브라우징 컨텍스트 그룹 ID</a>를
+              <var>creator</var>의 <a href="#concept-document-bc"
+                id="creating-browsing-contexts:concept-document-bc">브라우징 컨텍스트</a>의 <a href="#bc-tlbc"
+                id="creating-browsing-contexts:bc-tlbc">최상위 브라우징 컨텍스트</a>의 <a href="#virtual-browsing-context-group-id"
+                id="creating-browsing-contexts:virtual-browsing-context-group-id-2">가상 브라우징 컨텍스트 그룹
+                ID</a>로 설정한다.
             </p>
+          </li>
         </ol>
+      </li>
       <li>
-        <p><var>sandboxFlags</var>를 <var>browsingContext</var>와 <var>embedder</var>를 사용해 <a
-            href=#determining-the-creation-sandboxing-flags
-            id=creating-browsing-contexts:determining-the-creation-sandboxing-flags>생성 샌드박싱 플래그 결정</a>의 결과로
-          설정합니다.</p>
-      <li id=about-blank-origin>
-        <p><var>origin</var>을 <code
-            id=creating-browsing-contexts:about:blank><a href=#about:blank>about:blank</a></code>와
-          <var>sandboxFlags</var>, 그리고 <var>creatorOrigin</var>을 사용해 <a href=#determining-the-origin
-            id=creating-browsing-contexts:determining-the-origin>원본 결정</a>의 결과로 설정합니다.
+        <p><var>sandboxFlags</var>를 <a href="#determining-the-creation-sandboxing-flags"
+            id="creating-browsing-contexts:determining-the-creation-sandboxing-flags">생성 샌드박스 플래그 결정</a>의 결과로
+          <var>browsingContext</var>와 <var>embedder</var>를 전달하여 얻는다.
         </p>
+      </li>
+      <li id="about-blank-origin">
+        <p><var>origin</var>을 <a href="#determining-the-origin"
+            id="creating-browsing-contexts:determining-the-origin">origin 결정</a>의 결과로,
+          <code id="creating-browsing-contexts:about:blank"><a href="#about:blank">about:blank</a></code>,
+          <var>sandboxFlags</var>, <var>creatorOrigin</var>을 전달해서 얻는다.
+        </p>
+      </li>
       <li>
-        <p><var>permissionsPolicy</var>를 <var>embedder</var>와 <var>origin</var>을 사용해 <a
-            id=creating-browsing-contexts:creating-a-permissions-policy
-            href=https://w3c.github.io/webappsec-feature-policy/#create-for-navigable
-            data-x-internal=creating-a-permissions-policy>권한 정책 생성</a>의 결과로 설정합니다. <a
-            href=#refsPERMISSIONSPOLICY>[PERMISSIONSPOLICY]</a></p>
+        <p><var>permissionsPolicy</var>를 <a id="creating-browsing-contexts:creating-a-permissions-policy"
+            href="https://w3c.github.io/webappsec-feature-policy/#create-for-navigable"
+            data-x-internal="creating-a-permissions-policy">permissions policy 생성</a>의 결과로,
+          <var>embedder</var>와 <var>origin</var> 전달하여 얻는다. <a href="#refsPERMISSIONSPOLICY">[PERMISSIONSPOLICY]</a>
+        </p>
+      </li>
       <li>
-        <p><var>agent</var>을 <var>origin</var>, <var>group</var>, 그리고 false를 사용해 <a
-            href=#obtain-similar-origin-window-agent id=creating-browsing-contexts:obtain-similar-origin-window-agent>유사
-            출처 창 에이전트 획득</a>의 결과로 설정합니다.</p>
+        <p><var>agent</var>를 <a href="#obtain-similar-origin-window-agent"
+            id="creating-browsing-contexts:obtain-similar-origin-window-agent">유사 origin 윈도우 agent 얻기</a>의 결과로,
+          <var>origin</var>, <var>group</var>, false를 전달하여 얻는다.
+        </p>
+      </li>
       <li>
-        <p><var>realm execution context</var>를 <var>agent</var>와 다음 커스터마이징을 사용해 <a href=#creating-a-new-javascript-realm
-            id=creating-browsing-contexts:creating-a-new-javascript-realm>새로운 자바스크립트 렐름 생성</a>의 결과로 설정합니다:</p>
+        <p><var>realm execution context</var>를 <a href="#creating-a-new-javascript-realm"
+            id="creating-browsing-contexts:creating-a-new-javascript-realm">새 realm 생성</a>의 결과로,
+          <var>agent</var>와 다음의 커스터마이징을 전달해서 얻는다:
+        </p>
+
         <ul>
           <li>
-            <p>글로벌 객체의 경우, 새로운 <code id=creating-browsing-contexts:window><a href=#window>Window</a></code> 객체를
-              생성합니다.</p>
+            <p>글로벌 객체로 새 <code id="creating-browsing-contexts:window"><a href="#window">Window</a></code> 객체 생성.</p>
+          </li>
           <li>
-            <p>글로벌 <b>this</b> 바인딩의 경우, <var>browsingContext</var>의 <code
-                id=creating-browsing-contexts:windowproxy><a href=#windowproxy>WindowProxy</a></code> 객체를
-              사용합니다.</p>
+            <p>글로벌 <b>this</b> 바인딩에는 <var>browsingContext</var>의
+              <code id="creating-browsing-contexts:windowproxy"><a href="#windowproxy">WindowProxy</a></code> 객체 사용.
+            </p>
+          </li>
         </ul>
+      </li>
       <li>
         <p><var>topLevelCreationURL</var>을 <code
-            id=creating-browsing-contexts:about:blank-2><a href=#about:blank>about:blank</a></code>로 설정합니다;
-          <var>embedder</var>가 null이 아닌 경우, <var>embedder</var>의 <a href=#relevant-settings-object
-            id=creating-browsing-contexts:relevant-settings-object>관련 설정 객체</a>의 <a
-            href=#concept-environment-top-level-creation-url
-            id=creating-browsing-contexts:concept-environment-top-level-creation-url>최상위 생성 URL</a>로 설정합니다.
+            id="creating-browsing-contexts:about:blank-2"><a href="#about:blank">about:blank</a></code>로 설정한 후,
+          <var>embedder</var>가 null이라면 그렇고,
+          null이 아니라면 <var>embedder</var>의 <a href="#relevant-settings-object"
+            id="creating-browsing-contexts:relevant-settings-object">관련 설정 객체</a>의 <a
+            href="#concept-environment-top-level-creation-url"
+            id="creating-browsing-contexts:concept-environment-top-level-creation-url">최상위 생성 URL</a>을 사용한다.
         </p>
+      </li>
       <li>
-        <p><var>topLevelOrigin</var>을 <var>origin</var>으로 설정합니다; <var>embedder</var>가 null이 아닌 경우,
-          <var>embedder</var>의 <a href=#relevant-settings-object
-            id=creating-browsing-contexts:relevant-settings-object-2>관련 설정 객체</a>의 <a
-            href=#concept-environment-top-level-origin
-            id=creating-browsing-contexts:concept-environment-top-level-origin>최상위 출처</a>로 설정합니다.
+        <p><var>topLevelOrigin</var>을 <var>origin</var>으로 설정한 후, <var>embedder</var>가 null이면 그렇고,
+          null이 아니라면 <var>embedder</var>의 <a href="#relevant-settings-object"
+            id="creating-browsing-contexts:relevant-settings-object-2">관련 설정 객체</a>의 <a
+            href="#concept-environment-top-level-origin"
+            id="creating-browsing-contexts:concept-environment-top-level-origin">최상위 origin</a>을 사용한다.</p>
+      </li>
+      <li>
+        <p><a href="#set-up-a-window-environment-settings-object"
+            id="creating-browsing-contexts:set-up-a-window-environment-settings-object">윈도우 환경 설정 객체 설정</a>을
+          <code id="creating-browsing-contexts:about:blank-3"><a href="#about:blank">about:blank</a></code>,
+          <var>realm execution context</var>, null, <var>topLevelCreationURL</var>, <var>topLevelOrigin</var>와 함께 수행한다.
         </p>
+      </li>
       <li>
-        <p><a href=#set-up-a-window-environment-settings-object
-            id=creating-browsing-contexts:set-up-a-window-environment-settings-object>Window 환경 설정 객체 설정</a>을
-          <code id=creating-browsing-contexts:about:blank-3><a href=#about:blank>about:blank</a></code>,
-          <var>realm execution context</var>, null, <var>topLevelCreationURL</var>, 그리고 <var>topLevelOrigin</var>과
-          함께 실행합니다.
+        <p><var>loadTimingInfo</var>를 새 <a href="#document-load-timing-info"
+            id="creating-browsing-contexts:document-load-timing-info">문서 로드 타이밍 정보</a>로 설정하고,
+          <a href="#navigation-start-time" id="creating-browsing-contexts:navigation-start-time">네비게이션 시작 시간</a>은
+          <a id="creating-browsing-contexts:coarsen-time" href="https://w3c.github.io/hr-time/#dfn-coarsen-time"
+            data-x-internal="coarsen-time">coarsen time</a>
+          을 <var>unsafeContextCreationTime</var>과 새 <a href="#environment-settings-object"
+            id="creating-browsing-contexts:environment-settings-object">환경 설정 객체</a>의
+          <a href="#concept-settings-object-cross-origin-isolated-capability"
+            id="creating-browsing-contexts:concept-settings-object-cross-origin-isolated-capability">교차 origin 격리
+            기능</a>을 사용하여 호출한 결과로 설정한다.
         </p>
+      </li>
       <li>
-        <p><var>loadTimingInfo</var>를 새로운 <a href=#document-load-timing-info
-            id=creating-browsing-contexts:document-load-timing-info>문서 로드 타이밍 정보</a>로 설정하고, 그 <a
-            href=#navigation-start-time id=creating-browsing-contexts:navigation-start-time>탐색 시작 시간</a>을 <a
-            id=creating-browsing-contexts:coarsen-time href=https://w3c.github.io/hr-time/#dfn-coarsen-time
-            data-x-internal=coarsen-time>시간 조정</a>을 호출한 결과로 설정합니다.</p>
-      <li>
-        <p><var>document</var>를 새로운 <code id=creating-browsing-contexts:document-2><a href=#document>문서</a></code>로
-          설정하고, 다음을 포함합니다:</p>
-        <dl class=props>
-          <dt><a href=https://dom.spec.whatwg.org/#concept-document-type
-              id=creating-browsing-contexts:concept-document-type data-x-internal=concept-document-type>유형</a>
-          <dd>"<code>html</code>"
-          <dt><a href=https://dom.spec.whatwg.org/#concept-document-content-type
-              id=creating-browsing-contexts:concept-document-content-type
-              data-x-internal=concept-document-content-type>콘텐츠 유형</a>
-          <dd>"<code id=creating-browsing-contexts:text/html><a href=#text/html>text/html</a></code>"
-          <dt><a href=https://dom.spec.whatwg.org/#concept-document-mode
-              id=creating-browsing-contexts:concept-document-mode data-x-internal=concept-document-mode>모드</a>
-          <dd>"<code>quirks</code>"
-          <dt><a href=https://dom.spec.whatwg.org/#concept-document-origin
-              id=creating-browsing-contexts:concept-document-origin-2 data-x-internal=concept-document-origin>출처</a>
-          <dd><var>origin</var>
-          <dt><a href=#concept-document-bc id=creating-browsing-contexts:concept-document-bc-2>브라우징 컨텍스트</a>
+        <p><var>document</var>를 새 <code
+            id="creating-browsing-contexts:document-2"><a href="#document">Document</a></code>로 설정하고, 다음을 포함한다:</p>
+
+        <dl class="props">
+          <dt><a href="https://dom.spec.whatwg.org/#concept-document-type"
+              id="creating-browsing-contexts:concept-document-type" data-x-internal="concept-document-type">type</a>
+          </dt>
+          <dd>"<code>html</code>"</dd>
+          <dt><a href="https://dom.spec.whatwg.org/#concept-document-content-type"
+              id="creating-browsing-contexts:concept-document-content-type"
+              data-x-internal="concept-document-content-type">content type</a></dt>
+          <dd>"<code id="creating-browsing-contexts:text/html"><a href="#text/html">text/html</a></code>"</dd>
+          <dt><a href="https://dom.spec.whatwg.org/#concept-document-mode"
+              id="creating-browsing-contexts:concept-document-mode" data-x-internal="concept-document-mode">mode</a>
+          </dt>
+          <dd>"<code>quirks</code>"</dd>
+          <dt><a href="https://dom.spec.whatwg.org/#concept-document-origin"
+              id="creating-browsing-contexts:concept-document-origin-2"
+              data-x-internal="concept-document-origin">origin</a></dt>
+          <dd><var>origin</var></dd>
+          <dt><a href="#concept-document-bc" id="creating-browsing-contexts:concept-document-bc-2">브라우징 컨텍스트</a>
+          </dt>
           <dd><var>browsingContext</var>
-          <dt><a href=#concept-document-permissions-policy
-              id=creating-browsing-contexts:concept-document-permissions-policy>권한 정책</a>
-          <dd><var>permissionsPolicy</var>
-          <dt><a href=#active-sandboxing-flag-set id=creating-browsing-contexts:active-sandboxing-flag-set>활성화된
-              샌드박싱 플래그 세트</a>
-          <dd><var>sandboxFlags</var>
-          <dt><a href=#load-timing-info id=creating-browsing-contexts:load-timing-info>로드 타이밍 정보</a>
-          <dd><var>loadTimingInfo</var>
-          <dt><a href=#is-initial-about:blank id=creating-browsing-contexts:is-initial-about:blank>초기
-              <code>about:blank</code> 상태</a>
-          <dd>True
-          <dt><a href=#concept-document-about-base-url id=creating-browsing-contexts:concept-document-about-base-url>기본
-              URL</a>
-          <dd><var>creatorBaseURL</var>
-          <dt><a href=https://dom.spec.whatwg.org/#concept-document-allow-declarative-shadow-roots
-              id=creating-browsing-contexts:concept-document-allow-declarative-shadow-roots
-              data-x-internal=concept-document-allow-declarative-shadow-roots>선언적 쉐도우 루트 허용</a>
-          <dd>True
-          <dt><a href=https://dom.spec.whatwg.org/#document-custom-element-registry
-              id=creating-browsing-contexts:document-custom-element-registry
-              data-x-internal=document-custom-element-registry>사용자 정의 요소 레지스트리</a>
-          <dd>새로운 <code
-              id=creating-browsing-contexts:customelementregistry><a href=#customelementregistry>CustomElementRegistry</a></code>
-            객체입니다.
+          </dd>
+          <dt><a href="#concept-document-permissions-policy"
+              id="creating-browsing-contexts:concept-document-permissions-policy">permissions policy</a></dt>
+          <dd><var>permissionsPolicy</var></dd>
+          <dt><a href="#active-sandboxing-flag-set" id="creating-browsing-contexts:active-sandboxing-flag-set">활성
+              샌드박스 플래그 집합</a></dt>
+          <dd><var>sandboxFlags</var></dd>
+          <dt><a href="#load-timing-info" id="creating-browsing-contexts:load-timing-info">로드 타이밍 정보</a></dt>
+          <dd><var>loadTimingInfo</var></dd>
+          <dt><a href="#is-initial-about:blank" id="creating-browsing-contexts:is-initial-about:blank">초기
+              <code>about:blank</code></a></dt>
+          <dd>true</dd>
+          <dt><a href="#concept-document-about-base-url"
+              id="creating-browsing-contexts:concept-document-about-base-url">about 베이스 URL</a></dt>
+          <dd><var>creatorBaseURL</var></dd>
+          <dt><a href="https://dom.spec.whatwg.org/#concept-document-allow-declarative-shadow-roots"
+              id="creating-browsing-contexts:concept-document-allow-declarative-shadow-roots"
+              data-x-internal="concept-document-allow-declarative-shadow-roots">선언적 shadow root 허용</a></dt>
+          <dd>true</dd>
+          <dt><a href="https://dom.spec.whatwg.org/#document-custom-element-registry"
+              id="creating-browsing-contexts:document-custom-element-registry"
+              data-x-internal="document-custom-element-registry">커스텀 요소 레지스트리</a></dt>
+          <dd>새 <code
+              id="creating-browsing-contexts:customelementregistry"><a href="#customelementregistry">CustomElementRegistry</a></code>
+            객체</dd>
         </dl>
+      </li>
+      <li>
+        <p><var>iframeReferrerPolicy</var>를 <a href="#determining-the-iframe-element-referrer-policy"
+            id="creating-browsing-contexts:determining-the-iframe-element-referrer-policy"><code>iframe</code> 요소의 리퍼러
+            정책 결정</a>의 결과로,
+          <var>embedder</var>를 전달하여 얻는다.
+        </p>
+      </li>
       <li>
         <p><var>document</var>의 <a href="#concept-document-internal-ancestor-origin-objects-list"
-            id="creating-browsing-contexts:concept-document-internal-ancestor-origin-objects-list">internal ancestor
-            origin objects
-            list</a>을(를) 주어진 <var>document</var>에 대해 실행한 <a href="#internal-ancestor-origin-objects-list-creation-steps"
-            id="creating-browsing-contexts:internal-ancestor-origin-objects-list-creation-steps">internal ancestor
-            origin objects list creation
-            steps</a>의 결과로 설정합니다.</p>
+            id="creating-browsing-contexts:concept-document-internal-ancestor-origin-objects-list">내부 조상 origin 객체
+            리스트</a>를
+          <a href="#internal-ancestor-origin-objects-list-creation-steps"
+            id="creating-browsing-contexts:internal-ancestor-origin-objects-list-creation-steps">내부 조상 origin 객체 리스트 생성
+            단계</a>의 결과로,
+          <var>document</var>와 <var>iframeReferrerPolicy</var>를 전달해서 얻는다.
+        </p>
       </li>
       <li>
         <p><var>document</var>의 <a href="#concept-document-ancestor-origins-list"
-            id="creating-browsing-contexts:concept-document-ancestor-origins-list">ancestor
-            origins list</a>을(를) 주어진 <var>document</var>에 대해 실행한 <a href="#ancestor-origins-list-creation-steps"
-            id="creating-browsing-contexts:ancestor-origins-list-creation-steps">ancestor origins list creation
-            steps</a>의 결과로 설정합니다.</p>
+            id="creating-browsing-contexts:concept-document-ancestor-origins-list">조상 origins 리스트</a>를
+          <a href="#ancestor-origins-list-creation-steps"
+            id="creating-browsing-contexts:ancestor-origins-list-creation-steps">조상 origins 리스트 생성 단계</a>의 결과로,
+          <var>document</var>를 전달해서 얻는다.
+        </p>
       </li>
       <li>
-        <p><var>creator</var>가 null이 아닌 경우 다음을 수행합니다:</p>
+        <p><var>creator</var>가 null이 아니면:</p>
         <ol>
           <li>
             <p><var>document</var>의 <a href="#the-document's-referrer"
-                id="creating-browsing-contexts:the-document's-referrer">referrer</a>를 <a
-                href=https://url.spec.whatwg.org/#concept-url-serializer
-                id=creating-browsing-contexts:concept-url-serializer data-x-internal=concept-url-serializer>URL
-                직렬화(serialization)</a>로 설정합니다.</p>
-          <li>
-            <p><var>document</var>의 <a href=#concept-document-policy-container
-                id=creating-browsing-contexts:concept-document-policy-container>정책 컨테이너</a>를 <a
-                href=#clone-a-policy-container id=creating-browsing-contexts:clone-a-policy-container>복제</a>하여
-              <var>creator</var>의 <a href=#concept-document-policy-container
-                id=creating-browsing-contexts:concept-document-policy-container-2>정책 컨테이너</a>로 설정합니다.
+                id="creating-browsing-contexts:the-document's-referrer">referrer</a>를
+              <a href="https://url.spec.whatwg.org/#concept-url-serializer"
+                id="creating-browsing-contexts:concept-url-serializer" data-x-internal="concept-url-serializer">직렬화</a>한
+              <var>creator</var>의 <a href="https://dom.spec.whatwg.org/#concept-document-url"
+                id="creating-browsing-contexts:the-document's-address" data-x-internal="the-document's-address">URL</a>로
+              설정한다.
             </p>
+          </li>
           <li>
-            <p><var>creator</var>의 <a href=https://dom.spec.whatwg.org/#concept-document-origin
-                id=creating-browsing-contexts:concept-document-origin-3 data-x-internal=concept-document-origin>출처</a>가
-              <a href=#same-origin id=creating-browsing-contexts:same-origin>동일 출처</a>인 경우 <var>document</var>의 <a
-                href=#concept-document-coop id=creating-browsing-contexts:concept-document-coop>교차 출처 열기
-                정책</a>을 <var>creator</var>의 <a href=#concept-document-bc
-                id=creating-browsing-contexts:concept-document-bc-3>브라우징 컨텍스트</a>의 <a href=#bc-tlbc
-                id=creating-browsing-contexts:bc-tlbc-2>최상위 브라우징 컨텍스트</a>의 <a href=#active-document
-                id=creating-browsing-contexts:active-document>활성화된 문서</a>의 <a href=#concept-document-coop
-                id=creating-browsing-contexts:concept-document-coop-2>교차 출처 열기 정책</a>으로 설정합니다.
+            <p><var>document</var>의 <a href="#concept-document-policy-container"
+                id="creating-browsing-contexts:concept-document-policy-container">정책 컨테이너</a>를
+              <a href="#clone-a-policy-container" id="creating-browsing-contexts:clone-a-policy-container">클론</a>한
+              <var>creator</var>의 <a href="#concept-document-policy-container"
+                id="creating-browsing-contexts:concept-document-policy-container-2">정책 컨테이너</a>로 설정한다.
             </p>
+          </li>
+          <li>
+            <p><var>creator</var>의 <a href="https://dom.spec.whatwg.org/#concept-document-origin"
+                id="creating-browsing-contexts:concept-document-origin-3"
+                data-x-internal="concept-document-origin">origin</a>이
+              <a href="#same-origin" id="creating-browsing-contexts:same-origin">동일 origin</a>이고,
+              <var>creator</var>의 <a href="#relevant-settings-object"
+                id="creating-browsing-contexts:relevant-settings-object-3">관련 설정 객체</a>의
+              <a href="#concept-environment-top-level-origin"
+                id="creating-browsing-contexts:concept-environment-top-level-origin-2">최상위 origin</a>도 동일하다면,
+              <var>document</var>의 <a href="#concept-document-coop"
+                id="creating-browsing-contexts:concept-document-coop">opener policy</a>를 <var>creator</var>의 <a
+                href="#concept-document-bc" id="creating-browsing-contexts:concept-document-bc-3">브라우징 컨텍스트</a>의
+              <a href="#bc-tlbc" id="creating-browsing-contexts:bc-tlbc-2">최상위 브라우징 컨텍스트</a>의 <a href="#active-document"
+                id="creating-browsing-contexts:active-document">활성 문서</a>의 <a href="#concept-document-coop"
+                id="creating-browsing-contexts:concept-document-coop-2">opener policy</a>로 설정한다.
+            </p>
+          </li>
         </ol>
+      </li>
       <li>
-        <p><a id=creating-browsing-contexts:assert href=https://infra.spec.whatwg.org/#assert
-            data-x-internal=assert>확인(assert)</a>: <var>document</var>의 <a
-            href=https://dom.spec.whatwg.org/#concept-document-url
-            id="creating-browsing-contexts:the-document's-address-2" data-x-internal="the-document's-address">URL</a> 및
-          <var>document</var>의 <a href=#relevant-settings-object
-            id=creating-browsing-contexts:relevant-settings-object-4>관련 설정
-            객체</a>의 <a href=#concept-environment-creation-url
-            id=creating-browsing-contexts:concept-environment-creation-url>생성 URL</a>이 <code
-            id=creating-browsing-contexts:about:blank-4><a href=#about:blank>about:blank</a></code>임을 확인합니다.
+        <p><a id="creating-browsing-contexts:assert" href="https://infra.spec.whatwg.org/#assert"
+            data-x-internal="assert">Assert</a>: <var>document</var>의 <a
+            href="https://dom.spec.whatwg.org/#concept-document-url"
+            id="creating-browsing-contexts:the-document's-address-2" data-x-internal="the-document's-address">URL</a>과
+          <var>document</var>의 <a href="#relevant-settings-object"
+            id="creating-browsing-contexts:relevant-settings-object-4">관련 설정 객체</a>의 <a
+            href="#concept-environment-creation-url" id="creating-browsing-contexts:concept-environment-creation-url">생성
+            URL</a>은
+          <code id="creating-browsing-contexts:about:blank-4"><a href="#about:blank">about:blank</a></code>이다.
         </p>
+      </li>
       <li>
-        <p><var>document</var>를 <a href=#ready-for-post-load-tasks
-            id=creating-browsing-contexts:ready-for-post-load-tasks>로드 후 작업을 위한 준비 완료 상태</a>로 표시합니다.</p>
+        <p><var>document</var>를 <a href="#ready-for-post-load-tasks"
+            id="creating-browsing-contexts:ready-for-post-load-tasks">후처리 작업 준비됨</a>으로 표시한다.</p>
+      </li>
       <li>
-        <p><var>document</var>에 대해 <a href=#populate-with-html/head/body
-            id=creating-browsing-contexts:populate-with-html/head/body><code>html</code>/<code>head</code>/<code>body</code>로
-            채우기</a>를 실행합니다.</p>
+        <p><a href="#populate-with-html/head/body" id="creating-browsing-contexts:populate-with-html/head/body">
+            <code>html</code>/<code>head</code>/<code>body</code>로 채우기</a>를 <var>document</var>에 대해 수행한다.
+        </p>
+      </li>
       <li>
-        <p><var>document</var>를 <a href=#make-active id=creating-browsing-contexts:make-active>활성화</a>합니다.</p>
+        <p><a href="#make-active" id="creating-browsing-contexts:make-active">활성화</a> <var>document</var>을 수행한다.</p>
+      </li>
       <li>
-        <p><a href=#completely-finish-loading id=creating-browsing-contexts:completely-finish-loading>로드를 완전히
-            완료</a>한 후 <var>document</var>를 반환합니다.</p>
+        <p><a href="#completely-finish-loading" id="creating-browsing-contexts:completely-finish-loading">완전히 로딩 완료</a>
+          <var>document</var>을 수행한다.
+        </p>
+      </li>
       <li>
-        <p><var>browsingContext</var>와 <var>document</var>를 반환합니다.</p>
+        <p><var>browsingContext</var>와 <var>document</var>를 반환한다.</p>
+      </li>
     </ol>
   </div>
+
 
   <div data-algorithm="">
     <p><dfn id=creating-a-new-top-level-browsing-context>새로운 최상위 브라우징 컨텍스트와 문서</dfn>를 생성하려면:</p>
@@ -152488,124 +152803,150 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
 
   <hr>
 
-  <p><dfn id=target-snapshot-params>대상 스냅샷 매개변수</dfn> <a id=navigation-supporting-concepts:struct-2
-      href=https://infra.spec.whatwg.org/#struct data-x-internal=struct>구조체</a>는 내비게이션되는
-    <a href=#navigable id=navigation-supporting-concepts:navigable>내비게이션 가능 요소</a>의 데이터를
-    캡처하는 데 사용됩니다. <a href=#source-snapshot-params id=navigation-supporting-concepts:source-snapshot-params-3>소스
-      스냅샷 매개변수</a>와 마찬가지로, 내비게이션의 시작 시점에 스냅샷이 만들어지며, 내비게이션의 전체 수명 동안 사용됩니다.
-    이 구조체에는 다음과 같은 <a href=https://infra.spec.whatwg.org/#struct-item id=navigation-supporting-concepts:struct-item-2
-      data-x-internal=struct-item>항목들</a>이 포함됩니다:
+  <p><dfn id="target-snapshot-params">대상 스냅샷 파라미터</dfn> <a id="navigation-supporting-concepts:struct-2"
+      href="https://infra.spec.whatwg.org/#struct" data-x-internal="struct">구조체</a>는 탐색 중인
+    <a href="#navigable" id="navigation-supporting-concepts:navigable">내비게이블</a>에서 데이터를 캡처하는 데 사용됩니다. <a
+      href="#source-snapshot-params" id="navigation-supporting-concepts:source-snapshot-params-3">소스 스냅샷 파라미터</a>와
+    유사하게, 탐색 시작 시 스냅샷되고 탐색 수명 주기 동안 사용됩니다.
+    다음 <a href="https://infra.spec.whatwg.org/#struct-item" id="navigation-supporting-concepts:struct-item-2"
+      data-x-internal="struct-item">아이템</a>들을 가집니다:
   </p>
 
   <dl>
-    <dt><dfn id=target-snapshot-params-sandbox>샌드박싱 플래그</dfn>
-    <dd><a href=#sandboxing-flag-set id=navigation-supporting-concepts:sandboxing-flag-set-3>샌드박싱 플래그
-        세트</a>
+    <dt><dfn id="target-snapshot-params-sandbox">샌드박스 플래그</dfn></dt>
+    <dd><a href="#sandboxing-flag-set" id="navigation-supporting-concepts:sandboxing-flag-set-3">샌드박스 플래그 집합</a></dd>
+    <dt><dfn id="target-snapshot-params-iframe-referrer-policy"><code>iframe</code> 요소 리퍼러 정책</dfn></dt>
+    <dd><a id="navigation-supporting-concepts:referrer-policy"
+        href="https://w3c.github.io/webappsec-referrer-policy/#referrer-policy" data-x-internal="referrer-policy">리퍼러
+        정책</a></dd>
   </dl>
 
   <div data-algorithm="">
-    <p><dfn id=snapshotting-target-snapshot-params>대상 스냅샷 매개변수 스냅샷</dfn>을 위해 주어진
-      <a href=#navigable id=navigation-supporting-concepts:navigable-2>내비게이션 가능 요소</a>
-      <var>targetNavigable</var>에서 새로운 <a href=#target-snapshot-params
-        id=navigation-supporting-concepts:target-snapshot-params>대상 스냅샷 매개변수</a>를 반환합니다. 여기에는
-      <a href=#target-snapshot-params-sandbox id=navigation-supporting-concepts:target-snapshot-params-sandbox>샌드박싱
-        플래그</a>가
-      <var>targetNavigable</var>의 <a href=#nav-bc id=navigation-supporting-concepts:nav-bc>활성
-        브라우징 컨텍스트</a> 및
-      <var>targetNavigable</var>의 <a href=#nav-container id=navigation-supporting-concepts:nav-container>컨테이너</a>를
-      기준으로 <a href=#determining-the-creation-sandboxing-flags
-        id=navigation-supporting-concepts:determining-the-creation-sandboxing-flags>생성 샌드박싱 플래그 결정</a>의
-      결과로 설정됩니다.
+    <p><a href="#navigable" id="navigation-supporting-concepts:navigable-2">내비게이블</a>
+      <var>targetNavigable</var>이 주어졌을 때,
+      <dfn id="snapshotting-target-snapshot-params">대상 스냅샷 파라미터 스냅샷하기</dfn>
+      를 위해 다음과 같이 새 <a href="#target-snapshot-params" id="navigation-supporting-concepts:target-snapshot-params">대상 스냅샷
+        파라미터</a>를 반환합니다:
     </p>
+
+    <dl class="props">
+      <dt><a href="#target-snapshot-params-sandbox"
+          id="navigation-supporting-concepts:target-snapshot-params-sandbox">샌드박스 플래그</a></dt>
+      <dd><a href="#determining-the-creation-sandboxing-flags"
+          id="navigation-supporting-concepts:determining-the-creation-sandboxing-flags">생성 샌드박스 플래그 결정하기</a> 결과값으로
+        <var>targetNavigable</var>의 <a href="#nav-bc" id="navigation-supporting-concepts:nav-bc">활성 브라우징 컨텍스트</a>와
+        <var>targetNavigable</var>의 <a href="#nav-container" id="navigation-supporting-concepts:nav-container">컨테이너</a>를
+        전달
+      </dd>
+      <dt><a href="#target-snapshot-params-iframe-referrer-policy"
+          id="navigation-supporting-concepts:target-snapshot-params-iframe-referrer-policy"><code>iframe</code> 요소
+          리퍼러 정책</a></dt>
+      <dd><a href="#determining-the-iframe-element-referrer-policy"
+          id="navigation-supporting-concepts:determining-the-iframe-element-referrer-policy"><code>iframe</code> 요소 리퍼러
+          정책 결정하기</a> 결과값으로
+        <var>targetNavigable</var>의 <a href="#nav-container"
+          id="navigation-supporting-concepts:nav-container-2">컨테이너</a>를 전달
+      </dd>
+    </dl>
   </div>
 
   <hr>
 
-  <p>탐색 과정의 대부분은 새로운
-    <code id="navigation-supporting-concepts:document-3"><a href="#document">문서</a></code>를 생성하는 방법을 결정하는 것과 관련되어 있으며,
-    이는 궁극적으로 <a href="#initialise-the-document-object"
-      id="navigation-supporting-concepts:initialise-the-document-object"><code>Document</code> 객체를 생성 및 초기화</a>
-    알고리즘에서 수행됩니다. 해당 알고리즘의 매개변수는 <dfn id="navigation-params">탐색 매개변수(navigation params)</dfn>
+  <p>탐색 과정의 많은 부분은 새
+    <code id="navigation-supporting-concepts:document-3"><a href="#document">Document</a></code>
+    를 어떻게 생성할지를 결정하는 것과 관계있는데, 이는 궁극적으로 <a href="#initialise-the-document-object"
+      id="navigation-supporting-concepts:initialise-the-document-object">Document 객체 생성 및 초기화</a>
+    알고리즘에서 처리됩니다. 그 알고리즘에 넘겨지는 파라미터는 <dfn id="navigation-params">내비게이션 파라미터</dfn>
     <a id="navigation-supporting-concepts:struct-3" href="https://infra.spec.whatwg.org/#struct"
-      data-x-internal="struct">구조체(struct)</a>로 추적되며, 다음과 같은 <a href="https://infra.spec.whatwg.org/#struct-item"
-      id="navigation-supporting-concepts:struct-item-3" data-x-internal="struct-item">항목</a>을 갖습니다:
+      data-x-internal="struct">구조체</a>로 추적하며, 다음 <a href="https://infra.spec.whatwg.org/#struct-item"
+      id="navigation-supporting-concepts:struct-item-3" data-x-internal="struct-item">아이템</a>들을 포함합니다:
   </p>
 
   <dl>
     <dt><dfn data-dfn-for="navigation params" id="navigation-params-id">id</dfn></dt>
-    <dd>null 또는 <a href="#navigation-id" id="navigation-supporting-concepts:navigation-id">탐색 ID</a></dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-navigable">navigable</dfn></dt>
-    <dd>이동할 <a href="#navigable" id="navigation-supporting-concepts:navigable-3">navigable</a></dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-request">request</dfn></dt>
+    <dd>null 또는 <a href="#navigation-id" id="navigation-supporting-concepts:navigation-id">내비게이션 ID</a></dd>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-navigable">내비게이블</dfn></dt>
+    <dd>탐색될 <a href="#navigable" id="navigation-supporting-concepts:navigable-3">내비게이블</a></dd>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-request">요청</dfn></dt>
     <dd>null 또는 탐색을 시작한 <a href="https://fetch.spec.whatwg.org/#concept-request"
-        id="navigation-supporting-concepts:concept-request" data-x-internal="concept-request">request</a></dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-response">response</dfn></dt>
-    <dd>궁극적으로 탐색된 <a href="https://fetch.spec.whatwg.org/#concept-response"
-        id="navigation-supporting-concepts:concept-response" data-x-internal="concept-response">response</a>
-      (또는 <a id="navigation-supporting-concepts:network-error"
+        id="navigation-supporting-concepts:concept-request" data-x-internal="concept-request">요청</a></dd>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-response">응답</dfn></dt>
+    <dd><a href="https://fetch.spec.whatwg.org/#concept-response" id="navigation-supporting-concepts:concept-response"
+        data-x-internal="concept-response">응답</a> — 최종적으로 탐색된 대상
+      (혹은 <a id="navigation-supporting-concepts:network-error"
         href="https://fetch.spec.whatwg.org/#concept-network-error" data-x-internal="network-error">네트워크 오류</a>)
     </dd>
     <dt><dfn data-dfn-for="navigation params" id="navigation-params-fetch-controller">fetch
-        controller</dfn></dt>
+        컨트롤러</dfn></dt>
     <dd>null 또는 <a id="navigation-supporting-concepts:fetch-controller"
-        href="https://fetch.spec.whatwg.org/#fetch-controller" data-x-internal="fetch-controller">fetch controller</a>
+        href="https://fetch.spec.whatwg.org/#fetch-controller" data-x-internal="fetch-controller">fetch 컨트롤러</a>
     </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-commit-early-hints">commit early
-        hints</dfn></dt>
-    <dd>null 또는 생성된 <code id="navigation-supporting-concepts:document-4"><a href="#document">문서</a></code>를 인자로 받는 알고리즘
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-commit-early-hints">early hints 커밋</dfn></dt>
+    <dd>null 또는 생성된 <code id="navigation-supporting-concepts:document-4"><a href="#document">Document</a></code> 를 인자로
+      받는 알고리즘
     </dd>
     <dt><dfn data-dfn-for="navigation params" id="navigation-params-coop-enforcement-result">COOP
-        enforcement result</dfn></dt>
+        enforcement 결과</dfn></dt>
     <dd><a href="#coop-enforcement-result" id="navigation-supporting-concepts:coop-enforcement-result">opener 정책
-        강제 결과</a>로,
-      보고 및 <a href="#browsing-context-group-switches-due-to-cross-origin-opener-policy">브라우징 컨텍스트 그룹 전환</a>을 유발할 수 있음
+        enforcement 결과</a> — report에 사용되고
+      <a href="#browsing-context-group-switches-due-to-cross-origin-opener-policy">브라우징 컨텍스트
+        그룹 전환</a>을 야기할 수도 있음
     </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-reserved-environment">reserved
-        environment</dfn></dt>
-    <dd>null 또는 새 <code id="navigation-supporting-concepts:document-5"><a href="#document">문서</a></code>를 위해
-      예약된 <a href="#environment" id="navigation-supporting-concepts:environment">environment</a></dd>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-reserved-environment">예약된
+        환경</dfn></dt>
+    <dd>null 또는 새 <a href="#environment" id="navigation-supporting-concepts:environment">환경</a>
+      에 예약되는 공간
+      <code id="navigation-supporting-concepts:document-5"><a href="#document">Document</a></code>
+    </dd>
     <dt><dfn data-dfn-for="navigation params" id="navigation-params-origin">origin</dfn></dt>
-    <dd>새 <code id="navigation-supporting-concepts:document-6"><a href="#document">문서</a></code>에 사용할
-      <a href="#concept-origin" id="navigation-supporting-concepts:concept-origin">origin</a>
+    <dd>새 <a href="#concept-origin" id="navigation-supporting-concepts:concept-origin">origin</a> 으로 사용할
+      <code id="navigation-supporting-concepts:document-6"><a href="#document">Document</a></code>
     </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-policy-container">policy
-        container</dfn></dt>
-    <dd>새 <code id="navigation-supporting-concepts:document-7"><a href="#document">문서</a></code>에 사용할
-      <a href="#policy-container" id="navigation-supporting-concepts:policy-container-3">policy container</a>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-policy-container">정책
+        컨테이너</dfn></dt>
+    <dd>새 <a href="#policy-container" id="navigation-supporting-concepts:policy-container-3">정책 컨테이너</a>로 사용할
+      <code id="navigation-supporting-concepts:document-7"><a href="#document">Document</a></code>
     </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-sandboxing">final sandboxing flag
-        set</dfn></dt>
-    <dd>새 <code id="navigation-supporting-concepts:document-8"><a href="#document">문서</a></code>에 적용할
-      <a href="#sandboxing-flag-set" id="navigation-supporting-concepts:sandboxing-flag-set-4">sandboxing flag set</a>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-sandboxing">최종 샌드박스 플래그
+        집합</dfn></dt>
+    <dd>새 <a href="#sandboxing-flag-set" id="navigation-supporting-concepts:sandboxing-flag-set-4">샌드박스 플래그 집합</a>
+      에 적용할
+      <code id="navigation-supporting-concepts:document-8"><a href="#document">Document</a></code>
     </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-coop">opener policy</dfn></dt>
-    <dd>새 <code id="navigation-supporting-concepts:document-9"><a href="#document">문서</a></code>에 사용할
-      <a href="#cross-origin-opener-policy" id="navigation-supporting-concepts:cross-origin-opener-policy">opener 정책</a>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-iframe-referrer-policy"><code>iframe</code> 요소
+        리퍼러 정책</dfn></dt>
+    <dd><a id="navigation-supporting-concepts:referrer-policy-2"
+        href="https://w3c.github.io/webappsec-referrer-policy/#referrer-policy" data-x-internal="referrer-policy">리퍼러
+        정책</a> — <a href="#internal-ancestor-origin-objects-list-creation-steps"
+        id="navigation-supporting-concepts:internal-ancestor-origin-objects-list-creation-steps">내부 조상 origin 객체 리스트 생성
+        단계</a> 에 사용됨</dd>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-coop">opener 정책</dfn></dt>
+    <dd>새 <a href="#cross-origin-opener-policy" id="navigation-supporting-concepts:cross-origin-opener-policy">opener
+        정책</a>에 쓸
+      <code id="navigation-supporting-concepts:document-9"><a href="#document">Document</a></code>
     </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-nav-timing-type">navigation timing
-        type</dfn></dt>
-    <dd>새 <code id="navigation-supporting-concepts:document-10"><a href="#document">문서</a></code>에 대한
-      <a href="https://w3c.github.io/navigation-timing/#dfn-create-the-navigation-timing-entry"
-        id="navigation-supporting-concepts:create-the-navigation-timing-entry"
-        data-x-internal="create-the-navigation-timing-entry">navigation timing entry 생성</a>에 쓰이는
-      <code
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-nav-timing-type">내비게이션 타이밍
+        타입</dfn></dt>
+    <dd><code
         id="navigation-supporting-concepts:navigationtimingtype"><a data-x-internal="navigationtimingtype" href="https://w3c.github.io/navigation-timing/#dom-navigationtimingtype">NavigationTimingType</a></code>
+      — 새 <a href="https://w3c.github.io/navigation-timing/#dfn-create-the-navigation-timing-entry"
+        id="navigation-supporting-concepts:create-the-navigation-timing-entry"
+        data-x-internal="create-the-navigation-timing-entry">내비게이션 타이밍 엔트리 생성</a>에 사용
+      <code id="navigation-supporting-concepts:document-10"><a href="#document">Document</a></code>
     </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-about-base-url">about base
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-about-base-url">about 베이스
         URL</dfn></dt>
-    <dd>새 <code id="navigation-supporting-concepts:document-11"><a href="#document">문서</a></code>의
-      <a href="#concept-document-about-base-url"
-        id="navigation-supporting-concepts:concept-document-about-base-url">about base URL</a>을 채우는 데 쓰는
-      <a id="navigation-supporting-concepts:url" href="https://url.spec.whatwg.org/#concept-url"
-        data-x-internal="url">URL</a> 또는 null
-    </dd>
-    <dt><dfn data-dfn-for="navigation params" id="navigation-params-user-involvement">user
-        involvement</dfn></dt>
-    <dd>새 <code id="navigation-supporting-concepts:document-12"><a href="#document">문서</a></code>에
-      대한 <a href="#obtain-browsing-context-navigation"
-        id="navigation-supporting-concepts:obtain-browsing-context-navigation">브라우징 컨텍스트 획득</a> 시 사용하는
-      <a href="#user-navigation-involvement" id="navigation-supporting-concepts:user-navigation-involvement">user
-        navigation involvement</a>
+    <dd><a id="navigation-supporting-concepts:url" href="https://url.spec.whatwg.org/#concept-url"
+        data-x-internal="url">URL</a> 또는 null — 새 <code
+        id="navigation-supporting-concepts:document-11"><a href="#document">Document</a></code>의 <a
+        href="#concept-document-about-base-url"
+        id="navigation-supporting-concepts:concept-document-about-base-url">about 베이스 URL</a> 값으로 사용</dd>
+    <dt><dfn data-dfn-for="navigation params" id="navigation-params-user-involvement">사용자
+        참여</dfn></dt>
+    <dd><a href="#user-navigation-involvement" id="navigation-supporting-concepts:user-navigation-involvement">사용자
+        내비게이션 참여</a> — 새 <a href="#obtain-browsing-context-navigation"
+        id="navigation-supporting-concepts:obtain-browsing-context-navigation">브라우징 컨텍스트</a> 획득 시 사용
+      <code id="navigation-supporting-concepts:document-12"><a href="#document">Document</a></code>
     </dd>
   </dl>
 
@@ -153309,49 +153650,62 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
                 <p><var>navigationParams</var>를 다음을 사용하여 새 <a href=#navigation-params
                     id=beginning-navigation:navigation-params>탐색 매개변수</a>로 설정합니다.</p>
 
-                <dl class=props>
-                  <dt><a href=#navigation-params-id id=beginning-navigation:navigation-params-id>id</a>
-                  <dd><var>navigationId</var>
-                  <dt><a href=#navigation-params-navigable id=beginning-navigation:navigation-params-navigable>탐색 가능</a>
-                  <dd><var>navigable</var>
-                  <dt><a href=#navigation-params-request id=beginning-navigation:navigation-params-request>요청</a>
-                  <dd>null
-                  <dt><a href=#navigation-params-response id=beginning-navigation:navigation-params-response>응답</a>
-                  <dd><var>response</var>
-                  <dt><a href=#navigation-params-fetch-controller
-                      id=beginning-navigation:navigation-params-fetch-controller>fetch 컨트롤러</a>
-                  <dd>null
-                  <dt><a href=#navigation-params-commit-early-hints
-                      id=beginning-navigation:navigation-params-commit-early-hints>초기 힌트 커밋</a>
-                  <dd>null
-                  <dt><a href=#navigation-params-coop-enforcement-result
-                      id=beginning-navigation:navigation-params-coop-enforcement-result>COOP 시행 결과</a>
-                  <dd><var>coopEnforcementResult</var>
-                  <dt><a href=#navigation-params-reserved-environment
-                      id=beginning-navigation:navigation-params-reserved-environment>예약된 환경</a>
-                  <dd>null
-                  <dt><a href=#navigation-params-origin id=beginning-navigation:navigation-params-origin>출처</a>
-                  <dd><var>responseOrigin</var>
-                  <dt><a href=#navigation-params-policy-container
-                      id=beginning-navigation:navigation-params-policy-container>정책 컨테이너</a>
-                  <dd><var>policyContainer</var>
-                  <dt><a href=#navigation-params-sandboxing id=beginning-navigation:navigation-params-sandboxing>최종 샌드박싱
-                      플래그 집합</a>
-                  <dd><var>finalSandboxFlags</var>
-                  <dt><a href=#navigation-params-coop id=beginning-navigation:navigation-params-coop>오프너
-                      정책</a>
-                  <dd><var>coop</var>
-                  <dt><a href=#navigation-params-nav-timing-type
-                      id=beginning-navigation:navigation-params-nav-timing-type>탐색 타이밍 유형</a>
+                <dl class="props">
+                  <dt><a href="#navigation-params-id" id="beginning-navigation:navigation-params-id">id</a></dt>
+                  <dd><var>navigationId</var></dd>
+                  <dt><a href="#navigation-params-navigable" id="beginning-navigation:navigation-params-navigable">탐색 가능
+                      객체(navigable)</a></dt>
+                  <dd><var>navigable</var></dd>
+                  <dt><a href="#navigation-params-request"
+                      id="beginning-navigation:navigation-params-request">요청(request)</a></dt>
+                  <dd>null</dd>
+                  <dt><a href="#navigation-params-response"
+                      id="beginning-navigation:navigation-params-response">응답(response)</a></dt>
+                  <dd><var>response</var></dd>
+                  <dt><a href="#navigation-params-fetch-controller"
+                      id="beginning-navigation:navigation-params-fetch-controller">fetch 컨트롤러</a></dt>
+                  <dd>null</dd>
+                  <dt><a href="#navigation-params-commit-early-hints"
+                      id="beginning-navigation:navigation-params-commit-early-hints">early hints 커밋</a></dt>
+                  <dd>null</dd>
+                  <dt><a href="#navigation-params-coop-enforcement-result"
+                      id="beginning-navigation:navigation-params-coop-enforcement-result">COOP 정책 적용 결과</a>
+                  </dt>
+                  <dd><var>coopEnforcementResult</var></dd>
+                  <dt><a href="#navigation-params-reserved-environment"
+                      id="beginning-navigation:navigation-params-reserved-environment">예약 환경</a></dt>
+                  <dd>null</dd>
+                  <dt><a href="#navigation-params-origin" id="beginning-navigation:navigation-params-origin">origin</a>
+                  </dt>
+                  <dd><var>responseOrigin</var></dd>
+                  <dt><a href="#navigation-params-policy-container"
+                      id="beginning-navigation:navigation-params-policy-container">정책 컨테이너</a></dt>
+                  <dd><var>policyContainer</var></dd>
+                  <dt><a href="#navigation-params-sandboxing" id="beginning-navigation:navigation-params-sandboxing">최종
+                      샌드박스 플래그 집합</a></dt>
+                  <dd><var>finalSandboxFlags</var></dd>
+                  <dt><a href="#navigation-params-iframe-referrer-policy"
+                      id="beginning-navigation:navigation-params-iframe-referrer-policy"><code>iframe</code> 요소 리퍼러
+                      정책</a></dt>
+                  <dd><var>targetSnapshotParams</var>'s <a href="#target-snapshot-params-iframe-referrer-policy"
+                      id="beginning-navigation:target-snapshot-params-iframe-referrer-policy"><code>iframe</code>
+                      요소 리퍼러 정책</a></dd>
+                  <dt><a href="#navigation-params-coop" id="beginning-navigation:navigation-params-coop">opener
+                      정책</a></dt>
+                  <dd><var>coop</var></dd>
+                  <dt><a href="#navigation-params-nav-timing-type"
+                      id="beginning-navigation:navigation-params-nav-timing-type">네비게이션 타이밍 타입</a></dt>
                   <dd>"<code
-                      id=beginning-navigation:dom-navigationtimingtype-navigate><a data-x-internal=dom-navigationtimingtype-navigate href=https://w3c.github.io/navigation-timing/#dom-navigationtimingtype-navigate>탐색</a></code>"
-                  <dt><a href=#navigation-params-about-base-url
-                      id=beginning-navigation:navigation-params-about-base-url>about 기본 URL</a>
-                  <dd><var>documentState</var>의 <a href=#document-state-about-base-url
-                      id=beginning-navigation:document-state-about-base-url-2>about 기본 URL</a>
-                  <dt><a href=#navigation-params-user-involvement
-                      id=beginning-navigation:navigation-params-user-involvement>사용자 참여</a>
-                  <dd><var>userInvolvement</var>
+                      id="beginning-navigation:dom-navigationtimingtype-navigate"><a data-x-internal="dom-navigationtimingtype-navigate" href="https://w3c.github.io/navigation-timing/#dom-navigationtimingtype-navigate">navigate</a></code>"
+                  </dd>
+                  <dt><a href="#navigation-params-about-base-url"
+                      id="beginning-navigation:navigation-params-about-base-url">about 베이스 URL</a></dt>
+                  <dd><var>documentState</var>'s <a href="#document-state-about-base-url"
+                      id="beginning-navigation:document-state-about-base-url-2">about 베이스
+                      URL</a></dd>
+                  <dt><a href="#navigation-params-user-involvement"
+                      id="beginning-navigation:navigation-params-user-involvement">사용자 관여(user involvement)</a></dt>
+                  <dd><var>userInvolvement</var></dd>
                 </dl>
             </ol>
           <li>
@@ -153923,68 +154277,63 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
             id=the-javascript:-url-special-case:navigation-params>탐색 매개변수</a>로 설정하고, 다음을 포함하여
         </p>
 
-        <dl class=props>
-          <dt><a href=#navigation-params-id id=the-javascript:-url-special-case:navigation-params-id>id</a>
-          <dd><var>navigationId</var>
-          <dt><a href=#navigation-params-navigable id=the-javascript:-url-special-case:navigation-params-navigable>탐색
-              가능</a>
-          <dd><var>targetNavigable</var>
-          <dt><a href=#navigation-params-request id=the-javascript:-url-special-case:navigation-params-request>요청</a>
-          <dd>null <span class=XXX>이로 인해 생성되는 <code
-                id=the-javascript:-url-special-case:document-2><a href=#document>문서</a></code>의
-              참조자가
-              null이
-              됩니다. 이것이 맞습니까?</span>
-          <dt><a href=#navigation-params-response id=the-javascript:-url-special-case:navigation-params-response>응답</a>
-          <dd><var>response</var>
-          <dt><a href=#navigation-params-fetch-controller
-              id=the-javascript:-url-special-case:navigation-params-fetch-controller>가져오기
-              제어기</a>
-          <dd>null
-          <dt><a href=#navigation-params-commit-early-hints
-              id=the-javascript:-url-special-case:navigation-params-commit-early-hints>조기 힌트
-              커밋</a>
-          <dd>null
-          <dt><a href=#navigation-params-coop-enforcement-result
-              id=the-javascript:-url-special-case:navigation-params-coop-enforcement-result>COOP
-              시행
-              결과</a>
-          <dd><var>coopEnforcementResult</var>
-          <dt><a href=#navigation-params-reserved-environment
-              id=the-javascript:-url-special-case:navigation-params-reserved-environment>예약된
-              환경</a>
-          <dd>null
-          <dt><a href=#navigation-params-origin id=the-javascript:-url-special-case:navigation-params-origin>기원</a>
-          <dd><var>newDocumentOrigin</var>
-          <dt><a href=#navigation-params-policy-container
-              id=the-javascript:-url-special-case:navigation-params-policy-container>정책
-              컨테이너</a>
-          <dd><var>policyContainer</var>
-          <dt><a href=#navigation-params-sandboxing id=the-javascript:-url-special-case:navigation-params-sandboxing>최종
-              샌드박싱 플래그
-              집합</a>
-          <dd><var>finalSandboxFlags</var>
-          <dt><a href=#navigation-params-coop id=the-javascript:-url-special-case:navigation-params-coop>크로스 오리진
-              오프너 정책</a>
-          <dd><var>coop</var>
-          <dt><a href=#navigation-params-nav-timing-type
-              id=the-javascript:-url-special-case:navigation-params-nav-timing-type>탐색 타이밍
-              유형</a>
+        <dl class="props">
+          <dt><a href="#navigation-params-id" id="the-javascript:-url-special-case:navigation-params-id">id</a></dt>
+          <dd><var>navigationId</var></dd>
+          <dt><a href="#navigation-params-navigable"
+              id="the-javascript:-url-special-case:navigation-params-navigable">탐색 가능 객체(navigable)</a></dt>
+          <dd><var>targetNavigable</var></dd>
+          <dt><a href="#navigation-params-request"
+              id="the-javascript:-url-special-case:navigation-params-request">요청(request)</a></dt>
+          <dd>null <span class="XXX">이로 인해 생성된 <code
+                id="the-javascript:-url-special-case:document-2"><a href="#document">Document</a></code>의 referrer가
+              null이 될 것입니다; 맞나요?</span></dd>
+          <dt><a href="#navigation-params-response"
+              id="the-javascript:-url-special-case:navigation-params-response">응답(response)</a></dt>
+          <dd><var>response</var></dd>
+          <dt><a href="#navigation-params-fetch-controller"
+              id="the-javascript:-url-special-case:navigation-params-fetch-controller">fetch 컨트롤러</a></dt>
+          <dd>null</dd>
+          <dt><a href="#navigation-params-commit-early-hints"
+              id="the-javascript:-url-special-case:navigation-params-commit-early-hints">early hints 커밋</a></dt>
+          <dd>null</dd>
+          <dt><a href="#navigation-params-coop-enforcement-result"
+              id="the-javascript:-url-special-case:navigation-params-coop-enforcement-result">COOP 정책 적용 결과</a></dt>
+          <dd><var>coopEnforcementResult</var></dd>
+          <dt><a href="#navigation-params-reserved-environment"
+              id="the-javascript:-url-special-case:navigation-params-reserved-environment">예약 환경</a></dt>
+          <dd>null</dd>
+          <dt><a href="#navigation-params-origin"
+              id="the-javascript:-url-special-case:navigation-params-origin">origin</a></dt>
+          <dd><var>newDocumentOrigin</var></dd>
+          <dt><a href="#navigation-params-policy-container"
+              id="the-javascript:-url-special-case:navigation-params-policy-container">정책 컨테이너</a></dt>
+          <dd><var>policyContainer</var></dd>
+          <dt><a href="#navigation-params-sandboxing"
+              id="the-javascript:-url-special-case:navigation-params-sandboxing">최종 샌드박스 플래그 집합</a></dt>
+          <dd><var>finalSandboxFlags</var></dd>
+          <dt><a href="#navigation-params-iframe-referrer-policy"
+              id="the-javascript:-url-special-case:navigation-params-iframe-referrer-policy"><code>iframe</code> 요소 리퍼러
+              정책</a></dt>
+          <dd><var>targetSnapshotParams</var>의 <a href="#target-snapshot-params-iframe-referrer-policy"
+              id="the-javascript:-url-special-case:target-snapshot-params-iframe-referrer-policy"><code>iframe</code>
+              요소 리퍼러 정책</a></dd>
+          <dt><a href="#navigation-params-coop" id="the-javascript:-url-special-case:navigation-params-coop">opener
+              정책</a></dt>
+          <dd><var>coop</var></dd>
+          <dt><a href="#navigation-params-nav-timing-type"
+              id="the-javascript:-url-special-case:navigation-params-nav-timing-type">네비게이션 타이밍 타입</a></dt>
           <dd>"<code
-              id=the-javascript:-url-special-case:dom-navigationtimingtype-navigate><a data-x-internal=dom-navigationtimingtype-navigate href=https://w3c.github.io/navigation-timing/#dom-navigationtimingtype-navigate>탐색</a></code>"
-          <dt><a href=#navigation-params-about-base-url
-              id=the-javascript:-url-special-case:navigation-params-about-base-url>기본 URL
-              정보</a>
-          <dd><var>targetNavigable</var>의 <a href=#nav-document id=the-javascript:-url-special-case:nav-document-7>활성
-              문서</a>의 <a href=#concept-document-about-base-url
-              id=the-javascript:-url-special-case:concept-document-about-base-url>기본 URL
-              정보</a>
-          <dt><a href=#navigation-params-user-involvement
-              id=the-javascript:-url-special-case:navigation-params-user-involvement>사용자
-              관여</a>
-          </dt>
-          <dd><var>userInvolvement</var>
+              id="the-javascript:-url-special-case:dom-navigationtimingtype-navigate"><a data-x-internal="dom-navigationtimingtype-navigate" href="https://w3c.github.io/navigation-timing/#dom-navigationtimingtype-navigate">navigate</a></code>"
           </dd>
+          <dt><a href="#navigation-params-about-base-url"
+              id="the-javascript:-url-special-case:navigation-params-about-base-url">about 베이스 URL</a></dt>
+          <dd><var>targetNavigable</var>의 <a href="#nav-document"
+              id="the-javascript:-url-special-case:nav-document-7">활성 문서</a>의 <a href="#concept-document-about-base-url"
+              id="the-javascript:-url-special-case:concept-document-about-base-url">about 베이스 URL</a></dd>
+          <dt><a href="#navigation-params-user-involvement"
+              id="the-javascript:-url-special-case:navigation-params-user-involvement">사용자 관여(user involvement)</a></dt>
+          <dd><var>userInvolvement</var></dd>
         </dl>
       <li>
         <p><a href=#navigate-html id=the-javascript:-url-special-case:navigate-html>HTML 문서 로드</a>를
@@ -156024,69 +156373,64 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
         <p>다음과 함께 새로운 <a href=#navigation-params id=populating-a-session-history-entry:navigation-params-4>탐색
             매개변수</a>를 반환합니다:</p>
 
-        <dl class=props>
-          <dt><a href=#navigation-params-id id=populating-a-session-history-entry:navigation-params-id>id</a>
-          <dd><var>navigationId</var>
-          <dt><a href=#navigation-params-navigable id=populating-a-session-history-entry:navigation-params-navigable>탐색
-              가능</a>
-          <dd><var>navigable</var>
-          <dt><a href=#navigation-params-request
-              id=populating-a-session-history-entry:navigation-params-request-4>요청</a>
-          <dd>null
-          <dt><a href=#navigation-params-response
-              id=populating-a-session-history-entry:navigation-params-response-9>응답</a>
-          <dd><var>response</var>
-          <dt><a href=#navigation-params-fetch-controller
-              id=populating-a-session-history-entry:navigation-params-fetch-controller>페치
-              컨트롤러</a>
-          <dd>null
-          <dt><a href=#navigation-params-commit-early-hints
-              id=populating-a-session-history-entry:navigation-params-commit-early-hints>커밋 초기
-              힌트</a>
-          <dd>null
-          <dt><a href=#navigation-params-coop-enforcement-result
-              id=populating-a-session-history-entry:navigation-params-coop-enforcement-result>COOP
-              집행
-              결과</a>
-          <dd><var>coopEnforcementResult</var>
-          <dt><a href=#navigation-params-reserved-environment
-              id=populating-a-session-history-entry:navigation-params-reserved-environment-3>예약된
-              환경</a>
-          <dd>null
-          <dt><a href=#navigation-params-origin id=populating-a-session-history-entry:navigation-params-origin-2>기원</a>
-          <dd><var>responseOrigin</var>
-          <dt><a href=#navigation-params-policy-container
-              id=populating-a-session-history-entry:navigation-params-policy-container-5>정책
-              컨테이너</a>
-          <dd><var>policyContainer</var>
-          <dt><a href=#navigation-params-sandboxing
-              id=populating-a-session-history-entry:navigation-params-sandboxing-2>최종 샌드박싱 플래그
-              세트</a>
-          <dd><var>targetSnapshotParams</var>의 <a href=#target-snapshot-params-sandbox
-              id=populating-a-session-history-entry:target-snapshot-params-sandbox-3>샌드박싱
-              플래그</a>
-          <dt><a href=#navigation-params-coop id=populating-a-session-history-entry:navigation-params-coop>교차 출처
-              오프너 정책</a>
-          <dd><var>coop</var>
-          <dt><a href=#navigation-params-nav-timing-type
-              id=populating-a-session-history-entry:navigation-params-nav-timing-type>탐색 타이밍
-              유형</a>
-          <dd><var>navTimingType</var>
-          <dt><a href=#navigation-params-about-base-url
-              id=populating-a-session-history-entry:navigation-params-about-base-url>about 기본
-              URL</a>
-          <dd><var>entry</var>의 <a href=#she-document-state
-              id=populating-a-session-history-entry:she-document-state-22>문서
-              상태</a>의 <a href=#document-state-about-base-url
-              id=populating-a-session-history-entry:document-state-about-base-url>about 기본
-              URL</a>
-          <dt><a href=#navigation-params-user-involvement
-              id=populating-a-session-history-entry:navigation-params-user-involvement>사용자
-              관여</a>
+        <dl class="props">
+          <dt><a href="#navigation-params-id" id="populating-a-session-history-entry:navigation-params-id">id</a></dt>
+          <dd><var>navigationId</var></dd>
+          <dt><a href="#navigation-params-navigable"
+              id="populating-a-session-history-entry:navigation-params-navigable">탐색 가능 객체(navigable)</a></dt>
+          <dd><var>navigable</var></dd>
+          <dt><a href="#navigation-params-request"
+              id="populating-a-session-history-entry:navigation-params-request-4">요청(request)</a></dt>
+          <dd>null</dd>
+          <dt><a href="#navigation-params-response"
+              id="populating-a-session-history-entry:navigation-params-response-9">응답(response)</a></dt>
+          <dd><var>response</var></dd>
+          <dt><a href="#navigation-params-fetch-controller"
+              id="populating-a-session-history-entry:navigation-params-fetch-controller">fetch 컨트롤러</a></dt>
+          <dd>null</dd>
+          <dt><a href="#navigation-params-commit-early-hints"
+              id="populating-a-session-history-entry:navigation-params-commit-early-hints">early hints 커밋</a></dt>
+          <dd>null</dd>
+          <dt><a href="#navigation-params-coop-enforcement-result"
+              id="populating-a-session-history-entry:navigation-params-coop-enforcement-result">COOP 정책 적용 결과</a></dt>
+          <dd><var>coopEnforcementResult</var></dd>
+          <dt><a href="#navigation-params-reserved-environment"
+              id="populating-a-session-history-entry:navigation-params-reserved-environment-3">예약 환경</a></dt>
+          <dd>null</dd>
+          <dt><a href="#navigation-params-origin"
+              id="populating-a-session-history-entry:navigation-params-origin-2">origin</a></dt>
+          <dd><var>responseOrigin</var></dd>
+          <dt><a href="#navigation-params-policy-container"
+              id="populating-a-session-history-entry:navigation-params-policy-container-5">정책 컨테이너</a></dt>
+          <dd><var>policyContainer</var></dd>
+          <dt><a href="#navigation-params-sandboxing"
+              id="populating-a-session-history-entry:navigation-params-sandboxing-2">최종 샌드박스 플래그 집합</a></dt>
+          <dd><var>targetSnapshotParams</var>의 <a href="#target-snapshot-params-sandbox"
+              id="populating-a-session-history-entry:target-snapshot-params-sandbox-3">샌드박스 플래그</a></dd>
+          <dt><a href="#navigation-params-iframe-referrer-policy"
+              id="populating-a-session-history-entry:navigation-params-iframe-referrer-policy"><code>iframe</code> 요소
+              리퍼러 정책</a></dt>
+          <dd><var>targetSnapshotParams</var>의 <a href="#target-snapshot-params-iframe-referrer-policy"
+              id="populating-a-session-history-entry:target-snapshot-params-iframe-referrer-policy"><code>iframe</code>
+              요소 리퍼러 정책</a></dd>
+          <dt><a href="#navigation-params-coop" id="populating-a-session-history-entry:navigation-params-coop">opener
+              정책</a></dt>
+          <dd><var>coop</var></dd>
+          <dt><a href="#navigation-params-nav-timing-type"
+              id="populating-a-session-history-entry:navigation-params-nav-timing-type">네비게이션 타이밍 타입</a></dt>
+          <dd><var>navTimingType</var></dd>
+          <dt><a href="#navigation-params-about-base-url"
+              id="populating-a-session-history-entry:navigation-params-about-base-url">about 베이스 URL</a></dt>
+          <dd><var>entry</var>의 <a href="#she-document-state"
+              id="populating-a-session-history-entry:she-document-state-22">문서 상태(document state)</a>의 <a
+              href="#document-state-about-base-url"
+              id="populating-a-session-history-entry:document-state-about-base-url">about 베이스 URL</a></dd>
+          <dt><a href="#navigation-params-user-involvement"
+              id="populating-a-session-history-entry:navigation-params-user-involvement">사용자 관여(user involvement)</a>
           </dt>
-          <dd><var>userInvolvement</var>
-          </dd>
+          <dd><var>userInvolvement</var></dd>
         </dl>
+
     </ol>
   </div>
 
@@ -160988,12 +161332,16 @@ location<c- p>.</c->href <c- o>=</c-> <c- t>&apos;#foo&apos;</c-><c- p>;</c-></c
           <var>document</var>로 설정합니다.
       <li>
         <p><var>document</var>의 <a href="#concept-document-internal-ancestor-origin-objects-list"
-            id="shared-document-creation-infrastructure:concept-document-internal-ancestor-origin-objects-list">내부
-            조상 출처 객체
-            목록</a>을 주어진 <var>document</var>에 대해 실행한 <a href="#internal-ancestor-origin-objects-list-creation-steps"
-            id="shared-document-creation-infrastructure:internal-ancestor-origin-objects-list-creation-steps">내부
-            조상 출처 객체 목록 생성
-            단계</a>의 결과로 설정합니다.</p>
+            id="shared-document-creation-infrastructure:concept-document-internal-ancestor-origin-objects-list">내부 조상
+            origin 객체 리스트</a>를
+          <a href="#internal-ancestor-origin-objects-list-creation-steps"
+            id="shared-document-creation-infrastructure:internal-ancestor-origin-objects-list-creation-steps">내부 조상
+            origin 객체 리스트 생성 단계</a>의 결과로
+          <var>document</var>와 <var>navigationParams</var>의 <a href="#navigation-params-iframe-referrer-policy"
+            id="shared-document-creation-infrastructure:navigation-params-iframe-referrer-policy"><code>iframe</code>
+            요소 리퍼러 정책</a>을 전달하여 실행한 결과로 설정한다.
+        </p>
+
       </li>
       <li>
         <p><var>document</var>의 <a href="#concept-document-ancestor-origins-list"
@@ -161745,6 +162093,10 @@ document<c- p>.</c->domain <c- o>=</c-> <c- t>&apos;example.com&apos;</c-><c- p>
           <dt><a href="#navigation-params-sandboxing" id="read-ua-inline:navigation-params-sandboxing">최종 샌드박싱 플래그
               집합</a></dt>
           <dd>빈 집합</dd>
+          <dt><a href="#navigation-params-iframe-referrer-policy"
+              id="read-ua-inline:navigation-params-iframe-referrer-policy"><code>iframe</code> 요소 리퍼러
+              정책</a></dt>
+          <dd>빈 문자열</dd>
           <dt><a href="#navigation-params-coop" id="read-ua-inline:navigation-params-coop">opener 정책</a></dt>
           <dd><var>coop</var></dd>
           <dt><a href="#navigation-params-nav-timing-type"
