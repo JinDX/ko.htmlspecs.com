@@ -197,7 +197,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebVTT: The Web Video Text Tracks Format](https://ko.htmlspecs.com/webvtt1/)（[Source](https://www.w3.org/TR/2019/CR-webvtt1-20190404/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Media Source Extensions](https://ko.htmlspecs.com/media-source-2/)（[Source](https://www.w3.org/TR/2025/WD-media-source-2-20251104/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebCodecs](https://ko.htmlspecs.com/webcodecs/)（[Source](https://www.w3.org/TR/2026/WD-webcodecs-20260310/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Media Session](https://ko.htmlspecs.com/mediasession/)（[Source](https://www.w3.org/TR/2025/WD-mediasession-20250919/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Media Session](https://ko.htmlspecs.com/mediasession/)（[Source](https://www.w3.org/TR/2026/WD-mediasession-20260316/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Media Capabilities](https://ko.htmlspecs.com/media-capabilities/)（[Source](https://www.w3.org/TR/2026/WD-media-capabilities-20260210/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [MediaStream Image Capture](https://ko.htmlspecs.com/image-capture/)（[Source](https://www.w3.org/TR/2025/WD-image-capture-20250423/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Encrypted Media Extensions](https://ko.htmlspecs.com/encrypted-media-2/)（[Source](https://www.w3.org/TR/2025/WD-encrypted-media-2-20251126/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
