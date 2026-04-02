@@ -34,7 +34,7 @@
         src=https://resources.whatwg.org/logo.svg height=100></a>
     <hgroup>
       <h1 class=allcaps>HTML</h1>
-      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 3월 31일</span>
+      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 4월 1일</span>
     </hgroup>
 
     <nav>
@@ -63,7 +63,7 @@
         <a href=https://github.com/whatwg/html/commits class=changes><span><strong>커밋</strong>
             <code>on GitHub</code></span></a>
         <a id=commit-snapshot-link
-          href=https://html.spec.whatwg.org/commit-snapshots/f831ea031b42dd42cb64388fa98b965cf922be59/
+          href=https://html.spec.whatwg.org/commit-snapshots/0045b78791e65ebd43bdb8cf71c7d783591d67d0/
           class=changes><span><strong>스냅샷</strong> <code>as of this commit</code></span></a>
         <a href=https://twitter.com/htmlstandard class=changes><span><strong>트위터 업데이트</strong>
             <code>@htmlstandard</code></span></a>
@@ -5779,7 +5779,14 @@ a<c- p>.</c->setAttribute<c- p>(</c-><c- t>&apos;href&apos;</c-><c- p>,</c-> <c-
                 href=https://tc39.es/proposal-dynamic-code-brand-checks/#sec-hostgetcodeforeval>HostGetCodeForEval</a></dfn>
             추상 작업
         </ul>
+        <p>JavaScript를 지원하는 사용자 에이전트는 <cite>텍스트 가져오기(Import Text)</cite> 제안도 구현해야 합니다.
+          다음 용어가 그 제안에서 정의되어 있으며, 이 명세서에서 사용됩니다: <a href="#refsJSIMPORTTEXT">[JSIMPORTTEXT]</a></p>
 
+        <ul class="brief">
+          <li><dfn id="createtextmodule"><a
+                href="https://tc39.es/proposal-import-text/#sec-create-text-module">CreateTextModule</a></dfn> 추상 연산
+          </li>
+        </ul>
         <p>JavaScript를 지원하는 사용자 에이전트는 또한 <cite>ECMAScript 국제화 API</cite>를 구현해야 합니다.
           <a href=#refsJSINTL>[JSINTL]</a>
         </p>
@@ -40526,11 +40533,11 @@ document<c- p>.</c->body<c- p>.</c->appendChild<c- p>(</c->wbr<c- p>);</c-></cod
 
   <p>사용자 에이전트는 이 링크 유형에 대해 <a href=#delay-the-load-event id=link-type-modulepreload:delay-the-load-event>로드 이벤트를
       지연</a>해서는 안 됩니다.</p>
-  <p><dfn id="module-preload-destination">모듈 프리로드 목적지</dfn>는 "<code>json</code>", "<code>style</code>"
-    또는 <a href="https://fetch.spec.whatwg.org/#request-destination-script-like"
+  <p><dfn id="module-preload-destination">모듈 프리로드 대상</dfn>은 "<code>json</code>",
+    "<code>style</code>", "<code>text</code>" 또는 <a
+      href="https://fetch.spec.whatwg.org/#request-destination-script-like"
       id="link-type-modulepreload:concept-script-like-destination"
-      data-x-internal="concept-script-like-destination">스크립트
-      유사 목적지</a>입니다.</p>
+      data-x-internal="concept-script-like-destination">스크립트류 대상</a>이다.</p>
   <div data-algorithm="">
     <p>이 링크 유형에 대해 링크된 리소스를 <a href=#fetch-and-process-the-linked-resource
         id=link-type-modulepreload:fetch-and-process-the-linked-resource>가져오고 처리</a>하기에 적절한 시기는 다음과 같습니다:</p>
@@ -168305,11 +168312,12 @@ document<c- p>.</c->querySelector<c- p>(</c-><c- u>&quot;button&quot;</c-><c- p>
               id=script-structs:javascript-module-script>자바스크립트 모듈
               스크립트</a>용;
         <li>
-          <p><a href=#css-module-script id=script-structs:css-module-script>CSS 모듈 스크립트</a> 및
-            <a href=#json-module-script id=script-structs:json-module-script>JSON 모듈
-              스크립트</a>용 <a id=script-structs:synthetic-module-record
-              href=https://tc39.es/ecma262/#sec-synthetic-module-records data-x-internal=synthetic-module-record>합성 모듈
-              레코드</a>
+          <p><a id="script-structs:synthetic-module-record" href="https://tc39.es/ecma262/#sec-synthetic-module-records"
+              data-x-internal="synthetic-module-record">Synthetic Module Record</a>(합성 모듈 레코드), <a
+              href="#css-module-script" id="script-structs:css-module-script">CSS 모듈
+              스크립트</a>, <a href="#json-module-script" id="script-structs:json-module-script">JSON 모듈 스크립트</a>,
+            그리고
+            <a href="#text-module-script" id="script-structs:text-module-script">텍스트 모듈 스크립트</a>에 대해;
           </p>
         <li>
           <p><a id=script-structs:webassembly-module-record
@@ -168379,57 +168387,72 @@ document<c- p>.</c->querySelector<c- p>(</c-><c- u>&quot;button&quot;</c-><c- p>
   <ul>
     <li>
       <div data-algorithm="">
-        <p><a href=#module-script id=script-structs:module-script-5>모듈 스크립트</a>는 해당 <a href=#concept-script-record
-            id=script-structs:concept-script-record-2>레코드</a>가 <a id=script-structs:source-text-module-record-2
-            href=https://tc39.es/ecma262/#sec-source-text-module-records data-x-internal=source-text-module-record>소스
-            텍스트
-            모듈 레코드</a>인 경우 <dfn id=javascript-module-script data-export="">자바스크립트 모듈 스크립트</dfn>입니다.
+        <p><a href="#module-script" id="script-structs:module-script-5">모듈 스크립트</a>는 그 <a href="#concept-script-record"
+            id="script-structs:concept-script-record-2">레코드</a>가 <a id="script-structs:source-text-module-record-2"
+            href="https://tc39.es/ecma262/#sec-source-text-module-records"
+            data-x-internal="source-text-module-record">소스 텍스트 모듈
+            레코드(Source Text Module Record)</a>일 경우, <dfn id="javascript-module-script" data-export="">자바스크립트 모듈
+            스크립트</dfn>이다.</p>
+      </div>
+    </li>
+    <li>
+      <div data-algorithm="">
+        <p><a href="#module-script" id="script-structs:module-script-6">모듈 스크립트</a>는 그 <a href="#concept-script-record"
+            id="script-structs:concept-script-record-3">레코드</a>가 <a id="script-structs:synthetic-module-record-2"
+            href="https://tc39.es/ecma262/#sec-synthetic-module-records" data-x-internal="synthetic-module-record">합성 모듈
+            레코드(Synthetic Module Record)</a>이고,
+          <a href="#creating-a-css-module-script" id="script-structs:creating-a-css-module-script">CSS 모듈
+            스크립트 생성</a> 알고리즘을 통해 생성된 경우, <dfn id="css-module-script" data-export="">CSS 모듈 스크립트</dfn>이다.
+          CSS 모듈 스크립트는 파싱된 CSS 스타일 시트에 해당한다.
+        </p>
+      </div>
+
+
+    </li>
+    <li>
+      <div data-algorithm="">
+        <p><a href="#module-script" id="script-structs:module-script-7">모듈 스크립트</a>는 그 <a href="#concept-script-record"
+            id="script-structs:concept-script-record-4">레코드</a>가 <a id="script-structs:synthetic-module-record-3"
+            href="https://tc39.es/ecma262/#sec-synthetic-module-records" data-x-internal="synthetic-module-record">합성 모듈
+            레코드(Synthetic Module Record)</a>이고,
+          <a href="#creating-a-json-module-script" id="script-structs:creating-a-json-module-script">JSON 모듈
+            스크립트 생성</a> 알고리즘을 통해 생성된 경우, <dfn id="json-module-script" data-export="">JSON 모듈 스크립트</dfn>이다.
+          JSON 모듈 스크립트는 파싱된 JSON 문서에 해당한다.
+        </p>
+      </div>
+
+
+    </li>
+    <li>
+      <div data-algorithm="">
+        <p><a href="#module-script" id="script-structs:module-script-8">모듈 스크립트</a>는 그 <a href="#concept-script-record"
+            id="script-structs:concept-script-record-5">레코드</a>가 <a id="script-structs:synthetic-module-record-4"
+            href="https://tc39.es/ecma262/#sec-synthetic-module-records" data-x-internal="synthetic-module-record">합성 모듈
+            레코드(Synthetic Module Record)</a>이고,
+          <a href="#creating-a-text-module-script" id="script-structs:creating-a-text-module-script">텍스트 모듈
+            스크립트 생성</a> 알고리즘을 통해 생성된 경우, <dfn id="text-module-script" data-export="">텍스트 모듈 스크립트</dfn>이다.
+          텍스트 모듈 스크립트는 UTF-8로 인코딩된 텍스트 데이터를 나타낸다.
         </p>
       </div>
     </li>
     <li>
       <div data-algorithm="">
-        <p><a href=#module-script id=script-structs:module-script-6>모듈 스크립트</a>는 해당 <a href=#concept-script-record
-            id=script-structs:concept-script-record-3>레코드</a>가 <a id=script-structs:synthetic-module-record-2
-            href=https://tc39.es/ecma262/#sec-synthetic-module-records data-x-internal=synthetic-module-record>합성 모듈
-            레코드</a>이고 <a href=#creating-a-css-module-script id=script-structs:creating-a-css-module-script>CSS 모듈
-            스크립트 생성</a> 알고리즘을 통해 생성된 경우 <dfn id=css-module-script data-export="">CSS 모듈
-            스크립트</dfn>입니다.
-          CSS 모듈 스크립트는 구문 분석된 CSS 스타일시트를 나타냅니다.</p>
-      </div>
-
-
-    </li>
-    <li>
-      <div data-algorithm="">
-        <p><a href=#module-script id=script-structs:module-script-7>모듈 스크립트</a>는 해당 <a href=#concept-script-record
-            id=script-structs:concept-script-record-4>레코드</a>가 <a id=script-structs:synthetic-module-record-3
-            href=https://tc39.es/ecma262/#sec-synthetic-module-records data-x-internal=synthetic-module-record>합성 모듈
-            레코드</a>이고 <a href=#creating-a-json-module-script id=script-structs:creating-a-json-module-script>JSON 모듈
-            스크립트 생성</a> 알고리즘을 통해 생성된 경우 <dfn id=json-module-script data-export="">JSON 모듈
-            스크립트</dfn>입니다.
-          JSON 모듈 스크립트는 구문 분석된 JSON 문서를 나타냅니다.</p>
-      </div>
-
-
-    </li>
-    <li>
-      <div data-algorithm="">
-        <p><a href=#module-script id=script-structs:module-script-8>모듈 스크립트</a>는 해당 <a href=#concept-script-record
-            id=script-structs:concept-script-record-5>레코드</a>가 <a id=script-structs:webassembly-module-record-2
-            href=https://webassembly.github.io/esm-integration/js-api/index.html#webassembly-module-record
-            data-x-internal=webassembly-module-record>웹어셈블리 모듈 레코드</a>인 경우 <dfn id=webassembly-module-script
-            data-export="">웹어셈블리 모듈 스크립트</dfn>입니다.</p>
+        <p><a href="#module-script" id="script-structs:module-script-9">모듈 스크립트</a>는 그 <a href="#concept-script-record"
+            id="script-structs:concept-script-record-6">레코드</a>가 <a id="script-structs:webassembly-module-record-2"
+            href="https://webassembly.github.io/esm-integration/js-api/index.html#webassembly-module-record"
+            data-x-internal="webassembly-module-record">WebAssembly 모듈
+            레코드(WebAssembly Module Record)</a>일 경우, <dfn id="webassembly-module-script" data-export="">WebAssembly 모듈
+            스크립트</dfn>이다.</p>
       </div>
     </li>
   </ul>
 
-  <p class=note>CSS 스타일시트와 JSON 문서는 종속 모듈을 가져오지 않으며, 평가 중 예외를 발생시키지 않으므로, <a href=#concept-script-script-fetch-options
-      id=script-structs:concept-script-script-fetch-options>가져오기
-      옵션</a>과 <a href=#concept-script-base-url id=script-structs:concept-script-base-url>기본
-      URL</a>은 <a href=#css-module-script id=script-structs:css-module-script-2>CSS 모듈 스크립트</a>와
-    <a href=#json-module-script id=script-structs:json-module-script-2>JSON 모듈 스크립트</a>에서 항상
-    null입니다.
+  <p class="note">CSS 스타일 시트, JSON 문서, 그리고 텍스트는 의존하는 모듈을 가져오지 않으며,
+    평가 시 예외를 던지지 않는다. 따라서 <a href="#css-module-script" id="script-structs:css-module-script-2">CSS 모듈 스크립트</a>,
+    <a href="#json-module-script" id="script-structs:json-module-script-2">JSON 모듈
+      스크립트</a>, <a href="#text-module-script" id="script-structs:text-module-script-2">텍스트 모듈 스크립트</a>의
+    <a href="#concept-script-script-fetch-options" id="script-structs:concept-script-script-fetch-options">fetch
+      옵션</a>과 <a href="#concept-script-base-url" id="script-structs:concept-script-base-url">기준 URL</a>은 항상 null이다.
   </p>
 
   <div data-algorithm="">
@@ -169800,6 +169823,13 @@ document<c- p>.</c->querySelector<c- p>(</c-><c- u>&quot;button&quot;</c-><c- p>
                     디코딩</a>한
                   <var>bodyBytes</var>로 설정합니다.
               <li>
+                <p>만약 <var>moduleType</var>이 "<code>text</code>"라면,
+                  <var>moduleScript</var>를 <a href="#creating-a-text-module-script"
+                    id="fetching-scripts:creating-a-text-module-script">텍스트 모듈 스크립트 생성</a>의 결과로 설정한다.
+                  인자로는 <var>sourceText</var>와 <var>settingsObject</var>를 넘긴다.
+                </p>
+              </li>
+              <li>
                 <p>만약 <var>mimeType</var>이 <a id=fetching-scripts:javascript-mime-type-3
                     href=https://mimesniff.spec.whatwg.org/#javascript-mime-type
                     data-x-internal=javascript-mime-type>자바스크립트 MIME 유형</a>이고,
@@ -170305,6 +170335,50 @@ document<c- p>.</c->querySelector<c- p>(</c-><c- u>&quot;button&quot;</c-><c- p>
   </div>
 
   <div data-algorithm="">
+    <p><dfn id="creating-a-text-module-script">텍스트 모듈 스크립트 생성</dfn>은,
+      문자열 <var>text</var>와 <a href="#environment-settings-object" id="creating-scripts:environment-settings-object-6">환경
+        설정 객체</a> <var>settings</var>를 인자로 실행한다:</p>
+
+    <ol>
+      <li>
+        <p><var>script</var>를 새로운 <a href="#module-script" id="creating-scripts:module-script-5">모듈
+            스크립트</a>로 한다. 이 알고리즘에서 이후에 초기화한다.</p>
+      </li>
+      <li>
+        <p><var>script</var>의 <a href="#settings-object" id="creating-scripts:settings-object-6">설정 객체</a>를
+          <var>settings</var>로 설정한다.</p>
+      </li>
+      <li>
+        <p><var>script</var>의 <a href="#concept-script-base-url" id="creating-scripts:concept-script-base-url-6">기준
+            URL</a>과
+          <a href="#concept-script-script-fetch-options"
+            id="creating-scripts:concept-script-script-fetch-options-6">fetch 옵션</a>을 null로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>script</var>의 <a href="#concept-script-parse-error"
+            id="creating-scripts:concept-script-parse-error-11">파싱 에러</a>와
+          <a href="#concept-script-error-to-rethrow" id="creating-scripts:concept-script-error-to-rethrow-7">재던질 에러</a>를
+          null로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>result</var>를 <a id="creating-scripts:createtextmodule"
+            href="https://tc39.es/proposal-import-text/#sec-create-text-module"
+            data-x-internal="createtextmodule">CreateTextModule</a>(<var>text</var>)로 한다.</p>
+      </li>
+      <li>
+        <p><var>script</var>의 <a href="#concept-script-record" id="creating-scripts:concept-script-record-6">레코드</a>를
+          <var>result</var>로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>script</var>를 반환한다.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div data-algorithm="">
     <p><dfn id="module-type-from-module-request">모듈 요청에서 모듈 타입 추출</dfn> 절차는 <a
         id="creating-scripts:modulerequest-record" href="https://tc39.es/ecma262/#modulerequest-record"
         data-x-internal="modulerequest-record">ModuleRequest Record</a> <var>moduleRequest</var>가 주어졌을 때 다음과 같습니다:</p>
@@ -170341,44 +170415,51 @@ document<c- p>.</c->querySelector<c- p>(</c-><c- u>&quot;button&quot;</c-><c- p>
   </div>
 
   <div data-algorithm="">
-    <p><dfn id="module-type-allowed">모듈 타입 허용</dfn> 절차는 <a id="creating-scripts:string-3"
-        href="https://infra.spec.whatwg.org/#string" data-x-internal="string">문자열</a> <var>moduleType</var>과 <a
-        href="#environment-settings-object" id="creating-scripts:environment-settings-object-6">환경 설정 객체</a>
-      <var>settings</var>가 주어졌을 때 다음과 같습니다:
-    </p>
+    <p><dfn id="module-type-allowed">모듈 타입 허용됨</dfn> 단계는
+      <a id="creating-scripts:string-3"
+        href="https://infra.spec.whatwg.org/#string" data-x-internal="string">문자열</a> <var>moduleType</var>과
+      <a href="#environment-settings-object" id="creating-scripts:environment-settings-object-7">환경 설정 객체</a> <var>settings</var>를
+      받아서 다음과 같다:</p>
 
     <ol>
       <li>
-        <p><var>moduleType</var>이 "<code>javascript-or-wasm</code>", "<code>css</code>", "<code>json</code>"이 아니면 false를
-          반환합니다.</p>
+        <p><var>moduleType</var>이 "<code>javascript-or-wasm</code>", "<code>css</code>", "<code>json</code>",
+          또는 "<code>text</code>"가 아니면,
+          false를 반환한다.</p>
       </li>
       <li>
-        <p><var>moduleType</var>이 "<code>css</code>"이고, <code
+        <p><var>moduleType</var>이 "<code>css</code>"이고
+          <code
             id="creating-scripts:cssstylesheet"><a data-x-internal="cssstylesheet" href="https://drafts.csswg.org/cssom/#the-cssstylesheet-interface">CSSStyleSheet</a></code>
-          인터페이스가 <a href="https://webidl.spec.whatwg.org/#dfn-exposed" id="creating-scripts:idl-exposed"
-            data-x-internal="idl-exposed">노출</a>되어 있지 않다면(<var>settings</var>의 <a
-            href="#environment-settings-object's-realm"
-            id="creating-scripts:environment-settings-object's-realm-4">realm</a>에서), false를 반환합니다.
+          인터페이스가
+          <var>settings</var>의 <a href="#environment-settings-object's-realm"
+            id="creating-scripts:environment-settings-object's-realm-4">realm</a>에서
+          <a href="https://webidl.spec.whatwg.org/#dfn-exposed" id="creating-scripts:idl-exposed"
+            data-x-internal="idl-exposed">노출</a>되지 않았다면,
+          false를 반환한다.
         </p>
       </li>
       <li>
-        <p>true를 반환합니다.</p>
+        <p>true를 반환한다.</p>
       </li>
     </ol>
   </div>
 
   <div data-algorithm="">
-    <p><dfn id="fetch-destination-from-module-type">모듈 타입에서 fetch 목적지 추출</dfn> 절차는 <a
+    <p><dfn id="fetch-destination-from-module-type">모듈 타입에서 fetch 대상 추출</dfn> 단계는,
+      <a
         href="https://fetch.spec.whatwg.org/#concept-request-destination"
-        id="creating-scripts:concept-request-destination" data-x-internal="concept-request-destination">destination</a>
-      <var>defaultDestination</var>과 <a id="creating-scripts:string-4" href="https://infra.spec.whatwg.org/#string"
-        data-x-internal="string">문자열</a> <var>moduleType</var>가 주어졌을 때 다음과 같습니다:
+        id="creating-scripts:concept-request-destination" data-x-internal="concept-request-destination">대상</a>
+      <var>defaultDestination</var>과
+      <a id="creating-scripts:string-4" href="https://infra.spec.whatwg.org/#string" data-x-internal="string">문자열</a>
+      <var>moduleType</var>을 받아 다음과 같이 한다:
     </p>
 
     <ol>
-      <li><var>moduleType</var>이 "<code>json</code>"이면 "<code>json</code>"을 반환합니다.</li>
-      <li><var>moduleType</var>이 "<code>css</code>"이면 "<code>style</code>"을 반환합니다.</li>
-      <li><var>defaultDestination</var>을 반환합니다.</li>
+      <li><var>moduleType</var>이 "<code>json</code>"이면 "<code>json</code>"을 반환한다.</li>
+      <li><var>moduleType</var>이 "<code>css</code>"이면 "<code>style</code>"을 반환한다.</li>
+      <li><var>moduleType</var>이 "<code>text</code>"이면 "<code>text</code>"를 반환한다.</li>
+      <li><var>defaultDestination</var>을 반환한다.</li>
     </ol>
   </div>
 
@@ -241021,6 +241102,8 @@ select::picker-icon {
     <dd><cite><a href=https://tc39.es/proposal-dynamic-code-brand-checks>동적 코드 브랜드 체크</a></cite>.
       Ecma
       International.
+    <dt id="refsJSIMPORTTEXT">[JSIMPORTTEXT]</dt>
+    <dd><cite><a href="https://tc39.es/proposal-import-text/">Import Text</a></cite>. Ecma International.</dd>
     <dt id=refsJSINTL>[JSINTL]
     <dd><cite><a href=https://tc39.es/ecma402>ECMAScript 국제화 API 명세</a></cite>. Ecma International.
     <dt id=refsJSON>[JSON]
@@ -241824,6 +241907,7 @@ select::picker-icon {
     Eduardo Vela,
     Edward Welbourne,
     Edward Z. Yang,
+    Eemeli Aro,
     Ehsan Akhgari,
     Ehsan Karamad,
     Eira Monstad,
