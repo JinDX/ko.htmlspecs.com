@@ -7,7 +7,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [ECMAScript® 2026 Internationalization API Specification](https://ko.htmlspecs.com/ecma402/)（[Source](https://tc39.es/ecma402/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Language Tags and Locale Identifiers for the World Wide Web](https://ko.htmlspecs.com/ltli/)（[Source](https://www.w3.org/TR/2020/WD-ltli-20201007) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Source map format specification](https://ko.htmlspecs.com/ecma426/)（[Source](https://tc39.es/ecma426/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [WebAssembly JavaScript Interface](https://ko.htmlspecs.com/wasm-js-api-2/)（[Source](https://www.w3.org/TR/2026/CRD-wasm-js-api-2-20260403/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebAssembly JavaScript Interface](https://ko.htmlspecs.com/wasm-js-api-2/)（[Source](https://www.w3.org/TR/2026/CRD-wasm-js-api-2-20260407/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebAssembly Web API](https://ko.htmlspecs.com/wasm-web-api-2/)（[Source](https://www.w3.org/TR/2026/CRD-wasm-web-api-2-20260407/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [DOM](https://ko.htmlspecs.com/dom/)（[Source](https://dom.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [EditContext API](https://ko.htmlspecs.com/edit-context/)（[Source](https://www.w3.org/TR/2025/WD-edit-context-20251112/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
