@@ -55,7 +55,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Micropub](https://ko.htmlspecs.com/micropub/)（[Source](https://www.w3.org/TR/2017/REC-micropub-20170523/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Annotation Data Model](https://ko.htmlspecs.com/annotation-model/)（[Source](https://www.w3.org/TR/2017/REC-annotation-model-20170223/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [WebTransport](https://ko.htmlspecs.com/webtransport/)（[Source](https://www.w3.org/TR/2026/WD-webtransport-20260325/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Service Workers Nightly](https://ko.htmlspecs.com/service-workers/)（[Source](https://www.w3.org/TR/2026/CRD-service-workers-20260312/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [Service Workers Nightly](https://ko.htmlspecs.com/service-workers/)（[Source](https://www.w3.org/TR/2026/CRD-service-workers-20260409/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Push API](https://ko.htmlspecs.com/push-api/)（[Source](https://www.w3.org/TR/2025/WD-push-api-20251201/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebRTC](https://ko.htmlspecs.com/webrtc/)（[Source](https://www.w3.org/TR/2025/REC-webrtc-20250313/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Payment Request API](https://ko.htmlspecs.com/payment-request/)（[Source](https://www.w3.org/TR/2026/CRD-payment-request-20260327/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
