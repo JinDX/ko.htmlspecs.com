@@ -4,7 +4,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 핵심 표준
 - [HTML](https://ko.htmlspecs.com/)（[Source](https://html.spec.whatwg.org/multipage/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [ECMAScript® 2027 Language Specification](https://ecma262.com/k)（[Source](https://tc39.es/ecma262/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)），- [How to Read](https://ko.htmlspecs.com/es-howto/)（[Source](https://timothygu.me/es-howto/)）
-- [ECMAScript® 2026 Internationalization API Specification](https://ko.htmlspecs.com/ecma402/)（[Source](https://tc39.es/ecma402/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [ECMAScript® 2027 Internationalization API Specification](https://ko.htmlspecs.com/ecma402/)（[Source](https://tc39.es/ecma402/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Language Tags and Locale Identifiers for the World Wide Web](https://ko.htmlspecs.com/ltli/)（[Source](https://www.w3.org/TR/2020/WD-ltli-20201007) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Source map format specification](https://ko.htmlspecs.com/ecma426/)（[Source](https://tc39.es/ecma426/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebAssembly JavaScript Interface](https://ko.htmlspecs.com/wasm-js-api-2/)（[Source](https://www.w3.org/TR/2026/CRD-wasm-js-api-2-20260409/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
@@ -376,7 +376,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [index](https://ko.htmlspecs.com/http/)（[Source](https://httpwg.org/specs/)）
 
 ### 핵심 명세
-- [HTTP Semantics (RFC 9110)](https://ko.htmlspecs.com/http/rfc9110.html)（[Source](https://httpwg.org/specs/rfc9110.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [HTTP Semantics](https://ko.htmlspecs.com/http/rfc9110.html)（[Source](https://httpwg.org/specs/rfc9110.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [HTTP Caching](https://ko.htmlspecs.com/http/rfc9111.html)（[Source](https://httpwg.org/specs/rfc9111.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [HTTP/1.1](https://ko.htmlspecs.com/http/rfc9112.html)（[Source](https://httpwg.org/specs/rfc9112.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [HTTP/2](https://ko.htmlspecs.com/http/rfc9113.html)（[Source](https://httpwg.org/specs/rfc9113.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
