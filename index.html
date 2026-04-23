@@ -34,7 +34,7 @@
         src=https://resources.whatwg.org/logo.svg height=100></a>
     <hgroup>
       <h1 class=allcaps>HTML</h1>
-      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 4월 19일</span>
+      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 4월 22일</span>
     </hgroup>
 
     <nav>
@@ -63,7 +63,7 @@
         <a href=https://github.com/whatwg/html/commits class=changes><span><strong>커밋</strong>
             <code>on GitHub</code></span></a>
         <a id=commit-snapshot-link
-          href=https://html.spec.whatwg.org/commit-snapshots/5ef89b8e4397e3a88e5b8584bfdd6f201b5bcd60/
+          href=https://html.spec.whatwg.org/commit-snapshots/4ff60b08499a3009909ff9a0b80ccbf5aa1f8fc4/
           class=changes><span><strong>스냅샷</strong> <code>as of this commit</code></span></a>
         <a href=https://twitter.com/htmlstandard class=changes><span><strong>트위터 업데이트</strong>
             <code>@htmlstandard</code></span></a>
@@ -6790,6 +6790,8 @@ a<c- p>.</c->setAttribute<c- p>(</c-><c- t>&apos;href&apos;</c-><c- p>,</c-> <c-
         <ul class=brief>
           <li><dfn id=default-object-size><a href=https://drafts.csswg.org/css-images/#default-object-size>기본
                 객체 크기</a></dfn>
+          <li><dfn id="default-sizing-algorithm"><a href="https://drafts.csswg.org/css-images/#default-sizing">기본
+                크기 조정 알고리즘</a></dfn></li>
           <li><dfn id=concrete-object-size><a href=https://drafts.csswg.org/css-images/#concrete-object-size>구체적인 객체
                 크기</a></dfn>
           <li><dfn id=natural-dimensions><a href=https://drafts.csswg.org/css-images/#natural-dimensions>자연
@@ -44413,7 +44415,11 @@ sentence needed a separate <c- ni>&amp;lt;</c->del<c- ni>&amp;gt;</c-> element.<
         </div>
       </div>
     <dd>
-      <p>이 속성들은 이미지의 고유 크기(자연 크기)를 반환하거나 크기가 알려지지 않은 경우 0을 반환합니다.</p>
+      <p>이 속성들은 이미지의 <a href="#density-corrected-intrinsic-width-and-height"
+          id="the-img-element:density-corrected-intrinsic-width-and-height">밀도 보정된 자연 너비와
+          높이</a>를 반환하거나,
+        이미지가 <i id="the-img-element:img-available-4"><a href="#img-available">이용 가능</a></i>하지 않으면 0을 반환합니다.</p>
+    </dd>
     <dt><code><var>image</var>.<a href=#dom-img-complete id=dom-img-complete-dev>complete</a></code>
       <div class="mdn-anno wrapped before"><button onclick=toggleStatus(this) class=mdn-anno-btn><b
             title="모든 현재 엔진에서 지원합니다." class=all-engines-flag>✔</b><span>MDN</span></button>
@@ -44558,37 +44564,44 @@ sentence needed a separate <c- ni>&amp;lt;</c->del<c- ni>&amp;gt;</c-> element.<
 
 
   <div data-algorithm="">
-    <p>
-      IDL 속성 <dfn data-dfn-for=HTMLImageElement id=dom-img-width data-dfn-type=attribute><code>width</code></dfn>와
-      <dfn data-dfn-for=HTMLImageElement id=dom-img-height data-dfn-type=attribute><code>height</code></dfn>는
-      이미지가 <a href=#being-rendered id=the-img-element:being-rendered>렌더링 중</a>일 때
-      <a href=https://drafts.csswg.org/css-values/#px id="the-img-element:'px'" data-x-internal="'px'">CSS 픽셀</a> 단위로
-      렌더링된 너비와 높이를 반환해야 합니다.
-      그렇지 않고 이미지가 <a href=#density-corrected-intrinsic-width-and-height
-        id=the-img-element:density-corrected-intrinsic-width-and-height>밀도 보정된 자연 너비와 높이</a>를 가지고
-      <i id=the-img-element:img-available-4><a href=#img-available>사용 가능</a></i>하지만 <a href=#being-rendered
-        id=the-img-element:being-rendered-2>렌더링 중이 아닌</a> 경우에는
-      <a href=https://drafts.csswg.org/css-values/#px id="the-img-element:'px'-2" data-x-internal="'px'">CSS 픽셀</a>
-      단위로
-      밀도 보정된 자연 너비와 높이를 반환해야 합니다.
-      만약 이미지가 <i id=the-img-element:img-available-5><a href=#img-available>사용 가능</a></i>하지 않거나
-      <a href=#density-corrected-intrinsic-width-and-height
-        id=the-img-element:density-corrected-intrinsic-width-and-height-3>밀도 보정된 자연 너비와 높이</a>를 가지지 않는다면 0을 반환해야
-      합니다.
-      <a href=#refsCSS>[CSS]</a>
+    <p>IDL 속성인 <dfn data-dfn-for="HTMLImageElement" id="dom-img-width"
+        data-dfn-type="attribute"><code>width</code></dfn>와 <dfn data-dfn-for="HTMLImageElement" id="dom-img-height"
+        data-dfn-type="attribute"><code>height</code></dfn>는 이미지가 <a href="#being-rendered"
+        id="the-img-element:being-rendered">렌더링 중</a>일 경우 <a href="https://drafts.csswg.org/css-values/#px"
+        id="the-img-element:'px'" data-x-internal="'px'">CSS 픽셀</a> 단위의 렌더링된 너비와 높이를 반환해야 합니다.
+      그렇지 않고 이미지가 <a href="#density-corrected-intrinsic-width-and-height"
+        id="the-img-element:density-corrected-intrinsic-width-and-height-2">밀도 보정된 자연 너비 및 높이</a>를 가지고
+      <i id="the-img-element:img-available-5"><a href="#img-available">이용 가능</a></i>하지만
+      <a href="#being-rendered" id="the-img-element:being-rendered-2">렌더링 중</a>이 아닌 경우,
+      이미지의 <a href="#density-corrected-intrinsic-width-and-height"
+        id="the-img-element:density-corrected-intrinsic-width-and-height-3">밀도 보정된 자연 너비 및 높이</a>를 <a
+        href="https://drafts.csswg.org/css-values/#px" id="the-img-element:'px'-2" data-x-internal="'px'">CSS 픽셀</a> 단위로
+      반환해야 합니다.
+      그렇지 않고 이미지가 <i id="the-img-element:img-available-6"><a href="#img-available">이용 가능</a></i>하지 않거나
+      <a href="#density-corrected-intrinsic-width-and-height"
+        id="the-img-element:density-corrected-intrinsic-width-and-height-4">밀도 보정된 자연 너비 및 높이</a>를
+      가지고 있지 않다면 0을 반환해야 합니다. <a href="#refsCSS">[CSS]</a>
     </p>
   </div>
 
   <div data-algorithm="">
-    <p>IDL 속성 <dfn data-dfn-for=HTMLImageElement id=dom-img-naturalwidth
-        data-dfn-type=attribute><code>naturalWidth</code></dfn> 및 <dfn data-dfn-for=HTMLImageElement
-        id=dom-img-naturalheight data-dfn-type=attribute><code>naturalHeight</code></dfn>는 이미지가 <a
-        href=#density-corrected-intrinsic-width-and-height
-        id=the-img-element:density-corrected-intrinsic-width-and-height-4>밀도 보정 자연 너비와 높이</a>를 가지고 있고 <i
-        id=the-img-element:img-available-6><a href=#img-available>사용 가능</a></i>한 경우 CSS 픽셀 단위로 밀도 보정 자연 너비와 높이를 반환해야
-      하며, 그렇지 않으면 0을 반환해야 합니다.
-      <a href=#refsCSS>[CSS]</a>
-    </p>
+    <p><dfn data-dfn-for="HTMLImageElement" id="dom-img-naturalwidth"
+        data-dfn-type="attribute"><code>naturalWidth</code></dfn>와 <dfn data-dfn-for="HTMLImageElement"
+        id="dom-img-naturalheight" data-dfn-type="attribute"><code>naturalHeight</code></dfn> getter의
+      단계는 다음과 같습니다:</p>
+
+    <ol>
+      <li>
+        <p>이미지가 <i id="the-img-element:img-available-7"><a href="#img-available">이용 가능</a></i>하지 않으면
+          0을 반환합니다.</p>
+      </li>
+      <li>
+        <p>이미지의 <a href="#density-corrected-intrinsic-width-and-height"
+            id="the-img-element:density-corrected-intrinsic-width-and-height-5">밀도 보정된 자연 너비 및 높이</a>의
+          해당 컴포넌트를 <a href="https://drafts.csswg.org/css-values/#px" id="the-img-element:'px'-3"
+            data-x-internal="'px'">CSS 픽셀</a> 단위로 반환합니다. <a href="#refsCSS">[CSS]</a></p>
+      </li>
+    </ol>
   </div>
 
   <p class=note>이미지의 <a href=#density-corrected-intrinsic-width-and-height
@@ -45759,38 +45772,73 @@ img<c- p>.</c->decode<c- p>().</c->then<c- p>(()</c-> <c- p>=&gt;</c-> <c- p>{</
     null로 설정되어야 합니다.</p>
 
   <div data-algorithm="">
-    <p>이미지 요소 <var>img</var>의 <dfn id=density-corrected-intrinsic-width-and-height>밀도 보정된 자연 너비와 높이</dfn>를 결정하려면:</p>
+    <p><dfn id="density-corrected-intrinsic-width-and-height">밀도 보정된
+        자연 너비 및 높이</dfn>를 <code id="images-processing-model:the-img-element-8"><a href="#the-img-element">img</a></code>
+      요소 <var>img</var>에 대해 결정하려면:
+    </p>
 
     <ol>
       <li>
-        <p><var>dim</var>을 <var>img</var>의 <a href=#current-request id=images-processing-model:current-request-4>현재
-            요청</a>의 <a href=#preferred-density-corrected-dimensions
-            id=images-processing-model:preferred-density-corrected-dimensions>선호하는 밀도 보정된 크기</a>로 설정합니다.</p>
+        <p><var>density</var>를 <var>img</var>의 <a href="#current-request"
+            id="images-processing-model:current-request-4">현재 요청</a>의 <a href="#current-pixel-density"
+            id="images-processing-model:current-pixel-density">현재
+            픽셀 밀도</a>로 둔다.</p>
+      </li>
+      <li>
+        <p><var>dimensions</var>를 <var>img</var>의 <a href="#current-request"
+            id="images-processing-model:current-request-5">현재 요청</a>의
+          <a href="#preferred-density-corrected-dimensions"
+            id="images-processing-model:preferred-density-corrected-dimensions">선호하는 밀도 보정된
+            크기</a>로 둔다.
+        </p>
 
-        <p class=note><a href=#preferred-density-corrected-dimensions
-            id=images-processing-model:preferred-density-corrected-dimensions-2>선호하는 밀도 보정된 크기</a>는 이미지의 메타 정보에
-          기반하여 <a href=#prepare-an-image-for-presentation
-            id=images-processing-model:prepare-an-image-for-presentation>이미지
-            프레젠테이션 준비</a> 알고리즘에서 설정됩니다.</p>
+        <p class="note"><a href="#preferred-density-corrected-dimensions"
+            id="images-processing-model:preferred-density-corrected-dimensions-2">선호하는 밀도 보정된 크기</a>는
+          이미지의 메타 정보에 기반하여
+          <a href="#prepare-an-image-for-presentation"
+            id="images-processing-model:prepare-an-image-for-presentation">이미지 표현 준비</a>
+          알고리즘에서 설정된다.
+        </p>
+      </li>
       <li>
-        <p><var>dim</var>이 null이면 <var>dim</var>을 <var>img</var>의 <a id=images-processing-model:natural-dimensions
-            href=https://drafts.csswg.org/css-images/#natural-dimensions data-x-internal=natural-dimensions>자연
-            크기</a>로 설정합니다.</p>
+        <p><var>dimensions</var>가 null이 아니라면,
+          <var>dimensions</var>의 width 값을 <var>dimensions</var>의 width를 <var>density</var>로 나눈 값으로 설정하고,
+          <var>dimensions</var>의 height 값을 <var>dimensions</var>의 height를 <var>density</var>로 나눈 값으로 설정한 뒤,
+          <var>dimensions</var>를 반환한다.
+        </p>
+      </li>
       <li>
-        <p><var>dim</var>의 너비를 <var>img</var>의 <a href=#current-request id=images-processing-model:current-request-5>현재
-            요청</a>의 <a href=#current-pixel-density id=images-processing-model:current-pixel-density>현재 픽셀 밀도</a>로 나눈 값으로
-          설정합니다.</p>
+        <p><var>intrinsicWidth</var>, <var>intrinsicHeight</var>, <var>intrinsicRatio</var>를 각각 <var>img</var>의
+          <a href="https://drafts.csswg.org/css-images/#natural-dimensions"
+            id="images-processing-model:natural-dimensions" data-x-internal="natural-dimensions">고유 너비, 고유 높이, 고유
+            종횡비</a>
+          (존재하는 경우)로 둔다.
+        </p>
+      </li>
       <li>
-        <p><var>dim</var>의 높이를 <var>img</var>의 <a href=#current-request id=images-processing-model:current-request-6>현재
-            요청</a>의 <a href=#current-pixel-density id=images-processing-model:current-pixel-density-2>현재 픽셀 밀도</a>로 나눈
-          값으로
-          설정합니다.</p>
+        <p><var>intrinsicWidth</var>가 존재한다면,
+          <var>intrinsicWidth</var>를 <var>intrinsicWidth</var>를 <var>density</var>로 나눈 값으로 설정한다.
+        </p>
+      </li>
       <li>
-        <p><var>dim</var>을 반환합니다.</p>
+        <p><var>intrinsicHeight</var>가 존재한다면,
+          <var>intrinsicHeight</var>를 <var>intrinsicHeight</var>를 <var>density</var>로 나눈 값으로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>intrinsicWidth</var>, <var>intrinsicHeight</var>, <var>intrinsicRatio</var>와
+          <a id="images-processing-model:default-object-size"
+            href="https://drafts.csswg.org/css-images/#default-object-size"
+            data-x-internal="default-object-size">300x150의 기본 객체 크기</a>를 사용하여
+          <a id="images-processing-model:default-sizing-algorithm"
+            href="https://drafts.csswg.org/css-images/#default-sizing" data-x-internal="default-sizing-algorithm">기본 크기
+            결정 알고리즘</a>을 적용한 결과를 반환한다.
+        </p>
+      </li>
     </ol>
   </div>
 
-  <p class=example>예를 들어, <a href=#current-pixel-density id=images-processing-model:current-pixel-density-3>현재 픽셀
+  <p class=example>예를 들어, <a href=#current-pixel-density id=images-processing-model:current-pixel-density-2>현재 픽셀
       밀도</a>가 3.125인 경우, 이는 1인치 당 300개의 디바이스 픽셀이 있다는 의미이며, 따라서 이미지 데이터가 300x600이면 <a
       href=#density-corrected-intrinsic-width-and-height
       id=images-processing-model:density-corrected-intrinsic-width-and-height-3>밀도 보정된 자연 너비와 높이</a>는 96 <a
