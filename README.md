@@ -59,7 +59,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Push API](https://ko.htmlspecs.com/push-api/)（[Source](https://www.w3.org/TR/2025/WD-push-api-20251201/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebRTC](https://ko.htmlspecs.com/webrtc/)（[Source](https://www.w3.org/TR/2025/REC-webrtc-20250313/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Payment Request API](https://ko.htmlspecs.com/payment-request/)（[Source](https://www.w3.org/TR/2026/CRD-payment-request-20260327/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [Web-based Payment Handler API](https://ko.htmlspecs.com/web-based-payment-handler/)（[Source](https://www.w3.org/TR/2026/WD-web-based-payment-handler-20260218/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Web-based Payment Handler API](https://ko.htmlspecs.com/web-based-payment-handler/)（[Source](https://www.w3.org/TR/2026/WD-web-based-payment-handler-20260423/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Goods API](https://ko.htmlspecs.com/digital-goods/)（[Source](https://wicg.github.io/digital-goods/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Background Fetch](https://ko.htmlspecs.com/background-fetch/)（[Source](https://wicg.github.io/background-fetch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Periodic Background Sync](https://ko.htmlspecs.com/periodic-background-sync/)（[Source](https://wicg.github.io/periodic-background-sync/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
