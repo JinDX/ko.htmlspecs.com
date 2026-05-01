@@ -118,7 +118,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Clipboard API and events](https://ko.htmlspecs.com/clipboard-apis/)（[Source](https://www.w3.org/TR/2025/WD-clipboard-apis-20251124/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Selection API](https://ko.htmlspecs.com/selection-api/)（[Source](https://www.w3.org/TR/2025/WD-selection-api-20250105/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Input Events Level 1](https://ko.htmlspecs.com/input-events-1/)（[Source](https://www.w3.org/TR/2023/DISC-input-events-1-20230928/) ![Discontinued Draft](https://img.shields.io/badge/DISC-ffcc00)）
-- [Input Events Level 2](https://ko.htmlspecs.com/input-events-2/)（[Source](https://www.w3.org/TR/2025/WD-input-events-2-20250814/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Input Events Level 2](https://ko.htmlspecs.com/input-events-2/)（[Source](https://www.w3.org/TR/2026/WD-input-events-2-20260501/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Permissions](https://ko.htmlspecs.com/permissions/)（[Source](https://www.w3.org/TR/2025/WD-permissions-20251006/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebOTP API](https://ko.htmlspecs.com/web-otp/)（[Source](https://wicg.github.io/web-otp/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Device Posture API](https://ko.htmlspecs.com/device-posture/)（[Source](https://www.w3.org/TR/2024/CR-device-posture-20241126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
