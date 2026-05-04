@@ -70,6 +70,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 저장 및 데이터
 - [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB/)（[Source](https://www.w3.org/TR/2025/WD-IndexedDB-3-20250813/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Storage](https://ko.htmlspecs.com/storage/)（[Source](https://storage.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
+- [Storage Buckets](https://ko.htmlspecs.com/storage-buckets/)（[Source](https://wicg.github.io/storage-buckets/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [File API](https://ko.htmlspecs.com/FileAPI/)（[Source](https://www.w3.org/TR/2025/WD-FileAPI-20251203/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [File System](https://ko.htmlspecs.com/fs/)（[Source](https://fs.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [File System Access API](https://ko.htmlspecs.com/file-system-access/)（[Source](https://wicg.github.io/file-system-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
@@ -165,7 +166,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api/)（[Source](https://wicg.github.io/sanitizer-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Subresource Integrity (SRI)](https://ko.htmlspecs.com/sri/)（[Source](https://www.w3.org/TR/2016/REC-SRI-20160623/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3/)（[Source](https://www.w3.org/TR/2026/WD-CSP3-20260421/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Self-Review Questionnaire: Security and Privacy](https://ko.htmlspecs.com/security-privacy-questionnaire/)（[Source](https://www.w3.org/TR/2025/NOTE-security-privacy-questionnaire-20250418/) !![Note](https://img.shields.io/badge/NOTE-309c40)）
+- [Self-Review Questionnaire: Security and Privacy](https://ko.htmlspecs.com/security-privacy-questionnaire/)（[Source](https://www.w3.org/TR/2025/NOTE-security-privacy-questionnaire-20250418/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Permissions Policy](https://ko.htmlspecs.com/permissions-policy/)（[Source](https://www.w3.org/TR/2025/WD-permissions-policy-1-20251006/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Global Privacy Control (GPC)](https://ko.htmlspecs.com/gpc/)（[Source](https://www.w3.org/TR/2026/WD-gpc-20260423/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Privacy Principles](https://ko.htmlspecs.com/privacy-principles/)（[Source](https://www.w3.org/TR/2025/STMT-privacy-principles-20250515/) ![Statement](https://img.shields.io/badge/STMT-6c757d)）
