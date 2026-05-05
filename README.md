@@ -379,7 +379,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ## HTTP
 - [index](https://ko.htmlspecs.com/http/)（[Source](https://httpwg.org/specs/)）
 
-### 핵심 명세
+### 핵심 표준
 - [HTTP Semantics](https://ko.htmlspecs.com/http/rfc9110.html)（[Source](https://httpwg.org/specs/rfc9110.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [HTTP Caching](https://ko.htmlspecs.com/http/rfc9111.html)（[Source](https://httpwg.org/specs/rfc9111.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [HTTP/1.1](https://ko.htmlspecs.com/http/rfc9112.html)（[Source](https://httpwg.org/specs/rfc9112.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
