@@ -35,8 +35,10 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 접근성
 - [Web Content Accessibility Guidelines (WCAG) 2.2](https://ko.htmlspecs.com/WCAG22/)（[Source](https://www.w3.org/TR/2024/REC-WCAG22-20241212/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [W3C Accessibility Guidelines (WCAG) 3.0](https://ko.htmlspecs.com/wcag-3.0/)（[Source](https://www.w3.org/TR/2026/WD-wcag-3.0-20260303/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Making Content Usable for People with Cognitive and Learning Disabilities](https://ko.htmlspecs.com/coga-usable/)（[Source](https://www.w3.org/TR/2021/NOTE-coga-usable-20210429/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.2](https://ko.htmlspecs.com/wai-aria-1.2/)（[Source](https://www.w3.org/TR/2023/REC-wai-aria-1.2-20230606/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.3](https://ko.htmlspecs.com/wai-aria-1.3/)（[Source](https://www.w3.org/TR/2024/WD-wai-aria-1.3-20240123/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [WAI-ARIA Graphics Module](https://ko.htmlspecs.com/graphics-aria-1.0/)（[Source](https://www.w3.org/TR/2018/REC-graphics-aria-1.0-20181002/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [ARIA in HTML](https://ko.htmlspecs.com/html-aria/)（[Source](https://www.w3.org/TR/2026/REC-html-aria-20260415/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname-1.1/)（[Source](https://www.w3.org/TR/2018/REC-accname-1.1-20181218/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Name and Description Computation 1.2](https://ko.htmlspecs.com/accname-1.2/)（[Source](https://www.w3.org/TR/2026/WD-accname-1.2-20260430/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
