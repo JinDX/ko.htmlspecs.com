@@ -34,7 +34,7 @@
         src=https://resources.whatwg.org/logo.svg height=100></a>
     <hgroup>
       <h1 class=allcaps>HTML</h1>
-      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 5월 7일</span>
+      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class=pubdate>2026년 5월 8일</span>
     </hgroup>
 
     <nav>
@@ -63,7 +63,7 @@
         <a href=https://github.com/whatwg/html/commits class=changes><span><strong>커밋</strong>
             <code>on GitHub</code></span></a>
         <a id=commit-snapshot-link
-          href=https://html.spec.whatwg.org/commit-snapshots/f7b44021953ea2b5bbefc9beb538f5779db31a92/
+          href=https://html.spec.whatwg.org/commit-snapshots/55456349893da0b2c0d2aeeae1d04f1b4fd669c1/
           class=changes><span><strong>스냅샷</strong> <code>as of this commit</code></span></a>
         <a href=https://twitter.com/htmlstandard class=changes><span><strong>트위터 업데이트</strong>
             <code>@htmlstandard</code></span></a>
@@ -61713,24 +61713,77 @@ red:89
       <p>설정할 수 있으며, 오디오가 음소거된 상태를 변경할 수 있습니다.</p>
   </dl>
 
-  <p><a href=#media-element id=user-interface:media-element-5>미디어 요소</a>는 0.0(무음)에서 1.0(가장 큰 소리) 범위의 비율로 표현되는 <dfn
-      id=concept-media-volume>재생 볼륨</dfn>을 가지고 있습니다. 초기 볼륨은 1.0이어야 하지만, 사용자 에이전트는 세션 간 또는 사이트별로 마지막 설정 값을 기억하여 다른
-    값으로 시작할 수 있습니다.</p>
+  <p><a href="#media-element" id="user-interface:media-element-5">미디어 요소</a>는 0.0(무음)부터 1.0(최대 음량)까지의 범위에 있는 분수인 <dfn
+      id="concept-media-volume">재생 음량</dfn>을 가진다.
+    처음에는 음량이 1.0이어야 하지만, 사용자 에이전트는 사이트별 기준이나 그 밖의 방식으로 세션 간에
+    마지막으로 설정된 값을 기억할 수 있으므로, 음량은 다른 값에서 시작할 수도 있다.</p>
 
   <div data-algorithm="">
-    <p><dfn data-dfn-for=HTMLMediaElement id=dom-media-volume data-dfn-type=attribute><code>volume</code></dfn> IDL 속성은
-      <a href=#concept-media-volume id=user-interface:concept-media-volume>재생 볼륨</a>을 반환해야 합니다. 설정 시, 새로운 값이 0.0에서 1.0
-      범위 내에 있다면 <a href=#media-element id=user-interface:media-element-7>미디어 요소</a>의 <a href=#concept-media-volume
-        id=user-interface:concept-media-volume-2>재생 볼륨</a>을 해당 값으로 설정해야 합니다. 새로운 값이 0.0에서 1.0 범위 밖에 있다면, 설정 시 <a
-        id=user-interface:indexsizeerror-2 href=https://webidl.spec.whatwg.org/#indexsizeerror
-        data-x-internal=indexsizeerror>"<code>IndexSizeError</code>"</a> <code
-        id=user-interface:domexception-2><a data-x-internal=domexception href=https://webidl.spec.whatwg.org/#dfn-DOMException>DOMException</a></code>
-      예외를 발생시켜야 합니다.
+    <p><a href="#media-element" id="user-interface:media-element-6">미디어 요소</a>
+      <var>element</var>의 <dfn id="set-the-playback-volume" data-export="">재생 음량을 설정</dfn>하여 숫자 <var>value</var>로 만들려면:
     </p>
+
+    <ol>
+      <li>
+        <p><var>element</var>의 <a href="#concept-media-volume" id="user-interface:concept-media-volume">재생
+            음량</a>이
+          <var>value</var>와 같으면, 반환한다.
+        </p>
+      </li>
+      <li>
+        <p><var>element</var>의 <a href="#concept-media-volume" id="user-interface:concept-media-volume-2">재생
+            음량</a>을
+          <var>value</var>로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>element</var>가 <a href="#allowed-to-play" id="user-interface:allowed-to-play">재생이 허용된</a> 상태가
+          아니면, <var>element</var>에 대해 <a href="#internal-pause-steps" id="user-interface:internal-pause-steps">내부
+            일시정지 단계</a>를 실행한다.</p>
+      </li>
+      <li>
+        <p><var>element</var>가 주어졌을 때 <a href="#queue-a-media-element-task"
+            id="user-interface:queue-a-media-element-task">미디어 요소
+            태스크를 큐에 넣어</a>, <var>element</var>에서 <code
+            id="user-interface:event-media-volumechange"><a href="#event-media-volumechange">volumechange</a></code>라는
+          이름의 <a href="https://dom.spec.whatwg.org/#concept-event-fire" id="user-interface:concept-event-fire"
+            data-x-internal="concept-event-fire">이벤트를 발화</a>한다.
+        </p>
+      </li>
+    </ol>
   </div>
 
-  <p><a href="#media-element" id="user-interface:media-element-8">미디어 요소</a>는 다음 중 하나라도 true이면 <dfn
-      data-dfn-for="media element" id="concept-media-muted" data-export="">음소거된</dfn> 상태이다:
+  <div data-algorithm="">
+    <p><dfn data-dfn-for="HTMLMediaElement" id="dom-media-volume" data-dfn-type="attribute"><code>volume</code></dfn>
+      getter 단계는 <a id="user-interface:this" href="https://webidl.spec.whatwg.org/#this"
+        data-x-internal="this">this</a>의 <a href="#concept-media-volume" id="user-interface:concept-media-volume-3">재생
+        음량</a>을 반환하는 것이다.</p>
+  </div>
+
+  <div data-algorithm="">
+    <p><code id="user-interface:dom-media-volume-3"><a href="#dom-media-volume">volume</a></code> setter 단계는 다음과 같다:
+    </p>
+
+    <ol>
+      <li>
+        <p>주어진 값이 0.0 이상 1.0 이하의 범위에 있지 않으면,
+          <a id="user-interface:indexsizeerror-2" href="https://webidl.spec.whatwg.org/#indexsizeerror"
+            data-x-internal="indexsizeerror">"<code>IndexSizeError</code>"</a> <code
+            id="user-interface:domexception-2"><a data-x-internal="domexception" href="https://webidl.spec.whatwg.org/#dfn-DOMException">DOMException</a></code>을
+          예외 발생시킨다.
+        </p>
+      </li>
+      <li>
+        <p><a id="user-interface:this-2" href="https://webidl.spec.whatwg.org/#this" data-x-internal="this">this</a>의
+          <a href="#set-the-playback-volume" id="user-interface:set-the-playback-volume">재생 음량을 설정</a>하여
+          주어진 값으로 만든다.
+        </p>
+      </li>
+    </ol>
+  </div>
+
+  <p><a href="#media-element" id="user-interface:media-element-7">미디어 요소</a>는 다음 중 하나라도 true이면 <dfn
+      data-dfn-for="media element" id="concept-media-muted" data-export="">음소거됨</dfn> 상태이다:
   </p>
 
   <ul>
@@ -61740,115 +61793,133 @@ red:89
     </li>
     <li>
       <p>그 <a href="#concept-media-muted-state" id="user-interface:concept-media-muted-state-2">음소거 상태</a>가
-        "<code>default</code>"이고 <code id="user-interface:attr-media-muted"><a href="#attr-media-muted">muted</a></code>
-        콘텐츠
+        "<code>default</code>"이고, <code
+          id="user-interface:attr-media-muted"><a href="#attr-media-muted">muted</a></code> 콘텐츠
         속성을 가진다.</p>
     </li>
     <li>
       <p><a href="#direction-of-playback" id="user-interface:direction-of-playback">재생 방향</a>이
-        뒤쪽 방향이다.</p>
+        뒤쪽이다.</p>
     </li>
     <li>
-      <p>그 <code id="user-interface:dom-media-playbackrate"><a href="#dom-media-playbackrate">playbackRate</a></code>
-        가 너무 낮거나 너무 높아서 사용자 에이전트가 오디오를 유용하게 재생할 수 없다.</p>
+      <p>그 <code id="user-interface:dom-media-playbackrate"><a href="#dom-media-playbackrate">playbackRate</a></code>가
+        너무 낮거나 너무 높아서
+        사용자 에이전트가 오디오를 유용하게 재생할 수 없다.</p>
     </li>
   </ul>
 
-  <p>각 <a href="#media-element" id="user-interface:media-element-9">미디어 요소</a>는 <dfn id="concept-media-muted-state">음소거
-      상태</dfn>를 가지며, 이는 true, false 또는 "<code>default</code>" 중 하나이다. 초기값은 "<code>default</code>"이다. 사용자
-    에이전트는 <a href="#media-element" id="user-interface:media-element-10">미디어 요소</a>의 <a href="#concept-media-muted-state"
-      id="user-interface:concept-media-muted-state-3">음소거 상태</a>를 true 또는 false로
-    설정할 수 있다
-    (예를 들어, 세션 간에 마지막으로 설정된 값을 사이트별로 또는 그 밖의 방식으로 기억함).</p>
+  <p>각 <a href="#media-element" id="user-interface:media-element-8">미디어 요소</a>는 true, false, 또는 "<code>default</code>" 중
+    하나인 <dfn id="concept-media-muted-state">음소거
+      상태</dfn>를 가지며, 처음에는 "<code>default</code>"이다. 사용자
+    에이전트는 <a href="#media-element" id="user-interface:media-element-9">미디어
+      요소</a>의 <a href="#set-the-muted-state" id="user-interface:set-the-muted-state">음소거 상태를 설정</a>하여 true 또는 false로 만들
+    수 있다(예: 세션 간에, 사이트별 기준이나 그 밖의 방식으로
+    마지막으로 설정된 값을 기억).</p>
+
+  <div data-algorithm="">
+    <p><a href="#media-element" id="user-interface:media-element-10">미디어 요소</a> <var>element</var>의 <dfn
+        id="set-the-muted-state" data-export="">음소거 상태를 설정</dfn>하여
+      불리언 <var>value</var>로 만들려면:</p>
+
+    <ol>
+      <li>
+        <p><var>element</var>의 <a href="#concept-media-muted-state" id="user-interface:concept-media-muted-state-3">음소거
+            상태</a>가
+          <var>value</var>와 같으면, 반환한다.
+        </p>
+      </li>
+      <li>
+        <p><var>element</var>의 <a href="#concept-media-muted-state" id="user-interface:concept-media-muted-state-4">음소거
+            상태</a>를
+          <var>value</var>로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>element</var>가 <a href="#allowed-to-play" id="user-interface:allowed-to-play-2">재생이 허용된</a> 상태가
+          아니면, <var>element</var>에 대해 <a href="#internal-pause-steps" id="user-interface:internal-pause-steps-2">내부
+            일시정지 단계</a>를 실행한다.</p>
+      </li>
+      <li>
+        <p><var>element</var>가 주어졌을 때 <a href="#queue-a-media-element-task"
+            id="user-interface:queue-a-media-element-task-2">미디어 요소
+            태스크를 큐에 넣어</a>, <var>element</var>에서 <code
+            id="user-interface:event-media-volumechange-2"><a href="#event-media-volumechange">volumechange</a></code>라는
+          이름의 <a href="https://dom.spec.whatwg.org/#concept-event-fire" id="user-interface:concept-event-fire-2"
+            data-x-internal="concept-event-fire">이벤트를 발화</a>한다.</p>
+      </li>
+    </ol>
+  </div>
 
   <div data-algorithm="">
     <p><dfn data-dfn-for="HTMLMediaElement" id="dom-media-muted" data-dfn-type="attribute"><code>muted</code></dfn>
-      getter 단계는 this가 <a href="#concept-media-muted" id="user-interface:concept-media-muted">음소거된</a> 상태이면 true를 반환하고,
-      그렇지 않으면 false를 반환하는 것이다.</p>
+      getter 단계는 <a id="user-interface:this-3" href="https://webidl.spec.whatwg.org/#this"
+        data-x-internal="this">this</a>가 <a href="#concept-media-muted" id="user-interface:concept-media-muted">음소거됨</a>
+      상태이면 true를 반환하고, 그렇지 않으면 false를 반환하는 것이다.</p>
   </div>
 
   <div data-algorithm="">
-    <p><code id="user-interface:dom-media-muted"><a href="#dom-media-muted">muted</a></code> setter 단계는
-      this의
-      <a href="#concept-media-muted-state" id="user-interface:concept-media-muted-state-4">음소거 상태</a>를 주어진
-      값으로 설정하는 것이다.
-    </p>
+    <p><code id="user-interface:dom-media-muted"><a href="#dom-media-muted">muted</a></code> setter 단계는 <a
+        id="user-interface:this-4" href="https://webidl.spec.whatwg.org/#this" data-x-internal="this">this</a>의 <a
+        href="#set-the-muted-state" id="user-interface:set-the-muted-state-2">음소거
+        상태를 설정</a>하여 주어진 값으로 만드는 것이다.</p>
   </div>
 
-  <div data-algorithm="">
-    <p><code id="user-interface:dom-media-volume-3"><a href="#dom-media-volume">volume</a></code> 및 <code
-        id="user-interface:dom-media-muted-2"><a href="#dom-media-muted">muted</a></code> IDL
-      속성이 반환하는 값 중 하나라도 변경될 때마다, 사용자 에이전트는
-      <a href="#media-element" id="user-interface:media-element-11">미디어 요소</a>가 주어졌을 때 <a
-        href="https://dom.spec.whatwg.org/#concept-event-fire" id="user-interface:concept-event-fire"
-        data-x-internal="concept-event-fire">이벤트를 발화</a>하도록 <a href="#queue-a-media-element-task"
-        id="user-interface:queue-a-media-element-task">미디어 요소 태스크를 큐에 넣어야</a> 하며, 이벤트 이름은 <code
-        id="user-interface:event-media-volumechange"><a href="#event-media-volumechange">volumechange</a></code>이고 대상은
-      해당
-      <a href="#media-element" id="user-interface:media-element-12">미디어 요소</a>이다. 그런 다음,
-      <a href="#media-element" id="user-interface:media-element-13">미디어 요소</a>가 <a href="#allowed-to-play"
-        id="user-interface:allowed-to-play">재생이 허용된</a> 상태가 아니면, 사용자 에이전트는 해당 <a href="#media-element"
-        id="user-interface:media-element-14">미디어 요소</a>에 대해
-      <a href="#internal-pause-steps" id="user-interface:internal-pause-steps">내부 일시 정지 단계</a>를 실행해야 한다.
-    </p>
-  </div>
-
-  <p>사용자 에이전트는 연관된 <dfn id="volume-locked">볼륨 잠김</dfn>(불리언)을 가진다. 그 값은
+  <p>사용자 에이전트에는 관련된 <dfn id="volume-locked">음량 잠김</dfn>(불리언)이 있다. 그 값은
     <a id="user-interface:implementation-defined" href="https://infra.spec.whatwg.org/#implementation-defined"
       data-x-internal="implementation-defined">구현 정의</a>이며, <a href="#concept-media-volume"
-      id="user-interface:concept-media-volume-3">재생 볼륨</a>이 효과를 가지는지를 결정한다.
+      id="user-interface:concept-media-volume-4">재생 음량</a>이 효과를 발휘하는지를 결정한다.
   </p>
 
   <div data-algorithm="">
     <p>요소의 <dfn data-dfn-for="HTMLMediaElement" id="effective-media-volume" data-export="">유효 미디어
-        볼륨</dfn>은 다음과 같이 결정된다:</p>
+        음량</dfn>은 다음과 같이 결정된다:</p>
 
     <ol>
       <li>
-        <p>사용자가 사용자 에이전트에게 요소의 볼륨을 재정의하라고 표시했다면,
-          사용자가 원하는 볼륨을 반환한다.</p>
+        <p>사용자가 사용자 에이전트가 요소의 음량을 재정의해야 한다고 표시한 경우,
+          사용자가 원하는 음량을 반환한다.</p>
       </li>
       <li>
-        <p>사용자 에이전트의 <a href="#volume-locked" id="user-interface:volume-locked">볼륨 잠김</a>이 true이면,
+        <p>사용자 에이전트의 <a href="#volume-locked" id="user-interface:volume-locked">음량 잠김</a>이 true이면,
           시스템
-          볼륨을 반환한다.</p>
+          음량을 반환한다.</p>
       </li>
       <li>
-        <p>요소가 <a href="#concept-media-muted" id="user-interface:concept-media-muted-2">음소거된</a> 상태이면,
+        <p>요소가 <a href="#concept-media-muted" id="user-interface:concept-media-muted-2">음소거됨</a> 상태이면,
           0을 반환한다.</p>
       </li>
       <li>
-        <p><var>volume</var>을 <a href="#media-element" id="user-interface:media-element-15">미디어
-            요소</a>의 오디오 부분에 대한 <a href="#concept-media-volume" id="user-interface:concept-media-volume-4">재생
-            볼륨</a>이라고 하며, 범위는 0.0(무음)에서
-          1.0(가장 큼)까지이다.</p>
+        <p><var>volume</var>을 <a href="#media-element" id="user-interface:media-element-11">미디어
+            요소</a>의 오디오 부분의 <a href="#concept-media-volume" id="user-interface:concept-media-volume-5">재생
+            음량</a>으로 두며, 범위는 0.0(무음)부터
+          1.0(최대 음량)까지이다.</p>
       </li>
       <li>
-        <p>0.0이 무음이고 1.0이 가장 큰 설정이며 그 사이의 값은 음량이 증가하는 것으로,
-          0.0에서 1.0까지의 범위에 상대적으로 해석된 <var>volume</var>을 반환한다. 이 범위는
-          선형일 필요가 없다. 가장 큰 설정은 시스템의 가능한 가장 큰 설정보다 낮을 수 있다.
-          예를 들어 사용자가 최대 볼륨을 설정했을 수 있다.</p>
+        <p>0.0이 무음이고 1.0이 최대 음량 설정이며 그 사이의 값은 음량이 증가하는 것으로 하여,
+          <var>volume</var>을 0.0부터 1.0까지의 범위에 상대적으로 해석하여 반환한다. 이 범위는
+          선형일 필요가 없다. 최대 음량 설정은 시스템의 가능한 최대 설정보다 낮을 수 있다.
+          예를 들어 사용자가 최대 음량을 설정했을 수 있다.
+        </p>
       </li>
     </ol>
   </div>
 
 
 
-  <p><a href="#media-element" id="user-interface:media-element-16">미디어 요소</a>의
-    <dfn data-dfn-for="audio,video" id="attr-media-muted" data-dfn-type="element-attr"><code>muted</code></dfn>
+  <p><a href="#media-element" id="user-interface:media-element-12">미디어 요소</a>의 <dfn data-dfn-for="audio,video"
+      id="attr-media-muted" data-dfn-type="element-attr"><code>muted</code></dfn>
     콘텐츠 속성은 음소거의 기본값을 제공하는 <a href="#boolean-attribute" id="user-interface:boolean-attribute-2">불리언
-      속성</a>이다.
-  </p>
+      속성</a>이다.</p>
 
-  <p class="note">이 속성은 <code id="user-interface:dom-media-muted-3"><a href="#dom-media-muted">muted</a></code> setter가
+  <p class="note">이 속성은 <code id="user-interface:dom-media-muted-2"><a href="#dom-media-muted">muted</a></code> setter가
     호출되었거나
-    사용자가
-    선호를 표시한 뒤에는 더 이상의 효과가 없다.</p>
+    사용자가 선호를 표시한 뒤에는
+    더 이상 효과가 없다.</p>
 
   <div class="example">
-    <p>이 비디오(광고)는 자동 재생되지만, 사용자를 짜증나게 하지 않기 위해
-      소리 없이 재생되며 사용자가 소리를 켤 수 있게 한다. 사용자 상호작용 없이
-      음소거가 해제되면 사용자 에이전트는 비디오를 일시 정지할 수 있다.</p>
+    <p>이 비디오(광고)는 자동 재생되지만, 사용자를 성가시게 하지 않기 위해
+      소리 없이 재생되며, 사용자가 소리를 켤 수 있게 한다. 사용자 에이전트는 사용자 상호작용 없이
+      음소거가 해제되면 비디오를 일시정지할 수 있다.</p>
 
     <pre><code class="html"><c- p="">&lt;</c-><c- f="">video</c-> <c- e="">src</c-><c- o="">=</c-><c- s="">"adverts.cgi?kind=video"</c-> <c- e="">controls</c-> <c- e="">autoplay</c-> <c- e="">loop</c-> <c- e="">muted</c-><c- p="">&gt;&lt;/</c-><c- f="">video</c-><c- p="">&gt;</c-></code></pre>
   </div>
