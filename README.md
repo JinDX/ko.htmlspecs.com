@@ -224,7 +224,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 테스트와 자동화
 - [WebDriver](https://ko.htmlspecs.com/webdriver2/)（[Source](https://www.w3.org/TR/2026/WD-webdriver2-20260511/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [WebDriver BiDi](https://ko.htmlspecs.com/webdriver-bidi/)（[Source](https://www.w3.org/TR/2026/WD-webdriver-bidi-20260319/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [WebDriver BiDi](https://ko.htmlspecs.com/webdriver-bidi/)（[Source](https://www.w3.org/TR/2026/WD-webdriver-bidi-20260511/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ## CSS
 - [CSS current work](https://ko.htmlspecs.com/css/)（[Source](https://www.w3.org/Style/CSS/current-work)）
