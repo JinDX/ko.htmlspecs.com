@@ -115,6 +115,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Fullscreen](https://ko.htmlspecs.com/fullscreen/)（[Source](https://fullscreen.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Screen Capture](https://ko.htmlspecs.com/screen-capture/)（[Source](https://www.w3.org/TR/2025/WD-screen-capture-20250717/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Region Capture](https://ko.htmlspecs.com/mediacapture-region/)（[Source](https://www.w3.org/TR/2023/WD-mediacapture-region-20230712/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Capture Handle - Bootstrapping Collaboration when Screensharing](https://ko.htmlspecs.com/capture-handle-identity/)（[Source](https://www.w3.org/TR/2025/WD-capture-handle-identity-20250306/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [UI Events](https://ko.htmlspecs.com/uievents/)（[Source](https://www.w3.org/TR/2026/WD-uievents-20260221/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [UI Events KeyboardEvent code Values](https://ko.htmlspecs.com/uievents-code/)（[Source](https://www.w3.org/TR/2025/REC-uievents-code-20250422/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Keyboard Map](https://ko.htmlspecs.com/keyboard-map/)（[Source](https://wicg.github.io/keyboard-map/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
