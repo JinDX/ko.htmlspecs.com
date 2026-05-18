@@ -1,0 +1,3461 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr" typeof="bibo:Document w3p:WD"
+    prefix="bibo: http://purl.org/ontology/bibo/ w3p: http://www.w3.org/2001/02pd/rec54#">
+
+<head>
+    <meta property="dc:language" content="en" lang="">
+    <meta charset="UTF-8">
+    <title>DOM 구문 분석 및 직렬화</title>
+    <style>
+        /* Make these stand-out more... */
+        .externalDFN {
+            font-style: italic;
+            background-color: #fff9d6;
+        }
+
+        /* Switch statement */
+        dl.switch dt::before {
+            content: "↪ ";
+            margin-left: 1em;
+        }
+
+        /* Better spacing around various lists (implied paragraph children) */
+        ol>li,
+        section:not(#toc) ul>li,
+        section dl>dt {
+            margin: 1em 0;
+        }
+
+        var {
+            color: maroon;
+        }
+
+        /* domintro styling */
+        dl.domintro {
+            background-color: rgb(221, 255, 221);
+            padding: 1em 0.5em 1em 2em;
+            clear: both;
+        }
+
+        dl.domintro dt {
+            color: black;
+        }
+
+        dl.domintro>dd {
+            color: green;
+        }
+
+        dl.domintro::before {
+            float: right;
+            background-color: white;
+            display: block;
+            border: 2px solid black;
+            color: green;
+            margin-top: -20px;
+            padding: 2px;
+            content: "This box is non-normative. Implementation requirements are given below this box.";
+        }
+
+        /* Fancy table stuff */
+        table {
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            border-bottom: 2px solid black;
+        }
+
+        tbody tr:not(:last-child) {
+            border-bottom: 1px solid black;
+        }
+
+        td {
+            border-left: 1px solid black;
+            padding: 4px;
+        }
+
+        /* Extra IDL :-) */
+        .extraidl {
+            line-height: 120%;
+            padding: 1em;
+            border-top: 1px solid #90b8de;
+            border-bottom: 1px solid #90b8de;
+        }
+
+        .extraidl:before {
+            width: 150px;
+            color: #fff;
+            padding: 3px;
+            font-weight: bold;
+            font-family: initial;
+            margin: -1em 0 1em -1em;
+            display: block;
+            content: "WebIDL";
+            background-color: rgb(144, 184, 222);
+        }
+    </style>
+
+
+    <style>
+        /*****************************************************************
+ * ReSpec 3 CSS
+ * Robin Berjon - http://berjon.com/
+ *****************************************************************/
+
+        /* --- INLINES --- */
+        em.rfc2119 {
+            text-transform: lowercase;
+            font-variant: small-caps;
+            font-style: normal;
+            color: #900;
+        }
+
+        h1 acronym,
+        h2 acronym,
+        h3 acronym,
+        h4 acronym,
+        h5 acronym,
+        h6 acronym,
+        a acronym,
+        h1 abbr,
+        h2 abbr,
+        h3 abbr,
+        h4 abbr,
+        h5 abbr,
+        h6 abbr,
+        a abbr {
+            border: none;
+        }
+
+        dfn {
+            font-weight: bold;
+        }
+
+        a.internalDFN {
+            color: inherit;
+            border-bottom: 1px solid #99c;
+            text-decoration: none;
+        }
+
+        a.externalDFN {
+            color: inherit;
+            border-bottom: 1px dotted #ccc;
+            text-decoration: none;
+        }
+
+        a.bibref {
+            text-decoration: none;
+        }
+
+        cite .bibref {
+            font-style: normal;
+        }
+
+        code {
+            color: #C83500;
+        }
+
+        /* --- TOC --- */
+        .toc a,
+        .tof a {
+            text-decoration: none;
+        }
+
+        a .secno,
+        a .figno {
+            color: #000;
+        }
+
+        ul.tof,
+        ol.tof {
+            list-style: none outside none;
+        }
+
+        .caption {
+            margin-top: 0.5em;
+            font-style: italic;
+        }
+
+        /* --- TABLE --- */
+        table.simple {
+            border-spacing: 0;
+            border-collapse: collapse;
+            border-bottom: 3px solid #005a9c;
+        }
+
+        .simple th {
+            background: #005a9c;
+            color: #fff;
+            padding: 3px 5px;
+            text-align: left;
+        }
+
+        .simple th[scope="row"] {
+            background: inherit;
+            color: inherit;
+            border-top: 1px solid #ddd;
+        }
+
+        .simple td {
+            padding: 3px 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .simple tr:nth-child(even) {
+            background: #f0f6ff;
+        }
+
+        /* --- DL --- */
+        .section dd>p:first-child {
+            margin-top: 0;
+        }
+
+        .section dd>p:last-child {
+            margin-bottom: 0;
+        }
+
+        .section dd {
+            margin-bottom: 1em;
+        }
+
+        .section dl.attrs dd,
+        .section dl.eldef dd {
+            margin-bottom: 0;
+        }
+
+        .respec-hidden {
+            display: none;
+        }
+
+        @media print {
+            .removeOnSave {
+                display: none;
+            }
+        }
+    </style>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <style>
+        /* --- ISSUES/NOTES --- */
+        div.issue-title,
+        div.note-title,
+        div.ednote-title,
+        div.warning-title {
+            padding-right: 1em;
+            min-width: 7.5em;
+            color: #b9ab2d;
+        }
+
+        div.issue-title {
+            color: #e05252;
+        }
+
+        div.note-title,
+        div.ednote-title {
+            color: #2b2;
+        }
+
+        div.warning-title {
+            color: #f22;
+        }
+
+        div.issue-title span,
+        div.note-title span,
+        div.ednote-title span,
+        div.warning-title span {
+            text-transform: uppercase;
+        }
+
+        div.note,
+        div.issue,
+        div.ednote,
+        div.warning {
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+
+        .note>p:first-child,
+        .ednote>p:first-child,
+        .issue>p:first-child,
+        .warning>p:first-child {
+            margin-top: 0
+        }
+
+        .issue,
+        .note,
+        .ednote,
+        .warning {
+            padding: .5em;
+            border-left-width: .5em;
+            border-left-style: solid;
+        }
+
+        div.issue,
+        div.note,
+        div.ednote,
+        div.warning {
+            padding: 1em 1.2em 0.5em;
+            margin: 1em 0;
+            position: relative;
+            clear: both;
+        }
+
+        span.note,
+        span.ednote,
+        span.issue,
+        span.warning {
+            padding: .1em .5em .15em;
+        }
+
+        .issue {
+            border-color: #e05252;
+            background: #fbe9e9;
+        }
+
+        .note,
+        .ednote {
+            border-color: #52e052;
+            background: #e9fbe9;
+        }
+
+        .warning {
+            border-color: #f11;
+            border-width: .2em;
+            border-style: solid;
+            background: #fbe9e9;
+        }
+
+        .warning-title:before {
+            content: "⚠";
+            /*U+26A0 WARNING SIGN*/
+            font-size: 3em;
+            float: left;
+            height: 100%;
+            padding-right: .3em;
+            vertical-align: top;
+            margin-top: -0.5em;
+        }
+
+        li.task-list-item {
+            list-style: none;
+        }
+
+        input.task-list-item-checkbox {
+            margin: 0 0.35em 0.25em -1.6em;
+            vertical-align: middle;
+        }
+    </style>
+    <style>
+        /* --- WEB IDL --- */
+        pre.idl {
+            border-top: 1px solid #90b8de;
+            border-bottom: 1px solid #90b8de;
+            padding: 1em;
+            line-height: 120%;
+        }
+
+        @media print {
+            pre.idl {
+                white-space: pre-wrap;
+            }
+        }
+
+        pre.idl::before {
+            content: "WebIDL";
+            display: block;
+            width: 150px;
+            background: #90b8de;
+            color: #fff;
+            font-family: sans-serif;
+            padding: 3px;
+            font-weight: bold;
+            margin: -1em 0 1em -1em;
+        }
+
+        .idlType {
+            color: #ff4500;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        /*.idlModule*/
+        /*.idlModuleID*/
+        /*.idlInterface*/
+        .idlInterfaceID,
+        .idlDictionaryID,
+        .idlCallbackID,
+        .idlEnumID {
+            font-weight: bold;
+            color: #005a9c;
+        }
+
+        a.idlEnumItem {
+            color: #000;
+            border-bottom: 1px dotted #ccc;
+            text-decoration: none;
+        }
+
+        .idlSuperclass {
+            font-style: italic;
+            color: #005a9c;
+        }
+
+        /*.idlAttribute*/
+        .idlAttrType,
+        .idlFieldType,
+        .idlMemberType {
+            color: #005a9c;
+        }
+
+        .idlAttrName,
+        .idlFieldName,
+        .idlMemberName {
+            color: #ff4500;
+        }
+
+        .idlAttrName a,
+        .idlFieldName a,
+        .idlMemberName a {
+            color: #ff4500;
+            border-bottom: 1px dotted #ff4500;
+            text-decoration: none;
+        }
+
+        /*.idlMethod*/
+        .idlMethType,
+        .idlCallbackType {
+            color: #005a9c;
+        }
+
+        .idlMethName {
+            color: #ff4500;
+        }
+
+        .idlMethName a {
+            color: #ff4500;
+            border-bottom: 1px dotted #ff4500;
+            text-decoration: none;
+        }
+
+        /*.idlCtor*/
+        .idlCtorName {
+            color: #ff4500;
+        }
+
+        .idlCtorName a {
+            color: #ff4500;
+            border-bottom: 1px dotted #ff4500;
+            text-decoration: none;
+        }
+
+        /*.idlParam*/
+        .idlParamType {
+            color: #005a9c;
+        }
+
+        .idlParamName,
+        .idlDefaultValue {
+            font-style: italic;
+        }
+
+        .extAttr {
+            color: #666;
+        }
+
+        /*.idlSectionComment*/
+        .idlSectionComment {
+            color: gray;
+        }
+
+        /*.idlIterable*/
+        .idlIterableKeyType,
+        .idlIterableValueType {
+            color: #005a9c;
+        }
+
+        /*.idlMaplike*/
+        .idlMaplikeKeyType,
+        .idlMaplikeValueType {
+            color: #005a9c;
+        }
+
+        /*.idlConst*/
+        .idlConstType {
+            color: #005a9c;
+        }
+
+        .idlConstName {
+            color: #ff4500;
+        }
+
+        .idlConstName a {
+            color: #ff4500;
+            border-bottom: 1px dotted #ff4500;
+            text-decoration: none;
+        }
+
+        /*.idlException*/
+        .idlExceptionID {
+            font-weight: bold;
+            color: #c00;
+        }
+
+        .idlTypedefID,
+        .idlTypedefType {
+            color: #005a9c;
+        }
+
+        .idlRaises,
+        .idlRaises a.idlType,
+        .idlRaises a.idlType code,
+        .excName a,
+        .excName a code {
+            color: #c00;
+            font-weight: normal;
+        }
+
+        .excName a {
+            font-family: monospace;
+        }
+
+        .idlRaises a.idlType,
+        .excName a.idlType {
+            border-bottom: 1px dotted #c00;
+        }
+
+        .excGetSetTrue,
+        .excGetSetFalse,
+        .prmNullTrue,
+        .prmNullFalse,
+        .prmOptTrue,
+        .prmOptFalse {
+            width: 45px;
+            text-align: center;
+        }
+
+        .excGetSetTrue,
+        .prmNullTrue,
+        .prmOptTrue {
+            color: #0c0;
+        }
+
+        .excGetSetFalse,
+        .prmNullFalse,
+        .prmOptFalse {
+            color: #c00;
+        }
+
+        .idlImplements a {
+            font-weight: bold;
+        }
+
+        dl.attributes,
+        dl.methods,
+        dl.constants,
+        dl.constructors,
+        dl.fields,
+        dl.dictionary-members {
+            margin-left: 2em;
+        }
+
+        .attributes dt,
+        .methods dt,
+        .constants dt,
+        .constructors dt,
+        .fields dt,
+        .dictionary-members dt {
+            font-weight: normal;
+        }
+
+        .attributes dt code,
+        .methods dt code,
+        .constants dt code,
+        .constructors dt code,
+        .fields dt code,
+        .dictionary-members dt code {
+            font-weight: bold;
+            color: #000;
+            font-family: monospace;
+        }
+
+        .attributes dt code,
+        .fields dt code,
+        .dictionary-members dt code {
+            background: #ffffd2;
+        }
+
+        .attributes dt .idlAttrType code,
+        .fields dt .idlFieldType code,
+        .dictionary-members dt .idlMemberType code {
+            color: #005a9c;
+            background: transparent;
+            font-family: inherit;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .methods dt code {
+            background: #d9e6f8;
+        }
+
+        .constants dt code {
+            background: #ddffd2;
+        }
+
+        .constructors dt code {
+            background: #cfc;
+        }
+
+        .attributes dd,
+        .methods dd,
+        .constants dd,
+        .constructors dd,
+        .fields dd,
+        .dictionary-members dd {
+            margin-bottom: 1em;
+        }
+
+        table.parameters,
+        table.exceptions {
+            border-spacing: 0;
+            border-collapse: collapse;
+            margin: 0.5em 0;
+            width: 100%;
+        }
+
+        table.parameters {
+            border-bottom: 1px solid #90b8de;
+        }
+
+        table.exceptions {
+            border-bottom: 1px solid #deb890;
+        }
+
+        .parameters th,
+        .exceptions th {
+            color: #fff;
+            padding: 3px 5px;
+            text-align: left;
+            font-weight: normal;
+            text-shadow: #666 1px 1px 0;
+        }
+
+        .parameters th {
+            background: #90b8de;
+        }
+
+        .exceptions th {
+            background: #deb890;
+        }
+
+        .parameters td,
+        .exceptions td {
+            padding: 3px 10px;
+            border-top: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .parameters tr:first-child td,
+        .exceptions tr:first-child td {
+            border-top: none;
+        }
+
+        .parameters td.prmName,
+        .exceptions td.excName,
+        .exceptions td.excCodeName {
+            width: 100px;
+        }
+
+        .parameters td.prmType {
+            width: 120px;
+        }
+
+        table.exceptions table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+    </style>
+    <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-WD" rel="stylesheet">
+    <!--[if lt IE 9]><script src='https://www.w3.org/2008/site/js/html5shiv.js'></script><![endif]-->
+</head>
+
+<body id="respecDocument" role="document" class="h-entry">
+    <div id="respecHeader" role="contentinfo" class="head">
+        <p>
+            <a href="https://www.w3.org/"><img src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" alt="W3C"
+                    height="48" width="72"></a>
+        </p>
+        <h1 class="title p-name" id="title" property="dcterms:title">DOM 구문 분석 및 직렬화</h1>
+        <h2 property="bibo:subtitle" id="subtitle">DOMParser, XMLSerializer, innerHTML 및 유사한 API</h2>
+        <h2 id="w3c-working-draft-17-may-2016"><abbr title="World Wide Web Consortium">W3C</abbr> 작업 초안 <time
+                property="dcterms:issued" class="dt-published" datetime="2016-05-17">2016년 5월 17일</time></h2>
+        <dl>
+            <dt>이 버전:</dt>
+            <dd><a class="u-url"
+                    href="https://www.w3.org/TR/2016/WD-DOM-Parsing-20160517/">http://www.w3.org/TR/2016/WD-DOM-Parsing-20160517/</a>
+            </dd>
+            <dt>최신 공개 버전:</dt>
+            <dd><a href="https://www.w3.org/TR/DOM-Parsing/">http://www.w3.org/TR/DOM-Parsing/</a></dd>
+            <dt>최신 편집자 초안:</dt>
+            <dd><a href="https://w3c.github.io/DOM-Parsing/">https://w3c.github.io/DOM-Parsing/</a></dd>
+            <dt>테스트 스위트:</dt>
+            <dd><a href="http://w3c-test.org/domparsing/">http://w3c-test.org/domparsing/</a></dd>
+            <dt>이전 버전:</dt>
+            <dd><a rel="dcterms:replaces"
+                    href="https://www.w3.org/TR/2014/CR-DOM-Parsing-20140617/">http://www.w3.org/TR/2014/CR-DOM-Parsing-20140617/</a>
+            </dd>
+            <dt>편집자:</dt>
+            <dd class="p-author h-card vcard" property="bibo:editor" resource="_:editor0" data-editor-id="40117"><span
+                    property="rdf:first" typeof="foaf:Person"><span property="foaf:name" class="p-name fn">Travis
+                        Leithead</span>, <a property="foaf:workplaceHomepage" class="p-org org h-org h-card"
+                        href="http://www.microsoft.com">Microsoft</a>, <span class="ed_mailto"><a class="u-email email"
+                            property="foaf:mbox"
+                            href="mailto:travis.leithead@microsoft.com">travis.leithead@microsoft.com</a></span></span>
+                <span property="rdf:rest" resource="rdf:nil"></span>
+            </dd>
+
+            <dt>참여:</dt>
+            <dd>
+                <a href="https://github.com/w3c/DOM-Parsing">
+                    저희는 Github에 있습니다.
+                </a>
+            </dd>
+            <dd>
+                <a
+                    href="https://www.w3.org/Bugs/Public/buglist.cgi?component=DOM%20Parsing%20and%20Serialization&amp;list_id=44989&amp;product=WebAppsWG&amp;resolution=---">
+                    Bugzilla 버그 목록.
+                </a>
+            </dd>
+            <dd>
+                <a href="https://github.com/w3c/DOM-Parsing/issues">
+                    Github 이슈.
+                </a>
+            </dd>
+            <dd>
+                <a href="https://github.com/w3c/DOM-Parsing/commits">
+                    커밋 기록.
+                </a>
+            </dd>
+            <dd>
+                <a href="http://lists.w3.org/Archives/Public/www-dom/">
+                    메일링 리스트.
+                </a>
+            </dd>
+        </dl>
+        <p class="copyright">
+            <a href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> ©
+            2016
+
+            <a href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup>
+            (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>,
+            <a href="http://www.ercim.eu/"><abbr
+                    title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>,
+            <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>).
+            <abbr title="World Wide Web Consortium">W3C</abbr> <a
+                href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+            <a href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and
+            <a rel="license" href="https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document">permissive
+                document license</a>
+            rules apply.
+        </p>
+        <hr title="Separator for header">
+    </div>
+
+    <section property="dc:abstract" class="introductory" id="abstract">
+        <h2 resource="#h-abstract" id="h-abstract"><span property="xhv:role" resource="xhv:heading">초록</span></h2>
+        <p>이 명세는 웹 애플리케이션이 DOM 노드를 구문 분석하고 직렬화하는 데
+            사용할 수 있도록 HTML 및 범용 XML 파서에 프로그래밍 방식으로 접근하기 위한
+            다양한 API를 정의한다.</p>
+    </section>
+    <section id="sotd" class="introductory">
+        <h2 resource="#h-sotd" id="h-sotd"><span property="xhv:role" resource="xhv:heading">이 문서의
+                상태</span></h2>
+        <p>
+            <em>이 절은 이 문서가 공개된 시점에서의 상태를 설명한다. 다른 문서가 이 문서를
+                대체할 수 있다. 현재 <abbr title="World Wide Web Consortium">W3C</abbr>
+                공개 문서 목록과 이 기술 보고서의 최신 개정판은 <a href="https://www.w3.org/TR/"><abbr
+                        title="World Wide Web Consortium">W3C</abbr> 기술 보고서
+                    색인</a>(http://www.w3.org/TR/)에서 확인할 수 있다.</em>
+        </p>
+
+        <p>이 명세는 <a href="https://domparsing.spec.whatwg.org/">
+                DOM Parsing and Serialization</a> 살아있는 명세의 원래 작업을 기반으로 하지만,
+            지원되는 기능, 규범적 요구 사항, 알고리즘 구체성 측면에서는 달라졌다. 적절한 경우,
+            살아있는 명세의 관련 수정 사항이 이 문서에 통합된다.
+        </p>
+        <p>
+            이 문서는 <a href="https://www.w3.org/WebPlatform/WG/">Web Platform Working
+                Group</a>이 작업 초안으로 공개했다.
+            이 문서는 <abbr title="World Wide Web Consortium">W3C</abbr> 권고안이 되는 것을 목표로 한다.
+            이 문서에 대한 의견을 보내려면
+            <a href="mailto:www-dom@w3.org?subject=DOM-Parsing">www-dom@w3.org</a>
+            (<a href="mailto:www-dom-request@w3.org?subject=subscribe">구독</a>,
+            <a href="http://lists.w3.org/Archives/Public/www-dom/">아카이브</a>)로 보내고,
+            이메일 제목의 시작 부분에 <code>DOM-Parsing</code>을 포함해 달라.
+
+            모든 의견을 환영한다.
+        </p>
+        <p>
+            작업 초안으로 공개되었다고 해서 <abbr title="World Wide Web Consortium">W3C</abbr>
+            회원의 승인을 의미하지는 않는다. 이 문서는 초안 문서이며, 언제든 다른
+            문서로 업데이트, 대체 또는 폐기될 수 있다. 이 문서를 진행 중인 작업이 아닌
+            것으로 인용하는 것은 부적절하다.
+        </p>
+        <p>
+            이 문서는
+            <a id="sotd_patent" property="w3p:patentRules"
+                href="https://www.w3.org/Consortium/Patent-Policy-20040205/">2004년 2월 5일 <abbr
+                    title="World Wide Web Consortium">W3C</abbr> 특허
+                정책</a>에 따라 운영되는
+            그룹이 작성했다.
+            <abbr title="World Wide Web Consortium">W3C</abbr>는
+            해당 그룹의 산출물과 관련하여 이루어진 <a href="https://www.w3.org/2004/01/pp-impl/83482/status" rel="disclosure">모든 특허
+                공개의 공개 목록</a>을 유지한다. 해당 페이지에는 특허 공개를 위한
+            지침도 포함되어 있다. 해당 개인이
+            <a href="https://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">필수
+                청구항</a>을 포함한다고 믿는 특허에 대해 실제 지식을 가진 개인은
+            <a href="https://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure"><abbr
+                    title="World Wide Web Consortium">W3C</abbr> 특허 정책의 6절</a>에 따라
+            그 정보를 공개해야 한다.
+        </p>
+        <p>이 문서는 <a id="w3c_process_revision" href="https://www.w3.org/2015/Process-20150901/">2015년 9월 1일 <abbr
+                    title="World Wide Web Consortium">W3C</abbr> 프로세스 문서</a>의 적용을 받는다.
+        </p>
+
+    </section>
+    <nav id="toc">
+        <h2 resource="#table-of-contents" id="table-of-contents" class="introductory"><span property="xhv:role"
+                resource="xhv:heading">목차</span></h2>
+        <ul role="directory" class="toc">
+            <li class="tocline"><a class="tocxref" href="#conformance"><span class="secno">1. </span>적합성</a>
+                <ul class="toc">
+                    <li class="tocline"><a class="tocxref" href="#dependencies"><span class="secno">1.1
+                            </span>의존성</a></li>
+                    <li class="tocline"><a class="tocxref" href="#extensibility"><span class="secno">1.2
+                            </span>확장성</a></li>
+                </ul>
+            </li>
+            <li class="tocline"><a class="tocxref" href="#terminology"><span class="secno">2. </span>용어</a>
+            </li>
+            <li class="tocline"><a class="tocxref" href="#namespaces"><span class="secno">3. </span>네임스페이스</a></li>
+            <li class="tocline"><a class="tocxref" href="#parsing-and-serializing-nodes"><span class="secno">4.
+                    </span><span title="node" class="formerLink">Node</span> 구문 분석 및 직렬화</a>
+                <ul class="toc">
+                    <li class="tocline"><a class="tocxref" href="#parsing"><span class="secno">4.1 </span>구문 분석</a>
+                    </li>
+                    <li class="tocline"><a class="tocxref" href="#serializing"><span class="secno">4.2
+                            </span>직렬화</a></li>
+                </ul>
+            </li>
+            <li class="tocline"><a class="tocxref" href="#the-domparser-interface"><span class="secno">5.
+                    </span><code>DOMParser</code>
+                    인터페이스</a>
+                <ul class="toc">
+                    <li class="tocline"><a class="tocxref" href="#methods"><span class="secno">5.1 </span>메서드</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="tocline"><a class="tocxref" href="#the-xmlserializer-interface"><span class="secno">6.
+                    </span><code>XMLSerializer</code>
+                    인터페이스</a>
+                <ul class="toc">
+                    <li class="tocline"><a class="tocxref" href="#methods-1"><span class="secno">6.1 </span>메서드</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="tocline"><a class="tocxref" href="#extensions-to-the-element-interface"><span class="secno">7.
+                    </span><code><span title="element" class="formerLink">Element</span></code>
+                    인터페이스에 대한 확장</a>
+                <ul class="toc">
+                    <li class="tocline"><a class="tocxref" href="#attributes"><span class="secno">7.1
+                            </span>속성</a></li>
+                    <li class="tocline"><a class="tocxref" href="#methods-2"><span class="secno">7.2 </span>메서드</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="tocline"><a class="tocxref" href="#extensions-to-the-range-interface"><span class="secno">8.
+                    </span><code><span title="range" class="formerLink">Range</span></code>
+                    인터페이스에 대한 확장</a>
+                <ul class="toc">
+                    <li class="tocline"><a class="tocxref" href="#methods-3"><span class="secno">8.1 </span>메서드</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="tocline"><a class="tocxref" href="#revision-history"><span class="secno">A. </span>개정
+                    이력</a></li>
+            <li class="tocline"><a class="tocxref" href="#acknowledgements"><span class="secno">B.
+                    </span>감사의 말</a></li>
+            <li class="tocline"><a class="tocxref" href="#references"><span class="secno">C. </span>참고 문헌</a>
+                <ul class="toc">
+                    <li class="tocline"><a class="tocxref" href="#normative-references"><span class="secno">C.1
+                            </span>규범적 참고 문헌</a></li>
+                    <li class="tocline"><a class="tocxref" href="#informative-references"><span class="secno">C.2
+                            </span>정보성 참고 문헌</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+
+
+    <section property="bibo:hasPart" resource="#crec" typeof="bibo:Chapter" id="crec" class="introductory">
+        <h2 resource="#h-crec" id="h-crec"><span property="xhv:role" resource="xhv:heading">후보 권고안
+                종료 기준</span></h2>
+        <p>이 명세는 명세의
+            <a href="http://w3c-test.org/domparsing/">테스트 스위트</a>가 완료되고 둘 이상의
+            독립 구현이 각 테스트를 통과하기 전에는 제안 권고안으로 진행하지 않는다. 단일 구현이
+            모든 테스트를 통과해야 하는 것은 아니다. 이 기준은 2014년 10월 24일보다 이르게
+            충족되지는 않을 것으로 예상한다.
+            그룹은 또한
+            <a href="https://dvcs.w3.org/hg/innerhtml/raw-file/tip/implementationReport.html">구현 보고서</a>를 작성할 것이다.
+        </p>
+    </section>
+
+    <!-- <section id="issues" class="introductory">
+        <h1>이슈</h1>
+
+        <p class=issue>이 문서의 나머지 부분 전체에 나타나는 열린 이슈는
+        이와 같이 강조 표시된다.</p>
+    </section> -->
+
+    <section property="bibo:hasPart" resource="#conformance" typeof="bibo:Chapter" id="conformance"><!--OddPage-->
+        <h2 resource="#h-conformance" id="h-conformance"><span property="xhv:role" resource="xhv:heading"><span
+                    class="secno">1. </span>적합성</span></h2>
+        <p>
+            비규범적이라고 표시된 절뿐만 아니라, 이 명세의 모든 저작 지침, 도표, 예제,
+            및 참고 사항은 비규범적이다. 이 명세의 그 밖의 모든 것은
+            규범적이다.
+        </p>
+
+
+        <p>알고리즘의 일부로 명령형으로 표현된 요구 사항
+            (예: "선행 공백 문자를 모두 제거한다" 또는 "false를 반환하고
+            이 단계를 종료한다")은 해당 알고리즘을 도입하는 데 사용된
+            핵심 단어("must", "should", "may" 등)의 의미로
+            해석해야 한다.</p>
+
+        <p>알고리즘 또는 특정 단계로 표현된 적합성 요구 사항은
+            최종 결과가 동등하기만 하면 어떤 방식으로든 구현할 수 있다.
+            (특히 이 명세에 정의된 알고리즘은 따라가기 쉽게 의도된 것이며,
+            성능을 고려해 의도된 것은 아니다.)</p>
+
+        <p id="hardwareLimitations">사용자 에이전트는
+            예를 들어 서비스 거부 공격을 방지하거나, 메모리 부족을 막거나,
+            플랫폼별 제한을 우회하기 위해, 달리 제한되지 않은 입력에
+            구현별 제한을 부과할 수 있다.</p>
+
+        <p>메서드 또는 속성이 다른 메서드 또는 속성을 호출한다고
+            말하는 경우, 사용자 에이전트는 그 속성 또는 메서드에 대한
+            내부 API를 호출해야 하며, 예를 들어 작성자가 ECMAScript에서
+            사용자 지정 속성이나 함수로 속성 또는 메서드를 재정의하여
+            동작을 변경할 수 없도록 해야 한다.</p>
+
+        <p>달리 명시하지 않는 한, 문자열 비교는 <a href="https://www.w3.org/TR/dom/#case-sensitive" class="externalDFN"
+                title="case-sensitive">
+                대소문자를 구분하는</a> 방식으로 수행된다.</p>
+
+        <p>알고리즘이 다른 알고리즘을 호출하는 경우, 후자에서
+            던져진 모든 예외는(명시적으로 잡히지 않는 한) 전자를
+            종료시키고, 그 예외가 <em>그</em> 호출자에게 전파되도록
+            해야 한다.
+        </p>
+
+        <section property="bibo:hasPart" resource="#dependencies" typeof="bibo:Chapter" id="dependencies">
+            <h3 resource="#h-dependencies" id="h-dependencies"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">1.1 </span>의존성</span></h3>
+
+            <p>이 명세의 IDL 조각은 Web IDL 명세에 설명된
+                적합 IDL 조각에 요구되는 대로 해석해야 한다.
+                [<cite><a href="#bib-WEBIDL" class="bibref">WEBIDL</a></cite>]</p>
+
+            <p>이 명세에서 사용되는 일부 용어는
+                [<cite><a href="#bib-DOM4" class="bibref">DOM4</a></cite>], [<cite><a href="#bib-HTML5"
+                        class="bibref">HTML5</a></cite>], 및 [<cite><a href="#bib-XML10"
+                        class="bibref">XML10</a></cite>]에 정의되어 있다.
+            </p>
+        </section>
+
+        <section property="bibo:hasPart" resource="#extensibility" typeof="bibo:Chapter" id="extensibility">
+            <h3 resource="#h-extensibility" id="h-extensibility"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">1.2 </span>확장성</span></h3>
+
+            <p>이 명세에 대한 벤더별 독점 확장은
+                강하게 권장되지 않는다. 작성자는 이러한 확장을 사용해서는 안 된다.
+                그렇게 하면 상호운용성이 저하되고 사용자 기반이 분열되어,
+                특정 사용자 에이전트의 사용자만 해당 콘텐츠에 접근할 수 있게
+                되기 때문이다.</p>
+
+            <p>벤더별 확장이 필요한 경우, 향후 이 명세의 버전과의
+                충돌을 방지하기 위해 구성원에는 벤더별 문자열을
+                접두사로 붙여야 한다. 확장은 확장의 사용이 이 명세에
+                정의된 기능과 모순되거나 그 기능을 부적합하게 만들지
+                않도록 정의해야 한다.</p>
+
+            <p>이 명세에 대한 벤더 중립적 확장이 필요한 경우,
+                이 명세를 그에 맞게 업데이트하거나, 이 명세의
+                요구 사항을 재정의하는 확장 명세를 작성할 수 있다.
+                어떤 사람이 자신의 활동에 이 명세를 적용할 때 그러한
+                확장 명세의 요구 사항을 인정하기로 결정하면, 그것은
+                이 명세의 적합성 요구 사항의 목적상
+                <dfn id="dfn-other-applicable-specifications" data-dfn-type="dfn"
+                    data-lt="other applicable specifications">적용 가능한
+                    명세</dfn>가 된다.
+            </p>
+            <!-- http://www.w3.org/mid/17E341CD-E790-422C-9F9A-69347EE01CEB@iki.fi -->
+        </section>
+    </section>
+
+    <section property="bibo:hasPart" resource="#terminology" typeof="bibo:Chapter" id="terminology">
+        <!--OddPage-->
+        <h2 resource="#h-terminology" id="h-terminology"><span property="xhv:role" resource="xhv:heading"><span
+                    class="secno">2. </span>용어</span></h2>
+
+        <p><dfn id="dfn-context-object" data-dfn-type="dfn">컨텍스트 객체</dfn>라는 용어는 논의 중인
+            메서드 또는
+            속성이 호출된 객체를 의미한다.
+        </p>
+    </section>
+
+    <section property="bibo:hasPart" resource="#namespaces" typeof="bibo:Chapter" id="namespaces">
+        <!--OddPage-->
+        <h2 resource="#h-namespaces" id="h-namespaces"><span property="xhv:role" resource="xhv:heading"><span
+                    class="secno">3. </span>네임스페이스</span></h2>
+
+        <p><dfn id="dfn-html-ns" data-dfn-type="dfn" data-lt="html-ns">HTML 네임스페이스</dfn>는
+            <code>http://www.w3.org/1999/xhtml</code>이다.
+        </p>
+        <p><dfn id="dfn-xml-ns" data-dfn-type="dfn" data-lt="xml-ns">XML 네임스페이스</dfn>는
+            <code>http://www.w3.org/XML/1998/namespace</code>이다.
+        </p>
+        <p><dfn id="dfn-xmlns-ns" data-dfn-type="dfn" data-lt="xmlns-ns">XMLNS 네임스페이스</dfn>는
+            <code>http://www.w3.org/2000/xmlns/</code>이다.
+        </p>
+    </section>
+
+    <section property="bibo:hasPart" resource="#parsing-and-serializing-nodes" typeof="bibo:Chapter"
+        id="parsing-and-serializing-nodes">
+        <!--OddPage-->
+        <h2 resource="#h-parsing-and-serializing-nodes" id="h-parsing-and-serializing-nodes"><span property="xhv:role"
+                resource="xhv:heading"><span class="secno">4. </span><a href="https://www.w3.org/TR/dom/#node"
+                    title="node" class="externalDFN">Node</a> 구문 분석 및 직렬화</span></h2>
+
+        <section property="bibo:hasPart" resource="#parsing" typeof="bibo:Chapter" id="parsing">
+            <h3 resource="#h-parsing" id="h-parsing"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">4.1 </span>구문 분석</span></h3>
+
+            <p>다음 단계는
+                <dfn id="dfn-concept-parse-fragment" data-dfn-type="dfn" data-lt="concept-parse-fragment">조각
+                    구문 분석 알고리즘</dfn>을 구성하며, 그
+                인수는 <var>markup</var> 문자열과
+                <var>context element</var>이다.
+
+            </p>
+            <ol>
+                <li>
+                    <p><var>context element</var>의
+                        <a href="https://www.w3.org/TR/dom/#concept-node-document" title="concept-node-document"
+                            class="externalDFN">노드 문서</a>가
+                        <a href="https://www.w3.org/TR/dom/#html-document" title="html-document"
+                            class="externalDFN">HTML 문서</a>인 경우:
+                        <var>algorithm</var>을
+                        <a href="https://www.w3.org/TR/html5/single-page.html#html-fragment-parsing-algorithm"
+                            title="html-fragment-parsing-algorithm" class="externalDFN">HTML
+                            조각 구문 분석 알고리즘</a>으로 둔다.
+                    </p>
+
+                    <p><var>context element</var>의
+                        <a href="https://www.w3.org/TR/dom/#concept-node-document" title="concept-node-document"
+                            class="externalDFN">노드 문서</a>가
+                        <a href="https://www.w3.org/TR/dom/#xml-document" title="xml-document" class="externalDFN">XML
+                            문서</a>인 경우:
+                        <var>algorithm</var>을
+                        <a href="https://www.w3.org/TR/html5/single-page.html#xml-fragment-parsing-algorithm"
+                            title="xml-fragment-parsing-algorithm" class="externalDFN">XML
+                            조각 구문 분석 알고리즘</a>으로 둔다.
+                    </p>
+                </li>
+
+                <li><var>new children</var>을 <var>markup</var>을
+                    <var>input</var>으로, <var>context element</var>를
+                    <var><a href="https://www.w3.org/TR/html5/single-page.html#concept-frag-parse-context"
+                            title="concept-frag-parse-context" class="externalDFN">context</a></var>
+                    요소로 하여 <var>algorithm</var>을 호출한 결과로 둔다.
+                </li>
+
+                <li><var>fragment</var>를 새
+                    <code><a href="https://www.w3.org/TR/dom/#documentfragment" title="documentfragment" class="externalDFN">DocumentFragment</a></code>로
+                    두며,
+                    그
+                    <a href="https://www.w3.org/TR/dom/#concept-node-document" title="concept-node-document"
+                        class="externalDFN">노드 문서</a>는
+                    <var>context element</var>의
+                    <a href="https://www.w3.org/TR/dom/#concept-node-document" title="concept-node-document"
+                        class="externalDFN">노드 문서</a>이다.
+
+                </li>
+                <li><var>new children</var> 안의 각
+                    <a href="https://www.w3.org/TR/dom/#concept-node" title="concept-node" class="externalDFN">노드</a>를
+                    <var>fragment</var>에
+                    (<a href="https://www.w3.org/TR/dom/#concept-tree-order" title="concept-tree-order"
+                        class="externalDFN">트리 순서</a>로)
+                    <a href="https://www.w3.org/TR/dom/#concept-node-append" title="concept-node-append"
+                        class="externalDFN">추가</a>한다.
+
+                    <div class="note">
+                        <div id="h-note1" role="heading" aria-level="4" class="note-title marker"><span>참고</span>
+                        </div>
+                        <p class="">이는 새
+                            <a href="https://www.w3.org/TR/dom/#concept-node-document" title="concept-node-document"
+                                class="externalDFN">노드 문서</a>가
+                            <a href="https://www.w3.org/TR/dom/#concept-node" title="concept-node"
+                                class="externalDFN">노드</a>에 대해 올바르도록 보장한다.
+
+                        </p>
+                    </div>
+                </li>
+                <li><var>fragment</var>의 값을 반환한다.
+                </li>
+            </ol>
+        </section>
+
+        <section property="bibo:hasPart" resource="#serializing" typeof="bibo:Chapter" id="serializing">
+            <h3 resource="#h-serializing" id="h-serializing"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">4.2 </span>직렬화</span></h3>
+            <p>다음 단계는
+                <dfn id="dfn-concept-fragment-serializing-algorithm" data-dfn-type="dfn"
+                    data-lt="concept-fragment-serializing-algorithm">조각 직렬화 알고리즘</dfn>을 구성하며,
+                그 인수는
+                <code><a href="https://www.w3.org/TR/dom/#node" title="node" class="externalDFN">Node</a></code>
+                <var>node</var>와 플래그 <dfn id="dfn-concept-well-formed" data-dfn-type="dfn"
+                    data-lt="concept-well-formed">well-formed 요구</dfn>이다.
+
+            </p>
+            <ol>
+                <li><var>context document</var>를 <var>node</var>의
+                    <a href="https://www.w3.org/TR/dom/#concept-node-document" title="concept-node-document"
+                        class="externalDFN">노드 문서</a> 값으로 둔다.
+                </li>
+                <li><var>context document</var>가
+                    <a href="https://www.w3.org/TR/dom/#html-document" title="html-document" class="externalDFN">HTML
+                        문서</a>이면,
+                    <var>node</var>의 <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-html"
+                        title="concept-serialize-html">HTML 직렬화</a>를 반환한다.
+                </li>
+                <li>그렇지 않으면, <var>context document</var>는
+                    <a href="https://www.w3.org/TR/dom/#xml-document" title="xml-document" class="externalDFN">XML
+                        문서</a>이다.
+                    플래그 <var>require well-formed</var>를 전달하여
+                    <var>node</var>의 <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-xml"
+                        title="concept-serialize-xml">XML 직렬화</a>를 반환한다.
+                    <div class="note">
+                        <div id="h-note2" role="heading" aria-level="4" class="note-title marker"><span>참고</span>
+                        </div>
+                        <p class="">이 문서에 정의된 <a data-link-type="dfn" class="internalDFN"
+                                href="#dfn-concept-serialize-xml" title="concept-serialize-xml">XML 직렬화</a>는 [<cite><a
+                                    href="#bib-HTML5" class="bibref">HTML5</a></cite>]에 정의된 <a
+                                href="https://www.w3.org/TR/html5/single-page.html#xml-fragment-serialization-algorithm"
+                                title="xml-fragment-serialization-algorithm" class="externalDFN">XML 조각
+                                직렬화 알고리즘</a>의 요구 사항을 따른다.</p>
+                    </div>
+                </li>
+            </ol>
+
+            <p>
+                <code><a href="https://www.w3.org/TR/dom/#node" title="node" class="externalDFN">Node</a></code>
+                <var>node</var>의 <dfn id="dfn-concept-serialize-html" data-dfn-type="dfn"
+                    data-lt="concept-serialize-html">HTML 직렬화</dfn>를 생성하려면, 사용자 에이전트는
+                <var>node</var>에 대해
+                <a href="https://www.w3.org/TR/html5/single-page.html#html-fragment-serialization-algorithm"
+                    title="html-fragment-serialization-algorithm" class="externalDFN">HTML
+                    조각 직렬화 알고리즘</a> [<cite><a href="#bib-HTML5" class="bibref">HTML5</a></cite>]을
+                실행하고 생성된 문자열을 반환해야 한다.
+
+            </p>
+            <p>
+                <code><a href="https://www.w3.org/TR/dom/#node" title="node" class="externalDFN">Node</a></code>
+                <var>node</var>의 <dfn id="dfn-concept-serialize-xml" data-dfn-type="dfn"
+                    data-lt="concept-serialize-xml">XML
+                    직렬화</dfn>를
+                플래그 <var>require well-formed</var>가 주어진 상태에서 생성하려면, 다음 단계를 실행한다.
+            </p>
+            <ol>
+                <li><dfn id="dfn-concept-context-namespace" data-dfn-type="dfn" data-lt="concept-context-namespace">컨텍스트
+                        네임스페이스</dfn>를 <code>null</code>로 둔다.
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-context-namespace"
+                        title="concept-context-namespace">컨텍스트 네임스페이스</a>는
+                    <var>node</var>가 부모와 다른 기본 네임스페이스 정의를 직렬화할 때 변경된다. 이
+                    알고리즘은 시작 시 네임스페이스가 없다고 가정한다.
+                </li>
+                <li><dfn id="dfn-concept-namespace-prefix-map" data-dfn-type="dfn"
+                        data-lt="concept-namespace-prefix-map">네임스페이스 접두사 맵</dfn>을
+                    <code>namespaceURI</code>와 네임스페이스 <code>prefix</code> 쌍을 연결하기 위한 새 맵으로 둔다. 여기서
+                    <code>namespaceURI</code> 값은 맵의 키이고, <code>prefix</code> 값은
+                    맵의 키 값이다. <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                        title="concept-namespace-prefix-map">네임스페이스 접두사
+                        맵</a>은
+                    하위 트리에 대해 이전에 나타난 namespaceURI와 그 가장 최근의 접두사 연결로 채워진다.
+                    <span class="note"><strong>참고:</strong>
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                            title="concept-namespace-prefix-map">네임스페이스 접두사 맵</a>은 주어진 namespaceURI에 대해
+                        하나의 접두사 값만 연결한다. 직렬화 중 같은 namespaceURI에 매핑되는 다른 네임스페이스 접두사가
+                        발견되면, 마지막으로 만난 것이 맵의 기존 키 값을 새 접두사 값으로 바꾸어 "이긴다".</span>
+                </li>
+                <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                        title="concept-namespace-prefix-map">네임스페이스 접두사 맵</a>을
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-xml-ns" title="xml-ns">XML 네임스페이스</a> 키와
+                    문자열 "<code>xml</code>"을 키 값으로 하여 초기화한다.
+                </li>
+                <li><dfn id="dfn-concept-generated-prefix" data-dfn-type="dfn" data-lt="concept-generated-prefix">생성된
+                        네임스페이스 접두사 인덱스</dfn>를
+                    값이 <code>1</code>인 정수로 둔다. <a data-link-type="dfn" class="internalDFN"
+                        href="#dfn-concept-generated-prefix" title="concept-generated-prefix">생성된 네임스페이스
+                        접두사 인덱스</a>는 <var>node</var>의 namespaceURI(또는 <var>node</var>의 속성 중 하나의 namespaceURI)를
+                    직렬화하는 데 적절한 기존 네임스페이스 접두사를 사용할 수 없을 때 새 고유 접두사 값을 생성하는 데 사용된다.
+                    <span class="note">
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generate-prefix"
+                            title="concept-generate-prefix">접두사 생성</a> 알고리즘을 보라.</span>
+                </li>
+                <li><var>node</var>에 대해 <a data-link-type="dfn" class="internalDFN"
+                        href="#dfn-concept-context-namespace" title="concept-context-namespace">컨텍스트
+                        네임스페이스</a>, <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                        title="concept-namespace-prefix-map">네임스페이스 접두사
+                        맵</a>,
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generated-prefix"
+                        title="concept-generated-prefix">생성된 네임스페이스 접두사 인덱스</a> 참조 및
+                    플래그 <var>require well-formed</var>를 전달하여 <a data-link-type="dfn" class="internalDFN"
+                        href="#dfn-concept-xml-serialization-algorithm" title="concept-xml-serialization-algorithm">XML
+                        직렬화
+                        알고리즘</a>을 실행한 결과를 반환한다. 알고리즘 실행 중 <dfn id="dfn-concept-algorithm-exception" data-dfn-type="dfn"
+                        data-lt="concept-algorithm-exception">예외</dfn>가
+                    발생하면, 그 예외를 잡고
+                    이름이
+                    "<code><a href="https://www.w3.org/TR/dom/#invalidstateerror" title="invalidstateerror" class="externalDFN">InvalidStateError</a></code>"인
+                    <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                    던진다.
+                </li>
+            </ol>
+
+            <p><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-xml"
+                    title="concept-serialize-xml">XML 직렬화</a>는 다음과 같은 방식에서
+                <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-html"
+                    title="concept-serialize-html">HTML 직렬화</a>와 다르다.
+            </p>
+            <ul>
+                <li><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">요소</a>와
+                    <a href="https://www.w3.org/TR/dom/#concept-attribute" title="concept-attribute"
+                        class="externalDFN">속성</a>은
+                    항상 그 namespaceURI가 보존되도록 직렬화된다. 경우에 따라 이는 기존 접두사, 접두사 선언 속성 또는
+                    기본 네임스페이스 선언 속성이 삭제, 대체 또는 변경될 수 있음을 의미한다.
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-html"
+                        title="concept-serialize-html">HTML 직렬화</a>는
+                    namespaceURI를 보존하려고 시도하지 않는다.
+                </li>
+                <li><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">요소</a>가
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns" title="html-ns">HTML 네임스페이스</a>에
+                    속하지 않고
+                    <a href="https://www.w3.org/TR/dom/#concept-tree-child" title="concept-tree-child"
+                        class="externalDFN">자식</a>을 포함하지 않는 경우,
+                    자체 닫힘 태그 구문(즉, [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]의
+                    <code>EmptyElemTag</code> 생성식에 따른 구문)을 사용하여 직렬화된다.
+                </li>
+            </ul>
+
+            <p>그 밖의 경우, <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-xml"
+                    title="concept-serialize-xml">XML 직렬화</a>를 생성하는 알고리즘은
+                <a href="https://www.w3.org/TR/html5/single-page.html#html-parser" title="html-parser"
+                    class="externalDFN">HTML 파서</a>와 호환되는 직렬화를 생성하도록 설계되어 있다. 예를 들어,
+                자식 노드를 포함하지 않는 <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns" title="html-ns">HTML
+                    네임스페이스</a>의 요소는
+                자체 닫힘 태그 구문을 사용하지 않고 명시적인 시작 태그와 종료 태그로 직렬화된다 [<cite><a href="#bib-XML10"
+                        class="bibref">XML10</a></cite>].
+
+            </p>
+            <div class="note">
+                <div id="h-note3" role="heading" aria-level="4" class="note-title marker"><span>참고</span></div>
+                <p class="">[<cite><a href="#bib-DOM4" class="bibref">DOM4</a></cite>]에 따르면,
+                    <code><a href="https://www.w3.org/TR/dom/#interface-attr" title="interface-attr" class="externalDFN">Attr</a></code>
+                    객체는
+                    <code><a href="https://www.w3.org/TR/dom/#node" title="node" class="externalDFN">Node</a></code>를
+                    상속하지 않으므로
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-xml-serialization-algorithm"
+                        title="concept-xml-serialization-algorithm">XML
+                        직렬화 알고리즘</a>으로 직렬화할 수 없다.
+                    <code><a href="https://www.w3.org/TR/dom/#interface-attr" title="interface-attr" class="externalDFN">Attr</a></code>
+                    객체를 직렬화하려고 시도하면 <code>TypeError</code> 예외가 발생한다 [<cite><a href="#bib-WEBIDL"
+                            class="bibref">WEBIDL</a></cite>].
+
+                </p>
+            </div>
+            <p><var>node</var>에 대해 <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-context-namespace"
+                    title="concept-context-namespace">컨텍스트 네임스페이스</a>
+                <var>namespace</var>, <a data-link-type="dfn" class="internalDFN"
+                    href="#dfn-concept-namespace-prefix-map" title="concept-namespace-prefix-map">네임스페이스 접두사
+                    맵</a>
+                <var>prefix map</var>, <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generated-prefix"
+                    title="concept-generated-prefix">생성된 네임스페이스 접두사
+                    인덱스</a>
+                <var>prefix index</var>, 및 플래그 <var>require well-formed</var>가 주어진 상태에서
+                <dfn id="dfn-concept-xml-serialization-algorithm" data-dfn-type="dfn"
+                    data-lt="concept-xml-serialization-algorithm">XML 직렬화 알고리즘</dfn>을 실행하려면, 사용자 에이전트는
+                <var>node</var>의 인터페이스에 따라 적절한 단계를 실행해야 한다.
+            </p>
+
+            <dl class="switch">
+                <dt><code><a href="https://www.w3.org/TR/dom/#interface-element" title="interface-element" class="externalDFN">Element</a></code>
+                </dt>
+                <dd>
+                    <p>다음 알고리즘을 실행한다.
+                    </p>
+                    <ol>
+                        <!-- "namespace" was passed via the caller, it's the default namespace scope -->
+                        <!-- "prefix map" was passed via the caller, it's the namespace->prefix map -->
+                        <!-- "prefix index" was passed via the caller, it's a number for generating prefixes if necessary -->
+                        <!-- "require well-formed" was passed via the caller, it's a flag (true/false) for whether certain validation steps should be taken during serialization. -->
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                                title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                            <code>true</code>), 이 <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                            속성이 문자 "<code>:</code>"(U+003A COLON)를 포함하거나 XML <code>Name</code> 생성식
+                            [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과 일치하지 않으면,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                                title="concept-algorithm-exception">예외를
+                                던진다</a>. 이 <var>node</var>의 직렬화는 well-formed 요소가 되지 않는다.
+                        </li>
+                        <li><var>markup</var>을 문자열 "<code>&lt;</code>"(U+003C LESS-THAN SIGN)로 둔다.
+                        </li>
+                        <li><var>qualified name</var>을 빈 문자열로 둔다.
+                        </li>
+                        <li><var>skip end tag</var> 플래그의 값을 <code>false</code>로 둔다.
+                        </li>
+                        <li><var>ignore namespace definition attribute</var> 플래그의 값을
+                            <code>false</code>로 둔다.
+                        </li>
+                        <li><var>map</var>을 <var>prefix map</var>의 복사본으로 둔다.
+                        </li>
+                        <li><var>element prefixes list</var>를 빈 목록으로 둔다. <span class="note">이 목록은
+                                각 요소에 로컬이다. 그 목적은 새 네임스페이스 접두사 속성을 생성해야 할 때
+                                충돌하는 접두사가 없도록 보장하는 것이다.</span>
+                        </li>
+                        <li><var>duplicate prefix definition</var>을 <code>null</code>로 둔다.
+                        </li>
+                        <li><var>local default namespace</var>를
+                            <var>map</var>, <var>element prefixes list</var>, 및
+                            <var>duplicate prefix definition</var>이 주어진 <var>node</var>에 대해
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-record-namespace-info"
+                                title="concept-record-namespace-info">네임스페이스 정보 기록</a>을 수행한 결과로 둔다.
+                            <div class="note">
+                                <div id="h-note4" role="heading" aria-level="4" class="note-title marker">
+                                    <span>참고</span>
+                                </div>
+                                <p class="">위 단계는 발견된 모든 네임스페이스 접두사
+                                    정의로 <var>map</var>을 업데이트하고, 발견된 접두사 정의를
+                                    <var>element prefixes list</var>에 추가하며, 선택적으로
+                                    <var>duplicate prefix definition</var> 값을 설정하고, 기본 네임스페이스
+                                    속성이 존재하면 그 속성이 정의한 로컬 기본 네임스페이스 값을 반환한다.
+                                    그렇지 않으면 <code>null</code>을 반환한다.
+                                </p>
+                            </div>
+                        </li>
+                        <li><var>inherited ns</var>를 <var>namespace</var>의 복사본으로 둔다.
+                        </li>
+                        <li><var>ns</var>를 <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-namespaceuri" title="dom-element-namespaceuri" class="externalDFN">namespaceURI</a></code>
+                            속성 값으로 둔다.
+                        </li>
+                        <li><var>inherited ns</var>가 <var>ns</var>와 같으면:
+                            <ol>
+                                <li><var>local default namespace</var>가 <code>null</code>이 아니면,
+                                    <var>ignore namespace definition attribute</var>를 <code>true</code>로 설정한다.
+                                </li>
+                                <li><var>ns</var>가 <a data-link-type="dfn" class="internalDFN" href="#dfn-xml-ns"
+                                        title="xml-ns">XML 네임스페이스</a>이면,
+                                    <var>qualified name</var>을 문자열 "<code>xml:</code>"와 <var>node</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                                    값의 연결로 둔다.
+                                </li>
+                                <li>그렇지 않으면, <var>qualified name</var>을 <var>node</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                                    속성 값으로 둔다.
+                                    <span class="note"><var>node</var>의 접두사는 항상 삭제된다.</span>
+                                </li>
+                                <li><var>qualified name</var>의 값을 <var>markup</var>에 추가한다.
+                                </li>
+                            </ol>
+                        </li>
+                        <li>그렇지 않으면, <var>inherited ns</var>는 <var>ns</var>와 같지 않다
+                            (<var>node</var> 자신의 네임스페이스가 그 부모의 컨텍스트 네임스페이스와 다르다).
+                            다음 하위 단계를 실행한다.
+                            <!-- The serialization algorithm must differentiate this node's namespace from it's parent's default
+                        namespace. There are two ways to do this: (1) [preferred due to assumed minimum length] use a
+                        namespace prefix if one is available or (2) use a default namespace declaration. Both cases can
+                        run into conflicts with existing attributes on the element and are handled accordingly. -->
+                            <ol>
+                                <li><var>prefix</var>를 <var>node</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-element-prefix" title="dom-element-prefix" class="externalDFN">prefix</a></code>
+                                    속성 값으로 둔다.
+                                </li>
+                                <li><var>candidate prefix</var>를 <var>ns</var>의 값과 일치하는 키가
+                                    <var>map</var>에 존재하는 경우 <var>map</var>의 값으로 두고, 그러한 키가 없으면
+                                    <var>candidate prefix</var>를 <code>null</code>로 둔다.
+                                    <!-- Found a suitable prefix to use, either locally, or inherited through a parent node that
+                            matches the node's namespaceURI. This prefix will be used in serialization even if the node
+                            doesn't have a real prefix. -->
+                                </li>
+                                <li><var>candidate prefix</var>가 <code>null</code>이 아니면
+                                    (<var>ns</var>에 매핑되는 적절한 네임스페이스 접두사가 정의되어 있으면):
+                                    <ol>
+                                        <li><var>qualified name</var>을 <var>candidate
+                                                prefix</var>,
+                                            "<code>:</code>"(U+003A COLON), 및 <var>node</var>의 <code>
+                                <a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>의
+                                            연결로 둔다.
+                                            <span class="note">이 <var>node</var> 또는
+                                                <var>node</var>의 조상에는 <var>node</var>의
+                                                네임스페이스를 정의하는 네임스페이스 접두사 정의가 존재한다.</span>
+                                        </li>
+                                        <li><var>local default namespace</var>가 <code>null</code>이 아니면
+                                            (로컬로 정의된 기본 네임스페이스 선언 속성이 존재하면),
+                                            <var>inherited ns</var>가
+                                            <var>ns</var>의 값을 갖게 한다.
+                                        </li>
+                                        <li><var>qualified name</var>의 값을 <var>markup</var>에 추가한다.
+                                        </li>
+                                    </ol>
+                                    <!-- Now there's no existing namespace->prefix mapping to override; try to use a prefix: -->
+                                </li>
+                                <li>그렇지 않고, <var>prefix</var>가 <code>null</code>이 아니고
+                                    <var>local default namespace</var>가
+                                    <code>null</code>이면:
+                                    <ol>
+                                        <li><var>element prefixes list</var>가
+                                            <var>prefix</var>의 값을 포함하면,
+                                            <var>prefix</var>를
+                                            <a data-link-type="dfn" class="internalDFN"
+                                                href="#dfn-concept-generate-prefix" title="concept-generate-prefix">접두사
+                                                생성</a>의 결과로 둔다. 이때 입력으로
+                                            <a data-link-type="dfn" class="internalDFN"
+                                                href="#dfn-concept-namespace-prefix-map"
+                                                title="concept-namespace-prefix-map">네임스페이스 접두사 맵</a>
+                                            <var>map</var>,
+                                            <var>node</var>의 <var>ns</var> 문자열, 및 <var>prefix index</var>
+                                            정수를 제공한다.
+                                        </li>
+                                        <li>그렇지 않으면, <var>map</var>에 새 키 <var>ns</var>를 추가하고 그 키 값은
+                                            <var>prefix</var>로 한다.
+                                            <!-- Prefix is now either real or generated, and added to the map. -->
+                                        </li>
+                                        <li><var>qualified name</var>을
+                                            <var>prefix</var>, "<code>:</code>"(U+003A COLON), 및 <var>node</var>의
+                                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>의
+                                            연결로 둔다.
+                                        </li>
+                                        <li><var>qualified name</var>의 값을 <var>markup</var>에 추가한다.
+                                        </li>
+                                        <li>다음을 나열된 순서대로 <var>markup</var>에 추가한다. <span class="note">다음은
+                                                방금 <var>map</var>에 추가된 새 네임스페이스/접두사 연결을
+                                                직렬화한다.</span>
+                                            <ol>
+                                                <li>"<code> </code>" (U+0020 SPACE);
+                                                </li>
+                                                <li>문자열 "<code>xmlns:</code>";
+                                                </li>
+                                                <li><var>prefix</var>의 값;
+                                                </li>
+                                                <li>"<code>="</code>" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
+                                                </li>
+                                                <li><var>ns</var>와 <a data-link-type="dfn" class="internalDFN"
+                                                        href="#dfn-concept-well-formed"
+                                                        title="concept-well-formed">require well-formed</a> 플래그를
+                                                    입력으로 주어 <a data-link-type="dfn" class="internalDFN"
+                                                        href="#dfn-concept-serialize-attr-value"
+                                                        title="concept-serialize-attr-value">속성 값
+                                                        직렬화</a>를 수행한 결과;
+                                                </li>
+                                                <li>"<code>"</code>" (U+0022 QUOTATION MARK).
+                                                </li>
+                                            </ol>
+                                        </li>
+                                    </ol>
+                                    <!-- Giving up on the prefix route, try to use a default namespace instead (stomping on an existing
+                             one if necessary) and dropping the node's prefix -->
+                                </li>
+                                <li>그렇지 않고, <var>local default namespace</var>가 <code>null</code>이거나,
+                                    <var>local default
+                                        namespace</var>가 <code>null</code>이 아니고 그 값이
+                                    <var>ns</var>와 같지 않으면:
+                                    <ol>
+                                        <li><var>ignore namespace definition attribute</var> 플래그를
+                                            <code>true</code>로 설정한다.
+                                        </li>
+                                        <li><var>qualified name</var>을 <var>node</var>의
+                                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                                            속성 값으로 둔다.
+                                        </li>
+                                        <li><var>inherited ns</var>의 값을 <var>ns</var>로 둔다. <span class="note">새
+                                                기본 네임스페이스는 직렬화에서 이 <var>node</var>의
+                                                네임스페이스를 정의하고 그 <a href="https://www.w3.org/TR/dom/#concept-tree-child"
+                                                    title="concept-tree-child" class="externalDFN">자식</a>의
+                                                컨텍스트 네임스페이스로 작동하는 데 사용된다.</span>
+                                        </li>
+                                        <li><var>qualified name</var>의 값을 <var>markup</var>에 추가한다.
+                                        </li>
+                                        <li>다음을 나열된 순서대로 <var>markup</var>에 추가한다. <span class="note">다음은
+                                                새(또는 대체) 기본 네임스페이스 정의를 직렬화한다.</span>
+                                            <ol>
+                                                <li>"<code> </code>" (U+0020 SPACE);
+                                                </li>
+                                                <li>문자열 "<code>xmlns</code>";
+                                                </li>
+                                                <li>"<code>="</code>" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
+                                                </li>
+                                                <li><var>ns</var>와 <a data-link-type="dfn" class="internalDFN"
+                                                        href="#dfn-concept-well-formed"
+                                                        title="concept-well-formed">require well-formed</a> 플래그를
+                                                    입력으로 주어 <a data-link-type="dfn" class="internalDFN"
+                                                        href="#dfn-concept-serialize-attr-value"
+                                                        title="concept-serialize-attr-value">속성 값
+                                                        직렬화</a>를 수행한 결과;
+                                                </li>
+                                                <li>"<code>"</code>" (U+0022 QUOTATION MARK).
+                                                </li>
+                                            </ol>
+                                        </li>
+                                    </ol>
+                                    <!-- Finally, regardless of prefix, the node has a local default namespace that matches 'ns'.
+                            So, we'll just use that and drop the prefix -->
+                                </li>
+                                <li>그렇지 않으면, <var>node</var>는 <var>ns</var>와 일치하는
+                                    <var>local default namespace</var>를 가진다. <var>qualified name</var>을
+                                    <var>node</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                                    값으로 두고,
+                                    <var>inherited ns</var>의 값을 <var>ns</var>로 두며, <var>qualified name</var>의 값을
+                                    <var>markup</var>에 추가한다.
+                                </li>
+                            </ol>
+                        </li>
+                        <li><var>map</var>인
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                                title="concept-namespace-prefix-map">네임스페이스 접두사 맵</a>,
+                            <var>prefix index</var>인
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generated-prefix"
+                                title="concept-generated-prefix">생성된 접두사 인덱스</a>, 플래그
+                            <var>ignore namespace definition attribute</var> 및 <var>duplicate
+                                prefix definition</var>의 값이 주어진
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-xml-attributes"
+                                title="concept-serialize-xml-attributes"><var>node</var> 속성의
+                                XML 직렬화</a> 결과를 <var>markup</var>에 추가한다.
+                        </li>
+                        <li><var>ns</var>가 <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns"
+                                title="html-ns">HTML 네임스페이스</a>이고,
+                            <var>node</var>의
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-child" title="concept-tree-child"
+                                class="externalDFN">자식</a>
+                            목록이 비어 있으며, <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>이
+                            다음
+                            <a href="https://www.w3.org/TR/html5/single-page.html#void-elements" title="void-elements"
+                                class="externalDFN">void 요소</a> 중 하나와 일치하면:
+                            "<code>area</code>",
+                            "<code>base</code>",
+                            "<code>basefont</code>",
+                            "<code>bgsound</code>",
+                            "<code>br</code>",
+                            "<code>col</code>",
+                            "<code>embed</code>",
+                            "<code>frame</code>",
+                            "<code>hr</code>",
+                            "<code>img</code>",
+                            "<code>input</code>",
+                            "<code>keygen</code>",
+                            "<code>link</code>",
+                            "<code>menuitem</code>",
+                            "<code>meta</code>",
+                            "<code>param</code>",
+                            "<code>source</code>",
+                            "<code>track</code>",
+                            "<code>wbr</code>";
+                            그런 다음 다음을 나열된 순서대로 <var>markup</var>에 추가한다.
+                            <ol>
+                                <li>"<code> </code>" (U+0020 SPACE);
+                                </li>
+                                <li>"<code>/</code>" (U+002F SOLIDUS).
+                                </li>
+                            </ol>
+                            그리고 <var>skip end tag</var> 플래그를 <code>true</code>로 설정한다.
+                        </li>
+                        <li><var>ns</var>가 <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns"
+                                title="html-ns">HTML 네임스페이스</a>가
+                            아니고, <var>node</var>의
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-child" title="concept-tree-child"
+                                class="externalDFN">자식</a>
+                            목록이 비어 있으면, "<code>/</code>"(U+002F SOLIDUS)를 <var>markup</var>에 추가하고
+                            <var>skip end tag</var> 플래그를 <code>true</code>로 설정한다.
+                        </li>
+                        <li>"<code>&gt;</code>"(U+003E GREATER-THAN SIGN)를 <var>markup</var>에 추가한다.
+                        </li>
+                        <li><var>skip end tag</var>의 값이 <code>true</code>이면,
+                            <var>markup</var>의 값을 반환하고 나머지 단계를 건너뛴다.
+                            <var>node</var>는 리프 노드이다.
+                        </li>
+                        <li><var>ns</var>가 <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns"
+                                title="html-ns">HTML 네임스페이스</a>이고, <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>이
+                            문자열 "<code>template</code>"과 일치하면, 이는
+                            <code><a href="https://www.w3.org/TR/html5/single-page.html#the-template-element" title="the-template-element" class="externalDFN">template</a></code>
+                            요소이다.
+                            <a href="https://www.w3.org/TR/html5/single-page.html#the-template-element"
+                                title="the-template-element" class="externalDFN">template</a> 요소의
+                            <a href="https://www.w3.org/TR/html5/single-page.html#template-contents"
+                                title="template-contents" class="externalDFN">template 콘텐츠</a>
+                            (
+                            <code><a href="https://www.w3.org/TR/dom/#interface-documentfragment" title="interface-documentfragment" class="externalDFN">DocumentFragment</a></code>)에
+                            대해
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-context-namespace"
+                                title="concept-context-namespace">컨텍스트 네임스페이스</a>에는
+                            <var>inherited ns</var>의 값을 제공하고,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                                title="concept-namespace-prefix-map">네임스페이스
+                                접두사 맵</a>에는 <var>map</var>을 제공하며,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generated-prefix"
+                                title="concept-generated-prefix">생성된 네임스페이스 접두사 인덱스</a>에는
+                            <var>prefix index</var>를 제공하고, <var>require well-formed</var> 플래그의 값을 제공하여
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-xml-serialization-algorithm"
+                                title="concept-xml-serialization-algorithm">XML 직렬화 알고리즘</a>을 실행한 결과를
+                            <var>markup</var>에 추가한다. <span class="note">이는
+                                <a href="https://www.w3.org/TR/html5/single-page.html#parsing-xhtml-documents"
+                                    title="parsing-xhtml-documents" class="externalDFN">XHTML 문서 구문 분석</a>
+                                [<cite><a href="#bib-HTML5" class="bibref">HTML5</a></cite>]의 규칙이 주어졌을 때,
+                                <a href="https://www.w3.org/TR/html5/single-page.html#template-contents"
+                                    title="template-contents" class="externalDFN">template 콘텐츠</a>가
+                                왕복할 수 있도록 한다.</span>
+                        </li>
+                        <li>그렇지 않으면, <var>node</var>의 각
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-child" title="concept-tree-child"
+                                class="externalDFN">자식</a>에 대해
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-order" title="concept-tree-order"
+                                class="externalDFN">트리 순서</a>로,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-context-namespace"
+                                title="concept-context-namespace">컨텍스트 네임스페이스</a>에는
+                            <var>inherited ns</var>의 값을 제공하고,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                                title="concept-namespace-prefix-map">네임스페이스
+                                접두사 맵</a>에는 <var>map</var>을 제공하며,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generated-prefix"
+                                title="concept-generated-prefix">생성된 네임스페이스 접두사 인덱스</a>에는
+                            <var>prefix index</var>를 제공하고, <var>require well-formed</var> 플래그의 값을 제공하여
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-xml-serialization-algorithm"
+                                title="concept-xml-serialization-algorithm">XML 직렬화 알고리즘</a>을 실행한 결과를
+                            <var>markup</var>에 추가한다.
+                        </li>
+                        <li>다음을 나열된 순서대로 <var>markup</var>에 추가한다.
+                            <ol>
+                                <li>"<code>&lt;/</code>" (U+003C LESS-THAN SIGN, U+002F SOLIDUS);
+                                </li>
+                                <li><var>qualified name</var>의 값;
+                                </li>
+                                <li>"<code>&gt;</code>" (U+003E GREATER-THAN SIGN).
+                                </li>
+                            </ol>
+                        </li>
+                        <li><var>markup</var>의 값을 반환한다.
+                        </li>
+                    </ol>
+
+                </dd>
+                <dt><code><a href="https://www.w3.org/TR/dom/#interface-document" title="interface-document" class="externalDFN">Document</a></code>
+                </dt>
+                <dd>
+                    <p><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                            title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                        <code>true</code>), 이 <var>node</var>에
+                        <code><a href="https://www.w3.org/TR/dom/#dom-document-documentelement" title="dom-document-documentelement" class="externalDFN">documentElement</a></code>가
+                        없으면
+                        (
+                        <code><a href="https://www.w3.org/TR/dom/#dom-document-documentelement" title="dom-document-documentelement" class="externalDFN">documentElement</a></code>
+                        속성의 값이 <code>null</code>이면), <a data-link-type="dfn" class="internalDFN"
+                            href="#dfn-concept-algorithm-exception" title="concept-algorithm-exception">예외를
+                            던진다</a>. 이 <var>node</var>의 직렬화는 well-formed 문서가 되지 않는다.
+                    </p>
+                    <p>그렇지 않으면, 다음 단계를 실행한다.
+                    </p>
+                    <ol>
+                        <li><var>serialized document</var>를 빈 문자열로 둔다.
+                        </li>
+                        <li><var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-document-doctype" title="dom-document-doctype" class="externalDFN">doctype</a></code>
+                            속성이 <code>null</code>이 아니면, <var>require well-formed</var> 플래그가 제공된
+                            <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-document-doctype" title="dom-document-doctype" class="externalDFN">doctype</a></code>
+                            속성의
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-doctype"
+                                title="concept-serialize-doctype">DocumentType 직렬화 생성</a> 단계를 실행하여
+                            생성된 문자열을 <var>serialized document</var>에 추가한다.
+                        </li>
+                        <li><var>node</var>의 각
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-child" title="concept-tree-child"
+                                class="externalDFN">자식</a>
+                            <var>child</var>에 대해
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-order" title="concept-tree-order"
+                                class="externalDFN">트리 순서</a>로,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-context-namespace"
+                                title="concept-context-namespace">컨텍스트
+                                네임스페이스</a>
+                            <var>namespace</var>, <a data-link-type="dfn" class="internalDFN"
+                                href="#dfn-concept-namespace-prefix-map" title="concept-namespace-prefix-map">네임스페이스
+                                접두사 맵</a>
+                            <var>prefix map</var>, <a data-link-type="dfn" class="internalDFN"
+                                href="#dfn-concept-generated-prefix" title="concept-generated-prefix">생성된
+                                네임스페이스 접두사 인덱스</a> <var>prefix index</var>에 대한 참조, 플래그 <var>require well-formed</var>가
+                            주어진 <var>child</var>에 대해
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-xml-serialization-algorithm"
+                                title="concept-xml-serialization-algorithm">XML 직렬화 알고리즘</a>을
+                            실행하고, 그 결과를 <var>serialized document</var>에 추가한다.
+                        </li>
+                        <li><var>serialized document</var>의 값을 반환한다.
+                        </li>
+                    </ol>
+
+                </dd>
+                <dt><code><a href="https://www.w3.org/TR/dom/#interface-comment" title="interface-comment" class="externalDFN">Comment</a></code>
+                </dt>
+                <dd>
+                    <p><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                            title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                        <code>true</code>), <var>node</var>의
+                        <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>가
+                        XML <code>Char</code> 생성식 [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과 일치하지 않는
+                        문자를 포함하거나,
+                        "<code>--</code>"(인접한 두 U+002D HYPHEN-MINUS 문자)를 포함하거나,
+                        "<code>-</code>"(U+002D HYPHEN-MINUS) 문자로 끝나면,
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                            title="concept-algorithm-exception">예외를 던진다</a>. 이
+                        <var>node</var>의
+                        <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>
+                        직렬화는 well-formed가 되지 않는다.
+                    </p>
+                    <p>"<code>&lt;!--</code>", <var>node</var>의
+                        <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>,
+                        및
+                        "<code>--&gt;</code>"의 연결을 반환한다.
+
+                        <!-- Removing CDATA Serialization steps as this interface type is removed from DOM4:
+            <dt><code><a title="cdata" data-spec="DOML2" class="externalDFN">CDATASection</a></code>
+            <dd><ol>
+                <li>Let <var>markup</var> be the concatenation of "<code>&lt;![CDATA[</code>",
+                    <var>node</var>'s <code><a title="dom-characterdata-data" data-spec="DOM4"
+                    class="externalDFN">data</a></code>, and "<code>]]></code>".
+                <li>Return the value of <var>markup</var>.
+              </ol>
+
+              <p class=note>CDATASection objects may be created by the historical
+            <code>document.createCDATASection</code> API, or as a result of parsing an
+            <a title="xml-document" data-spec="DOM4" class="externalDFN">XML document</a>.
+            -->
+
+                    </p>
+                </dd>
+                <dt><code><a href="https://www.w3.org/TR/dom/#interface-text" title="interface-text" class="externalDFN">Text</a></code>
+                </dt>
+                <dd>
+                    <ol>
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                                title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                            <code>true</code>), <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>가
+                            XML <code>Char</code> 생성식 [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과 일치하지
+                            않는 문자를 포함하면,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                                title="concept-algorithm-exception">예외를 던진다</a>. 이
+                            <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>
+                            직렬화는 well-formed가 되지 않는다.
+                        </li>
+                        <li><var>markup</var>을 <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>
+                            값으로 둔다.
+
+                        </li>
+                        <li><var>markup</var> 안의 "<code>&amp;</code>" 발생을 모두
+                            "<code>&amp;amp;</code>"로 바꾼다.
+
+                        </li>
+                        <li><var>markup</var> 안의 "<code>&lt;</code>" 발생을 모두
+                            "<code>&amp;lt;</code>"로 바꾼다.
+
+                        </li>
+                        <li><var>markup</var> 안의 "<code>&gt;</code>" 발생을 모두
+                            "<code>&amp;gt;</code>"로 바꾼다.
+
+                        </li>
+                        <li><var>markup</var>의 값을 반환한다.
+                        </li>
+                    </ol>
+                </dd>
+                <dt><code><a href="https://www.w3.org/TR/dom/#interface-documentfragment" title="interface-documentfragment" class="externalDFN">DocumentFragment</a></code>
+                </dt>
+                <dd>
+                    <ol>
+                        <li><var>markup</var>을 빈 문자열로 둔다.
+
+                        </li>
+                        <li><var>node</var>의 각
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-child" title="concept-tree-child"
+                                class="externalDFN">자식</a>
+                            <var>child</var>에 대해
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-order" title="concept-tree-order"
+                                class="externalDFN">트리 순서</a>로,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-context-namespace"
+                                title="concept-context-namespace">컨텍스트 네임스페이스</a> <var>namespace</var>,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                                title="concept-namespace-prefix-map">네임스페이스 접두사 맵</a> <var>prefix map</var>,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generated-prefix"
+                                title="concept-generated-prefix">생성된
+                                네임스페이스 접두사 인덱스</a>
+                            <var>prefix index</var>에 대한 참조, 및 플래그 <var>require well-formed</var>가 주어진
+                            <var>child</var>에 대해
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-xml-serialization-algorithm"
+                                title="concept-xml-serialization-algorithm">XML 직렬화 알고리즘</a>을
+                            실행한다. 그 결과를 <var>markup</var>에 연결한다.
+                        </li>
+                        <li><var>markup</var>의 값을 반환한다.
+                        </li>
+                    </ol>
+
+                </dd>
+                <dt><code><a href="https://www.w3.org/TR/dom/#interface-documenttype" title="interface-documenttype" class="externalDFN">DocumentType</a></code>
+                </dt>
+                <dd><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                        title="concept-well-formed">require well-formed</a>
+                    플래그가 주어진 <var>node</var>의
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-doctype"
+                        title="concept-serialize-doctype">DocumentType
+                        직렬화 생성</a> 단계를 실행하고, 이것이 생성한 문자열을 반환한다.
+
+                </dd>
+                <dt><code><a href="https://www.w3.org/TR/dom/#interface-processinginstruction" title="interface-processinginstruction" class="externalDFN">ProcessingInstruction</a></code>
+                </dt>
+                <dd>
+                    <ol>
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                                title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                            <code>true</code>), <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-processinginstruction-target" title="dom-processinginstruction-target" class="externalDFN">target</a></code>이
+                            "<code>:</code>"(U+003A COLON) 문자를 포함하거나 문자열 "<code>xml</code>"과
+                            <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a>
+                            일치이면, <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                                title="concept-algorithm-exception">예외를
+                                던진다</a>. 이 <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-processinginstruction-target" title="dom-processinginstruction-target" class="externalDFN">target</a></code>
+                            직렬화는 well-formed가 되지 않는다.
+                        </li>
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                                title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                            <code>true</code>), <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>가
+                            XML <code>Char</code> 생성식 [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과 일치하지
+                            않는 문자를 포함하거나
+                            문자열 "<code>?&gt;</code>"(U+003F QUESTION MARK, U+003E GREATER-THAN SIGN)를 포함하면,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                                title="concept-algorithm-exception">예외를 던진다</a>. 이
+                            <var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>
+                            직렬화는 well-formed가 되지 않는다.
+                        </li>
+                        <li><var>markup</var>을 다음을 나열된 순서대로 연결한 것으로 둔다.
+                            <ol>
+                                <li>"<code>&lt;?</code>" (U+003C LESS-THAN SIGN, U+003F QUESTION MARK);
+                                </li>
+                                <li><var>node</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-processinginstruction-target" title="dom-processinginstruction-target" class="externalDFN">target</a></code>
+                                    값;
+                                </li>
+                                <li>"<code> </code>" (U+0020 SPACE);
+                                </li>
+                                <li><var>node</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-characterdata-data" title="dom-characterdata-data" class="externalDFN">data</a></code>
+                                    값;
+                                </li>
+                                <li>"<code>?&gt;</code>" (U+003F QUESTION MARK, U+003E GREATER-THAN SIGN).
+                                </li>
+                            </ol>
+                        </li>
+                        <li><var>markup</var>의 값을 반환한다.
+                        </li>
+                    </ol>
+
+                </dd>
+            </dl>
+
+            <p>
+                <code><a href="https://www.w3.org/TR/dom/#node" title="node" class="externalDFN">Node</a></code>
+                <var>node</var>의 <dfn id="dfn-concept-serialize-doctype" data-dfn-type="dfn"
+                    data-lt="concept-serialize-doctype">DocumentType 직렬화 생성</dfn>을,
+                <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                    title="concept-well-formed">require well-formed</a> 플래그가 주어진 상태에서 수행하려면,
+                사용자 에이전트는 다음 알고리즘의 결과를 반환해야 한다.
+            </p>
+
+            <ol>
+                <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                        title="concept-well-formed">require well-formed</a> 플래그가 <code>true</code>이고,
+                    <var>node</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-publicid" title="dom-documenttype-publicid" class="externalDFN">publicId</a></code>
+                    속성이 XML <code>PubidChar</code> 생성식
+                    [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과 일치하지 않는 문자를 포함하면,
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                        title="concept-algorithm-exception">예외를 던진다</a>. 이 <var>node</var>의 직렬화는
+                    well-formed 문서 타입 선언이 되지 않는다.
+                </li>
+                <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                        title="concept-well-formed">require well-formed</a> 플래그가 <code>true</code>이고
+                    <var>node</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-systemid" title="dom-documenttype-systemid" class="externalDFN">systemId</a></code>
+                    속성이 XML <code>Char</code> 생성식
+                    [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과 일치하지 않는 문자를 포함하거나,
+                    "<code>"</code>"(U+0022 QUOTATION MARK)와 "<code>'</code>"
+                    (U+0027 APOSTROPHE)를 모두 포함하면, <a data-link-type="dfn" class="internalDFN"
+                        href="#dfn-concept-algorithm-exception" title="concept-algorithm-exception">예외를
+                        던진다</a>. 이
+                    <var>node</var>의 직렬화는 well-formed 문서 타입 선언이 되지 않는다.
+                </li>
+                <li><var>markup</var>을 빈 문자열로 둔다.
+                </li>
+                <li>문자열 "<code>&lt;!DOCTYPE</code>"을 <var>markup</var>에 추가한다.
+                </li>
+                <li>"<code> </code>"(U+0020 SPACE)를 <var>markup</var>에 추가한다.
+                </li>
+                <li><var>node</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-name" title="dom-documenttype-name" class="externalDFN">name</a></code>
+                    속성 값을 <var>markup</var>에 추가한다.
+                    <a href="https://www.w3.org/TR/dom/#html-document" title="html-document" class="externalDFN">HTML
+                        문서</a>에 속한 <var>node</var>의 경우,
+                    그 값은 모두 소문자이다.
+                </li>
+                <li><var>node</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-publicid" title="dom-documenttype-publicid" class="externalDFN">publicId</a></code>가
+                    빈 문자열이 아니면, 다음을 나열된 순서대로 <var>markup</var>에 추가한다.
+                    <ol>
+                        <li>"<code> </code>" (U+0020 SPACE);
+                        </li>
+                        <li>문자열 "<code>PUBLIC</code>";
+                        </li>
+                        <li>"<code> </code>" (U+0020 SPACE);
+                        </li>
+                        <li>"<code>"</code>" (U+0022 QUOTATION MARK);
+                        </li>
+                        <li><var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-publicid" title="dom-documenttype-publicid" class="externalDFN">publicId</a></code>
+                            속성 값;
+                        </li>
+                        <li>"<code>"</code>" (U+0022 QUOTATION MARK).
+                        </li>
+                    </ol>
+                </li>
+                <li><var>node</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-systemid" title="dom-documenttype-systemid" class="externalDFN">systemId</a></code>가
+                    빈 문자열이 아니고 <var>node</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-publicid" title="dom-documenttype-publicid" class="externalDFN">publicId</a></code>가
+                    빈 문자열로 설정되어 있으면, 다음을 나열된 순서대로 <var>markup</var>에 추가한다.
+                    <ol>
+                        <li>"<code> </code>" (U+0020 SPACE);
+                        </li>
+                        <li>문자열 "<code>SYSTEM</code>".
+                        </li>
+                    </ol>
+                </li>
+                <li><var>node</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-systemid" title="dom-documenttype-systemid" class="externalDFN">systemId</a></code>가
+                    빈 문자열이 아니면, 다음을 나열된 순서대로 <var>markup</var>에 추가한다.
+                    <ol>
+                        <li>"<code> </code>" (U+0020 SPACE);
+                        </li>
+                        <li>"<code>"</code>" (U+0022 QUOTATION MARK);
+                        </li>
+                        <li><var>node</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-documenttype-systemid" title="dom-documenttype-systemid" class="externalDFN">systemId</a></code>
+                            속성 값;
+                        </li>
+                        <li>"<code>"</code>" (U+0022 QUOTATION MARK).
+                        </li>
+                    </ol>
+                </li>
+                <!-- Removing internalSubset serialization steps as this property is not supported by DOM4. Also,
+                optional requirements don't help improve interoperability:
+            <li>Optional: if the <var>node</var> has an (historical)
+                <code><a title="ID-Core-DocType-internalSubset" data-spec="DOM3" class="externalDFN">internalSubset</a></code>
+                and the
+                <code><a title="ID-Core-DocType-internalSubset" data-spec="DOM3" class="externalDFN">internalSubset</a></code>
+                attribute's value is a non-empty string, then append the following,
+                in the order listed, to <var>markup</var>:
+                <ol>
+                    <li>"<code> </code>" (U+0020 SPACE);
+                    <li>"<code>[</code>" (U+005B LEFT SQUARE BRACKET);
+                    <li>The value of the <var>node</var>'s
+                        <code><a title="ID-Core-DocType-internalSubset" data-spec="DOM3" class="externalDFN">internalSubset</a></code>
+                        attribute;
+                    <li>"<code>]</code>" (U+005D RIGHT SQUARE BRACKET);
+                </ol>
+                <p class=note>A <var>node</var> belonging to an
+                   <a title="html-document" data-spec="DOM4" class="externalDFN">HTML document</a>
+                   will never have an
+                   <code><a title="ID-Core-DocType-internalSubset" data-spec="DOM3" class="externalDFN">internalSubset</a></code>
+                   because any <code><a title="ID-Core-DocType-internalSubset" data-spec="DOM3" class="externalDFN">internalSubset</a></code>
+                   markup is ignored by the parser.</p>
+            </li>
+            -->
+                <li>"<code>&gt;</code>"(U+003E GREATER-THAN SIGN)를 <var>markup</var>에 추가한다.
+                </li>
+                <li><var>markup</var>의 값을 반환한다.
+                </li>
+            </ol>
+
+            <p>
+                <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>
+                <var>element</var>에 대해
+                <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                    title="concept-namespace-prefix-map">네임스페이스 접두사 맵</a> <var>map</var>,
+                <var>element prefixes list</var>(초기에는 비어 있음), 및 <var>duplicate prefix
+                    definition</var> 참조가 주어진 상태에서
+                <dfn id="dfn-concept-record-namespace-info" data-dfn-type="dfn"
+                    data-lt="concept-record-namespace-info">네임스페이스 정보 기록</dfn>을 수행하려면,
+                사용자 에이전트는 다음 단계를 실행해야 한다.
+            </p>
+            <ol>
+                <li><var>default namespace attr value</var>를 <code>null</code>로 둔다.
+                </li>
+                <li><dfn id="dfn-record-namespace-loop" data-dfn-type="dfn" data-lt="record-namespace-loop">Main</dfn>:
+                    <var>element</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-element-attributes" title="dom-element-attributes" class="externalDFN">attributes</a></code>
+                    안의 각
+                    <a href="https://www.w3.org/TR/dom/#concept-attribute" title="concept-attribute"
+                        class="externalDFN">속성</a>
+                    <var>attr</var>에 대해, <var>element</var>의
+                    <a href="https://www.w3.org/TR/dom/#dom-element-attributes" title="dom-element-attributes"
+                        class="externalDFN">속성 목록</a>에 지정된 순서대로:
+
+                    <div class="note">
+                        <div id="h-note5" role="heading" aria-level="4" class="note-title marker"><span>참고</span>
+                        </div>
+                        <p class="">다음 조건부 단계는 네임스페이스 접두사를
+                            <var>element prefixes list</var>에 추가하고 <var>map</var>에 추가하거나 대체한다.
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-xmlns-ns" title="xmlns-ns">XMLNS
+                                네임스페이스</a>의 속성만
+                            고려된다(예를 들어,
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-setattribute" title="dom-element-setattribute" class="externalDFN">setAttribute</a>(<em>"xmlns:pretend-prefix"</em>,
+                    <em>"pretend-namespace"</em>)</code>를 통해 네임스페이스 선언처럼 보이게 만든 속성은 포함되지 않는다).
+                        </p>
+                    </div>
+                    <ol>
+                        <li><var>attribute namespace</var>를 <var>attr</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-attr-namespaceuri" title="dom-attr-namespaceuri" class="externalDFN">namespaceURI</a></code>
+                            값으로 둔다.
+                        </li>
+                        <li><var>attribute prefix</var>를 <var>attr</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-attr-prefix" title="dom-attr-prefix" class="externalDFN">prefix</a></code>
+                            값으로 둔다.
+                        </li>
+                        <li><var>attribute namespace</var>가 <a data-link-type="dfn" class="internalDFN"
+                                href="#dfn-xmlns-ns" title="xmlns-ns">XMLNS 네임스페이스</a>이면:
+                            <ol>
+                                <li><var>attribute prefix</var>가 <code>null</code>이면, <var>attr</var>는
+                                    기본 네임스페이스 선언이다. <var>default namespace attr value</var>를
+                                    <var>attr</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-attr-value" title="dom-attr-value" class="externalDFN">value</a></code>로
+                                    설정하고 이 단계 실행을 중지한 다음,
+                                    다음 속성을 방문하기 위해
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-record-namespace-loop"
+                                        title="record-namespace-loop">Main</a>으로 돌아간다.
+                                </li>
+                                <li>그렇지 않으면, <var>attribute prefix</var>는 <code>null</code>이 아니고
+                                    <var>attr</var>는 네임스페이스 접두사 정의이다. 다음 단계를 실행한다.
+                                    <ol>
+                                        <li><var>prefix definition</var>을 <var>attr</var>의
+                                            <code><a href="https://www.w3.org/TR/dom/#dom-attr-localname" title="dom-attr-localname" class="externalDFN">localName</a></code>
+                                            값으로 둔다.
+                                        </li>
+                                        <li><var>namespace definition</var>을 <var>attr</var>의
+                                            <code><a href="https://www.w3.org/TR/dom/#dom-attr-value" title="dom-attr-value" class="externalDFN">value</a></code>
+                                            값으로 둔다.
+                                        </li>
+                                        <li><var>namespace definition</var> 값과 일치하는 키가
+                                            <var>map</var>에 이미 존재하고, 그 키의 값이 <var>prefix definition</var>과 일치하면,
+                                            이는 중복 네임스페이스 접두사 정의이다.
+                                            <var>duplicate
+                                                prefix definition</var>의 값을 <var>prefix definition</var>으로 설정한다.
+                                        </li>
+                                        <li>그렇지 않고, <var>namespace definition</var> 값과 일치하는 키가
+                                            <var>map</var>에 이미 존재하지만, 그 키의 값이 <var>prefix
+                                                definition</var>과 일치하지 않으면,
+                                            그 키의 값을 <var>prefix definition</var>이 되도록 업데이트한다.
+                                        </li>
+                                        <li>그렇지 않으면, <var>namespace definition</var> 값과 일치하는 키가
+                                            존재하지 않는다.
+                                            <var>map</var>에 새 키 <var>namespace definition</var>을 추가하고
+                                            그 키 값은 <var>prefix definition</var>으로 한다.
+                                        </li>
+                                        <li><var>prefix definition</var>의 값을 <var>element prefixes
+                                                list</var>에 추가한다.
+                                        </li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+                <li><var>default namespace attr value</var>의 값을 반환한다.
+                </li>
+            </ol>
+
+            <p><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                    title="concept-namespace-prefix-map">네임스페이스 접두사 맵</a> <var>map</var>,
+                문자열 <var>new namespace</var>, 및
+                <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-generated-prefix"
+                    title="concept-generated-prefix">생성된 네임스페이스 접두사 인덱스</a> <var>prefix
+                    index</var>에 대한 참조가 주어진 상태에서
+                <dfn id="dfn-concept-generate-prefix" data-dfn-type="dfn" data-lt="concept-generate-prefix">접두사를
+                    생성</dfn>하려면, 사용자 에이전트는 다음 단계를 실행해야 한다.
+            </p>
+            <ol>
+                <li><var>generated prefix</var>를 문자열 "<code>ns</code>"와
+                    <var>prefix index</var>의 현재 숫자 값의 연결로 둔다.
+                </li>
+                <li><var>prefix index</var>의 값을 1 증가시킨다.
+                </li>
+                <li><var>map</var>에 새 키 <var>new namespace</var>를 추가하고, 그 키 값은
+                    <var>generated prefix</var>로 한다.
+                </li>
+                <li><var>generated prefix</var>의 값을 반환한다.
+                </li>
+            </ol>
+
+            <p>
+                <code><a href="https://www.w3.org/TR/dom/#concept-element" title="concept-element" class="externalDFN">Element</a></code>
+                <var>element</var>의
+                <dfn id="dfn-concept-serialize-xml-attributes" data-dfn-type="dfn"
+                    data-lt="concept-serialize-xml-attributes">속성의 XML 직렬화</dfn>는
+                <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-namespace-prefix-map"
+                    title="concept-namespace-prefix-map">네임스페이스 접두사
+                    맵</a> <var>map</var>, <a data-link-type="dfn" class="internalDFN"
+                    href="#dfn-concept-generated-prefix" title="concept-generated-prefix">생성된 접두사 인덱스</a>
+                <var>prefix index</var> 참조, 플래그 <var>ignore namespace definition attribute</var>,
+                <var>duplicate prefix definition</var> 값, 및 플래그 <var>require well-formed</var>와 함께
+                다음 알고리즘의 결과이다.
+            </p>
+            <ol>
+                <li><var>result</var>를 빈 문자열로 둔다.
+                </li>
+                <li><var>localname set</var>를 새 빈
+                    <dfn id="dfn-concept-namespace-localname-set" data-dfn-type="dfn"
+                        data-lt="concept-namespace-localname-set">네임스페이스 localname 집합</dfn>으로 둔다. 이
+                    <var>localname set</var>는 고유한 속성
+                    <code><a href="https://www.w3.org/TR/dom/#dom-attr-namespaceuri" title="dom-attr-namespaceuri" class="externalDFN">namespaceURI</a></code>
+                    및
+                    <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                    쌍의 튜플을 포함하며, 각 <var>attr</var>가 처리될 때 채워진다.
+                    <span class="note">이 집합은 요소가 같은
+                        <code><a href="https://www.w3.org/TR/dom/#dom-attr-namespaceuri" title="dom-attr-namespaceuri" class="externalDFN">namespaceURI</a></code>와
+                        <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>을
+                        가진 두 속성을 가질 수 없다는 well-formed 제약을 [선택적으로] 강제하는 데 사용된다.
+                        이는 같은 요소 위의 서로 동일한 두 속성이 접두사 값만 다른 경우 발생할 수 있다.</span>
+                </li>
+                <li><dfn id="dfn-serialize-attributes-loop" data-dfn-type="dfn"
+                        data-lt="serialize-attributes-loop">Main</dfn>: <var>element</var>의
+                    <code><a href="https://www.w3.org/TR/dom/#dom-element-attributes" title="dom-element-attributes" class="externalDFN">attributes</a></code>
+                    안의 각
+                    <a href="https://www.w3.org/TR/dom/#concept-attribute" title="concept-attribute"
+                        class="externalDFN">속성</a>
+                    <var>attr</var>에 대해, <var>element</var>의
+                    <a href="https://www.w3.org/TR/dom/#dom-element-attributes" title="dom-element-attributes"
+                        class="externalDFN">속성 목록</a>에 지정된 순서대로:
+                    <ol>
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                                title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                            <code>true</code>), <var>localname set</var>가
+                            <var>attr</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-attr-namespaceuri" title="dom-attr-namespaceuri" class="externalDFN">namespaceURI</a></code>
+                            속성과
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                            속성으로 구성된 새 튜플의 값과 일치하는 값을 가진 튜플을 포함하면,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                                title="concept-algorithm-exception">예외를
+                                던진다</a>. 이
+                            <var>attr</var>의 직렬화는 well-formed 요소 직렬화를 생성하지 못한다.
+                        </li>
+                        <li><var>attr</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-attr-namespaceuri" title="dom-attr-namespaceuri" class="externalDFN">namespaceURI</a></code>
+                            속성과
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                            속성으로 구성된 새 튜플을 만들고, 이를 <var>localname set</var>에 추가한다.
+                        </li>
+                        <li><var>attribute namespace</var>를 <var>attr</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-attr-namespaceuri" title="dom-attr-namespaceuri" class="externalDFN">namespaceURI</a></code>
+                            값으로 둔다.
+                            <!-- Check for an unregistered attribute namespace, and if so, serialize a definition for it -->
+                        </li>
+                        <li><var>candidate prefix</var>를 <code>null</code>로 둔다.
+                        </li>
+                        <li><var>attribute namespace</var>가 <code>null</code>이 아니면, 다음 하위 단계를 실행한다.
+                            <ol>
+                                <li><var>attribute namespace</var>의 값이
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-xmlns-ns"
+                                        title="xmlns-ns">XMLNS 네임스페이스</a>이고,
+                                    <var>attr</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-attr-prefix" title="dom-attr-prefix" class="externalDFN">prefix</a></code>가
+                                    <code>null</code>이고 <var>ignore namespace definition
+                                        attribute</var> 플래그가 <code>true</code>이거나,
+                                    <var>attr</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-attr-prefix" title="dom-attr-prefix" class="externalDFN">prefix</a></code>가
+                                    <code>null</code>이 아니고 <var>attr</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-attr-localname" title="dom-attr-localname" class="externalDFN">localName</a></code>이
+                                    <var>duplicate prefix definition</var>의 값과 일치하면, 이 단계 실행을 중지하고
+                                    다음 속성을 방문하기 위해 <a data-link-type="dfn" class="internalDFN"
+                                        href="#dfn-serialize-attributes-loop"
+                                        title="serialize-attributes-loop">Main</a>으로 이동한다.
+                                </li>
+                                <li>그렇지 않고, <var>attribute namespace</var>의 값과 일치하는 키가
+                                    <var>map</var>에 존재하면,
+                                    <var>candidate prefix</var>를
+                                    <var>map</var>에 있는 그 키의 값으로 둔다.
+                                </li>
+                                <li>그렇지 않으면, <var>map</var>에는 <var>attribute namespace</var>와 일치하는 키가
+                                    없고,
+                                    <var>attribute namespace</var>는 <a data-link-type="dfn" class="internalDFN"
+                                        href="#dfn-xmlns-ns" title="xmlns-ns">XMLNS 네임스페이스</a>가
+                                    아니다. 다음 단계를 실행한다.
+                                    <ol>
+                                        <li><var>candidate prefix</var>를
+                                            <var>map</var>,
+                                            <var>attribute namespace</var>, 및 <var>prefix index</var>를 입력으로 제공하여
+                                            <a data-link-type="dfn" class="internalDFN"
+                                                href="#dfn-concept-generate-prefix" title="concept-generate-prefix">접두사
+                                                생성</a>을 수행한 결과로 둔다.
+                                        </li>
+                                        <li>다음을 나열된 순서대로 <var>result</var>에 추가한다.
+                                            <ol>
+                                                <li>"<code> </code>" (U+0020 SPACE);
+                                                </li>
+                                                <li>문자열 "<code>xmlns:</code>";
+                                                </li>
+                                                <li><var>candidate prefix</var>의 값;
+                                                </li>
+                                                <li>"<code>="</code>" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
+                                                </li>
+                                                <li><var>attribute namespace</var>와
+                                                    <a data-link-type="dfn" class="internalDFN"
+                                                        href="#dfn-concept-well-formed"
+                                                        title="concept-well-formed">require well-formed</a> 플래그를
+                                                    입력으로 주어
+                                                    <a data-link-type="dfn" class="internalDFN"
+                                                        href="#dfn-concept-serialize-attr-value"
+                                                        title="concept-serialize-attr-value">속성 값
+                                                        직렬화</a>를 수행한 결과;
+                                                </li>
+                                                <li>"<code>"</code>" (U+0022 QUOTATION MARK).
+                                                </li>
+                                            </ol>
+                                        </li>
+                                    </ol>
+                                </li>
+                            </ol>
+                            <!-- A namespace prefix has been set by this point if it needed to be set -->
+                        </li>
+                        <li>"<code> </code>"(U+0020 SPACE)를 <var>result</var>에 추가한다.
+                        </li>
+                        <li><var>candidate prefix</var>가 <code>null</code>이 아니면,
+                            <var>candidate prefix</var>와 "<code>:</code>"(U+003A COLON)의 연결을
+                            <var>result</var>에 추가한다.
+                            <!-- Check for well-formed localName -->
+                        </li>
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                                title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                            <code>true</code>), 이 <var>attr</var>의
+                            <code><a href="https://www.w3.org/TR/dom/#dom-element-localname" title="dom-element-localname" class="externalDFN">localName</a></code>
+                            속성이 문자 "<code>:</code>"(U+003A COLON)를 포함하거나 XML
+                            <code>Name</code> 생성식 [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과
+                            일치하지 않거나, "<code>xmlns</code>"와 같고 <var>attribute
+                                namespace</var>가 <code>null</code>이면,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                                title="concept-algorithm-exception">예외를
+                                던진다</a>. 이 <var>attr</var>의 직렬화는 well-formed 속성이 되지 않는다.
+                            <!-- Write out the standard attribute -->
+                        </li>
+                        <li>다음 문자열을 나열된 순서대로 <var>result</var>에 추가한다.
+                            <ol>
+                                <li><var>attr</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#dom-attr-localname" title="dom-attr-localname" class="externalDFN">localName</a></code>
+                                    값;
+                                </li>
+                                <li>"<code>="</code>" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
+                                </li>
+                                <li><var>attr</var>의
+                                    <code><a href="https://www.w3.org/TR/dom/#concept-attribute-value" title="concept-attribute-value" class="externalDFN">value</a></code>
+                                    속성과 <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                                        title="concept-well-formed">require
+                                        well-formed</a> 플래그를 입력으로 주어
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-attr-value"
+                                        title="concept-serialize-attr-value">속성 값 직렬화</a>를 수행한 결과;
+                                </li>
+                                <li>"<code>"</code>" (U+0022 QUOTATION MARK).
+                                </li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+                <li><var>result</var>의 값을 반환한다.
+                </li>
+            </ol>
+
+            <p><var>attribute value</var>와 <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                    title="concept-well-formed">require well-formed</a> 플래그가
+                주어진 상태에서
+                <dfn id="dfn-concept-serialize-attr-value" data-dfn-type="dfn" data-lt="concept-serialize-attr-value">속성
+                    값 직렬화</dfn>를 하려면,
+                사용자 에이전트는 다음 단계를 실행해야 한다.
+            </p>
+            <ol>
+                <li><a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                        title="concept-well-formed">require well-formed</a> 플래그가 설정되어 있고(그 값이
+                    <code>true</code>), <var>attribute value</var>가 XML <code>Char</code> 생성식
+                    [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]과 일치하지 않는 문자를 포함하면,
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-algorithm-exception"
+                        title="concept-algorithm-exception">예외를 던진다</a>. 이
+                    <var>attribute value</var>의 직렬화는 well-formed 요소 직렬화를 생성하지 못한다.
+                </li>
+                <li><var>attribute value</var>가 <code>null</code>이면, 빈 문자열을 반환한다.
+                </li>
+                <li>그렇지 않으면, <var>attribute value</var>는 문자열이다. 먼저 다음의 발생을 모두 바꾼 뒤,
+                    <var>attribute value</var>의 값을 반환한다.
+                    <ol>
+                        <li>"<code>"</code>"를 "<code>&amp;quot;</code>"로
+                        </li>
+                        <li>"<code>&amp;</code>"를 "<code>&amp;amp;</code>"로
+                        </li>
+                        <li>"<code>&lt;</code>"를 "<code>&amp;lt;</code>"로
+                        </li>
+                        <li>"<code>&gt;</code>"를 "<code>&amp;gt;</code>"로
+                        </li>
+                    </ol>
+                    <div class="note">
+                        <div id="h-note6" role="heading" aria-level="4" class="note-title marker"><span>참고</span>
+                        </div>
+                        <p class="">이는 브라우저에 존재하는 동작과 일치하며,
+                            "<code>&gt;</code>" 문자도 대체함으로써 XML 명세의 AttValue
+                            생성식 [<cite><a href="#bib-XML10" class="bibref">XML10</a></cite>]의 문법 요구 사항을
+                            넘어서는 동작이다.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+    </section>
+
+    <section property="bibo:hasPart" resource="#the-domparser-interface" typeof="bibo:Chapter"
+        id="the-domparser-interface">
+        <!--OddPage-->
+        <h2 resource="#h-the-domparser-interface" id="h-the-domparser-interface"><span property="xhv:role"
+                resource="xhv:heading"><span class="secno">5. </span><code>DOMParser</code> 인터페이스</span></h2>
+
+        <pre class="extraidl">enum <span class="idlInterfaceID">SupportedType</span> {
+    "text/html",
+    "text/xml",
+    "application/xml",
+    "application/xhtml+xml",
+    "image/svg+xml"
+};</pre>
+
+        <p><dfn id="dfn-dom-domparser" data-dfn-type="dfn" data-lt="dom-domparser"><code>DOMParser()</code></dfn>
+            생성자는
+            새 <code>DOMParser</code> 객체를 반환해야 한다.
+
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-DOMParser">[<span class="extAttr">Constructor</span>]
+interface <span class="idlInterfaceID">DOMParser</span> {
+<span class="idlMethod">    [<span class="extAttr">NewObject</span>]
+    <span class="idlMethType">Document</span> <span class="idlMethName"><a href="#widl-DOMParser-parseFromString-Document-DOMString-str-SupportedType-type">parseFromString</a></span> (<span class="idlParam"><span class="idlParamType">DOMString</span> <span class="idlParamName">str</span></span>, <span class="idlParam"><span class="idlParamType">SupportedType</span> <span class="idlParamName">type</span></span>);</span>
+};</span></pre>
+        <section property="bibo:hasPart" resource="#methods" typeof="bibo:Chapter" id="methods">
+            <h3 resource="#h-methods" id="h-methods"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">5.1 </span>메서드</span></h3>
+            <dl class="methods">
+                <dt id="widl-DOMParser-parseFromString-Document-DOMString-str-SupportedType-type">
+                    <code>parseFromString</code>
+                </dt>
+                <dd>
+                    <p>
+                        <dfn id="dfn-dom-domparser-parsefromstring" data-dfn-type="dfn"
+                            data-lt="dom-domparser-parsefromstring"><code>parseFromString(<var>str</var>, <var>type</var>)</code></dfn>
+                        메서드는 <var>type</var>에 따라 다음 단계를 실행해야 한다.
+
+                    </p>
+                    <dl class="switch">
+                        <dt>"<code>text/html</code>"
+                        </dt>
+                        <dd>
+                            <p><var>str</var>을
+                                <code><a href="https://www.w3.org/TR/html5/single-page.html#html-parser" title="html-parser" class="externalDFN">HTML 파서</a></code>로
+                                구문 분석하고,
+                                새로 생성된
+                                <a href="https://www.w3.org/TR/dom/#concept-document" title="concept-document"
+                                    class="externalDFN">문서</a>를 반환한다.
+
+                            </p>
+                            <p><a href="https://www.w3.org/TR/html5/single-page.html#scripting-flag"
+                                    title="scripting-flag" class="externalDFN">스크립팅 플래그</a>는
+                                "disabled"로 설정되어야 한다.
+
+                            </p>
+                            <div class="note">
+                                <div id="h-note7" role="heading" aria-level="4" class="note-title marker">
+                                    <span>참고</span>
+                                </div>
+                                <p class="">
+                                    <code><a href="https://www.w3.org/TR/html5/single-page.html#meta" title="meta" class="externalDFN">meta</a></code>
+                                    요소는 사용되는 인코딩을 결정할 때
+                                    고려되지 않는다. Unicode 스트림이
+                                    파서에 전달되기 때문이다.
+
+                                </p>
+                            </div>
+                            <div class="note">
+                                <div id="h-note8" role="heading" aria-level="4" class="note-title marker">
+                                    <span>참고</span>
+                                </div>
+                                <p class="">
+                                    <code><a href="https://www.w3.org/TR/html5/single-page.html#script" title="script" class="externalDFN">script</a></code>
+                                    요소는 실행 불가능으로 표시되고,
+                                    <code><a href="https://www.w3.org/TR/html5/single-page.html#the-noscript-element" title="the-noscript-element" class="externalDFN">noscript</a></code>의
+                                    내용은 마크업으로 구문 분석된다.
+
+                                </p>
+                            </div>
+                        </dd>
+                        <dt>"<code>text/xml</code>"
+                        </dt>
+                        <dt>"<code>application/xml</code>"
+                        </dt>
+                        <dt>"<code>application/xhtml+xml</code>"
+                        </dt>
+                        <dt>"<code>image/svg+xml</code>"
+                        </dt>
+                        <dd>
+                            <ol>
+                                <li><var>str</var>을 네임스페이스가 활성화된
+                                    <code><a href="https://www.w3.org/TR/html5/single-page.html#xml-parser" title="xml-parser" class="externalDFN">XML 파서</a></code>로
+                                    구문 분석한다.
+
+                                    <div class="note">
+                                        <div id="h-note9" role="heading" aria-level="4" class="note-title marker">
+                                            <span>참고</span>
+                                        </div>
+                                        <p class="">
+                                            <code><a href="https://www.w3.org/TR/html5/single-page.html#xml-parser" title="xml-parser" class="externalDFN">XML 파서</a></code>를
+                                            사용해 구문 분석된 모든 XHTML
+                                            <code><a href="https://www.w3.org/TR/html5/single-page.html#script" title="script" class="externalDFN">script</a></code>
+                                            요소에 대해서는,
+                                            <a href="https://www.w3.org/TR/html5/single-page.html#scripting-flag"
+                                                title="scripting-flag" class="externalDFN">스크립팅 플래그</a>에
+                                            해당하는 것이 "disabled"로 설정되어야 한다.
+                                        </p>
+                                    </div>
+
+                                </li>
+                                <li>이전 단계가 오류를 반환하지 않았으면, 새로
+                                    생성된 <a href="https://www.w3.org/TR/dom/#concept-document" title="concept-document"
+                                        class="externalDFN">문서</a>를 반환한다.
+
+                                    <!-- This seemed like a good idea, but isn't web compatible, unfortunately.
+                    <li>Otherwise, throw a
+                    <code><a data-spec="DOM4" title="domexception" class="externalDFN">DOMException</a></code>
+                    with name <code>SyntaxError</code>. -->
+
+                                </li>
+                                <li><var>document</var>를 새로 생성된
+                                    <a href="https://www.w3.org/TR/dom/#xml-document" title="xml-document"
+                                        class="externalDFN">XML 문서</a>로 둔다.
+                                    <span class="note"><var>document</var>는
+                                        <code><a href="https://www.w3.org/TR/dom/#xmldocument" title="xmldocument" class="externalDFN">XMLDocument</a></code>
+                                        인터페이스가 아니라
+                                        <code><a href="https://www.w3.org/TR/dom/#document" title="document" class="externalDFN">Document</a></code>
+                                        인터페이스를 사용한다.</span>
+
+                                </li>
+                                <li>
+                                    <p><var>root</var>를 새
+                                        <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>로
+                                        두고,
+                                        그
+                                        <a href="https://www.w3.org/TR/dom/#concept-element-local-name"
+                                            title="concept-element-local-name" class="externalDFN">로컬 이름</a>은
+                                        "<code>parsererror</code>"로 설정하며, 그
+                                        <a href="https://www.w3.org/TR/dom/#concept-element-namespace"
+                                            title="concept-element-namespace" class="externalDFN">네임스페이스</a>는
+                                        "<code>http://www.mozilla.org/newlayout/xml/parsererror.xml</code>"로
+                                        설정한다.
+                                        <!-- see https://bugzilla.mozilla.org/show_bug.cgi?id=45566 -->
+                                    </p>
+                                    <p>이 시점에서 사용자 에이전트는
+                                        예를 들어 오류의 성격을 설명하기 위해
+                                        노드를 <var>root</var>에
+                                        <a href="https://www.w3.org/TR/dom/#concept-node-append"
+                                            title="concept-node-append" class="externalDFN">추가</a>할 수 있다.
+
+                                    </p>
+                                </li>
+                                <li><var>root</var>를 <var>document</var>에
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-append" title="concept-node-append"
+                                        class="externalDFN">추가</a>한다.
+
+                                </li>
+                                <li><var>document</var>의 값을 반환한다.
+                                </li>
+                            </ol>
+                        </dd>
+                    </dl>
+
+                    <p>어떤 경우든, 반환되는
+                        <a href="https://www.w3.org/TR/dom/#concept-document" title="concept-document"
+                            class="externalDFN">문서</a>의
+                        <a href="https://www.w3.org/TR/dom/#concept-document-content-type"
+                            title="concept-document-content-type" class="externalDFN">콘텐츠 타입</a>은
+                        <var>type</var> 인수여야 한다. 또한,
+                        <a href="https://www.w3.org/TR/dom/#concept-document" title="concept-document"
+                            class="externalDFN">문서</a>는
+                        <a href="https://www.w3.org/TR/dom/#concept-document-url" title="concept-document-url"
+                            class="externalDFN">URL</a> 값이
+                        <a href="https://www.w3.org/TR/html5/single-page.html#active-document" title="active-document"
+                            class="externalDFN">활성 문서</a>의
+                        URL과 같아야 하며,
+                        <a href="https://www.w3.org/TR/html5/single-page.html#location" title="location"
+                            class="externalDFN">location</a> 값은 <code>null</code>이어야 한다.
+
+                    </p>
+                    <div class="note">
+                        <div id="h-note10" role="heading" aria-level="4" class="note-title marker"><span>참고</span>
+                        </div>
+                        <p class="">반환된
+                            <a href="https://www.w3.org/TR/dom/#concept-document" title="concept-document"
+                                class="externalDFN">문서</a>의
+                            <a href="https://www.w3.org/TR/dom/#concept-document-encoding"
+                                title="concept-document-encoding" class="externalDFN">인코딩</a>은
+                            기본값인 UTF-8이다.
+                        </p>
+                    </div>
+                    <table class="parameters">
+                        <tbody>
+                            <tr>
+                                <th>매개변수</th>
+                                <th>타입</th>
+                                <th>Null 가능</th>
+                                <th>선택 사항</th>
+                                <th>설명</th>
+                            </tr>
+                            <tr>
+                                <td class="prmName">str</td>
+                                <td class="prmType"><code>DOMString</code></td>
+                                <td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmDesc"></td>
+                            </tr>
+                            <tr>
+                                <td class="prmName">type</td>
+                                <td class="prmType"><code>SupportedType</code></td>
+                                <td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmDesc"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div><em>반환 타입: </em><code>Document</code></div>
+                </dd>
+            </dl>
+        </section>
+    </section>
+
+    <section property="bibo:hasPart" resource="#the-xmlserializer-interface" typeof="bibo:Chapter"
+        id="the-xmlserializer-interface">
+        <!--OddPage-->
+        <h2 resource="#h-the-xmlserializer-interface" id="h-the-xmlserializer-interface"><span property="xhv:role"
+                resource="xhv:heading"><span class="secno">6. </span><code>XMLSerializer</code> 인터페이스</span>
+        </h2>
+
+        <p><dfn id="dfn-dom-xmlserializer" data-dfn-type="dfn"
+                data-lt="dom-xmlserializer"><code>XMLSerializer()</code></dfn>
+            생성자는 새 <code>XMLSerializer</code> 객체를 반환해야 한다.
+
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-XMLSerializer">[<span class="extAttr">Constructor</span>]
+interface <span class="idlInterfaceID">XMLSerializer</span> {
+<span class="idlMethod">    <span class="idlMethType">DOMString</span> <span class="idlMethName"><a href="#widl-XMLSerializer-serializeToString-DOMString-Node-root">serializeToString</a></span> (<span class="idlParam"><span class="idlParamType">Node</span> <span class="idlParamName">root</span></span>);</span>
+};</span></pre>
+        <section property="bibo:hasPart" resource="#methods-1" typeof="bibo:Chapter" id="methods-1">
+            <h3 resource="#h-methods-1" id="h-methods-1"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">6.1 </span>메서드</span></h3>
+            <dl class="methods">
+                <dt id="widl-XMLSerializer-serializeToString-DOMString-Node-root"><code>serializeToString</code></dt>
+                <dd><dfn id="dfn-dom-xmlserializer-serializetostring" data-dfn-type="dfn"
+                        data-lt="dom-xmlserializer-serializetostring"><code>serializeToString(<var>root</var>)</code></dfn>
+                    메서드는 <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-serialize-xml"
+                        title="concept-serialize-xml"><var>root</var>의 XML 직렬화를 생성</a>해야 하며,
+                    <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                        title="concept-well-formed">require well-formed</a> 매개변수에는
+                    <code>false</code> 값을 전달하고,
+                    그 결과를 반환해야 한다.<table class="parameters">
+                        <tbody>
+                            <tr>
+                                <th>매개변수</th>
+                                <th>타입</th>
+                                <th>Null 가능</th>
+                                <th>선택 사항</th>
+                                <th>설명</th>
+                            </tr>
+                            <tr>
+                                <td class="prmName">root</td>
+                                <td class="prmType"><code>Node</code></td>
+                                <td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmDesc"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div><em>반환 타입: </em><code>DOMString</code></div>
+                </dd>
+            </dl>
+        </section>
+    </section>
+
+    <section property="bibo:hasPart" resource="#extensions-to-the-element-interface" typeof="bibo:Chapter"
+        id="extensions-to-the-element-interface">
+        <!--OddPage-->
+        <h2 resource="#h-extensions-to-the-element-interface" id="h-extensions-to-the-element-interface"><span
+                property="xhv:role" resource="xhv:heading"><span class="secno">7. </span>
+                <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>
+                인터페이스에 대한 확장</span></h2>
+
+        <pre class="idl"><span class="idlInterface" id="idl-def-Element">partial interface <span class="idlInterfaceID">Element</span> {
+<span class="idlAttribute">    [<span class="extAttr">CEReactions, TreatNullAs=EmptyString</span>]
+                    attribute <span class="idlAttrType">DOMString</span> <span class="idlAttrName"><a href="#widl-Element-innerHTML">innerHTML</a></span>;</span>
+<span class="idlAttribute">    [<span class="extAttr">CEReactions, TreatNullAs=EmptyString</span>]
+                    attribute <span class="idlAttrType">DOMString</span> <span class="idlAttrName"><a href="#widl-Element-outerHTML">outerHTML</a></span>;</span>
+<span class="idlMethod">    [<span class="extAttr">CEReactions</span>]
+    <span class="idlMethType">void</span> <span class="idlMethName"><a href="#widl-Element-insertAdjacentHTML-void-DOMString-position-DOMString-text">insertAdjacentHTML</a></span> (<span class="idlParam"><span class="idlParamType">DOMString</span> <span class="idlParamName">position</span></span>, <span class="idlParam"><span class="idlParamType">DOMString</span> <span class="idlParamName">text</span></span>);</span>
+};</span></pre>
+        <section property="bibo:hasPart" resource="#attributes" typeof="bibo:Chapter" id="attributes">
+            <h3 resource="#h-attributes" id="h-attributes"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">7.1 </span>속성</span></h3>
+            <dl class="attributes">
+                <dt id="widl-Element-innerHTML"><code>innerHTML</code>, 타입 <span class="idlAttrType">DOMString</span>
+                </dt>
+                <dd>
+                    <p><dfn id="dfn-dom-element-innerhtml" data-dfn-type="dfn"
+                            data-lt="dom-element-innerhtml"><code>innerHTML</code></dfn> IDL
+                        속성은
+                        <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>의
+                        콘텐츠 마크업을 나타낸다.
+
+                    </p>
+                    <dl class="domintro">
+                        <!--doc.ih
+                <dt><var>document</var> . <code title="dom-document-innerhtml">innerHTML</code> [ = <var>value</var> ]
+                <dd>
+                <p>Returns a fragment of HTML or XML that represents the
+                <code><a title="document" data-spec="DOM4" class="externalDFN">Document</a></code>.
+
+                <p>Can be set, to replace the
+                <code><a title="document" data-spec="DOM4" class="externalDFN">Document</a></code>'s contents with the result of
+                parsing the given string.
+
+                <p>In the case of an <a title="xml-document" data-spec="DOM4" class="externalDFN">XML document</a>,
+                will throw an
+                <code><a data-spec="DOM4" title="domexception" class="externalDFN">DOMException</a></code> with name <code>InvalidStateError</code>
+                if the <code><a title="document" data-spec="DOM4" class="externalDFN">Document</a></code> cannot be serialized
+                to XML, and a
+                <code><a data-spec="DOM4" title="domexception" class="externalDFN">DOMException</a></code> with name <code>SyntaxError</code>
+                if the given string is not well-formed.
+                -->
+
+                        <dt><var>element</var> . <code title="dom-element-innerhtml">innerHTML</code> [ =
+                            <var>value</var> ]
+                        </dt>
+                        <dd>
+                            <p>요소의 콘텐츠를 나타내는 HTML 또는 XML 조각을
+                                반환한다.
+
+                            </p>
+                            <p>설정할 수 있으며, 요소의 콘텐츠를 주어진 문자열에서
+                                구문 분석된 노드로 대체한다.
+
+                            </p>
+                            <p><a href="https://www.w3.org/TR/dom/#xml-document" title="xml-document"
+                                    class="externalDFN">XML 문서</a>의 경우,
+                                <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>를
+                                XML로 직렬화할 수 없으면
+                                이름이
+                                "<code><a href="https://www.w3.org/TR/dom/#invalidstateerror" title="invalidstateerror" class="externalDFN">InvalidStateError</a></code>"인
+                                <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                던지고, 주어진 문자열이 well-formed가 아니면
+                                이름이
+                                "<code><a href="https://www.w3.org/TR/dom/#syntaxerror" title="syntaxerror" class="externalDFN">SyntaxError</a></code>"인
+                                <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                던진다.
+                            </p>
+                        </dd>
+                    </dl>
+
+                    <p>가져올 때는
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                            title="context object">컨텍스트 객체</a>에 대해
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                            title="concept-well-formed">require well-formed</a> 플래그에 <code>true</code>를 제공하여
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-fragment-serializing-algorithm"
+                            title="concept-fragment-serializing-algorithm">조각 직렬화 알고리즘</a>을
+                        호출한 결과를 반환한다(문자열을 반환하는 대신 예외를 던질 수도 있다).
+
+                    </p>
+                    <p>설정할 때는 다음 단계를 실행해야 한다.
+                    </p>
+                    <ol>
+                        <li>새 값을 <var>markup</var>으로,
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                title="context object">컨텍스트 객체</a>를 <var>context element</var>로 하여
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-parse-fragment"
+                                title="concept-parse-fragment">조각 구문 분석 알고리즘</a>을
+                            호출한 결과를 <var>fragment</var>로 둔다.
+
+                        </li>
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                title="context object">컨텍스트 객체</a> 안에서
+                            <var>fragment</var>로
+                            <a href="https://www.w3.org/TR/dom/#concept-node-replace-all"
+                                title="concept-node-replace-all" class="externalDFN">모두 대체</a>한다.
+                        </li>
+                    </ol>
+                </dd>
+                <dt id="widl-Element-outerHTML"><code>outerHTML</code>, 타입 <span class="idlAttrType">DOMString</span>
+                </dt>
+                <dd>
+                    <p><dfn id="dfn-dom-element-outerhtml" data-dfn-type="dfn"
+                            data-lt="dom-element-outerhtml"><code>outerHTML</code></dfn> IDL
+                        속성은
+                        <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>와
+                        그 콘텐츠의 마크업을 나타낸다.
+
+                    </p>
+                    <dl class="domintro">
+                        <dt><var>element</var> . <code title="dom-element-outerhtml">outerHTML</code> [ =
+                            <var>value</var> ]
+                        </dt>
+                        <dd>
+                            <p>요소와 그 콘텐츠를 나타내는 HTML 또는 XML 조각을
+                                반환한다.
+
+                            </p>
+                            <p>설정할 수 있으며, 요소를 주어진 문자열에서 구문 분석된
+                                노드로 대체한다.
+
+                            </p>
+                            <p><a href="https://www.w3.org/TR/dom/#xml-document" title="xml-document"
+                                    class="externalDFN">XML 문서</a>의 경우,
+                                요소를 XML로 직렬화할 수 없으면 이름이
+                                "<code><a href="https://www.w3.org/TR/dom/#invalidstateerror" title="invalidstateerror" class="externalDFN">InvalidStateError</a></code>"인
+                                <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                던지고, 주어진 문자열이 well-formed가 아니면 이름이
+                                "<code><a href="https://www.w3.org/TR/dom/#syntaxerror" title="syntaxerror" class="externalDFN">SyntaxError</a></code>"인
+                                <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                던진다.
+
+                            </p>
+                            <p>요소의 부모가
+                                <code><a href="https://www.w3.org/TR/dom/#document" title="document" class="externalDFN">Document</a></code>
+                                노드이면,
+                                이름이
+                                "<code><a href="https://www.w3.org/TR/dom/#nomodificationallowederror" title="nomodificationallowederror" class="externalDFN">NoModificationAllowedError</a></code>"인
+                                <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                던진다.
+                            </p>
+                        </dd>
+                    </dl>
+
+                    <p>가져올 때는
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                            title="context object">컨텍스트 객체</a>만을 자식으로 가진
+                        가상의 노드에 대해
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-well-formed"
+                            title="concept-well-formed">require well-formed</a>
+                        플래그에 <code>true</code>를 제공하여
+                        <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-fragment-serializing-algorithm"
+                            title="concept-fragment-serializing-algorithm">조각 직렬화 알고리즘</a>을
+                        호출한 결과를 반환한다(문자열을 반환하는 대신 예외를 던질 수도 있다).
+
+                    </p>
+                    <p>설정할 때는 다음 단계를 실행해야 한다.
+
+                    </p>
+                    <ol>
+                        <li><var>parent</var>를 <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                title="context object">컨텍스트 객체</a>의
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-parent" title="concept-tree-parent"
+                                class="externalDFN">부모</a>로 둔다.
+
+                        </li>
+                        <li><var>parent</var>가 null이면, 이 단계를 종료한다. 나머지 단계를
+                            실행하더라도 생성된 노드에 대한 참조를 얻을 방법이 없다.
+
+                        </li>
+                        <li><var>parent</var>가
+                            <code><a href="https://www.w3.org/TR/dom/#document" title="document" class="externalDFN">Document</a></code>이면,
+                            이름이
+                            "<code><a href="https://www.w3.org/TR/dom/#nomodificationallowederror" title="nomodificationallowederror" class="externalDFN">NoModificationAllowedError</a></code>"인
+                            <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>
+                            예외를 던진다.
+
+                        </li>
+                        <li><var>parent</var>가
+                            <code><a href="https://www.w3.org/TR/dom/#documentfragment" title="documentfragment" class="externalDFN">DocumentFragment</a></code>이면,
+                            <var>parent</var>를 다음을 가진 새
+                            <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>로
+                            둔다.
+
+                            <ul>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-local-name"
+                                        title="concept-element-local-name" class="externalDFN">로컬 이름</a>으로
+                                    <code>body</code>,
+
+                                </li>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-namespace"
+                                        title="concept-element-namespace" class="externalDFN">네임스페이스</a>로
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns" title="html-ns">HTML
+                                        네임스페이스</a>, 그리고
+                                </li>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>로
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>.
+                                </li>
+                            </ul>
+
+                        </li>
+                        <li>새 값을 <var>markup</var>으로, <var>parent</var>를
+                            <var>context element</var>로 하여
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-parse-fragment"
+                                title="concept-parse-fragment">조각 구문 분석 알고리즘</a>을
+                            호출한 결과를 <var>fragment</var>로 둔다.
+
+                        </li>
+                        <li><a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                title="context object">컨텍스트 객체</a>의
+                            <a href="https://www.w3.org/TR/dom/#concept-tree-parent" title="concept-tree-parent"
+                                class="externalDFN">부모</a> 안에서
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                title="context object">컨텍스트 객체</a>를 <var>fragment</var>로
+                            <a href="https://www.w3.org/TR/dom/#concept-node-replace" title="concept-node-replace"
+                                class="externalDFN">대체</a>한다.
+                        </li>
+                    </ol>
+                </dd>
+            </dl>
+        </section>
+        <section property="bibo:hasPart" resource="#methods-2" typeof="bibo:Chapter" id="methods-2">
+            <h3 resource="#h-methods-2" id="h-methods-2"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">7.2 </span>메서드</span></h3>
+            <dl class="methods">
+                <dt id="widl-Element-insertAdjacentHTML-void-DOMString-position-DOMString-text">
+                    <code>insertAdjacentHTML</code>
+                </dt>
+                <dd>
+                    <dl class="domintro">
+                        <dt><var>element</var> . <code
+                                title="dom-element-insertadjacenthtml">insertAdjacentHTML</code>(<var>position</var>,
+                            <var>text</var>)
+
+                        </dt>
+                        <dd>
+                            <p>주어진 문자열 <var>text</var>를 HTML 또는 XML로 구문 분석하고,
+                                그 결과 노드를 <var>position</var> 인수가 지정한 위치의
+                                트리에 다음과 같이 삽입한다.
+
+                            </p>
+                            <dl>
+                                <dt>"beforebegin"
+                                </dt>
+                                <dd>요소 자체의 앞.
+
+                                </dd>
+                                <dt>"afterbegin"
+                                </dt>
+                                <dd>요소 바로 안쪽, 첫 번째 자식 앞.
+
+                                </dd>
+                                <dt>"beforeend"
+                                </dt>
+                                <dd>요소 바로 안쪽, 마지막 자식 뒤.
+
+                                </dd>
+                                <dt>"afterend"
+                                </dt>
+                                <dd>요소 자체의 뒤.
+                                </dd>
+                            </dl>
+
+                            <p>인수가 잘못된 값을 가지면(예:
+                                <a href="https://www.w3.org/TR/dom/#xml-document" title="xml-document"
+                                    class="externalDFN">XML 문서</a>의 경우, 주어진 문자열이
+                                well-formed가 아니면),
+                                이름이
+                                "<code><a href="https://www.w3.org/TR/dom/#syntaxerror" title="syntaxerror" class="externalDFN">SyntaxError</a></code>"인
+                                <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                던진다.
+
+                            </p>
+                            <p>주어진 위치가 가능하지 않으면(예:
+                                <code><a href="https://www.w3.org/TR/dom/#document" title="document" class="externalDFN">Document</a></code>의
+                                루트 요소 뒤에 요소를 삽입하는 경우),
+                                이름이
+                                "<code><a href="https://www.w3.org/TR/dom/#nomodificationallowederror" title="nomodificationallowederror" class="externalDFN">NoModificationAllowedError</a></code>"인
+                                <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                던진다.
+                            </p>
+                        </dd>
+                    </dl>
+
+                    <p>
+                        <dfn id="dfn-dom-element-insertadjacenthtml" data-dfn-type="dfn"
+                            data-lt="dom-element-insertadjacenthtml"><code>insertAdjacentHTML(<var>position</var>, <var>text</var>)</code></dfn>
+                        메서드는 다음 단계를 실행해야 한다.
+
+                    </p>
+                    <ol>
+                        <li>이 목록에서 처음 일치하는 항목을 사용한다.
+
+                            <dl class="switch">
+                                <dt><var>position</var>이
+                                    문자열 "beforebegin"과
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dt><var>position</var>이
+                                    문자열 "afterend"와
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dd>
+                                    <p><var>context</var>를 <a data-link-type="dfn" class="internalDFN"
+                                            href="#dfn-context-object" title="context object">컨텍스트 객체</a>의
+                                        <a href="https://www.w3.org/TR/dom/#concept-tree-parent"
+                                            title="concept-tree-parent" class="externalDFN">부모</a>로 둔다.
+
+                                    </p>
+                                    <p><var>context</var>가 null이거나
+                                        <a href="https://www.w3.org/TR/dom/#concept-document" class="externalDFN"
+                                            title="concept-document">문서</a>이면,
+                                        이름이
+                                        "<code><a href="https://www.w3.org/TR/dom/#nomodificationallowederror" title="nomodificationallowederror" class="externalDFN">NoModificationAllowedError</a></code>"인
+                                        <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                        던진다.
+
+                                    </p>
+                                </dd>
+                                <dt><var>position</var>이
+                                    문자열 "afterbegin"과
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dt><var>position</var>이
+                                    문자열 "beforeend"와
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dd><var>context</var>를 <a data-link-type="dfn" class="internalDFN"
+                                        href="#dfn-context-object" title="context object">컨텍스트 객체</a>로 둔다.
+
+                                </dd>
+                                <dt>그렇지 않으면
+                                </dt>
+                                <dd>
+                                    <p>이름이
+                                        "<code><a href="https://www.w3.org/TR/dom/#syntaxerror" title="syntaxerror" class="externalDFN">SyntaxError</a></code>"인
+                                        <code><a href="https://www.w3.org/TR/dom/#dfn-DOMException" title="domexception" class="externalDFN">DOMException</a></code>을
+                                        던진다.
+                                    </p>
+                                </dd>
+                            </dl>
+
+                        </li>
+                        <li><var>context</var>가
+                            <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>가
+                            아니거나, 다음이 모두 참이면:
+
+                            <ul>
+                                <li><var>context</var>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>가
+                                    <a href="https://www.w3.org/TR/dom/#html-document" title="html-document"
+                                        class="externalDFN">HTML 문서</a>이고,
+
+                                </li>
+                                <li><var>context</var>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-local-name"
+                                        title="concept-element-local-name" class="externalDFN">로컬 이름</a>이
+                                    "<code>html</code>"이며,
+
+                                </li>
+                                <li><var>context</var>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-namespace"
+                                        title="concept-element-namespace" class="externalDFN">네임스페이스</a>가
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns" title="html-ns">HTML
+                                        네임스페이스</a>이면,
+                                </li>
+                            </ul>
+
+                            <p><var>context</var>를 다음을 가진 새
+                                <code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>로
+                                둔다.
+
+                            </p>
+                            <ul>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-local-name"
+                                        title="concept-element-local-name" class="externalDFN">로컬 이름</a>으로
+                                    <code>body</code>,
+
+                                </li>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-namespace"
+                                        title="concept-element-namespace" class="externalDFN">네임스페이스</a>로
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns" title="html-ns">HTML
+                                        네임스페이스</a>, 그리고
+
+                                </li>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>로
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>.
+                                </li>
+                            </ul>
+
+                        </li>
+                        <li><var>text</var>를
+                            <var>markup</var>으로, <var>context</var>를 <var>context element</var>로 하여
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-parse-fragment"
+                                title="concept-parse-fragment">조각 구문 분석 알고리즘</a>을 호출한 결과를
+                            <var>fragment</var>로 둔다.
+
+                        </li>
+                        <li>이 목록에서 처음 일치하는 항목을 사용한다.
+
+                            <dl class="switch">
+                                <dt><var>position</var>이
+                                    문자열 "beforebegin"과
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dd>
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-tree-parent" title="concept-tree-parent"
+                                        class="externalDFN">부모</a> 안에서
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a> 앞에
+                                    <var>fragment</var>를
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-insert" title="concept-node-insert"
+                                        class="externalDFN">삽입</a>한다.
+
+                                </dd>
+                                <dt><var>position</var>이
+                                    문자열 "afterbegin"과
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dd>
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a> 안의
+                                    그
+                                    <a href="https://www.w3.org/TR/dom/#concept-tree-first-child"
+                                        title="concept-tree-first-child" class="externalDFN">첫 번째 자식</a> 앞에
+                                    <var>fragment</var>를
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-insert" title="concept-node-insert"
+                                        class="externalDFN">삽입</a>한다.
+
+                                </dd>
+                                <dt><var>position</var>이
+                                    문자열 "beforeend"와
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dd><var>fragment</var>를
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a>에
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-append" title="concept-node-append"
+                                        class="externalDFN">추가</a>한다.
+
+                                </dd>
+                                <dt><var>position</var>이
+                                    문자열 "afterend"와
+                                    <a href="https://www.w3.org/TR/dom/#ascii-case-insensitive" class="externalDFN"
+                                        title="ascii-case-insensitive">ASCII 대소문자 구분 없는</a> 일치인 경우
+
+                                </dt>
+                                <dd>
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-tree-parent" title="concept-tree-parent"
+                                        class="externalDFN">부모</a> 안에서
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-tree-next-sibling"
+                                        title="concept-tree-next-sibling" class="externalDFN">다음 형제</a> 앞에
+                                    <var>fragment</var>를
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-insert" title="concept-node-insert"
+                                        class="externalDFN">삽입</a>한다.
+                                </dd>
+                            </dl>
+                        </li>
+                    </ol>
+                    <table class="parameters">
+                        <tbody>
+                            <tr>
+                                <th>매개변수</th>
+                                <th>타입</th>
+                                <th>Null 가능</th>
+                                <th>선택 사항</th>
+                                <th>설명</th>
+                            </tr>
+                            <tr>
+                                <td class="prmName">position</td>
+                                <td class="prmType"><code>DOMString</code></td>
+                                <td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmDesc"></td>
+                            </tr>
+                            <tr>
+                                <td class="prmName">text</td>
+                                <td class="prmType"><code>DOMString</code></td>
+                                <td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmDesc"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div><em>반환 타입: </em><code>void</code></div>
+                </dd>
+            </dl>
+        </section>
+    </section>
+
+    <!-- Dropping this extention as it is not implemented, nor does it appear that any browser
+     is currently interested in supporting it. Perhaps it can come back in a V2 of this spec
+     if browsers become interested.
+<section>
+    <h1>Extensions to the <code><a title="text" data-spec="DOM4" class="externalDFN">Text</a></code> interface</h1>
+
+    <dl class="idl" title="partial interface Text">
+        <dt>attribute boolean serializeAsCDATA</dt>
+        <dd>
+            <dl class=domintro>
+              <dt><var>text</var> .
+                  <code title="dom-text-serializeascdata">serializeAsCDATA</code> [ = <var>value</var> ]
+              <dd>Controls whether, in XML, this node is serialized as a CDATA section.
+            </dl>
+
+            <p><code><a title="text" data-spec="DOM4" class="externalDFN">Text</a></code> nodes have an additional
+            associated flag, the <dfn>serialize as CDATA flag</dfn>.
+
+            <p>The
+            <dfn title="dom-text-serializeascdata"><code>serializeAsCDATA</code></dfn>
+            attribute must return true if the <a title="context object">context object</a> has its
+            <a>serialize as CDATA flag</a> set, or false otherwise.
+
+            <p>Setting the <code title="dom-text-serializeascdata">serializeAsCDATA</code>
+            attribute must, if the new value is true, set the
+            <a title="context object">context object</a>'s <a>serialize as CDATA flag</a>, or unset
+            it otherwise.
+        </dd>
+    </dl>
+</section>
+-->
+
+    <section property="bibo:hasPart" resource="#extensions-to-the-range-interface" typeof="bibo:Chapter"
+        id="extensions-to-the-range-interface">
+        <!--OddPage-->
+        <h2 resource="#h-extensions-to-the-range-interface" id="h-extensions-to-the-range-interface"><span
+                property="xhv:role" resource="xhv:heading"><span class="secno">8. </span>
+                <code><a href="https://www.w3.org/TR/dom/#range" title="range" class="externalDFN">Range</a></code>
+                인터페이스에 대한 확장</span></h2>
+
+        <pre class="idl"><span class="idlInterface" id="idl-def-Range">partial interface <span class="idlInterfaceID">Range</span> {
+<span class="idlMethod">    [<span class="extAttr">CEReactions, NewObject</span>]
+    <span class="idlMethType">DocumentFragment</span> <span class="idlMethName"><a href="#widl-Range-createContextualFragment-DocumentFragment-DOMString-fragment">createContextualFragment</a></span> (<span class="idlParam"><span class="idlParamType">DOMString</span> <span class="idlParamName">fragment</span></span>);</span>
+};</span></pre>
+        <section property="bibo:hasPart" resource="#methods-3" typeof="bibo:Chapter" id="methods-3">
+            <h3 resource="#h-methods-3" id="h-methods-3"><span property="xhv:role" resource="xhv:heading"><span
+                        class="secno">8.1 </span>메서드</span></h3>
+            <dl class="methods">
+                <dt id="widl-Range-createContextualFragment-DocumentFragment-DOMString-fragment">
+                    <code>createContextualFragment</code>
+                </dt>
+                <dd>
+                    <dl class="domintro">
+                        <dt><var>docFragment</var> = <var>range</var> . <code
+                                title="dom-range-createcontextualfragment">createContextualFragment</code>(<var>markupString</var>)
+                        </dt>
+                        <dd>주어진 마크업 문자열에서 생성된
+                            <code><a href="https://www.w3.org/TR/dom/#documentfragment" title="documentfragment" class="externalDFN">DocumentFragment</a></code>를
+                            반환한다.
+                        </dd>
+                    </dl>
+
+                    <p>
+                        <dfn id="dfn-dom-range-createcontextualfragment" data-dfn-type="dfn"
+                            data-lt="dom-range-createcontextualfragment"><code>createContextualFragment(<var>fragment</var>)</code></dfn>
+                        메서드는 다음 단계를 실행해야 한다.
+
+                    </p>
+                    <ol>
+                        <li><var>node</var>를 <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                title="context object">컨텍스트 객체</a>의
+                            <a href="https://www.w3.org/TR/dom/#concept-range-start-node"
+                                title="concept-range-start-node" class="externalDFN">시작 노드</a>로 둔다.
+
+                            <p><var>element</var>를 <var>node</var>의 인터페이스에 따라 다음과 같이 둔다.
+
+                            </p>
+                            <dl class="switch">
+                                <dt><code><a href="https://www.w3.org/TR/dom/#document" title="document" class="externalDFN">Document</a></code>
+                                </dt>
+                                <dt><code><a href="https://www.w3.org/TR/dom/#documentfragment" title="documentfragment" class="externalDFN">DocumentFragment</a></code>
+                                </dt>
+                                <dd>null
+
+                                </dd>
+                                <dt><code><a href="https://www.w3.org/TR/dom/#element" title="element" class="externalDFN">Element</a></code>
+                                </dt>
+                                <dd><var>node</var>
+
+                                </dd>
+                                <dt><code><a href="https://www.w3.org/TR/dom/#text" title="text" class="externalDFN">Text</a></code>
+                                </dt>
+                                <dt><code><a href="https://www.w3.org/TR/dom/#comment" title="comment" class="externalDFN">Comment</a></code>
+                                </dt>
+                                <dd><var>node</var>의
+                                    <a href="https://www.w3.org/TR/dom/#parent-element" class="externalDFN"
+                                        title="parent-element">부모 요소</a>
+
+                                </dd>
+                                <dt><code><a href="https://www.w3.org/TR/dom/#documenttype" title="documenttype" class="externalDFN">DocumentType</a></code>
+                                </dt>
+                                <dt><code><a href="https://www.w3.org/TR/dom/#processinginstruction" title="processinginstruction" class="externalDFN">ProcessingInstruction</a></code>
+                                </dt>
+                                <dd>[<cite><a href="#bib-DOM4" class="bibref">DOM4</a></cite>]가 이 경우를 방지한다.
+                                </dd>
+                            </dl>
+
+                        </li>
+                        <li><var>element</var>가 null이거나 다음이 모두 참이면:
+
+                            <ul>
+                                <li><var>element</var>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>가
+                                    <a href="https://www.w3.org/TR/dom/#html-document" title="html-document"
+                                        class="externalDFN">HTML 문서</a>이고,
+
+                                </li>
+                                <li><var>element</var>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-local-name"
+                                        title="concept-element-local-name" class="externalDFN">로컬 이름</a>이
+                                    "<code>html</code>"이며,
+
+                                </li>
+                                <li><var>element</var>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-namespace"
+                                        title="concept-element-namespace" class="externalDFN">네임스페이스</a>가
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns" title="html-ns">HTML
+                                        네임스페이스</a>이다.
+                                </li>
+                            </ul>
+
+                            <p><var>element</var>를 다음을 가진 새
+                                <a href="https://www.w3.org/TR/dom/#concept-element" title="concept-element"
+                                    class="externalDFN">요소</a>로 둔다.
+
+                            </p>
+                            <ul>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-local-name"
+                                        title="concept-element-local-name" class="externalDFN">로컬 이름</a>으로
+                                    "<code>body</code>",
+
+                                </li>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-element-namespace"
+                                        title="concept-element-namespace" class="externalDFN">네임스페이스</a>로
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-html-ns" title="html-ns">HTML
+                                        네임스페이스</a>, 그리고
+
+                                </li>
+                                <li>그
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>로
+                                    <a data-link-type="dfn" class="internalDFN" href="#dfn-context-object"
+                                        title="context object">컨텍스트 객체</a>의
+                                    <a href="https://www.w3.org/TR/dom/#concept-node-document"
+                                        title="concept-node-document" class="externalDFN">노드 문서</a>.
+                                </li>
+                            </ul>
+
+                        </li>
+                        <li><var>fragment</var>를
+                            <var>markup</var>으로, <var>element</var>를 <var>context element</var>로 하여
+                            <a data-link-type="dfn" class="internalDFN" href="#dfn-concept-parse-fragment"
+                                title="concept-parse-fragment">조각 구문 분석 알고리즘</a>을 호출한 결과를
+                            <var>fragment node</var>로 둔다.
+
+                        </li>
+                        <li><var>fragment node</var> 안의 모든 스크립트에서 "already started" 표시를 제거한다.
+
+                        </li>
+                        <li><var>fragment node</var>의 값을 반환한다.
+                        </li>
+                    </ol>
+                    <table class="parameters">
+                        <tbody>
+                            <tr>
+                                <th>매개변수</th>
+                                <th>타입</th>
+                                <th>Null 가능</th>
+                                <th>선택 사항</th>
+                                <th>설명</th>
+                            </tr>
+                            <tr>
+                                <td class="prmName">fragment</td>
+                                <td class="prmType"><code>DOMString</code></td>
+                                <td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td>
+                                <td class="prmDesc"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div><em>반환 타입: </em><code>DocumentFragment</code></div>
+                </dd>
+            </dl>
+        </section>
+    </section>
+
+    <section property="bibo:hasPart" resource="#revision-history" typeof="bibo:Chapter" id="revision-history"
+        class="appendix">
+        <!--OddPage-->
+        <h2 resource="#h-revision-history" id="h-revision-history"><span property="xhv:role"
+                resource="xhv:heading"><span class="secno">A. </span>개정 이력</span></h2>
+        <p>다음은 이 명세의 마지막 공개 이후 변경 사항에 대한 정보성 요약이다.
+            이 명세의 편집자 초안의 전체 개정 이력은
+            <a href="https://dvcs.w3.org/hg/innerhtml/summary/">여기</a>에서 확인할 수 있다.
+        </p>
+
+        <ul>
+            <li><a href="https://dvcs.w3.org/hg/innerhtml/raw-file/tip/LC2_comments.html">이전 Last Call 문서의
+                    비규범적 변경 사항을 통합했다.</a>
+            </li>
+        </ul>
+    </section>
+
+    <section property="bibo:hasPart" resource="#acknowledgements" typeof="bibo:Chapter" id="acknowledgements"
+        class="appendix">
+        <!--OddPage-->
+        <h2 resource="#h-acknowledgements" id="h-acknowledgements"><span property="xhv:role"
+                resource="xhv:heading"><span class="secno">B. </span>감사의 말</span></h2>
+        <p>이 명세의 초기 초안을 유지하고
+            <a href="https://domparsing.spec.whatwg.org/">살아있는 명세</a>에서 지속적으로 개선해 준
+            Ms2ger [<a href="http://www.mozilla.org">Mozilla</a>]에게 감사한다.
+
+        </p>
+        <p>
+            Victor Costan,
+            Aryeh Gregor,
+            Anne van Kesteren,
+            Arkadiusz Michalski,
+            Simon Pieters,
+            Henri Sivonen,
+            Josh Soref
+            및 Boris Zbarsky에게,
+            유용한 의견에 대해 감사한다.
+
+        </p>
+        <p>
+            [<cite><a href="#bib-HTML5" class="bibref">HTML5</a></cite>]에서
+            <code title="dom-element-innerhtml">innerHTML</code> 및
+            <code title="dom-element-outerhtml">outerHTML</code> 속성과
+            <code title="dom-element-insertadjacenthtml">insertAdjacentHTML()</code> 메서드를 정의하고
+            유용한 의견을 준 Ian Hickson에게 특별히 감사한다.
+        </p>
+    </section>
+
+    <section property="bibo:hasPart" resource="#references" typeof="bibo:Chapter" id="references" class="appendix">
+        <!--OddPage-->
+        <h2 resource="#h-references" id="h-references"><span property="xhv:role" resource="xhv:heading"><span
+                    class="secno">C. </span>참고 문헌</span></h2>
+        <section property="bibo:hasPart" resource="#normative-references" typeof="bibo:Chapter"
+            id="normative-references">
+            <h3 resource="#h-normative-references" id="h-normative-references"><span property="xhv:role"
+                    resource="xhv:heading"><span class="secno">C.1 </span>규범적 참고 문헌</span></h3>
+            <dl resource="" class="bibliography">
+                <dt id="bib-HTML5">[HTML5]</dt>
+                <dd>Ian Hickson; Robin Berjon; Steve Faulkner; Travis Leithead; Erika Doyle Navara; Edward O'Connor;
+                    Silvia Pfeiffer. W3C. <a property="dc:requires"
+                        href="https://www.w3.org/TR/html5/"><cite>HTML5</cite></a>. 2014년 10월 28일. W3C 권고안.
+                    URL: <a property="dc:requires" href="https://www.w3.org/TR/html5/">http://www.w3.org/TR/html5/</a>
+                </dd>
+                <dt id="bib-RFC2119">[RFC2119]</dt>
+                <dd>S. Bradner. IETF. <a property="dc:requires" href="https://tools.ietf.org/html/rfc2119"><cite>RFC에서
+                            요구 수준을 나타내는 데 사용하는 핵심 단어</cite></a>. 1997년 3월. Best Current
+                    Practice. URL: <a property="dc:requires"
+                        href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
+                </dd>
+                <dt id="bib-WEBIDL">[WEBIDL]</dt>
+                <dd>Cameron McCormack; Boris Zbarsky. W3C. <a property="dc:requires"
+                        href="https://www.w3.org/TR/WebIDL-1/"><cite>WebIDL Level 1</cite></a>. 2016년 3월 8일. W3C
+                    후보 권고안. URL: <a property="dc:requires"
+                        href="https://www.w3.org/TR/WebIDL-1/">http://www.w3.org/TR/WebIDL-1/</a>
+                </dd>
+            </dl>
+        </section>
+        <section property="bibo:hasPart" resource="#informative-references" typeof="bibo:Chapter"
+            id="informative-references">
+            <h3 resource="#h-informative-references" id="h-informative-references"><span property="xhv:role"
+                    resource="xhv:heading"><span class="secno">C.2 </span>정보성 참고 문헌</span></h3>
+            <dl resource="" class="bibliography">
+                <dt id="bib-DOM4">[DOM4]</dt>
+                <dd>Anne van Kesteren; Aryeh Gregor; Ms2ger; Alex Russell; Robin Berjon. W3C. <a
+                        property="dc:references" href="https://www.w3.org/TR/dom/"><cite>W3C DOM4</cite></a>. 2015년
+                    11월 19일. W3C 권고안. URL: <a property="dc:references"
+                        href="https://www.w3.org/TR/dom/">http://www.w3.org/TR/dom/</a>
+                </dd>
+                <dt id="bib-XML10">[XML10]</dt>
+                <dd>Tim Bray; Jean Paoli; Michael Sperberg-McQueen; Eve Maler; François Yergeau et al. W3C. <a
+                        property="dc:references" href="https://www.w3.org/TR/xml"><cite>Extensible Markup Language (XML)
+                            1.0 (Fifth Edition)</cite></a>. 2008년 11월 26일. W3C 권고안. URL: <a property="dc:references"
+                        href="https://www.w3.org/TR/xml">http://www.w3.org/TR/xml</a>
+                </dd>
+            </dl>
+        </section>
+    </section>
+    <p role="navigation" id="back-to-top"><a href="#toc"><abbr title="Back to Top">↑</abbr></a></p>
+    <script src="https://www.w3.org/scripts/TR/2016/fixup.js" defer="" async=""></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
