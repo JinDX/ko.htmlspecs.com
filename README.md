@@ -132,6 +132,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Window Management](https://ko.htmlspecs.com/window-management/)（[Source](https://www.w3.org/TR/2024/WD-window-management-20240607/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Web Share API](https://ko.htmlspecs.com/web-share/)（[Source](https://www.w3.org/TR/2023/REC-web-share-20230530/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Audio API](https://ko.htmlspecs.com/webaudio/)（[Source](https://www.w3.org/TR/2024/WD-webaudio-1.1-20241105/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Audio Output Devices API](https://ko.htmlspecs.com/audio-output/)（[Source](https://www.w3.org/TR/2025/CRD-audio-output-20251009/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Geolocation API](https://ko.htmlspecs.com/geolocation/)（[Source](https://www.w3.org/TR/2026/CR-geolocation-20260326/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Device Orientation and Motion](https://ko.htmlspecs.com/orientation-event/)（[Source](https://www.w3.org/TR/2025/CRD-orientation-event-20250212/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Motion Sensors Explainer](https://ko.htmlspecs.com/motion-sensors/)（[Source](https://www.w3.org/TR/2017/NOTE-motion-sensors-20170830/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
