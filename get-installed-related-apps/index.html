@@ -1,0 +1,2321 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>설치된 관련 앱 가져오기 API</title>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <link href="https://www.w3.org/StyleSheets/TR/2016/cg-draft" rel="stylesheet">
+    <!-- <meta content="Bikeshed version b9f8371cc, updated Fri Mar 5 18:35:23 2021 -0800" name="generator"> -->
+    <link href="https://wicg.github.io/get-installed-related-apps/spec/" rel="canonical">
+    <!-- <meta content="e7741e380853420f02e34f24685ecfcde5364be0" name="document-revision"> -->
+    <style>
+        /* style-autolinks */
+
+        .css.css,
+        .property.property,
+        .descriptor.descriptor {
+            color: var(--a-normal-text);
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+        .css::before,
+        .property::before,
+        .descriptor::before {
+            content: "‘";
+        }
+
+        .css::after,
+        .property::after,
+        .descriptor::after {
+            content: "’";
+        }
+
+        .property,
+        .descriptor {
+            /* Don't wrap property and descriptor names */
+            white-space: nowrap;
+        }
+
+        .type {
+            /* CSS value <type> */
+            font-style: italic;
+        }
+
+        pre .property::before,
+        pre .property::after {
+            content: "";
+        }
+
+        [data-link-type="property"]::before,
+        [data-link-type="propdesc"]::before,
+        [data-link-type="descriptor"]::before,
+        [data-link-type="value"]::before,
+        [data-link-type="function"]::before,
+        [data-link-type="at-rule"]::before,
+        [data-link-type="selector"]::before,
+        [data-link-type="maybe"]::before {
+            content: "‘";
+        }
+
+        [data-link-type="property"]::after,
+        [data-link-type="propdesc"]::after,
+        [data-link-type="descriptor"]::after,
+        [data-link-type="value"]::after,
+        [data-link-type="function"]::after,
+        [data-link-type="at-rule"]::after,
+        [data-link-type="selector"]::after,
+        [data-link-type="maybe"]::after {
+            content: "’";
+        }
+
+        [data-link-type].production::before,
+        [data-link-type].production::after,
+        .prod [data-link-type]::before,
+        .prod [data-link-type]::after {
+            content: "";
+        }
+
+        [data-link-type=element],
+        [data-link-type=element-attr] {
+            font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace;
+            font-size: .9em;
+        }
+
+        [data-link-type=element]::before {
+            content: "<"
+        }
+
+        [data-link-type=element]::after {
+            content: ">"
+        }
+
+        [data-link-type=biblio] {
+            white-space: pre;
+        }
+    </style>
+    <style>
+        /* style-colors */
+
+        /* Any --*-text not paired with a --*-bg is assumed to have a transparent bg */
+        :root {
+            color-scheme: light dark;
+
+            --text: black;
+            --bg: white;
+
+            --unofficial-watermark: url(https://www.w3.org/StyleSheets/TR/2016/logos/UD-watermark);
+
+            --logo-bg: #1a5e9a;
+            --logo-active-bg: #c00;
+            --logo-text: white;
+
+            --tocnav-normal-text: #707070;
+            --tocnav-normal-bg: var(--bg);
+            --tocnav-hover-text: var(--tocnav-normal-text);
+            --tocnav-hover-bg: #f8f8f8;
+            --tocnav-active-text: #c00;
+            --tocnav-active-bg: var(--tocnav-normal-bg);
+
+            --tocsidebar-text: var(--text);
+            --tocsidebar-bg: #f7f8f9;
+            --tocsidebar-shadow: rgba(0, 0, 0, .1);
+            --tocsidebar-heading-text: hsla(203, 20%, 40%, .7);
+
+            --toclink-text: var(--text);
+            --toclink-underline: #3980b5;
+            --toclink-visited-text: var(--toclink-text);
+            --toclink-visited-underline: #054572;
+
+            --heading-text: #005a9c;
+
+            --hr-text: var(--text);
+
+            --algo-border: #def;
+
+            --del-text: red;
+            --del-bg: transparent;
+            --ins-text: #080;
+            --ins-bg: transparent;
+
+            --a-normal-text: #034575;
+            --a-normal-underline: #707070;
+            --a-visited-text: var(--a-normal-text);
+            --a-visited-underline: #bbb;
+            --a-hover-bg: rgba(75%, 75%, 75%, .25);
+            --a-active-text: #c00;
+            --a-active-underline: #c00;
+
+            --blockquote-border: silver;
+            --blockquote-bg: transparent;
+            --blockquote-text: currentcolor;
+
+            --issue-border: #e05252;
+            --issue-bg: #fbe9e9;
+            --issue-text: var(--text);
+            --issueheading-text: #831616;
+
+            --example-border: #e0cb52;
+            --example-bg: #fcfaee;
+            --example-text: var(--text);
+            --exampleheading-text: #574b0f;
+
+            --note-border: #52e052;
+            --note-bg: #e9fbe9;
+            --note-text: var(--text);
+            --noteheading-text: hsl(120, 70%, 30%);
+            --notesummary-underline: silver;
+
+            --assertion-border: #aaa;
+            --assertion-bg: #eee;
+            --assertion-text: black;
+
+            --advisement-border: orange;
+            --advisement-bg: #fec;
+            --advisement-text: var(--text);
+            --advisementheading-text: #b35f00;
+
+            --warning-border: red;
+            --warning-bg: hsla(40, 100%, 50%, 0.95);
+            --warning-text: var(--text);
+
+            --amendment-border: #330099;
+            --amendment-bg: #F5F0FF;
+            --amendment-text: var(--text);
+            --amendmentheading-text: #220066;
+
+            --def-border: #8ccbf2;
+            --def-bg: #def;
+            --def-text: var(--text);
+            --defrow-border: #bbd7e9;
+
+            --datacell-border: silver;
+
+            --indexinfo-text: #707070;
+
+            --indextable-hover-text: black;
+            --indextable-hover-bg: #f7f8f9;
+
+            --outdatedspec-bg: rgba(0, 0, 0, .5);
+            --outdatedspec-text: black;
+            --outdated-bg: maroon;
+            --outdated-text: white;
+            --outdated-shadow: red;
+
+            --editedrec-bg: darkorange;
+        }
+    </style>
+    <style>
+        /* style-counters */
+
+        body {
+            counter-reset: example figure issue;
+        }
+
+        .issue {
+            counter-increment: issue;
+        }
+
+        .issue:not(.no-marker)::before {
+            content: "Issue " counter(issue);
+        }
+
+        .example {
+            counter-increment: example;
+        }
+
+        .example:not(.no-marker)::before {
+            content: "Example " counter(example);
+        }
+
+        .invalid.example:not(.no-marker)::before,
+        .illegal.example:not(.no-marker)::before {
+            content: "Invalid Example" counter(example);
+        }
+
+        figcaption {
+            counter-increment: figure;
+        }
+
+        figcaption:not(.no-marker)::before {
+            content: "Figure " counter(figure) " ";
+        }
+    </style>
+    <style>
+        /* style-dfn-panel */
+
+        :root {
+            --dfnpanel-bg: #ddd;
+            --dfnpanel-text: var(--text);
+        }
+
+        .dfn-panel {
+            position: absolute;
+            z-index: 35;
+            height: auto;
+            width: -webkit-fit-content;
+            width: fit-content;
+            max-width: 300px;
+            max-height: 500px;
+            overflow: auto;
+            padding: 0.5em 0.75em;
+            font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+            background: var(--dfnpanel-bg);
+            color: var(--dfnpanel-text);
+            border: outset 0.2em;
+        }
+
+        .dfn-panel:not(.on) {
+            display: none;
+        }
+
+        .dfn-panel * {
+            margin: 0;
+            padding: 0;
+            text-indent: 0;
+        }
+
+        .dfn-panel>b {
+            display: block;
+        }
+
+        .dfn-panel a {
+            color: var(--dfnpanel-text);
+        }
+
+        .dfn-panel a:not(:hover) {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+
+        .dfn-panel>b+b {
+            margin-top: 0.25em;
+        }
+
+        .dfn-panel ul {
+            padding: 0;
+        }
+
+        .dfn-panel li {
+            list-style: inside;
+        }
+
+        .dfn-panel.activated {
+            display: inline-block;
+            position: fixed;
+            left: .5em;
+            bottom: 2em;
+            margin: 0 auto;
+            max-width: calc(100vw - 1.5em - .4em - .5em);
+            max-height: 30vh;
+        }
+
+        .dfn-paneled {
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        /* style-md-lists */
+
+        /* This is a weird hack for me not yet following the commonmark spec
+   regarding paragraph and lists. */
+        [data-md]> :first-child {
+            margin-top: 0;
+        }
+
+        [data-md]> :last-child {
+            margin-bottom: 0;
+        }
+    </style>
+    <style>
+        /* style-selflinks */
+
+        :root {
+            --selflink-text: white;
+            --selflink-bg: gray;
+            --selflink-hover-text: black;
+        }
+
+        .heading,
+        .issue,
+        .note,
+        .example,
+        li,
+        dt {
+            position: relative;
+        }
+
+        a.self-link {
+            position: absolute;
+            top: 0;
+            left: calc(-1 * (3.5rem - 26px));
+            width: calc(3.5rem - 26px);
+            height: 2em;
+            text-align: center;
+            border: none;
+            transition: opacity .2s;
+            opacity: .5;
+        }
+
+        a.self-link:hover {
+            opacity: 1;
+        }
+
+        .heading>a.self-link {
+            font-size: 83%;
+        }
+
+        li>a.self-link {
+            left: calc(-1 * (3.5rem - 26px) - 2em);
+        }
+
+        dfn>a.self-link {
+            top: auto;
+            left: auto;
+            opacity: 0;
+            width: 1.5em;
+            height: 1.5em;
+            background: var(--selflink-bg);
+            color: var(--selflink-text);
+            font-style: normal;
+            transition: opacity .2s, background-color .2s, color .2s;
+        }
+
+        dfn:hover>a.self-link {
+            opacity: 1;
+        }
+
+        dfn>a.self-link:hover {
+            color: var(--selflink-hover-text);
+        }
+
+        a.self-link::before {
+            content: "¶";
+        }
+
+        .heading>a.self-link::before {
+            content: "§";
+        }
+
+        dfn>a.self-link::before {
+            content: "#";
+        }
+    </style>
+    <style>
+        /* style-syntax-highlighting */
+
+        pre.idl.highlight {
+            background: var(--borderedblock-bg, var(--def-bg));
+        }
+
+        code.highlight {
+            padding: .1em;
+            border-radius: .3em;
+        }
+
+        pre.highlight,
+        pre>code.highlight {
+            display: block;
+            padding: 1em;
+            margin: .5em 0;
+            overflow: auto;
+            border-radius: 0;
+        }
+
+        .highlight:not(.idl) {
+            background: rgba(0, 0, 0, .03);
+        }
+
+        c-[a] {
+            color: #990055
+        }
+
+        /* Keyword.Declaration */
+        c-[b] {
+            color: #990055
+        }
+
+        /* Keyword.Type */
+        c-[c] {
+            color: #708090
+        }
+
+        /* Comment */
+        c-[d] {
+            color: #708090
+        }
+
+        /* Comment.Multiline */
+        c-[e] {
+            color: #0077aa
+        }
+
+        /* Name.Attribute */
+        c-[f] {
+            color: #669900
+        }
+
+        /* Name.Tag */
+        c-[g] {
+            color: #222222
+        }
+
+        /* Name.Variable */
+        c-[k] {
+            color: #990055
+        }
+
+        /* Keyword */
+        c-[l] {
+            color: #000000
+        }
+
+        /* Literal */
+        c-[m] {
+            color: #000000
+        }
+
+        /* Literal.Number */
+        c-[n] {
+            color: #0077aa
+        }
+
+        /* Name */
+        c-[o] {
+            color: #999999
+        }
+
+        /* Operator */
+        c-[p] {
+            color: #999999
+        }
+
+        /* Punctuation */
+        c-[s] {
+            color: #a67f59
+        }
+
+        /* Literal.String */
+        c-[t] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Single */
+        c-[u] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Double */
+        c-[cp] {
+            color: #708090
+        }
+
+        /* Comment.Preproc */
+        c-[c1] {
+            color: #708090
+        }
+
+        /* Comment.Single */
+        c-[cs] {
+            color: #708090
+        }
+
+        /* Comment.Special */
+        c-[kc] {
+            color: #990055
+        }
+
+        /* Keyword.Constant */
+        c-[kn] {
+            color: #990055
+        }
+
+        /* Keyword.Namespace */
+        c-[kp] {
+            color: #990055
+        }
+
+        /* Keyword.Pseudo */
+        c-[kr] {
+            color: #990055
+        }
+
+        /* Keyword.Reserved */
+        c-[ld] {
+            color: #000000
+        }
+
+        /* Literal.Date */
+        c-[nc] {
+            color: #0077aa
+        }
+
+        /* Name.Class */
+        c-[no] {
+            color: #0077aa
+        }
+
+        /* Name.Constant */
+        c-[nd] {
+            color: #0077aa
+        }
+
+        /* Name.Decorator */
+        c-[ni] {
+            color: #0077aa
+        }
+
+        /* Name.Entity */
+        c-[ne] {
+            color: #0077aa
+        }
+
+        /* Name.Exception */
+        c-[nf] {
+            color: #0077aa
+        }
+
+        /* Name.Function */
+        c-[nl] {
+            color: #0077aa
+        }
+
+        /* Name.Label */
+        c-[nn] {
+            color: #0077aa
+        }
+
+        /* Name.Namespace */
+        c-[py] {
+            color: #0077aa
+        }
+
+        /* Name.Property */
+        c-[ow] {
+            color: #999999
+        }
+
+        /* Operator.Word */
+        c-[mb] {
+            color: #000000
+        }
+
+        /* Literal.Number.Bin */
+        c-[mf] {
+            color: #000000
+        }
+
+        /* Literal.Number.Float */
+        c-[mh] {
+            color: #000000
+        }
+
+        /* Literal.Number.Hex */
+        c-[mi] {
+            color: #000000
+        }
+
+        /* Literal.Number.Integer */
+        c-[mo] {
+            color: #000000
+        }
+
+        /* Literal.Number.Oct */
+        c-[sb] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Backtick */
+        c-[sc] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Char */
+        c-[sd] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Doc */
+        c-[se] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Escape */
+        c-[sh] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Heredoc */
+        c-[si] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Interpol */
+        c-[sx] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Other */
+        c-[sr] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Regex */
+        c-[ss] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Symbol */
+        c-[vc] {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Class */
+        c-[vg] {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Global */
+        c-[vi] {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Instance */
+        c-[il] {
+            color: #000000
+        }
+
+        /* Literal.Number.Integer.Long */
+    </style>
+    <style>
+        /* style-var-click-highlighting */
+
+        var {
+            cursor: pointer;
+        }
+
+        var.selected0 {
+            background-color: #F4D200;
+            box-shadow: 0 0 0 2px #F4D200;
+        }
+
+        var.selected1 {
+            background-color: #FF87A2;
+            box-shadow: 0 0 0 2px #FF87A2;
+        }
+
+        var.selected2 {
+            background-color: #96E885;
+            box-shadow: 0 0 0 2px #96E885;
+        }
+
+        var.selected3 {
+            background-color: #3EEED2;
+            box-shadow: 0 0 0 2px #3EEED2;
+        }
+
+        var.selected4 {
+            background-color: #EACFB6;
+            box-shadow: 0 0 0 2px #EACFB6;
+        }
+
+        var.selected5 {
+            background-color: #82DDFF;
+            box-shadow: 0 0 0 2px #82DDFF;
+        }
+
+        var.selected6 {
+            background-color: #FFBCF2;
+            box-shadow: 0 0 0 2px #FFBCF2;
+        }
+    </style>
+    <style>
+        /* style-darkmode */
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text: #ddd;
+                --bg: black;
+
+                --unofficial-watermark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cg fill='%23100808' transform='translate(200 200) rotate(-45) translate(-200 -200)' stroke='%23100808' stroke-width='3'%3E%3Ctext x='50%25' y='220' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EUNOFFICIAL%3C/text%3E%3Ctext x='50%25' y='305' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EDRAFT%3C/text%3E%3C/g%3E%3C/svg%3E");
+
+                --logo-bg: #1a5e9a;
+                --logo-active-bg: #c00;
+                --logo-text: white;
+
+                --tocnav-normal-text: #999;
+                --tocnav-normal-bg: var(--bg);
+                --tocnav-hover-text: var(--tocnav-normal-text);
+                --tocnav-hover-bg: #080808;
+                --tocnav-active-text: #f44;
+                --tocnav-active-bg: var(--tocnav-normal-bg);
+
+                --tocsidebar-text: var(--text);
+                --tocsidebar-bg: #080808;
+                --tocsidebar-shadow: rgba(255, 255, 255, .1);
+                --tocsidebar-heading-text: hsla(203, 20%, 40%, .7);
+
+                --toclink-text: var(--text);
+                --toclink-underline: #6af;
+                --toclink-visited-text: var(--toclink-text);
+                --toclink-visited-underline: #054572;
+
+                --heading-text: #8af;
+
+                --hr-text: var(--text);
+
+                --algo-border: #456;
+
+                --del-text: #f44;
+                --del-bg: transparent;
+                --ins-text: #4a4;
+                --ins-bg: transparent;
+
+                --a-normal-text: #6af;
+                --a-normal-underline: #555;
+                --a-visited-text: var(--a-normal-text);
+                --a-visited-underline: var(--a-normal-underline);
+                --a-hover-bg: rgba(25%, 25%, 25%, .2);
+                --a-active-text: #f44;
+                --a-active-underline: var(--a-active-text);
+
+                --borderedblock-bg: rgba(255, 255, 255, .05);
+
+                --blockquote-border: silver;
+                --blockquote-bg: var(--borderedblock-bg);
+                --blockquote-text: currentcolor;
+
+                --issue-border: #e05252;
+                --issue-bg: var(--borderedblock-bg);
+                --issue-text: var(--text);
+                --issueheading-text: hsl(0deg, 70%, 70%);
+
+                --example-border: hsl(50deg, 90%, 60%);
+                --example-bg: var(--borderedblock-bg);
+                --example-text: var(--text);
+                --exampleheading-text: hsl(50deg, 70%, 70%);
+
+                --note-border: hsl(120deg, 100%, 35%);
+                --note-bg: var(--borderedblock-bg);
+                --note-text: var(--text);
+                --noteheading-text: hsl(120, 70%, 70%);
+                --notesummary-underline: silver;
+
+                --assertion-border: #444;
+                --assertion-bg: var(--borderedblock-bg);
+                --assertion-text: var(--text);
+
+                --advisement-border: orange;
+                --advisement-bg: #222218;
+                --advisement-text: var(--text);
+                --advisementheading-text: #f84;
+
+                --warning-border: red;
+                --warning-bg: hsla(40, 100%, 20%, 0.95);
+                --warning-text: var(--text);
+
+                --amendment-border: #330099;
+                --amendment-bg: #080010;
+                --amendment-text: var(--text);
+                --amendmentheading-text: #cc00ff;
+
+                --def-border: #8ccbf2;
+                --def-bg: #080818;
+                --def-text: var(--text);
+                --defrow-border: #136;
+
+                --datacell-border: silver;
+
+                --indexinfo-text: #aaa;
+
+                --indextable-hover-text: var(--text);
+                --indextable-hover-bg: #181818;
+
+                --outdatedspec-bg: rgba(255, 255, 255, .5);
+                --outdatedspec-text: black;
+                --outdated-bg: maroon;
+                --outdated-text: white;
+                --outdated-shadow: red;
+
+                --editedrec-bg: darkorange;
+            }
+
+            /* In case a transparent-bg image doesn't expect to be on a dark bg,
+       which is quite common in practice... */
+            img {
+                background: white;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --selflink-text: black;
+                --selflink-bg: silver;
+                --selflink-hover-text: white;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --dfnpanel-bg: #222;
+                --dfnpanel-text: var(--text);
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .highlight:not(.idl) {
+                background: rgba(255, 255, 255, .05);
+            }
+
+            c-[a] {
+                color: #d33682
+            }
+
+            /* Keyword.Declaration */
+            c-[b] {
+                color: #d33682
+            }
+
+            /* Keyword.Type */
+            c-[c] {
+                color: #2aa198
+            }
+
+            /* Comment */
+            c-[d] {
+                color: #2aa198
+            }
+
+            /* Comment.Multiline */
+            c-[e] {
+                color: #268bd2
+            }
+
+            /* Name.Attribute */
+            c-[f] {
+                color: #b58900
+            }
+
+            /* Name.Tag */
+            c-[g] {
+                color: #cb4b16
+            }
+
+            /* Name.Variable */
+            c-[k] {
+                color: #d33682
+            }
+
+            /* Keyword */
+            c-[l] {
+                color: #657b83
+            }
+
+            /* Literal */
+            c-[m] {
+                color: #657b83
+            }
+
+            /* Literal.Number */
+            c-[n] {
+                color: #268bd2
+            }
+
+            /* Name */
+            c-[o] {
+                color: #657b83
+            }
+
+            /* Operator */
+            c-[p] {
+                color: #657b83
+            }
+
+            /* Punctuation */
+            c-[s] {
+                color: #6c71c4
+            }
+
+            /* Literal.String */
+            c-[t] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Single */
+            c-[u] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Double */
+            c-[ch] {
+                color: #2aa198
+            }
+
+            /* Comment.Hashbang */
+            c-[cp] {
+                color: #2aa198
+            }
+
+            /* Comment.Preproc */
+            c-[cpf] {
+                color: #2aa198
+            }
+
+            /* Comment.PreprocFile */
+            c-[c1] {
+                color: #2aa198
+            }
+
+            /* Comment.Single */
+            c-[cs] {
+                color: #2aa198
+            }
+
+            /* Comment.Special */
+            c-[kc] {
+                color: #d33682
+            }
+
+            /* Keyword.Constant */
+            c-[kn] {
+                color: #d33682
+            }
+
+            /* Keyword.Namespace */
+            c-[kp] {
+                color: #d33682
+            }
+
+            /* Keyword.Pseudo */
+            c-[kr] {
+                color: #d33682
+            }
+
+            /* Keyword.Reserved */
+            c-[ld] {
+                color: #657b83
+            }
+
+            /* Literal.Date */
+            c-[nc] {
+                color: #268bd2
+            }
+
+            /* Name.Class */
+            c-[no] {
+                color: #268bd2
+            }
+
+            /* Name.Constant */
+            c-[nd] {
+                color: #268bd2
+            }
+
+            /* Name.Decorator */
+            c-[ni] {
+                color: #268bd2
+            }
+
+            /* Name.Entity */
+            c-[ne] {
+                color: #268bd2
+            }
+
+            /* Name.Exception */
+            c-[nf] {
+                color: #268bd2
+            }
+
+            /* Name.Function */
+            c-[nl] {
+                color: #268bd2
+            }
+
+            /* Name.Label */
+            c-[nn] {
+                color: #268bd2
+            }
+
+            /* Name.Namespace */
+            c-[py] {
+                color: #268bd2
+            }
+
+            /* Name.Property */
+            c-[ow] {
+                color: #657b83
+            }
+
+            /* Operator.Word */
+            c-[mb] {
+                color: #657b83
+            }
+
+            /* Literal.Number.Bin */
+            c-[mf] {
+                color: #657b83
+            }
+
+            /* Literal.Number.Float */
+            c-[mh] {
+                color: #657b83
+            }
+
+            /* Literal.Number.Hex */
+            c-[mi] {
+                color: #657b83
+            }
+
+            /* Literal.Number.Integer */
+            c-[mo] {
+                color: #657b83
+            }
+
+            /* Literal.Number.Oct */
+            c-[sa] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Affix */
+            c-[sb] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Backtick */
+            c-[sc] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Char */
+            c-[dl] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Delimiter */
+            c-[sd] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Doc */
+            c-[se] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Escape */
+            c-[sh] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Heredoc */
+            c-[si] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Interpol */
+            c-[sx] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Other */
+            c-[sr] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Regex */
+            c-[ss] {
+                color: #6c71c4
+            }
+
+            /* Literal.String.Symbol */
+            c-[fm] {
+                color: #268bd2
+            }
+
+            /* Name.Function.Magic */
+            c-[vc] {
+                color: #cb4b16
+            }
+
+            /* Name.Variable.Class */
+            c-[vg] {
+                color: #cb4b16
+            }
+
+            /* Name.Variable.Global */
+            c-[vi] {
+                color: #cb4b16
+            }
+
+            /* Name.Variable.Instance */
+            c-[vm] {
+                color: #cb4b16
+            }
+
+            /* Name.Variable.Magic */
+            c-[il] {
+                color: #657b83
+            }
+
+            /* Literal.Number.Integer.Long */
+        }
+    </style>
+
+<body class="h-entry">
+    <div class="head">
+        <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48"
+                    src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
+        <h1 class="p-name no-ref" id="title">설치된 관련 앱 가져오기 API</h1>
+        <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">초안 커뮤니티 그룹
+                보고서, <time class="dt-updated" datetime="2021-03-08">2021년 3월 8일</time></span></h2>
+        <div data-fill-with="spec-metadata">
+            <dl>
+                <dt>이 버전:
+                <dd><a class="u-url"
+                        href="https://wicg.github.io/get-installed-related-apps/spec/">https://wicg.github.io/get-installed-related-apps/spec/</a>
+                <dt>이슈 추적:
+                <dd><a href="https://github.com/WICG/get-installed-related-apps/issues/">GitHub</a>
+                <dd><a href="#issues-index">명세 내 인라인</a>
+                <dt class="editor">편집자:
+                <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email"
+                        href="mailto:rayankans@google.com">Rayan Kanso</a> (<span class="p-org org">Google</span>)
+            </dl>
+        </div>
+        <div data-fill-with="warning"></div>
+        <p class="copyright" data-fill-with="copyright"><a
+                href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2021 the Contributors to
+            the Get Installed Related Apps API Specification, published by the <a
+                href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a
+                href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement
+                (CLA)</a>.
+            A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available.
+        </p>
+        <hr title="Separator for header">
+    </div>
+    <div class="p-summary" data-fill-with="abstract">
+        <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">초록</span></h2>
+        <p>설치된 관련 앱 가져오기 API는 현재 기기에 관련 앱이 설치되어 있는지를 웹 앱이 감지할 수 있게
+            해 준다.</p>
+    </div>
+    <div data-fill-with="at-risk"></div>
+    <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">이 문서의 상태</span>
+    </h2>
+    <div data-fill-with="status">
+        <p> 이 명세는 <a href="https://www.w3.org/community/wicg/">웹 플랫폼 인큐베이터
+                커뮤니티 그룹</a>에서 발행하였다.
+            이는 W3C 표준이 아니며 W3C 표준화 절차에 올라 있는 것도 아니다.
+
+            <a href="https://www.w3.org/community/about/agreements/cla/">W3C 커뮤니티
+                기여자 라이선스 계약(CLA)</a>에 따라 제한적인 옵트아웃 및 기타 조건이 적용됨에 유의하라.
+
+            <a href="http://www.w3.org/community/">W3C 커뮤니티 및 비즈니스 그룹</a>에 대해 더 알아보기.
+        </p>
+        <p></p>
+    </div>
+    <div data-fill-with="at-risk"></div>
+    <nav data-fill-with="table-of-contents" id="toc">
+        <h2 class="no-num no-toc no-ref" id="contents">목차</h2>
+        <ol class="toc" role="directory">
+            <li>
+                <a href="#intro"><span class="secno">1</span> <span class="content">소개</span></a>
+                <ol class="toc">
+                    <li><a href="#example"><span class="secno">1.1</span> <span class="content">예제</span></a>
+                </ol>
+            <li><a href="#privacy-considerations"><span class="secno">2</span> <span class="content">프라이버시
+                        고려사항</span></a>
+            <li>
+                <a href="#infrastructure"><span class="secno">3</span> <span class="content">인프라스트럭처</span></a>
+                <ol class="toc">
+                    <li><a href="#infra-platform"><span class="secno">3.1</span> <span class="content">플랫폼</span></a>
+                    <li><a href="#infra-installed-app"><span class="secno">3.2</span> <span class="content">설치된
+                                앱</span></a>
+                </ol>
+            <li>
+                <a href="#algorithms"><span class="secno">4</span> <span class="content">알고리즘</span></a>
+                <ol class="toc">
+                    <li><a href="#match-installed-app"><span class="secno">4.1</span> <span class="content">설치된 앱
+                                일치시키기</span></a>
+                </ol>
+            <li>
+                <a href="#api"><span class="secno">5</span> <span class="content">API</span></a>
+                <ol class="toc">
+                    <li><a href="#related-application"><span class="secno">5.1</span> <span
+                                class="content">RelatedApplication</span></a>
+                    <li>
+                        <a href="#extensions-to-navigator"><span class="secno">5.2</span> <span class="content"><code
+                                    class="idl"><span>Navigator</span></code>에 대한 확장</span></a>
+                        <ol class="toc">
+                            <li><a href="#navigator-get-installed-related-apps"><span class="secno">5.2.1</span> <span
+                                        class="content"><code
+                                            class="idl"><span>getInstalledRelatedApps()</span></code></span></a>
+                        </ol>
+                </ol>
+            <li>
+                <a href="#w3c-conformance"><span class="secno"></span> <span class="content">적합성</span></a>
+                <ol class="toc">
+                    <li><a href="#w3c-conventions"><span class="secno"></span> <span class="content">문서
+                                규약</span></a>
+                    <li><a href="#w3c-conformant-algorithms"><span class="secno"></span> <span class="content">적합한
+                                알고리즘</span></a>
+                </ol>
+            <li>
+                <a href="#index"><span class="secno"></span> <span class="content">색인</span></a>
+                <ol class="toc">
+                    <li><a href="#index-defined-here"><span class="secno"></span> <span class="content">이 명세에서 정의한
+                                용어</span></a>
+                    <li><a href="#index-defined-elsewhere"><span class="secno"></span> <span class="content">참조로
+                                정의된 용어</span></a>
+                </ol>
+            <li>
+                <a href="#references"><span class="secno"></span> <span class="content">참고 문헌</span></a>
+                <ol class="toc">
+                    <li><a href="#normative"><span class="secno"></span> <span class="content">규범적
+                                참고 문헌</span></a>
+                </ol>
+            <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL 색인</span></a>
+            <li><a href="#issues-index"><span class="secno"></span> <span class="content">이슈 색인</span></a>
+        </ol>
+    </nav>
+    <main>
+        <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span
+                class="content">소개</span><a class="self-link" href="#intro"></a></h2>
+        <p>웹의 기능이 성장함에 따라, 웹 앱의 기능은 대응하는 네이티브 앱의 기능과 맞먹기 시작한다. 사용자가 웹 앱과 대응하는 네이티브 앱을
+            같은 기기에 모두 설치해 두는 상황은 더 흔해질 것이며, 이러한 앱들의 기능 집합은 수렴하게 될 것이다.</p>
+        <p>웹사이트가 네이티브 앱이든 웹 앱이든 앱이 설치되어 있는지를 감지할 수 있게 하는 것은 중요하다. 이를 통해
+            다른 앱에서 제공되어야 하는 기능을 비활성화할 수 있다.</p>
+        <h3 class="heading settled" data-level="1.1" id="example"><span class="secno">1.1. </span><span
+                class="content">예제</span><a class="self-link" href="#example"></a></h3>
+        <div class="example" id="example-c46469d8">
+            <a class="self-link" href="#example-c46469d8"></a>
+            <pre class="lang-js highlight"><c- a>const</c-> installedApps <c- o>=</c-> <c- k>await</c-> navigator<c- p>.</c->getInstalledRelatedApps<c- p>();</c->
+<c- a>const</c-> nativeApp <c- o>=</c-> installedApps<c- p>.</c->find<c- p>(</c->app <c- p>=></c-> app<c- p>.</c->id <c- o>===</c-> <c- t>'com.example.myapp'</c-><c- p>);</c->
+
+<c- k>if</c-> <c- p>(</c->nativeApp <c- o>&amp;&amp;</c-> doesVersionSendPushMessages<c- p>(</c->nativeApp<c- p>.</c->version<c- p>))</c-> <c- p>{</c->
+  <c- c1>// 푸시 메시지 전송을 처리하는 설치된 네이티브 앱이 있다.</c->
+  <c- c1>// 아무것도 할 필요가 없다.</c->
+  <c- k>return</c-><c- p>;</c->
+<c- p>}</c->
+
+<c- c1>// 푸시 구독을 생성한다.</c->
+</pre>
+            <p>위 예제에서 <i>doesVersionSendPushMessages</i>는 개발자가 정의한 함수이다.</p>
+        </div>
+        <h2 class="heading settled" data-level="2" id="privacy-considerations"><span class="secno">2. </span><span
+                class="content">프라이버시 고려사항</span><a class="self-link" href="#privacy-considerations"></a>
+        </h2>
+        <p>이 API는 보안 최상위 컨텍스트에서만 활성화된다. 이를 통해 웹사이트가 위조될 수 없으며,
+            사이트와 애플리케이션 간의 연관이 유효함을 보장한다.</p>
+        <p>웹 앱과 그 대응 앱 간의 연관은 양방향이다. 즉, 웹 앱은 관련 앱과의 연관을
+            선언해야 하며, 관련 앱 역시 웹 앱과의 연관을 선언해야 한다. 이는 악의적인 웹사이트가 사용자를 핑거프린팅하고
+            설치된 애플리케이션 목록을 얻는 것을 방지한다.</p>
+        <p>사용자 에이전트는 핑거프린팅을 제한하기 위해 일치시킬 관련 애플리케이션의 수를 제한할 수 있다.</p>
+        <p>사용자 에이전트는 예를 들어 Chrome의 시크릿 모드나 Firefox의 사생활 보호 브라우징과 같은
+            프라이버시 보호 모드에서 실행 중일 때 설치된 애플리케이션을 반환해서는 안 된다.</p>
+        <h2 class="heading settled" data-level="3" id="infrastructure"><span class="secno">3. </span><span
+                class="content">인프라스트럭처</span><a class="self-link" href="#infrastructure"></a></h2>
+        <h3 class="heading settled" data-level="3.1" id="infra-platform"><span class="secno">3.1. </span><span
+                class="content">플랫폼</span><a class="self-link" href="#infra-platform"></a></h3>
+        <p><a data-link-type="dfn" href="https://www.w3.org/TR/appmanifest/#platform-member"
+                id="ref-for-platform-member">platform</a>은 같은 클래스의 애플리케이션들을 함께 묶는 OS별 개념이다.
+            이는 <code
+                class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString">USVString</a></code>으로
+            표현된다.
+        </p>
+        <p>OS에는 <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="installed-apps">설치된
+                앱</dfn>이 있다. 이는 키가 <a data-link-type="dfn" href="https://www.w3.org/TR/appmanifest/#platform-member"
+                id="ref-for-platform-member①">platform</a>이고,
+            값이 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list">list</a>인 <a
+                data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map"
+                id="ref-for-ordered-map">map</a>이며, 그 list에는 <a data-link-type="dfn" href="#installed-app"
+                id="ref-for-installed-app">설치된 앱</a>들이 들어 있다.</p>
+        <h3 class="heading settled" data-level="3.2" id="infra-installed-app"><span class="secno">3.2. </span><span
+                class="content">설치된 앱</span><a class="self-link" href="#infra-installed-app"></a></h3>
+        <p><a data-link-type="dfn" href="#installed-app" id="ref-for-installed-app①">설치된 앱</a>은 사용자의 기기에
+            설치된 애플리케이션을 나타낸다.</p>
+        <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="installed-app">설치된 앱</dfn>은
+            다음으로 구성된다.</p>
+        <div>
+            <ul>
+                <li data-md>
+                    <p><dfn class="dfn-paneled" data-dfn-for="installed app" data-dfn-type="dfn" data-noexport
+                            id="installed-app-id">id</dfn> (<code
+                            class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString">DOMString</a></code>).
+                        이는 애플리케이션이 속한 <a data-link-type="dfn" href="https://www.w3.org/TR/appmanifest/#platform-member"
+                            id="ref-for-platform-member②">platform</a> 내에서 애플리케이션의 고유 식별자이다.</p>
+                <li data-md>
+                    <p><dfn class="dfn-paneled" data-dfn-for="installed app" data-dfn-type="dfn" data-noexport
+                            id="installed-app-version">version</dfn> (<code
+                            class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString①">USVString</a></code>).
+                        이는 <a data-link-type="dfn" href="https://www.w3.org/TR/appmanifest/#platform-member"
+                            id="ref-for-platform-member③">platform</a>에서 정의한 애플리케이션의 버전이다.</p>
+                <li data-md>
+                    <p><dfn class="dfn-paneled" data-dfn-for="installed app" data-dfn-type="dfn" data-noexport
+                            id="installed-app-fingerprints">Fingerprints</dfn> (<code
+                            class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-fingerprint" id="ref-for-dom-fingerprint">Fingerprint</a></code>들의
+                        <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①">list</a>).
+                        이는 애플리케이션 메타데이터 안에 정의된 애플리케이션을 식별하기 위한 암호학적 값이다.
+                    </p>
+                <li data-md>
+                    <p><dfn class="dfn-paneled" data-dfn-for="installed app" data-dfn-type="dfn" data-noexport
+                            id="installed-app-relatedurls">relatedURLs</dfn> (<code
+                            class="idl"><a data-link-type="idl" href="https://url.spec.whatwg.org/#url" id="ref-for-url">URL</a></code>들의
+                        <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-set"
+                            id="ref-for-ordered-set">set</a>).
+                        이는 애플리케이션 안에 선언된 관련 웹 애플리케이션의 <code
+                            class="idl"><a data-link-type="idl" href="https://url.spec.whatwg.org/#dom-url-origin" id="ref-for-dom-url-origin">origin</a></code>이다.
+                    </p>
+            </ul>
+        </div>
+        <p><a data-link-type="dfn" href="#installed-app" id="ref-for-installed-app②">설치된 앱</a>은 또한
+            연관된 <a data-link-type="dfn" href="https://www.w3.org/TR/appmanifest/#platform-member"
+                id="ref-for-platform-member④">platform</a>을 가진다.</p>
+        <h2 class="heading settled" data-level="4" id="algorithms"><span class="secno">4. </span><span
+                class="content">알고리즘</span><a class="self-link" href="#algorithms"></a></h2>
+        <h3 class="heading settled" data-level="4.1" id="match-installed-app"><span class="secno">4.1. </span><span
+                class="content">설치된 앱 일치시키기</span><a class="self-link" href="#match-installed-app"></a></h3>
+        <div class="algorithm" data-algorithm="match an installed app">
+            <var>relatedApp</var> (<code
+                class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource" id="ref-for-dom-externalapplicationresource">ExternalApplicationResource</a></code>)
+            및
+            <var>manifestURL</var> (<code
+                class="idl"><a data-link-type="idl" href="https://url.spec.whatwg.org/#url" id="ref-for-url①">URL</a></code>)에
+            대해
+            <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="match-an-installed-app">설치된 앱을
+                일치시키려면</dfn>, 다음 단계를 실행한다.
+            <ol>
+                <li data-md>
+                    <p><var>platform</var>을 <var>relatedApp</var>의 <code
+                            class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-platform" id="ref-for-dom-externalapplicationresource-platform">platform</a></code>으로
+                        둔다.
+                    </p>
+                <li data-md>
+                    <p><a data-link-type="dfn" href="#installed-apps" id="ref-for-installed-apps">설치된
+                            앱</a>[<var>platform</var>]이 <a data-link-type="dfn"
+                            href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists">존재</a>하지 않으면,
+                        null을 반환한다.</p>
+                <li data-md>
+                    <p><var>installedApps</var>를 <a data-link-type="dfn" href="#installed-apps"
+                            id="ref-for-installed-apps①">설치된 앱</a>[<var>platform</var>]으로 둔다.</p>
+                <li data-md>
+                    <p><var>installedApps</var>의 각 <var>installedApp</var>에 대해 <a data-link-type="dfn"
+                            href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate">반복</a>한다.
+                    </p>
+                    <ol>
+                        <li data-md>
+                            <p><var>relatedApp</var>의 <code
+                                    class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-id" id="ref-for-dom-externalapplicationresource-id">id</a></code>가
+                                <var>installedApp</var>의 <a data-link-type="dfn" href="#installed-app-id"
+                                    id="ref-for-installed-app-id">id</a>와 같지 않고,
+                                <var>relatedApp</var>의 <code
+                                    class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-url" id="ref-for-dom-externalapplicationresource-url">url</a></code>도
+                                <var>installedApp</var>의 <a data-link-type="dfn" href="#installed-app-id"
+                                    id="ref-for-installed-app-id①">id</a>와 같지 않으면, <a data-link-type="dfn"
+                                    href="https://infra.spec.whatwg.org/#iteration-continue"
+                                    id="ref-for-iteration-continue">계속</a>한다.
+                            </p>
+                        <li data-md>
+                            <p><var>minVersion</var>을 <var>relatedApp</var>의 <code
+                                    class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-min_version" id="ref-for-dom-externalapplicationresource-min_version">min_version</a></code>으로
+                                둔다. 없으면 빈 문자열로 둔다.</p>
+                        <li data-md>
+                            <p><var>minVersion</var>이 빈 문자열이 아니고 <var>minVersion</var>이
+                                <var>installedApp</var>의 <a data-link-type="dfn" href="#installed-app-version"
+                                    id="ref-for-installed-app-version">version</a>보다 크면, null을 반환한다.
+                            </p>
+                            <p class="note" role="note"><span>참고:</span> `greater`는 애플리케이션 버전을
+                                순서화하기 위한 플랫폼별 개념이다. 반드시 사전식 순서일 필요는 없다.</p>
+                        <li data-md>
+                            <p><var>fingerprints</var>를 <var>relatedApp</var>의 <code
+                                    class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-fingerprints" id="ref-for-dom-externalapplicationresource-fingerprints">fingerprints</a></code>로
+                                둔다. 없으면 빈 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list"
+                                    id="ref-for-list②">list</a>로 둔다.</p>
+                        <li data-md>
+                            <p><var>fingerprints</var>의 각 <var>fingerprint</var>에 대해 <a data-link-type="dfn"
+                                    href="https://infra.spec.whatwg.org/#list-iterate"
+                                    id="ref-for-list-iterate①">반복</a>한다.
+                            </p>
+                            <ol>
+                                <li data-md>
+                                    <p><var>installedApp</var>의 <a data-link-type="dfn"
+                                            href="#installed-app-fingerprints"
+                                            id="ref-for-installed-app-fingerprints">fingerprints</a>가
+                                        <var>fingerprint</var>를 <a data-link-type="dfn"
+                                            href="https://infra.spec.whatwg.org/#list-contain"
+                                            id="ref-for-list-contain">포함</a>하지 않으면, null을 반환한다.
+                                    </p>
+                            </ol>
+                        <li data-md>
+                            <p><var>installedApp</var>의 <a data-link-type="dfn" href="#installed-app-relatedurls"
+                                    id="ref-for-installed-app-relatedurls">relatedURLs</a>가 <var>manifestURL</var>을 <a
+                                    data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain"
+                                    id="ref-for-list-contain①">포함</a>하지 않으면, null을 반환한다.</p>
+                        <li data-md>
+                            <p><var>installedApp</var>을 반환한다.</p>
+                    </ol>
+                <li data-md>
+                    <p>null을 반환한다.</p>
+            </ol>
+        </div>
+        <h2 class="heading settled" data-level="5" id="api"><span class="secno">5. </span><span
+                class="content">API</span><a class="self-link" href="#api"></a></h2>
+        <h3 class="heading settled" data-level="5.1" id="related-application"><span class="secno">5.1. </span><span
+                class="content">RelatedApplication</span><a class="self-link" href="#related-application"></a></h3>
+        <pre class="idl highlight def"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-relatedapplication"><code><c- g>RelatedApplication</c-></code></dfn> {
+    <c- b>required</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString②"><c- b>USVString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="RelatedApplication" data-dfn-type="dict-member" data-export data-type="USVString " id="dom-relatedapplication-platform"><code><c- g>platform</c-></code></dfn>;
+    <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString③"><c- b>USVString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="RelatedApplication" data-dfn-type="dict-member" data-export data-type="USVString " id="dom-relatedapplication-url"><code><c- g>url</c-></code></dfn>;
+    <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①"><c- b>DOMString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="RelatedApplication" data-dfn-type="dict-member" data-export data-type="DOMString " id="dom-relatedapplication-id"><code><c- g>id</c-></code></dfn>;
+    <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString" id="ref-for-idl-USVString④"><c- b>USVString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="RelatedApplication" data-dfn-type="dict-member" data-export data-type="USVString " id="dom-relatedapplication-version"><code><c- g>version</c-></code></dfn>;
+};
+</pre>
+        <p>각 <code
+                class="idl"><a data-link-type="idl" href="#dictdef-relatedapplication" id="ref-for-dictdef-relatedapplication">RelatedApplication</a></code>은
+            <code
+                class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-webappmanifest" id="ref-for-dom-webappmanifest">WebAppManifest</a></code>의
+            제공된 <code
+                class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource" id="ref-for-dom-externalapplicationresource①">ExternalApplicationResource</a></code>들과
+            일치된 <a data-link-type="dfn" href="#installed-app" id="ref-for-installed-app③">설치된 앱</a>을 나타낸다.
+        </p>
+        <h3 class="heading settled" data-level="5.2" id="extensions-to-navigator"><span class="secno">5.2. </span><span
+                class="content"><code
+                    class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator" id="ref-for-navigator">Navigator</a></code>에
+                대한 확장</span><a class="self-link" href="#extensions-to-navigator"></a></h3>
+        <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator" id="ref-for-navigator①"><c- g>Navigator</c-></a> {
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext"><c- g>SecureContext</c-></a>] <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="dfn" href="https://heycam.github.io/webidl/#idl-sequence" id="ref-for-idl-sequence"><c- b>sequence</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-relatedapplication" id="ref-for-dictdef-relatedapplication①"><c- n>RelatedApplication</c-></a>>> <a class="idl-code" data-link-type="method" href="#dom-navigator-getinstalledrelatedapps" id="ref-for-dom-navigator-getinstalledrelatedapps"><c- g>getInstalledRelatedApps</c-></a>();
+};
+</pre>
+        <div>
+            <h4 class="heading settled" data-level="5.2.1" id="navigator-get-installed-related-apps"><span
+                    class="secno">5.2.1. </span><span class="content"><code
+                        class="idl"><a data-link-type="idl" href="#dom-navigator-getinstalledrelatedapps" id="ref-for-dom-navigator-getinstalledrelatedapps①">getInstalledRelatedApps()</a></code></span><a
+                    class="self-link" href="#navigator-get-installed-related-apps"></a></h4>
+            <div class="algorithm" data-algorithm="getInstalledRelatedApps()">
+                <dfn class="dfn-paneled idl-code" data-dfn-for="Navigator" data-dfn-type="method" data-export
+                    id="dom-navigator-getinstalledrelatedapps"><code>getInstalledRelatedApps()</code></dfn> 메서드는
+                호출되면 다음 단계를 실행한다.
+                <ol>
+                    <li data-md>
+                        <p><var>relevantBrowsingContext</var>를 <a data-link-type="dfn"
+                                href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object">컨텍스트
+                                객체</a>의 <a data-link-type="dfn"
+                                href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object"
+                                id="ref-for-relevant-settings-object">관련 설정 객체</a>의 <a data-link-type="dfn">책임 있는 브라우징
+                                컨텍스트</a>로 둔다.</p>
+                    <li data-md>
+                        <p><var>relevantBrowsingContext</var>가 <a data-link-type="dfn"
+                                href="https://html.spec.whatwg.org/multipage/browsers.html#top-level-browsing-context"
+                                id="ref-for-top-level-browsing-context">최상위 브라우징 컨텍스트</a>가 아니면, <code
+                                class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code>
+                            <code
+                                class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code>으로
+                            <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-promise-rejected-with"
+                                id="ref-for-a-promise-rejected-with">거부된 promise</a>를 반환한다.
+                        </p>
+                        <p class="issue" id="issue-311e9dcb"><a class="self-link" href="#issue-311e9dcb"></a> 이
+                            제한을 제거해야 하는가? (<a
+                                href="https://github.com/WICG/get-installed-related-apps/issues/11">#11</a>)</p>
+                    <li data-md>
+                        <p><var>promise</var>를 <a data-link-type="dfn"
+                                href="https://heycam.github.io/webidl/#a-new-promise" id="ref-for-a-new-promise">새
+                                promise</a>로 둔다.</p>
+                    <li data-md>
+                        <p>다음 단계를 <a data-link-type="dfn"
+                                href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel"
+                                id="ref-for-in-parallel">병렬로</a> 실행한다.</p>
+                        <ol>
+                            <li data-md>
+                                <p><var>manifest</var> 및 <var>manifestURL</var>을 <a data-link-type="dfn"
+                                        href="https://www.w3.org/TR/appmanifest/#obtaining"
+                                        id="ref-for-obtaining">manifest 얻기</a>의 결과로 둔다. 이것이 실패하면, promise를
+                                    빈 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list"
+                                        id="ref-for-list③">list</a>로 <a data-link-type="dfn">해결</a>하고 이 단계를 중단한다.</p>
+                            <li data-md>
+                                <p><var>relatedApplications</var>를 <var>manifest</var>의 <code
+                                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-webappmanifest-related_applications" id="ref-for-dom-webappmanifest-related_applications">related_applications</a></code>로
+                                    둔다.
+                                </p>
+                            <li data-md>
+                                <p>선택적으로:</p>
+                                <ol>
+                                    <li data-md>
+                                        <p><var>maxRelatedApps</var>를 사용자 에이전트가 결정한 수로 둔다.</p>
+                                    <li data-md>
+                                        <p><var>relatedApplications</var>의 <a data-link-type="dfn"
+                                                href="https://infra.spec.whatwg.org/#list-size"
+                                                id="ref-for-list-size">size</a>가
+                                            <var>maxRelatedApps</var>보다 크면, <var>relatedApplications</var>를
+                                            <var>maxRelatedApps</var>의 <a data-link-type="dfn"
+                                                href="https://infra.spec.whatwg.org/#list-size"
+                                                id="ref-for-list-size①">size</a>로 자른다.
+                                        </p>
+                                </ol>
+                                <p class="note" role="note"><span>참고:</span> 이는 웹사이트가 얼마나 많은 네이티브 애플리케이션이
+                                    설치되어 있는지를 알 수 있는지를 제한한다. 매번 같은 <code
+                                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource" id="ref-for-dom-externalapplicationresource②">ExternalApplicationResource</a></code>들이
+                                    반환되도록 하려면 추가 항목은 잘라내야 한다.
+                                </p>
+                            <li data-md>
+                                <p><var>installedApps</var>를 빈 <a data-link-type="dfn"
+                                        href="https://infra.spec.whatwg.org/#list" id="ref-for-list④">list</a>로 둔다.</p>
+                            <li data-md>
+                                <p><var>relatedApplications</var>의 각 <var>relatedApplication</var>에 대해
+                                    <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate"
+                                        id="ref-for-list-iterate②">반복</a>한다.
+                                </p>
+                                <ol>
+                                    <li data-md>
+                                        <p><var>matchedApp</var>을 <var>relatedApplication</var> 및
+                                            <var>manifestURL</var>과 함께 <a data-link-type="dfn"
+                                                href="#match-an-installed-app" id="ref-for-match-an-installed-app">설치된 앱
+                                                일치시키기</a>를 실행한 결과로 둔다.
+                                        </p>
+                                    <li data-md>
+                                        <p><var>matchedApp</var>이 null이면, <a data-link-type="dfn"
+                                                href="https://infra.spec.whatwg.org/#iteration-continue"
+                                                id="ref-for-iteration-continue①">계속</a>한다.</p>
+                                    <li data-md>
+                                        <p><var>installedApp</var>를 다음을 가진 새 <code
+                                                class="idl"><a data-link-type="idl" href="#dictdef-relatedapplication" id="ref-for-dictdef-relatedapplication②">RelatedApplication</a></code>으로
+                                            둔다.</p>
+                                        <dl>
+                                            <dt data-md><code
+                                                    class="idl"><a data-link-type="idl" href="#dom-relatedapplication-platform" id="ref-for-dom-relatedapplication-platform">platform</a></code>
+                                            <dd data-md>
+                                                <p><var>relatedApplication</var>의 <code
+                                                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-platform" id="ref-for-dom-externalapplicationresource-platform①">platform</a></code>
+                                                </p>
+                                            <dt data-md><code
+                                                    class="idl"><a data-link-type="idl" href="#dom-relatedapplication-url" id="ref-for-dom-relatedapplication-url">url</a></code>
+                                            <dd data-md>
+                                                <p><var>relatedApplication</var>의 <code
+                                                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-url" id="ref-for-dom-externalapplicationresource-url①">url</a></code>
+                                                </p>
+                                            <dt data-md><code
+                                                    class="idl"><a data-link-type="idl" href="#dom-relatedapplication-id" id="ref-for-dom-relatedapplication-id">id</a></code>
+                                            <dd data-md>
+                                                <p><var>relatedApplication</var>의 <code
+                                                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-id" id="ref-for-dom-externalapplicationresource-id①">id</a></code>
+                                                </p>
+                                            <dt data-md><code
+                                                    class="idl"><a data-link-type="idl" href="#dom-relatedapplication-version" id="ref-for-dom-relatedapplication-version">version</a></code>
+                                            <dd data-md>
+                                                <p><var>matchedApp</var>의 <a data-link-type="dfn"
+                                                        href="#installed-app-version"
+                                                        id="ref-for-installed-app-version①">version</a></p>
+                                        </dl>
+                                    <li data-md>
+                                        <p><var>installedApp</var>를
+                                            <var>installedApps</var>에 <a data-link-type="dfn"
+                                                href="https://infra.spec.whatwg.org/#list-append"
+                                                id="ref-for-list-append">추가</a>한다.
+                                        </p>
+                                </ol>
+                            <li data-md>
+                                <p><var>promise</var>를 <var>installedApps</var>로 <a data-link-type="dfn">해결</a>한다.
+                                </p>
+                        </ol>
+                    <li data-md>
+                        <p><var>promise</var>를 반환한다.</p>
+                </ol>
+            </div>
+        </div>
+    </main>
+    <div data-fill-with="conformance">
+        <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">적합성</span><a
+                class="self-link" href="#w3c-conformance"></a></h2>
+        <h3 class="no-ref no-num heading settled" id="w3c-conventions"><span class="content">문서
+                규약</span><a class="self-link" href="#w3c-conventions"></a></h3>
+        <p>적합성 요구사항은 서술적 단언과
+            RFC 2119 용어의 조합으로 표현된다.
+            이 문서의 규범적 부분에서
+            핵심어 “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”,
+            “MAY”, “OPTIONAL”은
+            RFC 2119에 설명된 대로 해석해야 한다.
+            다만, 가독성을 위해
+            이 명세에서는 이러한 단어들이 모두 대문자로 나타나지는 않는다. </p>
+        <p>명시적으로 비규범이라고 표시된 절, 예제, 참고를 제외하고
+            이 명세의 모든 텍스트는 규범적이다. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
+        <p>이 명세의 예제는 “for example”이라는 말로 도입되거나
+            다음과 같이 <code>class="example"</code>을 사용하여
+            규범적 텍스트와 구분된다. </p>
+        <div class="example" id="w3c-example">
+            <a class="self-link" href="#w3c-example"></a>
+            <p>이것은 정보성 예제의 예이다. </p>
+        </div>
+        <p>정보성 참고는 “Note”라는 단어로 시작하며
+            다음과 같이 <code>class="note"</code>를 사용하여
+            규범적 텍스트와 구분된다. </p>
+        <p class="note" role="note">참고: 이것은 정보성 참고이다. </p>
+        <h3 class="no-ref no-num heading settled" id="w3c-conformant-algorithms"><span class="content">적합한
+                알고리즘</span><a class="self-link" href="#w3c-conformant-algorithms"></a></h3>
+        <p>알고리즘의 일부로 명령형으로 표현된 요구사항
+            예컨대 "strip any leading space characters"
+            또는 "return false and abort these steps"는
+            해당 알고리즘을 도입할 때 사용된 핵심어
+            ("must", "should", "may" 등)의 의미로 해석해야 한다. </p>
+        <p>알고리즘 또는 특정 단계로 표현된 적합성 요구사항은
+            최종 결과가 동등하기만 하다면
+            어떤 방식으로도 구현할 수 있다.
+            특히 이 명세에서 정의한 알고리즘은
+            이해하기 쉽도록 의도된 것이며
+            성능이 좋도록 의도된 것은 아니다.
+            구현자는 최적화할 것이 권장된다. </p>
+    </div>
+    <script src="https://www.w3.org/scripts/TR/2016/fixup.js"></script>
+    <h2 class="no-num no-ref heading settled" id="index"><span class="content">색인</span><a class="self-link"
+            href="#index"></a></h2>
+    <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">이 명세에서 정의한
+            용어</span><a class="self-link" href="#index-defined-here"></a></h3>
+    <ul class="index">
+        <li><a href="#installed-app-fingerprints">Fingerprints</a><span>, §3.2에서</span>
+        <li><a href="#dom-navigator-getinstalledrelatedapps">getInstalledRelatedApps()</a><span>, §5.2.1에서</span>
+        <li>
+            id
+            <ul>
+                <li><a href="#installed-app-id">설치된 앱에 대한 dfn</a><span>, §3.2에서</span>
+                <li><a href="#dom-relatedapplication-id">RelatedApplication에 대한 dict-member</a><span>, §5.1에서</span>
+            </ul>
+        <li><a href="#installed-app">설치된 앱</a><span>, §3.2에서</span>
+        <li><a href="#installed-apps">설치된 앱</a><span>, §3.1에서</span>
+        <li><a href="#match-an-installed-app">설치된 앱 일치시키기</a><span>, §4.1에서</span>
+        <li><a href="#dom-relatedapplication-platform">platform</a><span>, §5.1에서</span>
+        <li><a href="#dictdef-relatedapplication">RelatedApplication</a><span>, §5.1에서</span>
+        <li><a href="#installed-app-relatedurls">relatedURLs</a><span>, §3.2에서</span>
+        <li><a href="#dom-relatedapplication-url">url</a><span>, §5.1에서</span>
+        <li>
+            version
+            <ul>
+                <li><a href="#installed-app-version">설치된 앱에 대한 dfn</a><span>, §3.2에서</span>
+                <li><a href="#dom-relatedapplication-version">RelatedApplication에 대한 dict-member</a><span>,
+                        §5.1에서</span>
+            </ul>
+    </ul>
+    <aside class="dfn-panel" data-for="term-for-dom-externalapplicationresource">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource">https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-externalapplicationresource">4.1. Match an installed app</a>
+            <li><a href="#ref-for-dom-externalapplicationresource①">5.1. RelatedApplication</a>
+            <li><a href="#ref-for-dom-externalapplicationresource②">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-fingerprint">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-fingerprint">https://www.w3.org/TR/appmanifest/#dom-fingerprint</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-fingerprint">3.2. Installed App</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-webappmanifest">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-webappmanifest">https://www.w3.org/TR/appmanifest/#dom-webappmanifest</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-webappmanifest">5.1. RelatedApplication</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-externalapplicationresource-fingerprints">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-fingerprints">https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-fingerprints</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-externalapplicationresource-fingerprints">4.1. Match an installed app</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-externalapplicationresource-id">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-id">https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-id</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-externalapplicationresource-id">4.1. Match an installed app</a>
+            <li><a href="#ref-for-dom-externalapplicationresource-id①">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-externalapplicationresource-min_version">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-min_version">https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-min_version</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-externalapplicationresource-min_version">4.1. Match an installed app</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-obtaining">
+        <a href="https://www.w3.org/TR/appmanifest/#obtaining">https://www.w3.org/TR/appmanifest/#obtaining</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-obtaining">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-externalapplicationresource-platform">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-platform">https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-platform</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-externalapplicationresource-platform">4.1. Match an installed app</a>
+            <li><a href="#ref-for-dom-externalapplicationresource-platform①">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-webappmanifest-related_applications">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-webappmanifest-related_applications">https://www.w3.org/TR/appmanifest/#dom-webappmanifest-related_applications</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-webappmanifest-related_applications">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-externalapplicationresource-url">
+        <a
+            href="https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-url">https://www.w3.org/TR/appmanifest/#dom-externalapplicationresource-url</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-externalapplicationresource-url">4.1. Match an installed app</a>
+            <li><a href="#ref-for-dom-externalapplicationresource-url①">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-context-object">
+        <a href="https://dom.spec.whatwg.org/#context-object">https://dom.spec.whatwg.org/#context-object</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-context-object">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-navigator">
+        <a
+            href="https://html.spec.whatwg.org/multipage/system-state.html#navigator">https://html.spec.whatwg.org/multipage/system-state.html#navigator</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-navigator">5.2. Extensions to Navigator</a> <a href="#ref-for-navigator①">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-in-parallel">
+        <a
+            href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-in-parallel">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
+        <a
+            href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-relevant-settings-object">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-top-level-browsing-context">
+        <a
+            href="https://html.spec.whatwg.org/multipage/browsers.html#top-level-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#top-level-browsing-context</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-top-level-browsing-context">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-list-append">
+        <a href="https://infra.spec.whatwg.org/#list-append">https://infra.spec.whatwg.org/#list-append</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-list-append">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-list-contain">
+        <a href="https://infra.spec.whatwg.org/#list-contain">https://infra.spec.whatwg.org/#list-contain</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-list-contain">4.1. Match an installed app</a> <a href="#ref-for-list-contain①">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-iteration-continue">
+        <a
+            href="https://infra.spec.whatwg.org/#iteration-continue">https://infra.spec.whatwg.org/#iteration-continue</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-iteration-continue">4.1. Match an installed app</a>
+            <li><a href="#ref-for-iteration-continue①">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-map-exists">
+        <a href="https://infra.spec.whatwg.org/#map-exists">https://infra.spec.whatwg.org/#map-exists</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-map-exists">4.1. Match an installed app</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-list-iterate">
+        <a href="https://infra.spec.whatwg.org/#list-iterate">https://infra.spec.whatwg.org/#list-iterate</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-list-iterate">4.1. Match an installed app</a> <a href="#ref-for-list-iterate①">(2)</a>
+            <li><a href="#ref-for-list-iterate②">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-list">
+        <a href="https://infra.spec.whatwg.org/#list">https://infra.spec.whatwg.org/#list</a><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-list">3.1. Platform</a>
+            <li><a href="#ref-for-list①">3.2. Installed App</a>
+            <li><a href="#ref-for-list②">4.1. Match an installed app</a>
+            <li><a href="#ref-for-list③">5.2.1. getInstalledRelatedApps()</a> <a href="#ref-for-list④">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-ordered-map">
+        <a href="https://infra.spec.whatwg.org/#ordered-map">https://infra.spec.whatwg.org/#ordered-map</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-ordered-map">3.1. Platform</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-ordered-set">
+        <a href="https://infra.spec.whatwg.org/#ordered-set">https://infra.spec.whatwg.org/#ordered-set</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-ordered-set">3.2. Installed App</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-list-size">
+        <a href="https://infra.spec.whatwg.org/#list-size">https://infra.spec.whatwg.org/#list-size</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-list-size">5.2.1. getInstalledRelatedApps()</a> <a href="#ref-for-list-size①">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-url">
+        <a href="https://url.spec.whatwg.org/#url">https://url.spec.whatwg.org/#url</a><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-url">3.2. Installed App</a>
+            <li><a href="#ref-for-url①">4.1. Match an installed app</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-url-origin">
+        <a href="https://url.spec.whatwg.org/#dom-url-origin">https://url.spec.whatwg.org/#dom-url-origin</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-url-origin">3.2. Installed App</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-idl-DOMException">
+        <a
+            href="https://heycam.github.io/webidl/#idl-DOMException">https://heycam.github.io/webidl/#idl-DOMException</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-idl-DOMException">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-idl-DOMString">
+        <a href="https://heycam.github.io/webidl/#idl-DOMString">https://heycam.github.io/webidl/#idl-DOMString</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-idl-DOMString">3.2. Installed App</a>
+            <li><a href="#ref-for-idl-DOMString①">5.1. RelatedApplication</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-Exposed">
+        <a href="https://heycam.github.io/webidl/#Exposed">https://heycam.github.io/webidl/#Exposed</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-Exposed">5.2. Extensions to Navigator</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-invalidstateerror">
+        <a
+            href="https://heycam.github.io/webidl/#invalidstateerror">https://heycam.github.io/webidl/#invalidstateerror</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-invalidstateerror">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-idl-promise">
+        <a href="https://heycam.github.io/webidl/#idl-promise">https://heycam.github.io/webidl/#idl-promise</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-idl-promise">5.2. Extensions to Navigator</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-SecureContext">
+        <a href="https://heycam.github.io/webidl/#SecureContext">https://heycam.github.io/webidl/#SecureContext</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-SecureContext">5.2. Extensions to Navigator</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-idl-USVString">
+        <a href="https://heycam.github.io/webidl/#idl-USVString">https://heycam.github.io/webidl/#idl-USVString</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-idl-USVString">3.1. Platform</a>
+            <li><a href="#ref-for-idl-USVString①">3.2. Installed App</a>
+            <li><a href="#ref-for-idl-USVString②">5.1. RelatedApplication</a> <a href="#ref-for-idl-USVString③">(2)</a>
+                <a href="#ref-for-idl-USVString④">(3)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-a-new-promise">
+        <a href="https://heycam.github.io/webidl/#a-new-promise">https://heycam.github.io/webidl/#a-new-promise</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-a-new-promise">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-a-promise-rejected-with">
+        <a
+            href="https://heycam.github.io/webidl/#a-promise-rejected-with">https://heycam.github.io/webidl/#a-promise-rejected-with</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-a-promise-rejected-with">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-idl-sequence">
+        <a href="https://heycam.github.io/webidl/#idl-sequence">https://heycam.github.io/webidl/#idl-sequence</a><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-idl-sequence">5.2. Extensions to Navigator</a>
+        </ul>
+    </aside>
+    <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">참조로 정의된
+            용어</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
+    <ul class="index">
+        <li>
+            <a data-link-type="biblio">[appmanifest]</a>는 다음 용어를 정의한다.
+            <ul>
+                <li><span class="dfn-paneled"
+                        id="term-for-dom-externalapplicationresource">ExternalApplicationResource</span>
+                <li><span class="dfn-paneled" id="term-for-dom-fingerprint">Fingerprint</span>
+                <li><span class="dfn-paneled" id="term-for-dom-webappmanifest">WebAppManifest</span>
+                <li><span class="dfn-paneled"
+                        id="term-for-dom-externalapplicationresource-fingerprints">fingerprints</span>
+                <li><span class="dfn-paneled" id="term-for-dom-externalapplicationresource-id">id</span>
+                <li><span class="dfn-paneled"
+                        id="term-for-dom-externalapplicationresource-min_version">min_version</span>
+                <li><span class="dfn-paneled" id="term-for-obtaining">manifest 얻기</span>
+                <li><span class="dfn-paneled" id="term-for-dom-externalapplicationresource-platform">platform
+                        <small>(ExternalApplicationResource에 대한)</small></span>
+                <li><span class="dfn-paneled"
+                        id="term-for-dom-webappmanifest-related_applications">related_applications</span>
+                <li><span class="dfn-paneled" id="term-for-dom-externalapplicationresource-url">url</span>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[DOM]</a>은 다음 용어를 정의한다.
+            <ul>
+                <li><span class="dfn-paneled" id="term-for-context-object">컨텍스트 객체</span>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[HTML]</a>은 다음 용어를 정의한다.
+            <ul>
+                <li><span class="dfn-paneled" id="term-for-navigator">Navigator</span>
+                <li><span class="dfn-paneled" id="term-for-in-parallel">병렬로</span>
+                <li><span class="dfn-paneled" id="term-for-relevant-settings-object">관련 설정 객체</span>
+                <li><span class="dfn-paneled" id="term-for-top-level-browsing-context">최상위 브라우징 컨텍스트</span>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[INFRA]</a>는 다음 용어를 정의한다.
+            <ul>
+                <li><span class="dfn-paneled" id="term-for-list-append">추가</span>
+                <li><span class="dfn-paneled" id="term-for-list-contain">포함</span>
+                <li><span class="dfn-paneled" id="term-for-iteration-continue">계속</span>
+                <li><span class="dfn-paneled" id="term-for-map-exists">존재</span>
+                <li><span class="dfn-paneled" id="term-for-list-iterate">각각에 대해</span>
+                <li><span class="dfn-paneled" id="term-for-list">list</span>
+                <li><span class="dfn-paneled" id="term-for-ordered-map">map</span>
+                <li><span class="dfn-paneled" id="term-for-ordered-set">set</span>
+                <li><span class="dfn-paneled" id="term-for-list-size">size</span>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[URL]</a>은 다음 용어를 정의한다.
+            <ul>
+                <li><span class="dfn-paneled" id="term-for-url">URL</span>
+                <li><span class="dfn-paneled" id="term-for-dom-url-origin">origin</span>
+            </ul>
+        <li>
+            <a data-link-type="biblio">[WebIDL]</a>은 다음 용어를 정의한다.
+            <ul>
+                <li><span class="dfn-paneled" id="term-for-idl-DOMException">DOMException</span>
+                <li><span class="dfn-paneled" id="term-for-idl-DOMString">DOMString</span>
+                <li><span class="dfn-paneled" id="term-for-Exposed">Exposed</span>
+                <li><span class="dfn-paneled" id="term-for-invalidstateerror">InvalidStateError</span>
+                <li><span class="dfn-paneled" id="term-for-idl-promise">Promise</span>
+                <li><span class="dfn-paneled" id="term-for-SecureContext">SecureContext</span>
+                <li><span class="dfn-paneled" id="term-for-idl-USVString">USVString</span>
+                <li><span class="dfn-paneled" id="term-for-a-new-promise">새 promise</span>
+                <li><span class="dfn-paneled" id="term-for-a-promise-rejected-with">거부된 promise</span>
+                <li><span class="dfn-paneled" id="term-for-idl-sequence">sequence</span>
+            </ul>
+    </ul>
+    <h2 class="no-num no-ref heading settled" id="references"><span class="content">참고 문헌</span><a class="self-link"
+            href="#references"></a></h2>
+    <h3 class="no-num no-ref heading settled" id="normative"><span class="content">규범적 참고 문헌</span><a class="self-link"
+            href="#normative"></a></h3>
+    <dl>
+        <dt id="biblio-appmanifest">[APPMANIFEST]
+        <dd>Marcos Caceres; et al. <a href="https://www.w3.org/TR/appmanifest/">웹 애플리케이션 매니페스트</a>. 2021년 3월
+            5일. WD. URL: <a href="https://www.w3.org/TR/appmanifest/">https://www.w3.org/TR/appmanifest/</a>
+        <dt id="biblio-dom">[DOM]
+        <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM 표준</a>. 살아 있는 표준. URL: <a
+                href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
+        <dt id="biblio-html">[HTML]
+        <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML 표준</a>. 살아 있는
+            표준. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
+        <dt id="biblio-infra">[INFRA]
+        <dd>Anne van Kesteren; Domenic Denicola. <a href="https://infra.spec.whatwg.org/">Infra 표준</a>. 살아 있는
+            표준. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
+        <dt id="biblio-rfc2119">[RFC2119]
+        <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">요구 수준을 나타내기 위해 RFC에서 사용하는
+                핵심어</a>. 1997년 3월. Best Current Practice. URL: <a
+                href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
+        <dt id="biblio-url">[URL]
+        <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL 표준</a>. 살아 있는 표준. URL: <a
+                href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
+        <dt id="biblio-webidl">[WebIDL]
+        <dd>Boris Zbarsky. <a href="https://heycam.github.io/webidl/">Web IDL</a>. 2016년 12월 15일. ED. URL: <a
+                href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
+    </dl>
+    <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL 색인</span><a class="self-link"
+            href="#idl-index"></a></h2>
+    <pre class="idl highlight def"><c- b>dictionary</c-> <a href="#dictdef-relatedapplication"><code><c- g>RelatedApplication</c-></code></a> {
+    <c- b>required</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><c- b>USVString</c-></a> <a data-type="USVString " href="#dom-relatedapplication-platform"><code><c- g>platform</c-></code></a>;
+    <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><c- b>USVString</c-></a> <a data-type="USVString " href="#dom-relatedapplication-url"><code><c- g>url</c-></code></a>;
+    <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><c- b>DOMString</c-></a> <a data-type="DOMString " href="#dom-relatedapplication-id"><code><c- g>id</c-></code></a>;
+    <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><c- b>USVString</c-></a> <a data-type="USVString " href="#dom-relatedapplication-version"><code><c- g>version</c-></code></a>;
+};
+
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator"><c- g>Navigator</c-></a> {
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext"><c- g>SecureContext</c-></a>] <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="dfn" href="https://heycam.github.io/webidl/#idl-sequence"><c- b>sequence</c-></a>&lt;<a data-link-type="idl-name" href="#dictdef-relatedapplication"><c- n>RelatedApplication</c-></a>>> <a class="idl-code" data-link-type="method" href="#dom-navigator-getinstalledrelatedapps"><c- g>getInstalledRelatedApps</c-></a>();
+};
+
+</pre>
+    <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">이슈 색인</span><a class="self-link"
+            href="#issues-index"></a></h2>
+    <div style="counter-reset:issue">
+        <div class="issue"> 이 제한을 제거해야 하는가? (<a
+                href="https://github.com/WICG/get-installed-related-apps/issues/11">#11</a>)<a href="#issue-311e9dcb"> ↵
+            </a></div>
+    </div>
+    <aside class="dfn-panel" data-for="installed-apps">
+        <b><a href="#installed-apps">#installed-apps</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-installed-apps">4.1. Match an installed app</a> <a
+                    href="#ref-for-installed-apps①">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="installed-app">
+        <b><a href="#installed-app">#installed-app</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-installed-app">3.1. Platform</a>
+            <li><a href="#ref-for-installed-app①">3.2. Installed App</a> <a href="#ref-for-installed-app②">(2)</a>
+            <li><a href="#ref-for-installed-app③">5.1. RelatedApplication</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="installed-app-id">
+        <b><a href="#installed-app-id">#installed-app-id</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-installed-app-id">4.1. Match an installed app</a> <a
+                    href="#ref-for-installed-app-id①">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="installed-app-version">
+        <b><a href="#installed-app-version">#installed-app-version</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-installed-app-version">4.1. Match an installed app</a>
+            <li><a href="#ref-for-installed-app-version①">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="installed-app-fingerprints">
+        <b><a href="#installed-app-fingerprints">#installed-app-fingerprints</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-installed-app-fingerprints">4.1. Match an installed app</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="installed-app-relatedurls">
+        <b><a href="#installed-app-relatedurls">#installed-app-relatedurls</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-installed-app-relatedurls">4.1. Match an installed app</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="match-an-installed-app">
+        <b><a href="#match-an-installed-app">#match-an-installed-app</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-match-an-installed-app">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dictdef-relatedapplication">
+        <b><a href="#dictdef-relatedapplication">#dictdef-relatedapplication</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-dictdef-relatedapplication">5.1. RelatedApplication</a>
+            <li><a href="#ref-for-dictdef-relatedapplication①">5.2. Extensions to Navigator</a>
+            <li><a href="#ref-for-dictdef-relatedapplication②">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-relatedapplication-platform">
+        <b><a href="#dom-relatedapplication-platform">#dom-relatedapplication-platform</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-relatedapplication-platform">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-relatedapplication-url">
+        <b><a href="#dom-relatedapplication-url">#dom-relatedapplication-url</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-relatedapplication-url">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-relatedapplication-id">
+        <b><a href="#dom-relatedapplication-id">#dom-relatedapplication-id</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-relatedapplication-id">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-relatedapplication-version">
+        <b><a href="#dom-relatedapplication-version">#dom-relatedapplication-version</a></b><b>Referenced in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-relatedapplication-version">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-navigator-getinstalledrelatedapps">
+        <b><a href="#dom-navigator-getinstalledrelatedapps">#dom-navigator-getinstalledrelatedapps</a></b><b>Referenced
+            in:</b>
+        <ul>
+            <li><a href="#ref-for-dom-navigator-getinstalledrelatedapps">5.2. Extensions to Navigator</a>
+            <li><a href="#ref-for-dom-navigator-getinstalledrelatedapps①">5.2.1. getInstalledRelatedApps()</a>
+        </ul>
+    </aside>
+    <script>/* script-dfn-panel */
+
+        document.body.addEventListener("click", function (e) {
+            var queryAll = function (sel) { return [].slice.call(document.querySelectorAll(sel)); }
+            // Find the dfn element or panel, if any, that was clicked on.
+            var el = e.target;
+            var target;
+            var hitALink = false;
+            while (el.parentElement) {
+                if (el.tagName == "A") {
+                    // Clicking on a link in a <dfn> shouldn't summon the panel
+                    hitALink = true;
+                }
+                if (el.classList.contains("dfn-paneled")) {
+                    target = "dfn";
+                    break;
+                }
+                if (el.classList.contains("dfn-panel")) {
+                    target = "dfn-panel";
+                    break;
+                }
+                el = el.parentElement;
+            }
+            if (target != "dfn-panel") {
+                // Turn off any currently "on" or "activated" panels.
+                queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function (el) {
+                    el.classList.remove("on");
+                    el.classList.remove("activated");
+                });
+            }
+            if (target == "dfn" && !hitALink) {
+                // open the panel
+                var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+                if (dfnPanel) {
+                    dfnPanel.classList.add("on");
+                    var rect = el.getBoundingClientRect();
+                    dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+                    dfnPanel.style.top = window.scrollY + rect.top + "px";
+                    var panelRect = dfnPanel.getBoundingClientRect();
+                    var panelWidth = panelRect.right - panelRect.left;
+                    if (panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                        // Reposition, because the panel is overflowing
+                        dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+                    }
+                } else {
+                    console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+                }
+            } else if (target == "dfn-panel") {
+                // Switch it to "activated" state, which pins it.
+                el.classList.add("activated");
+                el.style.left = null;
+                el.style.top = null;
+            }
+
+        });
+    </script>
+    <script>/* script-var-click-highlighting */
+
+        document.addEventListener("click", e => {
+            if (e.target.nodeName == "VAR") {
+                highlightSameAlgoVars(e.target);
+            }
+        });
+        {
+            const indexCounts = new Map();
+            const indexNames = new Map();
+            function highlightSameAlgoVars(v) {
+                // Find the algorithm container.
+                let algoContainer = null;
+                let searchEl = v;
+                while (algoContainer == null && searchEl != document.body) {
+                    searchEl = searchEl.parentNode;
+                    if (searchEl.hasAttribute("data-algorithm")) {
+                        algoContainer = searchEl;
+                    }
+                }
+
+                // Not highlighting document-global vars,
+                // too likely to be unrelated.
+                if (algoContainer == null) return;
+
+                const algoName = algoContainer.getAttribute("data-algorithm");
+                const varName = getVarName(v);
+                const addClass = !v.classList.contains("selected");
+                let highlightClass = null;
+                if (addClass) {
+                    const index = chooseHighlightIndex(algoName, varName);
+                    indexCounts.get(algoName)[index] += 1;
+                    indexNames.set(algoName + "///" + varName, index);
+                    highlightClass = nameFromIndex(index);
+                } else {
+                    const index = previousHighlightIndex(algoName, varName);
+                    indexCounts.get(algoName)[index] -= 1;
+                    highlightClass = nameFromIndex(index);
+                }
+
+                // Find all same-name vars, and toggle their class appropriately.
+                for (const el of algoContainer.querySelectorAll("var")) {
+                    if (getVarName(el) == varName) {
+                        el.classList.toggle("selected", addClass);
+                        el.classList.toggle(highlightClass, addClass);
+                    }
+                }
+            }
+            function getVarName(el) {
+                return el.textContent.replace(/(\s|\xa0)+/, " ").trim();
+            }
+            function chooseHighlightIndex(algoName, varName) {
+                let indexes = null;
+                if (indexCounts.has(algoName)) {
+                    indexes = indexCounts.get(algoName);
+                } else {
+                    // 7 classes right now
+                    indexes = [0, 0, 0, 0, 0, 0, 0];
+                    indexCounts.set(algoName, indexes);
+                }
+
+                // If the element was recently unclicked,
+                // *and* that color is still unclaimed,
+                // give it back the same color.
+                const lastIndex = previousHighlightIndex(algoName, varName);
+                if (indexes[lastIndex] === 0) return lastIndex;
+
+                // Find the earliest index with the lowest count.
+                const minCount = Math.min.apply(null, indexes);
+                let index = null;
+                for (var i = 0; i < indexes.length; i++) {
+                    if (indexes[i] == minCount) {
+                        return i;
+                    }
+                }
+            }
+            function previousHighlightIndex(algoName, varName) {
+                return indexNames.get(algoName + "///" + varName);
+            }
+            function nameFromIndex(index) {
+                return "selected" + index;
+            }
+        }
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
