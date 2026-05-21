@@ -49,7 +49,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WAI-ARIA Graphics Module](https://ko.htmlspecs.com/graphics-aria-1.0/)（[Source](https://www.w3.org/TR/2018/REC-graphics-aria-1.0-20181002/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [ARIA in HTML](https://ko.htmlspecs.com/html-aria/)（[Source](https://www.w3.org/TR/2026/REC-html-aria-20260415/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Name and Description Computation 1.1](https://ko.htmlspecs.com/accname-1.1/)（[Source](https://www.w3.org/TR/2018/REC-accname-1.1-20181218/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
-- [Accessible Name and Description Computation 1.2](https://ko.htmlspecs.com/accname-1.2/)（[Source](hhttps://www.w3.org/TR/2026/WD-accname-1.2-20260520/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Accessible Name and Description Computation 1.2](https://ko.htmlspecs.com/accname-1.2/)（[Source](https://www.w3.org/TR/2026/WD-accname-1.2-20260520/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Accessibility Conformance Testing (ACT) Rules Format 1.1](https://ko.htmlspecs.com/act-rules-format/)（[Source](https://www.w3.org/TR/2026/REC-act-rules-format-1.1-20260205/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Using ARIA](https://ko.htmlspecs.com/using-aria/)（[Source](https://www.w3.org/TR/2026/DISC-using-aria-20260224/) ![Discontinued Draft](https://img.shields.io/badge/DISC-ffcc00)）
 
@@ -144,7 +144,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Input Events Level 2](https://ko.htmlspecs.com/input-events-2/)（[Source](https://www.w3.org/TR/2026/WD-input-events-2-20260501/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Permissions](https://ko.htmlspecs.com/permissions/)（[Source](https://www.w3.org/TR/2025/WD-permissions-20251006/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebOTP API](https://ko.htmlspecs.com/web-otp/)（[Source](https://wicg.github.io/web-otp/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [Device Posture API](https://ko.htmlspecs.com/device-posture/)（[Source](https://www.w3.org/TR/2024/CR-device-posture-20241126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
+- [Device Posture API](https://ko.htmlspecs.com/device-posture/)（[Source](https://www.w3.org/TR/2026/CRD-device-posture-20260520/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Ambient Light Sensor](https://ko.htmlspecs.com/ambient-light/)（[Source](https://www.w3.org/TR/2026/WD-ambient-light-20260514/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Proximity Sensor](https://ko.htmlspecs.com/proximity/)（[Source](https://www.w3.org/TR/2026/WD-proximity-20260514/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Generic Sensor API](https://ko.htmlspecs.com/generic-sensor/)（[Source](https://www.w3.org/TR/2026/CRD-generic-sensor-20260514/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
