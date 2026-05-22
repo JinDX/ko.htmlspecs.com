@@ -149,7 +149,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Proximity Sensor](https://ko.htmlspecs.com/proximity/)（[Source](https://www.w3.org/TR/2026/WD-proximity-20260514/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Generic Sensor API](https://ko.htmlspecs.com/generic-sensor/)（[Source](https://www.w3.org/TR/2026/CRD-generic-sensor-20260514/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Battery Status API](https://ko.htmlspecs.com/battery-status/)（[Source](https://www.w3.org/TR/2024/WD-battery-status-20241024/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Vibration API](https://ko.htmlspecs.com/vibration/)（[Source](https://www.w3.org/TR/2026/CRD-vibration-20260520/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [Vibration API](https://ko.htmlspecs.com/vibration/)（[Source](https://www.w3.org/TR/2026/CRD-vibration-20260521/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Accelerometer](https://ko.htmlspecs.com/accelerometer/)（[Source](https://www.w3.org/TR/2026/CRD-accelerometer-20260514/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Magnetometer](https://ko.htmlspecs.com/magnetometer/)（[Source](https://www.w3.org/TR/2026/WD-magnetometer-20260514/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Gyroscope](https://ko.htmlspecs.com/gyroscope/)（[Source](https://www.w3.org/TR/2026/CRD-gyroscope-20260514/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
