@@ -189,7 +189,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Cryptography Level 2](https://ko.htmlspecs.com/webcrypto-2/)（[Source](https://www.w3.org/TR/2025/WD-webcrypto-2-20250422/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Web Authentication: An API for accessing Public Key Credentials Level 2](https://ko.htmlspecs.com/webauthn-2/)（[Source](https://www.w3.org/TR/2021/REC-webauthn-2-20210408/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Authentication: An API for accessing Public Key Credentials Level 3](https://ko.htmlspecs.com/webauthn-3/)（[Source](https://www.w3.org/TR/2026/CR-webauthn-3-20260113/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
-- [Secure Payment Confirmation](https://ko.htmlspecs.com/secure-payment-confirmation/)（[Source](https://www.w3.org/TR/2026/CRD-secure-payment-confirmation-20260319/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [Secure Payment Confirmation](https://ko.htmlspecs.com/secure-payment-confirmation/)（[Source](https://www.w3.org/TR/2026/CRD-secure-payment-confirmation-20260525/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api/)（[Source](https://wicg.github.io/sanitizer-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Subresource Integrity (SRI)](https://ko.htmlspecs.com/sri/)（[Source](https://www.w3.org/TR/2016/REC-SRI-20160623/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Subresource Integrity (SRI) 2](https://ko.htmlspecs.com/sri-2/)（[Source](https://www.w3.org/TR/2026/WD-sri-2-20260320/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
