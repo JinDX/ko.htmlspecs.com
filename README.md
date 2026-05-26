@@ -79,6 +79,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Background Fetch](https://ko.htmlspecs.com/background-fetch/)（[Source](https://wicg.github.io/background-fetch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Periodic Background Sync](https://ko.htmlspecs.com/periodic-background-sync/)（[Source](https://wicg.github.io/periodic-background-sync/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [User-Agent Client Hints](https://ko.htmlspecs.com/ua-client-hints/)（[Source](https://wicg.github.io/ua-client-hints/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Trace Context Level 2](https://ko.htmlspecs.com/trace-context-2/)（[Source](https://www.w3.org/TR/2024/CRD-trace-context-2-20240328/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Beacon](https://ko.htmlspecs.com/beacon/)（[Source](https://www.w3.org/TR/2022/CRD-beacon-20220803/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Network Error Logging](https://ko.htmlspecs.com/network-error-logging/)（[Source](https://www.w3.org/TR/2025/WD-network-error-logging-20250505/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
