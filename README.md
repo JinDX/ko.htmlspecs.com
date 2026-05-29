@@ -222,6 +222,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [JWT Best Current Practices](https://ko.htmlspecs.com/jwt-bcp/)（[Source](https://www.rfc-editor.org/rfc/rfc8725) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### AI 및 머신러닝
+- [Web Neural Network API](https://ko.htmlspecs.com/webnn/)（[Source](https://www.w3.org/TR/2026/CRD-webnn-20260521/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Model Loader API](https://ko.htmlspecs.com/model-loader/)（[Source](https://webmachinelearning.github.io/model-loader/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 미디어 및 그래픽
