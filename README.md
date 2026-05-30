@@ -79,6 +79,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Digital Goods API](https://ko.htmlspecs.com/digital-goods/)（[Source](https://wicg.github.io/digital-goods/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Background Fetch](https://ko.htmlspecs.com/background-fetch/)（[Source](https://wicg.github.io/background-fetch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Periodic Background Sync](https://ko.htmlspecs.com/periodic-background-sync/)（[Source](https://wicg.github.io/periodic-background-sync/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Content Index](https://ko.htmlspecs.com/content-index/)（[Source](https://wicg.github.io/content-index/spec/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [User-Agent Client Hints](https://ko.htmlspecs.com/ua-client-hints/)（[Source](https://wicg.github.io/ua-client-hints/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Trace Context Level 2](https://ko.htmlspecs.com/trace-context-2/)（[Source](https://www.w3.org/TR/2024/CRD-trace-context-2-20240328/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Baggage](https://ko.htmlspecs.com/baggage/)（[Source](https://www.w3.org/TR/2024/CR-baggage-20240530/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
