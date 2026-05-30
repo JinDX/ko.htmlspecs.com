@@ -44,7 +44,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.2](https://ko.htmlspecs.com/wai-aria-1.2/)（[Source](https://www.w3.org/TR/2023/REC-wai-aria-1.2-20230606/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.3](https://ko.htmlspecs.com/wai-aria-1.3/)（[Source](https://www.w3.org/TR/2024/WD-wai-aria-1.3-20240123/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Core Accessibility API Mappings 1.2](https://ko.htmlspecs.com/core-aam-1.2/)（[Source](https://www.w3.org/TR/2026/CRD-core-aam-1.2-20260529/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [HTML Accessibility API Mappings 1.0](https://ko.htmlspecs.com/html-aam-1.0/)（[Source](https://www.w3.org/TR/2026/WD-html-aam-1.0-20260527/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [HTML Accessibility API Mappings 1.0](https://ko.htmlspecs.com/html-aam-1.0/)（[Source](https://www.w3.org/TR/2026/WD-html-aam-1.0-20260529/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [SVG Accessibility API Mappings](https://ko.htmlspecs.com/svg-aam-1.0/)（[Source](https://www.w3.org/TR/2026/WD-svg-aam-1.0-20260527/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WAI-ARIA Graphics Module](https://ko.htmlspecs.com/graphics-aria-1.0/)（[Source](https://www.w3.org/TR/2018/REC-graphics-aria-1.0-20181002/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [ARIA in HTML](https://ko.htmlspecs.com/html-aria/)（[Source](https://www.w3.org/TR/2026/REC-html-aria-20260415/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
