@@ -171,6 +171,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Navigation Timing Level 2](https://ko.htmlspecs.com/navigation-timing-2/)（[Source](https://www.w3.org/TR/2026/WD-navigation-timing-2-20260225/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Soft Navigations and Interaction Contentful Paint](https://ko.htmlspecs.com/soft-navigations/)（[Source](https://wicg.github.io/soft-navigations/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Resource Timing](https://ko.htmlspecs.com/resource-timing/)（[Source](https://www.w3.org/TR/2026/CRD-resource-timing-20260420/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [Element Timing API](https://ko.htmlspecs.com/element-timing/)（[Source](https://wicg.github.io/element-timing/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [User Timing Level 2](https://ko.htmlspecs.com/user-timing-2/)（[Source](https://www.w3.org/TR/2019/REC-user-timing-2-20190226/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [User Timing](https://ko.htmlspecs.com/user-timing/)（[Source](https://www.w3.org/TR/2026/CRD-user-timing-20260311/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Observable](https://ko.htmlspecs.com/observable/)（[Source](https://wicg.github.io/observable/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
