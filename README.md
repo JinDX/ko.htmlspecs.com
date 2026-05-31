@@ -275,6 +275,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebXR Gamepads Module - Level 1](https://ko.htmlspecs.com/webxr-gamepads-module-1/)（[Source](https://www.w3.org/TR/2025/WD-webxr-gamepads-module-1-20250707/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebXR Hit Test Module](https://ko.htmlspecs.com/webxr-hit-test-1/)（[Source](https://www.w3.org/TR/2025/WD-webxr-hit-test-1-20251211/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebXR DOM Overlays Module](https://ko.htmlspecs.com/webxr-dom-overlays-1/)（[Source](https://www.w3.org/TR/2024/WD-webxr-dom-overlays-1-20240924/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [WebXR Layers API Level 1](https://ko.htmlspecs.com/webxrlayers-1/)（[Source](https://www.w3.org/TR/2026/WD-webxrlayers-1-20260122/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Portable Network Graphics (PNG) 3](https://ko.htmlspecs.com/png-3/)（[Source](https://www.w3.org/TR/2025/REC-png-3-20250624/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Image Resource](https://ko.htmlspecs.com/image-resource/)（[Source](https://www.w3.org/TR/2021/WD-image-resource-20210604/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
