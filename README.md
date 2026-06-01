@@ -229,6 +229,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Neural Network API](https://ko.htmlspecs.com/webnn/)（[Source](https://www.w3.org/TR/2026/CRD-webnn-20260521/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Model Loader API](https://ko.htmlspecs.com/model-loader/)（[Source](https://webmachinelearning.github.io/model-loader/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Translator and Language Detector APIs](https://ko.htmlspecs.com/translation-api/)（[Source](https://webmachinelearning.github.io/translation-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Prompt API](https://ko.htmlspecs.com/prompt-api/)（[Source](https://webmachinelearning.github.io/prompt-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 미디어 및 그래픽
 - [WebGPU](https://ko.htmlspecs.com/webgpu/)（[Source](https://www.w3.org/TR/2026/CRD-webgpu-20260521/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
