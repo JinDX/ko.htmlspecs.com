@@ -58,7 +58,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Streams](https://ko.htmlspecs.com/streams/)（[Source](https://streams.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [XMLHttpRequest](https://ko.htmlspecs.com/xhr/)（[Source](https://xhr.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [WebSockets](https://ko.htmlspecs.com/websockets/)（[Source](https://websockets.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
-- [WebSub](https://ko.htmlspecs.com/websub/)（[Source](https://www.w3.org/TR/2018/REC-websub-20180123/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [WebSub](https://ko.htmlspecs.com/websub/)（[Source](https://www.w3.org/TR/2026/REC-websub-20260602/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [ActivityPub](https://ko.htmlspecs.com/activitypub/)（[Source](https://www.w3.org/TR/2018/REC-activitypub-20180123/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Activity Streams 2.0](https://ko.htmlspecs.com/activitystreams-core/)（[Source](https://www.w3.org/TR/2017/REC-activitystreams-core-20170523/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Private Network Access](https://ko.htmlspecs.com/private-network-access/)（[Source](https://wicg.github.io/private-network-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
