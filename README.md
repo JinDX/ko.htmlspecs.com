@@ -140,6 +140,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Virtual Keyboard](https://ko.htmlspecs.com/virtual-keyboard/)（[Source](https://www.w3.org/TR/2022/WD-virtual-keyboard-20220505/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Window Controls Overlay](https://ko.htmlspecs.com/window-controls-overlay/)（[Source](https://wicg.github.io/window-controls-overlay/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Window Management](https://ko.htmlspecs.com/window-management/)（[Source](https://www.w3.org/TR/2024/WD-window-management-20240607/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Web Printing API](https://ko.htmlspecs.com/web-printing/)（[Source](https://wicg.github.io/web-printing/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Web Share API](https://ko.htmlspecs.com/web-share/)（[Source](https://www.w3.org/TR/2023/REC-web-share-20230530/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Audio API](https://ko.htmlspecs.com/webaudio/)（[Source](https://www.w3.org/TR/2024/WD-webaudio-1.1-20241105/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Audio Output Devices API](https://ko.htmlspecs.com/audio-output/)（[Source](https://www.w3.org/TR/2025/CRD-audio-output-20251009/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
@@ -217,6 +218,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Secure Contexts](https://ko.htmlspecs.com/secure-contexts/)（[Source](https://www.w3.org/TR/2023/CRD-secure-contexts-20231110/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Isolated Contexts](https://ko.htmlspecs.com/isolated-contexts/)（[Source](https://wicg.github.io/isolated-web-apps/isolated-contexts.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Controlled Frame API](https://ko.htmlspecs.com/controlled-frame/)（[Source](https://wicg.github.io/controlled-frame/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Fenced Frame](https://ko.htmlspecs.com/fenced-frame/)（[Source](https://wicg.github.io/fenced-frame/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Referrer Policy](https://ko.htmlspecs.com/referrer-policy/)（[Source](https://www.w3.org/TR/2017/CR-referrer-policy-20170126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Fetch Metadata Request Headers](https://ko.htmlspecs.com/fetch-metadata/)（[Source](https://www.w3.org/TR/2025/WD-fetch-metadata-20250401/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Mixed Content](https://ko.htmlspecs.com/mixed-content/)（[Source](https://www.w3.org/TR/2023/CRD-mixed-content-20230223/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
@@ -257,7 +259,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [MediaStreamTrack Content Hints](https://ko.htmlspecs.com/mst-content-hint/)（[Source](https://www.w3.org/TR/2025/WD-mst-content-hint-20250919/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [MediaStreamTrack Insertable Media Processing using Streams](https://ko.htmlspecs.com/mediacapture-transform/)（[Source](https://www.w3.org/TR/2026/WD-mediacapture-transform-20260416/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Autoplay Detection](https://ko.htmlspecs.com/autoplay-detection/)（[Source](https://www.w3.org/TR/2025/WD-autoplay-detection-20250904/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Media Stream Recording](https://ko.htmlspecs.com/media-stream-recording/)（[Source](https://www.w3.org/TR/2026/WD-mediastream-recording-20260316/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [MediaStream Recording](https://ko.htmlspecs.com/mediastream-recording/)（[Source](https://www.w3.org/TR/2026/WD-mediastream-recording-20260316/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebVTT: The Web Video Text Tracks Format](https://ko.htmlspecs.com/webvtt1/)（[Source](https://www.w3.org/TR/2026/CRD-webvtt1-20260520/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Media Source Extensions](https://ko.htmlspecs.com/media-source-2/)（[Source](https://www.w3.org/TR/2025/WD-media-source-2-20251104/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebCodecs](https://ko.htmlspecs.com/webcodecs/)（[Source](https://www.w3.org/TR/2026/WD-webcodecs-20260505/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
@@ -310,6 +312,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Color Module Level 3](https://ko.htmlspecs.com/css/css-color-3/)（[Source](https://www.w3.org/TR/2022/REC-css-color-3-20220118/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [CSS Color Module Level 4](https://ko.htmlspecs.com/css/css-color-4/)（[Source](https://www.w3.org/TR/2026/CRD-css-color-4-20260502/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [CSS Color Module Level 5](https://ko.htmlspecs.com/css/css-color-5/)（[Source](https://www.w3.org/TR/2026/WD-css-color-5-20260605/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [CSS Color Module Level 6](https://ko.htmlspecs.com/css/css-color-6/)（[Source](https://drafts.csswg.org/css-color-6/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [CSS Color Adjustment Module Level 1](https://ko.htmlspecs.com/css/css-color-adjust-1/)（[Source](https://www.w3.org/TR/2025/CR-css-color-adjust-1-20251216/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [CSS Color HDR Module Level 1](https://ko.htmlspecs.com/css/css-color-hdr-1/)（[Source](https://www.w3.org/TR/2026/WD-css-color-hdr-1-20260303/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Filter Effects Module Level 1](https://ko.htmlspecs.com/css/filter-effects-1/)（[Source](https://www.w3.org/TR/2018/WD-filter-effects-1-20181218/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
