@@ -12,7 +12,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebAssembly Web API](https://ko.htmlspecs.com/wasm-web-api-2/)（[Source](https://www.w3.org/TR/2026/CRD-wasm-web-api-2-20260527/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [DOM](https://ko.htmlspecs.com/dom/)（[Source](https://dom.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [DOM Parsing and Serialization](https://ko.htmlspecs.com/dom-parsing/)（[Source](https://www.w3.org/TR/2016/WD-DOM-Parsing-20160517/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [EditContext API](https://ko.htmlspecs.com/edit-context/)（[Source](https://www.w3.org/TR/2026/WD-edit-context-20260609/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [EditContext API](https://ko.htmlspecs.com/edit-context/)（[Source](https://www.w3.org/TR/2026/WD-edit-context-20260610/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [URL](https://ko.htmlspecs.com/url/)（[Source](https://url.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [URL Pattern](https://ko.htmlspecs.com/urlpattern/)（[Source](https://urlpattern.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Scroll To Text Fragment](https://ko.htmlspecs.com/scroll-to-text-fragment/)（[Source](https://wicg.github.io/scroll-to-text-fragment/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
