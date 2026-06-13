@@ -21,6 +21,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [The JavaScript Object Notation (JSON) Data Interchange Format](https://ko.htmlspecs.com/json/)（[Source](https://www.rfc-editor.org/rfc/rfc8259.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON-LD 1.1](https://ko.htmlspecs.com/json-ld11/)（[Source](https://www.w3.org/TR/2020/REC-json-ld11-20200716/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [JSON-LD 1.1 Processing Algorithms and API](https://ko.htmlspecs.com/json-ld11-api/)（[Source](https://www.w3.org/TR/2020/REC-json-ld11-api-20200716/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [JSON-LD 1.1 Framing](https://ko.htmlspecs.com/json-ld11-framing/)（[Source](https://www.w3.org/TR/2020/REC-json-ld11-framing-20200716/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [MIME Sniffing](https://ko.htmlspecs.com/mimesniff/)（[Source](https://mimesniff.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Infra](https://ko.htmlspecs.com/infra/)（[Source](https://infra.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Web User Agents](https://ko.htmlspecs.com/web-user-agents/)（[Source](https://www.w3.org/TR/2026/DNOTE-web-user-agents-20260319/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
