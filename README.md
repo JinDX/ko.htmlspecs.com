@@ -332,7 +332,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebDriver](https://ko.htmlspecs.com/webdriver2/)（[Source](https://www.w3.org/TR/2026/WD-webdriver2-20260528/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebDriver BiDi](https://ko.htmlspecs.com/webdriver-bidi/)（[Source](https://www.w3.org/TR/2026/WD-webdriver-bidi-20260601/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
-### 색인, 스냅샷 및 개요
+## CSS
 - [CSS current work](https://ko.htmlspecs.com/css/)（[Source](https://www.w3.org/Style/CSS/current-work)）
 - [CSS 2.2 Specification](https://ko.htmlspecs.com/css/css22/)（[Source](https://www.w3.org/TR/2016/WD-CSS22-20160412/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)），- [How to Read](https://ko.htmlspecs.com/css/read/)（[Source](https://www.w3.org/Style/CSS/read)）
 - [CSS Snapshot 2024](https://ko.htmlspecs.com/css/css-2024/)（[Source](https://www.w3.org/TR/2025/NOTE-css-2024-20250225/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
@@ -488,7 +488,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Design Tokens Color Module 2025.10](https://ko.htmlspecs.com/css/design-tokens-color/)（[Source](https://www.designtokens.org/tr/2025.10/color/) ![Community Group Final Report](https://img.shields.io/badge/CG--FINAL-ffcc00)）
 - [Design Tokens Resolver Module 2025.10](https://ko.htmlspecs.com/css/design-tokens-resolver/)（[Source](https://www.designtokens.org/tr/2025.10/resolver/) ![Community Group Final Report](https://img.shields.io/badge/CG--FINAL-ffcc00)）
 
-### 색인 및 개요
+## HTTP
 - [index](https://ko.htmlspecs.com/http/)（[Source](https://httpwg.org/specs/)）
 
 ### HTTP 핵심, 버전 및 압축
