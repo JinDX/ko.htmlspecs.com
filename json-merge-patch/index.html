@@ -1,0 +1,498 @@
+<pre>인터넷 엔지니어링 태스크 포스(IETF)                        P. Hoffman
+Request for Comments: 7396                                VPN Consortium
+Obsoletes: <a href="./rfc7386">7386</a>                                                 J. Snell
+Category: Standards Track                                   2014년 10월
+ISSN: 2070-1721
+
+
+                            <span class="h1">JSON 병합 패치</span>
+
+초록
+
+   이 명세는 JSON 병합 패치 형식과 처리 규칙을 정의한다.
+   병합 패치 형식은 주로 HTTP PATCH 메서드와 함께 사용되어,
+   대상 리소스의 콘텐츠에 대한 일련의 수정을 설명하는 수단으로
+   의도되어 있다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 이 문서는 공개 검토를
+   받았으며 인터넷 엔지니어링 운영 그룹(IESG)의 승인을 받아
+   출판되었다. 인터넷 표준에 대한 자세한 정보는
+   <a href="./rfc5741#section-2">RFC 5741의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 피드백 제공 방법에 대한 정보는
+   <a href="http://www.rfc-editor.org/info/rfc7396">http://www.rfc-editor.org/info/rfc7396</a>에서 얻을 수 있다.
+
+저작권 고지
+
+   Copyright (c) 2014 IETF Trust 및 문서 저자로 식별된 사람들.
+   모든 권리 보유.
+
+   이 문서는 출판일에 유효한 <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> 및 IETF Trust의
+   IETF 문서와 관련된 법적 조항
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>)의 적용을 받는다.
+   이 문서와 관련된 권리와 제한을 설명하고 있으므로 해당 문서를
+   주의 깊게 검토해야 한다. 이 문서에서 추출된 코드 구성요소에는
+   Trust Legal Provisions의 Section 4.e에 설명된 Simplified BSD License
+   텍스트가 포함되어야 하며, Simplified BSD License에 설명된 대로
+   보증 없이 제공된다.
+
+
+
+
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>.  소개  . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-2">2</a>
+   <a href="#section-2">2</a>.  병합 패치 문서 처리  . . . . . . . . . . . . . . . . . .   <a href="#page-3">3</a>
+   <a href="#section-3">3</a>.  예제 . . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-4">4</a>
+   <a href="#section-4">4</a>.  IANA 고려사항 . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-5">5</a>
+   <a href="#section-5">5</a>.  보안 고려사항 . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-6">6</a>
+   <a href="#section-6">6</a>.  참고문헌  . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-7">7</a>
+     <a href="#section-6.1">6.1</a>.  규범 참고문헌  . . . . . . . . . . . . . . . . . . . .   <a href="#page-7">7</a>
+     <a href="#section-6.2">6.2</a>.  정보 참고문헌  . . . . . . . . . . . . . . . . . . . .   <a href="#page-7">7</a>
+   <a href="#appendix-A">부록 A</a>.  예제 테스트 케이스 . . . . . . . . . . . . . . . . .   <a href="#page-8">8</a>
+   감사의 말 . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-9">9</a>
+   저자 주소  . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-9">9</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   이 명세는 JSON 병합 패치 문서 형식, 처리 규칙 및 관련 MIME
+   미디어 타입 식별자를 정의한다. 병합 패치 형식은 주로 HTTP PATCH
+   메서드 [<a href="./rfc5789" title="&quot;PATCH Method for HTTP&quot;">RFC5789</a>]와 함께 사용되어, 대상 리소스의 콘텐츠에
+   대한 일련의 수정을 설명하는 수단으로 의도되어 있다.
+
+   JSON 병합 패치 문서는 수정되는 문서와 매우 유사한 구문을
+   사용하여 대상 JSON 문서에 적용할 변경 사항을 설명한다. 병합
+   패치 문서를 받는 측은 제공된 패치의 콘텐츠를 대상 문서의 현재
+   콘텐츠와 비교하여 요청된 정확한 변경 집합을 결정한다. 제공된
+   병합 패치에 대상 내에 나타나지 않는 멤버가 포함되어 있으면
+   해당 멤버가 추가된다. 대상에 해당 멤버가 포함되어 있으면 값이
+   교체된다. 병합 패치에서 null 값은 대상의 기존 값을 제거함을
+   나타내는 특별한 의미를 가진다.
+
+   예를 들어, 다음 원래 JSON 문서가 주어졌다고 하자.
+
+   {
+     "a": "b",
+     "c": {
+       "d": "e",
+       "f": "g"
+     }
+   }
+
+
+
+
+
+
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+   "a"의 값을 변경하고 "f"를 제거하려면 다음을 전송하여
+   달성할 수 있다.
+
+   PATCH /target HTTP/1.1
+   Host: example.org
+   Content-Type: application/merge-patch+json
+
+   {
+     "a":"z",
+     "c": {
+       "f": null
+     }
+   }
+
+   대상 리소스에 적용되면 "a" 멤버의 값은 "z"로 교체되고
+   "f"는 제거되어, 나머지 콘텐츠는 변경되지 않은 채 남는다.
+
+   이러한 설계는 병합 패치 문서가 주로 객체를 구조로 사용하고
+   명시적 null 값을 사용하지 않는 JSON 문서에 대한 수정을
+   설명하는 데 적합하다는 것을 의미한다. 병합 패치 형식이 모든
+   JSON 구문에 적합한 것은 아니다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  병합 패치 문서 처리</span>
+
+   JSON 병합 패치 문서는 대상 리소스에 적용해야 하는 일련의
+   변경 사항을 예시를 통해 설명한다. 병합 패치 문서를 받는 측은
+   병합 패치를 대상 리소스의 현재 콘텐츠와 비교하여, 대상에
+   적용할 구체적인 변경 작업 집합을 결정할 책임이 있다.
+
+   병합 패치 문서를 대상 리소스에 적용하기 위해 시스템은 다음
+   함수의 효과를 실현한다. 이 함수는 의사코드로 설명된다. 이
+   설명에서 함수는 MergePatch라고 하며, 두 개의 인수를 받는다:
+   대상 리소스 문서와 병합 패치 문서이다. Target 인수는 임의의
+   JSON 값 또는 undefined일 수 있다. Patch 인수는 임의의 JSON
+   값일 수 있다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+   define MergePatch(Target, Patch):
+     if Patch is an Object:
+       if Target is not an Object:
+         Target = {} # Ignore the contents and set it to an empty Object
+       for each Name/Value pair in Patch:
+         if Value is null:
+           if Name exists in Target:
+             remove the Name/Value pair from Target
+         else:
+           Target[Name] = MergePatch(Target[Name], Value)
+       return Target
+     else:
+       return Patch
+
+   이 함수에 대해 주의할 점이 몇 가지 있다. 패치가 객체가 아닌
+   어떤 것이든, 결과는 항상 전체 대상을 전체 패치로 교체하는
+   것이 된다. 또한 배열의 일부 값만 교체하는 것처럼, 객체가 아닌
+   대상의 일부를 패치하는 것은 불가능하다.
+
+   MergePatch 작업은 텍스트 표현 수준이 아니라 데이터 항목
+   수준에서 동작하도록 정의된다. MergePatch 작업이 공백, 멤버
+   순서, 대상 구현에서 사용할 수 있는 범위를 넘어서는 숫자 정밀도
+   등과 같은 텍스트 표현 수준의 특성을 보존할 것이라는 기대는
+   없다. 또한 대상 구현이 동일한 이름을 가진 여러 이름/값 쌍을
+   허용하더라도, 이러한 객체에 대한 MergePatch 작업의 결과는
+   정의되어 있지 않다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  예제</span>
+
+   다음 예제 JSON 문서가 주어졌다고 하자.
+
+   {
+     "title": "Goodbye!",
+     "author" : {
+       "givenName" : "John",
+       "familyName" : "Doe"
+     },
+     "tags":[ "example", "sample" ],
+     "content": "This will be unchanged"
+   }
+
+
+
+
+
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+   "title" 멤버의 값을 "Goodbye!"에서 "Hello!"로 변경하고, 새
+   "phoneNumber" 멤버를 추가하며, "author" 객체에서
+   "familyName" 멤버를 제거하고, "tags" 배열을 "sample"이라는
+   단어가 포함되지 않도록 교체하려는 사용자 에이전트는 다음
+   요청을 보낼 것이다.
+
+   PATCH /my/resource HTTP/1.1
+   Host: example.org
+   Content-Type: application/merge-patch+json
+
+   {
+     "title": "Hello!",
+     "phoneNumber": "+01-123-456-7890",
+     "author": {
+       "familyName": null
+     },
+     "tags": [ "example" ]
+   }
+
+   결과 JSON 문서는 다음과 같다.
+
+   {
+     "title": "Hello!",
+     "author" : {
+       "givenName" : "John"
+     },
+     "tags": [ "example" ],
+     "content": "This will be unchanged",
+     "phoneNumber": "+01-123-456-7890"
+   }
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  IANA 고려사항</span>
+
+   이 명세는 다음 추가 MIME 미디어 타입을 등록한다.
+
+      타입 이름: application
+
+      서브타입 이름: merge-patch+json
+
+      필수 매개변수: 없음
+
+      선택적 매개변수: 없음
+
+      인코딩 고려사항: "application/merge-patch+json" 미디어
+      타입을 사용하는 리소스는 "application/json" 미디어 타입을
+      준수해야 하므로, <a href="./rfc7159#section-8">[RFC7159]의 Section&nbsp;8</a>에 명시된 동일한
+      인코딩 고려사항의 적용을 받는다.
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+      보안 고려사항: 이 명세에 정의된 바와 같음
+
+      공개된 명세: 이 명세.
+
+      이 미디어 타입을 사용하는 애플리케이션: 현재 알려진 것 없음.
+
+      추가 정보:
+
+         매직 넘버: 해당 없음
+
+         파일 확장자: 해당 없음
+
+         Macintosh 파일 타입 코드: TEXT
+
+      추가 정보를 위한 연락 담당자 및 이메일 주소: IESG
+
+      의도된 사용: COMMON
+
+      사용 제한: 없음
+
+      저자: James M. Snell &lt;jasnell@gmail.com&gt;
+
+      변경 관리자: IESG
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  보안 고려사항</span>
+
+   "application/merge-patch+json" 미디어 타입은 사용자 에이전트가
+   대상 리소스에 적용할 구체적인 변경 작업 집합을 서버가 결정하기를
+   의도함을 나타낼 수 있게 한다. 따라서 어떤 변경이 적절한지와
+   사용자 에이전트가 그러한 변경을 요청할 권한이 있는지를 결정할
+   책임은 서버에 있다. 그러한 결정이 어떻게 이루어지는지는 이
+   명세의 범위를 벗어난다.
+
+   <a href="./rfc5789#section-5">[RFC5789]의 Section&nbsp;5</a>에서 논의된 모든 보안 고려사항은
+   "application/merge-patch+json" 미디어 타입과 함께 HTTP PATCH
+   메서드를 사용하는 모든 경우에 적용된다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  참고문헌</span>
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  규범 참고문헌</span>
+
+   [<a id="ref-RFC7159">RFC7159</a>]  Bray, T., "JavaScript Object Notation(JSON) 데이터
+              교환 형식", <a href="./rfc7159">RFC 7159</a>, 2014년 3월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc7159">http://www.rfc-editor.org/info/rfc7159</a>&gt;.
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  정보 참고문헌</span>
+
+   [<a id="ref-RFC5789">RFC5789</a>]  Dusseault, L. and J. Snell, "HTTP를 위한 PATCH 메서드", <a href="./rfc5789">RFC</a>
+              <a href="./rfc5789">5789</a>, 2010년 3월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc5789">http://www.rfc-editor.org/info/rfc5789</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">부록 A</a>.  예제 테스트 케이스</span>
+
+   ORIGINAL        PATCH            RESULT
+   ------------------------------------------
+   {"a":"b"}       {"a":"c"}       {"a":"c"}
+
+   {"a":"b"}       {"b":"c"}       {"a":"b",
+                                    "b":"c"}
+
+   {"a":"b"}       {"a":null}      {}
+
+   {"a":"b",       {"a":null}      {"b":"c"}
+    "b":"c"}
+
+   {"a":["b"]}     {"a":"c"}       {"a":"c"}
+
+   {"a":"c"}       {"a":["b"]}     {"a":["b"]}
+
+   {"a": {         {"a": {         {"a": {
+     "b": "c"}       "b": "d",       "b": "d"
+   }                 "c": null}      }
+                   }               }
+
+   {"a": [         {"a": [1]}      {"a": [1]}
+     {"b":"c"}
+    ]
+   }
+
+   ["a","b"]       ["c","d"]       ["c","d"]
+
+   {"a":"b"}       ["c"]           ["c"]
+
+   {"a":"foo"}     null            null
+
+   {"a":"foo"}     "bar"           "bar"
+
+   {"e":null}      {"a":1}         {"e":null,
+                                    "a":1}
+
+   [1,2]           {"a":"b",       {"a":"b"}
+                    "c":null}
+
+   {}              {"a":            {"a":
+                    {"bb":           {"bb":
+                     {"ccc":          {}}}
+                      null}}}
+
+
+
+
+
+<span class="grey">Hoffman &amp; Snell              Standards Track                    [Page 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc7396">RFC 7396</a>                    JSON 병합 패치                2014년 10월</span>
+
+
+감사의 말
+
+   많은 사람들이 이 문서에 중요한 아이디어를 기여했다. 이들에는
+   James Manger, Matt Miller, Carsten Bormann, Bjoern Hoehrmann,
+   Pete Resnick, Richard Barnes 등이 포함되지만, 이에 한정되지는 않는다.
+
+저자 주소
+
+   Paul Hoffman
+   VPN Consortium
+
+   EMail: paul.hoffman@vpnc.org
+
+
+   James M. Snell
+
+   EMail: jasnell@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hoffman &amp; Snell              Standards Track                    [Page 9]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
