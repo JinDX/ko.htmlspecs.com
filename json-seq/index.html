@@ -1,0 +1,441 @@
+<pre>인터넷 엔지니어링 태스크 포스(IETF)                       N. Williams
+Request for Comments: 7464                                  Cryptonector
+Category: Standards Track                                  2015년 2월
+ISSN: 2070-1721
+
+
+            <span class="h1">JavaScript Object Notation(JSON) 텍스트 시퀀스</span>
+
+초록
+
+   이 문서는 JavaScript Object Notation(JSON) 텍스트 시퀀스 형식과
+   관련 미디어 타입 "application/json-seq"를 설명한다. JSON 텍스트
+   시퀀스는 임의 개수의 JSON 텍스트로 구성되며, 모두 UTF-8로
+   인코딩되고, 각각 ASCII 레코드 구분자(0x1E)가 앞에 붙으며, 각각
+   ASCII 줄 바꿈 문자(0x0A)로 끝난다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 이 문서는 공개 검토를
+   받았으며 인터넷 엔지니어링 운영 그룹(IESG)의 승인을 받아
+   출판되었다. 인터넷 표준에 대한 자세한 정보는
+   <a href="./rfc5741#section-2">RFC 5741의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 피드백 제공 방법에 대한 정보는
+   <a href="http://www.rfc-editor.org/info/rfc7464">http://www.rfc-editor.org/info/rfc7464</a>에서 얻을 수 있다.
+
+저작권 고지
+
+   Copyright (c) 2015 IETF Trust 및 문서 저자로 식별된 사람들.
+   모든 권리 보유.
+
+   이 문서는 출판일에 유효한 <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> 및 IETF Trust의
+   IETF 문서와 관련된 법적 조항
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>)의 적용을 받는다.
+   이 문서와 관련된 권리와 제한을 설명하고 있으므로 해당 문서를
+   주의 깊게 검토해야 한다. 이 문서에서 추출된 코드 구성요소에는
+   Trust Legal Provisions의 Section 4.e에 설명된 Simplified BSD License
+   텍스트가 포함되어야 하며, Simplified BSD License에 설명된 대로
+   보증 없이 제공된다.
+
+
+
+
+
+
+
+<span class="grey">Williams                     Standards Track                    [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc7464">RFC 7464</a>                   JSON 텍스트 시퀀스             2015년 2월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>. 소개와 동기 ..................................................<a href="#page-2">2</a>
+      <a href="#section-1.1">1.1</a>. 이 문서에서 사용하는 규칙 ..............................<a href="#page-2">2</a>
+   <a href="#section-2">2</a>. JSON 텍스트 시퀀스 형식 ......................................<a href="#page-3">3</a>
+      <a href="#section-2.1">2.1</a>. JSON 텍스트 시퀀스 파싱 .................................<a href="#page-3">3</a>
+      <a href="#section-2.2">2.2</a>. JSON 텍스트 시퀀스 인코딩 ...............................<a href="#page-4">4</a>
+      <a href="#section-2.3">2.3</a>. 불완전/유효하지 않은 JSON 텍스트가 치명적일 필요는 없음 ..<a href="#page-4">4</a>
+      <a href="#section-2.4">2.4</a>. 최상위 값: numbers, true, false 및 null .................<a href="#page-5">5</a>
+   <a href="#section-3">3</a>. 보안 고려사항 ................................................<a href="#page-6">6</a>
+   <a href="#section-4">4</a>. IANA 고려사항 .................................................<a href="#page-6">6</a>
+   <a href="#section-5">5</a>. 규범 참고문헌 ................................................<a href="#page-7">7</a>
+   감사의 말 .......................................................<a href="#page-8">8</a>
+   저자 주소 .......................................................<a href="#page-8">8</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개와 동기</span>
+
+   JavaScript Object Notation(JSON) [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]은 매우 편리한
+   직렬화 형식이다. 그러나 큰 값 시퀀스를 배열로 직렬화하거나,
+   길이를 알 수 없거나 끝나지 않을 수도 있는 값 시퀀스를
+   직렬화할 때 JSON은 다루기 어려워진다.
+
+   각각 인코딩 시 1킬로바이트일 수 있는 백만 개 값의 시퀀스를
+   생각해 보자. 대략 1기가바이트에 해당한다. 이러한 데이터셋은
+   결과 생성을 시작하기 전에 전체를 먼저 읽지 않고도 점진적으로
+   처리하는 것이 바람직한 경우가 많다. 전통적으로 JSON으로 이를
+   수행하는 방법은 "스트리밍" 파서를 사용하는 것이지만, 이러한
+   파서는 널리 제공되거나 널리 사용되거나 사용하기 쉬운 편이 아니다.
+
+   이 문서는 "JSON 텍스트 시퀀스"의 개념과 형식을 설명한다.
+   이는 그 자체가 JSON 텍스트는 아니며, (가능한) JSON 텍스트로
+   구성된다. JSON 텍스트 시퀀스는 스트리밍 파서(또는 스트리밍
+   인코더)가 없어도 점진적으로 파싱(및 생성)할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  이 문서에서 사용하는 규칙</span>
+
+   이 문서의 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+   "MAY" 및 "OPTIONAL"은 [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]에 설명된 대로 해석되어야 한다.
+
+
+
+
+
+
+
+
+
+<span class="grey">Williams                     Standards Track                    [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc7464">RFC 7464</a>                   JSON 텍스트 시퀀스             2015년 2월</span>
+
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  JSON 텍스트 시퀀스 형식</span>
+
+   JSON 텍스트 시퀀스의 정의를 위해 두 가지 서로 다른 ABNF 규칙
+   집합이 제공된다. 하나는 파서용이고 하나는 인코더용이다. 두
+   가지 서로 다른 규칙 집합을 두면 어떤 이유로 일부 요소가 잘린
+   시퀀스에서도 파서가 복구할 수 있다. 파서용 구문은 가능한 경우
+   JSON 텍스트로 해석되는 옥텟 문자열의 관점에서 지정된다. 반면
+   인코더용 구문은 시퀀스 요소가 잘리지 않는다고 가정한다.
+
+   JSON 텍스트 시퀀스는 UTF-8 인코딩을 사용해야 한다(MUST).
+   JSON의 다른 인코딩(즉, UTF-16 및 UTF-32)은 사용하면 안 된다(MUST NOT).
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  JSON 텍스트 시퀀스 파싱</span>
+
+   JSON 텍스트 시퀀스 파서에 대한 ABNF [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]는 Figure 1에
+   제시된 것과 같다.
+
+      input-JSON-sequence = *(1*RS possible-JSON)
+      RS = %x1E; "레코드 구분자"(RS), <a href="./rfc20">RFC 20</a> 참조
+               ; 다른 이름: Unicode Character INFORMATION SEPARATOR
+               ;            TWO (U+001E)
+      possible-JSON = 1*(not-RS); UTF-8로 인코딩된 JSON 텍스트로
+                                ; 파싱 시도(<a href="./rfc7159">RFC 7159</a> 참조)
+      not-RS = %x00-1d / %x1f-ff; RS 이외의 모든 옥텟
+
+                     Figure 1: JSON 텍스트 시퀀스 ABNF
+
+   풀어서 말하면: 각각 레코드 구분자(RS)(0x1E) [<a href="./rfc20" title="&quot;ASCII format for network interchange&quot;">RFC20</a>] 이외의
+   임의 옥텟을 포함하는 일련의 옥텟 문자열이다. 모든 옥텟
+   문자열 앞에는 RS 바이트가 붙는다. 시퀀스의 각 옥텟 문자열은
+   UTF-8 인코딩 [<a href="./rfc3629" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">RFC3629</a>]의 JSON 텍스트로 파싱되어야 한다.
+
+   이러한 옥텟 문자열을 UTF-8로 인코딩된 JSON 텍스트로 파싱하는
+   데 실패하더라도, 파서는 그럼에도 불구하고 시퀀스의 나머지
+   부분을 계속 파싱해야 한다(SHOULD). 파서는 이러한 실패를
+   애플리케이션에 보고할 수 있으며, 애플리케이션은 이후 시퀀스
+   파싱을 종료하도록 선택할 수 있다. 여러 개의 연속된 RS 옥텟은
+   그 사이의 빈 시퀀스 요소를 나타내지 않으며 무시할 수 있다.
+
+   이 문서는 위치를 기준으로 텍스트 시퀀스를 신뢰성 있게 식별하는
+   메커니즘을 정의하지 않는다(예: 배열의 개별 요소를 고유한 텍스트
+   시퀀스로 전송하는 경우). 잘림 가능성이 있는 애플리케이션에서는
+   의도한 시퀀스 요소가 잘릴 수 있고, 완전히 누락될 수도 있음을
+   의미한다. 따라서 n번째 요소에 대한 참조는 신뢰할 수 없다.
+
+
+
+
+<span class="grey">Williams                     Standards Track                    [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc7464">RFC 7464</a>                   JSON 텍스트 시퀀스             2015년 2월</span>
+
+
+   시퀀스 종료 표시자는 없다.
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a>.  JSON 텍스트 시퀀스 인코딩</span>
+
+   JSON 텍스트 시퀀스 인코더에 대한 ABNF는 Figure 2에 제시되어 있다.
+
+      JSON-sequence = *(RS JSON-text LF)
+      RS = %x1E; <a href="./rfc20">RFC 20</a> 참조
+               ; 다른 이름: Unicode Character INFORMATION SEPARATOR
+               ;            TWO (U+001E)
+      LF = %x0A; "줄 바꿈"(LF), <a href="./rfc20">RFC 20</a> 참조
+      JSON-text = &lt;<a href="./rfc7159">RFC 7159</a>에서 제공되며, UTF-8 인코딩 사용&gt;
+
+                     Figure 2: JSON 텍스트 시퀀스 ABNF
+
+   풀어서 말하면: 임의 개수의 JSON 텍스트이며, 각각 UTF-8
+   [<a href="./rfc3629" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">RFC3629</a>]로 인코딩되고, 각각 앞에 ASCII RS 문자가 붙으며,
+   각각 뒤에 줄 바꿈(LF)이 붙는다. RS는 ASCII 제어 문자이므로 JSON
+   문자열 안에서는 이스케이프된 형식으로만 나타날 수 있고([<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]
+   참조), RS는 JSON 텍스트 안에서 다른 어떤 형식으로도 나타날 수
+   없으므로, RS는 시퀀스의 임의 요소 시작을 모호하지 않게 구분한다.
+   RS는 숫자를 제외한 모든 최상위 JSON 값 타입을 모호하지 않게
+   구분하기에 충분하다. 시퀀스의 각 JSON 텍스트 뒤에 LF를 붙이면
+   최상위에 숫자로 구성된 잘린 JSON 텍스트를 감지할 수 있다.
+   <a href="#section-2.4">Section 2.4</a>를 참조하라.
+
+   JSON 텍스트 시퀀스 인코더는 시퀀스 요소가 올바르게 형성되도록
+   보장할 것으로 기대된다. JSON 텍스트 시퀀스 인코더가 JSON
+   텍스트 인코딩을 수행하는 경우, 시퀀스 요소는 자연스럽게 올바르게
+   형성된다. JSON 텍스트 시퀀스 인코더가 이미 인코딩된 JSON
+   텍스트를 받아들이는 경우, JSON 텍스트 시퀀스 인코더는 이를
+   시퀀스에 추가하기 전에 파싱하는 것이 바람직하다.
+
+   일부 시스템에서는 "ctrl-^"를 입력하여 RS를 입력할 수 있음에
+   유의하라. 일부 시스템 또는 애플리케이션에서는 올바른 시퀀스가
+   "ctrl-v ctrl-^"일 수 있다. 이는 텍스트 편집기로 시퀀스를 수동
+   작성할 때 유용하다.
+
+<span class="h3"><a class="selflink" id="section-2.3" href="#section-2.3">2.3</a>.  불완전/유효하지 않은 JSON 텍스트가 치명적일 필요는 없음</span>
+
+   <a href="#section-2.1">Section 2.1</a>에 따르면, JSON 텍스트 시퀀스 파서는 옥텟 문자열에
+   잘못된 형식의 JSON 텍스트가 포함되어 있어도 중단해서는 안 된다.
+   대신 JSON 텍스트 시퀀스 파서는 다음 RS까지 건너뛰어야 한다.
+   이러한 상황은 예를 들어 로그 파일에 추가되는 데이터가 파일
+   시스템에 의해 잘리는 맥락에서 발생할 수 있다(예: 충돌 또는
+   관리 프로세스 종료로 인해).
+
+
+
+
+
+<span class="grey">Williams                     Standards Track                    [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc7464">RFC 7464</a>                   JSON 텍스트 시퀀스             2015년 2월</span>
+
+
+   점진적 JSON 텍스트 파서를 사용할 수도 있지만, 물론 특정 텍스트를
+   파싱하지 못하는 실패는 일부 점진적 파싱 결과를 먼저 생성한 후에
+   발생할 수 있다.
+
+   시퀀스 파서는 잘린 JSON 텍스트에 대해 경고하는 옵션을 가져야 한다.
+
+<span class="h3"><a class="selflink" id="section-2.4" href="#section-2.4">2.4</a>.  최상위 값: numbers, true, false 및 null</span>
+
+   객체, 배열 및 문자열은 JSON 텍스트에서 자체적으로 구분되지만,
+   숫자와 값 'true', 'false', 'null'은 그렇지 않다. 뒤의 네 종류
+   값은 공백만이 구분할 수 있다.
+
+   JSON 텍스트 시퀀스는 잘림을 감지하기 위한 "카나리아" 옥텟으로
+   0x0A를 사용한다.
+
+   파서는 최상위 숫자인 JSON 텍스트, 또는 'true', 'false', 'null'일
+   수 있는 JSON 텍스트가 해당 값 뒤에 JSON 공백([<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]의 "ws" ABNF
+   규칙과 일치하는 최소 1바이트)을 포함하는지 반드시 확인해야
+   한다(MUST). 그렇지 않으면 JSON-text가 잘렸을 수 있다. 각 JSON
+   텍스트 뒤의 LF는 "ws" ABNF 규칙과 일치한다는 점에 유의하라.
+
+   파서는 잘렸을 수 있는(공백으로 구분되지 않은) 자체 구분되지
+   않는 최상위 값으로 구성된 JSON-text 시퀀스 요소를 반드시
+   버려야 한다(MUST). 파서는 이러한 텍스트를 경고로 보고할 수
+   있다(선택적으로 파싱된 텍스트 및/또는 원래 옥텟 문자열 포함).
+
+   예를 들어, '&lt;RS&gt;123&lt;RS&gt;'는 최상위 숫자 1234를 담으려 했으나
+   잘렸을 수 있다. 마찬가지로, '&lt;RS&gt;true&lt;RS&gt;'는 유효하지 않은
+   텍스트 'trueish'를 담으려 했을 수 있다. '&lt;RS&gt;truefalse&lt;RS&gt;'는
+   두 개의 최상위 값인 'true'와 'false'가 아니다. 이는 단순히
+   유효한 JSON 텍스트가 아니다.
+
+   구현은 '&lt;RS&gt;"foo"&lt;RS&gt;'를 파싱할 때 값을 생성할 수 있다. 해당
+   JSON 텍스트 파서가 바이트를 점진적으로 소비할 수 있기 때문이다.
+   이 경우 JSON 텍스트는 자체 구분되는 최상위 값이므로, 파서는
+   추가 바이트를 소비하지 않고도 결과를 생성할 수 있다. 이러한
+   구현은 다음 RS 바이트까지 건너뛰는 것이 바람직하며, 그 사이의
+   비공백 바이트를 보고할 수도 있다.
+
+   자체 구분되지 않는 시퀀스 요소(숫자, true, false, null)의 잘림
+   감지는 시퀀스 인코더가 완전한 JSON 텍스트를 생성하거나 수신하는
+   경우에만 가능하다. 시퀀스 인코더가 개별 JSON 텍스트의 인코딩을
+   담당하지 않는 구현은 해당 JSON 텍스트가 완전한지 보장해야 한다.
+
+
+
+
+<span class="grey">Williams                     Standards Track                    [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc7464">RFC 7464</a>                   JSON 텍스트 시퀀스             2015년 2월</span>
+
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  보안 고려사항</span>
+
+   JSON [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]의 모든 보안 고려사항이 적용된다. 이 형식은 어떤
+   종류의 암호학적 무결성 보호도 제공하지 않는다.
+
+   일반적으로 파서는 신뢰할 수 없는 것으로 간주되는 입력을
+   처리해야 한다. 이는 악의적인 입력에 직면했을 때 파서가
+   우아하게 실패해야 함을 의미한다.
+
+   점진적 JSON 텍스트 파서는 부분 결과를 생성한 뒤 나중에 텍스트의
+   나머지 부분을 파싱하지 못했음을 나타낼 수 있음에 유의하라.
+   점진적 JSON 텍스트 파서를 사용하는 시퀀스 파서는
+   '&lt;RS&gt;"foo"&lt;LF&gt;456&lt;LF&gt;&lt;RS&gt;'와 같은 시퀀스를 하나의 요소("foo")로
+   처리할 수 있는 반면, 비점진적 JSON 텍스트 파서를 사용하는
+   시퀀스 파서는 같은 시퀀스를 비어 있는 것으로 처리할 수 있다.
+   이 효과와 파싱에 실패하여 무시되는 텍스트는 JSON 텍스트 실패에
+   대해 경고하지 않는 시퀀스 파서를 지나 데이터를 은닉하는 데
+   사용될 수 있다.
+
+   JSON 텍스트 시퀀스를 반복적으로 파싱하고 다시 인코딩하면 개별
+   시퀀스 요소 JSON 텍스트에 후행 LF 바이트가 추가되거나 제거될
+   수 있다. 이는 서명 검증을 깨뜨릴 수 있다. JSON에는 JSON 텍스트의
+   정규 형식이 없으므로, JSON 텍스트 시퀀스 형식에도 정규 형식은
+   없다.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  IANA 고려사항</span>
+
+   JSON 텍스트 시퀀스의 MIME 미디어 타입은 application/json-seq이다.
+
+   타입 이름: application
+
+   서브타입 이름: json-seq
+
+   필수 매개변수: 해당 없음
+
+   선택적 매개변수: 해당 없음
+
+   인코딩 고려사항: binary
+
+   보안 고려사항: <a href="./rfc7464#section-3">RFC 7464, Section&nbsp;3</a> 참조.
+
+   상호운용성 고려사항: 여기에 설명되어 있음.
+
+   공개된 명세: <a href="./rfc7464">RFC 7464</a>.
+
+
+
+
+
+
+
+<span class="grey">Williams                     Standards Track                    [Page 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc7464">RFC 7464</a>                   JSON 텍스트 시퀀스             2015년 2월</span>
+
+
+   이 미디어 타입을 사용하는 애플리케이션:
+
+      &lt;<a href="https://stedolan.github.io/jq">https://stedolan.github.io/jq</a>&gt;
+      &lt;<a href="https://github.com/mapbox/cligj">https://github.com/mapbox/cligj</a>&gt;
+      &lt;<a href="https://github.com/hildjj/json-text-sequence">https://github.com/hildjj/json-text-sequence</a>&gt;
+
+   프래그먼트 식별자 고려사항: 해당 없음
+
+   추가 정보:
+
+   o  이 타입의 폐기된 별칭 이름: 해당 없음
+
+   o  매직 넘버: 해당 없음
+
+   o  파일 확장자: 해당 없음
+
+   o  Macintosh 파일 타입 코드: 해당 없음
+
+   추가 정보를 위한 연락 담당자 및 이메일 주소:
+
+      json@ietf.org
+
+   의도된 사용: COMMON
+
+   저자: Nicolas Williams (nico@cryptonector.com)
+
+   변경 관리자: IETF
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  규범 참고문헌</span>
+
+   [<a id="ref-RFC20">RFC20</a>]    Cerf, V., "네트워크 교환을 위한 ASCII 형식", STD 80,
+              <a href="./rfc20">RFC 20</a>, 1969년 10월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc20">http://www.rfc-editor.org/info/rfc20</a>&gt;.
+
+   [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "RFC에서 요구 수준을 나타내기 위해
+              사용하는 핵심 단어", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>, 1997년 3월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>&gt;.
+
+   [<a id="ref-RFC3629">RFC3629</a>]  Yergeau, F., "UTF-8, ISO 10646의 변환 형식",
+              STD 63, <a href="./rfc3629">RFC 3629</a>, 2003년 11월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc3629">http://www.rfc-editor.org/info/rfc3629</a>&gt;.
+
+   [<a id="ref-RFC5234">RFC5234</a>]  Crocker, D., Ed. and P. Overell, "구문 명세를 위한
+              확장 BNF: ABNF", STD 68, <a href="./rfc5234">RFC 5234</a>, 2008년 1월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc5234">http://www.rfc-editor.org/info/rfc5234</a>&gt;.
+
+
+
+
+
+
+<span class="grey">Williams                     Standards Track                    [Page 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc7464">RFC 7464</a>                   JSON 텍스트 시퀀스             2015년 2월</span>
+
+
+   [<a id="ref-RFC7159">RFC7159</a>]  Bray, T., Ed., "JavaScript Object Notation(JSON) 데이터
+              교환 형식", <a href="./rfc7159">RFC 7159</a>, 2014년 3월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc7159">http://www.rfc-editor.org/info/rfc7159</a>&gt;.
+
+감사의 말
+
+   Phillip Hallam-Baker는 로그 파일을 위해 JSON 텍스트 시퀀스를
+   사용하는 방안을 제안했으며 재동기화의 필요성을 지적했다.
+   Stephen Dolan은 &lt;<a href="https://github.com/stedolan/jq">https://github.com/stedolan/jq</a>&gt;를 만들었는데,
+   이는 JSON 텍스트 시퀀스와 유사한 것을 사용한다(출력에서는
+   텍스트 사이의 구분자로 LF를 사용하고, 입력에서는 모호성을
+   해소하는 데 필요한 만큼의 공백만 요구함). Carsten Bormann은
+   ASCII RS 사용을 제안했고, Joe Hildebrand는 최상위 숫자 값을
+   모호하지 않게 하기 위해 RS에 더해 LF를 사용할 것을 제안했다.
+   Paul Hoffman은 문서의 셰퍼드를 맡았다. 많은 다른 사람들이 JSON
+   Working Group 메일링 리스트에서 검토와 의견을 제공했다.
+
+저자 주소
+
+   Nicolas Williams
+   Cryptonector, LLC
+
+   EMail: nico@cryptonector.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Williams                     Standards Track                    [Page 8]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
