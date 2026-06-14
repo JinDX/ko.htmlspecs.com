@@ -1,0 +1,325 @@
+<pre>인터넷 엔지니어링 태스크 포스(IETF)                      T. Bray, Ed.
+Request for Comments: 7493                           Textuality Services
+Category: Standards Track                                     2015년 3월
+ISSN: 2070-1721
+
+
+                       <span class="h1">I-JSON 메시지 형식</span>
+
+초록
+
+   I-JSON("Internet JSON"의 약어)은 상호운용성을 극대화하고
+   소프트웨어가 예측 가능한 결과로 성공적으로 처리할 수 있다는
+   신뢰를 높이도록 설계된 JSON의 제한된 프로파일이다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 이 문서는 공개 검토를
+   받았으며 인터넷 엔지니어링 운영 그룹(IESG)의 승인을 받아
+   출판되었다. 인터넷 표준에 대한 자세한 정보는
+   <a href="./rfc5741#section-2">RFC 5741의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 피드백 제공 방법에 대한 정보는
+   <a href="http://www.rfc-editor.org/info/rfc7493">http://www.rfc-editor.org/info/rfc7493</a>에서 얻을 수 있다.
+
+저작권 고지
+
+   Copyright (c) 2015 IETF Trust 및 문서 저자로 식별된 사람들.
+   모든 권리 보유.
+
+   이 문서는 출판일에 유효한 <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> 및 IETF Trust의
+   IETF 문서와 관련된 법적 조항
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>)의 적용을 받는다.
+   이 문서와 관련된 권리와 제한을 설명하고 있으므로 해당 문서를
+   주의 깊게 검토해야 한다. 이 문서에서 추출된 코드 구성요소에는
+   Trust Legal Provisions의 Section 4.e에 설명된 Simplified BSD License
+   텍스트가 포함되어야 하며, Simplified BSD License에 설명된 대로
+   보증 없이 제공된다.
+
+
+
+
+
+
+
+
+
+<span class="grey">Bray                         Standards Track                    [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc7493">RFC 7493</a>                I-JSON 메시지 형식             2015년 3월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>.  소개  . . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-2">2</a>
+     <a href="#section-1.1">1.1</a>.  용어 . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-2">2</a>
+     <a href="#section-1.2">1.2</a>.  요구사항 언어 . . . . . . . . . . . . . . . . . . . . .   <a href="#page-2">2</a>
+   <a href="#section-2">2</a>.  I-JSON 메시지 . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-3">3</a>
+     <a href="#section-2.1">2.1</a>.  인코딩과 문자 . . . . . . . . . . . . . . . . . . . . .   <a href="#page-3">3</a>
+     <a href="#section-2.2">2.2</a>.  숫자 . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-3">3</a>
+     <a href="#section-2.3">2.3</a>.  객체 제약  . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-3">3</a>
+   <a href="#section-3">3</a>.  소프트웨어 동작 . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-4">4</a>
+   <a href="#section-4">4</a>.  프로토콜 설계를 위한 권장사항 . . . . . . . . . . . . . .   <a href="#page-4">4</a>
+     <a href="#section-4.1">4.1</a>.  최상위 구성 . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-4">4</a>
+     <a href="#section-4.2">4.2</a>.  Must-Ignore 정책  . . . . . . . . . . . . . . . . . . .   <a href="#page-4">4</a>
+     <a href="#section-4.3">4.3</a>.  시간과 날짜 처리  . . . . . . . . . . . . . . . . . . .   <a href="#page-5">5</a>
+     <a href="#section-4.4">4.4</a>.  바이너리 데이터 . . . . . . . . . . . . . . . . . . . .   <a href="#page-5">5</a>
+   <a href="#section-5">5</a>.  보안 고려사항 . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-5">5</a>
+   <a href="#section-6">6</a>.  규범 참고문헌  . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-5">5</a>
+   감사의 말  . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-6">6</a>
+   저자 주소  . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-6">6</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   <a href="./rfc7159">RFC 7159</a>는 인터넷 프로토콜에서 널리 사용되는 JSON 데이터 교환
+   형식을 설명한다. 역사적인 이유로, 그 명세는 특히 JSON 데이터를
+   받는 프로그램이 이를 네이티브 프로그래밍 언어 구조나 데이터베이스
+   레코드로 매핑하기 위해 자동화된 소프트웨어를 사용할 때,
+   상호운용성 문제와 소프트웨어 손상을 일으킬 가능성이 있는 언어
+   관용구와 텍스트 인코딩 패턴의 사용을 허용한다. <a href="./rfc7159">RFC 7159</a>는
+   이러한 상호운용성 문제를 피하기 위해 사용할 수 있는 관행을
+   설명한다.
+
+   이 문서는 "Internet JSON"의 약어인 I-JSON을 명시한다. 정의의
+   단위는 "I-JSON 메시지"이다. I-JSON 메시지는 <a href="./rfc7159">RFC 7159</a>에
+   정의된 "JSON 텍스트"이기도 하지만, 해당 명세에 설명된 좋은
+   상호운용성 관행을 강제하는 특정 추가 제약을 가진다.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  용어</span>
+
+   이 문서의 "object", "member", "array", "number", "name", "string"
+   이라는 용어는 <a href="./rfc7159">RFC 7159</a> [<a href="./rfc7159" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC7159</a>]에 설명된 대로
+   해석되어야 한다.
+
+<span class="h3"><a class="selflink" id="section-1.2" href="#section-1.2">1.2</a>.  요구사항 언어</span>
+
+   이 문서의 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", "OPTIONAL"은
+   <a href="./rfc2119">RFC 2119</a> [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]에 설명된 대로 해석되어야 한다.
+
+
+
+<span class="grey">Bray                         Standards Track                    [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc7493">RFC 7493</a>                I-JSON 메시지 형식             2015년 3월</span>
+
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  I-JSON 메시지</span>
+
+   I-JSON 메시지는 <a href="./rfc7159">RFC 7159</a>에 정의된 JSON 텍스트이다.
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  인코딩과 문자</span>
+
+   I-JSON 메시지는 UTF-8 [<a href="./rfc3629" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">RFC3629</a>]을 사용하여 인코딩되어야 한다(MUST).
+
+   객체 멤버 이름과 배열 및 객체 멤버의 문자열 값은 [<a href="#ref-UNICODE" title="&quot;The Unicode Standard&quot;">UNICODE</a>]에
+   정의된 Surrogates 또는 Noncharacters를 식별하는 코드 포인트를
+   포함해서는 안 된다(MUST NOT).
+
+   이는 UTF-8로 직접 인코딩된 문자와 이스케이프된 문자 모두에
+   적용된다. 따라서 "\uDEAD"는 짝이 없는 서로게이트이므로
+   유효하지 않지만, "\uD800\uDEAD"는 적법하다.
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a>.  숫자</span>
+
+   IEEE 754-2008 binary64(배정밀도) 숫자 [<a href="#ref-IEEE754" title="&quot;IEEE Standard for Floating-Point Arithmetic&quot;">IEEE754</a>]를 구현하는
+   소프트웨어는 일반적으로 사용할 수 있으며 널리 사용된다.
+   I-JSON 메시지를 생성하는 구현은 수신 구현이 이러한 숫자가
+   제공하는 것보다 더 큰 크기나 정밀도의 숫자 값을 처리할 수
+   있다고 가정할 수 없다. I-JSON 메시지는 IEEE 754 배정밀도 숫자가
+   제공하는 것보다 더 큰 크기나 정밀도를 표현하는 숫자, 예를 들어
+   1E400 또는 3.141592653589793238462643383279를 포함하지 않는 것이
+   좋다(SHOULD NOT).
+
+   I-JSON 송신자는 절댓값이 9007199254740991보다 큰 정수(즉,
+   [-(2**53)+1, (2**53)-1] 범위를 벗어나는 정수)를 수신자가
+   정확한 값으로 처리할 것이라고 기대할 수 없다.
+
+   더 큰 크기나 정밀도를 가진 숫자의 정확한 교환이 필요한
+   애플리케이션의 경우, 이를 JSON 문자열 값으로 인코딩하는 것이
+   권장된다(RECOMMENDED). 이를 위해서는 수신 프로그램이 그 값의
+   의도된 의미를 이해해야 한다. 예로는 현대 하드웨어가 처리할 수
+   있더라도 JavaScript 숫자의 제한된 범위 때문에 64비트 정수가 있다.
+
+<span class="h3"><a class="selflink" id="section-2.3" href="#section-2.3">2.3</a>.  객체 제약</span>
+
+   I-JSON 메시지의 객체는 중복된 이름을 가진 멤버를 가져서는
+   안 된다(MUST NOT). 이 문맥에서 "중복"은 이스케이프된 문자를
+   처리한 뒤 이름이 동일한 유니코드 문자 시퀀스라는 뜻이다.
+
+
+
+
+
+
+
+<span class="grey">Bray                         Standards Track                    [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc7493">RFC 7493</a>                I-JSON 메시지 형식             2015년 3월</span>
+
+
+   I-JSON 메시지에서 객체 멤버의 순서는 I-JSON 메시지의 의미를
+   바꾸지 않는다. 수신 구현은 두 I-JSON 메시지가 객체 멤버의 순서만
+   다를 경우 이를 동등한 것으로 처리할 수 있다(MAY).
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  소프트웨어 동작</span>
+
+   I-JSON 사용의 주요 장점은 수신자가 수신한 JSON 메시지에서
+   모호한 의미를 피할 수 있다는 점이다. 이를 통해 수신자는
+   I-JSON 메시지에 대해 이 문서의 요구사항을 따르지 않는 메시지를
+   거부하거나 달리 무시할 수 있다. I-JSON 메시지를 사용하는
+   프로토콜은 수신 구현이 I-JSON의 제약을 만족하지 않는 메시지를
+   거부하도록(또는 보안 프로토콜의 경우처럼 신뢰하지 않도록)
+   요구하는 방식으로 작성될 수 있다.
+
+   I-JSON 메시지를 사용하는 프로토콜의 설계자는 이 경우 잘못된
+   데이터를 받은 수신자가 문제를 송신자에게 알릴 수 있는 방법을
+   제공해야 한다(SHOULD).
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  프로토콜 설계를 위한 권장사항</span>
+
+   I-JSON은 인터넷 프로토콜에서 사용되도록 설계되었다. 다음
+   권장사항은 그러한 프로토콜에서 I-JSON을 사용하는 데 적용된다.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  최상위 구성</span>
+
+   I-JSON 메시지는 임의의 JSON 값일 수 있다. 그러나 이전 명세
+   [<a href="./rfc4627" title="&quot;The application/json Media Type for JavaScript Object Notation (JSON)&quot;">RFC4627</a>]에 맞춰 작성되어 JSON 텍스트의 최상위에서 JSON 객체나
+   JSON 배열만 허용하는 소프트웨어 구현이 있다. 이러한 구현과의
+   최대 상호운용성을 위해, 프로토콜 설계자는 객체도 배열도 아닌
+   최상위 JSON 텍스트를 사용하지 않는 것이 좋다(SHOULD NOT).
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  Must-Ignore 정책</span>
+
+   프로토콜이 운영 환경에 배포된 뒤 변경이 필요한 경우는 자주
+   있다. 기존 소프트웨어의 동작을 방해하지 않는 방식으로 새
+   프로토콜 요소를 도입할 수 있게 하는 프로토콜은 실제 운용에서
+   유리한 것으로 입증되었다.
+
+   이를 "Must-Ignore" 정책이라고 부를 수 있다. 즉, 구현이 인식하지
+   못하는 프로토콜 요소를 만나면, 새 요소가 단순히 나타나지 않았던
+   것처럼 나머지 프로토콜 트랜잭션을 처리해야 하며, 특히 구현은
+   이를 오류 조건으로 처리해서는 안 된다(MUST NOT). 반대되는
+   "Must-Understand" 정책은 새 프로토콜 요소의 도입을 허용하지
+
+
+
+<span class="grey">Bray                         Standards Track                    [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc7493">RFC 7493</a>                I-JSON 메시지 형식             2015년 3월</span>
+
+
+   않으며, 특정 프로토콜 설계에서는 필요하다고 입증되었지만,
+   일반적으로는 지나치게 제한적이고 취약한 것으로 밝혀졌다.
+
+   I-JSON 프로토콜 설계에서 Must-Ignore 사용을 지원하는 좋은
+   방법은 최상위 프로토콜 요소가 JSON 객체여야 한다고 요구하고,
+   인식되지 않는 이름의 멤버는 무시되어야 한다(MUST)고 명시하는
+   것이다.
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  시간과 날짜 처리</span>
+
+   프로토콜에는 타임스탬프나 시간 지속기간을 담도록 설계된 데이터
+   항목이 포함되는 경우가 많다. 이러한 모든 데이터 항목은 [<a href="./rfc3339" title="&quot;Date and Time on the Internet: Timestamps&quot;">RFC3339</a>]에
+   명시된 ISO 8601 형식의 문자열 값으로 표현하는 것이 권장된다
+   (RECOMMENDED). 추가 제한으로, 소문자가 아니라 대문자를 사용하고,
+   시간대를 생략하지 않고 포함하며, 선택적 후행 초는 그 값이 "00"인
+   경우에도 포함해야 한다. 또한 시간 지속기간을 포함하는 모든
+   데이터 항목은 동일한 추가 제한과 함께 <a href="./rfc3339#appendix-A">RFC 3339의 Appendix&nbsp;A</a>의
+   "duration" production을 따르는 것이 권장된다(RECOMMENDED).
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a>.  바이너리 데이터</span>
+
+   I-JSON 프로토콜 요소가 임의의 바이너리 데이터를 포함해야 하는
+   경우, 이 데이터를 base64url의 문자열 값으로 인코딩하는 것이
+   권장된다(RECOMMENDED). <a href="./rfc4648#section-5">[RFC4648]의 Section&nbsp;5</a>를 참조하라.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  보안 고려사항</span>
+
+   JSON에 적용되는 모든 보안 고려사항(<a href="./rfc7159">RFC 7159</a> 참조)은
+   I-JSON에도 적용된다. I-JSON에 특화된 추가 보안 고려사항은 없다.
+
+   I-JSON은 수신 소프트웨어에서 예측할 수 없는 동작을 초래할 수
+   있는 특정 JSON 관용구의 사용을 금지하므로, 인터넷 프로토콜을
+   위한 더 안전한 기반이 될 수 있으며 특별한 보안 요구가 있는
+   프로토콜 설계자에게 좋은 선택일 수 있다.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  규범 참고문헌</span>
+
+   [<a id="ref-IEEE754">IEEE754</a>]  IEEE, "부동소수점 산술을 위한 IEEE 표준", IEEE
+              754-2008, 2008, &lt;<a href="http://grouper.ieee.org/groups/754/">http://grouper.ieee.org/groups/754/</a>&gt;.
+
+   [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "RFC에서 요구 수준을 나타내기 위해
+              사용하는 핵심 단어", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>, 1997년 3월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>&gt;.
+
+
+
+
+
+<span class="grey">Bray                         Standards Track                    [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc7493">RFC 7493</a>                I-JSON 메시지 형식             2015년 3월</span>
+
+
+   [<a id="ref-RFC3339">RFC3339</a>]  Klyne, G. and C. Newman, "인터넷상의 날짜와 시간:
+              타임스탬프", <a href="./rfc3339">RFC 3339</a>, 2002년 7월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc3339">http://www.rfc-editor.org/info/rfc3339</a>&gt;.
+
+   [<a id="ref-RFC3629">RFC3629</a>]  Yergeau, F., "UTF-8, ISO 10646의 변환 형식",
+              STD 63, <a href="./rfc3629">RFC 3629</a>, 2003년 11월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc3629">http://www.rfc-editor.org/info/rfc3629</a>&gt;.
+
+   [<a id="ref-RFC4627">RFC4627</a>]  Crockford, D., "JavaScript Object Notation(JSON)을 위한
+              application/json 미디어 타입", <a href="./rfc4627">RFC 4627</a>, 2006년 7월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc4627">http://www.rfc-editor.org/info/rfc4627</a>&gt;.
+
+   [<a id="ref-RFC4648">RFC4648</a>]  Josefsson, S., "Base16, Base32 및 Base64 데이터
+              인코딩", <a href="./rfc4648">RFC 4648</a>, 2006년 10월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc4648">http://www.rfc-editor.org/info/rfc4648</a>&gt;.
+
+   [<a id="ref-RFC7159">RFC7159</a>]  Bray, T., Ed., "JavaScript Object Notation(JSON) 데이터
+              교환 형식", <a href="./rfc7159">RFC 7159</a>, 2014년 3월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc7159">http://www.rfc-editor.org/info/rfc7159</a>&gt;.
+
+   [<a id="ref-UNICODE">UNICODE</a>]  The Unicode Consortium, "유니코드 표준",
+              &lt;<a href="http://www.unicode.org/versions/latest/">http://www.unicode.org/versions/latest/</a>&gt;.
+
+감사의 말
+
+   I-JSON은 Douglas Crockford의 공이 큰 JSON 설계에 전적으로
+   의존한다. 세부 사항은 IETF JSON Working Group에서 <a href="./rfc7159">RFC 7159</a>
+   설계에 기여한 사람들의 영향을 크게 받았다.
+
+저자 주소
+
+   Tim Bray (editor)
+   Textuality Services
+
+   EMail: tbray@textuality.com
+   URI:   <a href="https://www.tbray.org/">https://www.tbray.org/</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bray                         Standards Track                    [Page 6]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
