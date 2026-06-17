@@ -195,6 +195,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 미디어 형식, 자막 및 코덱
 - [WebVTT: The Web Video Text Tracks Format](https://ko.htmlspecs.com/webvtt1/)（[Source](https://www.w3.org/TR/2026/CRD-webvtt1-20260520/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Timed Text Markup Language 2 (TTML2)](https://ko.htmlspecs.com/ttml2/)（[Source](https://www.w3.org/TR/2018/REC-ttml2-20181108/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [IMSC Text Profile 1.3](https://ko.htmlspecs.com/ttml-imsc1.3/)（[Source](https://www.w3.org/TR/2026/REC-ttml-imsc1.3-20260521/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Media Source Extensions](https://ko.htmlspecs.com/media-source-2/)（[Source](https://www.w3.org/TR/2025/WD-media-source-2-20251104/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebCodecs](https://ko.htmlspecs.com/webcodecs/)（[Source](https://www.w3.org/TR/2026/WD-webcodecs-20260608/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebCodecs Codec Registry](https://ko.htmlspecs.com/webcodecs-codec-registry/)（[Source](https://www.w3.org/TR/2026/DRY-webcodecs-codec-registry-20260212/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
