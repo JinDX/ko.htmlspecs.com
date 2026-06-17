@@ -106,7 +106,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Subresource Loading with Web Bundles](https://ko.htmlspecs.com/webpackage-subresource-loading/)（[Source](https://wicg.github.io/webpackage/subresource-loading.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 입력, 편집 및 클립보드
-- [EditContext API](https://ko.htmlspecs.com/edit-context/)（[Source](https://www.w3.org/TR/2026/WD-edit-context-20260610/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [EditContext API](https://ko.htmlspecs.com/edit-context/)（[Source](https://www.w3.org/TR/2026/WD-edit-context-20260616/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Scroll To Text Fragment](https://ko.htmlspecs.com/scroll-to-text-fragment/)（[Source](https://wicg.github.io/scroll-to-text-fragment/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Pointer Events Level 2](https://ko.htmlspecs.com/pointerevents2/)（[Source](https://www.w3.org/TR/2019/REC-pointerevents2-20190404/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Pointer Events Level 3](https://ko.htmlspecs.com/pointerevents3/)（[Source](https://www.w3.org/TR/2026/CRD-pointerevents3-20260522/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
