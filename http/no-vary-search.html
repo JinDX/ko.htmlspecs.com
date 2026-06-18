@@ -1,0 +1,3010 @@
+<!DOCTYPE html>
+<html lang="ko" class="Internet-Draft">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Han,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>No-Vary-Search HTTP 캐싱 확장</title>
+    <meta content="Domenic Denicola" name="author">
+    <meta content="Jeremy Roman" name="author">
+    <meta content="Nidhi Jaju" name="author">
+    <meta content="
+       이 명세는 URI 쿼리 매개변수가 캐싱에 영향을 미치는 방식을 변경하는 HTTP 캐싱 확장을 정의합니다. 
+    " name="description">
+    <meta content="xml2rfc 3.33.0" name="generator">
+    <meta content="http" name="keyword">
+    <meta content="caching" name="keyword">
+    <meta content="draft-ietf-httpbis-no-vary-search-latest" name="ietf.draft">
+    <!-- Generator version information:
+  xml2rfc 3.33.0
+    Python 3.12.13
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.0.2
+    platformdirs 4.9.6
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.7.0
+-->
+    <link href="draft-ietf-httpbis-no-vary-search.xml" rel="alternate" type="application/rfc+xml">
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        @font-face {
+            font-family: 'Lora';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+            unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+            unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+            unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        @font-face {
+            font-family: 'Oxygen Mono';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+
+        @font-face {
+            font-family: 'Oxygen Mono';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: italic;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+            unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: italic;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+            unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: italic;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+            unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: italic;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: italic;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: normal;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+            unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: normal;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+            unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: normal;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+            unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: normal;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+
+        @font-face {
+            font-family: 'Sofia Sans Semi Condensed';
+            font-style: normal;
+            font-weight: 1 1000;
+            src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        :root {
+            color-scheme: light dark;
+            --background-color: #fff;
+            --text-color: #222;
+            --title-color: #191919;
+            --link-color: #2a6496;
+            --highlight-color: #f9f9f9;
+            --line-color: #eee;
+            --pilcrow-weak: #ddd;
+            --pilcrow-strong: #bbb;
+            --small-font-size: 14.5px;
+            --font-mono: 'Oxygen Mono', monospace;
+            --font-title: "Sofia Sans Semi Condensed", sans-serif;
+            scrollbar-color: #bbb #eee;
+        }
+
+        body {
+            max-width: 600px;
+            margin: 75px auto;
+            padding: 0 5px;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            font: 16px/22px "Lora", serif;
+            scroll-behavior: smooth;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        section {
+            clear: both;
+        }
+
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-title);
+            font-weight: 680;
+            margin: 0.8em 0 0.3em;
+            font-size-adjust: 0.5;
+            color: var(--title-color);
+        }
+
+        h1 {
+            &#title {
+                font-size: 32px;
+                line-height: 40px;
+                clear: both;
+                margin: 1.5em 0 0.2em;
+            }
+
+            &#rfcnum {
+                margin: 1.5em 0 0.2em;
+
+                &+h1#title {
+                    margin: 0.2em 0;
+                }
+            }
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-size: 22px;
+            line-height: 27px;
+        }
+
+        h4,
+        h5,
+        h6 {
+            font-size: 20px;
+            line-height: 24px;
+        }
+
+        /* general structure */
+        .author {
+            padding-bottom: 0.3em;
+            vertical-align: top;
+        }
+
+        #abstract+p {
+            font-size: 18px;
+            line-height: 24px;
+
+            & code,
+            & samp,
+            & tt {
+                font-size: 16px;
+                line-height: 0;
+            }
+        }
+
+        p {
+            padding: 0;
+            margin: 0.5em 0;
+            text-align: left;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+
+            &.art-text {
+                background-color: var(--highlight-color);
+                border: 1px solid var(--line-color);
+                border-radius: 3px;
+                padding: 0.5em 1em 0;
+                margin-bottom: 0.5em;
+
+                & pre {
+                    padding: 0;
+                    width: auto;
+                }
+            }
+
+            &>*:first-child {
+                border: none;
+                margin: 0;
+                float: right;
+                clear: both;
+            }
+
+            &>*:nth-child(2) {
+                clear: both;
+                display: block;
+                border: none;
+            }
+        }
+
+        svg {
+            display: block;
+
+            /* font-family isn't space-separated, but =~ will have to do */
+            &[font-family~="monospace" i],
+            & [font-family~="monospace" i] {
+                font-family: var(--font-mono);
+            }
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+
+            &.art-text {
+                background-color: var(--highlight-color);
+                border: 1px solid var(--line-color);
+                border-radius: 3px;
+                padding: 0.5em 1em 0;
+                margin-bottom: 0.5em;
+
+                & pre {
+                    padding: 0;
+                    width: auto;
+                }
+            }
+
+            &>*:first-child {
+                border: none;
+                /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+                display: table;
+                margin: 0 auto;
+            }
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 0.5em 2em;
+
+            & :is(ol, ul) {
+                margin-left: 1em;
+            }
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+
+            & li {
+                margin-top: 0.5em;
+            }
+        }
+
+        :is(ul, ol).compact,
+        .ulCompact,
+        .olCompact {
+            margin: 0 0 0 2em;
+
+            & li {
+                margin: 0;
+
+                & :first-child {
+                    margin-top: 0;
+                }
+
+                & :last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        /* definition lists */
+        dl {
+            clear: left;
+            --indent: 3ch;
+
+            /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+            &.olPercent {
+                --indent: 5ch;
+
+                &>dt {
+                    min-width: calc(var(--indent) - 2ch);
+                    float: none;
+                }
+            }
+
+            dl>dd>& {
+                margin-top: 0.5em;
+                margin-bottom: 0;
+            }
+
+            &:not(.dlNewline)>dt {
+                float: left;
+                margin-right: 2ch;
+                min-width: 8ch;
+            }
+
+            &>dd {
+                margin-bottom: .8em;
+                margin-left: var(--indent) !important;
+                /* stupid element overrides */
+                min-height: 2ex;
+            }
+        }
+
+        :is(dl.compact, .dlCompact)>dd {
+            margin-bottom: 0;
+
+            &> :is(:first-child, .break:first-child + *) {
+                margin-top: 0;
+            }
+
+            &> :is(:last-child) {
+                margin-bottom: 0;
+            }
+        }
+
+        :is(dd, span).break {
+            display: none;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+
+            &[href] {
+                color: var(--link-color);
+
+                &:hover {
+                    text-decoration: underline;
+                }
+
+                &.selfRef {
+                    color: var(--text-color);
+
+                    &:hover {
+                        text-decoration: none;
+                        background-color: var(--highlight-color);
+                    }
+                }
+            }
+        }
+
+        .iref+a[href].internal {
+            color: var(--text-color);
+        }
+
+        a.xref:is(.cite, .auto),
+        :is(#status-of-memo, #copyright) a {
+            white-space: nowrap;
+        }
+
+        /* Figures */
+        tt,
+        code,
+        pre {
+            background-color: var(--highlight-color);
+            font: 14px/22px var(--font-mono);
+        }
+
+        tt,
+        code {
+            /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+            line-height: 0;
+        }
+
+        :is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+            font-size: 84%;
+        }
+
+        pre {
+            border: 1px solid var(--line-color);
+            font-size: 13.5px;
+            line-height: 16px;
+            letter-spacing: -0.2px;
+            margin: 5px;
+            padding: 5px;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0.5em 0;
+            padding: 0;
+
+            & blockquote {
+                margin: 0.8em 0.4em 0.4em;
+            }
+        }
+
+        figcaption,
+        caption {
+            font-style: italic;
+            margin: 0.5em 1.5em;
+            text-align: left;
+            caption-side: bottom;
+        }
+
+        @media screen {
+
+            /* Auto-collapse boilerplate. */
+            :is(#status-of-memo, #copyright) {
+                & p {
+                    margin: -2px 0;
+                    max-height: 0;
+                    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+                    overflow: hidden;
+                }
+
+                &:hover p,
+                & h2:target~p {
+                    margin: 0.5em 0;
+                    max-height: 500px;
+                    overflow: auto;
+                }
+            }
+
+            pre,
+            svg {
+                display: inline-block;
+                /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+                overflow: auto hidden;
+            }
+
+            pre {
+                max-width: 100%;
+                width: calc(100% - 22px - 1em);
+            }
+
+            svg {
+                max-width: calc(100% - 22px - 1em);
+            }
+
+            figure pre {
+                display: block;
+                width: calc(100% - 25px);
+            }
+
+            :is(pre, svg)+.pilcrow {
+                display: inline-block;
+                vertical-align: text-bottom;
+                padding-bottom: 8px;
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 0 2em;
+            font-style: italic;
+        }
+
+        blockquote {
+            margin: 1em 0;
+            border-left: 2px var(--pilcrow-strong) solid;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* tables */
+        table {
+            width: auto;
+            max-width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+
+            &.right {
+                margin-left: auto;
+            }
+
+            &.center {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            &.left {
+                margin-right: auto;
+            }
+
+            & .text-left {
+                text-align: left;
+            }
+
+            & .text-center {
+                text-align: center;
+            }
+
+            & .text-right {
+                text-align: right;
+            }
+
+            & caption {
+                margin: 0;
+                padding: 3px 0 3px 1em;
+            }
+
+            & p {
+                margin: 0;
+            }
+        }
+
+        thead,
+        tbody {
+            border: 1px solid var(--line-color);
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 5px 10px;
+        }
+
+        th {
+            background-color: var(--line-color);
+        }
+
+        :is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1))>td {
+            background-color: var(--background-color);
+        }
+
+        :is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n))>td {
+            background-color: var(--highlight-color);
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            margin-left: 3px;
+            opacity: 0.2;
+            user-select: none;
+
+            &[href] {
+                color: var(--pilcrow-weak);
+
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+
+            @media not print {
+
+                :hover>&,
+                &:focus {
+                    opacity: 1;
+                }
+
+                &[href]:hover {
+                    color: var(--pilcrow-strong);
+                    background-color: transparent;
+                }
+            }
+
+            @media print {
+                display: none;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid var(--line-color);
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: 600;
+            font-size: var(--small-font-size);
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        sub,
+        sup {
+            line-height: 1;
+            font-size: 80%;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: var(--small-font-size);
+            line-height: 18px;
+            --identifier-width: 15ch;
+
+            & dt {
+                width: var(--identifier-width);
+                min-width: var(--identifier-width);
+                clear: left;
+                float: left;
+                text-align: right;
+                margin-right: 1ch;
+            }
+
+            & dd {
+                margin: 0;
+                margin-left: calc(1em + var(--identifier-width)) !important;
+                min-width: 5em;
+            }
+
+            & .authors {
+                & .author {
+                    display: inline-block;
+                    margin-right: 1.5em;
+                }
+
+                & .org {
+                    font-style: italic;
+                }
+            }
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #999;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+
+            & .prepared {
+                float: right;
+            }
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+
+            & nav {
+                & ul {
+                    margin: 0 0.5em 0 0;
+                    padding: 0;
+                    list-style: none;
+                }
+
+                & li {
+                    line-height: 1.3em;
+                    margin: 2px 0;
+                    padding-left: 1.2em;
+                    text-indent: -1.2em;
+                }
+            }
+
+            & a.xref {
+                white-space: normal;
+            }
+        }
+
+        .references {
+            &>dt {
+                text-align: right;
+                font-weight: bold;
+                min-width: 10ch;
+                margin-right: 1.5ch;
+
+                &:target::before {
+                    content: "⇒";
+                    margin: 0 10px 0 -25px;
+                }
+            }
+
+            &>dd {
+                margin-left: 12ch !important;
+                overflow: visible;
+
+                & .refInstance {
+                    margin-bottom: 0.8em;
+                }
+
+                & .ascii {
+                    margin-bottom: 0.25em;
+                }
+            }
+        }
+
+        #rfc\.index\.index+ul {
+            margin-left: 0;
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            max-width: 20em;
+            margin: 1em auto 1em 0;
+
+            & .nameRole {
+                font-weight: 700;
+                margin-left: 0;
+            }
+
+            & .label {
+                margin: 0.5em 0;
+            }
+
+            & .type {
+                display: none;
+            }
+
+            & .alternative-contact {
+                margin: 0.5em 0 0.25em 0;
+            }
+
+            & .non-ascii {
+                margin: 0 0 0 2em;
+            }
+
+            & div.left {
+                text-align: left;
+            }
+
+            & div.right {
+                text-align: right;
+            }
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        @media (min-width: 500px) {
+            #authors-addresses {
+                &>section {
+                    column-count: 2;
+                    column-gap: 20px;
+                }
+
+                &>section>h2 {
+                    column-span: all;
+                }
+
+                /* hack for break-inside: avoid-column */
+                & address {
+                    display: inline-block;
+                    break-inside: avoid-column;
+                }
+            }
+        }
+
+        /* Comments */
+        .rfcEditorRemove {
+            & p:first-of-type {
+                font-style: italic;
+            }
+        }
+
+        .cref {
+            background-color: rgba(249, 232, 105, 0.3);
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        @media screen {
+            #toc {
+                & nav {
+                    font-family: var(--font-title);
+                    font-weight: 360;
+
+                    &>ul {
+                        margin-bottom: 2em;
+                    }
+
+                    & ul {
+                        margin: 0 0 0 4px;
+
+                        & :is(p, li) {
+                            margin: 2px 0;
+                        }
+                    }
+                }
+
+                & a.toplink {
+                    float: right;
+                }
+            }
+        }
+
+        @media not screen {
+            #toc a.toplink {
+                display: none;
+            }
+        }
+
+
+        /* TOC layout for smaller screens */
+        @media screen and (max-width: 929px) {
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 1px 0 0 0;
+                margin: 0;
+                border-bottom: 1px solid #ccc;
+                opacity: 0.6;
+
+                & h2 {
+                    margin: 0;
+                    padding: 2px 0 2px 6px;
+                    padding-right: 1em;
+                    font-size: 18px;
+                    line-height: 24px;
+                    min-width: 190px;
+                    text-align: right;
+                    background-color: #444;
+                    color: white;
+                    cursor: pointer;
+
+                    &::before {
+                        /* css hamburger */
+                        float: right;
+                        position: relative;
+                        width: 1em;
+                        height: 1px;
+                        left: -164px;
+                        margin: 8px 0 0 0;
+                        background: white none repeat scroll 0 0;
+                        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                        content: "";
+                    }
+                }
+
+                & nav {
+                    display: none;
+                    background-color: var(--background-color);
+                    padding: 0.5em 1em 1em;
+                    overflow: auto;
+                    overscroll-behavior: contain;
+                    height: calc(100vh - 48px);
+                    border-left: 1px solid #ddd;
+                }
+
+                &.active {
+                    opacity: 1;
+
+                    & nav {
+                        display: block;
+                    }
+                }
+
+                /* Make the collapsed ToC header render white on gray also when it's a link */
+                & h2 a,
+                & h2 a:is(:link, :focus, :hover),
+                & a.toplink,
+                & a.toplink:hover {
+                    color: white;
+                    background-color: #444;
+                    text-decoration: none;
+                }
+
+                & a.toplink {
+                    margin: 2px 0.5em 0;
+                }
+            }
+        }
+
+        /* TOC layout for wide screens */
+        @media screen and (min-width: 930px) {
+            body {
+                padding-right: 360px;
+                padding-right: calc(min(180px + 20%, 500px));
+            }
+
+            #toc {
+                position: fixed;
+                bottom: 0;
+                right: 0;
+                right: calc(50vw - 480px);
+                width: 312px;
+                margin: 0;
+                padding: 0;
+                z-index: 1;
+
+                & h2 {
+                    margin: 0;
+                    padding: 0.25em 1em 1em 0;
+                }
+
+                & nav {
+                    display: block;
+                    height: calc(90vh - 84px);
+                    bottom: 0;
+                    padding: 0.5em 0 2em;
+                    overflow: auto;
+                    overscroll-behavior: contain;
+                    scrollbar-width: thin;
+                }
+
+                & a.toplink {
+                    margin: 8px 0.5em 0;
+                }
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc {
+                page-break-before: always;
+                border-top: none;
+                padding-top: 0;
+            }
+
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            figure,
+            pre,
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            :is(h2, h3, h4, h5, h6)+*,
+            dd {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+        }
+
+        /* Dark mode. */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #121212;
+                --text-color: #f0f0f0;
+                --title-color: #fff;
+                --link-color: #4da4f0;
+                --highlight-color: #282828;
+                --line-color: #444;
+                --pilcrow-weak: #444;
+                --pilcrow-strong: #666;
+                scrollbar-color: #777 #333;
+            }
+        }
+
+        /* SVG Trick: a prefix match works because only black and white are allowed */
+        svg {
+            & :is([stroke="black"], [stroke^="#000"]) {
+                stroke: var(--text-color);
+            }
+
+            & :is([stroke="white"], [stroke^="#fff"]) {
+                stroke: var(--background-color);
+            }
+
+            & :is([fill="black"], [fill^="#000"], :not([fill])) {
+                fill: var(--text-color);
+            }
+
+            & :is([fill="white"], [fill^="#fff"]) {
+                fill: var(--background-color);
+            }
+        }
+    </style>
+
+</head>
+
+<body class="xml2rfc">
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">인터넷 초안</td>
+                <td class="center">No-Vary-Search</td>
+                <td class="right">2026년 6월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Denicola 외</td>
+                <td class="center">2026년 12월 20일 만료</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-workgroup">작업 그룹:</dt>
+            <dd class="workgroup">하이퍼텍스트 전송 프로토콜</dd>
+            <dt class="label-internet-draft">인터넷 초안:</dt>
+            <dd class="internet-draft">draft-ietf-httpbis-no-vary-search-latest</dd>
+            <dt class="label-published">발행일:</dt>
+            <dd class="published">
+                <time datetime="2026-06-18" class="published">2026년 6월 18일</time>
+            </dd>
+            <dt class="label-intended-status">예정 상태:</dt>
+            <dd class="intended-status">표준 트랙</dd>
+            <dt class="label-expires">만료일:</dt>
+            <dd class="expires"><time datetime="2026-12-20">2026년 12월 20일</time></dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">D. Denicola</div>
+                    <div class="org">Google LLC</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">J. Roman</div>
+                    <div class="org">Google LLC</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">N. Jaju, <span class="editor">편집자</span>
+                    </div>
+                    <div class="org">Google LLC</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="title">No-Vary-Search HTTP 캐싱 확장</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">이 명세는 URI 쿼리 매개변수가 캐싱에 영향을 미치는 방식을 변경하는 HTTP 캐싱
+            확장을 정의합니다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+    </section>
+    <section class="note rfcEditorRemove" id="section-note.1">
+        <h2 id="name-about-this-document">
+            <a href="#name-about-this-document" class="section-name selfRef">이 문서에 관하여</a>
+        </h2>
+        <p id="section-note.1-1">이 참고 사항은 RFC로 발행하기 전에 제거됩니다.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+        <p id="section-note.1-2">
+            이 초안의 최신 개정판은 <span><a
+                    href="https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html">https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html</a></span>에서
+            찾을 수 있습니다.
+            이 문서의 상태 정보는 <span><a
+                    href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-no-vary-search/">https://datatracker.ietf.org/doc/draft-ietf-httpbis-no-vary-search/</a></span>에서
+            찾을 수 있습니다.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+        <p id="section-note.1-3">
+            이 문서에 대한 논의는
+            HTTP 작업 그룹 메일링 리스트(<span><a href="mailto:ietf-http-wg@w3.org">mailto:ietf-http-wg@w3.org</a></span>)에서
+            이루어지며,
+            그 아카이브는 <span><a
+                    href="https://lists.w3.org/Archives/Public/ietf-http-wg/">https://lists.w3.org/Archives/Public/ietf-http-wg/</a></span>에
+            있습니다.
+            작업 그룹 정보는 <span><a href="https://httpwg.org/">https://httpwg.org/</a></span>에서 찾을 수 있습니다.<a
+                href="#section-note.1-3" class="pilcrow">¶</a></p>
+        <p id="section-note.1-4">이 초안의 소스와 이슈 추적기는
+            <span><a
+                    href="https://github.com/httpwg/http-extensions/labels/no-vary-search">https://github.com/httpwg/http-extensions/labels/no-vary-search</a></span>에서
+            찾을 수 있습니다.<a href="#section-note.1-4" class="pilcrow">¶</a>
+        </p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 인터넷 초안은 BCP 78 및 BCP 79의 규정을
+                완전히 준수하여 제출됩니다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-2">
+                인터넷 초안은 인터넷 엔지니어링 태스크 포스(IETF)의 작업 문서입니다.
+                다른 그룹도 작업 문서를 인터넷 초안으로 배포할 수 있음을 유의하십시오.
+                현재 인터넷 초안 목록은 <span><a
+                        href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>에
+                있습니다.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-3">
+                인터넷 초안은 최대 6개월 동안 유효한 초안 문서이며,
+                언제든지 다른 문서로 갱신, 대체 또는 폐기될 수 있습니다.
+                인터넷 초안을 참조 자료로 사용하거나 "진행 중인 작업" 이외의 방식으로
+                인용하는 것은 부적절합니다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-4">
+                이 인터넷 초안은 2026년 12월 20일에 만료됩니다.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2026 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Revised BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="compact toc ulBare ulEmpty">
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1"
+                                class="auto internal xref">1</a>. <a href="#name-introduction"
+                                class="internal xref">소개</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2"
+                                class="auto internal xref">2</a>. <a href="#name-conventions-and-definitions"
+                                class="internal xref">규약 및 정의</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3"
+                                class="auto internal xref">3</a>. <a href="#name-http-header-field-definitio"
+                                class="internal xref">HTTP 헤더 필드 정의</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>. <a
+                                href="#name-data-model" class="internal xref">데이터 모델</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>. <a
+                                href="#name-parsing" class="internal xref">파싱</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1"
+                                        class="auto internal xref">5.1</a>. <a href="#name-parse-a-url-variation-confi"
+                                        class="internal xref">URL variation config 파싱</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2"
+                                        class="auto internal xref">5.2</a>. <a href="#name-obtain-a-url-variation-conf"
+                                        class="internal xref">URL variation config 얻기</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                                        <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1"
+                                                class="auto internal xref">5.2.1</a>. <a href="#name-examples"
+                                                class="internal xref">예제</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3"
+                                        class="auto internal xref">5.3</a>. <a href="#name-parse-a-key"
+                                        class="internal xref">키 파싱</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3.2.1">
+                                        <p id="section-toc.1-1.5.2.3.2.1.1"><a href="#section-5.3.1"
+                                                class="auto internal xref">5.3.1</a>. <a href="#name-examples-2"
+                                                class="internal xref">예제</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>. <a
+                                href="#name-comparing" class="internal xref">비교</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1"
+                                        class="auto internal xref">6.1</a>. <a href="#name-examples-3"
+                                        class="internal xref">예제</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>. <a
+                                href="#name-caching" class="internal xref">캐싱</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>. <a
+                                href="#name-security-considerations" class="internal xref">보안 고려 사항</a>
+                        </p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+                        <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>. <a
+                                href="#name-privacy-considerations" class="internal xref">개인정보 보호 고려 사항</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+                        <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a
+                                href="#name-iana-considerations" class="internal xref">IANA 고려 사항</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1"
+                                        class="auto internal xref">10.1</a>. <a href="#name-http-field-names"
+                                        class="internal xref">HTTP 필드 이름</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+                        <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a
+                                href="#name-references" class="internal xref">참고 문헌</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1"
+                                        class="auto internal xref">11.1</a>. <a href="#name-normative-references"
+                                        class="internal xref">규범적 참고 문헌</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2"
+                                        class="auto internal xref">11.2</a>. <a href="#name-informative-references"
+                                        class="internal xref">정보성 참고 문헌</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+                        <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a
+                                href="#name-acknowledgments" class="internal xref">감사의 말</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+                        <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a
+                                href="#name-index" class="internal xref">색인</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+                        <p id="section-toc.1-1.14.1"><a href="#appendix-C" class="auto internal xref"></a><a
+                                href="#name-authors-addresses" class="internal xref">저자 주소</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <div id="introduction">
+        <section id="section-1">
+            <h2 id="name-introduction">
+                <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                    class="section-name selfRef">소개</a>
+            </h2>
+            <p id="section-1-1">HTTP 캐싱 <span>[<a href="#HTTP-CACHING" class="cite xref">HTTP-CACHING</a>]</span>은
+                여러 캐시 키에서 일치하는 리소스를 재사용하는 것에 기반하며, 그중 가장 중요한 것은 제시된 대상
+                URI(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.1" class="relref">[<a href="#HTTP"
+                            class="cite xref">HTTP</a>]의 Section 7.1</span>)입니다. 그러나
+                때때로 여러 URI가 같은 리소스를 나타낼 수 있습니다. 이로 인해 캐시가 항상 기대만큼 유용하지는
+                않게 됩니다. 캐시에 어떤 URI 아래의 응답이 들어 있지만, 그 응답이 다른 URI 아래에서 요청되면
+                캐시된 버전은 무시됩니다.<a href="#section-1-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-1-2">"No-Vary-Search" 응답 헤더 필드는
+                <span><a href="https://rfc-editor.org/rfc/rfc9111#section-4" class="relref">[<a href="#HTTP-CACHING"
+                            class="cite xref">HTTP-CACHING</a>]의 Section 4</span>에 설명된
+                캐싱 확장을 정의하며, 특정 쿼리 매개변수에서만 다른 여러 URI가 같은 리소스를 식별하는 경우라는
+                이 일반적인 문제의 특정 하위 집합을 다룹니다. 이는 리소스가 쿼리 컴포넌트의 일부 또는 전부가
+                제공되는 응답에 의미적으로 영향을 주지 않으므로 캐시 매칭 목적에서는 무시될 수 있음을 선언할 수
+                있게 합니다. 예를 들어, 쿼리 매개변수의 순서가 어떤 리소스가 식별되는지에 영향을 주지 않는다면
+                이는 다음을 사용하여 표시됩니다<a href="#section-1-2" class="pilcrow">¶</a>
+            </p>
+            <div class="lang-http-message sourcecode" id="section-1-3">
+                <pre>
+No-Vary-Search: key-order
+</pre><a href="#section-1-3" class="pilcrow">¶</a>
+            </div>
+            <p id="section-1-4">특정 쿼리 매개변수(예: 분석용으로 무언가를 나타내는 것)가 제공되는 리소스에
+                의미적으로 영향을 주지 않는다면, 이는 다음을 사용하여 표시됩니다<a href="#section-1-4" class="pilcrow">¶</a></p>
+            <div class="lang-http-message sourcecode" id="section-1-5">
+                <pre>
+No-Vary-Search: params=("utm_source" "utm_medium" "utm_campaign")
+</pre><a href="#section-1-5" class="pilcrow">¶</a>
+            </div>
+            <p id="section-1-6">그리고 리소스가 대신 허용 목록 기반 접근 방식을 원하여, 특정한 알려진 쿼리
+                매개변수만 제공되는 응답에 의미적으로 영향을 주는 경우에는 다음을 사용할 수 있습니다<a href="#section-1-6" class="pilcrow">¶</a></p>
+            <div class="lang-http-message sourcecode" id="section-1-7">
+                <pre>
+No-Vary-Search: except=("productId")
+</pre><a href="#section-1-7" class="pilcrow">¶</a>
+            </div>
+            <p id="section-1-8">고유한 쿼리 매개변수를 보내 캐시된 응답 검색을 피하는 "cache busting"은
+                <code>No-Vary-Search</code> 헤더 필드로 인해 효과가 없어질 수 있음에 유의하십시오.<a href="#section-1-8" class="pilcrow">¶</a>
+            </p>
+            <p id="section-1-9"><a href="#header-definition" class="auto internal xref">Section 3</a>은
+                <span>[<a href="#STRUCTURED-FIELDS" class="cite xref">STRUCTURED-FIELDS</a>]</span> 프레임워크를 사용하여 새로운
+                응답 헤더 필드 <code>No-Vary-Search</code>를 정의합니다. <a href="#data-model" class="auto internal xref">Section
+                    4</a>와 <a href="#parsing" class="auto internal xref">Section
+                    5</a>는 필드 값을 명세에서 표현할 수 있는 방식에 대한 데이터 모델과,
+                구조화 필드 파서의 원시 출력을 그 데이터 모델로 파싱하는 과정을 설명합니다. <a href="#comparing" class="auto internal xref">Section
+                    6</a>은
+                헤더 필드의 영향을 받아 두 URL이 동등한지 비교하는 핵심 알고리즘을 제공합니다. 특히 이는
+                <span>[<a href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>에 지정된
+                <a href="https://url.spec.whatwg.org/#concept-urlencoded">application/x-www-form-urlencoded</a> 형식이
+                제공하는 쿼리 컴포넌트의 키와 값으로의 분해에 의존합니다. (따라서 이 헤더 필드는 쿼리
+                컴포넌트가 해당 형식을 따르지 않는 URL에는 유용하지 않습니다.) 마지막으로, <a href="#caching" class="auto internal xref">Section
+                    7</a>은 이 새로운 동등성을 고려하도록
+                <span><a href="https://rfc-editor.org/rfc/rfc9111#section-4" class="relref">[<a href="#HTTP-CACHING"
+                            class="cite xref">HTTP-CACHING</a>]의 Section 4</span>를
+                확장하는 방법을 설명합니다.<a href="#section-1-9" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="conventions-and-definitions">
+        <section id="section-2">
+            <h2 id="name-conventions-and-definitions">
+                <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions"
+                    class="section-name selfRef">규약 및 정의</a>
+            </h2>
+            <p id="section-2-1">이 문서의 핵심 단어 "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>",
+                "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL
+                    NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span
+                    class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+                "<span class="bcp14">MAY</span>", 및 "<span class="bcp14">OPTIONAL</span>"은
+                여기에 표시된 것처럼 모두 대문자로 나타날 때에만 BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span>
+                <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span>에 설명된 대로 해석됩니다.<a href="#section-2-1"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-2">이 문서에서 "URI"와 "URL"이라는 용어는 문맥에 따라 서로 바꾸어 사용됩니다.
+                "URI"는 <span>[<a href="#URI" class="cite xref">URI</a>]</span>,
+                <span>[<a href="#HTTP" class="cite xref">HTTP</a>]</span>, 및 <span>[<a href="#HTTP-CACHING"
+                        class="cite xref">HTTP-CACHING</a>]</span>의 문맥에서 사용되는 반면, "URL"은
+                <span>[<a href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>에 지정된
+                알고리즘의 문맥에서 사용됩니다.<a href="#section-2-2" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-3">이 문서는 또한 WHATWG 및 W3C 사용 방식에서 흔한 몇 가지 규약과 표기법을
+                채택하며, 특히 알고리즘과 관련된 부분에서 그렇습니다. <span>[<a href="#WHATWG-INFRA"
+                        class="cite xref">WHATWG-INFRA</a>]</span>, 특히 다음을 참조하십시오.<a href="#section-2-3"
+                    class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="section-2-4.1">
+                    <p id="section-2-4.1.1">리스트 리터럴 표기 « 1, 2, 3 »를 포함한 리스트의 정의.<a href="#section-2-4.1.1"
+                            class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="section-2-4.2">
+                    <p id="section-2-4.2.1">코드 단위로서의 표현을 포함한 문자열의 정의.<a href="#section-2-4.2.1" class="pilcrow">¶</a>
+                    </p>
+                </li>
+            </ul>
+            <p id="section-2-5">(사용되는 다른 개념은 인라인 참조로 표시됩니다.)<a href="#section-2-5" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="header-definition">
+        <section id="section-3">
+            <h2 id="name-http-header-field-definitio">
+                <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-http-header-field-definitio"
+                    class="section-name selfRef">HTTP 헤더 필드 정의</a>
+            </h2>
+            <p id="section-3-1"><code>No-Vary-Search</code> HTTP 헤더 필드는 값이 dictionary(<span><a
+                        href="https://rfc-editor.org/rfc/rfc9651#section-3.2" class="relref">[<a
+                            href="#STRUCTURED-FIELDS" class="cite xref">STRUCTURED-FIELDS</a>]의 Section 3.2</span>)이어야
+                하는
+                구조화 필드 <span>[<a href="#STRUCTURED-FIELDS" class="cite xref">STRUCTURED-FIELDS</a>]</span>입니다.<a
+                    href="#section-3-1" class="pilcrow">¶</a></p>
+            <p id="section-3-2">이는 다음 작성 적합성 요구 사항을 가집니다.<a href="#section-3-2" class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="section-3-3.1">
+                    <p id="section-3-3.1.1">존재하는 경우, <code>key-order</code> 항목의 값은 boolean(<span><a
+                                href="https://rfc-editor.org/rfc/rfc9651#section-3.3.6" class="relref">[<a
+                                    href="#STRUCTURED-FIELDS" class="cite xref">STRUCTURED-FIELDS</a>]의 Section
+                                3.3.6</span>)이어야 합니다.<a href="#section-3-3.1.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="section-3-3.2">
+                    <p id="section-3-3.2.1">존재하는 경우, <code>params</code> 항목의 값은 문자열의 inner list(<span><a
+                                href="https://rfc-editor.org/rfc/rfc9651#section-3.1.1" class="relref">[<a
+                                    href="#STRUCTURED-FIELDS" class="cite xref">STRUCTURED-FIELDS</a>]의 Section
+                                3.1.1</span>)이어야 합니다.<a href="#section-3-3.2.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="section-3-3.3">
+                    <p id="section-3-3.3.1">존재하는 경우, <code>except</code> 항목의 값은 문자열의 inner list(<span><a
+                                href="https://rfc-editor.org/rfc/rfc9651#section-3.1.1" class="relref">[<a
+                                    href="#STRUCTURED-FIELDS" class="cite xref">STRUCTURED-FIELDS</a>]의 Section
+                                3.1.1</span>)이어야 합니다.<a href="#section-3-3.3.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="section-3-3.4">
+                    <p id="section-3-3.4.1"><code>params</code> 항목도 존재하는 경우 <code>except</code> 항목은
+                        존재해서는 안 됩니다.<a href="#section-3-3.4.1" class="pilcrow">¶</a></p>
+                </li>
+            </ul>
+            <p id="section-3-4">dictionary는 키가
+                <code>key-order</code>, <code>params</code>, 및 <code>except</code> 중 하나가 아닌 항목을 포함할 수 있지만,
+                그 의미는 이 명세에서 정의되지 않습니다. 이 명세의 구현은 그러한 항목을 무시합니다(그러나 미래의
+                문서가 그러한 항목에 의미를 부여할 수 있습니다).<a href="#section-3-4" class="pilcrow">¶</a>
+            </p>
+            <aside id="section-3-5">
+                <p id="section-3-5.1">항상 그렇듯이 작성 적합성 요구 사항은 구현에 구속력을 갖지 않습니다.
+                    구현은 대신 <span id="iref-obtain-a-url-variation-conf" class="iref"></span><a
+                        href="#obtain-a-url-variation-config" class="internal xref">URL
+                        variation config 얻기</a> 알고리즘(<a href="#obtain-a-url-variation-config"
+                        class="auto internal xref">Section 5.2</a>)이 제공하는 URL variation
+                    configurations(configs)의 처리 모델을 구현해야 합니다.<a href="#section-3-5.1" class="pilcrow">¶</a></p>
+            </aside>
+        </section>
+    </div>
+    <div id="data-model">
+        <section id="section-4">
+            <h2 id="name-data-model">
+                <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-data-model"
+                    class="section-name selfRef">데이터 모델</a>
+            </h2>
+            <p id="section-4-1"><em>URL variation config</em>는 다음으로 구성됩니다.<a href="#section-4-1" class="pilcrow">¶</a>
+            </p>
+            <span class="break"></span>
+            <dl class="dlNewline" id="section-4-2">
+                <dt id="section-4-2.1">no-vary params</dt>
+                <dd style="margin-left: 1.5em" id="section-4-2.2">
+                    <p id="section-4-2.2.1">특수 값 <strong>wildcard</strong> 또는 문자열 리스트<a href="#section-4-2.2.1"
+                            class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-4-2.3">vary params</dt>
+                <dd style="margin-left: 1.5em" id="section-4-2.4">
+                    <p id="section-4-2.4.1">특수 값 <strong>wildcard</strong> 또는 문자열 리스트<a href="#section-4-2.4.1"
+                            class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-4-2.5">vary on key order</dt>
+                <dd style="margin-left: 1.5em" id="section-4-2.6">
+                    <p id="section-4-2.6.1">boolean<a href="#section-4-2.6.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+            <p id="section-4-3"><span id="iref-default-url-variation-confi" class="iref"></span>
+                <em><span id="iref-default-url-variation-config" class="iref"></span>기본 URL variation
+                    config</em>는 no-vary params가 빈 리스트이고, vary params가
+                <strong>wildcard</strong>이며, vary on key order가 true인 URL variation config입니다.<a href="#section-4-3"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-4-4"><span id="iref-obtain-a-url-variation-confi" class="iref"></span><a
+                    href="#obtain-a-url-variation-config" class="internal xref">URL variation config 얻기</a>
+                알고리즘(<a href="#obtain-a-url-variation-config" class="auto internal xref">Section 5.2</a>)은
+                모든 URL variation config가 다음 제약 조건을 따르도록 보장합니다.<a href="#section-4-4" class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="section-4-5.1">
+                    <p id="section-4-5.1.1">no-vary params가 <strong>wildcard</strong>인 경우에만
+                        vary params는 리스트입니다. 그리고<a href="#section-4-5.1.1" class="pilcrow">¶</a>
+                    </p>
+                </li>
+                <li class="normal" id="section-4-5.2">
+                    <p id="section-4-5.2.1">vary params가 <strong>wildcard</strong>인 경우에만
+                        no-vary params는 리스트입니다.<a href="#section-4-5.2.1" class="pilcrow">¶</a>
+                    </p>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <div id="parsing">
+        <section id="section-5">
+            <h2 id="name-parsing">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-parsing"
+                    class="section-name selfRef">파싱</a>
+            </h2>
+            <div id="parse-a-url-variation-config">
+                <section id="section-5.1">
+                    <h3 id="name-parse-a-url-variation-confi">
+                        <a href="#section-5.1" class="section-number selfRef">5.1. </a><a
+                            href="#name-parse-a-url-variation-confi" class="section-name selfRef">URL variation
+                            config 파싱</a>
+                    </h3>
+                    <p id="section-5.1-1"><span id="iref-parse-a-url-variation-confi" class="iref"></span>
+                        <em>value</em>가 주어졌을 때 <em><span id="iref-parse-a-url-variation-config" class="iref"></span><a
+                                href="#parse-a-url-variation-config" class="internal xref">URL variation
+                                config를 파싱</a></em>하려면:<a href="#section-5.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <ol start="1" type="1" class="normal type-1" id="section-5.1-2">
+                        <li id="section-5.1-2.1">
+                            <p id="section-5.1-2.1.1"><em>value</em>가 null이면, <span
+                                    id="iref-default-url-variation-config-" class="iref"></span>기본 URL variation
+                                config를 반환합니다.<a href="#section-5.1-2.1.1" class="pilcrow">¶</a></p>
+                        </li>
+                        <li id="section-5.1-2.2">
+                            <p id="section-5.1-2.2.1"><em>result</em>를 새 URL variation config로 둡니다.<a
+                                    href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+                        </li>
+                        <li id="section-5.1-2.3">
+                            <p id="section-5.1-2.3.1"><em>result</em>의 vary on key order를 true로 설정합니다.<a
+                                    href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
+                        </li>
+                        <li id="section-5.1-2.4">
+                            <p id="section-5.1-2.4.1"><em>value</em>["<code>key-order</code>"]가 존재하면:<a
+                                    href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+                            <ol start="1" type="1" class="normal type-1" id="section-5.1-2.4.2">
+                                <li id="section-5.1-2.4.2.1">
+                                    <p id="section-5.1-2.4.2.1.1"><em>value</em>["<code>key-order</code>"]가
+                                        boolean이 아니면, <span id="iref-default-url-variation-config-8"
+                                            class="iref"></span>기본 URL variation config를 반환합니다.<a
+                                            href="#section-5.1-2.4.2.1.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li id="section-5.1-2.4.2.2">
+                                    <p id="section-5.1-2.4.2.2.1"><em>result</em>의 vary on key order를
+                                        <em>value</em>["<code>key-order</code>"]의 boolean 부정으로 설정합니다.<a
+                                            href="#section-5.1-2.4.2.2.1" class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                            </ol>
+                        </li>
+                        <li id="section-5.1-2.5">
+                            <p id="section-5.1-2.5.1"><em>value</em>["<code>params</code>"]와
+                                <em>value</em>["<code>except</code>"]가 둘 다 존재하거나 둘 다 존재하지 않으면,
+                                <span id="iref-default-url-variation-config-9" class="iref"></span>기본 URL variation
+                                config를 반환합니다.<a href="#section-5.1-2.5.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-5.1-2.6">
+                            <p id="section-5.1-2.6.1"><em>value</em>["<code>params</code>"]가 존재하면:<a
+                                    href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
+                            <ol start="1" type="1" class="normal type-1" id="section-5.1-2.6.2">
+                                <li id="section-5.1-2.6.2.1">
+                                    <p id="section-5.1-2.6.2.1.1"><em>value</em>["<code>params</code>"]가
+                                        array가 아니면, <span id="iref-default-url-variation-config-1"
+                                            class="iref"></span>기본 URL variation config를 반환합니다.<a
+                                            href="#section-5.1-2.6.2.1.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li id="section-5.1-2.6.2.2">
+                                    <p id="section-5.1-2.6.2.2.1"><em>value</em>["<code>params</code>"]의 항목 중
+                                        어느 하나라도 string이 아니면, <span id="iref-default-url-variation-config-11"
+                                            class="iref"></span>기본 URL variation config를 반환합니다.<a
+                                            href="#section-5.1-2.6.2.2.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li id="section-5.1-2.6.2.3">
+                                    <p id="section-5.1-2.6.2.3.1"><em>result</em>의 no-vary params를
+                                        <em>value</em>["<code>params</code>"]의 각 항목에
+                                        <span id="iref-parse-a-key-12" class="iref"></span><a href="#parse-a-key"
+                                            class="internal xref">키 파싱</a> (<a href="#parse-a-key"
+                                            class="auto internal xref">Section 5.3</a>)을 적용한
+                                        결과로 설정합니다.<a href="#section-5.1-2.6.2.3.1" class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                                <li id="section-5.1-2.6.2.4">
+                                    <p id="section-5.1-2.6.2.4.1"><em>result</em>의 no-vary params 안의 항목 중
+                                        어느 하나라도 error이면, <span id="iref-default-url-variation-config-13"
+                                            class="iref"></span>기본 URL variation config를 반환합니다.<a
+                                            href="#section-5.1-2.6.2.4.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li id="section-5.1-2.6.2.5">
+                                    <p id="section-5.1-2.6.2.5.1"><em>result</em>의 vary params를
+                                        <strong>wildcard</strong>로 설정합니다.<a href="#section-5.1-2.6.2.5.1"
+                                            class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                            </ol>
+                        </li>
+                        <li id="section-5.1-2.7">
+                            <p id="section-5.1-2.7.1">그렇지 않고, <em>value</em>["<code>except</code>"]가 존재하면:<a
+                                    href="#section-5.1-2.7.1" class="pilcrow">¶</a></p>
+                            <ol start="1" type="1" class="normal type-1" id="section-5.1-2.7.2">
+                                <li id="section-5.1-2.7.2.1">
+                                    <p id="section-5.1-2.7.2.1.1"><em>value</em>["<code>except</code>"]가
+                                        array가 아니면, <span id="iref-default-url-variation-config-14"
+                                            class="iref"></span>기본 URL variation config를 반환합니다.<a
+                                            href="#section-5.1-2.7.2.1.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li id="section-5.1-2.7.2.2">
+                                    <p id="section-5.1-2.7.2.2.1"><em>value</em>["<code>except</code>"]의 항목 중
+                                        어느 하나라도 string이 아니면, <span id="iref-default-url-variation-config-15"
+                                            class="iref"></span>기본 URL variation config를 반환합니다.<a
+                                            href="#section-5.1-2.7.2.2.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li id="section-5.1-2.7.2.3">
+                                    <p id="section-5.1-2.7.2.3.1"><em>result</em>의 vary params를
+                                        <em>value</em>["<code>except</code>"]의 각 항목에
+                                        <span id="iref-parse-a-key-16" class="iref"></span><a href="#parse-a-key"
+                                            class="internal xref">키 파싱</a> (<a href="#parse-a-key"
+                                            class="auto internal xref">Section 5.3</a>)을 적용한
+                                        결과로 설정합니다.<a href="#section-5.1-2.7.2.3.1" class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                                <li id="section-5.1-2.7.2.4">
+                                    <p id="section-5.1-2.7.2.4.1"><em>result</em>의 vary params 안의 항목 중
+                                        어느 하나라도 error이면, <span id="iref-default-url-variation-config-17"
+                                            class="iref"></span>기본 URL variation config를 반환합니다.<a
+                                            href="#section-5.1-2.7.2.4.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li id="section-5.1-2.7.2.5">
+                                    <p id="section-5.1-2.7.2.5.1"><em>result</em>의 no-vary params를
+                                        <strong>wildcard</strong>로 설정합니다.<a href="#section-5.1-2.7.2.5.1"
+                                            class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                            </ol>
+                        </li>
+                        <li id="section-5.1-2.8">
+                            <p id="section-5.1-2.8.1"><em>result</em>를 반환합니다.<a href="#section-5.1-2.8.1"
+                                    class="pilcrow">¶</a></p>
+                        </li>
+                    </ol>
+                    <aside id="section-5.1-3">
+                        <p id="section-5.1-3.1">일반적으로 이 알고리즘은 엄격하며, 인식하지 못하는 것을 보면
+                            <span id="iref-default-url-variation-config-18" class="iref"></span>기본 URL variation
+                            config를 반환하는 경향이 있습니다. 이는 <span id="iref-default-url-variation-config-19"
+                                class="iref"></span>기본 URL variation
+                            config 동작이 단지 더 적은 캐시 적중을 유발할 뿐이며, 이는 허용 가능한 대체 동작이기
+                            때문입니다.<a href="#section-5.1-3.1" class="pilcrow">¶</a>
+                        </p>
+                        <p id="section-5.1-3.2">그러나 최상위의 인식되지 않은 키는 이 명세를 나중에 더 쉽게
+                            확장할 수 있도록 무시됩니다. 기존 클라이언트 소프트웨어의 오동작을 피하기 위해,
+                            그러한 확장은 캐시된 응답이 매치할 수 있는 요청 집합을 줄이기보다는 늘릴 가능성이
+                            큽니다.<a href="#section-5.1-3.2" class="pilcrow">¶</a></p>
+                    </aside>
+                    <aside id="section-5.1-4">
+                        <p id="section-5.1-4.1">이 알고리즘의 입력은 일반적으로 field_type "dictionary"를
+                            사용하여 구조화 필드(<span><a href="https://rfc-editor.org/rfc/rfc9651#section-4.2"
+                                    class="relref">[<a href="#STRUCTURED-FIELDS"
+                                        class="cite xref">STRUCTURED-FIELDS</a>]의 Section 4.2</span>)를 파싱하여 얻습니다.<a
+                                href="#section-5.1-4.1" class="pilcrow">¶</a></p>
+                    </aside>
+                </section>
+            </div>
+            <div id="obtain-a-url-variation-config">
+                <section id="section-5.2">
+                    <h3 id="name-obtain-a-url-variation-conf">
+                        <a href="#section-5.2" class="section-number selfRef">5.2. </a><a
+                            href="#name-obtain-a-url-variation-conf" class="section-name selfRef">URL variation
+                            config 얻기</a>
+                    </h3>
+                    <p id="section-5.2-1"><span id="iref-obtain-a-url-variation-config" class="iref"></span>
+                        <a href="https://fetch.spec.whatwg.org/#concept-response">response</a> <em>response</em>가
+                        주어졌을 때 <em><span id="iref-obtain-a-url-variation-config-" class="iref"></span><a
+                                href="#obtain-a-url-variation-config" class="internal xref">URL variation
+                                config를 얻으려면</a></em>:<a href="#section-5.2-1" class="pilcrow">¶</a>
+                    </p>
+                    <ol start="1" type="1" class="normal type-1" id="section-5.2-2">
+                        <li id="section-5.2-2.1">
+                            <p id="section-5.2-2.1.1"><em>fieldValue</em>를 <em>response</em>의 header list에서
+                                `<code>No-Vary-Search</code>` 및
+                                "<code>dictionary</code>"가 주어졌을 때 <a
+                                    href="https://fetch.spec.whatwg.org/#concept-header-list-get-structured-header">구조화
+                                    필드 값을 가져온</a> 결과 <span>[<a href="#FETCH" class="cite xref">FETCH</a>]</span>로 둡니다.<a
+                                    href="#section-5.2-2.1.1" class="pilcrow">¶</a></p>
+                        </li>
+                        <li id="section-5.2-2.2">
+                            <p id="section-5.2-2.2.1"><em>fieldValue</em>가 주어졌을 때 URL variation config를
+                                파싱한 결과(<a href="#parse-a-url-variation-config" class="auto internal xref">Section
+                                    5.1</a>)를
+                                반환합니다. <span id="iref-parse-a-url-variation-config-" class="iref"></span><a
+                                    href="#section-5.2-2.2.1" class="pilcrow">¶</a></p>
+                        </li>
+                    </ol>
+                    <div id="examples">
+                        <section id="section-5.2.1">
+                            <h4 id="name-examples">
+                                <a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a
+                                    href="#name-examples" class="section-name selfRef">예제</a>
+                            </h4>
+                            <p id="section-5.2.1-1">다음은 여러 입력이 결과 no-vary params 및 vary params에 미치는
+                                영향 측면에서 어떻게 파싱되는지를 보여줍니다.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+                            <table class="center" id="table-1">
+                                <caption><a href="#table-1" class="selfRef">표 1</a></caption>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left" rowspan="1" colspan="1">입력</th>
+                                        <th class="text-left" rowspan="1" colspan="1">결과</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: params=("a")</code>
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">no-vary params: « "<code>a</code>"
+                                            »<br>vary params: <strong>wildcard</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: except=("x")</code>
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">no-vary params:
+                                            <strong>wildcard</strong><br>vary params: « "<code>x</code>" »
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: params=()</code>
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">no-vary params: (빈
+                                            리스트)<br>vary params: <strong>wildcard</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: except=()</code>
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">no-vary params:
+                                            <strong>wildcard</strong><br>vary params: (빈 리스트)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p id="section-5.2.1-3">다음 입력은 모두 유효하지 않으며, <span id="iref-default-url-variation-config-2"
+                                    class="iref"></span>기본 URL variation
+                                config가 반환되도록 합니다.<a href="#section-5.2.1-3" class="pilcrow">¶</a></p>
+                            <ul class="compact">
+                                <li class="compact" id="section-5.2.1-4.1">
+                                    <p id="section-5.2.1-4.1.1"><code>No-Vary-Search: key-order="not a boolean"</code><a
+                                            href="#section-5.2.1-4.1.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.2">
+                                    <p id="section-5.2.1-4.2.1">
+                                        <code>No-Vary-Search: params="not an inner list"</code><a
+                                            href="#section-5.2.1-4.2.1" class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.3">
+                                    <p id="section-5.2.1-4.3.1"><code>No-Vary-Search: params=(not-a-string)</code><a
+                                            href="#section-5.2.1-4.3.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.4">
+                                    <p id="section-5.2.1-4.4.1"><code>No-Vary-Search: params=?0</code><a
+                                            href="#section-5.2.1-4.4.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.5">
+                                    <p id="section-5.2.1-4.5.1"><code>No-Vary-Search: params=?1</code><a
+                                            href="#section-5.2.1-4.5.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.6">
+                                    <p id="section-5.2.1-4.6.1"><code>No-Vary-Search: params=?1, except=("x")</code><a
+                                            href="#section-5.2.1-4.6.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.7">
+                                    <p id="section-5.2.1-4.7.1">
+                                        <code>No-Vary-Search: params=("a"), except=("x")</code><a
+                                            href="#section-5.2.1-4.7.1" class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.8">
+                                    <p id="section-5.2.1-4.8.1"><code>No-Vary-Search: params=(), except=()</code><a
+                                            href="#section-5.2.1-4.8.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.9">
+                                    <p id="section-5.2.1-4.9.1">
+                                        <code>No-Vary-Search: except="not an inner list"</code><a
+                                            href="#section-5.2.1-4.9.1" class="pilcrow">¶</a>
+                                    </p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.10">
+                                    <p id="section-5.2.1-4.10.1"><code>No-Vary-Search: except=(not-a-string)</code><a
+                                            href="#section-5.2.1-4.10.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="compact" id="section-5.2.1-4.11">
+                                    <p id="section-5.2.1-4.11.1"><code>No-Vary-Search: except=?1</code><a
+                                            href="#section-5.2.1-4.11.1" class="pilcrow">¶</a></p>
+                                </li>
+                            </ul>
+                            <p id="section-5.2.1-5">다음 입력은 유효하지만 다소 관례적이지 않습니다. 더 관례적인
+                                형식과 함께 표시되어 있습니다.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
+                            <table class="center" id="table-2">
+                                <caption><a href="#table-2" class="selfRef">표 2</a></caption>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left" rowspan="1" colspan="1">입력</th>
+                                        <th class="text-left" rowspan="1" colspan="1">관례적 형식</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: key-order=?1</code>
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: key-order</code>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: except=("x")</code>, key-order
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: key-order, except=("x")</code>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: params=()</code>
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">(헤더 필드를 생략)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" rowspan="1" colspan="1">
+                                            <code>No-Vary-Search: key-order=?0</code>
+                                        </td>
+                                        <td class="text-left" rowspan="1" colspan="1">(헤더 필드를 생략)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+                </section>
+            </div>
+            <div id="parse-a-key">
+                <section id="section-5.3">
+                    <h3 id="name-parse-a-key">
+                        <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-parse-a-key"
+                            class="section-name selfRef">키 파싱</a>
+                    </h3>
+                    <p id="section-5.3-1"><span id="iref-parse-a-key-24" class="iref"></span>
+                        ASCII 문자열 <em>keyString</em>이 주어졌을 때 <em><span id="iref-parse-a-key-25" class="iref"></span><a
+                                href="#parse-a-key" class="internal xref">키를 파싱</a></em>하려면:<a href="#section-5.3-1"
+                            class="pilcrow">¶</a></p>
+                    <ol start="1" type="1" class="normal type-1" id="section-5.3-2">
+                        <li id="section-5.3-2.1">
+                            <p id="section-5.3-2.1.1"><em>keyBytes</em>를
+                                <em>keyString</em>의 <a
+                                    href="https://infra.spec.whatwg.org/#isomorphic-encode">isomorphic encoding</a>
+                                <span>[<a href="#WHATWG-INFRA" class="cite xref">WHATWG-INFRA</a>]</span>으로 둡니다.<a
+                                    href="#section-5.3-2.1.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-5.3-2.2">
+                            <p id="section-5.3-2.2.1"><em>keyBytes</em> 안의 모든 0x2B (+)를 0x20 (SP)로
+                                바꿉니다.<a href="#section-5.3-2.2.1" class="pilcrow">¶</a></p>
+                        </li>
+                        <li id="section-5.3-2.3">
+                            <p id="section-5.3-2.3.1"><em>keyBytesDecoded</em>를
+                                <em>keyBytes</em>의 <a
+                                    href="https://url.spec.whatwg.org/#percent-decode">percent-decoding</a> <span>[<a
+                                        href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>으로 둡니다.<a
+                                    href="#section-5.3-2.3.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-5.3-2.4">
+                            <p id="section-5.3-2.4.1"><em>keyStringDecoded</em>를 <em>keyBytesDecoded</em>의
+                                <a href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">BOM 없는 UTF-8
+                                    디코딩</a>
+                                <span>[<a href="#WHATWG-ENCODING" class="cite xref">WHATWG-ENCODING</a>]</span>으로 둡니다.<a
+                                    href="#section-5.3-2.4.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-5.3-2.5">
+                            <p id="section-5.3-2.5.1"><em>keyStringDecoded</em>를 반환합니다.<a href="#section-5.3-2.5.1"
+                                    class="pilcrow">¶</a></p>
+                        </li>
+                    </ol>
+                    <div id="examples-1">
+                        <section id="section-5.3.1">
+                            <h4 id="name-examples-2">
+                                <a href="#section-5.3.1" class="section-number selfRef">5.3.1. </a><a
+                                    href="#name-examples-2" class="section-name selfRef">예제</a>
+                            </h4>
+                            <p id="section-5.3.1-1"><span id="iref-parse-a-key-26" class="iref"></span><a
+                                    href="#parse-a-key" class="internal xref">키 파싱</a> 알고리즘은,
+                                <a
+                                    href="https://url.spec.whatwg.org/#concept-urlencoded">application/x-www-form-urlencoded</a>
+                                형식 <span>[<a href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>이
+                                URI(ASCII 문자로 제한됨) 안에서 키와 값의 전체 entry list를 인코딩할 수 있게 하는 방식과
+                                유사하게, ASCII 구조화 헤더 필드 형식 안에서 ASCII가 아닌 키 문자열을 인코딩할 수
+                                있게 합니다. 예를 들어,<a href="#section-5.3.1-1" class="pilcrow">¶</a>
+                            </p>
+                            <div class="lang-http-message sourcecode" id="section-5.3.1-2">
+                                <pre>
+No-Vary-Search: params=("%C3%A9+%E6%B0%97")
+</pre><a href="#section-5.3.1-2" class="pilcrow">¶</a>
+                            </div>
+                            <p id="section-5.3.1-3">이는 vary params가 «
+                                "<code>é 気</code>" »인 URL variation config를 결과로 만듭니다. 뒤의 예제에서 설명하듯이,
+                                동등성 테스트 중의 정규화 과정은 다음과 같은 URI들을 동등한 것으로 취급한다는 것을
+                                의미합니다.<a href="#section-5.3.1-3" class="pilcrow">¶</a></p>
+                            <ul class="normal">
+                                <li class="normal" id="section-5.3.1-4.1">
+                                    <p id="section-5.3.1-4.1.1"><code>https://example.com/?é 気=1</code><a
+                                            href="#section-5.3.1-4.1.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="normal" id="section-5.3.1-4.2">
+                                    <p id="section-5.3.1-4.2.1"><code>https://example.com/?é+気=2</code><a
+                                            href="#section-5.3.1-4.2.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="normal" id="section-5.3.1-4.3">
+                                    <p id="section-5.3.1-4.3.1"><code>https://example.com/?%C3%A9%20気=3</code><a
+                                            href="#section-5.3.1-4.3.1" class="pilcrow">¶</a></p>
+                                </li>
+                                <li class="normal" id="section-5.3.1-4.4">
+                                    <p id="section-5.3.1-4.4.1"><code>https://example.com/?%C3%A9+%E6%B0%97=4</code><a
+                                            href="#section-5.3.1-4.4.1" class="pilcrow">¶</a></p>
+                                </li>
+                            </ul>
+                            <p id="section-5.3.1-5">그리고 계속해서, 이들은 모두 <a
+                                    href="https://url.spec.whatwg.org/#concept-urlencoded-parser">파싱</a> <span>[<a
+                                        href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>되어 같은
+                                키 "<code>é 気</code>"를 갖기 때문입니다.<a href="#section-5.3.1-5" class="pilcrow">¶</a></p>
+                        </section>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="comparing">
+        <section id="section-6">
+            <h2 id="name-comparing">
+                <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-comparing"
+                    class="section-name selfRef">비교</a>
+            </h2>
+            <p id="section-6-1"><span id="iref-equivalent-modulo-variation" class="iref"></span>
+                <a href="https://url.spec.whatwg.org/#concept-url">URL</a> <span>[<a href="#WHATWG-URL"
+                        class="cite xref">WHATWG-URL</a>]</span> 두 개 <em>urlA</em>와 <em>urlB</em>는
+                URL variation config <em>variationConfig</em>가 주어졌을 때, 다음 알고리즘이 true를 반환하면
+                <em>variation config를 모듈로 하여 동등</em>합니다.<a href="#section-6-1" class="pilcrow">¶</a>
+            </p>
+            <ol start="1" type="1" class="normal type-1" id="section-6-2">
+                <li id="section-6-2.1">
+                    <p id="section-6-2.1.1"><em>urlA</em>와
+                        <em>urlB</em>의 scheme, username, password, host, port, 또는 path가 다르면 false를 반환합니다.<a
+                            href="#section-6-2.1.1" class="pilcrow">¶</a>
+                    </p>
+                </li>
+                <li id="section-6-2.2">
+                    <p id="section-6-2.2.1"><em>variationConfig</em>가 <span id="iref-default-url-variation-config-28"
+                            class="iref"></span>기본 URL variation config와
+                        동등하면:<a href="#section-6-2.2.1" class="pilcrow">¶</a></p>
+                    <ol start="1" type="1" class="normal type-1" id="section-6-2.2.2">
+                        <li id="section-6-2.2.2.1">
+                            <p id="section-6-2.2.2.1.1"><em>urlA</em>의 query가 <em>urlB</em>의 query와 같으면
+                                true를 반환합니다.<a href="#section-6-2.2.2.1.1" class="pilcrow">¶</a></p>
+                        </li>
+                        <li id="section-6-2.2.2.2">
+                            <p id="section-6-2.2.2.2.1">false를 반환합니다.<a href="#section-6-2.2.2.2.1"
+                                    class="pilcrow">¶</a></p>
+                        </li>
+                    </ol>
+                    <p id="section-6-2.2.3">
+                        이 경우 <code>https://example.com/a</code>와 <code>https://example.com/a?</code>, 또는
+                        <code>https://example.com/foo?a=b&amp;&amp;&amp;c</code>와
+                        <code>https://example.com/foo?a=b&amp;c=</code>처럼, query에 <a
+                            href="https://url.spec.whatwg.org/#concept-urlencoded-parser">application/x-www-form-urlencoded
+                            parser</a> <span>[<a href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>를
+                        실행한 뒤에는 같아 보일 수 있는 URL 쌍도 동등하지 않은 것으로 취급됩니다.<a href="#section-6-2.2.3" class="pilcrow">¶</a>
+                    </p>
+                </li>
+                <li id="section-6-2.3">
+                    <p id="section-6-2.3.1"><em>searchParamsA</em>와 <em>searchParamsB</em>를 빈 리스트로 둡니다.<a
+                            href="#section-6-2.3.1" class="pilcrow">¶</a></p>
+                </li>
+                <li id="section-6-2.4">
+                    <p id="section-6-2.4.1"><em>urlA</em>의 query가 null이 아니면, <em>searchParamsA</em>를
+                        <em>urlA</em>의 query의
+                        <a href="https://infra.spec.whatwg.org/#isomorphic-encode">isomorphic encoding</a> <span>[<a
+                                href="#WHATWG-INFRA" class="cite xref">WHATWG-INFRA</a>]</span>이 주어졌을 때
+                        <a href="https://url.spec.whatwg.org/#concept-urlencoded-parser">application/x-www-form-urlencoded
+                            parser</a> <span>[<a href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>를 실행한
+                        결과로 설정합니다.<a href="#section-6-2.4.1" class="pilcrow">¶</a>
+                    </p>
+                </li>
+                <li id="section-6-2.5">
+                    <p id="section-6-2.5.1"><em>urlB</em>의 query가 null이 아니면, <em>searchParamsB</em>를
+                        <em>urlB</em>의 query의
+                        <a href="https://infra.spec.whatwg.org/#isomorphic-encode">isomorphic encoding</a> <span>[<a
+                                href="#WHATWG-INFRA" class="cite xref">WHATWG-INFRA</a>]</span>이 주어졌을 때
+                        <a href="https://url.spec.whatwg.org/#concept-urlencoded-parser">application/x-www-form-urlencoded
+                            parser</a> <span>[<a href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>를 실행한
+                        결과로 설정합니다.<a href="#section-6-2.5.1" class="pilcrow">¶</a>
+                    </p>
+                </li>
+                <li id="section-6-2.6">
+                    <p id="section-6-2.6.1"><em>variationConfig</em>의 no-vary params가 리스트이면:<a href="#section-6-2.6.1"
+                            class="pilcrow">¶</a></p>
+                    <ol start="1" type="1" class="normal type-1" id="section-6-2.6.2">
+                        <li id="section-6-2.6.2.1">
+                            <p id="section-6-2.6.2.1.1"><em>searchParamsA</em>를
+                                <em>searchParamsA</em> 안의 항목 <em>pair</em> 중에서
+                                <em>variationConfig</em>의 no-vary params가 <em>pair</em>[0]을 포함하지 않는
+                                항목을 담은 리스트로 설정합니다.<a href="#section-6-2.6.2.1.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-6-2.6.2.2">
+                            <p id="section-6-2.6.2.2.1"><em>searchParamsB</em>를
+                                <em>searchParamsB</em> 안의 항목 <em>pair</em> 중에서
+                                <em>variationConfig</em>의 no-vary params가 <em>pair</em>[0]을 포함하지 않는
+                                항목을 담은 리스트로 설정합니다.<a href="#section-6-2.6.2.2.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                    </ol>
+                </li>
+                <li id="section-6-2.7">
+                    <p id="section-6-2.7.1">그렇지 않고, <em>variationConfig</em>의 vary params가 리스트이면:<a
+                            href="#section-6-2.7.1" class="pilcrow">¶</a></p>
+                    <ol start="1" type="1" class="normal type-1" id="section-6-2.7.2">
+                        <li id="section-6-2.7.2.1">
+                            <p id="section-6-2.7.2.1.1"><em>searchParamsA</em>를
+                                <em>searchParamsA</em> 안의 항목 <em>pair</em> 중에서 <em>variationConfig</em>의 vary params가
+                                <em>pair</em>[0]을 포함하는 항목을 담은 리스트로 설정합니다.<a href="#section-6-2.7.2.1.1"
+                                    class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-6-2.7.2.2">
+                            <p id="section-6-2.7.2.2.1"><em>searchParamsB</em>를
+                                <em>searchParamsB</em> 안의 항목 <em>pair</em> 중에서 <em>variationConfig</em>의 vary params가
+                                <em>pair</em>[0]을 포함하는 항목을 담은 리스트로 설정합니다.<a href="#section-6-2.7.2.2.1"
+                                    class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                    </ol>
+                </li>
+                <li id="section-6-2.8">
+                    <p id="section-6-2.8.1"><em>variationConfig</em>의 vary on key order가 false이면:<a
+                            href="#section-6-2.8.1" class="pilcrow">¶</a></p>
+                    <ol start="1" type="1" class="normal type-1" id="section-6-2.8.2">
+                        <li id="section-6-2.8.2.1">
+                            <p id="section-6-2.8.2.1.1"><em>keyLessThan</em>을 두 쌍
+                                (<em>keyA</em>, <em>valueA</em>)와 (<em>keyB</em>, <em>valueB</em>)를 입력으로 받아
+                                <em>keyA</em>가 <em>keyB</em>보다
+                                <a href="https://infra.spec.whatwg.org/#code-unit-less-than">code unit less than</a>
+                                <span>[<a href="#WHATWG-INFRA" class="cite xref">WHATWG-INFRA</a>]</span>인지 여부를
+                                반환하는 알고리즘으로 둡니다.<a href="#section-6-2.8.2.1.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-6-2.8.2.2">
+                            <p id="section-6-2.8.2.2.1"><em>searchParamsA</em>를
+                                <em>keyLessThan</em>을 사용하여 오름차순으로
+                                <a href="https://infra.spec.whatwg.org/#list-sort-in-ascending-order">정렬</a>
+                                <span>[<a href="#WHATWG-INFRA" class="cite xref">WHATWG-INFRA</a>]</span>한
+                                <em>searchParamsA</em>의 결과로 설정합니다.<a href="#section-6-2.8.2.2.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-6-2.8.2.3">
+                            <p id="section-6-2.8.2.3.1"><em>searchParamsB</em>를
+                                <em>keyLessThan</em>을 사용하여 오름차순으로
+                                <a href="https://infra.spec.whatwg.org/#list-sort-in-ascending-order">정렬</a>
+                                <span>[<a href="#WHATWG-INFRA" class="cite xref">WHATWG-INFRA</a>]</span>한
+                                <em>searchParamsB</em>의 결과로 설정합니다.<a href="#section-6-2.8.2.3.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                    </ol>
+                </li>
+                <li id="section-6-2.9">
+                    <p id="section-6-2.9.1"><em>searchParamsA</em>의 size가 <em>searchParamsB</em>의
+                        size와 같지 않으면 false를 반환합니다.<a href="#section-6-2.9.1" class="pilcrow">¶</a></p>
+                </li>
+                <li id="section-6-2.10">
+                    <p id="section-6-2.10.1"><em>i</em>를 0으로 둡니다.<a href="#section-6-2.10.1" class="pilcrow">¶</a></p>
+                </li>
+                <li id="section-6-2.11">
+                    <p id="section-6-2.11.1"><em>i</em> &lt; <em>searchParamsA</em>의 size인 동안:<a
+                            href="#section-6-2.11.1" class="pilcrow">¶</a></p>
+                    <ol start="1" type="1" class="normal type-1" id="section-6-2.11.2">
+                        <li id="section-6-2.11.2.1">
+                            <p id="section-6-2.11.2.1.1"><em>searchParamsA</em>[<em>i</em>][0]이
+                                <em>searchParamsB</em>[<em>i</em>][0]과 같지 않으면 false를 반환합니다.<a
+                                    href="#section-6-2.11.2.1.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-6-2.11.2.2">
+                            <p id="section-6-2.11.2.2.1"><em>searchParamsA</em>[<em>i</em>][1]이
+                                <em>searchParamsB</em>[<em>i</em>][1]과 같지 않으면 false를 반환합니다.<a
+                                    href="#section-6-2.11.2.2.1" class="pilcrow">¶</a>
+                            </p>
+                        </li>
+                        <li id="section-6-2.11.2.3">
+                            <p id="section-6-2.11.2.3.1"><em>i</em>를 <em>i</em> + 1로 설정합니다.<a
+                                    href="#section-6-2.11.2.3.1" class="pilcrow">¶</a></p>
+                        </li>
+                    </ol>
+                </li>
+                <li id="section-6-2.12">
+                    <p id="section-6-2.12.1">true를 반환합니다.<a href="#section-6-2.12.1" class="pilcrow">¶</a></p>
+                </li>
+            </ol>
+            <div id="examples-2">
+                <section id="section-6.1">
+                    <h3 id="name-examples-3">
+                        <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-examples-3"
+                            class="section-name selfRef">예제</a>
+                    </h3>
+                    <p id="section-6.1-1">application/x-www-form-urlencoded parser가 query string을 정규화하는
+                        방식 때문에, 명백히 동등해 보이지 않는 query string이 파싱 후에는 동등한 것으로 취급되는
+                        일부 경우가 있습니다.<a href="#section-6.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-6.1-2">따라서 예를 들어 <code>No-Vary-Search</code>의 비기본 값,
+                        예컨대 <code>No-Vary-Search: key-order</code>가 주어지면 다음 동등성이 성립합니다.<a href="#section-6.1-2"
+                            class="pilcrow">¶</a></p>
+                    <table class="center" id="table-3">
+                        <caption><a href="#table-3" class="selfRef">표 3</a></caption>
+                        <thead>
+                            <tr>
+                                <th class="text-left" rowspan="1" colspan="1">첫 번째 Query</th>
+                                <th class="text-left" rowspan="1" colspan="1">두 번째 Query</th>
+                                <th class="text-left" rowspan="1" colspan="1">설명</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">null</td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">null query는 빈 문자열과 동일하게
+                                    파싱됩니다</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=x</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?%61=%78</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">파싱은 percent-decoding을 수행합니다</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=é</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=%C3%A9</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">파싱은 percent-decoding을 수행합니다</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=%f6</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=%ef%bf%bd</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">두 값 모두 U+FFFD (�)로 파싱됩니다</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=x&amp;&amp;&amp;&amp;</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=x</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">파싱은 <code>&amp;</code>에서 분할하고
+                                    빈 문자열을 버립니다</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">둘 다 <code>a</code>에 대해 빈 문자열 값을
+                                    갖는 것으로 파싱됩니다
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=%20</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a= &amp;</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>%20</code>은 U+0020 SPACE로 파싱됩니다
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a=+</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>?a= &amp;</code>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    <code>+</code>는 U+0020 SPACE로 파싱됩니다
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="caching">
+        <section id="section-7">
+            <h2 id="name-caching">
+                <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-caching"
+                    class="section-name selfRef">캐싱</a>
+            </h2>
+            <p id="section-7-1">캐시 <span>[<a href="#HTTP-CACHING" class="cite xref">HTTP-CACHING</a>]</span>가
+                이 명세를 구현한다면, <span><a href="https://rfc-editor.org/rfc/rfc9111#section-4" class="relref">[<a
+                            href="#HTTP-CACHING" class="cite xref">HTTP-CACHING</a>]의 Section 4</span>에 있는
+                제시된 대상 URI 요구 사항:<a href="#section-7-1" class="pilcrow">¶</a></p>
+            <blockquote id="section-7-2">
+                <p id="section-7-2.1">제시된 대상 URI(<span>[<a href="#HTTP" class="cite xref">HTTP</a>]</span>의 Section
+                    7.1)와 저장된 응답의 대상 URI가
+                    일치하고,<a href="#section-7-2.1" class="pilcrow">¶</a></p>
+            </blockquote>
+            <p id="section-7-3">는 다음으로 대체됩니다.<a href="#section-7-3" class="pilcrow">¶</a></p>
+            <blockquote id="section-7-4">
+                <p id="section-7-4.1">제시된 대상 URI(<span>[<a href="#HTTP" class="cite xref">HTTP</a>]</span>의 Section
+                    7.1)와 저장된 응답의 대상 URI가 일치하거나
+                    URL variation config를 모듈로 하여 동등하고,<a href="#section-7-4.1" class="pilcrow">¶</a></p>
+            </blockquote>
+            <p id="section-7-5">캐시 구현은 다음과 같은 응답을 더 최근에 저장한 경우, target URI가 URL
+                variation config를 모듈로 해서만 일치하는 저장된 응답을 재사용하지 않을 수 있습니다.<a href="#section-7-5" class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="section-7-6.1">
+                    <p id="section-7-6.1.1">query를 제외하고 제시된 대상 URI와 같은 target URI를 가지며,<a href="#section-7-6.1.1"
+                            class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="section-7-6.2">
+                    <p id="section-7-6.2.1"><code>No-Vary-Search</code> 필드에 비어 있지 않은 값을 가지며,<a href="#section-7-6.2.1"
+                            class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="section-7-6.3">
+                    <p id="section-7-6.3.1">재사용 대상으로 고려 중인 저장된 응답과 다른 <code>No-Vary-Search</code>
+                        필드 값을 가집니다.<a href="#section-7-6.3.1" class="pilcrow">¶</a></p>
+                </li>
+            </ul>
+            <aside id="section-7-7">
+                <p id="section-7-7.1">일반적으로 캐시는 저장된 응답을 반드시 재사용해야 하는 것은 아닙니다. 그러나
+                    위 내용은 성능 또는 다른 이유로 유리하다면 캐시가 더 적은 수의 저장된 응답을 검색할 수 있도록
+                    명시적으로 허용합니다.<a href="#section-7-7.1" class="pilcrow">¶</a></p>
+                <p id="section-7-7.2">즉, 캐시는 주어진 pathname에 대해 둘 이상의 응답을 저장할 수 있으므로,
+                    모든 캐시된 응답에 접근하지 않고도 No-Vary-Search 값을 효율적으로 조회하는 방법이 필요합니다.
+                    이러한 캐시는 <span><a href="https://rfc-editor.org/rfc/rfc9111#section-4" class="relref">[<a
+                                href="#HTTP-CACHING" class="cite xref">HTTP-CACHING</a>]의 Section 4</span>의
+                    다른 조건을 확인하기 전에 성능 좋은 방식으로 저장된 응답을 식별하기 위해 다음과 같은 단계를
+                    수행할 수 있습니다.<a href="#section-7-7.2" class="pilcrow">¶</a></p>
+                <ol start="1" type="1" class="normal type-1" id="section-7-7.3">
+                    <li id="section-7-7.3.1">
+                        <p id="section-7-7.3.1.1">exactMatch를 cache[presentedTargetURI]로 둡니다. 재사용할 수
+                            있는 저장된 응답이면 이를 반환합니다.<a href="#section-7-7.3.1.1" class="pilcrow">¶</a>
+                        </p>
+                    </li>
+                    <li id="section-7-7.3.2">
+                        <p id="section-7-7.3.2.1">targetPath를 query parameters가 제거된 presentedTargetURI로 둡니다.<a
+                                href="#section-7-7.3.2.1" class="pilcrow">¶</a></p>
+                    </li>
+                    <li id="section-7-7.3.3">
+                        <p id="section-7-7.3.3.1">lastNVS를 mostRecentNVS[targetPath]로 둡니다. 존재하지 않으면
+                            null을 반환합니다.<a href="#section-7-7.3.3.1" class="pilcrow">¶</a></p>
+                    </li>
+                    <li id="section-7-7.3.4">
+                        <p id="section-7-7.3.4.1">simplifiedURL을 lastNVS에 따라 presentedTargetURI를 단순화한
+                            결과로 둡니다(중요하지 않은 query parameters를 제거하고, key order를 무시해야 하는 경우
+                            매개변수를 key 기준 오름차순으로 <a
+                                href="https://infra.spec.whatwg.org/#list-sort-in-ascending-order">정렬</a> <span>[<a
+                                    href="#WHATWG-INFRA" class="cite xref">WHATWG-INFRA</a>]</span>함).<a
+                                href="#section-7-7.3.4.1" class="pilcrow">¶</a></p>
+                    </li>
+                    <li id="section-7-7.3.5">
+                        <p id="section-7-7.3.5.1">nvsMatch를 cache[simplifiedURL]로 둡니다. 존재하지 않으면
+                            null을 반환합니다. (이는 캐시에 저장할 때 정확한 URL에 더해 함께 기록되었다고 가정합니다.)<a href="#section-7-7.3.5.1"
+                                class="pilcrow">¶</a></p>
+                    </li>
+                    <li id="section-7-7.3.6">
+                        <p id="section-7-7.3.6.1">variationConfig를 nvsMatch에서 얻습니다(<a
+                                href="#obtain-a-url-variation-config" class="auto internal xref">Section 5.2</a>).<a
+                                href="#section-7-7.3.6.1" class="pilcrow">¶</a>
+                        </p>
+                    </li>
+                    <li id="section-7-7.3.7">
+                        <p id="section-7-7.3.7.1">nvsMatch의 target URI와 presentedTargetURI가 variationConfig가
+                            주어졌을 때 URL variation config를 모듈로 하여 동등하지 않으면(<a href="#comparing"
+                                class="auto internal xref">Section 6</a>)
+                            null을 반환합니다.<a href="#section-7-7.3.7.1" class="pilcrow">¶</a>
+                        </p>
+                    </li>
+                    <li id="section-7-7.3.8">
+                        <p id="section-7-7.3.8.1">nvsMatch가 재사용할 수 있는 저장된 응답이면 이를 반환합니다.
+                            그렇지 않으면 null을 반환합니다.<a href="#section-7-7.3.8.1" class="pilcrow">¶</a></p>
+                    </li>
+                </ol>
+            </aside>
+            <p id="section-7-8">캐시 구현 효율성을 돕기 위해, 서버는 query component를 처리하는 방식을 업데이트할
+                필요가 있는 경우가 아니라면, 시간이 지나면서 주어진 pathname에 대한 응답에서
+                <code>No-Vary-Search</code> 필드에 서로 다른 비어 있지 않은 값을 보내지 않는 것이 좋습니다.
+                그렇게 하면 위와 같은 전략을 사용하는 캐시 구현이 재사용될 수 있었던 일부 저장된 응답을 놓치게
+                됩니다.<a href="#section-7-8" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="security-considerations">
+        <section id="section-8">
+            <h2 id="name-security-considerations">
+                <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations"
+                    class="section-name selfRef">보안 고려 사항</a>
+            </h2>
+            <p id="section-8-1">주의해야 할 주된 위험은 일치하지 않는 URL의 영향입니다. 특히 이는 사용자가
+                링크에 마우스를 올렸을 때 표시된 URL이나 URL 표시줄에 표시된 URL과 다른 URL에서 원래 가져온
+                응답을 보게 만들 수 있습니다.<a href="#section-8-1" class="pilcrow">¶</a></p>
+            <p id="section-8-2">그러나 영향이 query parameters로 제한되므로, 이는 관련 보안 경계인
+                <a href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin">origin</a> <span>[<a
+                        href="#HTML" class="cite xref">HTML</a>]</span>을 넘지 않습니다. (또는 웹 브라우저
+                보안 UI의 관점에서는 <a href="https://url.spec.whatwg.org/#url-rendering-simplification">the perspective of web
+                    browser
+                    security UI</a>에서의 <a href="https://url.spec.whatwg.org/#concept-url-host">host</a>일 수도 있습니다.
+                <span>[<a href="#WHATWG-URL" class="cite xref">WHATWG-URL</a>]</span>) 실제로 우리는 이미 origin에게
+                <a
+                    href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-history-replacestate">history.replaceState()</a>
+                또는 service workers 같은 기술을 통해 클라이언트 측에서도 (URL, response body) 쌍을 어떻게
+                표시할지에 대한 완전한 제어권을 주었습니다.<a href="#section-8-2" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="privacy-considerations">
+        <section id="section-9">
+            <h2 id="name-privacy-considerations">
+                <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-privacy-considerations"
+                    class="section-name selfRef">개인정보 보호 고려 사항</a>
+            </h2>
+            <p id="section-9-1">이 제안은 사용자 식별자를 전달하기 위해 query parameters를 자주 사용하는
+                <a href="https://privacycg.github.io/nav-tracking-mitigations/#terminology">탐색 추적</a>이라는
+                개인정보 보호와 매우 관련이 큰 영역에 인접해 있습니다. 그러나 우리는 이 제안 자체에는 개인정보
+                보호 영향이 없다고 봅니다. 이는 <a
+                    href="https://privacycg.github.io/nav-tracking-mitigations/#deployed-mitigations">기존
+                    탐색 추적 완화</a>나 현재 검토 중인 알려진 미래의 완화책을 방해하지 않습니다. 실제로 어떤
+                페이지가 URI에 사용자 식별자를 인코딩한다면, 이 제안이 제공하는 유일한 능력은 서버가 캐시를
+                우회하지 않고 캐시가 서버를 대신하게 하여 그러한 사용자 ID의 서버 처리를 방지함으로써 사용자
+                추적을 <em>줄이는</em> 것입니다. <span>[<a href="#NAV-TRACKING-MITIGATIONS"
+                        class="cite xref">NAV-TRACKING-MITIGATIONS</a>]</span><a href="#section-9-1"
+                    class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="iana-considerations">
+        <section id="section-10">
+            <h2 id="name-iana-considerations">
+                <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations"
+                    class="section-name selfRef">IANA 고려 사항</a>
+            </h2>
+            <div id="http-field-names">
+                <section id="section-10.1">
+                    <h3 id="name-http-field-names">
+                        <a href="#section-10.1" class="section-number selfRef">10.1. </a><a
+                            href="#name-http-field-names" class="section-name selfRef">HTTP 필드 이름</a>
+                    </h3>
+                    <p id="section-10.1-1">IANA는 다음을 Hypertext Transfer Protocol
+                        (HTTP) Field Name Registry(<a
+                            href="https://www.iana.org/assignments/http-fields/http-fields.xhtml">https://www.iana.org/assignments/http-fields/http-fields.xhtml</a>)에
+                        입력해 달라는 요청을 받습니다.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-10.1-2">
+                        <dt id="section-10.1-2.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-10.1-2.2">
+                            <p id="section-10.1-2.2.1"><code>No-Vary-Search</code><a href="#section-10.1-2.2.1"
+                                    class="pilcrow">¶</a></p>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-10.1-2.3">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-10.1-2.4">
+                            <p id="section-10.1-2.4.1">permanent<a href="#section-10.1-2.4.1" class="pilcrow">¶</a></p>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-10.1-2.5">구조화 타입:</dt>
+                        <dd style="margin-left: 1.5em" id="section-10.1-2.6">
+                            <p id="section-10.1-2.6.1">Dictionary<a href="#section-10.1-2.6.1" class="pilcrow">¶</a></p>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-10.1-2.7">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-10.1-2.8">
+                            <p id="section-10.1-2.8.1">이 문서<a href="#section-10.1-2.8.1" class="pilcrow">¶</a>
+                            </p>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-10.1-2.9">비고:</dt>
+                        <dd style="margin-left: 1.5em" id="section-10.1-2.10">
+                            <p id="section-10.1-2.10.1">(없음)<a href="#section-10.1-2.10.1" class="pilcrow">¶</a></p>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="sec-combined-references">
+        <section id="section-11">
+            <h2 id="name-references">
+                <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references"
+                    class="section-name selfRef">참고 문헌</a>
+            </h2>
+            <div id="sec-normative-references">
+                <section id="section-11.1">
+                    <h3 id="name-normative-references">
+                        <a href="#section-11.1" class="section-number selfRef">11.1. </a><a
+                            href="#name-normative-references" class="section-name selfRef">규범적 참고 문헌</a>
+                    </h3>
+                    <dl class="references">
+                        <dt id="FETCH">[FETCH]</dt>
+                        <dd>
+                            <span class="refAuthor">van Kesteren, A.</span>, <span class="refTitle">"Fetch Living
+                                Standard"</span>, <span>n.d.</span>, <span>&lt;<a
+                                    href="https://fetch.spec.whatwg.org/">https://fetch.spec.whatwg.org/</a>&gt;</span>.
+                            <span class="annotation">WHATWG</span>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="HTTP">[HTTP]</dt>
+                        <dd>
+                            <span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M.,
+                                Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span
+                                class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span
+                                class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">2022년 6월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="HTTP-CACHING">[HTTP-CACHING]</dt>
+                        <dd>
+                            <span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M.,
+                                Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span
+                                class="refTitle">"HTTP Caching"</span>, <span class="seriesInfo">STD 98</span>, <span
+                                class="seriesInfo">RFC 9111</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC9111</span>, <time datetime="2022-06" class="refDate">2022년 6월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/rfc/rfc9111">https://www.rfc-editor.org/rfc/rfc9111</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC2119">[RFC2119]</dt>
+                        <dd>
+                            <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in
+                                RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>,
+                            <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">1997년 3월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC8174">[RFC8174]</dt>
+                        <dd>
+                            <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs
+                                Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span
+                                class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">2017년 5월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="STRUCTURED-FIELDS">[STRUCTURED-FIELDS]</dt>
+                        <dd>
+                            <span class="refAuthor">Nottingham, M.</span> and <span class="refAuthor">P. Kamp</span>,
+                            <span class="refTitle">"Structured Field Values for HTTP"</span>, <span
+                                class="seriesInfo">RFC 9651</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC9651</span>, <time datetime="2024-09" class="refDate">2024년 9월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/rfc/rfc9651">https://www.rfc-editor.org/rfc/rfc9651</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="URI">[URI]</dt>
+                        <dd>
+                            <span class="refAuthor">Berners-Lee, T.</span>, <span class="refAuthor">Fielding, R.</span>,
+                            and <span class="refAuthor">L. Masinter</span>, <span class="refTitle">"Uniform Resource
+                                Identifier (URI): Generic Syntax"</span>, <span class="seriesInfo">STD 66</span>, <span
+                                class="seriesInfo">RFC 3986</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC3986</span>, <time datetime="2005-01" class="refDate">2005년 1월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/rfc/rfc3986">https://www.rfc-editor.org/rfc/rfc3986</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="WHATWG-ENCODING">[WHATWG-ENCODING]</dt>
+                        <dd>
+                            <span class="refAuthor">van Kesteren, A.</span>, <span class="refTitle">"Encoding Living
+                                Standard"</span>, <span>n.d.</span>, <span>&lt;<a
+                                    href="https://encoding.spec.whatwg.org/">https://encoding.spec.whatwg.org/</a>&gt;</span>.
+                            <span class="annotation">WHATWG</span>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="WHATWG-INFRA">[WHATWG-INFRA]</dt>
+                        <dd>
+                            <span class="refAuthor">van Kesteren, A.</span> and <span class="refAuthor">D.
+                                Denicola</span>, <span class="refTitle">"Infra Living Standard"</span>,
+                            <span>n.d.</span>, <span>&lt;<a
+                                    href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>&gt;</span>.
+                            <span class="annotation">WHATWG</span>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="WHATWG-URL">[WHATWG-URL]</dt>
+                        <dd>
+                            <span class="refAuthor">van Kesteren, A.</span>, <span class="refTitle">"URL Living
+                                Standard"</span>, <span>n.d.</span>, <span>&lt;<a
+                                    href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>&gt;</span>.
+                            <span class="annotation">WHATWG</span>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+            <div id="sec-informative-references">
+                <section id="section-11.2">
+                    <h3 id="name-informative-references">
+                        <a href="#section-11.2" class="section-number selfRef">11.2. </a><a
+                            href="#name-informative-references" class="section-name selfRef">정보성 참고 문헌</a>
+                    </h3>
+                    <dl class="references">
+                        <dt id="HTML">[HTML]</dt>
+                        <dd>
+                            <span class="refAuthor">van Kesteren, A.</span>, <span class="refTitle">"HTML Living
+                                Standard"</span>, <span>n.d.</span>, <span>&lt;<a
+                                    href="https://html.spec.whatwg.org/">https://html.spec.whatwg.org/</a>&gt;</span>.
+                            <span class="annotation">WHATWG</span>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="NAV-TRACKING-MITIGATIONS">[NAV-TRACKING-MITIGATIONS]</dt>
+                        <dd>
+                            <span class="refAuthor">Snyder, P.</span> and <span class="refAuthor">J. Yasskin</span>,
+                            <span class="refTitle">"Navigational-Tracking Mitigations"</span>, <span>n.d.</span>,
+                            <span>&lt;<a
+                                    href="https://privacycg.github.io/nav-tracking-mitigations/">https://privacycg.github.io/nav-tracking-mitigations/</a>&gt;</span>.
+                            <span class="annotation">W3C Privacy CG</span>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="acknowledgments">
+        <section id="appendix-A">
+            <h2 id="name-acknowledgments">
+                <a href="#name-acknowledgments" class="section-name selfRef">감사의 말</a>
+            </h2>
+            <p id="appendix-A-1">이 문서는 다음 분들의 귀중한 검토와 제안으로부터 도움을 받았습니다.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="appendix-A-2.1">
+                    <p id="appendix-A-2.1.1">Adam Rice<a href="#appendix-A-2.1.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="appendix-A-2.2">
+                    <p id="appendix-A-2.2.1">Julian Reschke<a href="#appendix-A-2.2.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="appendix-A-2.3">
+                    <p id="appendix-A-2.3.1">Kevin McNee<a href="#appendix-A-2.3.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="appendix-A-2.4">
+                    <p id="appendix-A-2.4.1">Liviu Tinta<a href="#appendix-A-2.4.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="appendix-A-2.5">
+                    <p id="appendix-A-2.5.1">Mark Nottingham<a href="#appendix-A-2.5.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="appendix-A-2.6">
+                    <p id="appendix-A-2.6.1">Martin Thomson<a href="#appendix-A-2.6.1" class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="appendix-A-2.7">
+                    <p id="appendix-A-2.7.1">Valentin Gosu<a href="#appendix-A-2.7.1" class="pilcrow">¶</a></p>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <section id="appendix-B">
+        <h2 id="name-index">
+            <a href="#name-index" class="section-name selfRef">색인</a>
+        </h2>
+        <div id="rfc.index.index">
+            <p id="appendix-B-1">
+                <a href="#rfc.index.u68" class="internal xref">D</a>
+                <a href="#rfc.index.u69" class="internal xref">E</a>
+                <a href="#rfc.index.u79" class="internal xref">O</a>
+                <a href="#rfc.index.u80" class="internal xref">P</a><a href="#appendix-B-1" class="pilcrow">¶</a>
+            </p>
+        </div>
+        <ul class="normal ulEmpty">
+            <li class="normal ulEmpty" id="appendix-B-2.1">
+                <div id="rfc.index.u68">
+                    <p id="appendix-B-2.1.1" class="keepWithNext">
+                        <a href="#rfc.index.u68" class="internal xref">D</a><a href="#appendix-B-2.1.1"
+                            class="pilcrow">¶</a>
+                    </p>
+                </div>
+                <ul class="compact normal ulEmpty">
+                    <li class="compact normal ulEmpty" id="appendix-B-2.1.2.1">
+                        <span class="break"></span>
+                        <dl class="dlCompact dlParallel" id="appendix-B-2.1.2.1.1">
+                            <dt id="appendix-B-2.1.2.1.1.1">기본 URL variation config</dt>
+                            <dd style="margin-left: 1.5em" id="appendix-B-2.1.2.1.1.2">
+                                <p id="appendix-B-2.1.2.1.1.2.1">
+                                    <strong><em><a href="#section-4-3" class="auto internal xref">Section 4, Paragraph
+                                                3</a></em></strong>;
+                                    <a href="#section-5.1-2.1.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.1.1</a>;
+                                    <a href="#section-5.1-2.4.2.1.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.4.2.1.1</a>;
+                                    <a href="#section-5.1-2.5.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.5.1</a>;
+                                    <a href="#section-5.1-2.6.2.1.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.6.2.1.1</a>;
+                                    <a href="#section-5.1-2.6.2.2.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.6.2.2.1</a>;
+                                    <a href="#section-5.1-2.6.2.4.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.6.2.4.1</a>;
+                                    <a href="#section-5.1-2.7.2.1.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.7.2.1.1</a>;
+                                    <a href="#section-5.1-2.7.2.2.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.7.2.2.1</a>;
+                                    <a href="#section-5.1-2.7.2.4.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.7.2.4.1</a>;
+                                    <a href="#section-5.1-3.1" class="auto internal xref">Section 5.1, Paragraph
+                                        3.1</a>;
+                                    <a href="#section-5.2.1-3" class="auto internal xref">Section 5.2.1, Paragraph
+                                        3</a>;
+                                    <a href="#section-6-2.2.1" class="auto internal xref">Section 6, Paragraph
+                                        2.2.1</a><a href="#appendix-B-2.1.2.1.1.2.1" class="pilcrow">¶</a>
+                                </p>
+                            </dd>
+                            <dd class="break"></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </li>
+            <li class="normal ulEmpty" id="appendix-B-2.2">
+                <div id="rfc.index.u69">
+                    <p id="appendix-B-2.2.1" class="keepWithNext">
+                        <a href="#rfc.index.u69" class="internal xref">E</a><a href="#appendix-B-2.2.1"
+                            class="pilcrow">¶</a>
+                    </p>
+                </div>
+                <ul class="compact normal ulEmpty">
+                    <li class="compact normal ulEmpty" id="appendix-B-2.2.2.1">
+                        <span class="break"></span>
+                        <dl class="dlCompact dlParallel" id="appendix-B-2.2.2.1.1">
+                            <dt id="appendix-B-2.2.2.1.1.1">variation config를 모듈로 한 동등성</dt>
+                            <dd style="margin-left: 1.5em" id="appendix-B-2.2.2.1.1.2">
+                                <p id="appendix-B-2.2.2.1.1.2.1">
+                                    <strong><em><a href="#section-6-1" class="auto internal xref">Section 6, Paragraph
+                                                1</a></em></strong><a href="#appendix-B-2.2.2.1.1.2.1"
+                                        class="pilcrow">¶</a>
+                                </p>
+                            </dd>
+                            <dd class="break"></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </li>
+            <li class="normal ulEmpty" id="appendix-B-2.3">
+                <div id="rfc.index.u79">
+                    <p id="appendix-B-2.3.1" class="keepWithNext">
+                        <a href="#rfc.index.u79" class="internal xref">O</a><a href="#appendix-B-2.3.1"
+                            class="pilcrow">¶</a>
+                    </p>
+                </div>
+                <ul class="compact normal ulEmpty">
+                    <li class="compact normal ulEmpty" id="appendix-B-2.3.2.1">
+                        <span class="break"></span>
+                        <dl class="dlCompact dlParallel" id="appendix-B-2.3.2.1.1">
+                            <dt id="appendix-B-2.3.2.1.1.1">URL variation config 얻기</dt>
+                            <dd style="margin-left: 1.5em" id="appendix-B-2.3.2.1.1.2">
+                                <p id="appendix-B-2.3.2.1.1.2.1">
+                                    <a href="#section-3-5.1" class="auto internal xref">Section 3, Paragraph 5.1</a>;
+                                    <a href="#section-4-4" class="auto internal xref">Section 4, Paragraph 4</a>;
+                                    <strong><em><a href="#section-5.2-1" class="auto internal xref">Section 5.2,
+                                                Paragraph 1</a></em></strong><a href="#appendix-B-2.3.2.1.1.2.1"
+                                        class="pilcrow">¶</a>
+                                </p>
+                            </dd>
+                            <dd class="break"></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </li>
+            <li class="normal ulEmpty" id="appendix-B-2.4">
+                <div id="rfc.index.u80">
+                    <p id="appendix-B-2.4.1" class="keepWithNext">
+                        <a href="#rfc.index.u80" class="internal xref">P</a><a href="#appendix-B-2.4.1"
+                            class="pilcrow">¶</a>
+                    </p>
+                </div>
+                <ul class="compact normal ulEmpty">
+                    <li class="compact normal ulEmpty" id="appendix-B-2.4.2.1">
+                        <span class="break"></span>
+                        <dl class="dlCompact dlParallel" id="appendix-B-2.4.2.1.1">
+                            <dt id="appendix-B-2.4.2.1.1.1">키 파싱</dt>
+                            <dd style="margin-left: 1.5em" id="appendix-B-2.4.2.1.1.2">
+                                <p id="appendix-B-2.4.2.1.1.2.1">
+                                    <a href="#section-5.1-2.6.2.3.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.6.2.3.1</a>;
+                                    <a href="#section-5.1-2.7.2.3.1" class="auto internal xref">Section 5.1, Paragraph
+                                        2.7.2.3.1</a>;
+                                    <strong><em><a href="#section-5.3-1" class="auto internal xref">Section 5.3,
+                                                Paragraph 1</a></em></strong>;
+                                    <a href="#section-5.3.1-1" class="auto internal xref">Section 5.3.1, Paragraph
+                                        1</a><a href="#appendix-B-2.4.2.1.1.2.1" class="pilcrow">¶</a>
+                                </p>
+                            </dd>
+                            <dd class="break"></dd>
+                            <dt id="appendix-B-2.4.2.1.1.3">URL variation config 파싱</dt>
+                            <dd style="margin-left: 1.5em" id="appendix-B-2.4.2.1.1.4">
+                                <p id="appendix-B-2.4.2.1.1.4.1">
+                                    <strong><em><a href="#section-5.1-1" class="auto internal xref">Section 5.1,
+                                                Paragraph 1</a></em></strong>;
+                                    <a href="#section-5.2-2.2.1" class="auto internal xref">Section 5.2, Paragraph
+                                        2.2.1</a><a href="#appendix-B-2.4.2.1.1.4.1" class="pilcrow">¶</a>
+                                </p>
+                            </dd>
+                            <dd class="break"></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+    <div id="authors-addresses">
+        <section id="appendix-C">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Domenic Denicola</span></div>
+                <div dir="auto" class="left"><span class="org">Google LLC</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:d@domenic.me" class="email">d@domenic.me</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Jeremy Roman</span></div>
+                <div dir="auto" class="left"><span class="org">Google LLC</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:jbroman@chromium.org" class="email">jbroman@chromium.org</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Nidhi Jaju (<span class="role">편집자</span>)</span>
+                </div>
+                <div dir="auto" class="left"><span class="org">Google LLC</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:nidhijaju@chromium.org" class="email">nidhijaju@chromium.org</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script>const toc = document.getElementById("toc");
+        toc.querySelector("h2").addEventListener("click", e => {
+            toc.classList.toggle("active");
+        });
+        toc.querySelector("nav").addEventListener("click", e => {
+            toc.classList.remove("active");
+        });
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>

@@ -541,6 +541,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [The Cache-Status HTTP Response Header Field](https://ko.htmlspecs.com/http/rfc9211.html)（[Source](https://httpwg.org/specs/rfc9211.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Targeted HTTP Cache Control](https://ko.htmlspecs.com/http/rfc9213.html)（[Source](https://httpwg.org/specs/rfc9213.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [HTTP Cache Groups](https://ko.htmlspecs.com/http/rfc9875.html)（[Source](https://httpwg.org/specs/rfc9875.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The No-Vary-Search HTTP Caching Extension](https://ko.htmlspecs.com/http/no-vary-search.html)（[Source](https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 표현 메타데이터, 링크 및 콘텐츠 인코딩
 - [HTTP State Management Mechanism](https://ko.htmlspecs.com/http/rfc6265.html)（[Source](https://httpwg.org/specs/rfc6265.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
