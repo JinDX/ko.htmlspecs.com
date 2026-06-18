@@ -1682,7 +1682,7 @@ For darkmode:
         </p>
         <h1 class="no-ref p-name" id="title">CSS 컬러 모듈 레벨 5</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types/#WD">W3C 워킹 드래프트</a>,
-            <time class="dt-updated" datetime="2026-06-05">2026년 6월 5일</time>
+            <time class="dt-updated" datetime="2026-06-18">2026년 6월 18일</time>
         </p>
         <details open>
             <summary>이 문서에 대한 자세한 정보</summary>
@@ -1690,14 +1690,14 @@ For darkmode:
                 <dl>
                     <dt>이 버전:
                     <dd><a class="u-url"
-                            href="https://www.w3.org/TR/2026/WD-css-color-5-20260605/">https://www.w3.org/TR/2026/WD-css-color-5-20260605/</a>
+                            href="https://www.w3.org/TR/2026/WD-css-color-5-20260618/">https://www.w3.org/TR/2026/WD-css-color-5-20260618/</a>
                     <dt>최신 공식 버전:
                     <dd><a href="https://www.w3.org/TR/css-color-5/">https://www.w3.org/TR/css-color-5/</a>
                     <dt>에디터스 드래프트:
                     <dd><a href="https://drafts.csswg.org/css-color-5/">https://drafts.csswg.org/css-color-5/</a>
                     <dt>이전 버전:
-                    <dd><a href="https://www.w3.org/TR/2024/WD-css-color-5-20240229/"
-                            rel="prev">https://www.w3.org/TR/2024/WD-css-color-5-20240229/</a>
+                    <dd><a href="https://www.w3.org/TR/2026/WD-css-color-5-20260605/"
+                            rel="prev">https://www.w3.org/TR/2026/WD-css-color-5-20260605/</a>
                     <dd><a href="https://www.w3.org/TR/2026/CRD-css-color-4-20260502/"
                             rel="prev">https://www.w3.org/TR/2026/CRD-css-color-4-20260502/</a>
                     <dt>히스토리:
@@ -2929,134 +2929,178 @@ For darkmode:
                 class="content">
                 상대 색상에 대한 처리 모델
             </span><a class="self-link" href="#rcs-intro"></a></h3>
-        <p>이 명세의 이전 레벨에서는
-            색상 함수를 통해 각 색상 성분을 직접 지정하는
-            절대적인 방식만 허용되었습니다.</p>
-        <p>새로운 <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="relative-color">상대 색상(relative color)</dfn>
+        <p>이 명세의 이전 수준에서는
+            색상 함수가 모든 색상 구성 요소를 직접 지정하여
+            절대적인 방식으로만 색상을 지정할 수 있었다.</p>
+        <p>새로운 <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="relative-color">상대 색상</dfn>
             구문은
             <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#modern-color-syntax"
-                id="ref-for-modern-color-syntax">현대 색상 구문</a>을 확장합니다.
-            즉, 기존 색상을 색상 함수에서 변경할 수 있게 해줍니다.
-            <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="origin-color">원본 색상(origin color)</dfn>이
+                id="ref-for-modern-color-syntax">현대 색상 구문</a>을 확장하여
+            기존 색상이 색상 함수를 사용해
+            수정될 수 있게 한다:
+            <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="origin-color">원본 색상</dfn>이
             지정되면,
-            각 색상 성분(및 알파 값까지)
-            <em>직접 지정하거나</em>
-            원본 색상에서 가져오거나
+            각 색상 구성 요소
+            (그리고 지정된 경우 alpha 구성 요소)는
+            직접 지정되거나,
+            원본 색상에서 가져올 수 있다
             (그리고 <a data-link-type="dfn" href="https://www.w3.org/TR/css-values-4/#math-function"
-                id="ref-for-math-function">수학 함수</a>로 조정)할 수 있습니다.
-        </p>
-        <p>원본 색상과 상대 색상은 동일한 색상 함수를 사용하지 않아도 됩니다.</p>
-        <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="required-conversion">필수 변환(Required
-                conversion)</dfn>:
+                id="ref-for-math-function">수학 함수</a>로 수정될 수도 있다).</p>
+        <p>대부분의 상대 색상은
+            색상 구성 요소와
+            alpha 구성 요소를 모두 수정할 수 있다.
+            그러나 alpha 구성 요소만 수정되는
+            더 단순하고 제한적인 형식도 있다.</p>
+        <div class="example" id="ex-easy-rcs">
+            <a class="self-link" href="#ex-easy-rcs"></a>
+            예를 들어, 여기서는 상대 색상을 사용해
+            기존 색상의 덜 선명한 변형을 만든다:
+
+            <pre>--base: <span class="swatch" style="--color: gold"></span> gold;
+--softerbase: <span class="swatch" style="--color: oklch(88.68% 0.164 95.33)"></span> oklch(from var(--base) l calc(c * 0.9) h);
+</pre>
+            <p>반면 여기서는 불투명도만 변경한다:</p>
+            <pre>--marker: <span class="swatch" style="--color: teal"></span> teal;
+--palemarker: <span class="swatch" style="--color: rgb(0% 50.2% 50.2% / 70%)"></span> alpha(from var(--marker) / 0.7);
+</pre>
+        </div>
+        <p>원본 색상과 상대 색상은 같은 색상 함수를 사용할 필요가 없다.
+            따라서 우리는 <dfn class="dfn-paneled" data-dfn-type="dfn" data-export
+                id="relative-color-processing-space">상대 색상 처리 공간</dfn>을 정의한다.
+            이는 색상 값 계산이 이루어지는 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#color-space"
+                id="ref-for-color-space">색상 공간</a>이며;
+            이는 상대 색상 결과의 직렬화에도 영향을 준다.</p>
+        <ul>
+            <li data-md>
+                <p>alpha 전용 형식의 경우,
+                    <a data-link-type="dfn" href="#relative-color-processing-space"
+                        id="ref-for-relative-color-processing-space">상대 색상 처리 공간</a>은
+                    원본 색상의 공간이다.</p>
+            <li data-md>
+                <p>색상에 영향을 주는 형식의 경우,
+                    <a data-link-type="dfn" href="#relative-color-processing-space"
+                        id="ref-for-relative-color-processing-space①">상대 색상 처리 공간</a>은
+                    상대 색상 함수의 공간이다.</p>
+        </ul>
+        <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="required-conversion">필수 변환</dfn>:
             모든 연산은
-            <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#color-space" id="ref-for-color-space">상대 색상
-                함수의
-                색상 공간</a>에서 수행됩니다.
-            만일
-            <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="originally-specified-color-space">원래 지정된 색상
-                공간(originally
-                specified color space)</dfn>
-            을 가진 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color">원본 색상</a>이
-            다른 색상 함수였다면,
-            반드시 선택한 색상 함수로 변환해야 합니다.
-            그래야 그 구성 요소 값이 의미를 가지며,
-            <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword">구성 요소 키워드</a>도
-            원본 색상이 아니라 상대 색상 함수를 기준으로 적용됩니다.
+            <a data-link-type="dfn" href="#relative-color-processing-space"
+                id="ref-for-relative-color-processing-space②">상대 색상 처리 공간</a>에서 수행된다.
+            <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color">원본 색상</a>에 대한
+            <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="originally-specified-color-space">원래
+                지정된 색상 공간</dfn>이
+            다른 색상 함수를 사용했다면,
+            먼저 <span id="ref-for-relative-color-processing-space③">상대 색상 처리
+                공간</span>으로 변환되어,
+            구성 요소에 대해 의미 있는 값을 가지게 되고,
+            색상 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword">구성 요소
+                키워드</a>는
+            그 색상 공간을 가리킨다.
         </p>
-        <p>상대 색상의 알파 값이 명시되지 않으면,
-            <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②">원본 색상</a>의 알파가 기본값입니다
-            (절대 구문과 달리 <span class="css">100%</span>가 아닙니다).
+        <p>상대 색상의 alpha 값이 생략되면,
+            절대 구문에서처럼 <span class="css">100%</span>가 기본값이 되는 것이 아니라,
+            <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①">원본
+                색상</a>의 alpha 값이 기본값이 된다.</p>
+        <p>상대 색상 구문이 사용될 때,
+            직접 지정되었든
+            색상 공간 변환에서 비롯되었든,
+            <strong>색상 구성 요소</strong> 값은
+            기준 범위로 <em>클램프되지 않고</em> 있는 그대로 유지된다.
+            이는 대상 색상 공간이 이를 표현할 수 있는 경우,
+            색역 밖의 값을 보존한다.
         </p>
-        <p>상대 색상 구문을 사용할 때는,
-            <strong>색상 성분</strong> 값은
-            직접 지정하든 색 공간 변환에서 나오든
-            <em>기준 레인지로 클램프(clamp)하지 않고</em> 그대로 남아 있게 됩니다.
-            그래서 대상 색상 공간이 표현할 수 있으면,
-            색역 밖(out of gamut) 값도 보존됩니다.
+        <p>그러나 상대 색상 구문이 사용될 때,
+            직접 지정되었든
+            색상 공간 변환에서 비롯되었든,
+            <strong>alpha 구성 요소</strong> 값은
+            기준 범위로 클램프<em>된다</em>.
         </p>
-        <p>그러나 상대 색상 구문을 사용할 때,
-            <strong>알파(투명도) 성분</strong> 값은
-            직접 지정됐든 변환됐든
-            <em>반드시</em> 기준 레인지로 클램프됩니다.
-        </p>
-        <p>컴포넌트가 빠진 경우는
-            <a href="https://www.w3.org/TR/css-color-4/#interpolation-missing"><cite>CSS Color 4</cite> § 13.2
-                Interpolating with Missing Components</a>와 동일하게 처리합니다:
-            원본 색상 공간과 상대 함수 색상 공간 모두
+        <p>누락된 구성 요소는
+            <a href="https://www.w3.org/TR/css-color-4/#interpolation-missing"><cite>CSS Color 4</cite> § 13.2
+                누락된 구성 요소로 보간하기</a>와 같은 방식으로 처리된다:
+            원본 색상 공간과 상대 함수 색상 공간에서
             <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#analogous-components"
-                id="ref-for-analogous-components">유사 성분(analogous components)</a>을 확인해
+                id="ref-for-analogous-components">유사한 구성 요소</a>가
+            확인되고, 그러한 구성 요소는 누락된 것으로
             <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#carried-forward"
-                id="ref-for-carried-forward">forward</a>로 넘깁니다.
+                id="ref-for-carried-forward">전달된다</a>.
         </p>
-        <p>대부분의 <a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①">상대 색상</a> 구문 활용은
-            <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①">구성 요소 키워드</a>를
-            해당 인자(argument) 위치에 쓰지만,
-            어느 위치에서도 사용할 수 있습니다.
-        </p>
-        <p>구성 요소를 기본 위치가 아닌 곳에 쓰면
-            주의해야 합니다.
-            만일 %값이 숫자로 변환되어 다른 위치에서 쓰일 때에는
-            "매직 스케일(magic scaling)"이 없어
-            의도와 달라질 수 있습니다.</p>
-        <p><a class="css" data-link-type="maybe" href="#funcdef-device-cmyk"
-                id="ref-for-funcdef-device-cmyk③">device-cmyk()</a>는 상대 구문이 없습니다.</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color">상대
+                색상</a> 구문의 대부분의 사용은
+            <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①">구성 요소
+                키워드</a>를 해당 인수에서 사용하겠지만,
+            어떤 위치에서도 사용할 수 있다.</p>
+        <p>구성 요소를 일반적인 위치 밖에서 사용할 때는 주의하라;
+            백분율이 숫자로 해석될 때,
+            그 숫자가 다른 위치에서 사용되더라도
+            변경된 위치를 보정하기 위한
+            "마법 같은 스케일링"은 없다.</p>
+        <p>상대 <a class="css" data-link-type="maybe" href="#funcdef-device-cmyk"
+                id="ref-for-funcdef-device-cmyk③">device-cmyk()</a> 구문은 없다.</p>
         <h3 class="heading settled" data-level="4.2" id="relative-syntax"><span class="secno">4.2. </span><span
                 class="content">
                 상대 색상 구문(Relative Color Syntax)
             </span><a class="self-link" href="#relative-syntax"></a></h3>
-        <p>각 함수가 <a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color②">상대 색상</a>
-            을 수용하도록 구문이 어떻게 확장되는지의
-            구체적인 내용은 아래와 같지만, 모두 공통 구조를 따릅니다:</p>
+        <p>각 함수가 <a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①">상대
+                색상</a>을 수용하기 위해 갖는
+            구문 변경의 정확한 세부 사항은 아래에 나열되어 있지만,
+            모두 공통 구조를 따른다:</p>
         <ul>
             <li data-md>
-                <p><a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③">원본 색상(origin color)</a>은
-                    함수 시작에 <span class="css">from <a class="css production" data-link-type="type" href="#typedef-color"
-                            id="ref-for-typedef-color⑤">&lt;color></a></span> 값을 넣어서 지정할 수 있습니다.
-                    지정하면 선택적 알파 값도 포함할 수 있습니다.</p>
+                <p><a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②">원본 색상</a>은
+                    함수의 시작 부분에서 <span class="css">from <a class="css production" data-link-type="type"
+                            href="#typedef-color" id="ref-for-typedef-color⑤">&lt;color></a></span> 값으로
+                    지정될 수 있다.
+                    여기에는 지정된 경우 선택적 alpha 구성 요소가 포함된다.</p>
             <li data-md>
-                <p>원본 색상을 지정하지 않으면, 해당 함수는 상대 색상이 아닙니다.</p>
+                <p>원본 색상이 지정되지 않으면, 그 함수는 상대 색상이 아니다.</p>
             <li data-md>
-                <p><a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④">원본 색상</a>이
+                <p><a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③">원본 색상</a>이
                     지정되면,
-                    나머지 인자는 평소처럼 직접 지정하거나,
-                    <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="component-keyword">구성 요소
-                        키워드(component keyword)</dfn>
-                    로 원본 색상의 해당 컴포넌트 값을,
-                    상대 색상의 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#color-space"
-                        id="ref-for-color-space①">색상 공간</a>으로 변환한 값으로 지정할 수도 있습니다.
+                    나머지 인수는 일반적인 방식으로 직접 지정될 수도 있고,
+                    <a data-link-type="dfn" href="#relative-color-processing-space"
+                        id="ref-for-relative-color-processing-space④">상대 색상 처리 공간</a>으로 변환된
+                    <span id="ref-for-origin-color④">원본 색상</span>의 구성 요소 중 하나를 가리키는
+                    <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport
+                        id="component-keyword">구성 요소 키워드</dfn>로
+                    지정될 수도 있다.
                     <a data-link-type="dfn" href="https://www.w3.org/TR/css-values-4/#math-function"
-                        id="ref-for-math-function①">수학 함수(Math functions)</a> 역시 이 키워드를 써서
-                    원본 색상 <span id="ref-for-origin-color⑥">컴포넌트</span>를 동적으로 변형할 수 있습니다.
+                        id="ref-for-math-function①">수학 함수</a>도 이러한 키워드를 사용하여
+                    <span id="ref-for-origin-color⑤">원본 색상</span>의 구성 요소를
+                    동적으로 수정할 수 있다.
                 </p>
             <li data-md>
-                <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color③">상대 색상</a> 구문은, 인자가 필수인지
-                    옵션인지는 영향을 주지 않습니다.</p>
+                <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color②">상대 색상</a> 구문은
+                    어떤 인수가 필수인지 선택 사항인지 여부를 변경하지 않는다.</p>
             <li data-md>
-                <p>상대 색상 구문은 반드시 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#modern-color-syntax"
-                        id="ref-for-modern-color-syntax①">현대(Modern) 색상 구문</a>에만 적용됩니다.
-                    <em>절대</em> <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#legacy-color-syntax"
-                        id="ref-for-legacy-color-syntax">레거시 색상 구문</a>에는 사용할 수 없으며,
-                    그렇게 시도하면 오류입니다.
-                </p>
+                <p>상대 색상 구문은 <a data-link-type="dfn"
+                        href="https://www.w3.org/TR/css-color-4/#modern-color-syntax"
+                        id="ref-for-modern-color-syntax①">현대 색상 구문</a>에만 적용된다.
+                    이는 <a data-link-type="dfn"
+                        href="https://www.w3.org/TR/css-color-4/#legacy-color-syntax"
+                        id="ref-for-legacy-color-syntax">레거시 색상 구문</a>과 함께 사용할 수
+                    <em>없으며</em>,
+                    그렇게 시도하는 것은 오류이다.</p>
             <li data-md>
-                <p>단, <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color⑦">원본 색상</a> 지정에는 모던 또는 레거시
-                    구문 모두 사용할 수 있습니다.</p>
+                <p>그러나 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color⑥">원본 색상</a>은
+                    현대 구문이나 레거시 구문 중 어느 쪽도 사용할 수 있다.</p>
         </ul>
-        <p><a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword②">구성요소 키워드</a>는
-            <a class="css production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value"
-                id="ref-for-number-value">&lt;number></a> 또는 <a class="css" data-link-type="maybe"
-                href="#valdef-light-dark-none" id="ref-for-valdef-light-dark-none">none</a>을 반환한다;
-            원래 <a class="css production" data-link-type="type"
+        <p><a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword②">구성 요소 키워드</a>는
+            <a class="css production" data-link-type="type"
+                href="https://www.w3.org/TR/css-values-4/#number-value" id="ref-for-number-value">&lt;number></a> 또는 <a
+                class="css" data-link-type="maybe" href="#valdef-light-dark-none"
+                id="ref-for-valdef-light-dark-none">none</a>을 반환한다;
+            그것들이 원래 <a class="css production" data-link-type="type"
                 href="https://www.w3.org/TR/css-values-4/#percentage-value"
                 id="ref-for-percentage-value①">&lt;percentage></a> 또는 <a class="css production" data-link-type="type"
-                href="https://www.w3.org/TR/css-values-4/#angle-value" id="ref-for-angle-value">&lt;angle></a>로
-            지정된 경우, 그 <span class="production" id="ref-for-percentage-value②">&lt;percentage></span>는 <span
+                href="https://www.w3.org/TR/css-values-4/#angle-value" id="ref-for-angle-value">&lt;angle></a>로 지정되었다면,
+            그 <span class="production" id="ref-for-percentage-value②">&lt;percentage></span>는 <span
                 class="production" id="ref-for-number-value①">&lt;number></span>로 해석되고
-            <span class="production" id="ref-for-angle-value①">&lt;angle></span>는
-            범위 [0, 360] 안의 도 단위 <span class="production" id="ref-for-number-value②">&lt;number></span>로 해석된다
+            <span class="production" id="ref-for-angle-value①">&lt;angle></span>은
+            범위 [0, 360] 안에서 도 단위의 <span
+                class="production" id="ref-for-number-value②">&lt;number></span>로 해석된다
             (이는 <a data-link-type="dfn" href="https://www.w3.org/TR/css-values-4/#canonical-unit"
-                id="ref-for-canonical-unit">표준 단위</a>이다).
-        </p>
+                id="ref-for-canonical-unit">정규 단위</a>이다).</p>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
             <summary>테스트</summary>
             <ul class="wpt-tests-list">
@@ -3283,10 +3327,11 @@ For darkmode:
         </div>
         <div class="example" id="example-2a49656f">
             <a class="self-link" href="#example-2a49656f"></a>
-            <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword③">구성 요소 키워드</a>를
-            <a data-link-type="dfn" href="https://www.w3.org/TR/css-values-4/#math-function"
-                id="ref-for-math-function②">수학 함수</a>로 활용하면,
-            <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color⑧">원본 색상</a>을 더 복잡하게 변형할 수 있습니다.
+            <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword③">구성 요소
+                키워드</a>를 <a data-link-type="dfn" href="https://www.w3.org/TR/css-values-4/#math-function"
+                id="ref-for-math-function②">수학 함수</a>에서 사용함으로써,
+            <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color⑦">원본 색상</a>을
+            더 고급 방식으로 조작할 수 있다.
 
 
             <pre class="highlight">html <c- p>{</c-> <c- k>--color</c-><c- p>:</c-> green<c- p>;</c-> <c- p>}</c->
@@ -3294,19 +3339,21 @@ For darkmode:
   <c- k>--darker-accent</c-><c- p>:</c-> <c- nf>lch</c-><c- p>(</c->from <c- nf>var</c-><c- p>(</c->--color<c- p>)</c-> <c- nf>calc</c-><c- p>(</c->l / <c- m>2</c-><c- p>)</c-> c h<c- p>);</c->
 <c- p>}</c->
 </pre>
-            <p>이 예시에서는 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color⑨">원본 색상</a>의 명도(lightness)만
-                절반으로 낮춰
-                색상을 어둡게 했습니다.
-                나머지 성분은 그대로 유지됩니다.</p>
-            <p>참고로 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①⓪">원본 색상</a>은 색상 키워드(sRGB)이지만,
-                <a class="css" data-link-type="maybe" href="#funcdef-lch" id="ref-for-funcdef-lch②">lch()</a> 함수에서 사용되므로
-                자동으로 LCH 색상으로 해석됩니다.
-            </p>
+            <p>이 예제에서 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color⑧">원본
+                    색상</a>은 색상의 다른 어떤 측면도 변경하지 않고,
+                명도를 절반으로 줄여
+                어둡게 된다.</p>
+            <p>또한 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color⑨">원본
+                    색상</a>은 색상 키워드
+                (따라서 sRGB)이지만,
+                <a class="css" data-link-type="maybe" href="#funcdef-lch"
+                    id="ref-for-funcdef-lch②">lch()</a> 함수에서 사용되기 때문에
+                자동으로 LCH 색상으로 해석된다는 점에 유의하라.</p>
         </div>
-        <div class="example" id="example-1374fcad">
-            <a class="self-link" href="#example-1374fcad"></a>
-            예를 들어, 테마 색상이 불투명하게 지정되어 있지만
-            실제로는 부분적으로 투명하게 사용하고 싶을 때:
+        <div class="example" id="example-90bb3262">
+            <a class="self-link" href="#example-90bb3262"></a>
+            예를 들어, 테마 색상이 불투명하게 지정되어 있지만,
+            특정 경우에는 부분적으로 투명해야 한다면:
 
 
             <pre class="highlight">html <c- p>{</c-> <c- k>--bg-color</c-><c- p>:</c-> <span class="swatch" style="--color: blue"></span> blue<c- p>;</c-> <c- p>}</c->
@@ -3314,11 +3361,21 @@ For darkmode:
   <c- k>background</c-><c- p>:</c-> <span class="swatch" style="--color: rgb(0,0,255,80%)"></span> <c- nf>rgb</c-><c- p>(</c->from <c- nf>var</c-><c- p>(</c->--bg-color<c- p>)</c-> r g b / <c- m>80</c-><c- k>%</c-><c- p>);</c->
 <c- p>}</c->
 </pre>
-            <p>이 예시에서 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①①">원본 색상</a>의 r, g, b 성분은
-                그대로 유지되고,
-                알파만 80%로 설정되어 약간 투명해집니다.
-                <span id="ref-for-origin-color①②">(원본 색상의 알파가 무엇이었든 상관없음)</span>
-            </p>
+            <p>이 예제에서 <a data-link-type="dfn" href="#origin-color"
+                    id="ref-for-origin-color①⓪">원본 색상</a>의 r, g, b 구성 요소는 변경되지 않으며,
+                이는 <span id="ref-for-origin-color①①">원본 색상</span>에서 값을 가져오는
+                키워드로 지정함으로써 표시된다.
+                그러나 불투명도는 <span class="css">80%</span>로 설정되어 약간 투명해지며,
+                <span id="ref-for-origin-color①②">원본 색상</span>의 불투명도가 무엇이었는지는 관계없다.</p>
+            <p>이 예제는 구문적으로 올바르고,
+                어떤 일이 일어나는지 보여 주지만,
+                변경되지 않은 색상 구성 요소를 나열할 필요가 없게 해 주는,
+                alpha 전용 조작의 이 특정 경우를 위한 더 단순한 형식이 있다:</p>
+            <pre class="highlight">html <c- p>{</c-> <c- k>--bg-color</c-><c- p>:</c-> <span class="swatch" style="--color: blue"></span> blue<c- p>;</c-> <c- p>}</c->
+.overlay <c- p>{</c->
+  <c- k>background</c-><c- p>:</c-> <span class="swatch" style="--color: rgb(0,0,255,80%)"></span> <c- nf>alpha</c-><c- p>(</c->from <c- nf>var</c-><c- p>(</c->--bg-color<c- p>)</c-> / <c- m>80</c-><c- k>%</c-><c- p>);</c->
+<c- p>}</c->
+</pre>
         </div>
         <div class="example" id="example-b1f4bd13">
             <a class="self-link" href="#example-b1f4bd13"></a>
@@ -3409,7 +3466,7 @@ For darkmode:
         <div class="example" id="ex-missing-analogous">
             <a class="self-link" href="#ex-missing-analogous"></a>
             이 예시에서는 무채색 원본 색상에 hue가 없고,
-            <a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color④">상대 색상</a> 역시
+            <a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color③">상대 색상</a> 역시
             hue가 없어,
             그 색상을 이용하는 그라데이션에도 영향을 줍니다.
 
@@ -3465,34 +3522,33 @@ For darkmode:
         [ <a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value" id="ref-for-number-value⑧">&lt;number></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one②②">|</a> <a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#percentage-value" id="ref-for-percentage-value⑤">&lt;percentage></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one②③">|</a> none]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-num" id="ref-for-mult-num①">{3}</a>
         [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value①">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one②④">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt⑤">?</a>  )
 </pre>
-        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑤">상대 색상</a> 구문의 <a class="css"
-                data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#funcdef-rgb"
-                id="ref-for-funcdef-rgb④">rgb()</a>/<a class="css" data-link-type="maybe"
-                href="https://www.w3.org/TR/css-color-4/#funcdef-rgba" id="ref-for-funcdef-rgba④">rgba()</a> 함수에서는
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword④">구성 요소 키워드</a>가 다음과
-            같습니다:</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color④">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#funcdef-rgb"
+                id="ref-for-funcdef-rgb④">rgb()</a> 또는 <a class="css" data-link-type="maybe"
+                href="https://www.w3.org/TR/css-color-4/#funcdef-rgba" id="ref-for-funcdef-rgba④">rgba()</a> 함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword④">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="rgb()" data-dfn-type="value" data-export
                         id="valdef-rgb-r">r</dfn>, <dfn class="css dfn-paneled" data-dfn-for="rgb()"
-                        data-dfn-type="value" data-export id="valdef-rgb-g">g</dfn>, <dfn class="css dfn-paneled"
-                        data-dfn-for="rgb()" data-dfn-type="value" data-export id="valdef-rgb-b">b</dfn>
-                    : <a class="css production" data-link-type="type"
+                        data-dfn-type="value" data-export id="valdef-rgb-g">g</dfn>, 그리고 <dfn class="css dfn-paneled"
+                        data-dfn-for="rgb()" data-dfn-type="value" data-export id="valdef-rgb-b">b</dfn>는
+                    모두 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value⑨">&lt;number></a> 값이며,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①④">원본 색상</a>의 빨강/초록/파랑 컴포넌트에
-                    해당합니다
-                    (필요하다면 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion">sRGB
-                        변환</a> 후 결과).
-                    255.0은 100%와 같습니다.
-                </p>
+                        id="ref-for-number-value⑨">&lt;number></a>이며,
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color①③">원본 색상</a>이 필요하다면 sRGB로
+                    <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion">변환된 후</a>의 빨강, 초록, 파랑 구성 요소에 대응한다.
+                    255.0은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="rgb()" data-dfn-type="value" data-export
-                        id="valdef-rgb-alpha">alpha</dfn> : <a class="css production" data-link-type="type"
+                        id="valdef-rgb-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①④">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value①⓪">&lt;number></a> 값이며,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①⑤">원본 색상</a>의 알파 투명도에 해당합니다.
-                    1.0은 100%와 같습니다.
+                        id="ref-for-number-value①⓪">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
         </ul>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
@@ -3570,43 +3626,42 @@ For darkmode:
         [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#percentage-value" id="ref-for-percentage-value⑨">&lt;percentage></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one③④">|</a> <a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value" id="ref-for-number-value①④">&lt;number></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one③⑤">|</a> none]
         [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value③">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one③⑥">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt⑨">?</a> )
 </pre>
-        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑥">상대 색상</a> 구문 안의 <a class="css"
-                data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#funcdef-hsl"
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑤">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#funcdef-hsl"
                 id="ref-for-funcdef-hsl⑤">hsl()</a> 또는 <a class="css" data-link-type="maybe"
-                href="https://www.w3.org/TR/css-color-4/#funcdef-hsla" id="ref-for-funcdef-hsla⑤">hsla()</a> 함수에서
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑤">구성 요소 키워드</a>는 다음과
-            같습니다:</p>
+                href="https://www.w3.org/TR/css-color-4/#funcdef-hsla" id="ref-for-funcdef-hsla⑤">hsla()</a> 함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑤">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="hsl()" data-dfn-type="value" data-export
-                        id="valdef-hsl-h">h</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-hsl-h">h</dfn>는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
                         id="ref-for-number-value①⑤">&lt;number></a>이며,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①⑥">원본 색상</a>의 HSL 색상각(hue)에
-                    해당합니다(도 단위).
-                    sRGB로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①">변환이
-                        필요하면 변환 후</a>, [0, 360] 범위로 정규화됩니다. 90은 90deg와 동일합니다.
-                </p>
+                    필요하다면 sRGB로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①">변환된 후</a>,
+                    [0, 360] 범위로 정규화된 <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color①⑤">원본 색상</a>의 HSL 색조에 도 단위로 대응한다.
+                    90은 90deg와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="hsl()" data-dfn-type="value" data-export
-                        id="valdef-hsl-s">s</dfn> 및 <dfn class="css dfn-paneled" data-dfn-for="hsl()"
-                        data-dfn-type="value" data-export id="valdef-hsl-l">l</dfn> 은
+                        id="valdef-hsl-s">s</dfn>와 <dfn class="css dfn-paneled" data-dfn-for="hsl()"
+                        data-dfn-type="value" data-export id="valdef-hsl-l">l</dfn>은
                     <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value①⑥">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①⑦">원본 색상</a>의
-                    HSL 채도(saturation) 및 명도(lightness)에 해당합니다.
-                    sRGB로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion②">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    100은 100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value①⑥">&lt;number></a>이며, 필요하다면 sRGB로
+                    <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion②">변환된 후</a>의 <a data-link-type="dfn"
+                        href="#origin-color" id="ref-for-origin-color①⑥">원본 색상</a>
+                    HSL 채도와 명도에 대응한다.
+                    100은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="hsl()" data-dfn-type="value" data-export
-                        id="valdef-hsl-alpha">alpha</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-hsl-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①⑦">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value①⑦">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①⑧">원본 색상</a>의 알파 투명도에 해당합니다.
-                    1.0은 100%와 동일합니다.
+                        id="ref-for-number-value①⑦">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
         </ul>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
@@ -3652,41 +3707,41 @@ For darkmode:
         [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#percentage-value" id="ref-for-percentage-value①①">&lt;percentage></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one④⓪">|</a> <a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value" id="ref-for-number-value①⑨">&lt;number></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one④①">|</a> none]
         [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value④">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one④②">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt①①">?</a> )
 </pre>
-        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑦">상대 색상</a> 구문 안의 <a class="css"
-                data-link-type="maybe" href="#funcdef-hwb" id="ref-for-funcdef-hwb④">hwb()</a> 함수에서
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑥">구성 요소 키워드</a>는 다음과
-            같습니다:</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑥">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-hwb" id="ref-for-funcdef-hwb④">hwb()</a>
+            함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑥">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="hwb()" data-dfn-type="value" data-export
-                        id="valdef-hwb-h">h</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-hwb-h">h</dfn>는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
                         id="ref-for-number-value②⓪">&lt;number></a>이며,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color①⑨">원본 색상</a>의 HWB 색상각(hue)에
-                    해당합니다(도 단위).
-                    sRGB로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion③">변환이
-                        필요하면 변환 후</a>, [0, 360] 범위로 정규화됩니다. 90은 90deg와 동일합니다.
-                </p>
+                    필요하다면 sRGB로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion③">변환된 후</a>,
+                    [0, 360] 범위로 정규화된 <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color①⑧">원본 색상</a>의 HWB 색조에 도 단위로 대응한다.
+                    90은 90deg와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="hwb()" data-dfn-type="value" data-export
-                        id="valdef-hwb-w">w</dfn> 및 <dfn class="css dfn-paneled" data-dfn-for="hwb()"
-                        data-dfn-type="value" data-export id="valdef-hwb-b">b</dfn> 은
+                        id="valdef-hwb-w">w</dfn>와 <dfn class="css dfn-paneled" data-dfn-for="hwb()"
+                        data-dfn-type="value" data-export id="valdef-hwb-b">b</dfn>는
                     <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value②①">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⓪">원본 색상</a>의 HWB
-                    화이트니스(whiteness) 및 블랙니스(blackness)에 해당합니다.
-                    sRGB로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion④">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    100은 100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value②①">&lt;number></a>이며, 필요하다면 sRGB로
+                    <a data-link-type="dfn"
+                        href="#origin-color" id="ref-for-origin-color①⑨">원본 색상</a>의 HWB 백색도와 흑색도에
+                    <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion④">변환된 후</a> 대응한다.
+                    100은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="hwb()" data-dfn-type="value" data-export
-                        id="valdef-hwb-alpha">alpha</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-hwb-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⓪">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value②②">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②①">원본 색상</a>의 알파 투명도에 해당합니다.
-                    1.0은 100%와 동일합니다.
+                        id="ref-for-number-value②②">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
         </ul>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
@@ -3713,41 +3768,40 @@ For darkmode:
         [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#percentage-value" id="ref-for-percentage-value①④">&lt;percentage></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one④⑦">|</a> <a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value" id="ref-for-number-value②⑤">&lt;number></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one④⑧">|</a> none]
         [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value⑤">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one④⑨">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt①③">?</a> )
 </pre>
-        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑧">상대 색상</a> 구문 안의 <a class="css"
-                data-link-type="maybe" href="#funcdef-lab" id="ref-for-funcdef-lab③">lab()</a> 함수에서
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑦">구성 요소 키워드</a>는 다음과
-            같습니다:</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑦">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-lab" id="ref-for-funcdef-lab③">lab()</a>
+            함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑦">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="lab()" data-dfn-type="value" data-export
-                        id="valdef-lab-l">l</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-lab-l">l</dfn>은 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value②⑥">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②②">원본 색상</a>의 CIE
-                    명도(Lightness)에 해당합니다.
-                    CIE Lab로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion⑤">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    100은 100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value②⑥">&lt;number></a>이며,
+                    필요하다면 CIE Lab으로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion⑤">변환된 후</a>
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color②①">원본 색상</a>의 CIE 명도에 대응한다.
+                    100은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="lab()" data-dfn-type="value" data-export
-                        id="valdef-lab-a">a</dfn> 및 <dfn class="css dfn-paneled" data-dfn-for="lab()"
-                        data-dfn-type="value" data-export id="valdef-lab-b">b</dfn> 은 <a class="css production"
+                        id="valdef-lab-a">a</dfn>와 <dfn class="css dfn-paneled" data-dfn-for="lab()"
+                        data-dfn-type="value" data-export id="valdef-lab-b">b</dfn>는 <a class="css production"
                         data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value②⑦">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②③">원본 색상</a>의 CIE Lab a, b 축에
-                    해당합니다.
-                    CIE Lab로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion⑥">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    125는 100%와 동일하고, -125는 -100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value②⑦">&lt;number></a>이며,
+                    필요하다면 CIE Lab으로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion⑥">변환된 후</a>
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color②②">원본 색상</a>의 CIE Lab a축과 b축에 대응한다.
+                    125는 100%와 동등하고, -125는 -100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="lab()" data-dfn-type="value" data-export
-                        id="valdef-lab-alpha">alpha</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-lab-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②③">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value②⑧">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②④">원본 색상</a>의 알파 투명도에 해당합니다.
-                    1.0은 100%와 동일합니다.
+                        id="ref-for-number-value②⑧">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
                 <details class="wpt-tests-block" dir="ltr" lang="en" open>
                     <summary>테스트</summary>
@@ -3756,9 +3810,9 @@ For darkmode:
                                 href="https://wpt.fyi/results/css/css-color/relative-currentcolor-lab-01.html"
                                 title="css/css-color/relative-currentcolor-lab-01.html">relative-currentcolor-lab-01.html</a>
                             <a class="wpt-live"
-                                href="http://wpt.live/css/css-color/relative-currentcolor-lab-01.html"><small>(live
-                                    test)</small></a> <a class="wpt-source"
-                                href="https://github.com/web-platform-tests/wpt/blob/master/css/css-color/relative-currentcolor-lab-01.html"><small>(source)</small></a>
+                                href="http://wpt.live/css/css-color/relative-currentcolor-lab-01.html"><small>(실시간
+                                    테스트)</small></a> <a class="wpt-source"
+                                href="https://github.com/web-platform-tests/wpt/blob/master/css/css-color/relative-currentcolor-lab-01.html"><small>(소스)</small></a>
                     </ul>
                 </details>
         </ul>
@@ -3803,41 +3857,40 @@ For darkmode:
           [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#percentage-value" id="ref-for-percentage-value①⑦">&lt;percentage></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑤④">|</a> <a class="production" data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value" id="ref-for-number-value③①">&lt;number></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑤⑤">|</a> none]
           [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value⑥">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑤⑥">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt①⑤">?</a> )
 </pre>
-        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑨">상대 색상</a> 구문 안의 <a class="css"
-                data-link-type="maybe" href="#funcdef-oklab" id="ref-for-funcdef-oklab②">oklab()</a> 함수에서
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑧">구성 요소 키워드</a>는 다음과
-            같습니다:</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑧">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-oklab" id="ref-for-funcdef-oklab②">oklab()</a>
+            함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑧">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="oklab()" data-dfn-type="value" data-export
-                        id="valdef-oklab-l">l</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-oklab-l">l</dfn>은 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value③②">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⑤">원본 색상</a>의 Oklab
-                    명도(Lightness)에 해당합니다.
-                    Oklab로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion⑦">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    1.0은 100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value③②">&lt;number></a>이며,
+                    필요하다면 Oklab으로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion⑦">변환된 후</a>,
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color②④">원본 색상</a>의 Oklab 명도에 대응한다.
+                    1.0은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="oklab()" data-dfn-type="value" data-export
-                        id="valdef-oklab-a">a</dfn> 및 <dfn class="css dfn-paneled" data-dfn-for="oklab()"
-                        data-dfn-type="value" data-export id="valdef-oklab-b">b</dfn> 은 <a class="css production"
+                        id="valdef-oklab-a">a</dfn>와 <dfn class="css dfn-paneled" data-dfn-for="oklab()"
+                        data-dfn-type="value" data-export id="valdef-oklab-b">b</dfn>는 <a class="css production"
                         data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value③③">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⑥">원본 색상</a>의 Oklab a, b 축에
-                    해당합니다.
-                    Oklab로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion⑧">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    0.4는 100%와 동일하고, -0.4는 -100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value③③">&lt;number></a>이며,
+                    필요하다면 Oklab으로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion⑧">변환된 후</a>,
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color②⑤">원본 색상</a>의 Oklab a축과 b축에 대응한다.
+                    0.4는 100%와 동등하고, -0.4는 -100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="oklab()" data-dfn-type="value" data-export
-                        id="valdef-oklab-alpha">alpha</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-oklab-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⑥">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value③④">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⑦">원본 색상</a>의 알파 투명도에 해당합니다.
-                    1.0은 100%와 동일합니다.
+                        id="ref-for-number-value③④">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
                 <details class="wpt-tests-block" dir="ltr" lang="en" open>
                     <summary>테스트</summary>
@@ -3846,9 +3899,9 @@ For darkmode:
                                 href="https://wpt.fyi/results/css/css-color/relative-currentcolor-oklab-01.html"
                                 title="css/css-color/relative-currentcolor-oklab-01.html">relative-currentcolor-oklab-01.html</a>
                             <a class="wpt-live"
-                                href="http://wpt.live/css/css-color/relative-currentcolor-oklab-01.html"><small>(live
-                                    test)</small></a> <a class="wpt-source"
-                                href="https://github.com/web-platform-tests/wpt/blob/master/css/css-color/relative-currentcolor-oklab-01.html"><small>(source)</small></a>
+                                href="http://wpt.live/css/css-color/relative-currentcolor-oklab-01.html"><small>(실시간
+                                    테스트)</small></a> <a class="wpt-source"
+                                href="https://github.com/web-platform-tests/wpt/blob/master/css/css-color/relative-currentcolor-oklab-01.html"><small>(소스)</small></a>
                     </ul>
                 </details>
         </ul>
@@ -3864,50 +3917,49 @@ For darkmode:
         [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-hue" id="ref-for-typedef-hue④">&lt;hue></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑥①">|</a> none]
         [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value⑦">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑥②">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt①⑦">?</a> )
 </pre>
-        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①⓪">상대 색상</a> 구문 안의 <a class="css"
-                data-link-type="maybe" href="#funcdef-lch" id="ref-for-funcdef-lch④">lch()</a> 함수에서
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑨">구성 요소 키워드</a>는 다음과
-            같습니다:</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color⑨">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-lch" id="ref-for-funcdef-lch④">lch()</a>
+            함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword⑨">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="lch()" data-dfn-type="value" data-export
-                        id="valdef-lch-l">l</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-lch-l">l</dfn>은 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value③⑦">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⑧">원본 색상</a>의 CIE
-                    명도(Lightness)에 해당합니다.
-                    CIE LCH로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion⑨">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    100은 100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value③⑦">&lt;number></a>이며,
+                    필요하다면 CIE LCH로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion⑨">변환된 후</a>,
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color②⑦">원본 색상</a>의 CIE 명도에 대응한다.
+                    100은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="lch()" data-dfn-type="value" data-export
-                        id="valdef-lch-c">c</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-lch-c">c</dfn>는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value③⑧">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color②⑨">원본 색상</a>의 LCH 채도(chroma)에
-                    해당합니다.
-                    CIE LCH로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①⓪">변환이
-                        필요하면 변환 후</a> 취해집니다.
-                    150은 100%와 동일합니다.
-                </p>
+                        id="ref-for-number-value③⑧">&lt;number></a>이며,
+                    필요하다면 CIE LCH로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①⓪">변환된 후</a>,
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color②⑧">원본 색상</a>의 LCH 채도에 대응한다.
+                    150은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="lch()" data-dfn-type="value" data-export
-                        id="valdef-lch-h">h</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-lch-h">h</dfn>는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value③⑨">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⓪">원본 색상</a>의 LCH 색상각(hue)에
-                    해당합니다(도 단위).
-                    CIE LCH로의 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①①">변환이
-                        필요하면 변환 후</a> 취해지고, [0,360] 범위로 정규화됩니다. 90은 90deg와 동일합니다.
-                </p>
+                        id="ref-for-number-value③⑨">&lt;number></a>이며,
+                    필요하다면 CIE LCH로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①①">변환된 후</a>,
+                    [0, 360] 범위로 정규화된 <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color②⑨">원본 색상</a>의 LCH 색조에 도 단위로 대응한다.
+                    90은 90deg와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="lch()" data-dfn-type="value" data-export
-                        id="valdef-lch-alpha">alpha</dfn> 은 <a class="css production" data-link-type="type"
+                        id="valdef-lch-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⓪">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value④⓪">&lt;number></a>로,
-                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③①">원본 색상</a>의 알파 투명도에 해당합니다.
-                    1.0은 100%와 동일합니다.
+                        id="ref-for-number-value④⓪">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
         </ul>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
@@ -4022,46 +4074,49 @@ For darkmode:
           [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-hue" id="ref-for-typedef-hue⑤">&lt;hue></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑥⑦">|</a> none]
           [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value⑧">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑥⑧">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt①⑨">?</a> )
 </pre>
-        <p>상대 색상(<a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①①">relative color</a>) 구문 안에서
-            <a class="css" data-link-type="maybe" href="#funcdef-oklch" id="ref-for-funcdef-oklch④">oklch()</a> 함수에서는,
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①⓪">구성 요소 키워드</a>들이 다음과
-            같습니다:
-        </p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①⓪">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-oklch" id="ref-for-funcdef-oklch④">oklch()</a>
+            함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①⓪">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="oklch()" data-dfn-type="value" data-export
                         id="valdef-oklch-l">l</dfn>은 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
                         id="ref-for-number-value④③">&lt;number></a>이며,
-                    필요하면 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①②">변환</a> 후
-                    OkLCh에서의 원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③②">origin
-                        color’s</a>)의 Oklab 명도(Lightness)에 대응합니다.
-                    1.0은 100%와 같습니다.</p>
+                    필요하다면 OkLCh로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①②">변환된 후</a>,
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color③①">원본 색상</a>의 Oklab 명도에 대응한다.
+                    1.0은 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="oklch()" data-dfn-type="value" data-export
-                        id="valdef-oklch-c">c</dfn>은 <a class="css production" data-link-type="type"
+                        id="valdef-oklch-c">c</dfn>는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
                         id="ref-for-number-value④④">&lt;number></a>이며,
-                    필요하면 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①③">변환</a> 후
-                    OkLCh에서의 원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③③">origin
-                        color’s</a>) 채도(chroma)에 대응합니다.
-                    0.4는 100%와 같습니다.</p>
+                    필요하다면 OkLCh로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①③">변환된 후</a>,
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color③②">원본 색상</a>의 OkLCh 채도에 대응한다.
+                    0.4는 100%와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="oklch()" data-dfn-type="value" data-export
-                        id="valdef-oklch-h">h</dfn>은 <a class="css production" data-link-type="type"
+                        id="valdef-oklch-h">h</dfn>는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
                         id="ref-for-number-value④⑤">&lt;number></a>이며,
-                    필요하면 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①④">변환</a> 후
-                    OkLCh에서의 원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③④">origin
-                        color’s</a>) 색상각(hue, 도 단위)에 대응하고,
-                    [0, 360] 범위로 정규화됩니다. 90은 90deg와 동일합니다.</p>
+                    필요하다면 OkLCh로 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①④">변환된 후</a>,
+                    [0, 360] 범위로 정규화된 <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color③③">원본 색상</a>의 OkLCh 색조에 도 단위로 대응한다.
+                    90은 90deg와 동등하다.</p>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="oklch()" data-dfn-type="value" data-export
-                        id="valdef-oklch-alpha">alpha</dfn>은 <a class="css production" data-link-type="type"
+                        id="valdef-oklch-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③④">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value④⑥">&lt;number></a>이며,
-                    원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⑤">origin color’s</a>)의
-                    알파(투명도)에 대응합니다. 1.0은 100%와 동일합니다.
+                        id="ref-for-number-value④⑥">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
         </ul>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
@@ -4116,24 +4171,26 @@ For darkmode:
         <pre class="prod"><dfn class="dfn-paneled" data-dfn-type="function" data-export id="funcdef-alpha">alpha()</dfn> = alpha([from <a class="production" data-link-type="type" href="#typedef-color" id="ref-for-typedef-color①⑤">&lt;color></a>]
           [ / [<a class="production" data-link-type="type" href="https://www.w3.org/TR/css-color-4/#typedef-color-alpha-value" id="ref-for-typedef-color-alpha-value⑨">&lt;alpha-value></a> <a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#comb-one" id="ref-for-comb-one⑥⑨">|</a> none] ]<a data-link-type="grammar" href="https://www.w3.org/TR/css-values-4/#mult-opt" id="ref-for-mult-opt②⓪">?</a> )
 </pre>
-        <p>상대 색상(<a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①②">relative color</a>) 구문 안의
-            <a class="css" data-link-type="maybe" href="#funcdef-alpha" id="ref-for-funcdef-alpha②">alpha()</a> 함수에서,
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①①">구성 요소 키워드</a>는:
-        </p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①①">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-alpha" id="ref-for-funcdef-alpha②">alpha()</a>
+            함수 안에서,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①①">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="alpha()" data-dfn-type="value" data-export
-                        id="valdef-alpha-alpha">alpha</dfn>은 <a class="css production" data-link-type="type"
+                        id="valdef-alpha-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⑤">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value④⑦">&lt;number></a>이며,
-                    원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⑥">origin color’s</a>)의
-                    알파(투명도)에 대응합니다. 1.0은 100%와 동일합니다.
+                        id="ref-for-number-value④⑦">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
         </ul>
-        <p>원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⑦">origin color</a>)의 색상 성분들은
-            변경되지 않으며,
-            알파 성분만 수정되거나 대체됩니다.
-            이 함수의 결과는 원본 색상의 색상 공간으로 표현됩니다.</p>
+        <p><a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⑥">원본
+                색상</a>의 색상 구성 요소는 변경되지 않고,
+            alpha 구성 요소는 수정되거나 대체된다.
+            이 함수의 결과는 원본 색상의 색상 공간에 있다.</p>
+        
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
             <summary>Tests</summary>
             <ul class="wpt-tests-list">
@@ -4187,7 +4244,7 @@ For darkmode:
             </span><a class="self-link" href="#color-function"></a></h2>
         <p><a class="css" data-link-type="maybe" href="#funcdef-color" id="ref-for-funcdef-color③">color()</a>
             함수는 색상을 특정 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#color-space"
-                id="ref-for-color-space②">색 공간</a>에서
+                id="ref-for-color-space①">색 공간</a>에서
             지정할 수 있도록 해줍니다
             (다른 대부분의 색상 함수들이 작동하는 암묵적 sRGB 색 공간이 아닌, 명시적으로 지정된 색 공간).</p>
         <p>이 단계에서는 <a class="css" data-link-type="maybe" href="#funcdef-color" id="ref-for-funcdef-color④">color()</a>
@@ -4226,84 +4283,90 @@ For darkmode:
         <h3 class="heading settled" data-level="5.1" id="relative-color-function"><span class="secno">5.1. </span><span
                 class="content">상대 색상-함수 색상(Relative Color-Function Colors)</span><a class="self-link"
                 href="#relative-color-function"></a></h3>
-        <p>상대 색상(<a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①③">relative color</a>) 구문 안에서
-            <a class="css" data-link-type="maybe" href="#funcdef-color" id="ref-for-funcdef-color⑤">color()</a> 함수를
-            <a class="css production" data-link-type="type" href="#typedef-custom-params"
-                id="ref-for-typedef-custom-params①">&lt;custom-params></a>와 함께 사용할 경우,
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①②">구성 요소 키워드</a>의 이름과
-            개수는 다음에 의해 정의됩니다:
-        </p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①②">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-color" id="ref-for-funcdef-color⑤">color()</a>
+            함수에서 <a class="css production" data-link-type="type" href="#typedef-custom-params"
+                id="ref-for-typedef-custom-params①">&lt;custom-params></a>를 사용할 때,
+            허용되는 <a data-link-type="dfn" href="#component-keyword"
+                id="ref-for-component-keyword①②">구성 요소 키워드</a>의 수와 이름은 다음과 같다:</p>
         <ul>
             <li data-md>
-                <p>해당 <a class="css" data-link-type="maybe" href="#at-ruledef-profile"
-                        id="ref-for-at-ruledef-profile">@color-profile</a> 규칙의 <a class="property"
-                        data-link-type="propdesc" href="#descdef-color-profile-components"
-                        id="ref-for-descdef-color-profile-components">components</a> 디스크립터에 의해 정의됩니다.
-                    만약 존재하지 않으면, 상대 색상 조작은 허용되지 않습니다.
-                    이 값들은 <a class="css production" data-link-type="type"
-                        href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value⑤①">&lt;number></a>형이며,
-                    필요시 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①⑤">변환</a> 후
-                    색상 프로파일의 색상 공간으로 변환된
-                    원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⑧">origin color’s</a>)의
-                    구성 요소에 대응합니다. 값 1.0은 100%에 해당합니다.</p>
+                <p>대응하는 <a
+                        class="css" data-link-type="maybe" href="#at-ruledef-profile"
+                        id="ref-for-at-ruledef-profile">@color-profile</a>에
+                    <a class="property" data-link-type="propdesc" href="#descdef-color-profile-components"
+                        id="ref-for-descdef-color-profile-components">components</a> 디스크립터가 있으면
+                    그것에 의해 정의된다;
+                    그렇지 않으면 유효한 상대 색상 조작은 없다. 이들은 색상 프로필의 색상 공간으로
+                    필요하다면 <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①⑤">변환된 후</a>
+                    <a class="css production"
+                        data-link-type="type" href="https://www.w3.org/TR/css-values-4/#number-value"
+                        id="ref-for-number-value⑤①">&lt;number></a>이며, <a data-link-type="dfn"
+                        href="#origin-color" id="ref-for-origin-color③⑦">원본 색상</a>의 구성 요소에 대응한다.
+                    값 1.0은 100%에 대응한다.</p>
         </ul>
-        <p>상대 색상 구문에서 <a class="css" data-link-type="maybe" href="#funcdef-color"
-                id="ref-for-funcdef-color⑥">color()</a>
-            함수를 <a class="css production" data-link-type="type" href="#typedef-predefined-rgb-params"
-                id="ref-for-typedef-predefined-rgb-params①">&lt;predefined-rgb-params></a>와 함께 사용할 경우,
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①③">구성 요소 키워드</a>는:</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①③">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-color" id="ref-for-funcdef-color⑥">color()</a>
+            함수에서 <a class="css production" data-link-type="type" href="#typedef-predefined-rgb-params"
+                id="ref-for-typedef-predefined-rgb-params①">&lt;predefined-rgb-params></a>를 사용할 때,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①③">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="color()" data-dfn-type="value" data-export
                         id="valdef-color-r">r</dfn>, <dfn class="css dfn-paneled" data-dfn-for="color()"
-                        data-dfn-type="value" data-export id="valdef-color-g">g</dfn>, 및 <dfn class="css dfn-paneled"
+                        data-dfn-type="value" data-export id="valdef-color-g">g</dfn>, 그리고 <dfn class="css dfn-paneled"
                         data-dfn-for="color()" data-dfn-type="value" data-export id="valdef-color-b">b</dfn>는
                     모두 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
                         id="ref-for-number-value⑤②">&lt;number></a>이며,
-                    필요하면 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①⑥">변환</a> 후
-                    사전 정의된 RGB 색상 공간으로의
-                    원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color③⑨">origin color’s</a>)의
-                    빨강/녹색/파랑 성분에 해당합니다.
-                    값 1.0은 100%에 해당합니다.</p>
+                    필요하다면 미리 정의된 RGB 색상 공간으로
+                    <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①⑥">변환된 후</a>
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color③⑧">원본 색상</a>의 빨강, 초록, 파랑 구성 요소에 대응한다.
+                    값 1.0은 100%에 대응한다.</p>
         </ul>
-        <p>상대 색상 구문에서 <a class="css" data-link-type="maybe" href="#funcdef-color"
-                id="ref-for-funcdef-color⑦">color()</a>
-            함수를 <a class="css production" data-link-type="type" href="#typedef-xyz-params"
-                id="ref-for-typedef-xyz-params①">&lt;xyz-params></a>와 함께 사용할 경우,
-            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①④">구성 요소 키워드</a>는:</p>
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①④">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-color" id="ref-for-funcdef-color⑦">color()</a>
+            함수에서 <a class="css production" data-link-type="type" href="#typedef-xyz-params"
+                id="ref-for-typedef-xyz-params①">&lt;xyz-params></a>를 사용할 때,
+            허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①④">구성 요소
+                키워드</a>는 다음과 같다:</p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="color()" data-dfn-type="value" data-export
                         id="valdef-color-x">x</dfn>, <dfn class="css dfn-paneled" data-dfn-for="color()"
                         data-dfn-type="value" data-export id="valdef-color-y">y</dfn>, <dfn class="css dfn-paneled"
-                        data-dfn-for="color()" data-dfn-type="value" data-export id="valdef-color-z">z</dfn>는
-                    모두 <a class="css production" data-link-type="type"
+                        data-dfn-for="color()" data-dfn-type="value" data-export id="valdef-color-z">z</dfn>는 모두 <a
+                        class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
                         id="ref-for-number-value⑤③">&lt;number></a>이며,
-                    필요하면 <a data-link-type="dfn" href="#required-conversion" id="ref-for-required-conversion①⑦">변환</a> 후
-                    관련 백색점에 적응된 상대 CIE XYZ 색공간에서의
-                    원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④⓪">origin color’s</a>)의
-                    X, Y, Z 성분에 해당합니다.
-                    값 1.0은 100%에 해당합니다.</p>
+                    필요하다면 관련 백색점에 맞게 순응된 상대 CIE XYZ 색상 공간으로
+                    <a data-link-type="dfn" href="#required-conversion"
+                        id="ref-for-required-conversion①⑦">변환된 후</a>
+                    <a data-link-type="dfn" href="#origin-color"
+                        id="ref-for-origin-color③⑨">원본 색상</a>의 X, Y, Z 구성 요소에 대응한다.
+                    값 1.0은 100%에 대응한다.</p>
         </ul>
-        <p>상대 색상 구문에서 <a class="css" data-link-type="maybe" href="#funcdef-color"
-                id="ref-for-funcdef-color⑧">color()</a>
-            함수를 <a class="css production" data-link-type="type" href="#typedef-predefined-rgb-params"
+        <p><a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①⑤">상대 색상</a>
+            구문의 <a class="css" data-link-type="maybe" href="#funcdef-color" id="ref-for-funcdef-color⑧">color()</a>
+            함수에서
+            <a class="css production" data-link-type="type" href="#typedef-predefined-rgb-params"
                 id="ref-for-typedef-predefined-rgb-params②">&lt;predefined-rgb-params></a> 또는
             <a class="css production" data-link-type="type" href="#typedef-xyz-params"
-                id="ref-for-typedef-xyz-params②">&lt;xyz-params></a>와 함께 사용할 경우,
-            추가로 허용되는 <a data-link-type="dfn" href="#component-keyword" id="ref-for-component-keyword①⑤">구성 요소 키워드</a>는:
+                id="ref-for-typedef-xyz-params②">&lt;xyz-params></a> 중 하나를 사용할 때, 추가로 허용되는 <a data-link-type="dfn"
+                href="#component-keyword" id="ref-for-component-keyword①⑤">구성 요소 키워드</a>는 다음과 같다:
         </p>
         <ul>
             <li data-md>
                 <p><dfn class="css dfn-paneled" data-dfn-for="color()" data-dfn-type="value" data-export
-                        id="valdef-color-alpha">alpha</dfn>은 <a class="css production" data-link-type="type"
+                        id="valdef-color-alpha">alpha</dfn>는
+                    <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④⓪">원본 색상</a>의 alpha
+                    투명도에 대응하는 <a class="css production" data-link-type="type"
                         href="https://www.w3.org/TR/css-values-4/#number-value"
-                        id="ref-for-number-value⑤④">&lt;number></a>이며,
-                    원본 색상(<a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④①">origin color’s</a>)의
-                    알파(투명도)에 대응합니다. 1.0은 100%와 동일합니다.
+                        id="ref-for-number-value⑤④">&lt;number></a>이다. 1.0은 100%와 동등하다.
                 </p>
         </ul>
         <p>파라미터는 다음 형태를 가집니다:</p>
@@ -5465,11 +5528,13 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
             </span><a class="self-link" href="#resolving-rcs"></a></h3>
         <p>모든 <a class="css production" data-link-type="type" href="#typedef-color"
                 id="ref-for-typedef-color②③">&lt;color></a> 매개변수가
-            해당 색 공간의 상응 색상으로 해석되면,
-            계산값은 절대 <span class="production" id="ref-for-typedef-color②④">&lt;color></span>
-            값이 되며,
-            지정된 RCS 색 공간에 따라 <a href="https://www.w3.org/TR/css-color-4/#resolving-color-values"><cite>CSS Color
-                    4</cite> §  15. Resolving &lt;color> Values</a> 기준으로 해석됩니다.</p>
+            각각의 색상 공간에서 대응하는 색상으로 해석되면,
+            계산값은 <a data-link-type="dfn" href="#relative-color-processing-space"
+                id="ref-for-relative-color-processing-space⑤">상대 색상 처리 공간</a> 안의
+            절대 <span class="production" id="ref-for-typedef-color②④">&lt;color></span>
+            값이며,
+            <a href="https://www.w3.org/TR/css-color-4/#resolving-color-values"><cite>CSS Color
+                    4</cite> § 15. &lt;color> 값 해석하기</a>에 따라 해석된다.</p>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
             <summary>Tests</summary>
             <ul class="wpt-tests-list">
@@ -5938,7 +6003,7 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
         <p>그러나 <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#valdef-hsl-hsl"
                 id="ref-for-valdef-hsl-hsl③">hsl</a> 또는 <a class="css" data-link-type="maybe"
                 href="https://www.w3.org/TR/css-color-4/#valdef-hwb-hwb" id="ref-for-valdef-hwb-hwb①">hwb</a> <a
-                data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#color-space" id="ref-for-color-space③">색
+                data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#color-space" id="ref-for-color-space②">색
                 공간</a>에서 혼합한 결과에
             적어도 하나의 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#missing-color-component"
                 id="ref-for-missing-color-component">누락된 색상 구성요소</a>가 있으면
@@ -6007,7 +6072,7 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
                 원본 색상의 직렬화
             </span><a class="self-link" href="#serial-origin-color"></a></h3>
         <p>다른 색상 함수 내부에서
-            <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④②">원본 색상</a>으로 사용되는
+            <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④①">원본 색상</a>으로 사용되는
             색상의 선언값 직렬화는 아래와 같습니다:
         </p>
         <ol>
@@ -6153,6 +6218,23 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
                     마지막으로 ")"가 붙습니다.
                 </p>
         </ul>
+        <ol start="4">
+            <li data-md>
+                <p><a class="css" data-link-type="maybe" href="#funcdef-alpha"
+                        id="ref-for-funcdef-alpha③">alpha()</a>의 경우</p>
+        </ol>
+        <ul>
+            <li data-md>
+                <p>문자열 "alpha(from "에,
+                    중첩된 원본 색상을 직렬화하는 규칙을 사용한
+                    <a href="#serial-origin-color">원본 색상의 직렬화</a>가 뒤따르고,
+                    단일 공백이 뒤따르며,
+                    모든 문자가 소문자인 정규 색상 공간
+                    ("xyz"의 경우 "xyz-d65")이 뒤따르고,
+                    " / "와 지정된 alpha 구성 요소
+                    (색상 채널 인수와 같은 규칙을 사용하되, 클램프됨)가 뒤따르고,
+                    ")"가 뒤따른다.</p>
+        </ul>
         <div class="example" id="ex-serial-rcs-specified-simple">
             <a class="self-link" href="#ex-serial-rcs-specified-simple"></a>
             예를 들어 아래 선언값의 직렬화는
@@ -6185,43 +6267,42 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
         </div>
         <div class="example" id="ex-serial-rcs-alpha-none">
             <a class="self-link" href="#ex-serial-rcs-alpha-none"></a>
-            예를 들어, 다음 선언된 값의 직렬화는
+            예를 들어, 다음 선언값의 직렬화는
 
 
             <pre
                 class="highlight lang-css"><c- nf>hsl</c-><c- p>(</c->from rebeccapurple none none none / none<c- p>);</c-></pre>
-            <p>문자열 "hsl(from rebeccapurple none none none / none)"입니다.</p>
-            <p>계산값은 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#missing-color-component"
-                    id="ref-for-missing-color-component②">누락된</a> alpha를
-                전달한다
+            <p>문자열 "hsl(from rebeccapurple none none none / none)"이다.</p>
+            <p>계산값은 <a data-link-type="dfn"
+                    href="https://www.w3.org/TR/css-color-4/#missing-color-component"
+                    id="ref-for-missing-color-component②">누락된</a> alpha를 전달하며
                 (alpha는 그 자체의 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#analogous-components"
-                    id="ref-for-analogous-components①">유사 구성요소</a>이다).
-                이는 hue, saturation, lightness, alpha가 모두 <span id="ref-for-missing-color-component③">누락된</span>
+                    id="ref-for-analogous-components①">유사 구성 요소</a>이다),
+                색조, 채도, 명도, alpha가 모두 <span
+                    id="ref-for-missing-color-component③">누락된</span>
                 <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#funcdef-hsl"
                     id="ref-for-funcdef-hsl①⓪">hsl()</a> <a data-link-type="dfn" href="#relative-color"
-                    id="ref-for-relative-color①⑦">상대 색상</a>을
-                제공한다.
-                해결된 값이 <span id="ref-for-missing-color-component④">누락된 색상
-                    구성요소</span>를 포함하므로,
-                직렬화는 현대적인 <span class="css" id="ref-for-funcdef-hsl①①">hsl()</span> 형식을 사용하여,
-                <span class="css">color(srgb 0 0 0 / none)</span>이 아니라
-                문자열 "hsl(none none none / none)"을 산출한다.
-            </p>
+                    id="ref-for-relative-color①⑥">상대 색상</a>을 만든다.
+                해석된 값에 <span id="ref-for-missing-color-component④">누락된 색상
+                    구성 요소</span>가 포함되어 있으므로,
+                직렬화는 현대 <span class="css" id="ref-for-funcdef-hsl①①">hsl()</span> 형식을 사용하여,
+                <span class="css">color(srgb 0 0 0 / none)</span> 대신
+                문자열 "hsl(none none none / none)"을 산출한다.</p>
         </div>
         <div class="example" id="ex-serial-rcs-hsl-unclamped">
             <a class="self-link" href="#ex-serial-rcs-hsl-unclamped"></a>
-            예를 들어 아래 선언값의 직렬화는
+            예를 들어, 다음 선언값의 직렬화는
 
 
             <pre
                 class="highlight lang-css"><c- nf>hsl</c-><c- p>(</c->from <c- nf>hsl</c-><c- p>(</c-><c- m>127.9</c-> <c- m>302</c-><c- k>%</c-> <c- m>25.33</c-><c- k>%</c-><c- p>)</c-> h s l<c- p>);</c-></pre>
-            <p>"hsl(from hsl(127.9 302% 25.33%) h s l)"가 되고,
-                계산값 직렬화는
-                "color(srgb -0.511666 1.018266 -0.310225)"입니다.</p>
+            <p>문자열 "hsl(from hsl(127.9 302% 25.33%) h s l)"이며,
+                반면 계산값의 직렬화는
+                문자열 "color(srgb -0.511666 1.018266 -0.310225)"이다.</p>
         </div>
         <div class="example" id="ex-serial-rcs-currentcolor">
             <a class="self-link" href="#ex-serial-rcs-currentcolor"></a>
-            다음과 같은 HTML이 주어진 경우(이 요소에 color 속성 설정이 있음):
+            다음 HTML이 주어졌을 때(이 요소에 설정된 color 속성에 유의하라):
 
 
             <pre class="highlight lang-html"><c- p>&lt;</c-><c- f>div</c-> <c- e>id</c-><c- o>=</c-><c- s>"example"</c-> 
@@ -6229,31 +6310,33 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
 <c- s>  color: blue;"</c-><c- p>></c->
 <c- p>&lt;/</c-><c- f>div</c-><c- p>></c->
 </pre>
-            <p><span class="css">background-color</span> 선언값 직렬화는
-                "rgb(from currentcolor r g calc(b / 2))" 문자열이며,
-                계산값은
-                "color(srgb 0 0 0.5)"입니다</p>
+            <p><span class="css">background-color</span> 선언값의 직렬화는
+                문자열 "rgb(from currentcolor r g calc(b / 2))"이며,
+                반면 계산값의 직렬화는
+                문자열 "color(srgb 0 0 0.5)"이다</p>
         </div>
-        <p>상대 색상 함수 결과 직렬화는
-            <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#valdef-color-currentcolor"
-                id="ref-for-valdef-color-currentcolor④">currentColor</a> 키워드가 <a data-link-type="dfn"
-                href="#origin-color" id="ref-for-origin-color④③">원본 색상</a>인지에 따라 달라집니다.
-            그렇다면 선언값으로 직렬화됩니다.
-            이를 통해 자식 요소의 <span class="css">color</span> 속성 값이 달라져도
-            올바른 값이 사용될 수 있습니다.
-            아니라면 해석된 값,
-            즉 <a class="css production" data-link-type="type" href="#typedef-color"
-                id="ref-for-typedef-color②⑧">&lt;color></a>가 됩니다.
+        <p>상대 색상 함수 결과의 직렬화는
+            키워드 <a class="css" data-link-type="maybe"
+                href="https://www.w3.org/TR/css-color-4/#valdef-color-currentcolor"
+                id="ref-for-valdef-color-currentcolor④">currentColor</a>가 <a data-link-type="dfn"
+                href="#origin-color" id="ref-for-origin-color④②">원본 색상</a>인지 여부에 따라 달라진다.
+            그렇다면 결과는 선언값으로 직렬화된다.
+            이렇게 하면 <span class="css">color</span> 속성이 다른 값을 가진
+            자식 요소에서 올바른 값을 사용할 수 있다.
+            그렇지 않으면, 그것은 해석된 값이며,
             <a href="https://www.w3.org/TR/css-color-4/#serializing-color-values"><cite>CSS Color 4</cite>
-                §  16. Serializing &lt;color> Values</a>을 따릅니다.
-        </p>
-        <p>실제 적용 형태는 <a data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①⑧">상대 색상</a>의 색상 공간에 따라
-            달라집니다:</p>
+                § 16. &lt;color> 값 직렬화하기</a>에 정의된
+            <a class="css production" data-link-type="type" href="#typedef-color"
+                id="ref-for-typedef-color②⑧">&lt;color></a>이다.</p>
+        <p>사용되는 형식은
+            <a data-link-type="dfn" href="#relative-color-processing-space"
+                id="ref-for-relative-color-processing-space⑥">상대 색상 처리 공간</a>에 따라 달라진다:</p>
         <table class="data">
             <tbody>
                 <tr>
-                    <th>mixing color space
-                    <th>form
+                    <th><a data-link-type="dfn" href="#relative-color-processing-space"
+                            id="ref-for-relative-color-processing-space⑦">상대 색상 처리 공간</a>
+                    <th>형식
                 <tr>
                     <td>srgb
                     <td>color(srgb r g b)
@@ -6300,32 +6383,30 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
                     <td>oklch
                     <td>oklch(l c h)
         </table>
-        <p>그러나 <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#funcdef-hsl"
-                id="ref-for-funcdef-hsl①②">hsl()</a> 또는 <a class="css" data-link-type="maybe" href="#funcdef-hwb"
-                id="ref-for-funcdef-hwb⑦">hwb()</a> <a data-link-type="dfn" href="#relative-color"
-                id="ref-for-relative-color①⑨">상대 색상</a>의 해결된 값에
-            적어도 하나의 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#missing-color-component"
-                id="ref-for-missing-color-component⑤">누락된 색상 구성요소</a>가 있으면
-            (<a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#carried-forward"
-                id="ref-for-carried-forward②">전달된</a>
-            <span id="ref-for-missing-color-component⑥">누락된</span> alpha를 포함하며,
-            이는 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④④">원본 색상</a>으로부터 <a
+        <p>그러나 <a class="css" data-link-type="maybe"
+                href="https://www.w3.org/TR/css-color-4/#funcdef-hsl" id="ref-for-funcdef-hsl①②">hsl()</a> 또는 <a
+                class="css" data-link-type="maybe" href="#funcdef-hwb" id="ref-for-funcdef-hwb⑦">hwb()</a> <a
+                data-link-type="dfn" href="#relative-color" id="ref-for-relative-color①⑦">상대 색상</a>의 해석된 값에
+            최소 하나의 <a data-link-type="dfn" href="https://www.w3.org/TR/css-color-4/#missing-color-component"
+                id="ref-for-missing-color-component⑤">누락된 색상 구성 요소</a>가 있는 경우
+            (<a
                 href="https://www.w3.org/TR/css-color-4/#interpolation-missing"><cite>CSS Color 4</cite> § 13.2
-                누락된 구성요소로 보간하기</a>에 따른 것이다),
-            사용되는 형식은 각각 현대적인 <span class="css">hsl(h s l / a)</span> 또는 <span class="css">hwb(h w b /
+                누락된 구성 요소로 보간하기</a>에 따라 <a data-link-type="dfn" href="#origin-color" id="ref-for-origin-color④③">원본 색상</a>에서
+            <a data-link-type="dfn"
+                href="https://www.w3.org/TR/css-color-4/#carried-forward" id="ref-for-carried-forward②">전달된</a>
+            <span id="ref-for-missing-color-component⑥">누락된</span> alpha 포함),
+            사용되는 형식은 각각 현대 <span class="css">hsl(h s l / a)</span> 또는 <span class="css">hwb(h w b /
                 a)</span> 구문이며,
-            원래의 색상 함수와 각 <a class="css" data-link-type="maybe" href="#valdef-light-dark-none"
-                id="ref-for-valdef-light-dark-none⑥">none</a> 값을 보존하고,
-            <span class="css">color(srgb r g b)</span>로 저하시키지 않는다(그렇게 하면
-            <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#valdef-hsl-hsl"
+            <span class="css">color(srgb r g b)</span>로 저하되는 대신
+            원래 색상 함수와 각 <a class="css" data-link-type="maybe"
+                href="#valdef-light-dark-none" id="ref-for-valdef-light-dark-none⑥">none</a> 값을 보존한다
+            (그 경우 <a class="css" data-link-type="maybe" href="https://www.w3.org/TR/css-color-4/#valdef-hsl-hsl"
                 id="ref-for-valdef-hsl-hsl⑤">hsl</a>/<a class="css" data-link-type="maybe"
-                href="https://www.w3.org/TR/css-color-4/#valdef-hwb-hwb" id="ref-for-valdef-hwb-hwb③">hwb</a> 정체성이
-            손실된다).
-            이는 <a href="#serial-origin-color">§ 11.2 원본 색상 직렬화하기</a>와 나란한데,
-            그 절은 원본 색상에 대해 항상 현대적인 슬래시 구문을 내보내며,
-            <a href="https://www.w3.org/TR/css-color-4/#css-serialization-of-srgb"><cite>CSS Color 4</cite> § 16.2.2
-                sRGB 값의
-                CSS 직렬화</a>에 있는 일반 sRGB 직렬화 규칙을 따른다.
+                href="https://www.w3.org/TR/css-color-4/#valdef-hwb-hwb" id="ref-for-valdef-hwb-hwb③">hwb</a> 정체성을 잃게 된다).
+            이는 항상 원본 색상에 대해 현대 슬래시 구문을 내보내는
+            <a href="#serial-origin-color">§ 11.2 원본 색상 직렬화하기</a>와 병행되며,
+            <a href="https://www.w3.org/TR/css-color-4/#css-serialization-of-srgb"><cite>CSS Color 4</cite> § 16.2.2 sRGB 값의 CSS
+                직렬화</a>에 있는 일반 sRGB 직렬화 규칙을 따른다.
         </p>
         <details class="wpt-tests-block" dir="ltr" lang="en" open>
             <summary>Tests</summary>
@@ -7008,6 +7089,7 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
         <li><a href="#relative-color">상대 색상</a><span>, § 4.1에서</span>
         <li><a href="#valdef-color-profile-rendering-intent-relative-colorimetric">relative-colorimetric</a><span>,
                 § 5.3에서</span>
+        <li><a href="#relative-color-processing-space">relative color processing space</a><span>, § 4.1에서</span>
         <li><a href="#descdef-color-profile-rendering-intent">rendering-intent</a><span>, § 5.3에서</span>
         <li><a href="#dom-csscolorprofilerule-renderingintent">renderingIntent</a><span>, § 12.1에서</span>
         <li><a href="#required-conversion">필수 변환(Required conversion)</a><span>, § 4.1에서</span>
@@ -7567,11 +7649,11 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
                 "f0f7ce16": { "dfnID": "f0f7ce16", "dfnText": "premultiplied", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-premultiplied" }, { "id": "ref-for-premultiplied\u2460" }, { "id": "ref-for-premultiplied\u2461" }], "title": "3.5. \n\tEffect of Non-Unity Alpha on color-mix\n" }], "url": "https://www.w3.org/TR/css-color-4/#premultiplied" },
                 "f3226176": { "dfnID": "f3226176", "dfnText": "rgba()", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-funcdef-rgba" }, { "id": "ref-for-funcdef-rgba\u2460" }, { "id": "ref-for-funcdef-rgba\u2461" }], "title": "2. The <color> syntax" }, { "refs": [{ "id": "ref-for-funcdef-rgba\u2462" }, { "id": "ref-for-funcdef-rgba\u2463" }], "title": "4.3. Relative sRGB Colors" }, { "refs": [{ "id": "ref-for-funcdef-rgba\u2464" }, { "id": "ref-for-funcdef-rgba\u2465" }], "title": "11.2. \n\tSerializing Origin Colors\n" }, { "refs": [{ "id": "ref-for-funcdef-rgba\u2466" }, { "id": "ref-for-funcdef-rgba\u2467" }], "title": "11.3. \n\tSerializing Relative Color Functions\n" }], "url": "https://www.w3.org/TR/css-color-4/#funcdef-rgba" },
                 "f5b34cad": { "dfnID": "f5b34cad", "dfnText": "<dashed-ident>", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-typedef-dashed-ident" }], "title": "5. \n\tSpecifying Predefined and Custom Color Spaces: the color() Function\n" }, { "refs": [{ "id": "ref-for-typedef-dashed-ident\u2460" }, { "id": "ref-for-typedef-dashed-ident\u2461" }, { "id": "ref-for-typedef-dashed-ident\u2462" }], "title": "5.1. Relative Color-Function Colors" }, { "refs": [{ "id": "ref-for-typedef-dashed-ident\u2463" }], "title": "5.2. \n\tCustom Color Spaces\n" }, { "refs": [{ "id": "ref-for-typedef-dashed-ident\u2464" }, { "id": "ref-for-typedef-dashed-ident\u2465" }], "title": "5.3. \n\tSpecifying a Color Profile: the @color-profile at-rule\n" }, { "refs": [{ "id": "ref-for-typedef-dashed-ident\u2466" }, { "id": "ref-for-typedef-dashed-ident\u2467" }], "title": "9.1. \n\tColor Space for Interpolation" }], "url": "https://www.w3.org/TR/css-values-4/#typedef-dashed-ident" },
-                "f6f69187": { "dfnID": "f6f69187", "dfnText": "color space", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-color-space" }], "title": "4.1. \n\tProcessing Model for Relative Colors\n" }, { "refs": [{ "id": "ref-for-color-space\u2460" }], "title": "4.2. \n\tRelative Color Syntax\n" }, { "refs": [{ "id": "ref-for-color-space\u2461" }], "title": "5. \n\tSpecifying Predefined and Custom Color Spaces: the color() Function\n" }, { "refs": [{ "id": "ref-for-color-space\u2462" }], "title": "11.1. \n\tSerializing color-mix()\n" }], "url": "https://www.w3.org/TR/css-color-4/#color-space" },
+                "f6f69187": { "dfnID": "f6f69187", "dfnText": "color space", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-color-space" }], "title": "4.1. \n\tProcessing Model for Relative Colors\n" }, { "refs": [{ "id": "ref-for-color-space\u2460" }], "title": "5. \n\tSpecifying Predefined and Custom Color Spaces: the color() Function\n" }, { "refs": [{ "id": "ref-for-color-space\u2461" }], "title": "11.1. \n\tSerializing color-mix()\n" }], "url": "https://www.w3.org/TR/css-color-4/#color-space" },
                 "f8e15dd7": { "dfnID": "f8e15dd7", "dfnText": "lime", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-valdef-color-lime" }], "title": "4.2. \n\tRelative Color Syntax\n" }], "url": "https://www.w3.org/TR/css-color-4/#valdef-color-lime" },
                 "fca74142": { "dfnID": "fca74142", "dfnText": "pop", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-stack-pop" }], "title": "3.3. \n\tCalculating the Result of color-mix\n" }], "url": "https://infra.spec.whatwg.org/#stack-pop" },
                 "fetch-an-external-color-profile": { "dfnID": "fetch-an-external-color-profile", "dfnText": "fetch an external color profile", "external": false, "refSections": [], "url": "#fetch-an-external-color-profile" },
-                "funcdef-alpha": { "dfnID": "funcdef-alpha", "dfnText": "alpha()", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-funcdef-alpha" }], "title": "2. The <color> syntax" }, { "refs": [{ "id": "ref-for-funcdef-alpha\u2460" }, { "id": "ref-for-funcdef-alpha\u2461" }], "title": "4.10. Relative Alpha Colors" }], "url": "#funcdef-alpha" },
+                "funcdef-alpha": { "dfnID": "funcdef-alpha", "dfnText": "alpha()", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-funcdef-alpha" }], "title": "2. The <color> syntax" }, { "refs": [{ "id": "ref-for-funcdef-alpha\u2460" }, { "id": "ref-for-funcdef-alpha\u2461" }], "title": "4.10. Relative Alpha Colors" }, { "refs": [{ "id": "ref-for-funcdef-alpha\u2462" }], "title": "11.3. Serializing Relative Color Functions" }], "url": "#funcdef-alpha" },
                 "funcdef-color": { "dfnID": "funcdef-color", "dfnText": "color()", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-funcdef-color" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-funcdef-color\u2460" }], "title": "2. The <color> syntax" }, { "refs": [{ "id": "ref-for-funcdef-color\u2461" }, { "id": "ref-for-funcdef-color\u2462" }, { "id": "ref-for-funcdef-color\u2463" }], "title": "5. Specifying Predefined and Custom Color Spaces: the color() Function" }, { "refs": [{ "id": "ref-for-funcdef-color\u2464" }, { "id": "ref-for-funcdef-color\u2465" }, { "id": "ref-for-funcdef-color\u2466" }, { "id": "ref-for-funcdef-color\u2467" }], "title": "5.1. Relative Color-Function Colors" }, { "refs": [{ "id": "ref-for-funcdef-color\u2468" }], "title": "5.3. Specifying a Color Profile: the @color-profile at-rule" }, { "refs": [{ "id": "ref-for-funcdef-color\u2460\u24ea" }], "title": "11.2. Serializing Origin Colors" }, { "refs": [{ "id": "ref-for-funcdef-color\u2460\u2460" }], "title": "11.3. Serializing Relative Color Functions" }, { "refs": [{ "id": "ref-for-funcdef-color\u2460\u2461" }], "title": "11.4. Serializing Custom Color Spaces" }, { "refs": [{ "id": "ref-for-funcdef-color\u2460\u2462" }], "title": "18.4. Since the Working Draft of 28 June 2022" }, { "refs": [{ "id": "ref-for-funcdef-color\u2460\u2463" }], "title": "18.9. Changes from CSS Color 4" }], "url": "#funcdef-color" },
                 "funcdef-color-mix": { "dfnID": "funcdef-color-mix", "dfnText": "color-mix()", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-funcdef-color-mix" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2460" }, { "id": "ref-for-funcdef-color-mix\u2461" }], "title": "2. The <color> syntax" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2462" }], "title": "3. Mixing Colors: the color-mix() Function" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2463" }], "title": "3.4. Effect of Mixing Color Space on color-mix" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2464" }], "title": "3.5. Effect of Non-Unity Alpha on color-mix" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2465" }, { "id": "ref-for-funcdef-color-mix\u2466" }], "title": "10.1. Resolving color-mix() Values" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2467" }], "title": "11. Serialization" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2468" }, { "id": "ref-for-funcdef-color-mix\u2460\u24ea" }, { "id": "ref-for-funcdef-color-mix\u2460\u2460" }], "title": "11.1. Serializing color-mix()" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2460\u2461" }, { "id": "ref-for-funcdef-color-mix\u2460\u2462" }, { "id": "ref-for-funcdef-color-mix\u2460\u2463" }], "title": "18.4. Since the Working Draft of 28 June 2022" }, { "refs": [{ "id": "ref-for-funcdef-color-mix\u2460\u2464" }], "title": "18.9. Changes from CSS Color 4" }], "url": "#funcdef-color-mix" },
                 "funcdef-contrast-color": { "dfnID": "funcdef-contrast-color", "dfnText": "contrast-color()", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-funcdef-contrast-color" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-funcdef-contrast-color\u2460" }, { "id": "ref-for-funcdef-contrast-color\u2461" }], "title": "2. The <color> syntax" }, { "refs": [{ "id": "ref-for-funcdef-contrast-color\u2462" }, { "id": "ref-for-funcdef-contrast-color\u2463" }, { "id": "ref-for-funcdef-contrast-color\u2464" }], "title": "8. Dynamically specifying a text color with adequate contrast: the contrast-color() Function" }, { "refs": [{ "id": "ref-for-funcdef-contrast-color\u2465" }], "title": "18.4. Since the Working Draft of 28 June 2022" }], "url": "#funcdef-contrast-color" },
@@ -7586,10 +7668,11 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
                 "invalid-color": { "dfnID": "invalid-color", "dfnText": "invalid color", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-invalid-color" }], "title": "5. Specifying Predefined and Custom Color Spaces: the color() Function" }, { "refs": [{ "id": "ref-for-invalid-color\u2460" }, { "id": "ref-for-invalid-color\u2461" }], "title": "5.1. Relative Color-Function Colors" }, { "refs": [{ "id": "ref-for-invalid-color\u2462" }], "title": "5.3. Specifying a Color Profile: the @color-profile at-rule" }], "url": "#invalid-color" },
                 "naively-convert-from-cmyk-to-rgba": { "dfnID": "naively-convert-from-cmyk-to-rgba", "dfnText": "naively convert from CMYK to RGBA", "external": false, "refSections": [], "url": "#naively-convert-from-cmyk-to-rgba" },
                 "naively-convert-from-rgba-to-cmyk": { "dfnID": "naively-convert-from-rgba-to-cmyk", "dfnText": "naively convert from RGBA to CMYK", "external": false, "refSections": [], "url": "#naively-convert-from-rgba-to-cmyk" },
-                "origin-color": { "dfnID": "origin-color", "dfnText": "origin color", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-origin-color" }, { "id": "ref-for-origin-color\u2460" }, { "id": "ref-for-origin-color\u2461" }], "title": "4.1. Processing Model for Relative Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2462" }, { "id": "ref-for-origin-color\u2463" }, { "id": "ref-for-origin-color\u2464" }, { "id": "ref-for-origin-color\u2465" }, { "id": "ref-for-origin-color\u2466" }, { "id": "ref-for-origin-color\u2467" }, { "id": "ref-for-origin-color\u2468" }, { "id": "ref-for-origin-color\u2460\u24ea" }, { "id": "ref-for-origin-color\u2460\u2460" }, { "id": "ref-for-origin-color\u2460\u2461" }, { "id": "ref-for-origin-color\u2460\u2462" }], "title": "4.2. Relative Color Syntax" }, { "refs": [{ "id": "ref-for-origin-color\u2460\u2463" }, { "id": "ref-for-origin-color\u2460\u2464" }], "title": "4.3. Relative sRGB Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2460\u2465" }, { "id": "ref-for-origin-color\u2460\u2466" }, { "id": "ref-for-origin-color\u2460\u2467" }], "title": "4.4. Relative HSL Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2460\u2468" }, { "id": "ref-for-origin-color\u2461\u24ea" }, { "id": "ref-for-origin-color\u2461\u2460" }], "title": "4.5. Relative HWB Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2461\u2461" }, { "id": "ref-for-origin-color\u2461\u2462" }, { "id": "ref-for-origin-color\u2461\u2463" }], "title": "4.6. Relative Lab Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2461\u2464" }, { "id": "ref-for-origin-color\u2461\u2465" }, { "id": "ref-for-origin-color\u2461\u2466" }], "title": "4.7. Relative Oklab Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2461\u2467" }, { "id": "ref-for-origin-color\u2461\u2468" }, { "id": "ref-for-origin-color\u2462\u24ea" }, { "id": "ref-for-origin-color\u2462\u2460" }], "title": "4.8. Relative LCH Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2462\u2461" }, { "id": "ref-for-origin-color\u2462\u2462" }, { "id": "ref-for-origin-color\u2462\u2463" }, { "id": "ref-for-origin-color\u2462\u2464" }], "title": "4.9. Relative OkLCh Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2462\u2465" }, { "id": "ref-for-origin-color\u2462\u2466" }], "title": "4.10. Relative Alpha Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2462\u2467" }, { "id": "ref-for-origin-color\u2462\u2468" }, { "id": "ref-for-origin-color\u2463\u24ea" }, { "id": "ref-for-origin-color\u2463\u2460" }], "title": "5.1. Relative Color-Function Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2463\u2461" }], "title": "11.2. Serializing Origin Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2463\u2462" }, { "id": "ref-for-origin-color\u2463\u2463" }], "title": "11.3. Serializing Relative Color Functions" }], "url": "#origin-color" },
+                "origin-color": { "dfnID": "origin-color", "dfnText": "origin color", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-origin-color" }, { "id": "ref-for-origin-color\u2460" }], "title": "4.1. Processing Model for Relative Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2461" }, { "id": "ref-for-origin-color\u2462" }, { "id": "ref-for-origin-color\u2463" }, { "id": "ref-for-origin-color\u2464" }, { "id": "ref-for-origin-color\u2465" }, { "id": "ref-for-origin-color\u2466" }, { "id": "ref-for-origin-color\u2467" }, { "id": "ref-for-origin-color\u2468" }, { "id": "ref-for-origin-color\u2460\u24ea" }, { "id": "ref-for-origin-color\u2460\u2460" }, { "id": "ref-for-origin-color\u2460\u2461" }], "title": "4.2. Relative Color Syntax" }, { "refs": [{ "id": "ref-for-origin-color\u2460\u2462" }, { "id": "ref-for-origin-color\u2460\u2463" }], "title": "4.3. Relative sRGB Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2460\u2464" }, { "id": "ref-for-origin-color\u2460\u2465" }, { "id": "ref-for-origin-color\u2460\u2466" }], "title": "4.4. Relative HSL Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2460\u2467" }, { "id": "ref-for-origin-color\u2460\u2468" }, { "id": "ref-for-origin-color\u2461\u24ea" }], "title": "4.5. Relative HWB Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2461\u2460" }, { "id": "ref-for-origin-color\u2461\u2461" }, { "id": "ref-for-origin-color\u2461\u2462" }], "title": "4.6. Relative Lab Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2461\u2463" }, { "id": "ref-for-origin-color\u2461\u2464" }, { "id": "ref-for-origin-color\u2461\u2465" }], "title": "4.7. Relative Oklab Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2461\u2466" }, { "id": "ref-for-origin-color\u2461\u2467" }, { "id": "ref-for-origin-color\u2461\u2468" }, { "id": "ref-for-origin-color\u2462\u24ea" }], "title": "4.8. Relative LCH Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2462\u2460" }, { "id": "ref-for-origin-color\u2462\u2461" }, { "id": "ref-for-origin-color\u2462\u2462" }, { "id": "ref-for-origin-color\u2462\u2463" }], "title": "4.9. Relative OkLCh Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2462\u2464" }, { "id": "ref-for-origin-color\u2462\u2465" }], "title": "4.10. Relative Alpha Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2462\u2466" }, { "id": "ref-for-origin-color\u2462\u2467" }, { "id": "ref-for-origin-color\u2462\u2468" }, { "id": "ref-for-origin-color\u2463\u24ea" }], "title": "5.1. Relative Color-Function Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2463\u2460" }], "title": "11.2. Serializing Origin Colors" }, { "refs": [{ "id": "ref-for-origin-color\u2463\u2461" }, { "id": "ref-for-origin-color\u2463\u2462" }], "title": "11.3. Serializing Relative Color Functions" }], "url": "#origin-color" },
                 "originally-specified-color-space": { "dfnID": "originally-specified-color-space", "dfnText": "originally specified color space", "external": false, "refSections": [], "url": "#originally-specified-color-space" },
                 "out-of-gamut": { "dfnID": "out-of-gamut", "dfnText": "out of gamut", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-out-of-gamut" }], "title": "5. Specifying Predefined and Custom Color Spaces: the color() Function" }], "url": "#out-of-gamut" },
-                "relative-color": { "dfnID": "relative-color", "dfnText": "relative color", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-relative-color" }, { "id": "ref-for-relative-color\u2460" }], "title": "4.1. Processing Model for Relative Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2461" }, { "id": "ref-for-relative-color\u2462" }, { "id": "ref-for-relative-color\u2463" }], "title": "4.2. Relative Color Syntax" }, { "refs": [{ "id": "ref-for-relative-color\u2464" }], "title": "4.3. Relative sRGB Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2465" }], "title": "4.4. Relative HSL Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2466" }], "title": "4.5. Relative HWB Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2467" }], "title": "4.6. Relative Lab Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2468" }], "title": "4.7. Relative Oklab Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u24ea" }], "title": "4.8. Relative LCH Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u2460" }], "title": "4.9. Relative OkLCh Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u2461" }], "title": "4.10. Relative Alpha Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u2462" }, { "id": "ref-for-relative-color\u2460\u2463" }, { "id": "ref-for-relative-color\u2460\u2464" }, { "id": "ref-for-relative-color\u2460\u2465" }], "title": "5.1. Relative Color-Function Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u2466" }, { "id": "ref-for-relative-color\u2460\u2467" }, { "id": "ref-for-relative-color\u2460\u2468" }], "title": "11.3. Serializing Relative Color Functions" }], "url": "#relative-color" },
+                "relative-color": { "dfnID": "relative-color", "dfnText": "relative color", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-relative-color" }], "title": "4.1. Processing Model for Relative Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460" }, { "id": "ref-for-relative-color\u2461" }, { "id": "ref-for-relative-color\u2462" }], "title": "4.2. Relative Color Syntax" }, { "refs": [{ "id": "ref-for-relative-color\u2463" }], "title": "4.3. Relative sRGB Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2464" }], "title": "4.4. Relative HSL Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2465" }], "title": "4.5. Relative HWB Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2466" }], "title": "4.6. Relative Lab Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2467" }], "title": "4.7. Relative Oklab Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2468" }], "title": "4.8. Relative LCH Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u24ea" }], "title": "4.9. Relative OkLCh Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u2460" }], "title": "4.10. Relative Alpha Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u2461" }, { "id": "ref-for-relative-color\u2460\u2462" }, { "id": "ref-for-relative-color\u2460\u2463" }, { "id": "ref-for-relative-color\u2460\u2464" }], "title": "5.1. Relative Color-Function Colors" }, { "refs": [{ "id": "ref-for-relative-color\u2460\u2465" }, { "id": "ref-for-relative-color\u2460\u2466" }], "title": "11.3. Serializing Relative Color Functions" }], "url": "#relative-color" },
+                "relative-color-processing-space": { "dfnID": "relative-color-processing-space", "dfnText": "relative color processing space", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-relative-color-processing-space" }, { "id": "ref-for-relative-color-processing-space\u2460" }, { "id": "ref-for-relative-color-processing-space\u2461" }, { "id": "ref-for-relative-color-processing-space\u2462" }], "title": "4.1. Processing Model for Relative Colors" }, { "refs": [{ "id": "ref-for-relative-color-processing-space\u2463" }], "title": "4.2. Relative Color Syntax" }, { "refs": [{ "id": "ref-for-relative-color-processing-space\u2464" }], "title": "10.2. Resolving Relative Color Syntax Values" }, { "refs": [{ "id": "ref-for-relative-color-processing-space\u2465" }, { "id": "ref-for-relative-color-processing-space\u2466" }], "title": "11.3. Serializing Relative Color Functions" }], "url": "#relative-color-processing-space" },
                 "required-conversion": { "dfnID": "required-conversion", "dfnText": "Required conversion", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-required-conversion" }], "title": "4.3. Relative sRGB Colors" }, { "refs": [{ "id": "ref-for-required-conversion\u2460" }, { "id": "ref-for-required-conversion\u2461" }], "title": "4.4. Relative HSL Colors" }, { "refs": [{ "id": "ref-for-required-conversion\u2462" }, { "id": "ref-for-required-conversion\u2463" }], "title": "4.5. Relative HWB Colors" }, { "refs": [{ "id": "ref-for-required-conversion\u2464" }, { "id": "ref-for-required-conversion\u2465" }], "title": "4.6. Relative Lab Colors" }, { "refs": [{ "id": "ref-for-required-conversion\u2466" }, { "id": "ref-for-required-conversion\u2467" }], "title": "4.7. Relative Oklab Colors" }, { "refs": [{ "id": "ref-for-required-conversion\u2468" }, { "id": "ref-for-required-conversion\u2460\u24ea" }, { "id": "ref-for-required-conversion\u2460\u2460" }], "title": "4.8. Relative LCH Colors" }, { "refs": [{ "id": "ref-for-required-conversion\u2460\u2461" }, { "id": "ref-for-required-conversion\u2460\u2462" }, { "id": "ref-for-required-conversion\u2460\u2463" }], "title": "4.9. Relative OkLCh Colors" }, { "refs": [{ "id": "ref-for-required-conversion\u2460\u2464" }, { "id": "ref-for-required-conversion\u2460\u2465" }, { "id": "ref-for-required-conversion\u2460\u2466" }], "title": "5.1. Relative Color-Function Colors" }], "url": "#required-conversion" },
                 "resolve-to-srgb": { "dfnID": "resolve-to-srgb", "dfnText": "resolve to sRGB", "external": false, "refSections": [], "url": "#resolve-to-srgb" },
                 "support-legacy-color-syntax": { "dfnID": "support-legacy-color-syntax", "dfnText": "support legacy color syntax", "external": false, "refSections": [], "url": "#support-legacy-color-syntax" },
@@ -8093,6 +8176,7 @@ color: <span class="swatch" style="--color: rgb(70.690% 26.851% 19.724%)"></span
                 "#origin-color": { "displayText": "origin color", "export": true, "for_": [], "level": "5", "normative": true, "shortname": "css-color", "spec": "css-color-5", "status": "local", "text": "origin color", "type": "dfn", "url": "#origin-color" },
                 "#out-of-gamut": { "displayText": "out of gamut", "export": true, "for_": [], "level": "5", "normative": true, "shortname": "css-color", "spec": "css-color-5", "status": "local", "text": "out of gamut", "type": "dfn", "url": "#out-of-gamut" },
                 "#relative-color": { "displayText": "relative color", "export": true, "for_": [], "level": "5", "normative": true, "shortname": "css-color", "spec": "css-color-5", "status": "local", "text": "relative color", "type": "dfn", "url": "#relative-color" },
+                "#relative-color-processing-space": { "displayText": "relative color processing space", "export": true, "for_": [], "level": "5", "normative": true, "shortname": "css-color", "spec": "css-color-5", "status": "local", "text": "relative color processing space", "type": "dfn", "url": "#relative-color-processing-space" },
                 "#required-conversion": { "displayText": "required conversion", "export": true, "for_": [], "level": "5", "normative": true, "shortname": "css-color", "spec": "css-color-5", "status": "local", "text": "required conversion", "type": "dfn", "url": "#required-conversion" },
                 "#typedef-cmyk-component": { "displayText": "<cmyk-component>", "export": true, "for_": [], "level": "5", "normative": true, "shortname": "css-color", "spec": "css-color-5", "status": "local", "text": "<cmyk-component>", "type": "type", "url": "#typedef-cmyk-component" },
                 "#typedef-color": { "displayText": "<color>", "export": true, "for_": [], "level": "5", "normative": true, "shortname": "css-color", "spec": "css-color-5", "status": "local", "text": "<color>", "type": "type", "url": "#typedef-color" },
