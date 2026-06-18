@@ -322,6 +322,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Isolated Contexts](https://ko.htmlspecs.com/isolated-contexts/)（[Source](https://wicg.github.io/isolated-web-apps/isolated-contexts.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Controlled Frame API](https://ko.htmlspecs.com/controlled-frame/)（[Source](https://wicg.github.io/controlled-frame/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Fenced Frame](https://ko.htmlspecs.com/fenced-frame/)（[Source](https://wicg.github.io/fenced-frame/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Iframe credentialless](https://ko.htmlspecs.com/anonymous-iframe/)（[Source](https://wicg.github.io/anonymous-iframe/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Private State Token API](https://ko.htmlspecs.com/trust-token-api/)（[Source](https://wicg.github.io/trust-token-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Attribution Level 1](https://ko.htmlspecs.com/attribution/)（[Source](https://www.w3.org/TR/2026/WD-attribution-20260602/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
