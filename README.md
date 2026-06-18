@@ -545,7 +545,6 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 표현 메타데이터, 링크 및 콘텐츠 인코딩
 - [HTTP State Management Mechanism](https://ko.htmlspecs.com/http/rfc6265.html)（[Source](https://httpwg.org/specs/rfc6265.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
-- [Cookies: HTTP State Management Mechanism](https://ko.htmlspecs.com/http/draft-ietf-httpbis-rfc6265bis.html)（[Source](https://httpwg.org/http-extensions/draft-ietf-httpbis-rfc6265bis.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Use of the Content-Disposition Header Field in the Hypertext Transfer Protocol (HTTP)](https://ko.htmlspecs.com/http/rfc6266.html)（[Source](https://httpwg.org/specs/rfc6266.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Hypertext Transfer Protocol (HTTP) Client-Initiated Content-Encoding](https://ko.htmlspecs.com/http/rfc7694.html)（[Source](https://httpwg.org/specs/rfc7694.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Web Linking](https://ko.htmlspecs.com/http/rfc8288.html)（[Source](https://httpwg.org/specs/rfc8288.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
