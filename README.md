@@ -263,7 +263,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2026/WD-paint-timing-20260324/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Largest Contentful Paint](https://ko.htmlspecs.com/largest-contentful-paint/)（[Source](https://www.w3.org/TR/2026/WD-largest-contentful-paint-20260408/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2026/WD-event-timing-20260319/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Performance measure memory](https://wicg.github.io/performance-measure-memory/)（[Source](https://wicg.github.io/performance-measure-memory/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Performance measure memory](https://ko.htmlspecs.com/performance-measure-memory/)（[Source](https://wicg.github.io/performance-measure-memory/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Device Memory API](https://ko.htmlspecs.com/device-memory/)（[Source](https://www.w3.org/TR/2026/WD-device-memory-1-20260330/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Layout Instability API](https://ko.htmlspecs.com/layout-instability/)（[Source](https://wicg.github.io/layout-instability/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
