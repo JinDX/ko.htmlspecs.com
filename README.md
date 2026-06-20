@@ -359,6 +359,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 디지털 출판 및 전자책
 - [EPUB 3.3](https://ko.htmlspecs.com/epub-33/)（[Source](https://www.w3.org/TR/2026/REC-epub-33-20260113/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [EPUB Reading Systems 3.3](https://ko.htmlspecs.com/epub-rs-33/)（[Source](https://www.w3.org/TR/2024/REC-epub-rs-33-20241017/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 
 ### 개발자 도구, 테스트 및 자동화
 - [Test Utils](https://ko.htmlspecs.com/testutils/)（[Source](https://testutils.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
