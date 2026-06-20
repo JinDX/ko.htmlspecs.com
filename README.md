@@ -357,6 +357,9 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Accessibility Conformance Testing (ACT) Rules Format 1.1](https://ko.htmlspecs.com/act-rules-format/)（[Source](https://www.w3.org/TR/2026/REC-act-rules-format-1.1-20260205/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Using ARIA](https://ko.htmlspecs.com/using-aria/)（[Source](https://www.w3.org/TR/2026/DISC-using-aria-20260224/) ![Discontinued Draft](https://img.shields.io/badge/DISC-ffcc00)）
 
+### 디지털 출판 및 전자책
+- [EPUB 3.3](https://ko.htmlspecs.com/epub-33/)（[Source](https://www.w3.org/TR/2026/REC-epub-33-20260113/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+
 ### 개발자 도구, 테스트 및 자동화
 - [Test Utils](https://ko.htmlspecs.com/testutils/)（[Source](https://testutils.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Console](https://ko.htmlspecs.com/console/)（[Source](https://console.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
