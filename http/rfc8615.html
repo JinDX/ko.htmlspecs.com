@@ -1,0 +1,653 @@
+<pre>Internet Engineering Task Force (IETF)                     M. Nottingham
+Request for Comments: 8615                                      2019년 5월
+Obsoletes: <a href="./rfc5785">5785</a>
+Updates: <a href="./rfc7230">7230</a>, <a href="./rfc7595">7595</a>
+Category: Standards Track
+ISSN: 2070-1721
+
+
+             <span class="h1">잘 알려진 Uniform Resource Identifier(URI)</span>
+
+초록
+
+   이 메모는 선택된 Uniform Resource Identifier(URI) 스킴에서
+   "잘 알려진 위치"를 위한 경로 접두사 "/.well-known/"을 정의한다.
+
+   그렇게 함으로써, 이 문서는 <a href="./rfc5785">RFC 5785</a>를 폐기하고
+   <a href="./rfc7230">RFC 7230</a>에 정의된 URI 스킴을 갱신하여 그 공간을 예약한다.
+   또한 잘 알려진 URI를 지원하는 URI 스킴을 해당 레지스트리에서
+   추적하도록 <a href="./rfc7595">RFC 7595</a>를 갱신한다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 Internet Engineering Task Force(IETF)의 산출물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 공개 검토를 거쳤으며
+   Internet Engineering Steering Group(IESG)에 의해 발행 승인을 받았다.
+   인터넷 표준에 관한 추가 정보는 <a href="./rfc7841#section-2">RFC 7841의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 피드백 제공 방법에 관한 정보는
+   <a href="https://www.rfc-editor.org/info/rfc8615">https://www.rfc-editor.org/info/rfc8615</a>에서 얻을 수 있다.
+
+저작권 고지
+
+   Copyright (c) 2019 IETF Trust 및 문서 저자로 식별된 사람들.
+   모든 권리는 보호된다.
+
+   이 문서는 발행일 현재 유효한 <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> 및 IETF Trust의
+   IETF 문서 관련 법적 조항
+   (<a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>)의 적용을 받는다.
+   이 문서들은 이 문서에 관한 권리와 제한 사항을 설명하므로
+   주의 깊게 검토하기 바란다. 이 문서에서 추출한 Code Component는
+   Trust Legal Provisions의 Section 4.e에 설명된 Simplified BSD License
+   텍스트를 포함해야 하며, Simplified BSD License에 설명된 대로
+   보증 없이 제공된다.
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>.  소개  . . . . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-2">2</a>
+   <a href="#section-2">2</a>.  표기 규칙  . . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-3">3</a>
+   <a href="#section-3">3</a>.  잘 알려진 URI . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-3">3</a>
+     <a href="#section-3.1">3.1</a>.  잘 알려진 URI 등록  . . . . . . . . . . . . . . . . .   <a href="#page-4">4</a>
+   <a href="#section-4">4</a>.  보안 고려 사항 . . . . . . . . . . . . . . . . . . . . .   <a href="#page-5">5</a>
+     <a href="#section-4.1">4.1</a>.  잘 알려진 리소스 보호  . . . . . . . . . . . . . . .   <a href="#page-6">6</a>
+     <a href="#section-4.2">4.2</a>.  웹 브라우징과의 상호작용  . . . . . . . . . . . . .   <a href="#page-6">6</a>
+     <a href="#section-4.3">4.3</a>.  애플리케이션 범위 지정  . . . . . . . . . . . . . .   <a href="#page-7">7</a>
+     <a href="#section-4.4">4.4</a>.  숨겨진 기능  . . . . . . . . . . . . . . . . . . . .   <a href="#page-8">8</a>
+   <a href="#section-5">5</a>.  IANA 고려 사항 . . . . . . . . . . . . . . . . . . . . .   <a href="#page-8">8</a>
+     <a href="#section-5.1">5.1</a>.  잘 알려진 URI 레지스트리 . . . . . . . . . . . . .   <a href="#page-8">8</a>
+     5.2.  Uniform Resource Identifier (URI) 스킴 레지스트리  .   9
+   <a href="#section-6">6</a>.  참고 문헌  . . . . . . . . . . . . . . . . . . . . . . .   <a href="#page-9">9</a>
+     <a href="#section-6.1">6.1</a>.  규범적 참고 문헌  . . . . . . . . . . . . . . . . .   <a href="#page-9">9</a>
+     <a href="#section-6.2">6.2</a>.  정보성 참고 문헌  . . . . . . . . . . . . . . . . .  <a href="#page-10">10</a>
+   <a href="#appendix-A">부록 A</a>.  자주 묻는 질문 . . . . . . . . . . . . . . . . . .  <a href="#page-12">12</a>
+   <a href="#appendix-B">부록 B</a>.  <a href="./rfc5785">RFC 5785</a>로부터의 변경 사항  . . . . . . . . . . . . . .  <a href="#page-12">12</a>
+   저자 주소  . . . . . . . . . . . . . . . . . . . . . . . . .  <a href="#page-12">12</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   웹의 일부 애플리케이션은 요청을 하기 전에 origin [<a href="./rfc6454" title="&quot;The Web Origin Concept&quot;">RFC6454</a>]에
+   관한 정보(때로는 "사이트 전체 메타데이터"라고 함)를 발견해야 한다.
+   예를 들어 Robots Exclusion Protocol
+   (<a href="http://www.robotstxt.org">http://www.robotstxt.org</a>)은 자동화된 프로세스가 리소스 접근 권한을
+   얻는 방법을 지정한다. 마찬가지로 Platform for Privacy Preferences
+   [<a href="#ref-P3P" title="&quot;The Platform for Privacy Preferences 1.0 (P3P1.0) Specification&quot;">P3P</a>]는 사용자 에이전트가 origin 서버와 상호작용하기 전에
+   개인정보 보호 정책을 발견하는 방법을 알려준다.
+
+   리소스별 메타데이터에 접근하는 방법은 여러 가지가 있지만
+   (예: HTTP 헤더 필드, Web Distributed Authoring and Versioning
+   (WebDAV) [<a href="./rfc4918" title="&quot;HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)&quot;">RFC4918</a>]의 PROPFIND), 그러한 방법과 관련된
+   인지된 오버헤드(클라이언트가 인지하는 지연 및/또는 배포상의
+   어려움)가 이런 시나리오에서 그 사용을 가로막는 경우가 많다.
+
+   동시에 HTTP를 비웹 프로토콜의 기반으로 사용하는 일이 더 흔해졌다.
+   때때로 그러한 프로토콜은 주어진 호스트에서 하나 이상의 리소스를
+   찾는 방법을 필요로 한다.
+
+   이러한 경우 한 가지 해결책은 origin 전체와 관련된 데이터나 서비스를
+   쉽게 찾을 수 있도록 지정된 "잘 알려진 위치"를 정하는 것이다.
+   그러나 이 접근 방식에는, 다른 지정된 "잘 알려진 위치"와 origin이
+   생성했거나 생성하고자 하는 리소스 모두와 충돌할 위험이 있다는
+   단점이 있다. 더 나아가 잘 알려진 위치를 정의하는 것은 origin이
+   자신의 URI 공간을 통제할 권한을 빼앗는다 [<a href="./rfc7320" title="&quot;URI Design and Ownership&quot;">RFC7320</a>].
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   이러한 용도를 다루기 위해, 이 메모는 HTTP, HTTPS, WebSocket(WS),
+   Secure WebSocket(WSS) URI에서 이러한 "잘 알려진 위치"를 위한
+   경로 접두사 "/.well-known/"를 예약한다. 이러한 메타데이터를 위한
+   리소스를 정의해야 하는 향후 명세는 충돌을 피하고 origin의 URI
+   공간 침해를 최소화하기 위해 그 사용을 등록할 수 있다.
+
+   잘 알려진 URI는 다른 URI 스킴에서도 사용할 수 있지만, 해당 스킴의
+   정의가 이를 명시적으로 허용하는 경우에만 가능하다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  표기 규칙</span>
+
+   이 문서의 핵심어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",
+   "NOT RECOMMENDED", "MAY", "OPTIONAL"은, 여기에 표시된 것처럼
+   모두 대문자로 나타날 때에만 <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a> [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>] [<a href="./rfc8174" title="&quot;Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words&quot;">RFC8174</a>]에
+   설명된 대로 해석되어야 한다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  잘 알려진 URI</span>
+
+   잘 알려진 URI는 경로 구성요소가 "/.well-known/" 문자로 시작하는
+   URI [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]이며, 단 해당 스킴이 잘 알려진 URI를 지원하도록
+   명시적으로 정의되어 있어야 한다.
+
+   예를 들어 어떤 애플리케이션이 'example'이라는 이름을 등록했다면,
+   'http://www.example.com/'에서 대응하는 잘 알려진 URI는
+   'http://www.example.com/.well-known/example'이 된다.
+
+   이 명세는 "http" [<a href="./rfc7230" title="&quot;Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing&quot;">RFC7230</a>] 및 "https" [<a href="./rfc7230" title="&quot;Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing&quot;">RFC7230</a>] 스킴을
+   갱신하여 잘 알려진 URI를 지원하게 한다. 다른 기존 스킴은 그
+   정의를 갱신하기 위한 적절한 절차를 사용할 수 있다. 예를 들어
+   [<a href="./rfc8307" title="&quot;Well-Known URIs for the WebSocket Protocol&quot;">RFC8307</a>]은 "ws" 및 "wss" 스킴에 대해 그렇게 한다.
+   "Uniform Resource Identifier (URI) Schemes" 레지스트리는 어떤
+   스킴이 잘 알려진 URI를 지원하는지 추적한다. <a href="#section-5.2">Section 5.2</a>를 보라.
+
+   새로운 잘 알려진 URI를 만들고자 하는 애플리케이션은 다음 요구
+   사항에 따라 <a href="#section-5.1">Section 5.1</a>의 절차를 따라 이를 반드시 등록해야 한다.
+
+   등록된 이름은 [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]의 "segment-nz" production을 반드시
+   준수해야 한다. 이는 이름에 "/" 문자를 포함할 수 없음을 의미한다.
+
+   특정 애플리케이션의 등록 이름은 그에 맞게 정밀해야 한다. 일반적인
+   용어를 "선점"하는 것은 권장되지 않는다. 예를 들어 Example
+   애플리케이션이 메타데이터를 위한 잘 알려진 위치를 원한다면,
+   적절한 등록 이름은 "metadata"가 아니라 "example-metadata" 또는
+   "example.com-metadata"일 수 있다.
+
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   등록에는 최소한, 잘 알려진 URI를 역참조하여 얻는 형식과 관련
+   미디어 타입(들)을 정의하는 명세에 대한 참조와, 그 잘 알려진 URI를
+   사용할 수 있는 URI 스킴(들)이 포함된다. URI 스킴이 명시적으로
+   지정되지 않으면 "http" 및 "https"가 가정된다.
+
+   일반적으로 애플리케이션은 주어진 스킴의 기본 포트를 사용한다.
+   대체 포트를 사용하는 경우, 해당 애플리케이션이 이를 반드시
+   명시적으로 지정해야 한다.
+
+   등록에는 잘 알려진 URI에 추가될 추가 경로 구성요소, 쿼리 문자열
+   및/또는 fragment identifier의 구문, 또는 프로토콜별 세부 사항
+   (예: HTTP [<a href="./rfc7231" title="&quot;Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content&quot;">RFC7231</a>] 메서드 처리)과 같은 추가 정보를 포함할 수도 있다.
+
+   이 명세는 특정 애플리케이션을 위한 잘 알려진 URI를 찾는 데 사용할
+   호스트 이름을 결정하는 방법도, 잘 알려진 URI를 역참조하여 발견된
+   메타데이터의 범위도 정의하지 않는다는 점에 유의하라. 둘 모두
+   애플리케이션 자체에서 정의해야 한다.
+
+   또한 이 명세는 "/.well-known/"에 위치한 리소스의 형식이나 미디어
+   타입을 정의하지 않으며, 클라이언트는 해당 위치에 리소스가 존재할
+   것으로 기대해서는 안 된다.
+
+   잘 알려진 URI는 경로 계층의 최상위에 뿌리를 둔다. 경로의 다른
+   부분에서는 정의상 잘 알려진 것이 아니다. 예를 들어
+   "/.well-known/example"은 잘 알려진 URI인 반면,
+   "/foo/.well-known/example"은 그렇지 않다.
+
+   잘 알려진 위치에 관한 보안 고려 사항은 <a href="#section-4">Section 4</a>도 보라.
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  잘 알려진 URI 등록</span>
+
+   "Well-Known URIs" 레지스트리는
+   &lt;<a href="https://www.iana.org/assignments/well-known-uris/">https://www.iana.org/assignments/well-known-uris/</a>&gt;에 있다.
+   등록 요청은 그곳에 있는 지침을 따르거나
+   &lt;wellknown-uri-review@ietf.org&gt; 메일링 리스트로 이메일을 보내
+   할 수 있다.
+
+   등록 요청은 최소한 다음 정보를 포함한다.
+
+   URI suffix:  "/.well-known/"에 상대적인, 잘 알려진 URI에 대해
+      요청한 이름. 예: "example".
+
+
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   Change controller:  Standards Track RFC의 경우 "IETF"라고 명시한다.
+      그 밖의 경우에는 책임 당사자의 이름을 제시한다. 다른 세부 정보
+      (예: 이메일 주소, 홈페이지 URI)도 포함될 수 있다.
+
+   Specification document(s):  해당 필드를 지정하는 문서에 대한 참조.
+      가능한 경우 문서 사본을 가져올 수 있는 URI를 포함한다. 관련
+      섹션의 표시도 포함될 수 있지만 필수는 아니다.
+
+   Status:  "permanent" 또는 "provisional" 중 하나. 아래 지침을 보라.
+
+   Related information:  선택적으로, 추가 관련 정보를 담은 문서에 대한
+      인용.
+
+   등록 값에 대한 일반 요구 사항은 <a href="#section-3">Section 3</a>에 설명되어 있다.
+
+   Standards Track RFC 및 기타 공개 표준(<a href="./rfc2026#section-7.1.1">[RFC2026], Section&nbsp;7.1.1</a>의
+   의미에서)에 의해 정의된 값은 "permanent" 상태를 갖는다. 다른 값도
+   전문가들이, 커뮤니티와 협의하여, 그것이 사용 중이라고 판단하면
+   permanent로 등록될 수 있다. 그 밖의 값은 "provisional"로 등록되어야
+   한다.
+
+   전문가들이 커뮤니티와 협의하여 사용 중이 아니라고 판단하면
+   provisional 항목은 제거될 수 있다. 전문가들은 provisional 항목의
+   상태를 permanent로 바꿀 수 있다. 이때 전문가들은 해당 값이 얼마나
+   널리 사용되는지 고려하고 사전에 커뮤니티와 협의해야 한다.
+
+   위의 "커뮤니티와 협의"는 해당 URI 스킴(들)을 책임지는 주체를
+   의미한다. 일반적으로 이는 적절한 Working Group(들)(종료된 경우도
+   포함)의 메일링 리스트에서 이루어지거나, 그러한 리스트가 없으면
+   &lt;art@ietf.org&gt;에서 이루어진다.
+
+   잘 알려진 URI는 전문가(들)를 포함한 제3자가 등록할 수 있다.
+   전문가(들)가 등록되지 않은 잘 알려진 URI가 널리 배포되어 있으며
+   그렇지 않으면 적시에 등록될 가능성이 낮다고 판단하는 경우이다.
+   그러한 등록도 명세 참조 필요성을 포함하여 정의된 요구 사항의
+   적용을 받는다.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  보안 고려 사항</span>
+
+   새로운 잘 알려진 URI를 만드는 애플리케이션과 이를 배포하는
+   관리자는 민감한 데이터의 노출, 서비스 거부 공격(일반적인 부하
+   문제에 추가로), 서버
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   및 클라이언트 인증, DNS rebinding 공격에 대한 취약성, 서버에 대한
+   제한된 접근이 잘 알려진 URI가 제공되는 방식에 영향을 줄 수 있는
+   공격 등을 포함하되 이에 한정되지 않는 여러 보안 관련 문제를
+   고려해야 한다.
+
+   [<a id="ref-RFC3552">RFC3552</a>]에는 애플리케이션 프로토콜과 이를 배포하는 관리자에게
+   관련될 수 있는 잠재적인 보안 고려 사항의 몇 가지 예가 포함되어
+   있다.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  잘 알려진 리소스 보호</span>
+
+   잘 알려진 위치는 사실상 전체 origin을 대표하므로, 서버 운영자는
+   해당 위치에 대한 쓰기 권한을 적절히 통제해야 한다. 이는 동일한
+   origin에 둘 이상의 엔터티가 함께 위치하는 경우 특히 중요하다.
+   단일 엔터티가 제어하고 대표하는 origin의 경우에도, 서버 구성이나
+   파일시스템 같은 구현 권한을 통해 외부 또는 로컬에서 잘 알려진
+   위치에 대한 쓰기 접근이 부주의하게 허용되지 않도록 주의해야 한다.
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  웹 브라우징과의 상호작용</span>
+
+   "http" 또는 "https" URL에 대해 잘 알려진 URI를 사용하는
+   애플리케이션은, 잘 알려진 리소스가 웹 브라우저에 접근 가능하며
+   따라서 해당 origin의 다른 부분에서 얻은 콘텐츠에 의해 조작될 수
+   있음을 인식해야 한다. 공격자가 콘텐츠를 주입할 수 있다면(예:
+   Cross-Site Scripting 취약점을 통해), 잘 알려진 리소스에 잠재적으로
+   임의의 요청을 할 수 있게 된다.
+
+   HTTP와 HTTPS는 쿠키 [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>], Web Storage [<a href="#ref-WEBSTORAGE">WEBSTORAGE</a>] 및
+   다양한 capability를 포함하되 이에 한정되지 않는 많은 다른 메커니즘의
+   보안 경계로도 origin을 사용한다.
+
+   잘 알려진 위치를 정의하는 애플리케이션은 이러한 메커니즘에 대한
+   단독 접근 권한이 있다거나 그 origin을 사용하는 유일한
+   애플리케이션이라고 가정해서는 안 된다. 애플리케이션의 성격에 따라
+   완화책에는 다음이 포함될 수 있다.
+
+   o  민감한 정보 암호화
+
+   o  다른 애플리케이션과의 충돌을 피하기 위해 식별자(예: 쿠키 이름)
+      사용에 유연성 허용
+
+   o  쿠키에 'HttpOnly' 플래그를 사용하여 쿠키가 브라우저 스크립팅
+      언어에 노출되지 않도록 보장 [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>]
+
+   o  쿠키에 'Path' 매개변수를 사용하여 쿠키가 origin의 다른 부분에서
+      사용 가능하지 않도록 보장 [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>]
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   o  X-Content-Type-Options: nosniff [<a href="#ref-FETCH" title="&quot;Fetch - Living Standard&quot;">FETCH</a>]를 사용하여
+      공격자가 제어하는 콘텐츠가 웹 브라우저에 의해 active content로
+      해석되는 형태로 유도되지 않도록 보장
+
+   다른 좋은 관행에는 다음이 포함된다.
+
+   o  Content-Type 헤더 필드에 애플리케이션별 미디어 타입을 사용하고,
+      해당 타입이 사용되지 않으면 클라이언트가 실패하도록 요구
+
+   o  Content-Security-Policy [<a href="#ref-CSP" title="&quot;Content Security Policy Level 3&quot;">CSP</a>]를 사용하여 active content(예: HTML
+      [<a href="#ref-HTML5" title="&quot;HTML - Living Standard&quot;">HTML5</a>])의 capability를 제한함으로써 Cross-Site Scripting 공격을
+      완화
+
+   o  Referrer-Policy [<a href="#ref-REFERRER-POLICY">REFERRER-POLICY</a>]를 사용하여 URL의 민감한 데이터가
+      Referer 요청 헤더 필드로 유출되는 것을 방지
+
+   o  민감한 정보(예: 인증 토큰, 비밀번호)에 압축 사용을 피함. 웹
+      브라우저가 제공하는 스크립팅 환경은 공격자가 압축 공간을
+      반복적으로 탐색할 수 있게 하며, 공격자가 통신 경로에 접근할 수
+      있다면 이 capability를 사용해 해당 정보를 복구할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  애플리케이션 범위 지정</span>
+
+   이 메모는 잘 알려진 URI에서 얻은 정보의 적용 범위를 지정하지
+   않으며, 특정 애플리케이션을 위한 잘 알려진 URI를 발견하는 방법도
+   지정하지 않는다.
+
+   이 메커니즘을 사용하는 개별 애플리케이션은 두 측면 모두를 정의해야
+   한다. 이것이 지정되지 않으면 구현 편차와 애플리케이션 간 경계에
+   대한 혼동으로 보안 문제가 발생할 수 있다.
+
+   잘 알려진 URI에서 발견한 메타데이터를 동일 origin에 함께 위치하지
+   않은 리소스에 적용하면 관리상 문제뿐 아니라 보안 문제도 초래할
+   위험이 있다. 예를 들어
+   "https://example.com/.well-known/example"이
+   "https://department.example.com", "https://www.example.com", 또는
+   "<a href="https://www.example.com:8000">https://www.example.com:8000</a>"에 정책을 적용하도록 허용하면,
+   실제로는 존재하지 않을 수도 있는 호스트 간 관계를 가정하게 되어
+   잠재적 공격자에게 제어권을 줄 수 있다.
+
+   마찬가지로 특정 호스트 이름의 잘 알려진 URI를 어떤 프로토콜을
+   부트스트랩하는 데 사용하도록 지정하면 많은 원치 않는 요청을
+   유발할 수 있다. 예를 들어 잘 알려진 HTTPS URI가 이메일과 같은
+   별도 서비스에 관한 정책을 찾는 데 사용되면, 해당 잘 알려진 URI를
+   구현하지 않는 경우에도 웹 서버로 요청이 홍수처럼 몰릴 수 있다.
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   이러한 원치 않는 요청은 서비스 거부 공격처럼 보일 수 있다.
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a>.  숨겨진 기능</span>
+
+   잘 알려진 위치를 사용하는 애플리케이션은 일부 서버 관리자가 그
+   존재를 알지 못할 수 있다는 점을 고려해야 한다(특히 "."으로 시작하는
+   디렉터리 이름을 숨기는 운영 체제에서). 이는 공격자가 .well-known
+   디렉터리에 쓰기 접근 권한을 가진 경우, 관리자가 이를 알아차리지
+   못한 채 그 내용을 제어할 수 있음을 의미한다.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  IANA 고려 사항</span>
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>.  잘 알려진 URI 레지스트리</span>
+
+   이 명세는 [<a href="./rfc5785" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">RFC5785</a>]에서 처음 정의된 "Well-Known URI" 레지스트리의
+   등록 절차를 갱신한다. <a href="#section-3.1">Section 3.1</a>을 보라.
+
+   잘 알려진 URI는 하나 이상의 전문가의 조언에 따라 등록되며,
+   Specification Required([<a href="./rfc8126" title="">RFC8126</a>]의 용어 사용) 방식이다.
+
+   등록 요청을 평가할 때 전문가의 주요 고려 사항은 다음과 같다.
+
+   o  <a href="#section-3">Section 3</a>의 요구 사항 준수
+
+   o  명세 문서의 가용성과 안정성
+
+   o  <a href="#section-4">Section 4</a>에 제시된 고려 사항
+
+   IANA는 들어오는 모든 레지스트리 요청의 발신자를 이 문서 및 정의된
+   경우 전문가(들)가 수립한 절차로 안내한다. 일반적으로 이는
+   레지스트리 웹 페이지로 안내하는 것을 의미한다.
+
+   이 문서에 따라 IANA는 다음을 수행했다.
+
+   o  등록 절차를 Specification Required로 갱신했다.
+
+   o  레지스트리에 "Status" 열을 추가하고 기존 등록을 모두
+      "permanent"로 표시했다.
+
+
+
+
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  Uniform Resource Identifier (URI) 스킴 레지스트리</span>
+
+   이 명세는 "Uniform Resource Identifier (URI) Schemes" 레지스트리의
+   등록 템플릿에 "Well-Known URI Support"라는 이름의 필드를 추가하며,
+   기본값은 "-"이다.
+
+   URI 스킴이 <a href="#section-3">Section 3</a>에 따라 잘 알려진 URI를 사용하도록
+   명시적으로 지정된 경우, 그 값은 해당 명세에 대한 참조로 변경된다.
+   "-"가 아닌 초기값은 Table 1에 제시되어 있다.
+
+                  +------------+------------------------+
+                  | URI Scheme | Well-Known URI Support |
+                  +------------+------------------------+
+                  | coap       | [<a href="./rfc7252" title="&quot;The Constrained Application Protocol (CoAP)&quot;">RFC7252</a>]              |
+                  | coap+tcp   | [<a href="./rfc8323" title="&quot;CoAP (Constrained Application Protocol) over TCP, TLS, and WebSockets&quot;">RFC8323</a>]              |
+                  | coap+ws    | [<a href="./rfc8323" title="&quot;CoAP (Constrained Application Protocol) over TCP, TLS, and WebSockets&quot;">RFC8323</a>]              |
+                  | coaps      | [<a href="./rfc7252" title="&quot;The Constrained Application Protocol (CoAP)&quot;">RFC7252</a>]              |
+                  | coaps+tcp  | [<a href="./rfc8323" title="&quot;CoAP (Constrained Application Protocol) over TCP, TLS, and WebSockets&quot;">RFC8323</a>]              |
+                  | coaps+ws   | [<a href="./rfc8323" title="&quot;CoAP (Constrained Application Protocol) over TCP, TLS, and WebSockets&quot;">RFC8323</a>]              |
+                  | http       | [<a href="./rfc8615">RFC8615</a>]              |
+                  | https      | [<a href="./rfc8615">RFC8615</a>]              |
+                  | ws         | [<a href="./rfc8307" title="&quot;Well-Known URIs for the WebSocket Protocol&quot;">RFC8307</a>]              |
+                  | wss        | [<a href="./rfc8307" title="&quot;Well-Known URIs for the WebSocket Protocol&quot;">RFC8307</a>]              |
+                  +------------+------------------------+
+
+       Table 1: 비어 있지 않은 새 열을 가진 URI 스킴 레지스트리 행
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  참고 문헌</span>
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  규범적 참고 문헌</span>
+
+   [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "요구 수준을 나타내기 위해 RFC에서
+              사용하는 핵심어", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>,
+              DOI 10.17487/RFC2119, 1997년 3월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;.
+
+   [<a id="ref-RFC3986">RFC3986</a>]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): 일반 구문", STD 66,
+              <a href="./rfc3986">RFC 3986</a>, DOI 10.17487/RFC3986, 2005년 1월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;.
+
+   [<a id="ref-RFC6454">RFC6454</a>]  Barth, A., "웹 Origin 개념", <a href="./rfc6454">RFC 6454</a>,
+              DOI 10.17487/RFC6454, 2011년 12월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc6454">https://www.rfc-editor.org/info/rfc6454</a>&gt;.
+
+
+
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                    [Page 9]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   [<a id="ref-RFC7230">RFC7230</a>]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): 메시지 구문과 라우팅",
+              <a href="./rfc7230">RFC 7230</a>, DOI 10.17487/RFC7230, 2014년 6월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7230">https://www.rfc-editor.org/info/rfc7230</a>&gt;.
+
+   [<a id="ref-RFC8126">RFC8126</a>]  Cotton, M., Leiba, B., and T. Narten, "RFC의 IANA
+              Considerations 섹션 작성 지침", <a href="https://www.rfc-editor.org/bcp/bcp26">BCP 26</a>,
+              <a href="./rfc8126">RFC 8126</a>, DOI 10.17487/RFC8126, 2017년 6월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;.
+
+   [<a id="ref-RFC8174">RFC8174</a>]  Leiba, B., "<a href="./rfc2119">RFC</a> <a href="./rfc2119">2119</a> 핵심어에서 대문자와 소문자의
+              모호성", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc8174">RFC 8174</a>, DOI 10.17487/RFC8174,
+              2017년 5월, &lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;.
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  정보성 참고 문헌</span>
+
+   [<a id="ref-CSP">CSP</a>]      West, M., "Content Security Policy Level 3", World Wide
+              Web Consortium WD WD-CSP3-20160913, 2016년 9월,
+              &lt;<a href="https://www.w3.org/TR/2016/WD-CSP3-20160913">https://www.w3.org/TR/2016/WD-CSP3-20160913</a>&gt;.
+
+   [<a id="ref-FETCH">FETCH</a>]    WHATWG, "Fetch - Living Standard",
+              &lt;<a href="https://fetch.spec.whatwg.org">https://fetch.spec.whatwg.org</a>&gt;.
+
+   [<a id="ref-HTML5">HTML5</a>]    WHATWG, "HTML - Living Standard",
+              &lt;<a href="https://html.spec.whatwg.org">https://html.spec.whatwg.org</a>&gt;.
+
+   [<a id="ref-P3P">P3P</a>]      Marchiori, M., "The Platform for Privacy Preferences 1.0
+              (P3P1.0) Specification", World Wide Web Consortium
+              Recommendation REC-P3P-20020416, 2002년 4월,
+              &lt;<a href="http://www.w3.org/TR/2002/REC-P3P-20020416">http://www.w3.org/TR/2002/REC-P3P-20020416</a>&gt;.
+
+   [<a id="ref-REFERRER-POLICY">REFERRER-POLICY</a>]
+              Eisinger, J. and E. Stark, "Referrer Policy", World Wide
+              Web Consortium CR CR-referrer-policy-20170126, 2017년 1월,
+              &lt;<a href="https://www.w3.org/TR/2017/CR-referrer-policy-20170126">https://www.w3.org/TR/2017/CR-referrer-policy-20170126</a>&gt;.
+
+   [<a id="ref-RFC2026">RFC2026</a>]  Bradner, S., "인터넷 표준 절차 -- 개정 3",
+              <a href="https://www.rfc-editor.org/bcp/bcp9">BCP 9</a>, <a href="./rfc2026">RFC 2026</a>, DOI 10.17487/RFC2026, 1996년 10월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc2026">https://www.rfc-editor.org/info/rfc2026</a>&gt;.
+
+   [<a id="ref-RFC3552">RFC3552</a>]  Rescorla, E. and B. Korver, "보안 고려 사항에 관한 RFC
+              텍스트 작성 지침", <a href="https://www.rfc-editor.org/bcp/bcp72">BCP 72</a>, <a href="./rfc3552">RFC 3552</a>,
+              DOI 10.17487/RFC3552, 2003년 7월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc3552">https://www.rfc-editor.org/info/rfc3552</a>&gt;.
+
+
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                   [Page 10]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+   [<a id="ref-RFC4918">RFC4918</a>]  Dusseault, L., Ed., "HTTP Extensions for Web Distributed
+              Authoring and Versioning (WebDAV)", <a href="./rfc4918">RFC 4918</a>,
+              DOI 10.17487/RFC4918, 2007년 6월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc4918">https://www.rfc-editor.org/info/rfc4918</a>&gt;.
+
+   [<a id="ref-RFC5785">RFC5785</a>]  Nottingham, M. and E. Hammer-Lahav, "잘 알려진
+              Uniform Resource Identifier(URI) 정의", <a href="./rfc5785">RFC 5785</a>,
+              DOI 10.17487/RFC5785, 2010년 4월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc5785">https://www.rfc-editor.org/info/rfc5785</a>&gt;.
+
+   [<a id="ref-RFC6265">RFC6265</a>]  Barth, A., "HTTP 상태 관리 메커니즘", <a href="./rfc6265">RFC 6265</a>,
+              DOI 10.17487/RFC6265, 2011년 4월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc6265">https://www.rfc-editor.org/info/rfc6265</a>&gt;.
+
+   [<a id="ref-RFC7231">RFC7231</a>]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): 의미론과 콘텐츠", <a href="./rfc7231">RFC 7231</a>,
+              DOI 10.17487/RFC7231, 2014년 6월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7231">https://www.rfc-editor.org/info/rfc7231</a>&gt;.
+
+   [<a id="ref-RFC7252">RFC7252</a>]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
+              Application Protocol (CoAP)", <a href="./rfc7252">RFC 7252</a>,
+              DOI 10.17487/RFC7252, 2014년 6월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7252">https://www.rfc-editor.org/info/rfc7252</a>&gt;.
+
+   [<a id="ref-RFC7320">RFC7320</a>]  Nottingham, M., "URI 설계와 소유권", <a href="https://www.rfc-editor.org/bcp/bcp190">BCP 190</a>,
+              <a href="./rfc7320">RFC 7320</a>, DOI 10.17487/RFC7320, 2014년 7월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7320">https://www.rfc-editor.org/info/rfc7320</a>&gt;.
+
+   [<a id="ref-RFC8307">RFC8307</a>]  Bormann, C., "WebSocket Protocol을 위한 잘 알려진 URI",
+              <a href="./rfc8307">RFC 8307</a>, DOI 10.17487/RFC8307, 2018년 1월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc8307">https://www.rfc-editor.org/info/rfc8307</a>&gt;.
+
+   [<a id="ref-RFC8323">RFC8323</a>]  Bormann, C., Lemay, S., Tschofenig, H., Hartke, K.,
+              Silverajan, B., and B. Raymor, Ed., "CoAP (Constrained
+              Application Protocol) over TCP, TLS, and WebSockets",
+              <a href="./rfc8323">RFC 8323</a>, DOI 10.17487/RFC8323, 2018년 2월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc8323">https://www.rfc-editor.org/info/rfc8323</a>&gt;.
+
+   [<a id="ref-WEBSTORAGE">WEBSTORAGE</a>]
+              Hickson, I., "Web Storage (Second Edition)", World Wide
+              Web Consortium Recommendation REC-webstorage-20160419,
+              2016년 4월,
+              &lt;<a href="http://www.w3.org/TR/2016/REC-webstorage-20160419">http://www.w3.org/TR/2016/REC-webstorage-20160419</a>&gt;.
+
+
+
+
+
+
+
+
+<span class="grey">Nottingham                   Standards Track                   [Page 11]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc8615">RFC 8615</a>                     Well-Known URIs                    2019년 5월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">부록 A</a>.  자주 묻는 질문</span>
+
+   잘 알려진 위치는 웹에 나쁜 것이 아닌가?
+      그렇다. 하지만 기술적, 사회적 여러 이유로 때로는 필요하다.
+      이 메모는 그것들을 위한 "샌드박스"를 정의하여 충돌 위험을
+      줄이고 사이트의 기존 URI에 미치는 영향을 최소화한다.
+
+   왜 "/.well-known"인가?
+      짧고 설명적이며, 검색 색인에 따르면 널리 사용되지 않는다.
+
+   P3P 및 robots.txt 같은 기존 메커니즘에는 어떤 영향이 있는가?
+      그들이 이 메커니즘을 사용하기로 선택하기 전까지는 없다.
+
+   왜 디렉터리별 잘 알려진 위치를 정의하지 않는가?
+      모든 URI 경로 세그먼트가 잘 알려진 위치를 갖도록 허용하면
+      (예: "/images/.well-known/") 사이트의 기존 URI와 충돌할 위험이
+      증가하며, 일반적으로 이러한 해결책은 너무 "수다스럽기" 때문에
+      잘 확장되지 않는 것으로 나타난다.
+
+<span class="h2"><a class="selflink" id="appendix-B" href="#appendix-B">부록 B</a>.  <a href="./rfc5785">RFC 5785</a>로부터의 변경 사항</span>
+
+   o  비웹 잘 알려진 위치를 허용함
+
+   o  IANA 지침을 조정함
+
+   o  참고 문헌을 갱신함
+
+   o  여러 다른 명확화 사항을 반영함
+
+   o  "Uniform Resource Identifier (URI) Schemes" 레지스트리에서
+      지원 스킴을 추적함
+
+저자 주소
+
+   Mark Nottingham
+
+   Email: mnot@mnot.net
+   URI:   <a href="https://www.mnot.net/">https://www.mnot.net/</a>
+
+
+
+
+
+
+
+
+
+Nottingham                   Standards Track                   [Page 12]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
