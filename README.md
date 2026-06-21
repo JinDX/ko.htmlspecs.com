@@ -22,6 +22,9 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Quirks Mode](https://ko.htmlspecs.com/quirks/)（[Source](https://quirks.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Minimum common web API](https://ko.htmlspecs.com/min-common-api/)（[Source](https://min-common-api.proposal.wintertc.org/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
+### 통합 자원 식별자 및 미디어 타입
+- [Uniform Resource Identifier (URI): Generic Syntax](https://ko.htmlspecs.com/uri/)（[Source](https://www.rfc-editor.org/rfc/rfc3986.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
 ### 국제화 및 지역화
 - [ECMAScript® 2027 Internationalization API Specification](https://ko.htmlspecs.com/ecma402/)（[Source](https://tc39.es/ecma402/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Language Tags and Locale Identifiers for the World Wide Web](https://ko.htmlspecs.com/ltli/)（[Source](https://www.w3.org/TR/2020/WD-ltli-20201007) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
