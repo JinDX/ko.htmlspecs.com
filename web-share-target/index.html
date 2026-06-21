@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        웹 공유 대상 API
+    </title>
+    <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
+    <script class='remove'>
+        var respecConfig = {
+            specStatus: "unofficial", // until we publish a FPWD!
+            github: {
+                repoURL: "w3c/web-share-target",
+                branch: "main"
+            },
+            group: "webapps",
+            editors: [{
+                name: "Matt Giuca",
+                company: "Google Inc.",
+                companyURL: "https://google.com",
+                w3cid: 91260
+            },
+            {
+                name: "Eric Willigers",
+                company: "Google Inc.",
+                companyURL: "https://google.com",
+                w3cid: 67534
+            }],
+            // eventually add mdn: true, and caniuse: "web-share-target"
+            xref: "web-platform",
+        };
+    </script>
+</head>
+
+<body data-cite="Web-Share encoding secure-contexts appmanifest">
+    <section id="abstract">
+        <p>
+            이 명세는 웹사이트가 자신을 <a>웹 공유 대상</a>으로 선언하여,
+            [[[Web-Share]]] 또는 시스템 이벤트(예: 네이티브 앱에서의 공유)로부터
+            공유된 콘텐츠를 받을 수 있게 하는 API를 정의한다.
+        </p>
+        <p>
+            이는 {{NavigatorContentUtils/registerProtocolHandler()}}와 유사한
+            메커니즘이다. 사용자 에이전트에 웹사이트를 등록하여, 나중에 다른 사이트나
+            네이티브 애플리케이션에서 사용자 에이전트를 통해(사용자의 재량에 따라)
+            <a>호출</a>될 수 있게 하기 때문이다. 차이점은
+            {{NavigatorContentUtils/registerProtocolHandler()}}는 프로그래밍 방식의 API로
+            핸들러를 등록하는 반면, Web Share Target은 [[[appmanifest]]]에 선언되어,
+            사용자 에이전트 또는 사용자가 선택한 시점에 등록된다는 점이다.
+        </p>
+    </section>
+    <section id="sotd">
+        <p>
+            이것은 Web Share Target 명세의 초기 초안이다.
+        </p>
+    </section>
+    <section>
+        <h2>
+            전제 조건
+        </h2>
+        <p>
+            이 API를 구현하려면 사용자 에이전트는 [[[appmanifest]]]를 지원해야
+            한다. 이 명세는 [[[Web-Share]]] 명세의 일부 정의도 재사용한다. 그러나
+            [[[Web-Share]]] 지원은 선택 사항이다.
+        </p>
+    </section>
+    <section class="informative">
+        <h2>
+            사용 예
+        </h2>
+        <p>
+            사이트를 공유 대상으로 등록하려면 아래와 같이 [=manifest/share_target=]
+            항목을 [[[appmanifest]]]에 추가한다.
+        </p>
+        <pre class="example json" title="manifest.webmanifest">
+      {
+        "name": "Includinator",
+        "share_target": {
+          "action": "share.html",
+          "params": {
+            "title": "name",
+            "text": "description",
+            "url": "link"
+          }
+        }
+      }
+      </pre>
+        <p>
+            [=ShareTarget/params=] 키는 [[[Web-Share]]]의 {{ShareData}}에 있는
+            키 이름에 대응하며, 값은 대상이 실행될 때 쿼리 매개변수로 사용될
+            임의의 이름이다.
+        </p>
+        <p>
+            공유가 발생할 때 사용자가 이 공유 대상을 선택하면, 사용자 에이전트는
+            HTML 폼 제출과 마찬가지로 공유된 데이터를 포함한 쿼리 매개변수 값을
+            붙여 `action` URL에서 새 브라우징 컨텍스트를 연다.
+        </p>
+        <p>
+            이 예의 목적상 매니페스트가
+            `https://example.org/includinator/manifest.webmanifest`에 있다고 가정한다.
+        </p>
+        <pre class="example html" title="share.html">
+      &lt;html&gt;
+      &lt;link rel="manifest" href="manifest.webmanifest"&gt;
+      &lt;script&gt;
+        window.addEventListener('load', () =&gt; {
+          const parsedUrl = new URL(window.location);
+          const { searchParams } = parsedUrl;
+          console.log("Title shared:", searchParams.get('name'));
+          console.log("Text shared:", searchParams.get('description'));
+          console.log("URL shared:", searchParams.get('link'));
+        });
+      &lt;/script&gt;
+      </pre>
+        <p>
+            들어오는 공유에 제목 "My News"와 URL `http://example.com/news`가
+            포함되어 있으면, 사용자 에이전트는 새 창 또는 탭을 열고 다음으로
+            이동한다.
+        </p>
+        <pre>
+https://example.org/includinator/share.html?name=My+News&amp;link=http%3A%2F%2Fexample.com%2Fnews
+</pre>
+        <p class="warning">
+            U+0020 (SPACE) 문자는 [=`application\/x-www-form-urlencoded`=]
+            인코딩 사용으로 인해 예상할 수 있는 "`%20`"이 아니라 "`+`"로
+            인코딩된다. 처리기는 U+002B (+) 문자를 U+0020 (SPACE) 문자로
+            디코딩하도록 주의해야 하며, ECMAScript의
+            <a data-cite="ECMASCRIPT#sec-decodeuricomponent-encodeduricomponent">`decodeURIComponent`</a>
+            함수를 포함한 일부 URL 디코딩 라이브러리는 이를 자동으로 수행하지
+            않을 수 있다.
+        </p>
+        <p>
+            쿼리 매개변수는 공유되는 {{ShareData}}의 정보로 채워진다.
+            {{ShareData}}에 특정 멤버에 대한 정보가 없으면 해당 쿼리 매개변수는
+            생략된다.
+        </p>
+        <p>
+            공유 대상은 {{ShareData}} 멤버의 하위 집합에만 관심이 있을 수 있다.
+            이 예는 공유 대상이 `POST` 요청으로 데이터를 수신하는 경우도 보여주며,
+            요청이 즉각적인 부작용을 일으키는 경우에는 이렇게 해야 한다.
+        </p>
+        <pre class="example json" title="manifest.webmanifest">
+      {
+        "name": "Bookmark",
+        "share_target": {
+          "action": "/bookmark",
+          "method": "POST",
+          "enctype": "multipart/form-data",
+          "params": {
+            "url": "link"
+          }
+        }
+      }
+      </pre>
+        <p data-cite="service-workers-1">
+            공유된 정보는 서버로 네트워크를 통해 전송되는 대신 [=service worker=]가
+            읽을 수 있다.
+        </p>
+        <pre class="example javascript" title="sw.js">
+        self.addEventListener("fetch", (event) =&gt; {
+          if (event.request.method !== "POST") {
+            event.respondWith(fetch(event.request));
+            return;
+          }
+
+          const formDataPromise = event.request.formData();
+          event.respondWith(
+            formDataPromise.then((formData) =&gt; {
+              const link = formData.get("link") || "";
+              saveBookmark(link);
+              return new Response(`Bookmark saved: ${link}`);
+            })
+          );
+        });
+      </pre>
+        <p>
+            핸들러가 공유된 데이터를 처리하는 방식은 핸들러의 재량이며, 일반적으로
+            앱의 유형에 따라 달라진다. 다음은 몇 가지 제안이다.
+        </p>
+        <ul>
+            <li>이메일 클라이언트는 `title`을 이메일 제목으로 사용하고, `text`와
+                `url`을 함께 연결해 본문으로 사용하여 새 이메일 초안을 만들 수 있다.
+            </li>
+            <li>소셜 네트워킹 앱은 `title`을 무시하고, `text`를 메시지 본문으로
+                사용하며 `url`을 링크로 추가하여 새 게시물 초안을 만들 수 있다.
+                `text`가 없으면 본문에도 `url`을 사용할 수 있다. `url`이 없으면
+                `text`에서 URL을 찾아 이를 링크로 추가할 수 있다.
+            </li>
+            <li>문자 메시지 앱은 `title`을 무시하고 `text`와 `url`을 함께 연결하여
+                새 메시지 초안을 만들 수 있다. 메시지 크기에 맞추기 위해 텍스트를
+                줄이거나 `url`을 짧은 링크로 바꿀 수 있다.
+            </li>
+        </ul>
+    </section>
+    <section>
+        <h2>
+            Web App Manifest 확장
+        </h2>
+        <p>
+            [=manifest=]는 <abbr title="JavaScript Object Notation">JSON</abbr>이므로, 이 명세는
+            [[JSON]] 명세에 정의된 타입, 즉 <dfn data-cite="JSON#section-4">object</dfn>와
+            <dfn data-cite="JSON#section-7">string</dfn>에 의존한다.
+        </p>
+        <p>
+            다음 단계가 [=processing extension-point of
+            web manifest=]에 추가된다.
+        </p>
+        <ol class="algorithm">
+            <li>|json|과 |manifest|를 [=processing a manifest=]의 대응하는 변수로
+                둔다.
+            </li>
+            <li>|json|과 |manifest|로 [=Process the `share_target` member=]를 수행한다.
+            </li>
+        </ol>
+        <section>
+            <h3>
+                `share_target` 멤버
+            </h3>
+            <p>
+                매니페스트의 <code><dfn data-dfn-for="manifest">share_target</dfn></code>
+                멤버는 [=object=]이다. 존재할 경우, 이 애플리케이션을
+                <a>웹 공유 대상</a>으로 선언하고 애플리케이션이 공유 데이터를
+                수신하는 방식을 설명한다.
+            </p>
+            <p>
+                <dfn data-export="">웹 공유 대상</dfn>은 [=manifest/share_target=] 멤버를
+                포함한 유효한 [=manifest=]를 가진 웹사이트이다.
+            </p>
+            <p>
+                웹 공유 대상은 <a>공유 대상</a>의 한 유형이다(예: 일부 시스템
+                애플리케이션과 같은 다른 유형도 사용할 수 있다).
+            </p>
+            <p>
+                [=object=] |json:JSON|과 [=ordered map=] |manifest:ordered map|이
+                주어졌을 때 <dfn>`share_target` 멤버를 처리</dfn>하려면:
+            </p>
+            <ol class="algorithm">
+                <li>|json|["share_target"]이 [=object=]가 아니면 반환한다.
+                </li>
+                <li>|target:object|를 |json|["share_target"]로 둔다.
+                </li>
+                <li>|target|["action"] 또는 |target|["params"]가 없으면 반환한다.
+                </li>
+                <li>[=ShareTarget/action=]을 처리한다.
+                    <ol>
+                        <li>|action:URL|을 |manifest URL|을 기준으로, 인코딩 오버라이드
+                            없이 |share target|["action"]을 [=URL parser|파싱=]한 결과로
+                            둔다. 결과가 실패이면 반환한다.
+                        </li>
+                        <li>|action|이 |manifest|["scope"]의 [=URL/within scope=]가
+                            아니면 반환한다.
+                        </li>
+                        <li>|action|의 [=url/origin=]이 [=potentially
+                            trustworthy origin=]이 아니면 반환한다.
+                        </li>
+                    </ol>
+                </li>
+                <li>|method:string|을 "GET"으로 둔다.
+                </li>
+                <li>|target|["method"]가 있으면 [=ShareTarget/method=]를 처리한다.
+                    <ol>
+                        <li>|target|["method"]가 문자열 `"GET"` 또는 `"POST"`와
+                            [=ASCII case-insensitive=] 일치하지 않으면 반환한다.
+                        </li>
+                        <li>|method|를 [=ASCII uppercase=] |target|["method"]로 설정한다.
+                        </li>
+                    </ol>
+                </li>
+                <li>|enctype:string|을 "application/x-www-form-urlencoded"로 둔다.
+                </li>
+                <li>|method|가 `"POST"`이면:
+                    <ol>
+                        <li>|target|["enctype"]가 문자열
+                            `"application/x-www-form-urlencoded"` 또는
+                            `"multipart/form-data"`와 [=ASCII case-insensitive=] 일치하지
+                            않으면 반환한다.
+                        </li>
+                        <li>|enctype|를 [=ASCII lowercase=] |target|["enctype"]로 설정한다.
+                        </li>
+                    </ol>
+                </li>
+                <li>|params:ordered map|을 새 [=ordered map=]으로 둔다.
+                </li>
+                <li>[=ShareTarget/params=]를 처리한다.
+                    <ol>
+                        <li>« "title", "text", "url" »의 각 |member:string|에 대해
+                            [=List/For each=]를 수행한다.
+                            <ol>
+                                <li>|target|["param"]에 |member| 속성이 없으면
+                                    계속한다.
+                                </li>
+                                <li>|target|["param"][member]가 [=string=]이 아니면 반환한다.
+                                </li>
+                                <li>|params|[member]를 |target|["param"][member]로 설정한다.
+                                </li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+                <li>|manifest|["share_target"]를 [=ordered map=] «[<br>
+                    "action" → [=URL serializer|serialize=] |action|,<br>
+                    "enctype" → |enctype|,<br>
+                    "method" → |method|,<br>
+                    "params" → |params|,<br>
+                    ]»로 설정한다.
+                </li>
+            </ol>
+        </section>
+        <section>
+            <h3>
+                `ShareTarget` 및 그 멤버
+            </h3>
+            <p>
+                <dfn>ShareTarget</dfn> [=object=]는 다음 멤버를 가질 수 있다.
+            </p>
+            <dl>
+                <dt>
+                    <code><dfn data-dfn-for="ShareTarget">action</dfn></code> 멤버
+                </dt>
+                <dd>
+                    [=web share target=]의 [=URL=]을 지정하는 [=string=]이다.
+                </dd>
+                <dt>
+                    <code><dfn data-dfn-for="ShareTarget">method</dfn></code> 멤버
+                </dt>
+                <dd>
+                    [=web share target=]에 대한 HTTP [=request=] [=request/method=]를
+                    지정하는 [=string=]이다.
+                    <aside class="note">
+                        `GET` 요청의 사용 사례는 공유 대상이 이후 사용자 승인을 위해
+                        메시지 초안을 만드는 경우이다. 그렇지 않고 공유 대상이 사용자
+                        상호작용 없이 부작용을 수행한다면 `POST`를 사용한다.
+                    </aside>
+                </dd>
+                <dt>
+                    <code><dfn data-dfn-for="ShareTarget">enctype</dfn></code> 멤버
+                </dt>
+                <dd>
+                    `POST` 요청의 본문에서 공유 데이터가 인코딩되는 방식을 지정하는
+                    [=string=]이다. [=method=]가 `"GET"`이면 무시된다.
+                </dd>
+                <dt>
+                    <code><dfn data-dfn-for="ShareTarget">params</dfn></code> 멤버
+                </dt>
+                <dd>
+                    <a>ShareTargetParams</a> [=object=]이다.
+                </dd>
+            </dl>
+        </section>
+        <section>
+            <h3>
+                `ShareTargetParams` 및 그 멤버
+            </h3>
+            <p>
+                <dfn>ShareTargetParams</dfn> [=object=]는 다음 멤버를 가질 수 있다.
+            </p>
+            <dl>
+                <dt>
+                    <code><dfn data-dfn-for="ShareTargetParams">title</dfn></code>
+                    멤버
+                </dt>
+                <dd>
+                    공유되는 문서의 제목에 사용되는 쿼리 매개변수 이름을 지정하는
+                    [=string=]이다.
+                </dd>
+                <dt>
+                    <code><dfn data-dfn-for="ShareTargetParams">text</dfn></code>
+                    멤버
+                </dt>
+                <dd>
+                    공유되는 메시지의 본문을 구성하는 임의의 텍스트에 사용되는
+                    쿼리 매개변수 이름을 지정하는 [=string=]이다.
+                </dd>
+                <dt>
+                    <code><dfn data-dfn-for="ShareTargetParams">url</dfn></code> 멤버
+                </dt>
+                <dd>
+                    공유되는 리소스를 참조하는 URL 문자열에 사용되는 쿼리 매개변수
+                    이름을 지정하는 [=string=]이다.
+                </dd>
+            </dl>
+        </section>
+    </section>
+    <section>
+        <h2>
+            웹 공유 대상 등록
+        </h2>
+        <p>
+            <a>웹 공유 대상</a>이 어떻게 그리고 언제 "등록"되는지는 사용자
+            에이전트 및/또는 최종 사용자의 재량이다. 실제로 "등록"은 여기서
+            형식적으로 정의하지 않는 사용자 에이전트별 개념이다. 사용자 에이전트는
+            웹 공유 대상을 전혀 "등록"할 필요가 없다. 다만 최종 사용자가 선택한
+            웹 공유 대상으로 공유 데이터를 전달할 수 있는 어떤 메커니즘을 제공해야
+            한다. 사용자 에이전트는 웹 공유 대상이 [=installed web application|설치=]되어
+            있지 않더라도 이를 "등록됨"으로 간주할 수 있다.
+        </p>
+        <p>
+            사용자 에이전트는 사용자가 사이트를 방문할 때 모든 <a>웹 공유 대상</a>을
+            자동으로 등록할 수 있지만, 사용자가 너무 많은 대상 선택지에 압도되지
+            않도록 더 신중하게 적용하는 것이 권장된다.
+        </p>
+        <div class="note">
+            <p>
+                사용자 에이전트가 사용할 수 있는 등록 전략의 예는 다음과 같다.
+            </p>
+            <ul>
+                <li>웹 공유 대상이 [=installed web application|설치=]된 뒤에만 등록한다.
+                </li>
+                <li>최종 사용자가 일정 기간 동안 해당 사이트를 사용한 뒤에만 웹
+                    공유 대상을 등록한다.
+                </li>
+                <li>사용자에게 웹 공유 대상을 등록할지 명시적으로 묻는다
+                    (아마 {{NavigatorContentUtils/registerProtocolHandler()}}와 같은 UI를
+                    사용할 수 있다).
+                </li>
+                <li>웹 공유 대상에 서비스 워커가 있는 경우에만 등록한다.
+                </li>
+            </ul>
+        </div>
+        <p>
+            최종 사용자에게 <a>웹 공유 대상</a> 목록을 표시할 때, 사용자 에이전트는
+            매니페스트를 미리 색인화한 온라인 서비스를 사용할 수 있으며, 따라서
+            사용자가 방문하거나 명시적으로 등록한 적이 없는 대상도 사용자에게
+            보여줄 수 있다.
+        </p>
+        <div class="issue" data-number="26"></div>
+    </section>
+    <section>
+        <h2>
+            들어오는 공유 처리
+        </h2>
+        <p>
+            최종 사용자가 일반 애플리케이션에 보내려는 데이터를 공유하면서, 특정
+            웹 공유 대상을 데이터의 수신자로 지정하면 <a>웹 공유 대상</a>은
+            <dfn data-lt="invoke|invocation">호출</dfn>된다.
+        </p>
+        <p>
+            데이터가 어디에서 오는지, 또는 최종 사용자가 웹 공유 대상을 수신자로
+            지정하는 방식은 명시되지 않는다. 그러나 한 가능한 출처는 같은 사용자
+            에이전트에서 {{Navigator}}의 {{Navigator/share()}} 메서드를 호출하는
+            것이다.
+        </p>
+        <div class="note">
+            <p>
+                <a>웹 공유 대상</a> 호출의 다른 가능한 출처 예는 다음과 같다.
+            </p>
+            <ul>
+                <li>사용자 에이전트의 내장 UI에서 발생하는 경우(<i>예:</i>, 최종
+                    사용자가 브라우저 메뉴에서 "Share"를 선택하여 현재 페이지 제목을
+                    "`title`"로, 현재 페이지 URL을 "`url`"로 공유하는 경우).
+                </li>
+                <li>네이티브 애플리케이션에서(독자적인 공유 시스템을 통해) 트리거된
+                    공유 동작 후, 최종 사용자가 웹 공유 대상을 수신자로 선택하는 경우.
+                </li>
+            </ul>
+        </div>
+        <section>
+            <h3>
+                `ShareData` 얻기
+            </h3>
+            <p>
+                <a>웹 공유 대상</a>이 <a>호출</a>될 때 데이터는 지정되지 않은
+                형식일 수 있다. 사용자 에이전트는 해당 데이터가 아직 {{ShareData}}
+                객체가 아니라면, 호스트 시스템의 동등한 개념에서 `ShareData`의
+                멤버로 매핑하여 먼저 {{ShareData}} 객체로 변환해야 한다. 출처가
+                {{Navigator/share()}} 호출이었다면, 사용자 에이전트는 {{ShareData}}
+                인수를 수정하지 않고 사용해야 한다(하지만 어떤 다른 형식을 거치며
+                손실이 발생할 수 있으므로 항상 가능하지는 않다). 사용자 에이전트는
+                데이터를 `ShareData` 필드에 가능한 한 잘 매핑하기 위해 휴리스틱을
+                사용할 수 있다.
+            </p>
+            <p class="note">
+                예를 들어 호스트 공유 시스템에는 전용 URL 필드가 없지만, 일반
+                텍스트와 URL이 모두 "text" 필드로 전송되는 경우가 있다는 관례가
+                있을 수 있다. Android가 이에 해당한다. 사용자 에이전트는 "text"
+                필드의 전체 또는 일부가 [=valid URL string=]인지 확인하고, 그렇다면
+                그 부분을 {{ShareData}}의 {{ShareData/url}} 멤버로 옮길 수 있다.
+            </p>
+        </section>
+        <section>
+            <h3>
+                웹 공유 대상 실행
+            </h3>
+            <p>
+                [=ordered map=] |manifest|를 가진 <a>웹 공유 대상</a>이
+                {{ShareData}} |data|와 함께 <a>호출</a>되면 다음 단계를 실행한다.
+            </p>
+            <ol class="algorithm">
+                <li>|url:URL|을 |manifest|["share_target"]["action"]을
+                    [=URL parser|파싱=]한 결과로 둔다.
+                </li>
+                <li>|entries:list|를 새 빈 [=list=]로 둔다.
+                </li>
+                <li>« "title", "text", "url" »의 각 |member:string|에 대해
+                    [=List/For each=]를 수행한다.
+                    <ol>
+                        <li>|name:string|을
+                            |manifest|["share_target"]["params"][|member|]의 값으로 둔다.
+                        </li>
+                        <li>|name|이 `undefined`이거나 빈 문자열이면 계속한다.
+                        </li>
+                        <li>|data|[|member|]가 `undefined`이면 계속한다.
+                        </li>
+                        <li>|value:string|을 <a data-cite="ecma262#sec-tostring">ToString</a>(|data|[|member|])로 둔다.
+                        </li>
+                        <li>[=tuple=] (|name|, |value|)를 |entry list|에 [=List/Append=]한다.
+                        </li>
+                    </ol>
+                </li>
+                <li>|header list|를 새로 생성된 [=Headers/header list=]로 둔다.
+                </li>
+                <li>|method:string|을 |manifest|["share_target"]["method"]로 둔다.
+                </li>
+                <li>|enctype:string|을 |manifest|["share_target"]["enctype"]로 둔다.
+                </li>
+                <li>|method|가 `"GET"`이면:
+                    <ol>
+                        <li>|query|를 인코딩 오버라이드 없이 |entries|로
+                            [=urlencoded serializer=]를 실행한 결과로 둔다.
+                        </li>
+                        <li>|url|의 [=URL/query=] 구성 요소를 |query|로 설정한다.
+                        </li>
+                        <li>|body|를 null로 둔다.
+                        </li>
+                    </ol>
+                </li>
+                <li>그렇지 않고 |method|가 `"POST"`이고 |enctype|가
+                    `"application/x-www-form-urlencoded"`이면:
+                    <ol>
+                        <li>|body:string|을 인코딩 오버라이드 없이 |entries|로
+                            [=urlencoded serializer=]를 실행한 결과로 둔다.
+                        </li>
+                        <li>|body|를 |body|를 [=UTF-8 encode=]한 결과로 설정한다.
+                        </li>
+                        <li>|header list|에
+                            `"Content-Type"`/`"application/x-www-form-urlencoded"`를
+                            [=header list/Append=]한다.
+                        </li>
+                    </ol>
+                </li>
+                <li>그렇지 않고 |method|가 `"POST"`이고 | enctype|가
+                    `"multipart/form-data"`이면:
+                    <ol>
+                        <li>|body|를 |entries|와 [=UTF-8=] 인코딩으로
+                            <a>multipart/form-data encoding algorithm</a>을 실행한 결과로
+                            둔다.
+                        </li>
+                        <li>|MIME type:string|을 문자열 `"multipart/form-data;"`,
+                            U+0020 SPACE 문자, 문자열 `"boundary="`, 그리고
+                            [=`multipart\/form-data` encoding algorithm=]이 생성한
+                            [=`multipart\/form-data` boundary string=]을 연결한 값으로 둔다.
+                        </li>
+                        <li>|header list|에 `"Content-Type"`/|MIME type|을
+                            [=header list/Append=]한다.
+                        </li>
+                    </ol>
+                </li>
+                <li>|browsing context|를 [=top-level browsing context=]를
+                    <a data-cite="HTML#creating-a-new-browsing-context">새로</a>
+                    생성한 결과로 둔다.
+                </li>
+                <li>|request:Request|를 method가 |method|, url이 |url|,
+                    header list가 |header list|, body가 |body|인 새 [=Request=]로 둔다.
+                </li>
+                <li>|browsing context|를 |request =|로 [=Navigate=]한다.
+                </li>
+            </ol>
+            <p class="note">
+                이 알고리즘은 |manifest|에 [=process the `share_target` member=]
+                알고리즘이 실행되었고, 이후에도 [=manifest/share_target=]가
+                남아 있다고 가정한다.
+            </p>
+        </section>
+    </section>
+    <section class="informative">
+        <h2>
+            접근성
+        </h2>
+        <p>
+            이 명세에는 알려진 접근성 고려 사항이 없다.
+        </p>
+    </section>
+    <section class="informative">
+        <h2>
+            보안 및 개인정보 고려 사항
+        </h2>
+        <ul>
+            <li><a>웹 공유 대상</a>을 호출한다는 것은 잠재적으로 비공개 사용자
+                데이터를 제3자 웹사이트로 전송한다는 뜻이다. 구현자는
+                <a>호출</a> 알고리즘을 실행하기 전에, 데이터가 어느 당사자에게
+                전송되는지(예: 웹 공유 대상의 출처를 전달하는 것)를 사용자가
+                이해하도록 모든 예방 조치를 취해야 한다.
+            </li>
+            <li>특히 우려되는 것은 스푸핑이다. 즉 웹 공유 대상이 이름과 아이콘을
+                그에 맞게 설정하여 자신을 다른 당사자로 보이게 하는 것이다.
+            </li>
+            <li>최종 사용자가 명시적으로 설치하거나 등록한 대상 집합이 아니라
+                온라인 색인에서 웹 공유 대상을 선택하는 경우 스푸핑 위험이 더 커진다.
+            </li>
+            <li>웹 공유 대상의 출처가 [=potentially trustworthy origin=]이어야
+                한다는 요구 사항은 비공개 사용자 데이터가 해당 출처를 제어하지 않는
+                당사자에게 전송되거나, 네트워크를 통해 평문으로 전송되는 것을
+                방지하기 위한 것이다.
+            </li>
+            <li>Web Share API를 사용하는 출처 사이트와 Web Share Target을 사용하는
+                수신 사이트는 협력하여 사용자 ID를 연결할 수 있다. 출처 사이트는
+                `navigator.share(text: my_id_for_this_user)`를 사용할 수 있고,
+                (사용자가 선택한) 수신자는 그 정보를 사용해 자신의 사용자 ID를
+                출처 origin의 사용자 ID와 연결할 수 있다. 양쪽 모두 이 전송을
+                수행하기 위한 코드를 작성해야 하며, 사용자는 수신자를 선택해야 한다.
+            </li>
+        </ul>
+    </section>
+    <section id="conformance"></section>
+    <section class="appendix informative">
+        <h2>
+            감사의 말
+        </h2>
+        <p>
+            웹 앱 상호운용성 사용 사례의 토대를 마련한 [[[WEBINTENTS]]] 팀에
+            감사한다. 특히 Web Share와 Web Share Target의 초기 홍보를 많이 한
+            <a href="https://paul.kinlan.me/">Paul Kinlan</a>에게 감사한다.
+        </p>
+        <p>
+            이 명세의 초기 초안을 작성하고 API 설계와 프로토타입 제작을 도운
+            Connie Pyromallis에게 감사한다.
+        </p>
+        <p>
+            이 명세의 초기 초안에 피드백을 준 Alex Russell과 David Baron에게
+            감사한다.
+        </p>
+    </section>
+    <section id="index"></section>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
