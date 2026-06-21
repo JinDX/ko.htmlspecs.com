@@ -1,0 +1,3210 @@
+<pre>네트워크 작업 그룹                                     T. Berners-Lee
+Request for Comments: 3986                                       W3C/MIT
+STD: 66                                                      R. Fielding
+Updates: <a href="./rfc1738">1738</a>                                               Day Software
+Obsoletes: <a href="./rfc2732">2732</a>, <a href="./rfc2396">2396</a>, <a href="./rfc1808">1808</a>                                  L. Masinter
+Category: Standards Track                                  Adobe Systems
+                                                            2005년 1월
+
+
+           <span class="h1">통합 자원 식별자(URI): 일반 구문</span>
+
+이 메모의 상태
+
+   이 문서는 인터넷 커뮤니티를 위한 인터넷 표준 트랙 프로토콜을
+   명시하며, 개선을 위한 논의와 제안을 요청한다. 이 프로토콜의
+   표준화 단계와 상태에 대해서는 "Internet Official Protocol
+   Standards"(STD 1)의 최신판을 참조하기 바란다. 이 메모의 배포에는 제한이 없다.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2005).
+
+Abstract
+
+   통합 자원 식별자(URI)는 추상적 또는 물리적 자원을 식별하는
+   간결한 문자 시퀀스이다. 이 명세는 일반 URI 구문과 상대 형식일
+   수 있는 URI 참조를 해석하는 절차를 정의하며, 인터넷에서 URI를
+   사용할 때의 지침과 보안 고려 사항도 함께 제공한다. URI 구문은
+   모든 유효한 URI의 상위 집합인 문법을 정의하여, 구현이 가능한
+   모든 식별자의 체계별 요구 사항을 알지 못하더라도 URI 참조의
+   공통 구성 요소를 파싱할 수 있게 한다. 이 명세는 URI를 생성하기
+   위한 문법을 정의하지 않는다. 그 작업은 각 URI 체계의 개별
+   명세가 수행한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [1페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>.  소개 . . . . . . . . . . . . . . . . . . . . . . . . . . . .  <a href="#page-4">4</a>
+       <a href="#section-1.1">1.1</a>.  URI 개요 . . . . . . . . . . . . . . . . . . . . . . .  <a href="#page-4">4</a>
+             <a href="#section-1.1.1">1.1.1</a>.  일반 구문 . . . . . . . . . . . . . . . . . .  <a href="#page-6">6</a>
+             <a href="#section-1.1.2">1.1.2</a>.  예 . . . . . . . . . . . . . . . . . . . . .  <a href="#page-7">7</a>
+             <a href="#section-1.1.3">1.1.3</a>.  URI, URL 및 URN  . . . . . . . . . . . . . .  <a href="#page-7">7</a>
+       <a href="#section-1.2">1.2</a>.  설계 고려 사항  . . . . . . . . . . . . . . . . . . .  <a href="#page-8">8</a>
+             <a href="#section-1.2.1">1.2.1</a>.  전사  . . . . . . . . . . . . . . . . . . . .  <a href="#page-8">8</a>
+             <a href="#section-1.2.2">1.2.2</a>.  식별과 상호작용의 분리 . . . . . . . . . . .  <a href="#page-9">9</a>
+             <a href="#section-1.2.3">1.2.3</a>.  계층적 식별자 . . . . . . . . . . . . . . . . <a href="#page-10">10</a>
+       <a href="#section-1.3">1.3</a>.  구문 표기법  . . . . . . . . . . . . . . . . . . . . . <a href="#page-11">11</a>
+   <a href="#section-2">2</a>.  문자 . . . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-11">11</a>
+       <a href="#section-2.1">2.1</a>.  퍼센트 인코딩 . . . . . . . . . . . . . . . . . . . . <a href="#page-12">12</a>
+       <a href="#section-2.2">2.2</a>.  예약 문자  . . . . . . . . . . . . . . . . . . . . . <a href="#page-12">12</a>
+       <a href="#section-2.3">2.3</a>.  비예약 문자  . . . . . . . . . . . . . . . . . . . . <a href="#page-13">13</a>
+       <a href="#section-2.4">2.4</a>.  인코딩 또는 디코딩 시점 . . . . . . . . . . . . . . <a href="#page-14">14</a>
+       <a href="#section-2.5">2.5</a>.  식별 데이터 . . . . . . . . . . . . . . . . . . . . . <a href="#page-14">14</a>
+   <a href="#section-3">3</a>.  구문 구성 요소  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-16">16</a>
+       <a href="#section-3.1">3.1</a>.  체계 . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-17">17</a>
+       <a href="#section-3.2">3.2</a>.  권한  . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-17">17</a>
+             <a href="#section-3.2.1">3.2.1</a>.  사용자 정보 . . . . . . . . . . . . . . . . . <a href="#page-18">18</a>
+             <a href="#section-3.2.2">3.2.2</a>.  호스트 . . . . . . . . . . . . . . . . . . . . <a href="#page-18">18</a>
+             <a href="#section-3.2.3">3.2.3</a>.  포트 . . . . . . . . . . . . . . . . . . . . . <a href="#page-22">22</a>
+       <a href="#section-3.3">3.3</a>.  경로 . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-22">22</a>
+       <a href="#section-3.4">3.4</a>.  쿼리  . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-23">23</a>
+       <a href="#section-3.5">3.5</a>.  프래그먼트 . . . . . . . . . . . . . . . . . . . . . . <a href="#page-24">24</a>
+   <a href="#section-4">4</a>.  사용  . . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-25">25</a>
+       <a href="#section-4.1">4.1</a>.  URI 참조  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-25">25</a>
+       <a href="#section-4.2">4.2</a>.  상대 참조 . . . . . . . . . . . . . . . . . . . . . . <a href="#page-26">26</a>
+       <a href="#section-4.3">4.3</a>.  절대 URI . . . . . . . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+       <a href="#section-4.4">4.4</a>.  동일 문서 참조  . . . . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+       <a href="#section-4.5">4.5</a>.  접미사 참조 . . . . . . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+   <a href="#section-5">5</a>.  참조 해석 . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-28">28</a>
+       <a href="#section-5.1">5.1</a>.  기본 URI 설정  . . . . . . . . . . . . . . . . . . . . <a href="#page-28">28</a>
+             <a href="#section-5.1.1">5.1.1</a>.  콘텐츠에 포함된 기본 URI . . . . . . . . . . <a href="#page-29">29</a>
+             <a href="#section-5.1.2">5.1.2</a>.  캡슐화 엔터티에서 온 기본 URI . . . . . . . <a href="#page-29">29</a>
+             <a href="#section-5.1.3">5.1.3</a>.  검색 URI에서 온 기본 URI  . . . . . . . . . <a href="#page-30">30</a>
+             <a href="#section-5.1.4">5.1.4</a>.  기본 기본 URI . . . . . . . . . . . . . . . . <a href="#page-30">30</a>
+       <a href="#section-5.2">5.2</a>.  상대 해석  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-30">30</a>
+             <a href="#section-5.2.1">5.2.1</a>.  기본 URI 사전 파싱 . . . . . . . . . . . . . <a href="#page-31">31</a>
+             <a href="#section-5.2.2">5.2.2</a>.  참조 변환 . . . . . . . . . . . . . . . . . . <a href="#page-31">31</a>
+             <a href="#section-5.2.3">5.2.3</a>.  경로 병합  . . . . . . . . . . . . . . . . . <a href="#page-32">32</a>
+             <a href="#section-5.2.4">5.2.4</a>.  점 세그먼트 제거  . . . . . . . . . . . . . <a href="#page-33">33</a>
+       <a href="#section-5.3">5.3</a>.  구성 요소 재조합  . . . . . . . . . . . . . . . . . . <a href="#page-35">35</a>
+       <a href="#section-5.4">5.4</a>.  참조 해석 예  . . . . . . . . . . . . . . . . . . . . <a href="#page-35">35</a>
+             <a href="#section-5.4.1">5.4.1</a>.  정상 예  . . . . . . . . . . . . . . . . . . . <a href="#page-36">36</a>
+             <a href="#section-5.4.2">5.4.2</a>.  비정상 예  . . . . . . . . . . . . . . . . . <a href="#page-36">36</a>
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [2페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   <a href="#section-6">6</a>.  정규화와 비교 . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-38">38</a>
+       <a href="#section-6.1">6.1</a>.  동등성  . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-38">38</a>
+       <a href="#section-6.2">6.2</a>.  비교 사다리  . . . . . . . . . . . . . . . . . . . . . <a href="#page-39">39</a>
+             <a href="#section-6.2.1">6.2.1</a>.  단순 문자열 비교 . . . . . . . . . . . . . . . <a href="#page-39">39</a>
+             <a href="#section-6.2.2">6.2.2</a>.  구문 기반 정규화 . . . . . . . . . . . . . . <a href="#page-40">40</a>
+             <a href="#section-6.2.3">6.2.3</a>.  체계 기반 정규화 . . . . . . . . . . . . . . <a href="#page-41">41</a>
+             <a href="#section-6.2.4">6.2.4</a>.  프로토콜 기반 정규화 . . . . . . . . . . . . <a href="#page-42">42</a>
+   <a href="#section-7">7</a>.  보안 고려 사항  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-43">43</a>
+       <a href="#section-7.1">7.1</a>.  신뢰성과 일관성  . . . . . . . . . . . . . . . . . . <a href="#page-43">43</a>
+       <a href="#section-7.2">7.2</a>.  악의적 구성 . . . . . . . . . . . . . . . . . . . . . <a href="#page-43">43</a>
+       <a href="#section-7.3">7.3</a>.  백엔드 트랜스코딩 . . . . . . . . . . . . . . . . . . <a href="#page-44">44</a>
+       <a href="#section-7.4">7.4</a>.  드문 IP 주소 형식  . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+       <a href="#section-7.5">7.5</a>.  민감한 정보  . . . . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+       <a href="#section-7.6">7.6</a>.  의미 공격 . . . . . . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+   <a href="#section-8">8</a>.  IANA 고려 사항  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+   <a href="#section-9">9</a>.  감사의 말 . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+   <a href="#section-10">10</a>. 참조 문헌 . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+       <a href="#section-10.1">10.1</a>. 규범적 참조 문헌 . . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+       <a href="#section-10.2">10.2</a>. 정보성 참조 문헌 . . . . . . . . . . . . . . . . . . . <a href="#page-47">47</a>
+   <a href="#appendix-A">A</a>.  URI에 대한 수집 ABNF . . . . . . . . . . . . . . . . . . . . <a href="#page-49">49</a>
+   <a href="#appendix-B">B</a>.  정규식으로 URI 참조 파싱하기  . . . . . . . . . . . . . . . <a href="#page-50">50</a>
+   <a href="#appendix-C">C</a>.  문맥에서 URI 구분하기  . . . . . . . . . . . . . . . . . . . <a href="#page-51">51</a>
+   <a href="#appendix-D">D</a>.  <a href="./rfc2396">RFC 2396</a>에서의 변경 사항  . . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+       <a href="#appendix-D.1">D.1</a>.  추가 사항  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+       <a href="#appendix-D.2">D.2</a>.  수정 사항  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+   색인  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-56">56</a>
+   저자 주소 . . . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-60">60</a>
+   전체 저작권 고지 . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-61">61</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [3페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   통합 자원 식별자(URI)는 자원을 식별하기 위한 단순하고 확장
+   가능한 수단을 제공한다. URI 구문과 의미에 대한 이 명세는
+   World Wide Web 글로벌 정보 이니셔티브가 도입한 개념에서
+   파생되었으며, 이러한 식별자의 사용은 1990년부터 시작되었고
+   "Universal Resource Identifiers in WWW" [<a href="./rfc1630" title="&quot;Universal Resource Identifiers in WWW: A Unifying Syntax for the Expression of Names and Addresses of Objects on the Network as used in the World-Wide Web&quot;">RFC1630</a>]에
+   설명되어 있다. 이 구문은 "Functional Recommendations for Internet
+   Resource Locators" [<a href="./rfc1736" title="&quot;Functional Recommendations for Internet Resource Locators&quot;">RFC1736</a>]와 "Functional Requirements for Uniform
+   Resource Names" [<a href="./rfc1737" title="&quot;Functional Requirements for Uniform Resource Names&quot;">RFC1737</a>]에 제시된 권고를 충족하도록 설계되었다.
+
+   이 문서는 [<a href="./rfc2396" title="&quot;Uniform Resource Identifiers (URI): Generic Syntax&quot;">RFC2396</a>]을 폐지한다. 이 문서는 모든 URI에 대한 단일
+   일반 구문을 정의하기 위해 "Uniform Resource Locators" [<a href="./rfc1738" title="&quot;Uniform Resource Locators (URL)&quot;">RFC1738</a>]와
+   "Relative Uniform Resource Locators" [<a href="./rfc1808" title="&quot;Relative Uniform Resource Locators&quot;">RFC1808</a>]를 병합했던 문서이다.
+   또한 IPv6 주소 구문을 도입한 [<a href="./rfc2732" title="&quot;Format for Literal IPv6 Addresses in URL's&quot;">RFC2732</a>]도 폐지한다. 이 문서는
+   개별 URI 체계의 특정 구문을 정의했던 <a href="./rfc1738">RFC 1738</a>의 일부를 제외한다.
+   그 부분들은 별도의 문서로 갱신될 것이다. 새로운 URI 체계 등록
+   절차는 [<a href="#ref-BCP35" title="&quot;Registration Procedures for URL Scheme Names&quot;">BCP35</a>]에서 별도로 정의한다. 새로운 URI 체계 설계자를 위한
+   조언은 [<a href="./rfc2718" title="&quot;Guidelines for new URL Schemes&quot;">RFC2718</a>]에서 찾을 수 있다. <a href="./rfc2396">RFC</a>
+   <a href="./rfc2396">2396</a> 이후의 모든 중요한 변경 사항은 <a href="#appendix-D">부록 D</a>에 기록되어 있다.
+
+   이 명세는 [<a href="#ref-BCP19" title="&quot;IANA Charset Registration Procedures&quot;">BCP19</a>]에서 제공한 정의에 따라 "character"와 "coded character
+   set"이라는 용어를 사용하며, [<a href="#ref-BCP19" title="&quot;IANA Charset Registration Procedures&quot;">BCP19</a>]가 "charset"이라고 부르는 것 대신
+   "character encoding"이라는 용어를 사용한다.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  URI 개요</span>
+
+   URI는 다음과 같이 특징지어진다.
+
+   통합성
+
+      통합성은 여러 이점을 제공한다. 통합성은 해당 자원에 접근하는
+      데 사용되는 메커니즘이 다를 수 있더라도 서로 다른 유형의
+      자원 식별자를 같은 문맥에서 사용할 수 있게 한다. 또한 서로
+      다른 유형의 자원 식별자에서 공통 구문 관례를 통일된 의미로
+      해석할 수 있게 한다. 기존 식별자의 사용 방식을 방해하지
+      않으면서 새로운 유형의 자원 식별자를 도입할 수 있게 한다.
+      식별자를 다양한 문맥에서 재사용할 수 있게 하여, 새로운
+      애플리케이션이나 프로토콜이 이미 존재하고 크고 널리 사용되는
+      자원 식별자 집합을 활용할 수 있게 한다.
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [4페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   자원
+
+      이 명세는 무엇이 자원이 될 수 있는지 그 범위를 제한하지 않는다.
+      오히려 "resource"라는 용어는 URI로 식별될 수 있는 모든 것을
+      가리키는 일반적인 의미로 사용된다. 익숙한 예로는 전자 문서,
+      이미지, 일관된 목적을 가진 정보 소스(예: "오늘의 로스앤젤레스
+      날씨 보고서"), 서비스(예: HTTP-to-SMS 게이트웨이), 그리고
+      다른 자원들의 모음이 있다. 자원이 반드시 인터넷을 통해 접근
+      가능해야 하는 것은 아니다. 예를 들어 사람, 기업, 도서관의
+      제본된 책도 자원이 될 수 있다. 마찬가지로 추상 개념도 자원이
+      될 수 있다. 예를 들어 수학 방정식의 연산자와 피연산자, 관계
+      유형(예: "부모" 또는 "직원"), 또는 숫자 값(예: 0, 1, 무한대)이
+      이에 해당한다.
+
+   식별자
+
+      식별자는 식별 범위 내에서 식별되는 대상을 다른 모든 것과
+      구별하는 데 필요한 정보를 담고 있다. 이 문서에서 "identify"와
+      "identifying"이라는 용어는 이름, 주소, 문맥 등 어떤 방식으로
+      이루어지든 하나의 자원을 다른 모든 자원과 구별한다는 목적을
+      가리킨다. 이러한 용어를, 식별자가 참조 대상의 정체성을
+      정의하거나 내포한다는 가정으로 오해해서는 안 된다. 물론 일부
+      식별자에서는 그럴 수 있다. 또한 URI를 사용하는 시스템이
+      식별된 자원에 접근할 것이라고 가정해서도 안 된다. 많은 경우
+      URI는 자원에 접근하려는 의도 없이 자원을 나타내기 위해
+      사용된다. 마찬가지로 식별되는 "하나의" 자원이 본질적으로
+      단일한 것이라고 볼 필요도 없다. 예를 들어 자원은 이름 붙은
+      집합이거나 시간에 따라 달라지는 매핑일 수 있다.
+
+   URI는 <a href="#section-3">3절</a>의 &lt;URI&gt;라는 구문 규칙과 일치하는 문자 시퀀스로
+   구성된 식별자이다. 이는 별도로 정의된, 확장 가능한 명명 체계
+   집합(<a href="#section-3.1">3.1절</a>)을 통해 자원을 통일적으로 식별할 수 있게 한다.
+   그 식별이 어떻게 수행되고, 할당되고, 가능해지는지는 각 체계
+   명세에 위임된다.
+
+   이 명세는 자원의 성격, 애플리케이션이 자원을 참조하려는 이유,
+   또는 자원 식별을 위해 URI를 사용할 수 있는 시스템의 종류에 어떤
+   제한도 두지 않는다. 이 명세는 URI가 시간이 지나도 같은 자원을
+   계속 식별해야 한다고 요구하지 않는다. 다만 그것은 모든 URI
+   체계의 공통 목표이다. 그럼에도 이 명세의 어느 내용도
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [5페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   애플리케이션이 특정 유형의 자원이나 해당 애플리케이션이 원하는
+   특성을 유지하는 URI의 부분 집합으로 스스로를 제한하는 것을
+   막지 않는다.
+
+   URI는 전역 범위를 가지며 문맥과 관계없이 일관되게 해석된다.
+   다만 그 해석의 결과는 최종 사용자의 문맥과 관련될 수 있다.
+   예를 들어 "<a href="http://localhost/">http://localhost/</a>"는 그 참조를 사용하는 모든 사용자에게 같은
+   해석을 갖는다. 비록 "localhost"에 해당하는 네트워크 인터페이스는
+   각 최종 사용자마다 다를 수 있지만, 해석은 접근과 독립적이다.
+   그러나 그 참조를 바탕으로 한 동작은 최종 사용자의 문맥과 관련해
+   수행된다. 이는 전역적으로 고유한 것을 참조하려는 동작에는 해당
+   자원을 다른 모든 것과 구별하는 URI를 사용해야 함을 의미한다.
+   최종 사용자의 로컬 문맥에 대해 식별하는 URI는 그 문맥 자체가
+   자원의 정의적 측면일 때에만 사용해야 한다. 예를 들어 온라인
+   도움말 매뉴얼이 최종 사용자의 파일 시스템에 있는 파일(예:
+   "file:///etc/hosts")을 참조하는 경우가 이에 해당한다.
+
+<span class="h4"><a class="selflink" id="section-1.1.1" href="#section-1.1.1">1.1.1</a>.  일반 구문</span>
+
+   각 URI는 <a href="#section-3.1">3.1절</a>에 정의된 체계 이름으로 시작하며, 이 이름은 해당
+   체계 안에서 식별자를 할당하기 위한 명세를 가리킨다. 따라서 URI
+   구문은 연합적이고 확장 가능한 명명 시스템이며, 각 체계의 명세는
+   그 체계를 사용하는 식별자의 구문과 의미를 추가로 제한할 수 있다.
+
+   이 명세는 모든 URI 체계에 필요한 URI 구문의 요소나 많은 URI
+   체계에 공통적인 요소를 정의한다. 따라서 URI 참조에 대한
+   체계 독립적인 파싱 메커니즘을 구현하는 데 필요한 구문과 의미를
+   정의하며, 이를 통해 URI의 체계 의존적 처리를 체계 의존적 의미가
+   필요할 때까지 미룰 수 있다. 마찬가지로 URI 참조를 사용하는
+   프로토콜과 데이터 형식은 아직 정의되지 않은 체계를 포함하여
+   모든 URI에 허용되는 구문 범위를 정의하는 명세로 이 문서를
+   참조할 수 있다. 이는 식별 체계의 진화를 URI를 사용하는
+   프로토콜, 데이터 형식, 구현의 진화와 분리한다.
+
+   일반 URI 구문의 파서는 모든 URI 참조를 주요 구성 요소로 파싱할
+   수 있다. 체계가 결정되면 구성 요소에 대해 추가적인 체계별
+   파싱을 수행할 수 있다. 다시 말해 URI 일반 구문은 모든 URI
+   체계 구문의 상위 집합이다.
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [6페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h4"><a class="selflink" id="section-1.1.2" href="#section-1.1.2">1.1.2</a>.  예</span>
+
+   다음 URI 예들은 여러 URI 체계와 그 공통 구문 구성 요소의 변형을
+   보여준다.
+
+      <a href="ftp://ftp.is.co.za/rfc/rfc1808.txt">ftp://ftp.is.co.za/rfc/rfc1808.txt</a>
+
+      <a href="http://www.ietf.org/rfc/rfc2396.txt">http://www.ietf.org/rfc/rfc2396.txt</a>
+
+      ldap://[2001:db8::7]/c=GB?objectClass?one
+
+      mailto:John.Doe@example.com
+
+      news:comp.infosystems.www.servers.unix
+
+      tel:+1-816-555-1212
+
+      telnet://192.0.2.16:80/
+
+      urn:oasis:names:specification:docbook:dtd:xml:4.1.2
+
+
+<span class="h4"><a class="selflink" id="section-1.1.3" href="#section-1.1.3">1.1.3</a>.  URI, URL 및 URN</span>
+
+   URI는 로케이터, 이름 또는 둘 다로 더 분류될 수 있다. "Uniform
+   Resource Locator"(URL)라는 용어는 자원을 식별하는 것에 더해,
+   그 주요 접근 메커니즘(예: 네트워크 "위치")을 설명하여 자원을
+   찾는 수단을 제공하는 URI의 부분 집합을 가리킨다. "Uniform
+   Resource Name"(URN)이라는 용어는 역사적으로 "urn" 체계 [<a href="./rfc2141" title="&quot;URN Syntax&quot;">RFC2141</a>] 아래의
+   URI를 가리키는 데 사용되어 왔다. 이 URI들은 자원이 더 이상
+   존재하지 않거나 이용 가능하지 않게 되더라도 전역적으로 고유하고
+   지속적이어야 한다. 또한 이 용어는 이름의 속성을 가진 다른 모든
+   URI를 가리키는 데도 사용되어 왔다.
+
+   개별 체계가 반드시 "name" 또는 "locator" 중 하나로만 분류되어야
+   하는 것은 아니다. 어떤 주어진 체계의 URI 인스턴스도 이름 또는
+   로케이터의 특성, 혹은 둘 다의 특성을 가질 수 있다. 이는 종종
+   체계의 어떤 성질보다도 명명 권한자가 식별자를 할당할 때의
+   지속성과 주의에 따라 달라진다. 향후 명세와 관련 문서는 더 제한적인
+   용어인 "URL"과 "URN" 대신 일반 용어인 "URI"를 사용해야 한다
+   [<a href="./rfc3305" title="&quot;Report from the Joint W3C/IETF URI Planning Interest Group: Uniform Resource Identifiers (URIs), URLs, and Uniform Resource Names (URNs): Clarifications and Recommendations&quot;">RFC3305</a>].
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [7페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h3"><a class="selflink" id="section-1.2" href="#section-1.2">1.2</a>.  설계 고려 사항</span>
+
+<span class="h4"><a class="selflink" id="section-1.2.1" href="#section-1.2.1">1.2.1</a>.  전사</span>
+
+   URI 구문은 전역적 전사를 주요 고려 사항 중 하나로 삼아
+   설계되었다. URI는 매우 제한된 집합의 문자 시퀀스이다. 즉 기본
+   라틴 알파벳의 문자, 숫자, 그리고 몇 가지 특수 문자로 구성된다.
+   URI는 여러 방식으로 표현될 수 있다. 예를 들어 종이 위의 잉크,
+   화면의 픽셀, 또는 문자 인코딩 옥텟 시퀀스로 표현될 수 있다.
+   URI의 해석은 사용된 문자에만 의존하며, 그 문자가 네트워크
+   프로토콜에서 어떻게 표현되는지에는 의존하지 않는다.
+
+   전사의 목표는 간단한 시나리오로 설명할 수 있다. Sam과 Kim이라는
+   두 동료가 국제 학회의 술집에 앉아 연구 아이디어를 교환한다고
+   상상해 보자. Sam이 Kim에게 더 많은 정보를 얻을 수 있는 위치를
+   묻자, Kim은 냅킨에 연구 사이트의 URI를 적는다. 집에 돌아온
+   Sam은 냅킨을 꺼내 URI를 컴퓨터에 입력하고, 컴퓨터는 Kim이
+   언급한 정보를 검색한다.
+
+   이 시나리오에서 드러나는 설계 고려 사항은 여러 가지이다.
+
+   o  URI는 항상 옥텟 시퀀스로 표현되는 것은 아닌 문자 시퀀스이다.
+
+   o  URI는 네트워크가 아닌 소스에서 전사될 수 있으므로, 언어와
+      로캘 전반의 키보드(및 관련 입력 장치)가 부과하는 제약 내에서
+      컴퓨터에 입력될 가능성이 가장 높은 문자로 구성되어야 한다.
+
+   o  URI는 사람이 기억해야 하는 경우가 많으며, 의미 있거나 익숙한
+      구성 요소로 이루어져 있을 때 사람이 더 쉽게 기억할 수 있다.
+
+   이러한 설계 고려 사항들이 항상 일치하는 것은 아니다. 예를 들어
+   URI 구성 요소에 가장 의미 있는 이름은 일부 시스템에서 입력할 수
+   없는 문자를 요구하는 경우가 많다. 자원 식별자를 한 매체에서 다른
+   매체로 전사할 수 있는 능력이, URI가 가장 의미 있는 구성 요소로
+   이루어지는 것보다 더 중요하게 고려되었다.
+
+   지역적 또는 로컬 문맥과 기술의 발전 속에서 사용자는 더 넓은
+   범위의 문자를 사용할 수 있어 이익을 얻을 수 있다. 그러한 사용은
+   이 명세에서 정의하지 않는다. URI 안에서 US-ASCII 부호화 문자 집합의
+   범위를 벗어난 문자를 나타내기 위해 퍼센트 인코딩된 옥텟
+   (<a href="#section-2.1">2.1절</a>)을 사용할 수 있다. 단, 이러한
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [8페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   표현이 체계 또는 URI가 참조되는 프로토콜 요소에서 허용되어야 한다.
+   그러한 정의는 해당 문자를 URI용으로 퍼센트 인코딩하기 전에 옥텟에
+   매핑하는 데 사용되는 문자 인코딩을 명시해야 한다.
+
+<span class="h4"><a class="selflink" id="section-1.2.2" href="#section-1.2.2">1.2.2</a>.  식별과 상호작용의 분리</span>
+
+   URI에 대한 흔한 오해는 URI가 접근 가능한 자원을 참조하는 데만
+   사용된다는 것이다. URI 자체는 식별만 제공한다. URI가 있다고 해서
+   자원에 대한 접근이 보장되거나 암시되는 것은 아니다. 대신 URI
+   참조와 관련된 모든 작업은 그것이 나타나는 프로토콜 요소, 데이터
+   형식 속성 또는 자연어 텍스트에 의해 정의된다.
+
+   URI가 주어졌을 때 시스템은 "access", "update", "replace" 또는
+   "find attributes" 같은 단어로 특징지을 수 있는 다양한 작업을
+   자원에 수행하려고 시도할 수 있다. 이러한 작업은 URI를 사용하는
+   프로토콜에 의해 정의되며, 이 명세에 의해 정의되는 것이 아니다.
+   그러나 URI에 대한 공통 작업을 설명하기 위해 몇 가지 일반 용어를
+   사용한다. URI "resolution"은 URI를 역참조하는 데 필요한 접근
+   메커니즘과 적절한 매개변수를 결정하는 과정이며, 이 해석은 여러
+   차례의 반복을 필요로 할 수 있다. 그 접근 메커니즘을 사용하여
+   URI의 자원에 대한 동작을 수행하는 것을 URI를 "dereference"한다고
+   한다.
+
+   URI가 정보 검색 시스템에서 정보 소스를 식별하는 데 사용될 때,
+   URI 역참조의 가장 흔한 형태는 "retrieval"이다. 즉 URI를 사용하여
+   그 관련 자원의 표현을 검색하는 것이다. "representation"은 옥텟
+   시퀀스와, 그 옥텟을 설명하는 표현 메타데이터로서, 표현이 생성된
+   시점의 자원 상태 기록을 이룬다. 검색은 로컬 캐시된 표현을
+   확인하기 위해 URI를 캐시 키로 사용하는 것, 적절한 접근 메커니즘이
+   있는지 확인하기 위한 URI 해석, 그리고 검색 작업을 적용하기 위한
+   URI 역참조를 포함할 수 있는 절차로 수행된다. 검색을 수행하는 데
+   사용된 프로토콜에 따라 자원에 대한 추가 정보(자원 메타데이터)와
+   다른 자원과의 관계가 제공될 수 있다.
+
+   정보 검색 시스템의 URI 참조는 지연 바인딩되도록 설계된다. 접근
+   결과는 일반적으로 접근되는 시점에 결정되며, 시간이나 상호작용의
+   다른 측면에 따라 달라질 수 있다. 이러한 참조는 미래에 사용되도록
+   만들어진다. 식별되는 것은 과거에 얻은 특정 결과가 아니라, 미래
+   결과에 대해 참일 것으로 기대되는 어떤 특성이다. 이러한 경우 URI가
+   참조하는 자원은 실제로 시간에 따라 관찰되는 특성의 동일성이다.
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                         [9페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   이는 자원 제공자가 작성한 추가 설명이나 주장에 의해 더 명확해질
+   수 있다.
+
+   많은 URI 체계가 프로토콜의 이름을 따서 명명되지만, 이것이 해당
+   URI를 사용하면 그 이름의 프로토콜을 통해 자원에 접근하게 됨을
+   의미하지는 않는다. URI는 종종 단순히 식별을 위해 사용된다. URI가
+   자원의 표현을 검색하는 데 사용될 때에도, 그 접근은 체계 이름과
+   관련된 프로토콜과 독립적인 게이트웨이, 프록시, 캐시, 이름 해석
+   서비스를 통해 이루어질 수 있다. 일부 URI의 해석에는 하나 이상의
+   프로토콜 사용이 필요할 수 있다. 예를 들어 로컬 캐시에서 표현을
+   찾지 못할 때 "http" URI의 원 서버에 접근하려면 일반적으로 DNS와
+   HTTP가 모두 사용된다.
+
+<span class="h4"><a class="selflink" id="section-1.2.3" href="#section-1.2.3">1.2.3</a>.  계층적 식별자</span>
+
+   URI 구문은 왼쪽에서 오른쪽으로 중요도가 감소하는 순서로 구성
+   요소가 나열되는 계층 구조로 조직된다. 일부 URI 체계에서는 보이는
+   계층이 체계 자체로 제한된다. 체계 구성 요소 구분자(":") 뒤의
+   모든 것은 URI 처리에 불투명한 것으로 간주된다. 다른 URI 체계는
+   계층을 명시적이고 보이게 하여 일반 파싱 알고리즘에 드러낸다.
+
+   일반 구문은 슬래시("/"), 물음표("?"), 번호 기호("#") 문자를
+   사용하여 식별자에 대한 일반 파서의 계층적 해석에서 중요한 구성
+   요소를 구분한다. 이러한 식별자는 익숙한 구문의 일관된 사용을
+   통해 가독성을 높일 뿐 아니라, 명명 체계 전반에서 계층을 통일된
+   방식으로 표현함으로써 그 계층에 대한 체계 독립적 상대 참조를
+   가능하게 한다.
+
+   공통 목적을 위해 문서들의 그룹 또는 "트리"가 구성된 경우가
+   많으며, 이러한 문서 안의 URI 참조 대부분은 트리 외부가 아니라
+   트리 내부의 자원을 가리킨다. 마찬가지로 특정 사이트에 위치한
+   문서는 원격 사이트의 자원보다 그 사이트의 다른 자원을 참조할
+   가능성이 훨씬 크다. URI의 상대 참조는 문서 트리가 그 위치와 접근
+   체계로부터 부분적으로 독립적일 수 있게 한다. 예를 들어 하나의
+   하이퍼텍스트 문서 집합은 문서들이 서로를 상대 참조로 참조한다면
+   "file", "http", "ftp" 체계 각각을 통해 동시에 접근 가능하고
+   탐색 가능할 수 있다. 또한 이러한 문서 트리는 상대 참조를 전혀
+   변경하지 않고 전체로 이동될 수 있다.
+
+   상대 참조(<a href="#section-4.2">4.2절</a>)는 참조 문맥과 대상 URI 사이의 계층적 이름
+   공간 내 차이를 설명하여 자원을 참조한다. 참조 해석 알고리즘은,
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [10페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   <a href="#section-5">5절</a>에 제시되어 있으며, 그러한 참조가 대상 URI로 어떻게 변환되는지
+   정의한다. 상대 참조는 계층적 URI의 문맥 안에서만 사용할 수
+   있으므로, 새로운 URI 체계의 설계자는 그 체계 안에서 상대 참조를
+   금지해야 할 설득력 있는 이유가 없는 한 일반 구문의 계층적 구성
+   요소와 일관된 구문을 사용해야 한다.
+
+      참고: 이전 명세들은 URI에 대한 상대 참조를 나타내기 위해
+      "partial URI"와 "relative URI"라는 용어를 사용했다. 일부 독자가
+      이 용어들을 상대 URI가 URI를 참조하는 방법이 아니라 URI의
+      부분 집합이라는 뜻으로 오해했기 때문에, 이 명세는 이를 단순히
+      상대 참조라고 부른다.
+
+   모든 URI 참조는 사용될 때 일반 구문 파서에 의해 파싱된다.
+   그러나 하나 이상의 점 세그먼트("." 또는 ".."의 완전한 경로
+   세그먼트, <a href="#section-3.3">3.3절</a>에 설명)가 포함되지 않는 한, 참조에 사용된
+   절대 URI에 대해 계층적 처리는 아무 효과가 없다. 따라서 URI 체계
+   명세는 슬래시 문자, 물음표 문자, 그리고 URI "scheme:." 및
+   "scheme:.."의 사용을 금지함으로써 불투명한 식별자를 정의할 수
+   있다.
+
+<span class="h3"><a class="selflink" id="section-1.3" href="#section-1.3">1.3</a>.  구문 표기법</span>
+
+   이 명세는 [<a href="./rfc2234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC2234</a>]의 Augmented Backus-Naur Form(ABNF) 표기법을
+   사용하며, 그 명세가 정의한 다음 핵심 ABNF 구문 규칙도 포함한다:
+   ALPHA(문자), CR(캐리지 리턴), DIGIT(10진 숫자), DQUOTE(큰따옴표),
+   HEXDIG(16진 숫자), LF(줄 바꿈), SP(공백). 완전한 URI 구문은
+   <a href="#appendix-A">부록 A</a>에 모아져 있다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  문자</span>
+
+   URI 구문은 자원을 식별하기 위한 것으로 추정되는 데이터를 문자
+   시퀀스로 인코딩하는 방법을 제공한다. URI 문자는 다시 전송 또는
+   표시를 위해 옥텟으로 인코딩되는 경우가 많다. 이 명세는 URI
+   문자와 그 문자를 저장하거나 전송하는 데 사용되는 옥텟 사이의
+   매핑에 특정 문자 인코딩을 의무화하지 않는다. URI가 프로토콜
+   요소에 나타날 때 문자 인코딩은 해당 프로토콜이 정의한다. 그러한
+   정의가 없으면 URI는 주변 텍스트와 같은 문자 인코딩으로 되어
+   있다고 가정한다.
+
+   ABNF 표기법은 그 종단값을 US-ASCII 부호화 문자 집합 [<a href="#ref-ASCII" title="&quot;Coded Character Set -- 7-bit American Standard Code for Information Interchange&quot;">ASCII</a>]에
+   기반한 음이 아닌 정수(코드포인트)로 정의한다. URI는 문자
+   시퀀스이기 때문에 URI 구문을 이해하려면 그 관계를 반대로 보아야
+   한다. 따라서
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [11페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   ABNF에서 사용되는 정수 값은 구문 규칙을 완성하기 위해 US-ASCII를
+   통해 해당 문자로 다시 매핑되어야 한다.
+
+   URI는 숫자, 문자, 몇 가지 그래픽 기호로 이루어진 제한된 문자
+   집합으로 구성된다. 이러한 문자 중 예약된 부분 집합은 URI 안에서
+   구문 구성 요소를 구분하는 데 사용될 수 있으며, 나머지 문자,
+   즉 비예약 집합과 구분자로 작용하지 않는 예약 문자는 각 구성
+   요소의 식별 데이터를 정의한다.
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  퍼센트 인코딩</span>
+
+   퍼센트 인코딩 메커니즘은 어떤 옥텟의 해당 문자가 허용된 집합
+   밖에 있거나 구성 요소의 구분자로, 또는 구성 요소 안의 구분자로
+   사용될 때 그 데이터 옥텟을 구성 요소 안에서 표현하는 데
+   사용된다. 퍼센트 인코딩된 옥텟은 퍼센트 문자 "%" 뒤에 그 옥텟의
+   숫자 값을 나타내는 두 개의 16진 숫자가 오는 세 문자로 인코딩된다.
+   예를 들어 "%20"은 이진 옥텟 "00100000"(ABNF: %x20)의 퍼센트
+   인코딩이며, 이는 US-ASCII에서 공백 문자(SP)에 해당한다.
+   <a href="#section-2.4">2.4절</a>은 퍼센트 인코딩과 디코딩이 언제 적용되는지 설명한다.
+
+      pct-encoded = "%" HEXDIG HEXDIG
+
+   대문자 16진 숫자 'A'부터 'F'는 각각 소문자 'a'부터 'f'와
+   동등하다. 두 URI가 퍼센트 인코딩된 옥텟에 사용된 16진 숫자의
+   대소문자만 다르다면, 두 URI는 동등하다. 일관성을 위해 URI
+   생성자와 정규화기는 모든 퍼센트 인코딩에 대문자 16진 숫자를
+   사용해야 한다.
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a>.  예약 문자</span>
+
+   URI에는 "reserved" 집합의 문자로 구분되는 구성 요소와 하위 구성
+   요소가 포함된다. 이러한 문자는 일반 구문, 각 체계별 구문 또는
+   URI 역참조 알고리즘의 구현별 구문에서 구분자로 정의될 수 있기
+   때문에(또는 그렇지 않을 수도 있기 때문에) "reserved"라고 불린다.
+   URI 구성 요소의 데이터가 구분자로서의 예약 문자 목적과 충돌할
+   경우, 그 충돌하는 데이터는 URI가 형성되기 전에 퍼센트 인코딩되어야
+   한다.
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [12페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      reserved    = gen-delims / sub-delims
+
+      gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+
+      sub-delims  = "!" / "$" / "&amp;" / "'" / "(" / ")"
+                  / "*" / "+" / "," / ";" / "="
+
+   예약 문자의 목적은 URI 안의 다른 데이터와 구별될 수 있는 구분
+   문자 집합을 제공하는 것이다. 예약 문자를 해당 퍼센트 인코딩된
+   옥텟으로 대체한 것만 다른 URI들은 동등하지 않다. 예약 문자를
+   퍼센트 인코딩하거나, 예약 문자에 해당하는 퍼센트 인코딩된 옥텟을
+   디코딩하면 대부분의 애플리케이션에서 URI가 해석되는 방식이
+   달라진다. 따라서 예약 집합의 문자는 정규화로부터 보호되며, URI
+   안에서 데이터 하위 구성 요소를 구분하기 위해 체계별 및 생성자별
+   알고리즘이 사용하기에 안전하다.
+
+   예약 문자 중 일부(gen-delims)는 <a href="#section-3">3절</a>에 설명된 일반 URI 구성 요소의
+   구분자로 사용된다. 구성 요소의 ABNF 구문 규칙은 reserved 또는
+   gen-delims 규칙 이름을 직접 사용하지 않는다. 대신 각 구문 규칙은
+   해당 구성 요소 안에 허용되는 문자(즉 그것을 구분하지 않는 문자)를
+   나열하며, 그중 예약 집합에도 속하는 문자는 해당 구성 요소 안에서
+   하위 구성 요소 구분자로 사용할 수 있도록 "reserved"된다. 이
+   명세는 가장 흔한 하위 구성 요소만 정의한다. 다른 하위 구성
+   요소는 URI 체계의 명세나 URI 역참조 알고리즘의 구현별 구문에서
+   정의할 수 있다. 단, 그러한 하위 구성 요소는 해당 구성 요소 안에
+   허용된 예약 집합의 문자로 구분되어야 한다.
+
+   URI 생성 애플리케이션은 예약 집합의 문자에 해당하는 데이터 옥텟을,
+   이러한 문자가 해당 구성 요소에서 데이터를 표현하도록 URI 체계가
+   명시적으로 허용하지 않는 한, 퍼센트 인코딩해야 한다. URI 구성
+   요소에서 예약 문자가 발견되고 그 문자에 대해 알려진 구분 역할이
+   없다면, 그 문자는 US-ASCII에서 해당 문자 인코딩에 대응하는 데이터
+   옥텟을 나타내는 것으로 해석되어야 한다.
+
+<span class="h3"><a class="selflink" id="section-2.3" href="#section-2.3">2.3</a>.  비예약 문자</span>
+
+   URI에서 허용되지만 예약된 목적을 갖지 않는 문자를 비예약이라고
+   한다. 여기에는 대문자와 소문자, 10진 숫자, 하이픈, 마침표,
+   밑줄, 틸드가 포함된다.
+
+      unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [13페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   비예약 문자를 해당 퍼센트 인코딩된 US-ASCII 옥텟으로 대체한 것만
+   다른 URI들은 동등하다. 즉 같은 자원을 식별한다. 그러나 URI 비교
+   구현이 비교 전에 항상 정규화를 수행하는 것은 아니다(<a href="#section-6">6절</a> 참조).
+   일관성을 위해 ALPHA 범위(%41-%5A 및 %61-%7A), DIGIT 범위(%30-%39),
+   하이픈(%2D), 마침표(%2E), 밑줄(%5F), 또는 틸드(%7E)의 퍼센트
+   인코딩된 옥텟은 URI 생성자가 만들지 않아야 하며, URI에서 발견될
+   경우 URI 정규화기는 이를 해당 비예약 문자로 디코딩해야 한다.
+
+<span class="h3"><a class="selflink" id="section-2.4" href="#section-2.4">2.4</a>.  인코딩 또는 디코딩 시점</span>
+
+   일반적인 상황에서 URI 안의 옥텟이 퍼센트 인코딩되는 유일한
+   시점은 URI를 그 구성 요소 부분으로부터 생성하는 과정이다. 이때
+   구현은 어떤 예약 문자가 하위 구성 요소 구분자로 사용될지, 어떤
+   문자가 데이터로 안전하게 사용될 수 있는지를 결정한다. 일단
+   생성되면 URI는 항상 퍼센트 인코딩된 형식으로 존재한다.
+
+   URI가 역참조될 때, 체계별 역참조 과정에 중요한 구성 요소와 하위
+   구성 요소(있는 경우)는 해당 구성 요소 안의 퍼센트 인코딩된 옥텟을
+   안전하게 디코딩하기 전에 파싱되고 분리되어야 한다. 그렇지 않으면
+   데이터가 구성 요소 구분자로 오인될 수 있다. 유일한 예외는
+   비예약 집합의 문자에 해당하는 퍼센트 인코딩된 옥텟으로, 이는
+   언제든 디코딩될 수 있다. 예를 들어 틸드("~") 문자에 해당하는
+   옥텟은 오래된 URI 처리 구현에서 "%7E"로 인코딩되는 경우가 많다.
+   "%7E"는 해석을 바꾸지 않고 "~"로 대체될 수 있다.
+
+   퍼센트("%") 문자는 퍼센트 인코딩된 옥텟의 표시자로 사용되므로,
+   이 옥텟이 URI 안에서 데이터로 사용되려면 "%25"로 퍼센트 인코딩되어야
+   한다. 구현은 같은 문자열을 한 번 넘게 퍼센트 인코딩하거나
+   디코딩해서는 안 된다. 이미 디코딩된 문자열을 디코딩하면 퍼센트
+   데이터 옥텟을 퍼센트 인코딩의 시작으로 잘못 해석할 수 있으며,
+   반대로 이미 퍼센트 인코딩된 문자열을 퍼센트 인코딩하는 경우에도
+   문제가 생길 수 있다.
+
+<span class="h3"><a class="selflink" id="section-2.5" href="#section-2.5">2.5</a>.  식별 데이터</span>
+
+   URI 문자는 각 URI 구성 요소에 대한 식별 데이터를 제공하며,
+   시스템 간 식별을 위한 외부 인터페이스 역할을 한다. URI 생성
+   인터페이스의 존재와 성격은 URI를 사용하는 클라이언트에게 숨겨져
+   있으므로 이 명세가 정의하는 상호운용성 요구 사항의 범위를
+   벗어나지만, URI 문자 문제 해석에서 혼동과 오류가 자주 발생하는
+   원천이다. 구현자는 URI의 생성과 전송에 여러 문자 인코딩이
+   관여한다는 점을 알아야 한다.
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [14페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   즉 로컬 이름 및 데이터 인코딩, 공개 인터페이스 인코딩, URI 문자
+   인코딩, 데이터 형식 인코딩, 프로토콜 인코딩이 관여한다.
+
+   파일 시스템 이름과 같은 로컬 이름은 로컬 문자 인코딩으로 저장된다.
+   URI 생성 애플리케이션(예: 원 서버)은 일반적으로 의미 있는 이름을
+   생성하기 위한 기초로 로컬 인코딩을 사용할 것이다. URI 생성자는
+   로컬 인코딩을 공개 인터페이스에 적합한 인코딩으로 변환한 다음,
+   공개 인터페이스 인코딩을 제한된 URI 문자 집합(예약 문자, 비예약
+   문자, 퍼센트 인코딩)으로 변환한다. 이러한 문자는 다시 데이터
+   형식(예: 문서 charset) 안의 참조로 사용되기 위해 옥텟으로
+   인코딩되고, 그러한 데이터 형식은 종종 이후 인터넷 프로토콜을
+   통해 전송되도록 인코딩된다.
+
+   대부분의 시스템에서 URI 구성 요소 안에 나타나는 비예약 문자는
+   US-ASCII에서 해당 문자 인코딩에 대응하는 데이터 옥텟을 나타내는
+   것으로 해석된다. URI 소비자는 문자 "X"가 옥텟 "01011000"에
+   대응한다고 가정하며, 그 가정이 잘못된 경우에도 그러한 가정을
+   해도 해가 없다. EBCDIC과 같은 다른 문자 인코딩 형식으로 내부
+   식별자를 제공하는 시스템은 일반적으로 내부 인터페이스에서 텍스트
+   식별자를 UTF-8 [<a href="#ref-STD63" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">STD63</a>](또는 US-ASCII 문자 인코딩의 다른 상위 집합)로
+   문자 변환하여, 원래 옥텟을 단순히 퍼센트 인코딩해서 얻은 것보다
+   더 의미 있는 식별자를 제공한다.
+
+   예를 들어 EBCDIC 기반 파일 시스템을 사용하여 로컬에 저장된
+   데이터를 HTTP 서버를 통해 인터넷의 클라이언트에 제공하는 정보
+   서비스를 생각해 보자. 작성자가 해당 파일 시스템에 "Laguna Beach"
+   라는 이름의 파일을 만들면, 그 자원에 대응하는 "http" URI는 의미
+   있는 문자열 "Laguna%20Beach"를 포함할 것으로 기대된다. 그러나
+   그 서버가 지나치게 단순한 원시 옥텟 매핑을 사용하여 URI를
+   생성한다면, 결과는 "%D3%81%87%A4%95%81@%C2%85%81%83%88"을 포함하는
+   URI가 될 것이다. 내부 트랜스코딩 인터페이스는 URI를 생성하기 전에
+   로컬 이름을 US-ASCII의 상위 집합으로 트랜스코딩함으로써 이 문제를
+   해결한다. 물론 그러한 인터페이스에서 들어오는 URI를 올바르게
+   해석하려면 역 트랜스코딩을 적용해 로컬 이름을 얻기 전에 퍼센트
+   인코딩된 옥텟을 디코딩해야 한다(예: "%20"을 SP로).
+
+   어떤 경우에는 URI 구성 요소와 그것이 나타내도록 만들어진 식별
+   데이터 사이의 내부 인터페이스가 문자 인코딩 변환보다 훨씬 덜
+   직접적이다. 예를 들어 URI의 일부는 비ASCII 데이터에 대한 질의를
+   반영하거나, 지도상의 숫자
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [15페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   좌표를 반영할 수 있다. 마찬가지로 URI 체계는 구성 요소를 형성하고
+   URI를 생성하기 전에 적용되는 추가 인코딩 요구 사항을 가진 구성
+   요소를 정의할 수 있다.
+
+   새로운 URI 체계가 Universal Character Set [<a href="#ref-UCS" title="&quot;Information Technology - Universal Multiple-Octet Coded Character Set (UCS)&quot;">UCS</a>]의 문자로 구성된
+   텍스트 데이터를 나타내는 구성 요소를 정의할 때, 그 데이터는 먼저
+   UTF-8 문자 인코딩 [<a href="#ref-STD63" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">STD63</a>]에 따라 옥텟으로 인코딩되어야 한다. 그런 다음
+   비예약 집합의 문자에 해당하지 않는 옥텟만 퍼센트 인코딩해야 한다.
+   예를 들어 문자 A는 "A"로 표현되고, 문자 LATIN CAPITAL LETTER A
+   WITH GRAVE는 "%C3%80"으로 표현되며, 문자 KATAKANA LETTER A는
+   "%E3%82%A2"로 표현된다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  구문 구성 요소</span>
+
+   일반 URI 구문은 체계, 권한, 경로, 쿼리, 프래그먼트라고 불리는
+   구성 요소들의 계층적 시퀀스로 이루어진다.
+
+      URI         = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+
+      hier-part   = "//" authority path-abempty
+                  / path-absolute
+                  / path-rootless
+                  / path-empty
+
+   체계와 경로 구성 요소는 필수이지만, 경로는 비어 있을 수 있다
+   (문자가 없을 수 있다). 권한이 존재하는 경우 경로는 비어 있거나
+   슬래시("/") 문자로 시작해야 한다. 권한이 존재하지 않는 경우
+   경로는 두 개의 슬래시 문자("//")로 시작할 수 없다. 이러한 제한은
+   경로에 대해 다섯 가지 서로 다른 ABNF 규칙(<a href="#section-3.3">3.3절</a>)을 낳으며,
+   주어진 URI 참조에는 그중 하나만 일치한다.
+
+   다음은 두 개의 예시 URI와 그 구성 요소이다.
+
+         foo://example.com:8042/over/there?name=ferret#nose
+         \_/   \______________/\_________/ \_________/ \__/
+          |           |            |            |        |
+       scheme     authority       path        query   fragment
+          |   _____________________|__
+         / \ /                        \
+         urn:example:animal:ferret:nose
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [16페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  체계</span>
+
+   각 URI는 체계 이름으로 시작하며, 이 이름은 해당 체계 안에서
+   식별자를 할당하기 위한 명세를 가리킨다. 따라서 URI 구문은
+   연합적이고 확장 가능한 명명 시스템이며, 각 체계의 명세는 그
+   체계를 사용하는 식별자의 구문과 의미를 추가로 제한할 수 있다.
+
+   체계 이름은 문자로 시작하고 그 뒤에 문자, 숫자, 더하기("+"),
+   마침표("."), 하이픈("-")의 임의 조합이 오는 문자 시퀀스로
+   구성된다. 체계는 대소문자를 구분하지 않지만, 정준 형식은 소문자이며
+   체계를 지정하는 문서는 소문자로 지정해야 한다. 구현은 견고성을
+   위해 체계 이름에서 대문자를 소문자와 동등하게 받아들여야 한다
+   (예: "http"뿐 아니라 "HTTP"도 허용). 그러나 일관성을 위해 체계
+   이름은 소문자로만 생성해야 한다.
+
+      scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+
+   개별 체계는 이 문서에서 지정하지 않는다. 새로운 URI 체계 등록
+   절차는 [<a href="#ref-BCP35" title="&quot;Registration Procedures for URL Scheme Names&quot;">BCP35</a>]에서 별도로 정의한다. 체계 레지스트리는 체계 이름과
+   그 명세 사이의 매핑을 유지한다. 새로운 URI 체계 설계자를 위한
+   조언은 [<a href="./rfc2718" title="&quot;Guidelines for new URL Schemes&quot;">RFC2718</a>]에서 찾을 수 있다. URI 체계 명세는 그 체계별
+   구문과 일치하는 모든 문자열이 <a href="#section-4.3">4.3절</a>에 설명된 &lt;absolute-URI&gt;
+   문법에도 일치하도록 자체 구문을 정의해야 한다.
+
+   하나 이상의 체계별 제한을 위반하는 URI가 제시되면, 체계별 해석
+   절차는 사용되지 않은 부분을 무시하기보다 그 참조를 오류로 표시해야
+   한다. 그렇게 하면 동등한 URI의 수를 줄이고, 사용자를 오도하기
+   위해 URI가 구성되었음을 나타낼 수 있는 일반 구문 남용을 탐지하는
+   데 도움이 된다(<a href="#section-7.6">7.6절</a>).
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a>.  권한</span>
+
+   많은 URI 체계는 이름 공간의 관리를, URI의 나머지 부분으로 정의된
+   이름 공간의 권한자에게 위임하기 위해(그 권한자는 다시 이를 더
+   위임할 수 있다) 명명 권한에 대한 계층적 요소를 포함한다. 일반
+   구문은 선택적 포트 및 사용자 정보와 함께 등록 이름 또는 서버
+   주소를 기반으로 권한을 구별하는 공통 수단을 제공한다.
+
+   권한 구성 요소는 이중 슬래시("//")가 앞에 오며, 다음 슬래시("/"),
+   물음표("?"), 번호 기호("#") 문자 또는 URI의 끝에서 종료된다.
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [17페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      authority   = [ userinfo "@" ] host [ ":" port ]
+
+   URI 생성자와 정규화기는 포트 구성 요소가 비어 있을 경우 호스트와
+   포트를 구분하는 ":" 구분자를 생략해야 한다. 일부 체계는 userinfo
+   및/또는 port 하위 구성 요소를 허용하지 않는다.
+
+   URI가 권한 구성 요소를 포함하면, 경로 구성 요소는 비어 있거나
+   슬래시("/") 문자로 시작해야 한다. 검증하지 않는 파서(URI 참조를
+   주요 구성 요소로만 분리하는 파서)는 URI가 역참조될 때까지
+   권한의 하위 구성 요소 구조를 무시하고, 이중 슬래시부터 첫 종료
+   구분자까지를 불투명한 문자열로 취급하는 경우가 많다.
+
+<span class="h4"><a class="selflink" id="section-3.2.1" href="#section-3.2.1">3.2.1</a>.  사용자 정보</span>
+
+   userinfo 하위 구성 요소는 사용자 이름과, 선택적으로 자원 접근
+   권한을 얻는 방법에 대한 체계별 정보로 구성될 수 있다. 사용자
+   정보가 존재하는 경우, 그 뒤에는 이를 호스트와 구분하는 상업용
+   at 기호("@")가 온다.
+
+      userinfo    = *( unreserved / pct-encoded / sub-delims / ":" )
+
+   userinfo 필드에서 "user:password" 형식을 사용하는 것은 폐기되었다.
+   애플리케이션은 userinfo 하위 구성 요소 안에서 처음 발견된 콜론(":")
+   문자 이후의 데이터를, 그 콜론 이후의 데이터가 빈 문자열(비밀번호
+   없음 표시)인 경우가 아니라면, 평문으로 렌더링해서는 안 된다.
+   애플리케이션은 그러한 데이터가 참조의 일부로 수신될 때 이를
+   무시하거나 거부하도록 선택할 수 있으며, 그러한 데이터를 암호화되지
+   않은 형식으로 저장하는 것을 거부해야 한다. 인증 정보를 평문으로
+   전달하는 것은 사용된 거의 모든 경우에서 보안 위험임이 입증되었다.
+
+   그래픽 하이퍼텍스트 브라우징처럼 사용자 피드백을 위해 URI를
+   렌더링하는 애플리케이션은 가능하다면 userinfo를 URI의 나머지
+   부분과 구별되는 방식으로 렌더링해야 한다. 이러한 렌더링은
+   userinfo가 신뢰할 수 있는 도메인 이름처럼 보이도록 오도하게
+   만들어진 경우 사용자에게 도움이 된다(<a href="#section-7.6">7.6절</a>).
+
+<span class="h4"><a class="selflink" id="section-3.2.2" href="#section-3.2.2">3.2.2</a>.  호스트</span>
+
+   권한의 host 하위 구성 요소는 대괄호 안에 캡슐화된 IP 리터럴,
+   점-십진 형식의 IPv4 주소, 또는 등록 이름으로 식별된다. host
+   하위 구성 요소는 대소문자를 구분하지 않는다. URI 안에 host 하위
+   구성 요소가 존재한다고 해서 그 체계가 인터넷상의 해당 호스트에
+   대한 접근을 요구한다는 뜻은 아니다. 많은 경우 host 구문은 단지
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [18페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   DNS를 위해 만들어지고 배포된 기존 등록 절차를 재사용하여, 다른
+   레지스트리를 배포하는 비용 없이 전역적으로 고유한 이름을 얻기
+   위한 것이다. 그러나 이러한 사용에는 자체 비용이 따른다. 도메인
+   이름 소유권은 URI 생성자가 예상하지 못한 이유로 시간이 지나면서
+   바뀔 수 있다. 다른 경우에는 host 구성 요소 안의 데이터가 인터넷
+   호스트와 아무 관련이 없는 등록 이름을 식별한다. 이 ABNF 규칙에
+   "host"라는 이름을 사용하는 이유는 그것이 가장 흔한 목적이기
+   때문이지, 유일한 목적이기 때문은 아니다.
+
+      host        = IP-literal / IPv4address / reg-name
+
+   host에 대한 구문 규칙은 IPv4address와 reg-name을 완전히 구별하지
+   않기 때문에 모호하다. 구문을 명확히 하기 위해 우리는 "first-match-wins"
+   알고리즘을 적용한다. host가 IPv4address 규칙과 일치하면, 이는
+   reg-name이 아니라 IPv4 주소 리터럴로 간주되어야 한다. host는
+   대소문자를 구분하지 않지만, 생성자와 정규화기는 통일성을 위해
+   등록 이름과 16진 주소에는 소문자를 사용하고, 퍼센트 인코딩에는
+   대문자만 사용해야 한다.
+
+   인터넷 프로토콜 리터럴 주소, 버전 6 [<a href="./rfc3513" title="&quot;Internet Protocol Version 6 (IPv6) Addressing Architecture&quot;">RFC3513</a>] 또는 그 이후 버전으로
+   식별되는 host는 IP 리터럴을 대괄호("["와 "]") 안에 넣어 구별한다.
+   URI 구문에서 대괄호 문자가 허용되는 유일한 위치는 이곳이다.
+   아직 정의되지 않은 향후 IP 리터럴 주소 형식을 예상하여, 구현은
+   휴리스틱 판정에 의존하기보다 그러한 형식을 명시적으로 나타내기
+   위해 선택적 버전 플래그를 사용할 수 있다.
+
+      IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
+
+      IPvFuture  = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+
+   버전 플래그는 IP 버전을 나타내지 않는다. 오히려 리터럴 형식의
+   향후 버전을 나타낸다. 따라서 구현은 아래에 설명된 기존 IPv4 및
+   IPv6 리터럴 주소 형식에 대해 버전 플래그를 제공해서는 안 된다.
+   버전 플래그가 존재함을 나타내는 "v"(대소문자 구분 없음)로 시작하는
+   IP-literal을 포함하는 URI가 역참조되고, 애플리케이션이 그 버전
+   플래그의 의미를 모른다면, 애플리케이션은 "address mechanism not
+   supported"에 해당하는 적절한 오류를 반환해야 한다.
+
+   IPv6 리터럴 주소로 식별되는 host는 앞에 버전 플래그 없이 대괄호
+   안에 표현된다. 여기에 제공된 ABNF는 [<a href="./rfc3513" title="&quot;Internet Protocol Version 6 (IPv6) Addressing Architecture&quot;">RFC3513</a>]에서 제공한 IPv6
+   리터럴 주소의 텍스트 정의를 번역한 것이다. 이 구문은 IPv6 범위
+   지정 주소 영역 식별자를 지원하지 않는다.
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [19페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   128비트 IPv6 주소는 여덟 개의 16비트 조각으로 나뉜다. 각 조각은
+   대소문자를 구분하지 않는 16진수로 수치 표현되며, 하나에서 네 개의
+   16진 숫자를 사용한다(앞쪽 0은 허용된다). 인코딩된 여덟 조각은
+   최상위 조각부터 제시되며, 콜론 문자로 구분된다. 선택적으로 최하위
+   두 조각은 대신 IPv4 주소 텍스트 형식으로 표현될 수 있다. 주소
+   안에서 연속된 하나 이상의 0 값을 가진 16비트 조각 시퀀스는
+   생략될 수 있으며, 그 모든 숫자를 생략하고 그 자리에 정확히 두 개의
+   연속 콜론을 남겨 생략을 표시한다.
+
+      IPv6address =                            6( h16 ":" ) ls32
+                  /                       "::" 5( h16 ":" ) ls32
+                  / [               h16 ] "::" 4( h16 ":" ) ls32
+                  / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+                  / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+                  / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+                  / [ *4( h16 ":" ) h16 ] "::"              ls32
+                  / [ *5( h16 ":" ) h16 ] "::"              h16
+                  / [ *6( h16 ":" ) h16 ] "::"
+
+      ls32        = ( h16 ":" h16 ) / IPv4address
+                  ; least-significant 32 bits of address
+
+      h16         = 1*4HEXDIG
+                  ; 16 bits of address represented in hexadecimal
+
+   IPv4 리터럴 주소로 식별되는 호스트는 [<a href="./rfc0952" title="&quot;DoD Internet host table specification&quot;">RFC0952</a>]를 참조하는
+   [<a href="./rfc1123" title="&quot;Requirements for Internet Hosts - Application and Support&quot;">RFC1123</a>]에 설명된 것처럼 점-십진 표기법("."으로 구분된, 0에서
+   255 범위의 네 개의 10진수 시퀀스)으로 표현된다. <a href="#section-7.4">7.4절</a>에 설명된
+   것처럼 일부 플랫폼에서는 다른 형태의 점 표기법이 해석될 수
+   있지만, 이 문법에서는 네 옥텟의 점-십진 형식만 허용된다는 점에
+   유의한다.
+
+      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
+
+      dec-octet   = DIGIT                 ; 0-9
+                  / %x31-39 DIGIT         ; 10-99
+                  / "1" 2DIGIT            ; 100-199
+                  / "2" %x30-34 DIGIT     ; 200-249
+                  / "25" %x30-35          ; 250-255
+
+   등록 이름으로 식별되는 호스트는 보통 로컬로 정의된 호스트 또는
+   서비스 이름 레지스트리에서 조회하기 위한 문자 시퀀스이다. 다만
+   URI의 체계별 의미가 특정 레지스트리(또는 고정 이름 표)를 대신
+   사용하도록 요구할 수 있다. 가장 일반적인 이름 레지스트리
+   메커니즘은 도메인 이름 시스템(DNS)이다. DNS에서 조회하기 위한
+   등록 이름은
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [20페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   <a href="./rfc1034#section-3.5">[RFC1034]의 3.5절</a>과 <a href="./rfc1123#section-2.1">[RFC1123]의 2.1절</a>에 정의된 구문을 사용한다.
+   그러한 이름은 "."으로 구분된 도메인 레이블 시퀀스로 구성되며,
+   각 도메인 레이블은 영숫자 문자로 시작하고 끝나며 "-" 문자를
+   포함할 수도 있다. DNS의 완전한 정규화 도메인 이름에서 가장 오른쪽
+   도메인 레이블 뒤에는 하나의 "."이 올 수 있으며, 완전한 도메인
+   이름과 어떤 로컬 도메인을 구별해야 할 필요가 있다면 그렇게 해야
+   한다.
+
+      reg-name    = *( unreserved / pct-encoded / sub-delims )
+
+   URI 체계가 host의 기본값을 정의한다면, 그 기본값은 host 하위 구성
+   요소가 정의되지 않았거나 등록 이름이 비어 있을 때(길이 0) 적용된다.
+   예를 들어 "file" URI 체계는 권한이 없는 경우, 빈 host, 그리고
+   "localhost"가 모두 최종 사용자의 기계를 의미하도록 정의되어 있는
+   반면, "http" 체계는 권한이 없거나 host가 비어 있는 경우를
+   유효하지 않은 것으로 간주한다.
+
+   이 명세는 특정 등록 이름 조회 기술을 의무화하지 않으므로,
+   상호운용성에 필요한 범위를 넘어 reg-name의 구문을 제한하지 않는다.
+   대신 등록 이름 구문 적합성 문제를 URI 해석을 수행하는 각
+   애플리케이션의 운영 체제에 위임하며, 그 운영 체제가 호스트 식별
+   목적을 위해 무엇을 허용할지 결정한다. URI 해석 구현은 등록 이름
+   조회를 위해 DNS, 호스트 테이블, yellow pages, NetInfo, WINS 또는
+   그 밖의 어떤 시스템도 사용할 수 있다. 그러나 DNS의 완전한 정규화
+   도메인 이름과 같은 전역 범위의 명명 시스템은 전역 범위를 갖도록
+   의도된 URI에 필요하다. URI 생성자는 DNS 사용이 즉시 드러나지 않는
+   경우에도 DNS 구문을 따르는 이름을 사용해야 하며, 이러한 이름의
+   길이를 255자를 넘지 않도록 제한해야 한다.
+
+   reg-name 구문은 비ASCII 등록 이름을 그 기반 이름 해석 기술과
+   독립적인 통일된 방식으로 표현하기 위해 퍼센트 인코딩된 옥텟을
+   허용한다. 비ASCII 문자는 먼저 UTF-8 [<a href="#ref-STD63" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">STD63</a>]에 따라 인코딩되어야
+   하며, 그 다음 대응하는 UTF-8 시퀀스의 각 옥텟이 URI 문자로
+   표현되도록 퍼센트 인코딩되어야 한다. URI 생성 애플리케이션은
+   UTF-8 문자 시퀀스를 표현하는 데 사용되는 경우가 아니라면 host에서
+   퍼센트 인코딩을 사용해서는 안 된다. 비ASCII 등록 이름이 DNS를 통한
+   해석을 의도한 국제화 도메인 이름을 나타내는 경우, 그 이름은 이름
+   조회 전에 IDNA 인코딩 [<a href="./rfc3490" title="&quot;Internationalizing Domain Names in Applications (IDNA)&quot;">RFC3490</a>]으로 변환되어야 한다. URI 생성자는
+   레거시 URI 해석기와의 상호운용성을 최대화하려면 이러한 등록 이름을
+   퍼센트 인코딩이 아니라 IDNA 인코딩으로 제공해야 한다.
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [21페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h4"><a class="selflink" id="section-3.2.3" href="#section-3.2.3">3.2.3</a>.  포트</span>
+
+   권한의 port 하위 구성 요소는 호스트 뒤에 오는 선택적 10진 포트
+   번호로 지정되며, 하나의 콜론(":") 문자로 호스트와 구분된다.
+
+      port        = *DIGIT
+
+   체계는 기본 포트를 정의할 수 있다. 예를 들어 "http" 체계는 예약된
+   TCP 포트 번호에 대응하는 기본 포트 "80"을 정의한다. 포트 번호가
+   지정하는 포트의 유형(예: TCP, UDP, SCTP)은 URI 체계에 의해
+   정의된다. URI 생성자와 정규화기는 port가 비어 있거나 그 값이
+   체계의 기본값과 같을 경우 포트 구성 요소와 그 ":" 구분자를
+   생략해야 한다.
+
+<span class="h3"><a class="selflink" id="section-3.3" href="#section-3.3">3.3</a>.  경로</span>
+
+   path 구성 요소는 보통 계층적 형식으로 조직된 데이터를 포함하며,
+   비계층적 query 구성 요소(<a href="#section-3.4">3.4절</a>)의 데이터와 함께 URI의 체계와
+   명명 권한(있는 경우)의 범위 안에서 자원을 식별하는 역할을 한다.
+   경로는 첫 번째 물음표("?") 또는 번호 기호("#") 문자, 또는 URI의
+   끝에서 종료된다.
+
+   URI가 authority 구성 요소를 포함하면 path 구성 요소는 비어 있거나
+   슬래시("/") 문자로 시작해야 한다. URI가 authority 구성 요소를
+   포함하지 않으면 path는 두 개의 슬래시 문자("//")로 시작할 수
+   없다. 또한 URI 참조(<a href="#section-4.1">4.1절</a>)는 relative-path 참조일 수 있으며,
+   이 경우 첫 번째 path 세그먼트는 콜론(":") 문자를 포함할 수 없다.
+   ABNF는 이러한 경우를 명확히 구분하기 위해 다섯 개의 별도 규칙을
+   요구하며, 주어진 URI 참조 안의 path 부분 문자열에는 그중 하나만
+   일치한다. 우리는 이러한 규칙 중 하나에 파서가 일치시킨 URI 부분
+   문자열을 설명하기 위해 일반 용어 "path component"를 사용한다.
+
+      path          = path-abempty    ; begins with "/" or is empty
+                    / path-absolute   ; begins with "/" but not "//"
+                    / path-noscheme   ; begins with a non-colon segment
+                    / path-rootless   ; begins with a segment
+                    / path-empty      ; zero characters
+
+      path-abempty  = *( "/" segment )
+      path-absolute = "/" [ segment-nz *( "/" segment ) ]
+      path-noscheme = segment-nz-nc *( "/" segment )
+      path-rootless = segment-nz *( "/" segment )
+      path-empty    = 0&lt;pchar&gt;
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [22페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      segment       = *pchar
+      segment-nz    = 1*pchar
+      segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
+                    ; non-zero-length segment without any colon ":"
+
+      pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+
+   path는 슬래시("/") 문자로 구분된 path 세그먼트들의 시퀀스로
+   구성된다. path는 URI에 대해 항상 정의되지만, 정의된 path는 비어
+   있을 수 있다(길이 0). 계층을 나타내기 위한 슬래시 문자의 사용은
+   URI가 상대 참조의 문맥으로 사용될 때에만 필요하다. 예를 들어 URI
+   &lt;mailto:fred@example.com&gt;의 path는 "fred@example.com"인 반면,
+   URI &lt;foo://info.example.com?fred&gt;의 path는 비어 있다.
+
+   "." 및 ".." path 세그먼트는 dot-segment라고도 하며, path 이름
+   계층 안에서 상대 참조를 위해 정의된다. 이들은 relative-path 참조
+   (<a href="#section-4.2">4.2절</a>)의 시작 부분에서 이름의 계층 트리 안의 상대 위치를
+   나타내기 위한 것이다. 이는 일부 운영 체제의 파일 디렉터리 구조에서
+   각각 현재 디렉터리와 부모 디렉터리를 나타내는 역할과 유사하다.
+   그러나 파일 시스템에서와 달리 이러한 dot-segment는 URI path 계층
+   안에서만 해석되며, 해석 절차의 일부로 제거된다(<a href="#section-5.2">5.2절</a>).
+
+   계층적 path의 dot-segment를 제외하면, path 세그먼트는 일반 구문에
+   의해 불투명한 것으로 간주된다. URI 생성 애플리케이션은 세그먼트에
+   허용되는 예약 문자를 사용하여 체계별 또는 역참조 처리기별 하위
+   구성 요소를 구분하는 경우가 많다. 예를 들어 세미콜론(";")과
+   등호("=") 예약 문자는 해당 세그먼트에 적용되는 매개변수와
+   매개변수 값을 구분하는 데 자주 사용된다. 쉼표(",") 예약 문자도
+   유사한 목적으로 자주 사용된다. 예를 들어 한 URI 생성자는 "name"의
+   버전 1.1에 대한 참조를 나타내기 위해 "name;v=1.1"과 같은
+   세그먼트를 사용할 수 있고, 다른 생성자는 같은 것을 나타내기 위해
+   "name,1.1"과 같은 세그먼트를 사용할 수 있다. 매개변수 유형은
+   체계별 의미에 의해 정의될 수 있지만, 대부분의 경우 매개변수의
+   구문은 URI 역참조 알고리즘 구현에 특화되어 있다.
+
+<span class="h3"><a class="selflink" id="section-3.4" href="#section-3.4">3.4</a>.  쿼리</span>
+
+   query 구성 요소는 비계층적 데이터를 포함하며, path 구성 요소
+   (<a href="#section-3.3">3.3절</a>)의 데이터와 함께 URI의 체계와 명명 권한(있는 경우)의
+   범위 안에서 자원을 식별하는 역할을 한다. query 구성 요소는 첫 번째
+   물음표("?") 문자로 표시되며, 번호 기호("#") 문자 또는 URI의 끝에서
+   종료된다.
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [23페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      query       = *( pchar / "/" / "?" )
+
+   슬래시("/")와 물음표("?") 문자는 query 구성 요소 안에서 데이터를
+   나타낼 수 있다. 일부 오래된 잘못된 구현은 상대 참조를 위한 기본
+   URI로 이것이 사용될 때(<a href="#section-5.1">5.1절</a>) 그러한 데이터를 올바르게 처리하지
+   못할 수 있음에 주의해야 한다. 이는 계층 구분자를 찾을 때 query
+   데이터를 path 데이터와 구별하지 못하기 때문으로 보인다. 그러나
+   query 구성 요소는 "key=value" 쌍 형식의 식별 정보를 전달하는 데
+   자주 사용되고, 자주 사용되는 값 중 하나가 다른 URI에 대한 참조이기
+   때문에, 사용성 측면에서는 때때로 이러한 문자를 퍼센트 인코딩하지
+   않는 편이 더 낫다.
+
+<span class="h3"><a class="selflink" id="section-3.5" href="#section-3.5">3.5</a>.  프래그먼트</span>
+
+   URI의 fragment identifier 구성 요소는 기본 자원에 대한 참조와 추가
+   식별 정보를 통해 보조 자원을 간접적으로 식별할 수 있게 한다.
+   식별된 보조 자원은 기본 자원의 어떤 부분 또는 부분 집합일 수
+   있고, 기본 자원의 표현에 대한 어떤 뷰일 수 있으며, 또는 그러한
+   표현에 의해 정의되거나 설명되는 다른 자원일 수 있다. fragment
+   identifier 구성 요소는 번호 기호("#") 문자의 존재로 표시되며
+   URI의 끝에서 종료된다.
+
+      fragment    = *( pchar / "/" / "?" )
+
+   fragment identifier의 의미는 기본 자원에 대한 검색 동작에서 나올
+   수 있는 표현 집합에 의해 정의된다. 따라서 fragment의 형식과
+   해석은 잠재적으로 검색될 표현의 미디어 유형 [<a href="./rfc2046" title="&quot;Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types&quot;">RFC2046</a>]에 의존한다.
+   비록 그러한 검색은 URI가 역참조될 때에만 수행되지만 그렇다. 그러한
+   표현이 존재하지 않으면 fragment의 의미는 알 수 없는 것으로
+   간주되며 사실상 제약되지 않는다. fragment identifier의 의미는 URI
+   체계와 독립적이므로 체계 명세가 이를 재정의할 수 없다.
+
+   개별 미디어 유형은 해당 미디어 유형에 의해 보조 자원으로 식별될
+   수 있는 다양한 유형의 부분 집합, 뷰 또는 외부 참조를 지정하기
+   위해 fragment identifier 구문 안의 자체 제한이나 구조를 정의할 수
+   있다. 기본 자원이 여러 표현을 갖는 경우, 즉 검색 요청의 속성에
+   따라 표현이 선택되는 자원에서 흔히 있는 경우(일명 콘텐츠 협상),
+   fragment가 식별하는 것은 그러한 모든 표현에서 일관되어야 한다.
+   각 표현은 fragment가 표현 방식과 관계없이 같은 보조 자원에
+   대응하도록 정의하거나, fragment를 정의하지 않은 상태로 두어야 한다
+   (즉 찾을 수 없음).
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [24페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   다른 URI와 마찬가지로 fragment identifier 구성 요소를 사용한다고
+   해서 검색 동작이 발생한다는 뜻은 아니다. fragment identifier가 있는
+   URI는 기본 자원이 접근 가능하거나 언젠가 접근될 것이라는 어떤
+   암시도 없이 보조 자원을 참조하는 데 사용될 수 있다.
+
+   fragment identifier는 정보 검색 시스템에서 클라이언트 측 간접 참조의
+   기본 형식으로 특별한 역할을 하며, 작성자가 자원 소유자가 간접적으로만
+   제공하는 기존 자원의 측면을 특정하여 식별할 수 있게 한다. 따라서
+   fragment identifier는 URI의 체계별 처리에 사용되지 않는다. 대신
+   fragment identifier는 역참조 전에 URI의 나머지 부분에서 분리되며,
+   따라서 fragment 자체 안의 식별 정보는 URI 체계와 관계없이 오직
+   사용자 에이전트에 의해 역참조된다. 이러한 별도 처리는 종종 정보
+   손실로 인식되며, 특히 자원이 시간이 지나 이동할 때 참조를 정확히
+   리디렉션하는 데 그렇다. 그러나 이는 정보 제공자가 참조 작성자에게
+   자원 안의 정보를 선택적으로 참조할 권리를 부정하지 못하게 하는
+   역할도 한다. 또한 간접 참조는 URI를 사용하는 시스템에 추가적인
+   유연성과 확장성을 제공한다. 새로운 식별 체계보다 새로운 미디어
+   유형을 정의하고 배포하는 편이 더 쉽기 때문이다.
+
+   슬래시("/")와 물음표("?") 문자는 fragment identifier 안에서 데이터를
+   나타내도록 허용된다. 일부 오래된 잘못된 구현은 이것이 상대 참조의
+   기본 URI로 사용될 때(<a href="#section-5.1">5.1절</a>) 이 데이터를 올바르게 처리하지 못할
+   수 있음에 주의해야 한다.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  사용</span>
+
+   애플리케이션이 URI를 참조할 때 항상 "URI" 구문 규칙에 정의된
+   참조의 전체 형식을 사용하는 것은 아니다. 공간을 절약하고 계층적
+   지역성을 활용하기 위해 많은 인터넷 프로토콜 요소와 미디어 유형
+   형식은 URI의 축약형을 허용하는 반면, 다른 것들은 구문을 특정 URI
+   형식으로 제한한다. 우리는 가장 일반적인 참조 구문 형식을 이
+   명세에서 정의한다. 이는 일반 구문의 설계에 영향을 주고 이에
+   의존하며, 일관되게 해석되기 위해 통일된 파싱 알고리즘을 요구하기
+   때문이다.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  URI 참조</span>
+
+   URI-reference는 자원 식별자의 가장 일반적인 사용을 나타내는 데
+   사용된다.
+
+      URI-reference = URI / relative-ref
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [25페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-26" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   URI-reference는 URI 또는 상대 참조이다. URI-reference의 접두사가
+   체계 뒤에 콜론 구분자가 오는 구문과 일치하지 않으면, 그
+   URI-reference는 상대 참조이다.
+
+   URI-reference는 일반적으로 먼저 다섯 URI 구성 요소로 파싱되어,
+   어떤 구성 요소가 존재하는지와 그 참조가 상대적인지를 결정한다.
+   그런 다음 각 구성 요소는 그 하위 부분과 그 검증을 위해 파싱된다.
+   URI-reference의 ABNF는 "first-match-wins" 명확화 규칙과 함께 일반
+   구문에 대한 검증 파서를 정의하기에 충분하다. 정규식에 익숙한
+   독자는 주어진 어떤 문자열에서도 URI 구성 요소를 추출하는 검증하지
+   않는 URI-reference 파서의 예를 <a href="#appendix-B">부록 B</a>에서 볼 수 있다.
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  상대 참조</span>
+
+   상대 참조는 계층적 구문(<a href="#section-1.2.3">1.2.3절</a>)을 활용하여 다른 계층적 URI의
+   이름 공간에 상대적인 URI 참조를 표현한다.
+
+      relative-ref  = relative-part [ "?" query ] [ "#" fragment ]
+
+      relative-part = "//" authority path-abempty
+                    / path-absolute
+                    / path-noscheme
+                    / path-empty
+
+   상대 참조가 가리키는 URI, 즉 대상 URI는 <a href="#section-5">5절</a>의 참조 해석
+   알고리즘을 적용하여 얻는다.
+
+   두 개의 슬래시 문자로 시작하는 상대 참조는 network-path 참조라고
+   하며, 그러한 참조는 거의 사용되지 않는다. 하나의 슬래시 문자로
+   시작하는 상대 참조는 absolute-path 참조라고 한다. 슬래시 문자로
+   시작하지 않는 상대 참조는 relative-path 참조라고 한다.
+
+   콜론 문자를 포함하는 path 세그먼트(예: "this:that")는 체계 이름으로
+   오인될 수 있으므로 relative-path 참조의 첫 번째 세그먼트로 사용할
+   수 없다. 이러한 세그먼트는 relative-path 참조가 되도록 앞에
+   dot-segment(예: "./this:that")가 와야 한다.
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [26페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-27" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  절대 URI</span>
+
+   일부 프로토콜 요소는 fragment identifier가 없는 절대 형식의 URI만
+   허용한다. 예를 들어 이후 상대 참조에서 사용할 기본 URI를 정의하려면
+   fragment를 허용하지 않는 absolute-URI 구문 규칙이 필요하다.
+
+      absolute-URI  = scheme ":" hier-part [ "?" query ]
+
+   URI 체계 명세는 그 체계별 구문과 일치하는 모든 문자열이
+   &lt;absolute-URI&gt; 문법에도 일치하도록 자체 구문을 정의해야 한다. 체계
+   명세는 해당 체계로 식별 가능한 자원에 fragment identifier가
+   적용될 수 있더라도, fragment identifier 구문이나 사용법을 정의하지
+   않는다. fragment 식별은 체계 정의와 직교하기 때문이다. 그러나 체계
+   명세는 적절한 경우 해당 체계의 URI와 fragment identifier 사용을
+   보여주는 예를 포함하여 다양한 예를 포함하도록 권장된다.
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a>.  동일 문서 참조</span>
+
+   URI 참조가 fragment 구성 요소(있는 경우)를 제외하고 기본 URI
+   (<a href="#section-5.1">5.1절</a>)와 동일한 URI를 참조할 때, 그 참조를 "same-document"
+   참조라고 한다. same-document 참조의 가장 빈번한 예는 비어 있거나
+   번호 기호("#") 구분자 뒤에 fragment identifier만 포함하는 상대
+   참조이다.
+
+   same-document 참조가 검색 동작을 위해 역참조될 때, 그 참조의 대상은
+   그 참조와 같은 엔터티(표현, 문서 또는 메시지) 안에 있는 것으로
+   정의된다. 따라서 역참조가 새로운 검색 동작을 초래해서는 안 된다.
+
+   <a href="#section-6.2.2">6.2.2절</a>과 <a href="#section-6.2.3">6.2.3절</a>에 설명된 것처럼 비교 전에 기본 URI와 대상
+   URI를 정규화하는 것은 허용되지만 실제로는 거의 수행되지 않는다.
+   정규화는 same-document 참조의 집합을 늘릴 수 있으며, 이는 일부
+   캐싱 애플리케이션에 도움이 될 수 있다. 따라서 참조 작성자는 약간
+   다르지만 동등한 참조 URI가 어떤 특정 애플리케이션에 의해
+   same-document 참조로 해석될 것이라고(또는 해석되지 않을 것이라고)
+   가정해서는 안 된다.
+
+<span class="h3"><a class="selflink" id="section-4.5" href="#section-4.5">4.5</a>.  접미사 참조</span>
+
+   URI 구문은 자원에 대한 모호하지 않은 참조와 URI 체계를 통한
+   확장성을 위해 설계되었다. 그러나 URI 식별과 사용이 보편화되면서
+   전통 매체(텔레비전, 라디오, 신문, 광고판 등)는 점점 URI의 접미사를
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [27페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-28" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   참조로 사용해 왔다. 이는 다음과 같이 URI의 authority와 path 부분만
+   구성된다.
+
+      www.w3.org/Addressing/
+
+   또는 단순히 DNS 등록 이름 자체일 수 있다. 이러한 참조는 주로
+   기계가 아니라 사람이 해석하기 위한 것이며, 문맥 기반 휴리스틱이
+   URI를 완성하기에 충분하다는 가정을 둔다(예: "www"로 시작하는
+   대부분의 등록 이름은 URI 접두사 "http://"를 가질 가능성이 높다).
+   URI 접미사를 명확히 구분하기 위한 표준 휴리스틱 집합은 없지만,
+   많은 클라이언트 구현은 사용자가 이를 입력하도록 허용하고
+   휴리스틱으로 해석한다.
+
+   접미사 참조를 사용하는 이 관행은 흔하지만, 가능하면 피해야 하며
+   장기 참조가 기대되는 상황에서는 절대 사용해서는 안 된다. 위에서
+   언급한 휴리스틱은 시간이 지나면서, 특히 새로운 URI 체계가 인기를
+   얻게 될 때 바뀔 것이며, 문맥 밖에서 사용될 때는 종종 부정확하다.
+   또한 [<a href="./rfc1535" title="&quot;A Security Problem and Proposed Correction With Widely Deployed DNS Software&quot;">RFC1535</a>]에 설명된 것과 같은 보안 문제로 이어질 수 있다.
+
+   URI 접미사는 relative-path 참조와 같은 구문을 가지므로, 상대 참조가
+   기대되는 문맥에서는 접미사 참조를 사용할 수 없다. 그 결과 접미사
+   참조는 대화 상자와 오프라인 광고처럼 정의된 기본 URI가 없는 곳으로
+   제한된다.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  참조 해석</span>
+
+   이 절은 상대 참조를 허용하는 문맥 안에서 URI 참조를 해석하여
+   결과가 <a href="#section-3">3절</a>의 &lt;URI&gt; 구문 규칙과 일치하는 문자열이 되도록 하는
+   절차를 정의한다.
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>.  기본 URI 설정</span>
+
+   "relative"라는 용어는 상대 참조가 적용되는 "base URI"가 존재한다는
+   것을 의미한다. fragment만 있는 참조(<a href="#section-4.4">4.4절</a>)를 제외하고, 상대
+   참조는 기본 URI가 알려져 있을 때에만 사용할 수 있다. 파서는
+   상대적일 수 있는 URI 참조를 파싱하기 전에 기본 URI를 설정해야
+   한다. 기본 URI는 &lt;absolute-URI&gt; 구문 규칙(<a href="#section-4.3">4.3절</a>)을 따라야 한다.
+   기본 URI가 URI 참조에서 얻어진 경우, 그 참조는 기본 URI로 사용되기
+   전에 절대 형식으로 변환되고 fragment 구성 요소가 제거되어야 한다.
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [28페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-29" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   참조의 기본 URI는 아래에서 우선순위 순서로 논의되는 네 가지 방법 중
+   하나로 설정될 수 있다. 우선순위 순서는 계층의 관점에서 생각할 수
+   있으며, 가장 안쪽에 정의된 기본 URI가 가장 높은 우선순위를 갖는다.
+   이는 다음과 같이 그래픽으로 시각화할 수 있다.
+
+         .----------------------------------------------------------.
+         |  .----------------------------------------------------.  |
+         |  |  .----------------------------------------------.  |  |
+         |  |  |  .----------------------------------------.  |  |  |
+         |  |  |  |  .----------------------------------.  |  |  |  |
+         |  |  |  |  |       &lt;relative-reference&gt;       |  |  |  |  |
+         |  |  |  |  `----------------------------------'  |  |  |  |
+         |  |  |  | (5.1.1) Base URI embedded in content   |  |  |  |
+         |  |  |  `----------------------------------------'  |  |  |
+         |  |  | (5.1.2) Base URI of the encapsulating entity |  |  |
+         |  |  |         (message, representation, or none)   |  |  |
+         |  |  `----------------------------------------------'  |  |
+         |  | (5.1.3) URI used to retrieve the entity            |  |
+         |  `----------------------------------------------------'  |
+         | (5.1.4) Default Base URI (application-dependent)         |
+         `----------------------------------------------------------'
+
+<span class="h4"><a class="selflink" id="section-5.1.1" href="#section-5.1.1">5.1.1</a>.  콘텐츠에 포함된 기본 URI</span>
+
+   특정 미디어 유형 안에서는 상대 참조를 위한 기본 URI가 콘텐츠 자체
+   안에 포함될 수 있어, 파서가 이를 쉽게 얻을 수 있다. 이는 보통의
+   검색 문맥이 아닌 프로토콜(예: 이메일 또는 USENET 뉴스)을 통해
+   다른 사람에게 전송될 수 있는 목차와 같은 설명 문서에 유용할 수
+   있다.
+
+   각 미디어 유형에 대해 기본 URI를 어떻게 포함할 수 있는지를 지정하는
+   것은 이 명세의 범위를 벗어난다. 적절한 구문이 있는 경우, 각 미디어
+   유형과 관련된 데이터 형식 명세에서 설명한다.
+
+<span class="h4"><a class="selflink" id="section-5.1.2" href="#section-5.1.2">5.1.2</a>.  캡슐화 엔터티에서 온 기본 URI</span>
+
+   기본 URI가 포함되어 있지 않으면, 기본 URI는 표현의 검색 문맥에 의해
+   정의된다. 메시지나 아카이브와 같은 다른 엔터티 안에 포함된 문서의
+   경우 검색 문맥은 그 엔터티이다. 따라서 표현의 기본 기본 URI는
+   그 표현이 캡슐화된 엔터티의 기본 URI이다.
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [29페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-30" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   MIME 컨테이너 유형(예: message 및 multipart 유형) 안에 기본 URI를
+   포함하기 위한 메커니즘은 MHTML [<a href="./rfc2557" title="&quot;MIME Encapsulation of Aggregate Documents, such as HTML (MHTML)&quot;">RFC2557</a>]에서 정의된다. MIME 메시지
+   헤더 구문을 사용하지 않지만 메시지 안에 어떤 형태의 태그된
+   메타데이터를 포함할 수 있는 프로토콜은, 메시지의 일부로 기본 URI를
+   정의하기 위한 자체 구문을 정의할 수 있다.
+
+<span class="h4"><a class="selflink" id="section-5.1.3" href="#section-5.1.3">5.1.3</a>.  검색 URI에서 온 기본 URI</span>
+
+   기본 URI가 포함되어 있지 않고 표현이 다른 엔터티 안에 캡슐화되어
+   있지 않다면, 표현을 검색하는 데 URI가 사용된 경우 그 URI를 기본
+   URI로 간주해야 한다. 검색이 리디렉션된 요청의 결과였던 경우,
+   마지막으로 사용된 URI(즉 표현의 실제 검색 결과가 된 URI)가 기본
+   URI라는 점에 유의한다.
+
+<span class="h4"><a class="selflink" id="section-5.1.4" href="#section-5.1.4">5.1.4</a>.  기본 기본 URI</span>
+
+   위에 설명된 조건 중 어느 것도 적용되지 않으면, 기본 URI는
+   애플리케이션의 문맥에 의해 정의된다. 이 정의는 필연적으로
+   애플리케이션 의존적이므로, 다른 방법 중 하나를 사용하여 기본 URI를
+   정의하지 못하면 같은 콘텐츠가 서로 다른 유형의 애플리케이션에서
+   다르게 해석될 수 있다.
+
+   상대 참조를 포함하는 표현의 발신자는 그 참조들에 대한 기본 URI가
+   설정될 수 있도록 보장할 책임이 있다. fragment만 있는 참조를
+   제외하면, 상대 참조는 기본 URI가 잘 정의된 상황에서만 신뢰성 있게
+   사용할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  상대 해석</span>
+
+   이 절은 상대적일 수 있는 URI 참조를 주어진 기본 URI에 대해 참조
+   대상의 파싱된 구성 요소로 변환하는 알고리즘을 설명한다. 그런 다음
+   구성 요소는 <a href="#section-5.3">5.3절</a>에 설명된 대로 재조합되어 대상 URI를 형성할 수
+   있다. 이 알고리즘은 다른 구현의 출력을 테스트하는 데 사용할 수
+   있는 결정적 결과를 제공한다. 애플리케이션은 결과가 이 알고리즘이
+   제공하는 것과 일치한다면 다른 알고리즘을 사용하여 상대 참조 해석을
+   구현할 수 있다.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [30페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-31" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h4"><a class="selflink" id="section-5.2.1" href="#section-5.2.1">5.2.1</a>.  기본 URI 사전 파싱</span>
+
+   기본 URI(Base)는 <a href="#section-5.1">5.1절</a>의 절차에 따라 설정되고, <a href="#section-3">3절</a>에 설명된
+   다섯 주요 구성 요소로 파싱된다. 기본 URI에는 scheme 구성 요소만
+   존재해야 한다는 점에 유의한다. 다른 구성 요소는 비어 있거나
+   정의되지 않을 수 있다. 구성 요소는 그 관련 구분자가 URI 참조에
+   나타나지 않을 때 정의되지 않은 것이다. path 구성 요소는 결코
+   정의되지 않은 것이 아니지만, 비어 있을 수 있다.
+
+   <a href="#section-6.2.2">6.2.2절</a>과 6.2.3절에 설명된 기본 URI의 정규화는 선택 사항이다.
+   URI 참조는 정규화되기 전에 먼저 대상 URI로 변환되어야 한다.
+
+<span class="h4"><a class="selflink" id="section-5.2.2" href="#section-5.2.2">5.2.2</a>.  참조 변환</span>
+
+   각 URI 참조(R)에 대해 다음 의사 코드는 R을 그 대상 URI(T)로
+   변환하는 알고리즘을 설명한다.
+
+      -- The URI reference is parsed into the five URI components
+      --
+      (R.scheme, R.authority, R.path, R.query, R.fragment) = parse(R);
+
+      -- A non-strict parser may ignore a scheme in the reference
+      -- if it is identical to the base URI's scheme.
+      --
+      if ((not strict) and (R.scheme == Base.scheme)) then
+         undefine(R.scheme);
+      endif;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [31페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-32" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      if defined(R.scheme) then
+         T.scheme    = R.scheme;
+         T.authority = R.authority;
+         T.path      = remove_dot_segments(R.path);
+         T.query     = R.query;
+      else
+         if defined(R.authority) then
+            T.authority = R.authority;
+            T.path      = remove_dot_segments(R.path);
+            T.query     = R.query;
+         else
+            if (R.path == "") then
+               T.path = Base.path;
+               if defined(R.query) then
+                  T.query = R.query;
+               else
+                  T.query = Base.query;
+               endif;
+            else
+               if (R.path starts-with "/") then
+                  T.path = remove_dot_segments(R.path);
+               else
+                  T.path = merge(Base.path, R.path);
+                  T.path = remove_dot_segments(T.path);
+               endif;
+               T.query = R.query;
+            endif;
+            T.authority = Base.authority;
+         endif;
+         T.scheme = Base.scheme;
+      endif;
+
+      T.fragment = R.fragment;
+
+<span class="h4"><a class="selflink" id="section-5.2.3" href="#section-5.2.3">5.2.3</a>.  경로 병합</span>
+
+   위 의사 코드는 상대 경로 참조를 기본 URI의 path와 병합하기 위한
+   "merge" 루틴을 참조한다. 이는 다음과 같이 수행된다.
+
+   o  기본 URI에 정의된 authority 구성 요소와 빈 path가 있으면,
+      "/"와 참조의 path를 연결한 문자열을 반환한다. 그렇지 않으면,
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [32페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-33" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   o  기본 URI path의 마지막 세그먼트를 제외한 모든 부분에 참조의 path
+      구성 요소를 덧붙인 문자열을 반환한다(즉 기본 URI path에서 가장
+      오른쪽 "/" 뒤의 모든 문자를 제외하거나, 기본 URI path에 "/" 문자가
+      하나도 없으면 기본 URI path 전체를 제외한다).
+
+<span class="h4"><a class="selflink" id="section-5.2.4" href="#section-5.2.4">5.2.4</a>.  점 세그먼트 제거</span>
+
+   의사 코드는 참조된 path에서 특별한 "." 및 ".." 완전한 path
+   세그먼트를 해석하고 제거하기 위한 "remove_dot_segments" 루틴도
+   참조한다. 이는 path가 상대적이었는지 여부와 관계없이 참조에서 path를
+   추출한 뒤 수행되며, 대상 URI를 형성하기 전에 유효하지 않거나
+   불필요한 dot-segment를 제거하기 위한 것이다. 이러한 제거 절차를
+   수행하는 방법은 많지만, 여기서는 두 문자열 버퍼를 사용하는 간단한
+   방법을 설명한다.
+
+   1.  입력 버퍼는 이제 덧붙여진 path 구성 요소로 초기화되고, 출력
+       버퍼는 빈 문자열로 초기화된다.
+
+   2.  입력 버퍼가 비어 있지 않은 동안 다음과 같이 반복한다.
+
+       A.  입력 버퍼가 "../" 또는 "./" 접두사로 시작하면, 그 접두사를
+           입력 버퍼에서 제거한다. 그렇지 않으면,
+
+       B.  입력 버퍼가 "/./" 또는 "/." 접두사로 시작하고, 여기서 "."
+           가 완전한 path 세그먼트이면, 입력 버퍼에서 그 접두사를
+           "/"로 대체한다. 그렇지 않으면,
+
+       C.  입력 버퍼가 "/../" 또는 "/.." 접두사로 시작하고, 여기서
+           ".."가 완전한 path 세그먼트이면, 입력 버퍼에서 그 접두사를
+           "/"로 대체하고 출력 버퍼에서 마지막 세그먼트와 그 앞의
+           "/"(있는 경우)를 제거한다. 그렇지 않으면,
+
+       D.  입력 버퍼가 "." 또는 ".."만으로 구성되어 있으면, 그것을
+           입력 버퍼에서 제거한다. 그렇지 않으면,
+
+       E.  입력 버퍼의 첫 번째 path 세그먼트를 출력 버퍼의 끝으로
+           이동한다. 여기에는 초기 "/" 문자(있는 경우)와 그 뒤의
+           다음 "/" 문자 직전까지의 모든 문자, 또는 입력 버퍼의 끝까지의
+           모든 문자가 포함된다.
+
+   3.  마지막으로 출력 버퍼를 remove_dot_segments의 결과로 반환한다.
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [33페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-34" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   dot-segment는 기본 URI 안의 이름 계층에 상대적인 식별자를 표현하기
+   위해 URI 참조에서 사용되도록 의도되었다는 점에 유의한다.
+   remove_dot_segments 알고리즘은 여분의 dot-segment를 오류로 처리하거나
+   역참조 구현이 잘못 해석하도록 남겨 두지 않고 제거함으로써 그 계층을
+   존중한다.
+
+   다음은 병합된 path의 두 예에 위 단계가 어떻게 적용되는지를 보여주며,
+   각 단계 뒤 두 버퍼의 상태를 나타낸다.
+
+      STEP   OUTPUT BUFFER         INPUT BUFFER
+
+       1 :                         /a/b/c/./../../g
+       2E:   /a                    /b/c/./../../g
+       2E:   /a/b                  /c/./../../g
+       2E:   /a/b/c                /./../../g
+       2B:   /a/b/c                /../../g
+       2C:   /a/b                  /../g
+       2C:   /a                    /g
+       2E:   /a/g
+
+      STEP   OUTPUT BUFFER         INPUT BUFFER
+
+       <a href="#section-1">1</a> :                         mid/content=5/../6
+       2E:   mid                   /content=5/../6
+       2E:   mid/content=5         /../6
+       2C:   mid                   /6
+       2E:   mid/6
+
+   일부 애플리케이션은 remove_dot_segments 알고리즘을 문자열 대신 두 개의
+   세그먼트 스택을 사용하여 구현하는 것이 더 효율적이라고 생각할 수
+   있다.
+
+      참고: 일부 오래된 잘못된 구현은 기본 path와 참조 path를 병합하기
+      전에 참조의 query 구성 요소를 path 구성 요소와 분리하지 못할 수
+      있음에 주의한다. query 구성 요소에 문자열 "/../" 또는 "/./"가
+      포함된 경우 이는 상호운용성 실패를 초래한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [34페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-35" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  구성 요소 재조합</span>
+
+   파싱된 URI 구성 요소는 해당 URI 참조 문자열을 얻기 위해 재조합될
+   수 있다. 의사 코드로 표현하면 다음과 같다.
+
+      result = ""
+
+      if defined(scheme) then
+         append scheme to result;
+         append ":" to result;
+      endif;
+
+      if defined(authority) then
+         append "//" to result;
+         append authority to result;
+      endif;
+
+      append path to result;
+
+      if defined(query) then
+         append "?" to result;
+         append query to result;
+      endif;
+
+      if defined(fragment) then
+         append "#" to result;
+         append fragment to result;
+      endif;
+
+      return result;
+
+   우리는 구성 요소가 정의되지 않은 경우, 즉 그 구분자가 참조에
+   존재하지 않았음을 의미하는 경우와, 구성 요소가 비어 있는 경우,
+   즉 구분자가 존재했고 곧바로 다음 구성 요소 구분자나 참조의 끝이
+   뒤따랐음을 의미하는 경우의 구별을 보존하도록 주의한다.
+
+<span class="h3"><a class="selflink" id="section-5.4" href="#section-5.4">5.4</a>.  참조 해석 예</span>
+
+   잘 정의된 기본 URI가 다음과 같은 표현 안에서
+
+      http://a/b/c/d;p?q
+
+   상대 참조는 다음과 같이 대상 URI로 변환된다.
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [35페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-36" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h4"><a class="selflink" id="section-5.4.1" href="#section-5.4.1">5.4.1</a>.  정상 예</span>
+
+      "g:h"           =  "g:h"
+      "g"             =  "<a href="http://a/b/c/g">http://a/b/c/g</a>"
+      "./g"           =  "<a href="http://a/b/c/g">http://a/b/c/g</a>"
+      "g/"            =  "<a href="http://a/b/c/g/">http://a/b/c/g/</a>"
+      "/g"            =  "<a href="http://a/g">http://a/g</a>"
+      "//g"           =  "http://g"
+      "?y"            =  "http://a/b/c/d;p?y"
+      "g?y"           =  "<a href="http://a/b/c/g?y">http://a/b/c/g?y</a>"
+      "#s"            =  "http://a/b/c/d;p?q#s"
+      "g#s"           =  "<a href="http://a/b/c/g#s">http://a/b/c/g#s</a>"
+      "g?y#s"         =  "<a href="http://a/b/c/g?y#s">http://a/b/c/g?y#s</a>"
+      ";x"            =  "http://a/b/c/;x"
+      "g;x"           =  "http://a/b/c/g;x"
+      "g;x?y#s"       =  "http://a/b/c/g;x?y#s"
+      ""              =  "http://a/b/c/d;p?q"
+      "."             =  "<a href="http://a/b/c/">http://a/b/c/</a>"
+      "./"            =  "<a href="http://a/b/c/">http://a/b/c/</a>"
+      ".."            =  "<a href="http://a/b/">http://a/b/</a>"
+      "../"           =  "<a href="http://a/b/">http://a/b/</a>"
+      "../g"          =  "<a href="http://a/b/g">http://a/b/g</a>"
+      "../.."         =  "<a href="http://a/">http://a/</a>"
+      "../../"        =  "<a href="http://a/">http://a/</a>"
+      "../../g"       =  "<a href="http://a/g">http://a/g</a>"
+
+<span class="h4"><a class="selflink" id="section-5.4.2" href="#section-5.4.2">5.4.2</a>.  비정상 예</span>
+
+   다음 비정상 예는 일반적인 실제 사용에서는 발생할 가능성이 낮지만,
+   모든 URI 파서는 이를 일관되게 해석할 수 있어야 한다. 각 예는 위와
+   같은 기본 URI를 사용한다.
+
+   파서는 relative-path 참조에 기본 URI path의 계층 수준보다 더 많은
+   ".." 세그먼트가 있는 경우를 처리할 때 주의해야 한다. ".." 구문은
+   URI의 authority 구성 요소를 변경하는 데 사용할 수 없다는 점에
+   유의한다.
+
+      "../../../g"    =  "<a href="http://a/g">http://a/g</a>"
+      "../../../../g" =  "<a href="http://a/g">http://a/g</a>"
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [36페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-37" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   마찬가지로 파서는 dot-segment "."와 ".."가 path의 완전한 구성 요소일
+   때 이를 제거해야 하지만, 세그먼트의 일부일 뿐일 때는 제거해서는
+   안 된다.
+
+      "/./g"          =  "<a href="http://a/g">http://a/g</a>"
+      "/../g"         =  "<a href="http://a/g">http://a/g</a>"
+      "g."            =  "<a href="http://a/b/c/g">http://a/b/c/g</a>."
+      ".g"            =  "<a href="http://a/b/c/.g">http://a/b/c/.g</a>"
+      "g.."           =  "<a href="http://a/b/c/g">http://a/b/c/g</a>.."
+      "..g"           =  "<a href="http://a/b/c/..g">http://a/b/c/..g</a>"
+
+   상대 참조가 "." 및 ".." 완전한 path 세그먼트의 불필요하거나 무의미한
+   형식을 사용하는 경우는 더 드물다.
+
+      "./../g"        =  "<a href="http://a/b/g">http://a/b/g</a>"
+      "./g/."         =  "<a href="http://a/b/c/g/">http://a/b/c/g/</a>"
+      "g/./h"         =  "<a href="http://a/b/c/g/h">http://a/b/c/g/h</a>"
+      "g/../h"        =  "<a href="http://a/b/c/h">http://a/b/c/h</a>"
+      "g;x=1/./y"     =  "http://a/b/c/g;x=1/y"
+      "g;x=1/../y"    =  "<a href="http://a/b/c/y">http://a/b/c/y</a>"
+
+   일부 애플리케이션은 참조의 query 및/또는 fragment 구성 요소를, 기본
+   path와 병합하고 dot-segment를 제거하기 전에 path 구성 요소와
+   분리하지 못한다. 일반적인 fragment 사용은 계층 문자("/")를 포함하지
+   않으며 query 구성 요소는 보통 상대 참조 안에서 사용되지 않기 때문에,
+   이 오류는 거의 발견되지 않는다.
+
+      "g?y/./x"       =  "<a href="http://a/b/c/g?y/./x">http://a/b/c/g?y/./x</a>"
+      "g?y/../x"      =  "<a href="http://a/b/c/g?y/../x">http://a/b/c/g?y/../x</a>"
+      "g#s/./x"       =  "<a href="http://a/b/c/g#s/./x">http://a/b/c/g#s/./x</a>"
+      "g#s/../x"      =  "<a href="http://a/b/c/g#s/../x">http://a/b/c/g#s/../x</a>"
+
+   일부 파서는 상대 참조 안에 기본 URI 체계와 같은 체계 이름이 존재하는
+   것을 허용한다. 이는 이전 partial URI 명세 [<a href="./rfc1630" title="&quot;Universal Resource Identifiers in WWW: A Unifying Syntax for the Expression of Names and Addresses of Objects on the Network as used in the World-Wide Web&quot;">RFC1630</a>]의 허점으로
+   간주된다. 그 사용은 피해야 하지만, 하위 호환성을 위해 허용된다.
+
+      "http:g"        =  "http:g"         ; for strict parsers
+                      /  "<a href="http://a/b/c/g">http://a/b/c/g</a>" ; for backward compatibility
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [37페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-38" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  정규화와 비교</span>
+
+   URI에 대한 가장 일반적인 작업 중 하나는 단순 비교이다. 즉 URI를
+   사용하여 각 자원에 접근하지 않고 두 URI가 동등한지 판단하는 것이다.
+   비교는 응답 캐시에 접근할 때마다, 브라우저가 링크에 색을 지정하기
+   위해 기록을 확인할 때마다, 또는 XML 파서가 이름 공간 안의 태그를
+   처리할 때마다 수행된다. URI 비교 전에 광범위한 정규화는 스파이더와
+   색인 엔진이 검색 공간을 줄이거나 요청 동작과 응답 저장의 중복을
+   줄이기 위해 자주 사용한다.
+
+   URI 비교는 특정 목적을 위해 수행된다. 서로 다른 목적을 위해 URI를
+   비교하는 프로토콜이나 구현은, 별칭 식별자를 줄이는 데 어느 정도의
+   노력을 들여야 하는지와 관련해 서로 다른 설계상의 절충에 놓이는
+   경우가 많다. 이 절은 URI를 비교하는 데 사용할 수 있는 다양한 방법,
+   그들 사이의 절충, 그리고 이를 사용할 수 있는 애플리케이션 유형을
+   설명한다.
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  동등성</span>
+
+   URI는 자원을 식별하기 위해 존재하므로, 아마 같은 자원을 식별할 때
+   동등한 것으로 간주되어야 한다. 그러나 이러한 동등성 정의는 실제로는
+   별로 유용하지 않다. 구현이 두 자원에 대한 완전한 지식이나 통제권을
+   갖지 않는 한 두 자원을 비교할 방법이 없기 때문이다. 이러한 이유로
+   URI의 동등성 또는 차이를 판단하는 것은 문자열 비교에 기반하며,
+   URI 체계 정의가 제공하는 추가 규칙에 대한 참조로 보강될 수 있다.
+   우리는 그러한 비교의 가능한 결과를 설명하기 위해 "different"와
+   "equivalent"라는 용어를 사용하지만, 애플리케이션 의존적인 여러
+   버전의 동등성이 존재한다.
+
+   두 URI가 동등하다고 판단할 수 있더라도, URI 비교만으로 두 URI가
+   서로 다른 자원을 식별한다고 판단하기에는 충분하지 않다. 예를 들어
+   서로 다른 두 도메인 이름의 소유자가 양쪽에서 같은 자원을 제공하기로
+   결정할 수 있으며, 그 결과 서로 다른 두 URI가 생긴다. 따라서 비교
+   방법은 거짓 양성을 엄격히 피하면서 거짓 음성을 최소화하도록
+   설계된다.
+
+   동등성을 테스트할 때 애플리케이션은 상대 참조를 직접 비교해서는
+   안 된다. 참조는 비교 전에 각자의 대상 URI로 변환되어야 한다. 표현
+   검색과 같은 네트워크 동작을 선택(또는 회피)하기 위해 URI를 비교할
+   때는 fragment 구성 요소(있는 경우)를 비교에서 제외해야 한다.
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [38페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-39" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  비교 사다리</span>
+
+   실제로 URI 동등성을 테스트하기 위해 다양한 방법이 사용된다. 이러한
+   방법은 필요한 처리량과 거짓 음성의 확률을 줄이는 정도에 따라 구분되는
+   범위에 속한다. 위에서 언급했듯이 거짓 음성은 제거될 수 없다.
+   실제로 그 확률은 줄일 수 있지만, 이러한 감소에는 더 많은 처리가
+   필요하며 모든 애플리케이션에 비용 효율적인 것은 아니다.
+
+   이 비교 관행의 범위를 사다리로 본다면, 다음 논의는 저렴하지만
+   상대적으로 거짓 음성을 낼 가능성이 높은 관행에서 시작하여, 계산
+   비용은 더 높지만 거짓 음성의 위험은 낮은 관행으로 올라간다.
+
+<span class="h4"><a class="selflink" id="section-6.2.1" href="#section-6.2.1">6.2.1</a>.  단순 문자열 비교</span>
+
+   두 URI가 문자 문자열로 보았을 때 동일하다면, 두 URI가 동등하다고
+   결론내리는 것은 안전하다. 이러한 유형의 동등성 테스트는 계산
+   비용이 매우 낮으며, 특히 파싱 영역을 비롯한 다양한 애플리케이션에서
+   널리 사용된다.
+
+   문자열의 동등성을 테스트하려면 몇 가지 기본 주의가 필요하다. 이
+   절차는 종종 "bit-for-bit" 또는 "byte-for-byte" 비교라고 불리지만,
+   이는 잠재적으로 오해의 소지가 있다. 문자열의 동등성 테스트는 보통
+   문자열을 이루는 문자들의 쌍 비교에 기반하며, 첫 문자에서 시작하여
+   양쪽 문자열이 모두 소진되고 모든 문자가 같다고 판명될 때까지, 한
+   쌍의 문자가 같지 않다고 비교될 때까지, 또는 한 문자열이 다른
+   문자열보다 먼저 소진될 때까지 진행한다.
+
+   이 문자 비교에서는 각 문자 쌍이 비교 가능한 형식으로 놓여야 한다.
+   예를 들어 한 URI가 EBCDIC 인코딩의 바이트 배열에 저장되어 있고 두
+   번째 URI가 Java String 객체(UTF-16)에 저장되어 있다면, 단순히
+   bit-for-bit 비교를 적용하면 오류가 발생한다. byte-for-byte 또는
+   bit-for-bit 기준보다 character-for-character 기준의 동등성을 말하는
+   편이 더 낫다. 실제적으로 문자별 비교는 공통 문자 인코딩으로 변환한
+   뒤 코드포인트별로 수행되어야 한다.
+
+   거짓 음성은 URI 별칭의 생성과 사용으로 인해 발생한다. 비교 방법과
+   관계없이, 이미 정규화된 형식(즉 아래에 설명된 정규화가 적용된 뒤
+   생성될 형식과 동일한 형식)으로 URI 참조를 일관되게 제공함으로써
+   불필요한 별칭을 줄일 수 있다.
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [39페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-40" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   프로토콜과 데이터 형식은 종종 일부 URI 비교를 단순 문자열 비교로
+   제한한다. 이는 사람과 구현이 자신에게 이익이 되도록 URI 참조를
+   일관되게 제공하거나, 적어도 추가 정규화로 얻을 수 있는 효율성을
+   상쇄할 정도로 충분히 일관되게 제공할 것이라는 이론에 기반한다.
+
+<span class="h4"><a class="selflink" id="section-6.2.2" href="#section-6.2.2">6.2.2</a>.  구문 기반 정규화</span>
+
+   구현은 이 명세가 제공하는 정의에 기반한 논리를 사용하여 거짓 음성의
+   확률을 줄일 수 있다. 이 처리는 character-for-character 문자열 비교보다
+   비용이 적당히 더 높다. 예를 들어 이 접근법을 사용하는 애플리케이션은
+   다음 두 URI를 동등하다고 합리적으로 간주할 수 있다.
+
+      example://a/b/c/%7Bfoo%7D
+      eXAMPLE://a/./b/../b/%63/%7bfoo%7d
+
+   브라우저와 같은 웹 사용자 에이전트는 일반적으로 캐시된 응답이
+   사용 가능한지 판단할 때 이러한 유형의 URI 정규화를 적용한다.
+   구문 기반 정규화에는 대소문자 정규화, 퍼센트 인코딩 정규화,
+   dot-segment 제거와 같은 기법이 포함된다.
+
+<span class="h5"><a class="selflink" id="section-6.2.2.1" href="#section-6.2.2.1">6.2.2.1</a>. 대소문자 정규화</span>
+
+   모든 URI에서 퍼센트 인코딩 삼중항 안의 16진 숫자(예: "%3a"와
+   "%3A")는 대소문자를 구분하지 않으므로, 숫자 A-F에 대해 대문자를
+   사용하도록 정규화해야 한다.
+
+   URI가 일반 구문의 구성 요소를 사용할 때는 구성 요소 구문 동등성
+   규칙이 항상 적용된다. 즉 scheme과 host는 대소문자를 구분하지
+   않으므로 소문자로 정규화해야 한다. 예를 들어 URI
+   &lt;HTTP://www.EXAMPLE.com/&gt;은 &lt;http://www.example.com/&gt;과 동등하다.
+   다른 일반 구문 구성 요소는 체계가 달리 명시적으로 정의하지 않는 한
+   대소문자를 구분하는 것으로 가정된다(<a href="#section-6.2.3">6.2.3절</a> 참조).
+
+<span class="h5"><a class="selflink" id="section-6.2.2.2" href="#section-6.2.2.2">6.2.2.2</a>. 퍼센트 인코딩 정규화</span>
+
+   퍼센트 인코딩 메커니즘(<a href="#section-2.1">2.1절</a>)은 그 밖에는 동일한 URI들 사이에서
+   차이가 발생하는 흔한 원인이다. 위에서 언급한 대소문자 정규화 문제에
+   더해, 일부 URI 생성자는 퍼센트 인코딩이 필요하지 않은 옥텟을
+   퍼센트 인코딩하여, 인코딩되지 않은 대응 URI와 동등한 URI를 만든다.
+   이러한 URI는 <a href="#section-2.3">2.3절</a>에 설명된 대로 비예약 문자에 해당하는
+   퍼센트 인코딩된 옥텟을 디코딩하여 정규화해야 한다.
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [40페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-41" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h5"><a class="selflink" id="section-6.2.2.3" href="#section-6.2.2.3">6.2.2.3</a>.  경로 세그먼트 정규화</span>
+
+   완전한 path 세그먼트 "."와 ".."는 상대 참조(<a href="#section-4.1">4.1절</a>) 안에서만
+   사용되도록 의도되었으며, 참조 해석 절차(<a href="#section-5.2">5.2절</a>)의 일부로 제거된다.
+   그러나 배포된 일부 구현은 참조가 이미 URI인 경우 참조 해석이
+   필요하지 않다고 잘못 가정하여, 비상대 path에 dot-segment가 나타날
+   때 이를 제거하지 못한다. URI 정규화기는 <a href="#section-5.2.4">5.2.4절</a>에 설명된 대로
+   remove_dot_segments 알고리즘을 path에 적용하여 dot-segment를
+   제거해야 한다.
+
+<span class="h4"><a class="selflink" id="section-6.2.3" href="#section-6.2.3">6.2.3</a>.  체계 기반 정규화</span>
+
+   URI의 구문과 의미는 각 체계를 정의하는 명세가 설명하듯이 체계마다
+   다르다. 구현은 추가 처리 비용을 들여 체계별 규칙을 사용함으로써
+   거짓 음성의 확률을 줄일 수 있다. 예를 들어 "http" 체계는 authority
+   구성 요소를 사용하고, 기본 포트 "80"을 가지며, 빈 path를 "/"와
+   동등한 것으로 정의하므로, 다음 네 URI는 동등하다.
+
+      http://example.com
+      http://example.com/
+      <a href="http://example.com:/">http://example.com:/</a>
+      <a href="http://example.com:80/">http://example.com:80/</a>
+
+   일반적으로 authority에 일반 구문을 사용하면서 빈 path를 가진 URI는
+   "/"의 path로 정규화되어야 한다. 마찬가지로 명시적 ":port"에서
+   port가 비어 있거나 체계의 기본값이면, port와 그 ":" 구분자를 생략한
+   것과 동등하므로 체계 기반 정규화에 의해 제거되어야 한다. 예를 들어
+   위의 두 번째 URI는 "http" 체계의 정규 형식이다.
+
+   정규화가 체계마다 달라지는 또 다른 경우는 빈 authority 구성 요소나
+   빈 host 하위 구성 요소의 처리이다. 많은 체계 명세에서는 빈 authority
+   또는 host를 오류로 간주하지만, 다른 체계에서는 이를 "localhost" 또는
+   최종 사용자의 host와 동등하게 간주한다. 체계가 authority의 기본값을
+   정의하고 그 기본값에 대한 URI 참조가 필요한 경우, 통일성, 간결성,
+   국제화를 위해 그 참조는 빈 authority로 정규화되어야 한다. 그러나
+   userinfo 또는 port 하위 구성 요소 중 하나라도 비어 있지 않다면,
+   host가 기본값과 일치하더라도 명시적으로 제공되어야 한다.
+
+   정규화는 체계 명세가 허용하지 않는 한, 관련 구성 요소가 비어 있다고
+   해서 구분자를 제거해서는 안 된다. 예를 들어 URI "http://example.com/?"
+   는 위의 예 중 어느 것과도 동등하다고 가정할 수 없다. 마찬가지로
+   userinfo 하위 구성 요소 안에서 구분자의 존재 여부는 보통 그 해석에
+   중요하다. fragment 구성 요소는 어떤 체계 기반 정규화의 대상도
+   아니다. 따라서 접미사 "#"만 다른 두 URI는 체계와 관계없이 서로
+   다른 것으로 간주된다.
+
+   일부 체계는 대소문자를 구분하지 않는 데이터로 구성된 추가 하위
+   구성 요소를 정의하여, 정규화기가 이 데이터를 공통 대소문자 형식
+   (예: 모두 소문자)으로 변환할 수 있도록 암묵적으로 허용한다. 예를
+   들어 "mailto" URI 체계처럼 path의 하위 구성 요소가 인터넷 hostname을
+   포함하도록 정의하는 URI 체계는 그 하위 구성 요소를 대소문자 구분
+   없이 만들며, 따라서 대소문자 정규화의 대상이 되게 한다(예:
+   "mailto:Joe@Example.COM"은 "mailto:Joe@example.com"과 동등하다.
+   일반 구문은 path 구성 요소를 대소문자 구분으로 간주하더라도 그렇다).
+
+   다른 체계별 정규화도 가능하다.
+
+<span class="h4"><a class="selflink" id="section-6.2.4" href="#section-6.2.4">6.2.4</a>.  프로토콜 기반 정규화</span>
+
+   거짓 음성의 발생을 줄이기 위한 상당한 노력은 웹 스파이더에게 종종
+   비용 효율적이다. 따라서 이들은 URI 비교에서 훨씬 더 적극적인
+   기법을 구현한다. 예를 들어 다음과 같은 URI가
+
+      http://example.com/data
+
+   뒤쪽 슬래시만 다른 URI로 리디렉션되는 것을 관찰하면
+
+      http://example.com/data/
+
+   앞으로는 이 둘을 동등한 것으로 간주할 가능성이 높다. 이러한 종류의
+   기법은 자원에 접근한 결과와 해당 체계의 역참조 알고리즘의 공통
+   관례 모두가 동등성을 명확히 나타낼 때에만 적절하다. 이 경우에는
+   상대 참조 문제를 피하기 위해 HTTP 원 서버가 리디렉션을 사용하는
+   관례가 이에 해당한다.
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [42페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-43" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  보안 고려 사항</span>
+
+   URI는 그 자체로 보안 위협을 일으키지 않는다. 그러나 URI는 네트워크
+   자원에 접근하기 위한 간결한 명령 집합을 제공하는 데 자주 사용되므로,
+   URI 안의 데이터를 올바르게 해석하고, 그 데이터가 의도하지 않은
+   접근을 유발하지 않도록 하며, 평문으로 드러나서는 안 되는 데이터를
+   포함하지 않도록 주의해야 한다.
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  신뢰성과 일관성</span>
+
+   URI가 정보를 검색하는 데 한 번 사용되었다고 해서, 앞으로도 같은
+   정보가 그 URI로 검색 가능하다는 보장은 없다. 또한 앞으로 그 URI를
+   통해 검색 가능한 정보가 과거에 검색된 정보와 관찰 가능하게 유사할
+   것이라는 보장도 없다. URI 구문은 주어진 체계나 authority가 그 이름
+   공간을 어떻게 배분하거나 시간이 지나며 어떻게 유지하는지를 제한하지
+   않는다. 그러한 보장은 해당 이름 공간과 문제의 자원을 제어하는
+   사람에게서만 얻을 수 있다. 특정 URI 체계는 그 체계의 모든 명명
+   authority에 그러한 의미가 요구되는 경우, 이름 지속성과 같은 추가
+   의미를 정의할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  악의적 구성</span>
+
+   겉보기에는 무해하고 멱등적인 작업, 예를 들어 표현 검색을 수행하려는
+   시도가 실제로는 손상을 줄 수 있는 원격 작업을 유발하도록 URI를
+   구성하는 것이 때때로 가능하다. 안전하지 않은 URI는 보통 해당 네트워크
+   프로토콜에 예약된 포트가 아닌 포트 번호를 지정하여 구성된다.
+   클라이언트는 자신도 모르게 다른 프로토콜 서비스를 실행 중인 사이트에
+   접속하고, URI 안의 데이터는 이 다른 프로토콜에 따라 해석될 때
+   예상치 못한 작업을 유발하는 명령을 포함한다. 이러한 남용의 흔한
+   예는 프로토콜 기반 체계에 port 구성 요소 "25"를 사용하여 사용자
+   에이전트 소프트웨어가 SMTP 서버를 통해 의도하지 않았거나 가장된
+   메시지를 보내도록 속이는 것이었다.
+
+   애플리케이션은 URI를 역참조하는 데 사용되는 프로토콜이 해당 well-known
+   port에서 예상되는 프로토콜과 호환되지 않는 한, "well-known port"
+   범위(0 - 1023)의 TCP 포트 번호를 지정하는 URI의 역참조를 방지해야
+   한다. IANA가 well-known port 레지스트리를 유지하지만, 애플리케이션은
+   새로운 서비스의 배포를 막지 않도록 이러한 제한을 사용자가 설정할
+   수 있게 해야 한다.
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [43페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-44" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   URI가 주어진 해석 또는 역참조 프로토콜의 구분자와 일치하는
+   퍼센트 인코딩된 옥텟을 포함하는 경우(예: TELNET 프로토콜의 CR 및
+   LF 문자), 이러한 퍼센트 인코딩은 그 프로토콜을 통해 전송되기 전에
+   디코딩되어서는 안 된다. 프로토콜을 위반할 수 있는 퍼센트 인코딩을
+   전송하는 것이, 디코딩된 옥텟이 추가 작업이나 매개변수로 해석되어
+   예상치 못하고 해로울 수 있는 원격 작업을 유발하도록 허용하는 것보다
+   덜 해롭다.
+
+<span class="h3"><a class="selflink" id="section-7.3" href="#section-7.3">7.3</a>.  백엔드 트랜스코딩</span>
+
+   URI가 역참조될 때, 그 안의 데이터는 사용자 에이전트와 하나 이상의
+   서버 모두에 의해 파싱되는 경우가 많다. 예를 들어 HTTP에서 일반적인
+   사용자 에이전트는 URI를 다섯 주요 구성 요소로 파싱하고, authority의
+   서버에 접근하며, authority, path, query 구성 요소 안의 데이터를
+   서버에 보낸다. 일반적인 서버는 그 정보를 받아 path를 세그먼트로,
+   query를 키/값 쌍으로 파싱한 다음, 요청에 응답하기 위해 구현별
+   처리기를 호출한다. 그 결과 URI를 전체로든 별도 구성 요소로
+   분할해서든 처리하는 서버 구현에서 공통적인 보안 관심사는, 그 URI
+   안의 문자와 퍼센트 인코딩이 나타내는 옥텟 데이터를 올바르게 해석하는
+   것이다.
+
+   퍼센트 인코딩된 옥텟은 역참조 절차 중 어느 시점에는 디코딩되어야
+   한다. 애플리케이션은 옥텟을 디코딩하기 전에 URI를 구성 요소와 하위
+   구성 요소로 분할해야 한다. 그렇지 않으면 디코딩된 옥텟이 구분자로
+   오인될 수 있다. URI 안의 데이터에 대한 보안 검사는 옥텟을 디코딩한
+   뒤 적용되어야 한다. 그러나 "%00" 퍼센트 인코딩(NUL)은 특별한
+   처리가 필요할 수 있으며, 애플리케이션이 구성 요소 안에서 원시
+   데이터를 받을 것을 기대하지 않는다면 거부해야 한다는 점에 유의한다.
+
+   URI path 해석 절차가 백엔드 파일 시스템이나 관련 시스템 기능의 사용을
+   포함할 때는 특별히 주의해야 한다. 파일 시스템은 보통 "/", "\", ":",
+   "[", "]" 문자와 같은 특수 문자 및 ".", "..", "...", "aux", "lpt" 등과
+   같은 특수 장치 이름에 작업상의 의미를 부여한다. 어떤 경우에는 그러한
+   이름의 존재를 검사하는 것만으로도 운영 체제가 일시 정지하거나 관련
+   없는 시스템 호출을 실행하여, 서비스 거부와 의도하지 않은 데이터
+   전송에 관한 중대한 보안 문제로 이어질 수 있다. 이 명세가 그러한
+   모든 중요한 문자와 장치 이름을 나열하는 것은 불가능하다. 구현자는
+   애플리케이션에 연결될 수 있는 저장 장치 유형에 대해 예약된 이름과
+   문자를 조사하고, 이에 따라 URI 구성 요소에서 얻은 데이터의 사용을
+   제한해야 한다.
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [44페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-45" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h3"><a class="selflink" id="section-7.4" href="#section-7.4">7.4</a>.  드문 IP 주소 형식</span>
+
+   IPv4address에 대한 URI 구문은 일반적인 IPv4 주소 리터럴의 점-십진
+   형식만 허용하지만, URI를 처리하는 많은 구현은 문자열 리터럴을 실제
+   IP 주소로 변환하기 위해 gethostbyname() 및 inet_aton() 같은 플랫폼
+   의존적 시스템 루틴을 사용한다. 불행히도 그러한 시스템 루틴은
+   <a href="#section-3.2.2">3.2.2절</a>에 설명된 것보다 훨씬 더 큰 형식 집합을 허용하고 처리하는
+   경우가 많다.
+
+   예를 들어 많은 구현은 세 숫자의 점 표기 형식을 허용하며, 이 경우
+   마지막 부분은 16비트 수량으로 해석되어 네트워크 주소의 가장 오른쪽
+   두 바이트에 배치된다(예: Class B 네트워크). 마찬가지로 두 숫자의
+   점 표기 형식은 마지막 부분이 24비트 수량으로 해석되어 네트워크
+   주소의 가장 오른쪽 세 바이트에 배치됨을 의미하며(Class A), 하나의
+   숫자(점 없음)는 32비트 수량으로 해석되어 네트워크 주소에 직접
+   저장된다. 혼란을 더하는 것은, 일부 구현이 C 언어에서 지정된 것처럼
+   각 점으로 구분된 부분을 10진수, 8진수 또는 16진수로 해석하도록
+   허용한다는 점이다(즉 앞쪽 0x 또는 0X는 16진수를 의미하고, 앞쪽 0은
+   8진수를 의미하며, 그 외에는 10진수로 해석된다).
+
+   이러한 추가 IP 주소 형식은 플랫폼 구현 간 차이 때문에 URI 구문에서
+   허용되지 않는다. 그러나 애플리케이션이 문자열 리터럴 형식의 IP
+   주소를 기반으로 자원 접근을 필터링하려고 할 경우, 이는 보안 문제가
+   될 수 있다. 이러한 필터링이 수행된다면, 리터럴은 숫자 형식으로
+   변환되어야 하며 문자열 형식의 접두사나 접미사가 아니라 숫자 값을
+   기반으로 필터링되어야 한다.
+
+<span class="h3"><a class="selflink" id="section-7.5" href="#section-7.5">7.5</a>.  민감한 정보</span>
+
+   URI 생성자는 비밀로 의도된 사용자 이름이나 비밀번호를 포함하는 URI를
+   제공해서는 안 된다. URI는 브라우저에 자주 표시되고, 평문 북마크에
+   저장되며, 사용자 에이전트 기록과 중개 애플리케이션(프록시)에 의해
+   기록된다. userinfo 구성 요소 안에 나타나는 비밀번호는 폐기되었으며,
+   'password' 매개변수가 공개되도록 의도된 드문 경우를 제외하고는
+   오류로 간주해야 한다(또는 단순히 무시해야 한다).
+
+<span class="h3"><a class="selflink" id="section-7.6" href="#section-7.6">7.6</a>.  의미 공격</span>
+
+   userinfo 하위 구성 요소는 거의 사용되지 않고 authority 구성 요소에서
+   host 앞에 나타나므로, 실제로는 잡음 뒤에 숨겨진 다른 authority를
+   식별하면서도 사람 사용자가 하나의 (신뢰된) 명명 authority를 식별하는
+   것처럼 보이도록 오도하려는 URI를 구성하는 데 사용될 수 있다. 예를
+   들어
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [45페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-46" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      ftp://cnn.example.com&amp;story=breaking_news@10.0.0.1/top_story.htm
+
+   은 사람 사용자가 host가 'cnn.example.com'이라고 가정하게 만들 수
+   있지만, 실제로는 '10.0.0.1'이다. 오도하는 userinfo 하위 구성 요소는
+   위 예보다 훨씬 길 수 있다는 점에 유의한다.
+
+   위와 같은 오도하는 URI는 소프트웨어 자체에 대한 공격이라기보다,
+   URI의 의미에 대한 사용자의 선입견에 대한 공격이다. 사용자 에이전트는
+   URI의 다양한 구성 요소를 렌더링할 때 구별함으로써, 예를 들어
+   userinfo가 존재하면 이를 다른 색상이나 톤으로 렌더링함으로써 이러한
+   공격의 영향을 줄일 수 있다. 하지만 만병통치책은 없다. URI 기반
+   의미 공격에 대한 자세한 정보는 [<a href="#ref-Siedzik" title="&quot;Semantic Attacks: What's in a URL?&quot;">Siedzik</a>]에서 찾을 수 있다.
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  IANA 고려 사항</span>
+
+   <a href="#section-3.1">3.1절</a>의 &lt;scheme&gt;에 의해 정의되는 URI 체계 이름은 [<a href="#ref-BCP35" title="&quot;Registration Procedures for URL Scheme Names&quot;">BCP35</a>]에
+   정의된 절차에 따라 IANA가 관리하는 등록 이름 공간을 형성한다. 이
+   문서에 의해 요구되는 IANA 조치는 없다.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  감사의 말</span>
+
+   이 명세는 <a href="./rfc2396">RFC 2396</a> [<a href="./rfc2396" title="&quot;Uniform Resource Identifiers (URI): Generic Syntax&quot;">RFC2396</a>], <a href="./rfc1808">RFC 1808</a> [<a href="./rfc1808" title="&quot;Relative Uniform Resource Locators&quot;">RFC1808</a>], 그리고
+   <a href="./rfc1738">RFC 1738</a> [<a href="./rfc1738" title="&quot;Uniform Resource Locators (URL)&quot;">RFC1738</a>]에서 파생되었으며, 그 문서들의 감사의 말은 여전히
+   적용된다. 또한 Robert M. Hinden, Brian E. Carpenter, Larry Masinter가
+   [<a href="./rfc2732" title="&quot;Format for Literal IPv6 Addresses in URL's&quot;">RFC2732</a>]에서 정의한 host 구문의 IPv6 리터럴에 대한 갱신(수정 포함)을
+   통합한다. 그 밖에도 Gisle Aas, Reese Anschultz, Daniel Barclay,
+   Tim Bray, Mike Brown, Rob Cameron, Jeremy Carroll, Dan Connolly,
+   Adam M. Costello, John Cowan, Jason Diamond, Martin Duerst,
+   Stefan Eissing, Clive D.W. Feather, Al Gilman, Tony Hammond,
+   Elliotte Harold, Pat Hayes, Henry Holtzman, Ian B. Jacobs, Michael
+   Kay, John C. Klensin, Graham Klyne, Dan Kohn, Bruce Lilly, Andrew
+   Main, Dave McAlpin, Ira McDonald, Michael Mealling, Ray Merkert,
+   Stephen Pollei, Julian Reschke, Tomas Rokicki, Miles Sabin, Kai
+   Schaetzl, Mark Thomson, Ronald Tschalaer, Norm Walsh, Marc Warne,
+   Stuart Williams, Henry Zongaro의 기여에 깊이 감사한다.
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  참조 문헌</span>
+
+<span class="h3"><a class="selflink" id="section-10.1" href="#section-10.1">10.1</a>.  규범적 참조 문헌</span>
+
+   [<a id="ref-ASCII">ASCII</a>]    American National Standards Institute, "Coded Character
+              Set -- 7-bit American Standard Code for Information
+              Interchange", ANSI X3.4, 1986.
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [46페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-47" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   [<a id="ref-RFC2234">RFC2234</a>]  Crocker, D. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", <a href="./rfc2234">RFC 2234</a>, 1997년 11월.
+
+   [<a id="ref-STD63">STD63</a>]    Yergeau, F., "UTF-8, a transformation format of
+              ISO 10646", STD 63, <a href="./rfc3629">RFC 3629</a>, 2003년 11월.
+
+   [<a id="ref-UCS">UCS</a>]      International Organization for Standardization,
+              "Information Technology - Universal Multiple-Octet Coded
+              Character Set (UCS)", ISO/IEC 10646:2003, 2003년 12월.
+
+<span class="h3"><a class="selflink" id="section-10.2" href="#section-10.2">10.2</a>.  정보성 참조 문헌</span>
+
+   [<a id="ref-BCP19">BCP19</a>]    Freed, N. and J. Postel, "IANA Charset Registration
+              Procedures", <a href="https://www.rfc-editor.org/bcp/bcp19">BCP 19</a>, <a href="./rfc2978">RFC 2978</a>, 2000년 10월.
+
+   [<a id="ref-BCP35">BCP35</a>]    Petke, R. and I. King, "Registration Procedures for URL
+              Scheme Names", <a href="https://www.rfc-editor.org/bcp/bcp35">BCP 35</a>, <a href="./rfc2717">RFC 2717</a>, 1999년 11월.
+
+   [<a id="ref-RFC0952">RFC0952</a>]  Harrenstien, K., Stahl, M., and E. Feinler, "DoD Internet
+              host table specification", <a href="./rfc952">RFC 952</a>, 1985년 10월.
+
+   [<a id="ref-RFC1034">RFC1034</a>]  Mockapetris, P., "Domain names - concepts and facilities",
+              STD 13, <a href="./rfc1034">RFC 1034</a>, 1987년 11월.
+
+   [<a id="ref-RFC1123">RFC1123</a>]  Braden, R., "Requirements for Internet Hosts - Application
+              and Support", STD 3, <a href="./rfc1123">RFC 1123</a>, 1989년 10월.
+
+   [<a id="ref-RFC1535">RFC1535</a>]  Gavron, E., "A Security Problem and Proposed Correction
+              With Widely Deployed DNS Software", <a href="./rfc1535">RFC 1535</a>,
+              1993년 10월.
+
+   [<a id="ref-RFC1630">RFC1630</a>]  Berners-Lee, T., "Universal Resource Identifiers in WWW: A
+              Unifying Syntax for the Expression of Names and Addresses
+              of Objects on the Network as used in the World-Wide Web",
+              <a href="./rfc1630">RFC 1630</a>, 1994년 6월.
+
+   [<a id="ref-RFC1736">RFC1736</a>]  Kunze, J., "Functional Recommendations for Internet
+              Resource Locators", <a href="./rfc1736">RFC 1736</a>, 1995년 2월.
+
+   [<a id="ref-RFC1737">RFC1737</a>]  Sollins, K. and L. Masinter, "Functional Requirements for
+              Uniform Resource Names", <a href="./rfc1737">RFC 1737</a>, 1994년 12월.
+
+   [<a id="ref-RFC1738">RFC1738</a>]  Berners-Lee, T., Masinter, L., and M. McCahill, "Uniform
+              Resource Locators (URL)", <a href="./rfc1738">RFC 1738</a>, 1994년 12월.
+
+   [<a id="ref-RFC1808">RFC1808</a>]  Fielding, R., "Relative Uniform Resource Locators",
+              <a href="./rfc1808">RFC 1808</a>, 1995년 6월.
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [47페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-48" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   [<a id="ref-RFC2046">RFC2046</a>]  Freed, N. and N. Borenstein, "Multipurpose Internet Mail
+              Extensions (MIME) Part Two: Media Types", <a href="./rfc2046">RFC 2046</a>,
+              1996년 11월.
+
+   [<a id="ref-RFC2141">RFC2141</a>]  Moats, R., "URN Syntax", <a href="./rfc2141">RFC 2141</a>, 1997년 5월.
+
+   [<a id="ref-RFC2396">RFC2396</a>]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifiers (URI): Generic Syntax", <a href="./rfc2396">RFC 2396</a>,
+              1998년 8월.
+
+   [<a id="ref-RFC2518">RFC2518</a>]  Goland, Y., Whitehead, E., Faizi, A., Carter, S., and D.
+              Jensen, "HTTP Extensions for Distributed Authoring --
+              WEBDAV", <a href="./rfc2518">RFC 2518</a>, 1999년 2월.
+
+   [<a id="ref-RFC2557">RFC2557</a>]  Palme, J., Hopmann, A., and N. Shelness, "MIME
+              Encapsulation of Aggregate Documents, such as HTML
+              (MHTML)", <a href="./rfc2557">RFC 2557</a>, 1999년 3월.
+
+   [<a id="ref-RFC2718">RFC2718</a>]  Masinter, L., Alvestrand, H., Zigmond, D., and R. Petke,
+              "Guidelines for new URL Schemes", <a href="./rfc2718">RFC 2718</a>, 1999년 11월.
+
+   [<a id="ref-RFC2732">RFC2732</a>]  Hinden, R., Carpenter, B., and L. Masinter, "Format for
+              Literal IPv6 Addresses in URL's", <a href="./rfc2732">RFC 2732</a>, 1999년 12월.
+
+   [<a id="ref-RFC3305">RFC3305</a>]  Mealling, M. and R. Denenberg, "Report from the Joint
+              W3C/IETF URI Planning Interest Group: Uniform Resource
+              Identifiers (URIs), URLs, and Uniform Resource Names
+              (URNs): Clarifications and Recommendations", <a href="./rfc3305">RFC 3305</a>,
+              2002년 8월.
+
+   [<a id="ref-RFC3490">RFC3490</a>]  Faltstrom, P., Hoffman, P., and A. Costello,
+              "Internationalizing Domain Names in Applications (IDNA)",
+              <a href="./rfc3490">RFC 3490</a>, 2003년 3월.
+
+   [<a id="ref-RFC3513">RFC3513</a>]  Hinden, R. and S. Deering, "Internet Protocol Version 6
+              (IPv6) Addressing Architecture", <a href="./rfc3513">RFC 3513</a>, 2003년 4월.
+
+   [<a id="ref-Siedzik">Siedzik</a>]  Siedzik, R., "Semantic Attacks: What's in a URL?",
+              2001년 4월, &lt;<a href="http://www.giac.org/practical/gsec/Richard_Siedzik_GSEC.pdf">http://www.giac.org/practical/gsec/</a>
+              <a href="http://www.giac.org/practical/gsec/Richard_Siedzik_GSEC.pdf">Richard_Siedzik_GSEC.pdf</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [48페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-49" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">부록 A</a>.  URI에 대한 수집 ABNF</span>
+
+   URI           = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+
+   hier-part     = "//" authority path-abempty
+                 / path-absolute
+                 / path-rootless
+                 / path-empty
+
+   URI-reference = URI / relative-ref
+
+   absolute-URI  = scheme ":" hier-part [ "?" query ]
+
+   relative-ref  = relative-part [ "?" query ] [ "#" fragment ]
+
+   relative-part = "//" authority path-abempty
+                 / path-absolute
+                 / path-noscheme
+                 / path-empty
+
+   scheme        = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+
+   authority     = [ userinfo "@" ] host [ ":" port ]
+   userinfo      = *( unreserved / pct-encoded / sub-delims / ":" )
+   host          = IP-literal / IPv4address / reg-name
+   port          = *DIGIT
+
+   IP-literal    = "[" ( IPv6address / IPvFuture  ) "]"
+
+   IPvFuture     = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+
+   IPv6address   =                            6( h16 ":" ) ls32
+                 /                       "::" 5( h16 ":" ) ls32
+                 / [               h16 ] "::" 4( h16 ":" ) ls32
+                 / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+                 / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+                 / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+                 / [ *4( h16 ":" ) h16 ] "::"              ls32
+                 / [ *5( h16 ":" ) h16 ] "::"              h16
+                 / [ *6( h16 ":" ) h16 ] "::"
+
+   h16           = 1*4HEXDIG
+   ls32          = ( h16 ":" h16 ) / IPv4address
+   IPv4address   = dec-octet "." dec-octet "." dec-octet "." dec-octet
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [49페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-50" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   dec-octet     = DIGIT                 ; 0-9
+                 / %x31-39 DIGIT         ; 10-99
+                 / "1" 2DIGIT            ; 100-199
+                 / "2" %x30-34 DIGIT     ; 200-249
+                 / "25" %x30-35          ; 250-255
+
+   reg-name      = *( unreserved / pct-encoded / sub-delims )
+
+   path          = path-abempty    ; begins with "/" or is empty
+                 / path-absolute   ; begins with "/" but not "//"
+                 / path-noscheme   ; begins with a non-colon segment
+                 / path-rootless   ; begins with a segment
+                 / path-empty      ; zero characters
+
+   path-abempty  = *( "/" segment )
+   path-absolute = "/" [ segment-nz *( "/" segment ) ]
+   path-noscheme = segment-nz-nc *( "/" segment )
+   path-rootless = segment-nz *( "/" segment )
+   path-empty    = 0&lt;pchar&gt;
+
+   segment       = *pchar
+   segment-nz    = 1*pchar
+   segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
+                 ; non-zero-length segment without any colon ":"
+
+   pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+
+   query         = *( pchar / "/" / "?" )
+
+   fragment      = *( pchar / "/" / "?" )
+
+   pct-encoded   = "%" HEXDIG HEXDIG
+
+   unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+   reserved      = gen-delims / sub-delims
+   gen-delims    = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+   sub-delims    = "!" / "$" / "&amp;" / "'" / "(" / ")"
+                 / "*" / "+" / "," / ";" / "="
+
+<span class="h2"><a class="selflink" id="appendix-B" href="#appendix-B">부록 B</a>.  정규식으로 URI 참조 파싱하기</span>
+
+   "first-match-wins" 알고리즘은 POSIX 정규식에서 사용하는 "greedy"
+   명확화 방법과 동일하므로, URI 참조의 잠재적인 다섯 구성 요소를
+   파싱하는 데 정규식을 사용하는 것은 자연스럽고 흔한 일이다.
+
+   다음 줄은 올바른 형식의 URI 참조를 그 구성 요소로 분해하기 위한
+   정규식이다.
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [50페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-51" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
+       12            3  4          5       6  7        8 9
+
+   위의 두 번째 줄에 있는 숫자는 가독성을 돕기 위한 것일 뿐이다. 이들은
+   각 하위 표현식(즉, 각 쌍을 이루는 괄호)에 대한 참조 지점을 나타낸다.
+   하위 표현식 &lt;n&gt;에 일치한 값을 $&lt;n&gt;이라고 부른다. 예를 들어 위
+   표현식을 다음에 일치시키면
+
+      <a href="http://www.ics.uci.edu/pub/ietf/uri/#Related">http://www.ics.uci.edu/pub/ietf/uri/#Related</a>
+
+   다음과 같은 하위 표현식 일치 결과가 나온다.
+
+      $1 = http:
+      $2 = http
+      $3 = //www.ics.uci.edu
+      $4 = www.ics.uci.edu
+      $5 = /pub/ietf/uri/
+      $6 = &lt;undefined&gt;
+      $7 = &lt;undefined&gt;
+      $8 = #Related
+      $9 = Related
+
+   여기서 &lt;undefined&gt;는 해당 구성 요소가 존재하지 않음을 나타내며, 위
+   예에서는 query 구성 요소가 이에 해당한다. 따라서 다섯 구성 요소의
+   값을 다음과 같이 결정할 수 있다.
+
+      scheme    = $2
+      authority = $4
+      path      = $5
+      query     = $7
+      fragment  = $9
+
+   반대 방향으로는, <a href="#section-5.3">5.3절</a>의 알고리즘을 사용하여 구성 요소로부터 URI
+   참조를 다시 만들 수 있다.
+
+<span class="h2"><a class="selflink" id="appendix-C" href="#appendix-C">부록 C</a>.  문맥에서 URI 구분하기</span>
+
+   URI는 해석을 위한 명확한 문맥을 제공하지 않는 형식을 통해 전송되는
+   경우가 많다. 예를 들어 URI가 일반 텍스트에 포함되는 경우가 많다.
+   여기에는 이메일, USENET 뉴스, 인쇄된 종이로 전송된 텍스트가 포함된다.
+   이러한 경우 URI를 텍스트의 나머지 부분과, 특히 URI의 일부로 오인될
+   수 있는 구두점과 구분할 수 있는 것이 중요하다.
+
+   실제로 URI는 다양한 방식으로 구분되지만, 보통 큰따옴표
+   "http://example.com/", 꺾쇠괄호 &lt;http://example.com/&gt; 안에 두거나
+   단순히 공백을 사용한다.
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [51페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-52" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      http://example.com/
+
+   이러한 감싸는 표시는 URI의 일부를 이루지 않는다.
+
+   어떤 경우에는 긴 URI를 여러 줄에 걸쳐 나누기 위해 추가 공백(스페이스,
+   줄 바꿈, 탭 등)을 넣어야 할 수 있다. URI를 추출할 때 그 공백은
+   무시되어야 한다.
+
+   하이픈("-") 문자 뒤에는 공백을 도입해서는 안 된다. 일부 조판기와
+   프린터가 줄을 나눌 때 (잘못하여) 줄 끝에 하이픈을 넣을 수 있기
+   때문에, 하이픈 바로 뒤에 줄 바꿈이 포함된 URI의 해석자는 줄 바꿈
+   주변의 모든 공백을 무시해야 하며, 그 하이픈이 실제로 URI의 일부일
+   수도 있고 아닐 수도 있음을 알아야 한다.
+
+   각 URI를 &lt;&gt; 꺾쇠괄호로 감싸는 것은 포함된 공백을 가진 참조에 대해
+   구분 스타일로 특히 권장된다.
+
+   접두사 "URL:"(뒤에 공백이 있거나 없거나)은 이전에는 URI를 다른
+   괄호로 묶인 지정자와 구별하는 데 도움이 되는 방법으로 권장되었지만,
+   실제로는 흔히 사용되지 않으며 더 이상 권장되지 않는다.
+
+   견고성을 위해 사용자가 입력한 URI를 받아들이는 소프트웨어는 구분자와
+   포함된 공백을 모두 인식하고 제거하려고 시도해야 한다.
+
+   예를 들어 다음 텍스트는
+
+      Yes, Jim, I found it under "<a href="http://www.w3.org/Addressing/">http://www.w3.org/Addressing/</a>",
+      but you can probably pick it up from &lt;ftp://foo.example.
+      com/rfc/&gt;.  Note the warning in &lt;<a href="http://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING">http://www.ics.uci.edu/pub/</a>
+      <a href="http://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING">ietf/uri/historical.html#WARNING</a>&gt;.
+
+   다음 URI 참조를 포함한다.
+
+      <a href="http://www.w3.org/Addressing/">http://www.w3.org/Addressing/</a>
+      ftp://foo.example.com/rfc/
+      <a href="http://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING">http://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [52페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-53" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-D" href="#appendix-D">부록 D</a>.  <a href="./rfc2396">RFC 2396</a>에서의 변경 사항</span>
+
+<span class="h3"><a class="selflink" id="appendix-D.1" href="#appendix-D.1">D.1</a>.  추가 사항</span>
+
+   URI에 대한 ABNF 규칙이 도입되어, 해당 용어의 일반적인 한 가지 사용,
+   즉 선택적 fragment가 있는 절대 URI에 대응하게 되었다.
+
+   IPv6(및 이후 버전) 리터럴은 [<a href="./rfc2732" title="&quot;Format for Literal IPv6 Addresses in URL's&quot;">RFC2732</a>]에서 설명한 것처럼 authority
+   구성 요소의 host 부분에 가능한 식별자 목록에 추가되었으며, 여기에
+   예약 집합에 "["와 "]"가 추가되고 향후 IP 리터럴 버전을 예상하기
+   위한 버전 플래그가 추가되었다. 이제 대괄호는 authority 구성 요소
+   안에서 예약된 것으로 지정되며, host 안에서 IP 리터럴의 구분자로
+   사용되는 경우를 제외하고는 허용되지 않는다. path, query, fragment
+   구성 요소의 기술적 정의를 변경하지 않고 이 변경을 수행하기 위해,
+   해당 규칙들은 허용되는 문자를 직접 지정하도록 재정의되었다.
+
+   [<a href="./rfc2732" title="&quot;Format for Literal IPv6 Addresses in URL's&quot;">RFC2732</a>]는 IPv6 리터럴 주소 정의를 [<a href="./rfc3513" title="&quot;Internet Protocol Version 6 (IPv6) Addressing Architecture&quot;">RFC3513</a>]에 위임하지만,
+   안타깝게도 [<a href="./rfc3513" title="&quot;Internet Protocol Version 6 (IPv6) Addressing Architecture&quot;">RFC3513</a>]에는 IPv6address의 ABNF 설명이 없으므로, 우리는
+   <a href="./rfc3513#section-2.2">[RFC3513]의 2.2절</a>에 정의된 텍스트 표현과 일치하는 새로운 ABNF
+   규칙 IPv6address를 만들었다. 마찬가지로 IPv4address의 정의는 각
+   10진 옥텟을 0-255 범위로 제한하도록 개선되었다.
+
+   URI 정규화와 비교에 관한 <a href="#section-6">6절</a>은 Tim Bray의 입력과 W3C Technical
+   Architecture Group 내 논의를 사용하여 완전히 다시 작성되고 확장되었다.
+
+<span class="h3"><a class="selflink" id="appendix-D.2" href="#appendix-D.2">D.2</a>.  수정 사항</span>
+
+   <a href="./rfc2396">RFC 2396</a>의 임시 BNF 구문은 [<a href="./rfc2234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC2234</a>]의 ABNF로 대체되었다.
+   이 변경으로 인해 이전에 밑줄 문자를 포함했던 모든 규칙 이름은
+   대신 대시를 사용하도록 이름이 바뀌어야 했다. 또한 전체 문법을 더
+   이해하기 쉽게 만들기 위해 여러 구문 규칙이 제거되거나 단순화되었다.
+   폐기된 문법 규칙을 참조하는 명세는 다음 표에 따라 그 규칙들을
+   대체하여 이해할 수 있다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [53페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-54" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   +----------------+--------------------------------------------------+
+   | obsolete rule  | translation                                      |
+   +----------------+--------------------------------------------------+
+   | absoluteURI    | absolute-URI                                     |
+   | relativeURI    | relative-part [ "?" query ]                      |
+   | hier_part      | ( "//" authority path-abempty /                  |
+   |                | path-absolute ) [ "?" query ]                    |
+   |                |                                                  |
+   | opaque_part    | path-rootless [ "?" query ]                      |
+   | net_path       | "//" authority path-abempty                      |
+   | abs_path       | path-absolute                                    |
+   | rel_path       | path-rootless                                    |
+   | rel_segment    | segment-nz-nc                                    |
+   | reg_name       | reg-name                                         |
+   | server         | authority                                        |
+   | hostport       | host [ ":" port ]                                |
+   | hostname       | reg-name                                         |
+   | path_segments  | path-abempty                                     |
+   | param          | *&lt;pchar excluding ";"&gt;                           |
+   |                |                                                  |
+   | uric           | unreserved / pct-encoded / ";" / "?" / ":"       |
+   |                |  / "@" / "&amp;" / "=" / "+" / "$" / "," / "/"       |
+   |                |                                                  |
+   | uric_no_slash  | unreserved / pct-encoded / ";" / "?" / ":"       |
+   |                |  / "@" / "&amp;" / "=" / "+" / "$" / ","             |
+   |                |                                                  |
+   | mark           | "-" / "_" / "." / "!" / "~" / "*" / "'"          |
+   |                |  / "(" / ")"                                     |
+   |                |                                                  |
+   | escaped        | pct-encoded                                      |
+   | hex            | HEXDIG                                           |
+   | alphanum       | ALPHA / DIGIT                                    |
+   +----------------+--------------------------------------------------+
+
+   체계별 구문 정의에 위의 폐기된 규칙을 사용하는 것은 폐기되었다.
+
+   문자에 관한 <a href="#section-2">2절</a>은 어떤 문자가 예약되는지, 언제 예약되는지, 그리고
+   일반 구문에서 구분자로 사용되지 않더라도 왜 예약되는지를 설명하도록
+   다시 작성되었다. 느낌표("!"), 별표("*"), 작은따옴표("'"), 여는
+   괄호와 닫는 괄호("(" 및 ")")를 포함하여 일반적으로 디코딩하기에
+   안전하지 않은 mark 문자는 예약 문자와 비예약 문자의 구별을 명확히
+   하고, 바라건대 체계 설계자가 가장 자주 묻는 질문에 답하기 위해
+   예약 집합으로 이동되었다. 마찬가지로 퍼센트 인코딩된 문자에 관한
+   절도 다시 작성되었으며, 이제 URI 정규화기에는 비예약 문자에 해당하는
+   모든 퍼센트 인코딩된 옥텟을 디코딩할 수 있는 권한이 주어졌다.
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [54페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-55" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   일반적으로 "escaped"와 "unescaped"라는 용어는 다른 형태의 escape
+   메커니즘과의 혼동을 줄이기 위해 각각 "percent-encoded"와 "decoded"로
+   대체되었다.
+
+   URI와 URI-reference에 대한 ABNF는 LALR 파서에 더 친화적이고 복잡성을
+   줄이도록 재설계되었다. 그 결과 uric, uric_no_slash, opaque_part,
+   net_path, abs_path, rel_path, path_segments, rel_segment, mark 규칙과
+   함께 구문 설명의 레이아웃 형식이 제거되었다. "opaque" URI에 대한
+   모든 참조는 path 구성 요소가 계층에 대해 어떻게 불투명할 수 있는지에
+   대한 더 나은 설명으로 대체되었다. relativeURI 규칙은 그것들이 URI의
+   부분 집합인지에 대한 불필요한 혼동을 피하기 위해 relative-ref로
+   대체되었다. URI-reference를 URI로 파싱할지, 첫 번째 세그먼트에
+   콜론이 있는 relative-ref로 파싱할지에 관한 모호성은 다섯 개의 별도
+   path 일치 규칙을 사용함으로써 제거되었다.
+
+   fragment identifier는 다시 일반 구문 구성 요소에 관한 절과 URI 및
+   relative-ref 규칙 안으로 이동되었지만, absolute-URI에서는 여전히
+   제외된다. 번호 기호("#") 문자는 fragment 구문을 재통합한 결과로
+   다시 예약 집합으로 이동되었다.
+
+   ABNF는 path 구성 요소가 비어 있을 수 있도록 수정되었다. 이는 또한
+   실제로 "dav:" 이름 공간 [<a href="./rfc2518" title="&quot;HTTP Extensions for Distributed Authoring -- WEBDAV&quot;">RFC2518</a>]과 많은 WWW 브라우저 구현에서
+   내부적으로 사용되는 "about:" 체계에 존재하는 것처럼, absolute-URI가
+   "scheme:" 뒤에 아무것도 없는 형태로 구성될 수 있게 한다. authority와
+   path 사이의 경계에 관한 모호성은 다섯 개의 별도 path 일치 규칙을
+   사용함으로써 제거되었다.
+
+   일반 구문을 사용하는 레지스트리 기반 명명 authority는 이제 host 규칙
+   안에서 정의된다. 이 변경은 제공된 이름이 무엇이든 단순히 로컬 이름
+   해석 메커니즘에 전달하는 현재 구현이 명세와 일관될 수 있게 한다.
+   또한 여기에서 DNS 이름 형식을 다시 지정할 필요를 제거한다. 더 나아가
+   host 구성 요소가 퍼센트 인코딩된 옥텟을 포함할 수 있게 하며, 이는
+   국제화 도메인 이름이 URI 안에 제공되고, URI 처리 위의 애플리케이션
+   계층에서 그 원래 문자 인코딩으로 처리되며, UTF-8 문자 인코딩의 등록
+   이름으로 IDNA 라이브러리에 전달될 수 있도록 하는 데 필요하다. server,
+   hostport, hostname, domainlabel, toplabel, alphanum 규칙은 제거되었다.
+
+   [<a href="./rfc2396" title="&quot;Uniform Resource Identifiers (URI): Generic Syntax&quot;">RFC2396</a>]의 상대 참조 해석 알고리즘은 명확성을 높이고 다음 문제들을
+   수정하기 위해 이 개정에서 의사 코드로 다시 작성되었다.
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [55페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-56" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   o  <a href="./rfc2396#section-5.2">[RFC2396] 5.2절</a>, 6a단계는 path가 없는 기본 URI를 고려하지 못했다.
+
+   o  참조가 빈 path와 정의된 query 구성 요소를 포함하는 경우 대상
+      URI가 기본 URI의 path 구성 요소를 상속하는 [<a href="./rfc1808" title="&quot;Relative Uniform Resource Locators&quot;">RFC1808</a>]의 동작을
+      복원했다.
+
+   o  URI 참조가 same-document 참조인지 판단하는 일을 URI 파서에서
+      분리하여, 배포된 URI 처리 구현의 내부 아키텍처와 일관되는 방식으로
+      애플리케이션 안의 URI 처리 인터페이스를 단순화했다. 이제 판단은
+      참조 자체의 형식이 아니라, 참조를 절대 형식으로 변환한 뒤 기본
+      URI와 비교하는 것에 기반한다. 이 변경은 특히 별칭을 줄이기 위해
+      정규화가 사용될 때, 이 명세에서 <a href="./rfc2396">RFC 2396</a>의 규칙보다 더 많은 참조가
+      "same-document"로 간주되는 결과를 낳을 수 있다. 그러나 기존
+      same-document 참조의 상태를 변경하지는 않는다.
+
+   o  path 병합 루틴을 두 루틴으로 분리했다. 하나는 기본 URI path와
+      relative-path 참조의 결합을 설명하기 위한 merge이고, 다른 하나는
+      구성된 path에서 특별한 "." 및 ".." 세그먼트를 제거하는 방법을
+      설명하기 위한 remove_dot_segments이다. remove_dot_segments 알고리즘은
+      이제 일반 구현과 일치하고 실제 URI 정규화를 개선하기 위해 모든
+      URI 참조 path에 적용된다. 이 변경은 비정상 참조와 기본 URI가
+      비계층적 path를 가진 same-scheme 참조의 파싱에만 영향을 준다.
+
+색인
+
+   A
+      ABNF  11
+      absolute  27
+      absolute-path  26
+      absolute-URI  27
+      access  9
+      authority  17, 18
+
+   B
+      base URI  28
+
+   C
+      character encoding  4
+      character  4
+      characters  8, 11
+      coded character set  4
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [56페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-57" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+   D
+      dec-octet  20
+      dereference  9
+      dot-segments  23
+
+   F
+      fragment  16, 24
+
+   G
+      gen-delims  13
+      generic syntax  6
+
+   H
+      h16  20
+      hier-part  16
+      hierarchical  10
+      host  18
+
+   I
+      identifier  5
+      IP-literal  19
+      IPv4  20
+      IPv4address  19, 20
+      IPv6  19
+      IPv6address  19, 20
+      IPvFuture  19
+
+   L
+      locator  7
+      ls32  20
+
+   M
+      merge  32
+
+   N
+      name  7
+      network-path  26
+
+   P
+      path  16, 22, 26
+         path-abempty  22
+         path-absolute  22
+         path-empty  22
+         path-noscheme  22
+         path-rootless  22
+      path-abempty  16, 22, 26
+      path-absolute  16, 22, 26
+      path-empty  16, 22, 26
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [57페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-58" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+      path-rootless  16, 22
+      pchar  23
+      pct-encoded  12
+      percent-encoding  12
+      port  22
+
+   Q
+      query  16, 23
+
+   R
+      reg-name  21
+      registered name  20
+      relative  10, 28
+      relative-path  26
+      relative-ref  26
+      remove_dot_segments  33
+      representation  9
+      reserved  12
+      resolution  9, 28
+      resource  5
+      retrieval  9
+
+   S
+      same-document  27
+      sameness  9
+      scheme  16, 17
+      segment  22, 23
+         segment-nz  23
+         segment-nz-nc  23
+      sub-delims  13
+      suffix  27
+
+   T
+      transcription  8
+
+   U
+      uniform  4
+      unreserved  13
+      URI grammar
+         absolute-URI  27
+         ALPHA  11
+         authority  18
+         CR  11
+         dec-octet  20
+         DIGIT  11
+         DQUOTE  11
+         fragment  24
+         gen-delims  13
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [58페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-59" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+         h16  20
+         HEXDIG  11
+         hier-part  16
+         host  19
+         IP-literal  19
+         IPv4address  20
+         IPv6address  20
+         IPvFuture  19
+         LF  11
+         ls32  20
+         OCTET  11
+         path  22
+         path-abempty  22
+         path-absolute  22
+         path-empty  22
+         path-noscheme  22
+         path-rootless  22
+         pchar  23
+         pct-encoded  12
+         port  22
+         query  24
+         reg-name  21
+         relative-ref  26
+         reserved  13
+         scheme  17
+         segment  23
+         segment-nz  23
+         segment-nz-nc  23
+         SP  11
+         sub-delims  13
+         unreserved  13
+         URI  16
+         URI-reference  25
+         userinfo  18
+      URI  16
+      URI-reference  25
+      URL  7
+      URN  7
+      userinfo  18
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [59페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-60" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+저자 주소
+
+   Tim Berners-Lee
+   World Wide Web Consortium
+   Massachusetts Institute of Technology
+   77 Massachusetts Avenue
+   Cambridge, MA  02139
+   USA
+
+   Phone: +1-617-253-5702
+   Fax:   +1-617-258-5999
+   EMail: timbl@w3.org
+   URI:   <a href="http://www.w3.org/People/Berners-Lee/">http://www.w3.org/People/Berners-Lee/</a>
+
+
+   Roy T. Fielding
+   Day Software
+   5251 California Ave., Suite 110
+   Irvine, CA  92617
+   USA
+
+   Phone: +1-949-679-2960
+   Fax:   +1-949-679-2972
+   EMail: fielding@gbiv.com
+   URI:   <a href="http://roy.gbiv.com/">http://roy.gbiv.com/</a>
+
+
+   Larry Masinter
+   Adobe Systems Incorporated
+   345 Park Ave
+   San Jose, CA  95110
+   USA
+
+   Phone: +1-408-536-3024
+   EMail: LMM@acm.org
+   URI:   <a href="http://larry.masinter.net/">http://larry.masinter.net/</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee 등              표준 트랙                        [60페이지]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-61" ></span>
+<span class="grey"><a href="./rfc3986">RFC 3986</a>                   URI 일반 구문                    2005년 1월</span>
+
+
+전체 저작권 고지
+
+   Copyright (C) The Internet Society (2005).
+
+   이 문서는 <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a>에 포함된 권리, 라이선스 및 제한의 적용을 받으며,
+   그 안에 명시된 경우를 제외하고 저자는 모든 권리를 보유한다.
+
+   이 문서와 여기에 포함된 정보는 "있는 그대로" 제공되며, 기여자,
+   그가 대표하거나 후원을 받는 조직(있는 경우), 인터넷 소사이어티,
+   인터넷 엔지니어링 태스크 포스는 명시적이든 묵시적이든 모든 보증을
+   부인한다. 여기에는 여기에 포함된 정보의 사용이 어떤 권리도 침해하지
+   않을 것이라는 보증 또는 상품성이나 특정 목적 적합성에 대한 묵시적
+   보증이 포함되지만 이에 한정되지 않는다.
+
+지적 재산
+
+   IETF는 이 문서에 설명된 기술의 구현 또는 사용과 관련된 것으로
+   주장될 수 있는 지적 재산권 또는 기타 권리의 유효성이나 범위, 또는
+   그러한 권리에 따른 라이선스가 어느 정도까지 이용 가능하거나 이용
+   가능하지 않을 수 있는지에 대해 어떤 입장도 취하지 않는다. 또한
+   그러한 권리를 식별하기 위해 독립적인 노력을 했다고 진술하지도 않는다.
+   IETF 문서의 권리에 관한 IETF 절차 정보는 <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> 및
+   <a href="https://www.rfc-editor.org/bcp/bcp79">BCP 79</a>에서 찾을 수 있다.
+
+   IETF 사무국에 제출된 IPR 공개 사본과 제공될 라이선스에 대한 보증,
+   또는 이 명세의 구현자나 사용자가 그러한 독점적 권리를 사용하기 위한
+   일반 라이선스나 허가를 얻으려는 시도의 결과는 IETF 온라인 IPR
+   저장소 <a href="http://www.ietf.org/ipr">http://www.ietf.org/ipr</a>에서 얻을 수 있다.
+
+   IETF는 이 표준을 구현하는 데 필요할 수 있는 기술을 포괄할 수 있는
+   저작권, 특허 또는 특허 출원, 또는 기타 독점적 권리를 알고 있는 모든
+   관심 당사자가 이를 IETF에 알려 주기를 요청한다. 관련 정보는 IETF의
+   ietf-ipr@ietf.org로 보내기 바란다.
+
+
+감사의 말
+
+   RFC Editor 기능을 위한 재원은 현재 Internet Society가 제공한다.
+
+
+
+
+
+
+Berners-Lee 등              표준 트랙                        [61페이지]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
