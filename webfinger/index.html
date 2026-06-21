@@ -1,0 +1,1531 @@
+<pre>인터넷 엔지니어링 태스크 포스 (IETF)                          P. Jones
+의견 요청: 7033                                             G. Salgueiro
+범주: 표준 트랙                                             Cisco Systems
+ISSN: 2070-1721                                                 M. Jones
+                                                               Microsoft
+                                                                J. Smarr
+                                                                  Google
+                                                           2013년 9월
+
+
+                               <span class="h1">WebFinger</span>
+
+초록
+
+   이 명세는 표준 HTTP 메서드를 사용하여 인터넷상의 사람이나
+   기타 엔터티에 관한 정보를 발견하는 데 사용할 수 있는 WebFinger
+   프로토콜을 정의한다. WebFinger는 계정 URI나 이메일 URI처럼
+   그 자체로는 로케이터로 사용할 수 없을 수도 있는 URI에 대한
+   정보를 발견한다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물이다. 이는
+   IETF 커뮤니티의 합의를 나타낸다. 이 문서는 공개 검토를 거쳤고,
+   인터넷 엔지니어링 운영 그룹(IESG)에 의해 출판 승인을 받았다.
+   인터넷 표준에 관한 추가 정보는 <a href="./rfc5741#section-2">RFC 5741의 제&nbsp;2절</a>에서
+   확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 그리고 이에 대한 피드백 제공 방법에
+   관한 정보는 다음에서 얻을 수 있다:
+   <a href="http://www.rfc-editor.org/info/rfc7033">http://www.rfc-editor.org/info/rfc7033</a>.
+
+Copyright Notice
+
+   Copyright (c) 2013 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>. 소개 ..........................................................<a href="#page-3">3</a>
+   <a href="#section-2">2</a>. 용어 ..........................................................<a href="#page-3">3</a>
+   <a href="#section-3">3</a>. WebFinger 사용 예 ..............................................<a href="#page-4">4</a>
+      <a href="#section-3.1">3.1</a>. OpenID Connect를 위한 ID 제공자 발견 .....................<a href="#page-4">4</a>
+      <a href="#section-3.2">3.2</a>. 웹 페이지의 저자 및 저작권 정보 가져오기 .................<a href="#page-5">5</a>
+   <a href="#section-4">4</a>. WebFinger 프로토콜 ............................................<a href="#page-7">7</a>
+        <a href="#section-4.1">4.1</a>. 요청 URI의 쿼리 구성 요소 구성하기......................<a href="#page-7">7</a>
+        <a href="#section-4.2">4.2</a>. WebFinger 쿼리 수행하기.................................<a href="#page-8">8</a>
+        <a href="#section-4.3">4.3</a>. "rel" 매개변수..........................................<a href="#page-9">9</a>
+        <a href="#section-4.4">4.4</a>. JSON Resource Descriptor (JRD)..........................<a href="#page-11">11</a>
+           <a href="#section-4.4.1">4.4.1</a>. subject.............................................<a href="#page-11">11</a>
+           <a href="#section-4.4.2">4.4.2</a>. aliases.............................................<a href="#page-11">11</a>
+           <a href="#section-4.4.3">4.4.3</a>. properties..........................................<a href="#page-12">12</a>
+           <a href="#section-4.4.4">4.4.4</a>. links...............................................<a href="#page-12">12</a>
+        <a href="#section-4.5">4.5</a>. WebFinger와 URI.........................................<a href="#page-14">14</a>
+   <a href="#section-5">5</a>. 교차 출처 리소스 공유(CORS) ...................................<a href="#page-14">14</a>
+   <a href="#section-6">6</a>. 접근 제어 .....................................................<a href="#page-15">15</a>
+   <a href="#section-7">7</a>. 호스팅된 WebFinger 서비스 .....................................<a href="#page-15">15</a>
+   <a href="#section-8">8</a>. WebFinger 애플리케이션 정의 ...................................<a href="#page-16">16</a>
+      <a href="#section-8.1">8.1</a>. URI 스킴 및 URI의 명세 ..................................<a href="#page-17">17</a>
+      <a href="#section-8.2">8.2</a>. 호스트 해석 ..............................................<a href="#page-17">17</a>
+      <a href="#section-8.3">8.3</a>. 속성의 명세 .............................................<a href="#page-17">17</a>
+      <a href="#section-8.4">8.4</a>. 링크의 명세 .............................................<a href="#page-18">18</a>
+      <a href="#section-8.5">8.5</a>. 하나의 URI, 여러 애플리케이션 ...........................<a href="#page-18">18</a>
+      <a href="#section-8.6">8.6</a>. 링크 관계 유형 및 속성의 등록 ...........................<a href="#page-19">19</a>
+   <a href="#section-9">9</a>. 보안 고려사항 .................................................<a href="#page-19">19</a>
+      <a href="#section-9.1">9.1</a>. 전송 관련 문제 ..........................................<a href="#page-19">19</a>
+      <a href="#section-9.2">9.2</a>. 사용자 프라이버시 고려사항 .............................<a href="#page-19">19</a>
+      <a href="#section-9.3">9.3</a>. 남용 가능성 .............................................<a href="#page-21">21</a>
+      <a href="#section-9.4">9.4</a>. 정보 신뢰성 .............................................<a href="#page-21">21</a>
+   <a href="#section-10">10</a>. IANA 고려사항 ................................................<a href="#page-22">22</a>
+      <a href="#section-10.1">10.1</a>. Well-Known URI ..........................................<a href="#page-22">22</a>
+      <a href="#section-10.2">10.2</a>. JSON Resource Descriptor (JRD) 미디어 유형 ..............<a href="#page-22">22</a>
+      <a href="#section-10.3">10.3</a>. 링크 관계 유형 등록 ....................................<a href="#page-24">24</a>
+      <a href="#section-10.4">10.4</a>. "WebFinger Properties" 레지스트리의 수립 ...............<a href="#page-24">24</a>
+           <a href="#section-10.4.1">10.4.1</a>. 등록 템플릿 .....................................<a href="#page-24">24</a>
+           <a href="#section-10.4.2">10.4.2</a>. 등록 절차 .......................................<a href="#page-25">25</a>
+   <a href="#section-11">11</a>. 감사의 말 ....................................................<a href="#page-26">26</a>
+   <a href="#section-12">12</a>. 참고문헌 .....................................................<a href="#page-26">26</a>
+      <a href="#section-12.1">12.1</a>. 규범적 참고문헌 ........................................<a href="#page-26">26</a>
+      <a href="#section-12.2">12.2</a>. 정보성 참고문헌 ........................................<a href="#page-27">27</a>
+
+
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   WebFinger는 보안 전송 [<a href="#ref-12" title="&quot;HTTP Over TLS&quot;">12</a>] 위에서 표준 하이퍼텍스트 전송
+   프로토콜(HTTP) [<a href="#ref-2" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">2</a>] 메서드를 사용하여 URI [<a href="#ref-6" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">6</a>]로
+   식별되는 인터넷상의 사람이나 기타 엔터티에 관한 정보를 발견하는
+   데 사용된다. WebFinger 리소스는 쿼리된 엔터티를 설명하는
+   JavaScript Object Notation (JSON) [<a href="#ref-5" title="&quot;The application/json Media Type for JavaScript Object Notation (JSON)&quot;">5</a>] 객체를 반환한다.
+   이 JSON 객체는 JSON Resource Descriptor (JRD)라고 한다.
+
+   사람의 경우, WebFinger를 통해 발견될 수 있는 정보의 유형에는
+   개인 프로필 주소, ID 서비스, 전화번호 또는 선호 아바타가
+   포함된다. 인터넷상의 다른 엔터티의 경우, WebFinger 리소스는
+   예를 들어 프린터가 A4 용지에 컬러로 인쇄할 수 있다는 것,
+   서버의 물리적 위치, 또는 기타 정적 정보를 클라이언트가
+   발견할 수 있게 하는 링크 관계 [<a href="#ref-8" title="&quot;Link Relations&quot;">8</a>]를 포함하는 JRD를 반환할 수 있다.
+
+   WebFinger를 통해 반환되는 정보는 사람이 직접 소비하기 위한
+   것일 수도 있고(예: 누군가의 전화번호 조회), 시스템이 어떤
+   작업을 수행하는 데 도움을 주기 위해 사용될 수도 있다(예:
+   추가 보안 메커니즘과 함께, 사용자의 ID 서비스를 결정하여
+   웹 사이트 로그인을 용이하게 하는 것). 이 정보는 본질적으로
+   정적인 것이 되도록 의도되며, 따라서 WebFinger는 CPU의 온도나
+   레이저 프린터의 현재 토너 잔량과 같은 동적 정보를 반환하는 데
+   사용되도록 의도되지 않는다.
+
+   WebFinger 프로토콜은 여러 애플리케이션에서 사용되도록
+   설계되었다. WebFinger를 활용하려는 애플리케이션은 해당
+   애플리케이션에 적절한 속성, 제목 및 링크 관계 유형을 지정해야
+   한다. 또한 애플리케이션은 쿼리 대상에 활용할 적절한 URI
+   스킴을 정의해야 한다.
+
+   WebFinger의 사용은 <a href="#section-3">제 3절</a>의 예에서 설명되며, 더 형식적으로는
+   <a href="#section-4">제 4절</a>에서 설명된다. <a href="#section-8">제 8절</a>은 WebFinger의 애플리케이션을
+   정의할 수 있는 방법을 설명한다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  용어</span>
+
+   이 문서에서 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", 및
+   "OPTIONAL"은 <a href="./rfc2119">RFC 2119</a> [<a href="#ref-1" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">1</a>]에 설명된 대로 해석되어야 한다.
+
+   WebFinger는 "link relations"를 많이 사용한다. 링크 관계는
+   연결된 엔터티 또는 리소스와 값에 지정된 정보 사이의 관계
+   유형을 속성이 식별하는 속성-값 쌍이다. Web Linking [<a href="#ref-4" title="&quot;Web Linking&quot;">4</a>]에서
+   링크 관계는 "Link"라는 HTTP entity-header를 사용하여 표현되며,
+   여기서 "rel" 속성은 관계 유형을 지정하고 "href"
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   속성은 엔터티 또는 리소스에 연결된 정보를 지정한다. WebFinger에서
+   동일한 개념은 "links" 객체의 JSON 배열을 사용하여 표현되며,
+   각 "rel"이라는 이름의 멤버는 관계 유형을 지정하고 각 "href"라는
+   이름의 멤버는 엔터티 또는 리소스에 연결된 정보를 지정한다.
+   WebFinger는 "rel" 멤버의 값이 단일 IANA 등록 링크 관계 유형
+   [<a href="#ref-8" title="&quot;Link Relations&quot;">8</a>] 또는 URI [<a href="#ref-6" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">6</a>]여야 한다고 규정함으로써, Web Linking에
+   정의된 것보다 링크 관계의 범위를 좁힌다는 점에 유의한다.
+
+   이 문서 전체에서 URI의 사용은 <a href="./rfc3986#section-3">RFC 3986의 제&nbsp;3절</a> [<a href="#ref-6" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">6</a>]에
+   지정된 구문을 따르는 URI를 가리킨다. <a href="./rfc3986#section-4.2">RFC 3986의 제&nbsp;4.2절</a>의
+   구문을 따르는 상대 URI는 WebFinger와 함께 사용되지 않는다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  WebFinger 사용 예</span>
+
+   이 절은 WebFinger의 몇 가지 사용 예를 보여 준다. WebFinger의
+   모든 애플리케이션은 <a href="#section-8">제 8절</a>에 설명된 대로 이 문서 외부에서
+   지정된다. 이 절의 예는 애플리케이션의 형식적 명세를 보지
+   않았더라도 이해할 수 있을 만큼 단순해야 한다.
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  OpenID Connect를 위한 ID 제공자 발견</span>
+
+   Carol이 방문하는 웹 사이트에서 OpenID Connect [<a href="#ref-15" title="&quot;OpenID Connect Messages 1.0&quot;">15</a>]를 사용하여
+   인증하려고 한다고 가정하자. 그녀는 웹 사이트에 자신의 OpenID
+   Connect 식별자, 예컨대 carol@example.com을 제공할 것이다.
+   방문한 웹 사이트는 OpenID Connect 제공자를 찾기 위해 WebFinger
+   쿼리를 수행할 것이다. 해당 사이트는 하나의 특정 링크 관계에만
+   관심이 있으므로, WebFinger 리소스는 <a href="#section-4.3">제 4.3절</a>에 설명된 대로
+   "rel" 매개변수를 활용할 수 있다:
+
+     GET /.well-known/webfinger?
+            resource=acct%3Acarol%40example.com&amp;
+            rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer
+            HTTP/1.1
+     Host: example.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   서버는 다음과 같이 응답할 수 있다:
+
+     HTTP/1.1 200 OK
+     Access-Control-Allow-Origin: *
+     Content-Type: application/jrd+json
+
+     {
+       "subject" : "acct:carol@example.com",
+       "links" :
+       [
+         {
+           "rel" : "<a href="http://openid.net/specs/connect/1.0/issuer">http://openid.net/specs/connect/1.0/issuer</a>",
+           "href" : "https://openid.example.com"
+         }
+       ]
+     }
+
+   "rel" 매개변수는 리소스가 반환하는 링크 관계를 필터링하는
+   역할만 하므로, 별칭이나 속성을 포함하여 응답의 다른 이름/값
+   쌍은 반환된다. 또한 "rel" 매개변수의 지원이 보장되지 않으므로,
+   클라이언트는 "links" 배열에 요청한 링크 관계만 포함될 것이라고
+   가정해서는 안 된다.
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a>.  웹 페이지의 저자 및 저작권 정보 가져오기</span>
+
+   저자 및 저작권 정보와 같은 웹 페이지 URL에 대한 메타데이터
+   정보를 검색하도록 애플리케이션이 정의되어 있다고 가정하자.
+   이 정보를 검색하기 위해 클라이언트는 WebFinger를 활용하여
+   특정 URL에 대한 쿼리를 발행할 수 있다. 관심 있는 URL이
+   http://blog.example.com/article/id/314라고 가정하자. 클라이언트는
+   다음과 유사한 쿼리를 발행할 것이다:
+
+     GET /.well-known/webfinger?
+          resource=http%3A%2F%2Fblog.example.com%2Farticle%2Fid%2F314
+          HTTP/1.1
+     Host: blog.example.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   그러면 서버는 다음과 같이 응답할 수 있다:
+
+     HTTP/1.1 200 OK
+     Access-Control-Allow-Origin: *
+     Content-Type: application/jrd+json
+
+     {
+       "subject" : "http://blog.example.com/article/id/314",
+       "aliases" :
+       [
+         "http://blog.example.com/cool_new_thing",
+         "http://blog.example.com/steve/article/7"
+       ],
+       "properties" :
+       {
+         "http://blgx.example.net/ns/version" : "1.3",
+         "http://blgx.example.net/ns/ext" : null
+       },
+       "links" :
+       [
+         {
+           "rel" : "copyright",
+           "href" : "http://www.example.com/copyright"
+         },
+         {
+           "rel" : "author",
+           "href" : "http://blog.example.com/author/steve",
+           "titles" :
+           {
+             "en-us" : "The Magical World of Steve",
+             "fr" : "Le Monde Magique de Steve"
+           },
+           "properties" :
+           {
+             "http://example.com/role" : "editor"
+           }
+         }
+
+       ]
+     }
+
+   위 예에서 서버가 subject URL과 관련된 aliases, properties 및
+   links 목록을 반환한 것을 볼 수 있다. 링크는 각 링크 관계
+   유형에 대한 정보 참조를 포함한다. author 링크의 경우, 서버는
+   저자의 블로그에 대한 참조와 함께 두 언어로 된 블로그 제목을
+   제공했다. 또한 서버는 저자와 관련된 단일 속성을 반환하여
+   블로그에서 저자의 역할이 편집자임을 나타냈다.
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   이 예에서 서버가 "links" 배열에 단 두 개의 링크만 반환했지만,
+   서버는 쿼리될 때 임의 개수의 링크를 반환할 수 있다는 점은
+   주목할 만하다.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  WebFinger 프로토콜</span>
+
+   WebFinger 프로토콜은 쿼리 대상(URI)으로 식별되는 엔터티에 관한
+   정보를 요청하는 데 사용된다. 클라이언트는 정보를 받고자 하는
+   하나 이상의 링크 관계 유형을 선택적으로 지정할 수 있다.
+
+   WebFinger 요청은 WebFinger 리소스에 대한 HTTPS 요청이다.
+   WebFinger 리소스는 필수 쿼리 대상 및 선택적 링크 관계 유형과
+   함께 구성되는 HTTPS 스킴을 사용하는 well-known URI [<a href="#ref-3" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">3</a>]이다.
+   WebFinger 리소스는 다른 어떤 URI 스킴(예: HTTP)으로도 제공되어서는
+   안 된다(MUST NOT).
+
+   WebFinger 리소스에는 항상 쿼리 대상이 주어지며, 이는 정보를
+   찾는 엔터티를 식별하는 또 다른 URI이다. WebFinger 리소스에 대한
+   GET 요청은 WebFinger URI 쿼리 문자열의 "resource" 매개변수로
+   쿼리 대상을 전달한다. 자세한 내용은 <a href="#section-4.1">제</a>
+   <a href="#section-4.1">4.1절</a>을 참조한다.
+
+   WebFinger 쿼리가 발행되는 호스트는 중요하다. 쿼리 대상이
+   "host" 부분(<a href="./rfc3986#section-3.2.2">RFC 3986의 제&nbsp;3.2.2절</a>)을 포함하는 경우,
+   클라이언트가 어떤 대역 외 메커니즘을 통해 다른 호스트로 쿼리를
+   보내라는 지시를 받지 않는 한, WebFinger 쿼리가 발행되는 호스트는
+   쿼리 대상의 "host" 부분과 같아야 한다(SHOULD). 쿼리 대상이
+   "host" 부분을 포함하지 않는 경우, 클라이언트는 자신이 가진
+   추가 정보를 사용하여 쿼리를 보낼 호스트를 선택한다.
+
+   WebFinger URI의 path 구성 요소는 well-known path인
+   "/.well-known/webfinger"여야 한다(MUST). WebFinger URI는 <a href="#section-4.1">제 4.1절</a>에
+   지정된 대로 쿼리 대상과 선택적 링크 관계 유형을 인코딩하는
+   query 구성 요소를 포함해야 한다(MUST).
+
+   WebFinger 리소스는 인터넷상의 엔터티에 관한 정보를 전달하기
+   위해 JSON Resource Descriptor (JRD)를 리소스 표현으로 반환한다.
+   또한 웹 브라우저를 통해 만들어지는 쿼리를 용이하게 하기 위해
+   교차 출처 리소스 공유(CORS) [<a href="#ref-7" title="&quot;Cross-Origin Resource Sharing&quot;">7</a>] 명세가 활용된다.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  요청 URI의 쿼리 구성 요소 구성하기</span>
+
+   WebFinger URI는 query 구성 요소(<a href="./rfc3986#section-3.4">RFC 3986의 제&nbsp;3.4절</a> 참조)를
+   포함해야 한다(MUST). query 구성 요소는 "resource" 매개변수를
+   포함해야 하며(MUST), 하나 이상의 "rel" 매개변수를 포함할 수
+   있다(MAY). "resource"
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   매개변수는 쿼리 대상(URI)을 포함해야 하며(MUST), "rel" 매개변수는
+   이 절에 설명된 인코딩에 따라 인코딩된 링크 관계 유형을 포함해야
+   한다(MUST).
+
+   query 구성 요소를 구성하기 위해, 클라이언트는 다음 단계를
+   수행한다. 먼저 각 매개변수 값은 <a href="./rfc3986#section-2.1">RFC 3986의 제&nbsp;2.1절</a>에 따라
+   퍼센트 인코딩된다. 인코딩은 해당 명세의 <a href="#section-3.4">제 3.4절</a>에 있는
+   query 생성 규칙을 준수하도록 수행되며, 매개변수 값 내의 "=" 및
+   "&amp;" 문자의 모든 인스턴스도 퍼센트 인코딩된다는 점이 추가된다.
+   다음으로 클라이언트는 첫 번째 매개변수의 이름과 등호("=") 및
+   퍼센트 인코딩된 매개변수 값을 연결하여 query 구성 요소에 배치할
+   문자열을 구성한다. 이후의 매개변수에 대해서는, 클라이언트가
+   문자열에 앰퍼샌드("&amp;"), 다음 매개변수의 이름, 등호, 그리고
+   매개변수 값을 추가한다. 클라이언트는 문자열을 구성하는 동안
+   공백을 삽입해서는 안 된다(MUST NOT). 클라이언트가 각
+   attribute-value 쌍을 query 구성 요소 안에 배치하는 순서는 query
+   구성 요소의 해석에서 중요하지 않다.
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  WebFinger 쿼리 수행하기</span>
+
+   WebFinger 클라이언트는 path 구성 요소가 "/.well-known/webfinger"인
+   URI로 식별되는 well-known [<a href="#ref-3" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">3</a>] 리소스에 GET 메서드를 사용하여
+   쿼리를 발행하며, 그 query 구성 요소는 "resource" 매개변수를
+   정확히 한 번 포함해야 하고, 이 매개변수는 정보를 찾고자 하는
+   URI의 값으로 설정되어야 한다(MUST).
+
+   "resource" 매개변수가 없거나 형식이 잘못된 경우, WebFinger
+   리소스는 <a href="./rfc2616#section-10.4.1">RFC 2616의 제&nbsp;10.4.1절</a> [<a href="#ref-2" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">2</a>]에 따라 요청이
+   잘못되었음을 표시해야 한다(MUST).
+
+   "resource" 매개변수가 서버에 정보가 없는 값인 경우, 서버는
+   <a href="./rfc2616#section-10.4.5">RFC 2616의 제&nbsp;10.4.5절</a>에 따라 요청과 일치시킬 수 없었음을
+   표시해야 한다(MUST).
+
+   클라이언트는 HTTPS만 사용하여 WebFinger 리소스를 쿼리해야 한다
+   (MUST). 클라이언트가 리소스에 유효하지 않은 인증서가 있음을
+   확인하거나, 리소스가 4xx 또는 5xx 상태 코드를 반환하거나, 어떤
+   이유로든 HTTPS 연결을 설정할 수 없는 경우, 클라이언트는 WebFinger
+   쿼리가 실패했음을 받아들여야 하며(MUST), 비보안 연결을 통해
+   HTTP를 사용하여 WebFinger 요청을 다시 발행하려고 시도해서는
+   안 된다(MUST NOT).
+
+   WebFinger 리소스는 클라이언트가 HTTP "Accept" 헤더를 통해
+   다른 지원 형식을 명시적으로 요청하지 않는 경우, 리소스의 표현으로
+   JRD를 반환해야 한다(MUST). 클라이언트는 원하는 표현을 나타내기
+   위해 "Accept" 헤더를 포함할 수 있다(MAY). JRD 이외의 표현은
+   향후 명세에서 정의될 수 있다. WebFinger
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   리소스는 이해하지 못하거나 지원하지 않는 요청된 표현을 조용히
+   무시해야 한다(MUST). JSON Resource Descriptor (JRD)에 사용되는
+   미디어 유형은 "application/jrd+json"이다(<a href="#section-10.2">제</a>
+   <a href="#section-10.2">10.2절</a> 참조).
+
+   서버가 JRD에서 반환하는 properties, titles 및 링크 관계 유형은
+   다양하고 많을 수 있다. 예를 들어, 서버는 응답에서 사람의 블로그,
+   vCard [<a href="#ref-14" title="&quot;vCard Format Specification&quot;">14</a>], 아바타, OpenID Connect 제공자, RSS 또는 ATOM 피드
+   등에 관한 정보를 반환할 수 있다. 마찬가지로, 서버가 제공할
+   정보가 없는 경우, 빈 "links" 배열이 있거나 "links" 배열이 없는
+   JRD를 반환할 수 있다.
+
+   WebFinger 리소스는 클라이언트를 리디렉션할 수 있다(MAY). 그렇게
+   하는 경우, 리디렉션은 "https" URI로만 이루어져야 하며(MUST),
+   클라이언트는 리디렉션될 때 인증서 검증을 다시 수행해야 한다
+   (MUST).
+
+   WebFinger 리소스는 클라이언트에 의한 조건부 요청 및/또는
+   <a href="./rfc2616#section-13">RFC 2616의 제&nbsp;13절</a>에 따른 만료 시간을 가능하게 하기 위해
+   응답에 캐시 검증자를 포함할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  "rel" 매개변수</span>
+
+   WebFinger 리소스에 요청을 발행할 때, 클라이언트는 "rel"
+   매개변수가 없으면 반환될 정보의 하위 집합만 요청하기 위해
+   "rel" 매개변수를 활용할 수 있다(MAY). "rel" 매개변수가 사용되고
+   수락되면, "rel" 매개변수를 통해 제공된 링크 관계 유형과 일치하는
+   링크 관계 유형만 JRD에서 반환되는 링크 배열에 포함된다. 리소스에
+   대해 정의된 일치하는 링크 관계 유형이 없는 경우, JRD의 "links"
+   배열은 없거나 비어 있을 것이다. "rel"이 사용되는 경우에도
+   리소스 설명자에 존재하는 다른 모든 정보는 그대로 존재한다.
+
+   "rel" 매개변수는 여러 링크 관계 유형을 요청하기 위해 여러 번
+   포함될 수 있다(MAY).
+
+   "rel" 매개변수의 목적은 리소스 설명자에서 반환될 "link relation
+   objects"(<a href="#section-4.4.4">제 4.4.4절</a> 참조)의 하위 집합을 반환하는 것이다.
+   이 매개변수의 사용은 클라이언트나 서버의 처리 요구사항을 줄일
+   수 있고, 특히 주어진 "resource" 값에 대해 전달할 링크 관계 값이
+   많은 경우 부분 리소스 설명자를 전달하는 데 필요한 대역폭도 줄일
+   수 있다. 클라이언트가 서버에 정보가 없는 특정 링크 관계 유형을
+   요청하는 경우, 서버는 빈 "links" 배열이 있거나 "links" 배열이
+   없는 JRD를 반환할 수 있다는 점에 유의한다(MAY).
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                         [페이지 9]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   WebFinger 리소스는 "rel" 매개변수를 지원해야 한다(SHOULD). 리소스가
+   "rel" 매개변수를 지원하지 않는 경우, 해당 매개변수를 무시하고
+   "rel" 매개변수 값이 없는 것처럼 요청을 처리해야 한다(MUST).
+
+   다음 예는 "rel" 매개변수를 사용하여 두 링크 관계 유형에 대한
+   링크를 요청한다:
+
+    GET /.well-known/webfinger?
+        resource=acct%3Abob%40example.com&amp;
+        rel=http%3A%2F%2Fwebfinger.example%2Frel%2Fprofile-page&amp;
+        rel=http%3A%2F%2Fwebfinger.example%2Frel%2Fbusinesscard HTTP/1.1
+    Host: example.com
+
+   이 예에서 클라이언트는
+   "http://webfinger.example/rel/profile-page" 및
+   "http://webfinger.example/rel/businesscard" 유형의 링크 관계를
+   요청한다. 그러면 서버는 다음과 같은 메시지로 응답한다:
+
+     HTTP/1.1 200 OK
+     Access-Control-Allow-Origin: *
+     Content-Type: application/jrd+json
+
+     {
+       "subject" : "acct:bob@example.com",
+       "aliases" :
+       [
+         "https://www.example.com/~bob/"
+       ],
+       "properties" :
+       {
+           "http://example.com/ns/role" : "employee"
+       },
+       "links" :
+       [
+         {
+           "rel" : "http://webfinger.example/rel/profile-page",
+           "href" : "https://www.example.com/~bob/"
+         },
+         {
+           "rel" : "http://webfinger.example/rel/businesscard",
+           "href" : "https://www.example.com/~bob/bob.vcf"
+         }
+       ]
+     }
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 10]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   응답에서 볼 수 있듯이, 리소스 표현에는 클라이언트가 요청했고
+   서버에 정보가 있었던 유형의 링크만 포함되지만, JRD의 다른 부분은
+   여전히 존재한다. 또한 위 예에서 "links" 배열에 반환된 링크가
+   모두 HTTPS를 사용한다는 점에도 유의한다. 이는 WebFinger를 통해
+   간접적으로 얻은 데이터를 안전하게 반환해야 하는 경우 중요하다.
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a>.  JSON Resource Descriptor (JRD)</span>
+
+   JSON Resource Descriptor (JRD)는 원래 <a href="./rfc6415">RFC 6415</a>
+   [<a href="#ref-16" title="&quot;Web Host Metadata&quot;">16</a>]에서 도입되었고 Extensible Resource Descriptor (XRD) 형식
+   [<a href="#ref-17" title="&quot;Extensible Resource Descriptor (XRD) Version 1.0&quot;">17</a>]을 기반으로 하며, 다음 name/value 쌍으로 구성되는 JSON 객체이다:
+
+           o subject
+           o aliases
+           o properties
+           o links
+
+   "subject" 멤버는 값이 문자열인 name/value 쌍이고, "aliases"는
+   문자열 배열이며, "properties"는 값이 문자열인 name/value 쌍으로
+   구성된 객체이고, "links"는 링크 관계 정보를 포함하는 객체의
+   배열이다.
+
+   JRD를 처리할 때 클라이언트는 알 수 없는 멤버를 무시해야 하며
+   (MUST), 알 수 없는 멤버의 존재를 오류로 취급해서는 안 된다.
+
+   아래에서는 JRD의 각 멤버를 더 자세히 설명한다.
+
+<span class="h4"><a class="selflink" id="section-4.4.1" href="#section-4.4.1">4.4.1</a>.  subject</span>
+
+   "subject" 멤버의 값은 JRD가 설명하는 엔터티를 식별하는 URI이다.
+
+   WebFinger 리소스가 반환하는 "subject" 값은 클라이언트 요청에
+   사용된 "resource" 매개변수의 값과 다를 수 있다(MAY). 예를 들어,
+   subject의 ID가 변경되는 경우(예: 사용자가 자신의 계정을 다른
+   서비스로 이동하는 경우) 또는 리소스가 URI를 정규 형식으로
+   표현하는 것을 선호하는 경우에 이런 일이 발생할 수 있다.
+
+   "subject" 멤버는 JRD에 존재해야 한다(SHOULD).
+
+<span class="h4"><a class="selflink" id="section-4.4.2" href="#section-4.4.2">4.4.2</a>.  aliases</span>
+
+   "aliases" 배열은 "subject" URI와 동일한 엔터티를 식별하는
+   0개 이상의 URI 문자열 배열이다.
+
+   "aliases" 배열은 JRD에서 선택 사항이다(OPTIONAL).
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 11]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+<span class="h4"><a class="selflink" id="section-4.4.3" href="#section-4.4.3">4.4.3</a>.  properties</span>
+
+   "properties" 객체는 이름이 URI("property identifiers"라고 함)이고
+   값이 문자열 또는 null인 0개 이상의 name/value 쌍으로 구성된다.
+   Properties는 JRD의 subject에 관한 추가 정보를 전달하는 데 사용된다.
+   예로, "properties"의 다음 사용을 고려하자:
+
+     "properties" : { "http://webfinger.example/ns/name" : "Bob Smith" }
+
+   "properties" 멤버는 JRD에서 선택 사항이다(OPTIONAL).
+
+<span class="h4"><a class="selflink" id="section-4.4.4" href="#section-4.4.4">4.4.4</a>.  links</span>
+
+   "links" 배열에는 임의 개수의 멤버 객체가 있으며, 각각은 링크
+   [<a href="#ref-4" title="&quot;Web Linking&quot;">4</a>]를 나타낸다. 이러한 각 링크 객체는 다음 멤버를 가질 수 있다:
+
+           o rel
+           o type
+           o href
+           o titles
+           o properties
+
+   "rel" 및 "href" 멤버는 각각 링크의 관계 유형과 대상 URI를
+   나타내는 문자열이다. 링크의 문맥은 "subject"이다(<a href="#section-4.4.1">제 4.4.1절</a> 참조).
+
+   "type" 멤버는 링크를 역참조한 결과의 미디어 유형이 무엇이어야
+   하는지를 나타내는 문자열이다.
+
+   "links" 배열에서 요소의 순서는 선호 순서를 나타내는 것으로
+   해석될 수 있다(MAY). 따라서 동일한 "rel" 값을 갖는 링크 관계가
+   둘 이상 있는 경우, 첫 번째 링크 관계는 사용자의 선호 링크를
+   나타낸다.
+
+   "links" 배열은 JRD에서 선택 사항이다(OPTIONAL).
+
+   아래에서는 "links" 배열에 있는 객체의 각 멤버를 더 자세히
+   설명한다. "link relation object"라고 하는 "links" 배열의 각
+   객체는 배열의 다른 어떤 객체와도 완전히 독립적이다. 링크 관계
+   객체에 특정 멤버를 포함해야 한다는 모든 요구사항은 오직 해당
+   특정 객체만을 가리킨다.
+
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 12]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+<span class="h5"><a class="selflink" id="section-4.4.4.1" href="#section-4.4.4.1">4.4.4.1</a>.  rel</span>
+
+   "rel" 멤버의 값은 URI 또는 등록된 관계 유형 [<a href="#ref-8" title="&quot;Link Relations&quot;">8</a>] 중 하나인
+   문자열이다(<a href="./rfc5988">RFC 5988</a> [<a href="#ref-4" title="&quot;Web Linking&quot;">4</a>] 참조). "rel" 멤버의 값은 정확히
+   하나의 URI 또는 등록된 관계 유형을 포함해야 한다(MUST). URI 또는
+   등록된 관계 유형은 링크 관계의 유형을 식별한다.
+
+   객체의 다른 멤버는 링크 관계의 유형이 이해된 뒤에만 의미를
+   가진다. 어떤 경우에는 링크 관계가 클라이언트가 인터넷상의 다른
+   리소스를 쿼리할 수 있게 하는 관련 의미론을 가질 것이다. 다른
+   경우에는 링크 관계가 클라이언트가 추가 외부 리소스를 가져오지
+   않고도 링크 관계 객체의 다른 멤버를 활용할 수 있게 하는 관련
+   의미론을 가질 것이다.
+
+   URI 링크 관계 유형 값은 <a href="./rfc3986#section-6.2.1">RFC 3986의 제&nbsp;6.2.1절</a>의 "Simple String
+   Comparison" 알고리즘을 사용하여 비교된다.
+
+   "rel" 멤버는 링크 관계 객체에 존재해야 한다(MUST).
+
+<span class="h5"><a class="selflink" id="section-4.4.4.2" href="#section-4.4.4.2">4.4.4.2</a>.  type</span>
+
+   "type" 멤버의 값은 대상 리소스의 미디어 유형 [<a href="#ref-9" title="&quot;MIME Media Types&quot;">9</a>]을 나타내는
+   문자열이다(<a href="./rfc6838">RFC 6838</a> [<a href="#ref-10" title="&quot;Media Type Specifications and Registration Procedures&quot;">10</a>] 참조).
+
+   "type" 멤버는 링크 관계 객체에서 선택 사항이다(OPTIONAL).
+
+<span class="h5"><a class="selflink" id="section-4.4.4.3" href="#section-4.4.4.3">4.4.4.3</a>.  href</span>
+
+   "href" 멤버의 값은 대상 리소스를 가리키는 URI를 포함하는
+   문자열이다.
+
+   "href" 멤버는 링크 관계 객체에서 선택 사항이다(OPTIONAL).
+
+<span class="h5"><a class="selflink" id="section-4.4.4.4" href="#section-4.4.4.4">4.4.4.4</a>.  titles</span>
+
+   "titles" 객체는 이름이 언어 태그 [<a href="#ref-11" title="&quot;Tags for Identifying Languages&quot;">11</a>] 또는 문자열 "und"인
+   0개 이상의 name/value 쌍으로 구성된다. 문자열은 사람이 읽을 수
+   있으며 링크 관계를 설명한다. 링크 관계를 활용하는 사용자의 편의를
+   위해 링크 관계에 둘 이상의 title을 제공할 수 있으며(MAY),
+   사용되는 경우 언어 식별자를 이름으로 적절히 사용해야 한다
+   (SHOULD). 언어가 알려지지 않았거나 지정되지 않은 경우, 이름은
+   "und"이다.
+
+   JRD는 링크 관계 객체 내에서 동일한 언어 태그(또는 "und")로
+   식별되는 title을 둘 이상 포함하지 않아야 한다(SHOULD NOT).
+   링크 관계 객체가 동일한 언어 태그(또는 "und")로 명명된 title을
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 13]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   둘 이상 포함하는 경우 의미는 정의되지 않지만, 이를 오류로
+   처리해서는 안 된다(MUST NOT). 클라이언트는 활용하려는 title 또는
+   titles를 무엇이든 선택할 수 있다(MAY).
+
+   다음은 "titles" 객체의 예이다:
+
+     "titles" :
+     {
+       "en-us" : "The Magical World of Steve",
+       "fr" : "Le Monde Magique de Steve"
+     }
+
+   "titles" 멤버는 링크 관계 객체에서 선택 사항이다(OPTIONAL).
+
+<span class="h5"><a class="selflink" id="section-4.4.4.5" href="#section-4.4.4.5">4.4.4.5</a>.  properties</span>
+
+   링크 관계 객체 내의 "properties" 객체는 이름이 URI("property
+   identifiers"라고 함)이고 값이 문자열 또는 null인 0개 이상의
+   name/value 쌍으로 구성된다. Properties는 링크 관계에 관한 추가
+   정보를 전달하는 데 사용된다. 예로, "properties"의 다음 사용을
+   고려하자:
+
+     "properties" : { "http://webfinger.example/mail/port" : "993" }
+
+   "properties" 멤버는 링크 관계 객체에서 선택 사항이다(OPTIONAL).
+
+<span class="h3"><a class="selflink" id="section-4.5" href="#section-4.5">4.5</a>.  WebFinger와 URI</span>
+
+   WebFinger 요청은 클라이언트가 정보를 요청하는 쿼리 대상(URI)을
+   지정하는 "resource" 매개변수(<a href="#section-4.1">제 4.1절</a> 참조)를 포함한다.
+   WebFinger는 그러한 URI의 스킴에 대해 중립적이다. 이는 "acct"
+   URI [<a href="#ref-18" title="&quot;The 'acct' URI Scheme&quot;">18</a>], "http" 또는 "https" URI, "mailto" URI [<a href="#ref-19" title="&quot;The 'mailto' URI Scheme&quot;">19</a>],
+   또는 다른 어떤 스킴일 수 있다.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  교차 출처 리소스 공유(CORS)</span>
+
+   WebFinger 리소스는 "Same-Origin" 정책 때문에 웹 브라우저에서
+   접근할 수 없을 수도 있다. 현재의 모범 사례는 교차 출처 리소스
+   공유(CORS) [<a href="#ref-7" title="&quot;Cross-Origin Resource Sharing&quot;">7</a>]를 통해 리소스를 브라우저에 제공하는 것이며,
+   서버는 응답에 Access-Control-Allow-Origin HTTP 헤더를 포함해야
+   한다(MUST). 서버는 모든 도메인이 WebFinger 리소스에 접근하도록
+   허용하여 가장 제한이 적은 설정을 지원해야 한다(SHOULD):
+
+      Access-Control-Allow-Origin: *
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 14]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   가장 제한이 적은 설정을 기본값으로 하는 것이 적절하지 않은
+   경우도 있다. 예를 들어, 민감한 회사 정보를 제공하는 인트라넷의
+   서버는 어떤 도메인으로부터의 CORS 요청도 허용해서는 안 된다
+   (SHOULD NOT). 그렇게 하면 그 민감한 정보가 유출될 수 있기 때문이다.
+   외부 엔터티로부터 정보 접근을 제한하려는 서버는 더 제한적인
+   Access-Control-Allow-Origin 헤더를 사용해야 한다(SHOULD).
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  접근 제어</span>
+
+   모든 웹 리소스와 마찬가지로, WebFinger 리소스에 대한 접근은
+   인증을 요구할 수 있다. 또한 필요한 자격 증명을 제공하지 못하면
+   서버가 접근을 금지하거나, 클라이언트가 서버에 인증했을 때와 다른
+   응답을 제공하는 결과가 될 수 있다.
+
+   마찬가지로, WebFinger 리소스는 클라이언트가 기업 네트워크 내부에
+   있는지 외부에 있는지와 같은 다른 요소에 기반하여 서로 다른
+   클라이언트에 서로 다른 응답을 제공할 수 있다(MAY). 구체적인 예로,
+   내부 기업 네트워크에서 수행된 쿼리는 직원 사진에 대한 링크 관계를
+   반환할 수 있지만, 직원 사진에 대한 링크 관계는 외부 엔터티에는
+   제공되지 않을 수 있다.
+
+   또한 WebFinger 리소스 표현에 제공된 링크 관계는 접근 제한을
+   부과하는 웹 리소스를 가리킬 수 있다. 예를 들어, 앞서 언급한
+   기업 서버는 내부 및 외부 엔터티 모두에게 직원 사진에 대한 URI를
+   제공할 수 있지만, 요청이 기업 네트워크 외부에서 오는 경우
+   클라이언트가 사진 리소스에 접근하기 위해 추가 인증이 필요할 수
+   있다.
+
+   WebFinger 리소스가 어떤 클라이언트에게 어떤 링크 관계 집합을
+   제공할지, 어떤 리소스가 추가 인증을 요구할지, 그리고 사용되는
+   구체적 인증 메커니즘에 관해 내려지는 결정은 이 문서의 범위를
+   벗어난다.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  호스팅된 WebFinger 서비스</span>
+
+   인터넷에서 제공되는 대부분의 서비스와 마찬가지로, 도메인
+   소유자는 "호스팅된" WebFinger 서비스를 활용할 수 있다. 예를
+   들어, 도메인 소유자는 자신의 도메인 대부분을 제어하지만 이메일은
+   제3자 호스팅 서비스를 사용할 수 있다. 이메일의 경우,
+   메일 교환(MX) 레코드는 도메인의 메일 서버를 식별한다. MX 레코드는
+   해당 도메인의 메일이 전달되어야 하는 메일 서버를 가리킨다.
+   보내는 서버에게는 해당 MX 레코드가 대상 도메인의 서버를
+   가리키는지, 아니면 다른 도메인을 가리키는지가 중요하지 않다.
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 15]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   마찬가지로, 도메인 소유자는 자신의 사용자를 대신하여 WebFinger
+   서비스를 제공하기 위해 제3자의 서비스를 활용할 수 있다. 도메인
+   소유자가 호스팅된 이메일 서비스를 허용하기 위해 DNS에 MX 레코드를
+   삽입해야 하는 것처럼, 도메인 소유자는 호스팅된 WebFinger 서비스를
+   허용하기 위해 자신의 도메인으로 오는 HTTP 쿼리를 리디렉션해야
+   한다.
+
+   WebFinger 리소스로 쿼리가 발행되면, 웹 서버는 호스팅된 WebFinger
+   서비스 URI의 위치를 가리키는 Location 헤더를 포함하는 리디렉션
+   상태 코드로 응답을 반환해야 한다(MUST). 이 WebFinger 서비스 URI는
+   호스팅 서비스 제공자 서버의 well-known WebFinger 위치를 가리킬
+   필요가 없다.
+
+   예로, example.com의 WebFinger 서비스가 wf.example.net에서
+   호스팅된다고 가정하자. 클라이언트가 acct:alice@example.com에 대한
+   쿼리를 다음과 같이 발행한다고 하자:
+
+     GET /.well-known/webfinger?
+                   resource=acct%3Aalice%40example.com HTTP/1.1
+     Host: example.com
+
+   서버는 다음과 같이 응답할 수 있다:
+
+     HTTP/1.1 307 Temporary Redirect
+     Access-Control-Allow-Origin: *
+     Location: https://wf.example.net/example.com/webfinger?
+                   resource=acct%3Aalice%40example.com
+
+   그러면 클라이언트는 Location 헤더에 제공된 URI로 요청을 다시
+   발행하여 리디렉션을 따를 수 있다. 서버는 필요한 모든 URI
+   매개변수를 Location 헤더 값에 포함할 것이며, 이는 클라이언트가
+   원래 사용한 URI 매개변수와 다를 수 있다는 점에 유의한다.
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  WebFinger 애플리케이션의 정의</span>
+
+   이 명세는 URI에 관한 정보를 도메인에 쿼리하는 데 사용되는
+   프로토콜 구문, 해당 쿼리에 대한 응답으로 반환되는 JSON Resource
+   Descriptor (JRD)의 구문, 보안 요구사항 및 고려사항, 호스팅된
+   WebFinger 서비스, 다양한 예상 HTTP 상태 코드 등을 상세히
+   설명한다. 그러나 이 명세는 특정 애플리케이션을 위해 WebFinger와
+   함께 사용될 수 있는 다양한 가능한 속성이나 링크 관계 유형을
+   열거하지 않으며, 특정 URI 또는 URI 스킴을 쿼리한 결과로 어떤
+   속성이나 링크 관계 유형을 볼 수 있을지 정의하지도 않는다.
+   그렇더라도, 이러한 지정되지 않은 모든 요소는 WebFinger 프로토콜을
+   활용하는 상호운용 가능한 애플리케이션을 구현하기 위해 중요하며,
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 16]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   이 절에 설명된 절차에 따라 WebFinger 프로토콜을 사용하는 특정
+   애플리케이션을 정의하는 관련 문서에서 지정되어야 한다(MUST).
+
+<span class="h3"><a class="selflink" id="section-8.1" href="#section-8.1">8.1</a>.  URI 스킴 및 URI의 명세</span>
+
+   WebFinger를 사용하는 모든 애플리케이션은 URI 스킴(들)과, 적절한
+   범위에서 URI(들)가 취할 수 있는 형식을 지정해야 한다(MUST).
+   예를 들어, 어떤 도메인의 사용자 계정에 관한 정보를 쿼리할 때는
+   "acct" URI 스킴 [<a href="#ref-18" title="&quot;The 'acct' URI Scheme&quot;">18</a>]의 사용을 지정하는 것이 타당할 수 있다.
+   웹 페이지의 저작권 정보를 얻으려 할 때는 웹 페이지 URI(http 또는
+   https)의 사용을 지정하는 것이 타당하다.
+
+   <a href="#section-3.1">3.1절</a>과 <a href="#section-3.2">3.2절</a>의 예는 WebFinger 애플리케이션에서 서로 다른
+   URI 스킴을 사용하는 것을 보여 준다. <a href="#section-3.1">제</a>
+   <a href="#section-3.1">3.1절</a>의 예에서 WebFinger는 OpenID Connect와 관련된 정보를 검색하는 데
+   사용된다. <a href="#section-3.2">제 3.2절</a>의 예에서 WebFinger는 저자 및 저작권 정보를
+   포함하여 웹 페이지에 관한 메타데이터 정보를 발견하는 데 사용된다.
+   이러한 각 WebFinger 애플리케이션은 상호운용성을 보장하기 위해
+   완전히 지정되어야 한다.
+
+<span class="h3"><a class="selflink" id="section-8.2" href="#section-8.2">8.2</a>.  호스트 해석</span>
+
+   <a href="#section-4">제 4절</a>에서 설명했듯이, WebFinger 쿼리가 발행되는 호스트는
+   중요하다. 일반적으로 WebFinger 애플리케이션은 WebFinger 쿼리를
+   적절히 지시하기 위해 <a href="#section-4">제 4절</a>에 설명된 절차를 따를 것이다.
+
+   그러나 일부 URI 스킴에는 host 부분이 없으며, URI의 host 부분을
+   활용할 수 없거나 활용해서는 안 되는 WebFinger 애플리케이션도
+   있을 수 있다. 이러한 경우, 애플리케이션 명세는 host 해석 절차를
+   명확히 정의해야 하며(MUST), 여기에는 쿼리가 지시되는 "기본"
+   호스트를 클라이언트 내에 프로비저닝하는 것이 포함될 수 있다.
+
+<span class="h3"><a class="selflink" id="section-8.3" href="#section-8.3">8.3</a>.  속성의 명세</span>
+
+   WebFinger는 subject별 속성(즉, 정보를 쿼리하는 URI와 관련된
+   <a href="#section-4.4.3">제 4.4.3절</a>에 설명된 속성)과 링크별 속성(<a href="#section-4.4.4.5">제</a>
+   <a href="#section-4.4.4.5">4.4.4.5절</a> 참조)을 모두 정의한다. 이 절은 subject별 속성을 가리킨다.
+
+   subject별 속성을 활용하는 애플리케이션은 해당 속성을 식별하는 데
+   사용되는 URI와 유효한 속성 값을 정의해야 한다(MUST).
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 17]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   <a href="#section-3.2">제 3.2절</a>의 예에서 발견되는 JRD의 이 부분을 고려하자.
+
+       "properties" :
+       {
+         "http://blgx.example.net/ns/version" : "1.3",
+         "http://blgx.example.net/ns/ext" : null
+       }
+
+   여기서는 WebFinger 응답에서 두 개의 속성이 반환된다. 이들 각각은
+   WebFinger 애플리케이션 명세에서 정의될 것이다. 이 두 속성은
+   같은 WebFinger 애플리케이션 명세에서 정의될 수도 있고, 서로 다른
+   명세에서 별도로 정의될 수도 있다. 후자가 가능하므로, WebFinger
+   클라이언트가 특정 WebFinger 애플리케이션 명세에서 어떤 관계가
+   명시적으로 정의되지 않는 한 한 속성이 다른 속성과 어떤 특정
+   관계를 가진다고 가정하지 않는 것이 중요하다.
+
+<span class="h3"><a class="selflink" id="section-8.4" href="#section-8.4">8.4</a>.  링크의 명세</span>
+
+   WebFinger 응답에서 반환되는 각 링크는 여러 정보 조각으로
+   구성되며, 그중 일부는 선택 사항이다(<a href="#section-4.4.4">제</a>
+   <a href="#section-4.4.4">4.4.4절</a> 참조). WebFinger 애플리케이션 명세는 링크 관계 유형
+   ("rel"), 예상 미디어 유형("type"), properties 및 titles를 포함하여
+   각 링크와 링크에 연관된 모든 값을 정의해야 한다(MUST).
+
+   링크가 가리키는 대상 URI(즉, "href")가 존재하는 경우, 이는
+   일반적으로 애플리케이션 명세에 지정되지 않는다. 그러나 URI 스킴
+   또는 URI의 특별한 특성은 보통 지정된다. 특정 링크가 외부 참조를
+   요구하지 않는 경우, 해당 링크의 사용과 관련된 모든 의미론은
+   애플리케이션 명세 안에서 정의되어야 한다(MUST). 이러한 링크는
+   의미를 전달하기 위해 링크의 properties 또는 titles에만 의존할 수
+   있다.
+
+<span class="h3"><a class="selflink" id="section-8.5" href="#section-8.5">8.5</a>.  하나의 URI, 여러 애플리케이션</span>
+
+   서로 다른 WebFinger 애플리케이션이 동일한 URI 스킴의 사용을
+   지정할 수 있으며, 사실상 서로 다른 목적을 위해 동일한 URI를
+   지정할 수 있다는 사실을 유념하는 것이 중요하다. 이는 문제가
+   되지 않을 것이다. property identifier(<a href="#section-4.4.3">4.4.3절</a> 및
+   4.4.4.5 참조)와 링크 관계 유형이 각각 특정 애플리케이션에 대해
+   고유하게 정의되기 때문이다.
+
+   클라이언트가 특정 URI에 관한 정보를 요청하고 여러 다른 property
+   identifier 또는 링크 관계 유형이 포함된 응답을 받는 경우, 그
+   응답은 어떤 특정 의미론 없이 해당 URI에 관한 정보를 제공한다는
+   점에 유의해야 한다.
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 18]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   클라이언트가 그 정보를 해석하는 방법은 클라이언트가 구현하는 특정
+   애플리케이션 명세 또는 명세 집합에 따라야 한다(SHOULD).
+
+   클라이언트가 수신한, 구문적으로 유효하지만 완전히 이해되지 않는
+   모든 properties 또는 links는 무시되어야 하며(SHOULD), 클라이언트가
+   오류를 보고하게 해서는 안 된다(SHOULD NOT).
+
+<span class="h3"><a class="selflink" id="section-8.6" href="#section-8.6">8.6</a>.  링크 관계 유형 및 속성의 등록</span>
+
+   애플리케이션 명세는 링크에 대한 링크 관계 유형으로 단순 토큰을
+   정의할 수 있다(MAY). 이 경우, 링크 관계 유형은 <a href="#section-10.3">10.3절</a>에 지정된
+   대로 IANA에 등록되어야 한다(MUST).
+
+   또한 정의된 모든 속성은 <a href="#section-10.4">제 10.4절</a>에 설명된 대로 IANA에 등록되어야
+   한다(MUST).
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  보안 고려사항</span>
+
+<span class="h3"><a class="selflink" id="section-9.1" href="#section-9.1">9.1</a>.  전송 관련 문제</span>
+
+   이 명세는 교차 출처 리소스 공유(CORS) [<a href="#ref-7" title="&quot;Cross-Origin Resource Sharing&quot;">7</a>]를 활용하므로,
+   CORS에 적용되는 모든 보안 고려사항은 이 명세에도 적용된다.
+
+   전송 중 정보가 수정되지 않도록 보장하기 위해 HTTPS의 사용이
+   요구된다(REQUIRED). 웹 서버가 일반적으로 사용 가능한 환경에서는,
+   손상된 네트워크가 HTTPS에서 동작하는 WebFinger 리소스를 HTTP로만
+   동작하는 리소스로 대체할 가능성이 있음을 인정해야 한다. 따라서
+   클라이언트는 비보안 연결을 통해 쿼리를 발행해서는 안 된다
+   (MUST NOT).
+
+   클라이언트는 HTTPS 연결에 사용된 인증서가([<a href="#ref-12" title="&quot;HTTP Over TLS&quot;">12</a>]에 정의된 대로)
+   유효한지 검증해야 하며(MUST), 인증서가 유효한 경우에만 응답을
+   받아들여야 한다.
+
+<span class="h3"><a class="selflink" id="section-9.2" href="#section-9.2">9.2</a>.  사용자 프라이버시 고려사항</span>
+
+   서비스 제공자와 사용자는 인터넷에 정보를 올린다는 것은 어떤
+   사용자든 그 정보에 접근할 수 있음을 의미하며, WebFinger가 그
+   정보를 발견하는 일을 훨씬 더 쉽게 만드는 데 사용될 수 있음을
+   알아야 한다. WebFinger는 자신의 아바타, 블로그 또는 기타 개인
+   데이터를 발견하는 데 매우 유용한 도구가 될 수 있지만, 사용자는
+   그 위험도 이해해야 한다.
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 19]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   WebFinger를 통해 개인 데이터를 노출하는 시스템 또는 서비스는
+   사용자가 WebFinger 인터페이스를 통해 어떤 데이터 요소가 노출될지
+   선택할 수 있는 인터페이스를 제공해야 한다(MUST). 예를 들어,
+   소셜 네트워킹 사이트는 사용자가 특정 데이터를 "public"으로 표시할
+   수 있게 하고, 그 표시를 WebFinger를 통해 어떤 정보를 노출할지
+   결정하는 수단으로 활용할 수 있다. 따라서 WebFinger를 통해
+   게시되는 정보는 사용자가 public으로 표시한 정보만으로 구성될
+   것이다. 또한 사용자는 이 표시를 제거함으로써 WebFinger를 통한
+   게시에서 정보를 제거할 수 있다.
+
+   관련 서비스가 WebFinger를 통해 해당 데이터를 게시하는 것을 정보가
+   공유되는 당사자가 명시적으로 승인하지 않은 한, WebFinger는 어떤
+   개인 데이터도 제공하는 데 사용되어서는 안 된다(MUST NOT). 인터넷의
+   접근 제어되거나 그 밖의 제한된 환경 안에 자신의 개인 데이터를
+   게시하는 것은 WebFinger를 통해 해당 데이터를 추가로 게시하는 데
+   대한 묵시적 승인을 제공하는 것과 동일하지 않다.
+
+   WebFinger를 통해 개인 데이터를 게시할 때의 프라이버시 및 보안
+   우려는 사용자의 현재 맥락(예: 사용자의 위치)을 드러낼 수 있는
+   개인 데이터와 관련하여 다시 강조할 가치가 있다. WebFinger의 힘은
+   다른 사람들이 한 사람에 관한 정보에 대한 포인터를 찾을 수 있는
+   단일 장소를 제공하는 데서 나오지만, 서비스 제공자와 사용자는
+   공유되는 정보의 성격과 그 정보가 전 세계가 볼 수 있도록 제공될
+   수 있다는 사실을 유념해야 한다. 예를 들어 위치 정보를 공유하면,
+   그 사람에게 해를 끼치려는 어떤 개인으로부터도 잠재적으로 그
+   사람을 위험에 빠뜨릴 수 있다.
+
+   사용자는 자신이 게시할 수 있는 개인 데이터가 의도하지 않은
+   방식으로 얼마나 쉽게 사용될 수 있는지 알아야 한다. WebFinger와
+   유사한 서비스와 관련된 한 연구에서, Balduzzi 외 [<a href="#ref-20" title="&quot;Abusing Social Networks for Automated User Profiling&quot;">20</a>]는 유출된
+   이메일 주소의 대규모 집합을 사용하여 여러 잠재적 프라이버시
+   우려를 입증했으며, 여기에는 여러 소셜 네트워크에서 동일한
+   사용자의 계정을 상호 연관시키는 능력이 포함된다. 저자들은 또한
+   잠재적 완화 전략도 설명한다.
+
+   WebFinger를 통한 사용자 정보에 대한 쉬운 접근은 이 프로토콜의
+   설계 목표이지, 제한 사항이 아니다. 기업 네트워크 내부에서 사용할
+   WebFinger 리소스와 같이 WebFinger를 통해 제공되는 정보에 대한
+   접근을 제한하려면, 네트워크 관리자는 네트워크 외부로부터의 접근을
+   제한하기 위해 필요한 조치를 취해야 한다. 웹 리소스를 보호하는
+   표준 방법을 사용하면, 네트워크 관리자는 민감한 정보를 반환할 수
+   있는 리소스에 대한 접근을 제어할 수 있다. 또한 서버는 인증을
+   요구하고 권한 없는 엔터티에 대한 정보 공개를 방지하는 방식으로
+   사용될 수 있다.
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 20]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+<span class="h3"><a class="selflink" id="section-9.3" href="#section-9.3">9.3</a>.  남용 가능성</span>
+
+   서비스 제공자는 WebFinger를 사용한 남용 가능성을 유념해야 한다.
+
+   한 가지 예로, 어떤 URI가 유효한지 여부만 발견하기 위해 WebFinger
+   서버를 쿼리할 수 있다. 그러한 쿼리를 통해, 예를 들어 그 사람은
+   이메일 식별자가 유효하다고 추론할 수 있다. 이러한 접근 방식은
+   스패머가 알려진 이메일 주소의 최신 목록을 유지하고 새로운 주소를
+   발견하는 데 도움이 될 수 있다.
+
+   WebFinger는 이름이나 기타 개인 데이터를 이메일 주소와 연결하는 데
+   사용될 수 있으며, 이는 스패머가 더 그럴듯한 이메일 메시지를
+   작성할 수 있게 한다. 이는 피싱 시도에서 특히 가치가 있을 수
+   있다.
+
+   WebFinger 서버 소프트웨어 구현자는 서버의 악의적 과다 사용 및
+   사용자 정보 수집을 포함한 남용을 완화하기 위한 조치를 취할 것을
+   권장한다(RECOMMENDED). 공개적으로 접근 가능한 WebFinger 데이터베이스가
+   수집되지 않도록 보장할 수 있는 메커니즘은 없지만, IP 주소별
+   rate-limiting은 봇넷이나 기타 분산 시스템에 접근할 수 없는 개인에
+   의한 수집을 방지하거나 적어도 극적으로 늦출 것이다. 이러한 완화
+   전략이 의무가 아닌 이유는 올바른 완화 전략의 선택(있는 경우)이
+   맥락에 크게 의존하기 때문이다. 구현자는 이것을 완화 전략을 사용할
+   것인지, 그렇다면 어떤 전략을 사용할 것인지를 고려할 필요가 없다는
+   의미로 해석해서는 안 된다.
+
+   WebFinger 클라이언트 개발자도 스패머나 사용자에 관한 정보를
+   피싱하는 사람들에 의한 잠재적 남용을 인식해야 한다. 예로, 메일
+   클라이언트가 수신한 각 메일 메시지의 발신자에 대해 자동으로
+   WebFinger 쿼리를 수행하도록 구성되어 있다고 가정하자. 스패머가
+   'From' 헤더에 고유 식별자를 사용하여 이메일을 보낸 경우, WebFinger
+   쿼리가 수행될 때 스패머는 그 요청을 특정 사용자의 이메일 주소와
+   연결할 수 있을 것이다. 이는 사용자의 IP 주소, 사용자가 방금
+   이메일을 확인했다는 사실, 사용자가 어떤 종류의 WebFinger
+   클라이언트를 사용했는지 등 여러 정보를 스패머에게 제공할 것이다.
+   이러한 이유로, 사용자의 승인이 없는 한 클라이언트가 WebFinger
+   쿼리를 수행하지 않는 것이 강력히 권고된다.
+
+<span class="h3"><a class="selflink" id="section-9.4" href="#section-9.4">9.4</a>.  정보 신뢰성</span>
+
+   WebFinger 리소스는 사용자가 제공한 정보가 정확한지 보장할 수단을
+   갖고 있지 않다. 마찬가지로, 리소스도 클라이언트도 정보가 서버에서
+   또는 클라이언트와 서버 사이의 통신 경로를 따라 조작되지 않았음을
+   절대적으로 보장할 수 없다.
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 21]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   HTTPS의 사용은 통신 경로를 따라 정보가 조작되는 것에 대한 일부
+   우려를 해결하는 데 도움이 되지만, 리소스가 허위 정보를 제공받았기
+   때문에 또는 서버 관리자의 악의적 행동 때문에 잘못된 정보를
+   제공하는 문제는 분명히 해결할 수 없다. 인터넷에서 이용 가능한
+   모든 정보 서비스와 마찬가지로, 사용자는 신뢰할 수 없는 출처에서
+   받은 정보를 경계해야 한다.
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  IANA 고려사항</span>
+
+<span class="h3"><a class="selflink" id="section-10.1" href="#section-10.1">10.1</a>.  Well-Known URI</span>
+
+   이 명세는 <a href="./rfc5785">RFC 5785</a> [<a href="#ref-3" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">3</a>]에 정의된 "Well-Known URIs"
+   레지스트리에 "webfinger" well-known URI를 등록한다.
+
+   URI suffix:  webfinger
+
+   Change controller:  IETF
+
+   Specification document(s):  <a href="./rfc7033">RFC 7033</a>
+
+   Related information:  WebFinger 리소스에 대한 쿼리는 쿼리 문자열에
+   하나 이상의 매개변수를 포함할 것이다. <a href="./rfc7033#section-4.1">RFC 7033의 제&nbsp;4.1절</a>을
+   참조한다. 이 위치의 리소스는 <a href="./rfc7033#section-4.4">RFC 7033의 제&nbsp;4.4절</a>에 설명된
+   JSON Resource Descriptor (JRD)를 반환할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-10.2" href="#section-10.2">10.2</a>.  JSON Resource Descriptor (JRD) 미디어 유형</span>
+
+   이 명세는 <a href="./rfc6838">RFC 6838</a> [<a href="#ref-10" title="&quot;Media Type Specifications and Registration Procedures&quot;">10</a>]에 정의된 미디어 유형 등록 절차에
+   따라 WebFinger와 함께 사용하기 위한 미디어 유형
+   application/jrd+json을 등록한다.
+
+   Type name: application
+
+   Subtype name: jrd+json
+
+   Required parameters: N/A
+
+   Optional parameters: N/A
+
+     특히, <a href="./rfc4627">RFC 4627</a>이 이미 JSON의 문자 인코딩을 정의하고 있으므로,
+     "charset" 매개변수는 사용되지 않는다.
+
+   Encoding considerations: <a href="./rfc6839#section-3.1">RFC 6839, 제&nbsp;3.1절</a> 참조.
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 22]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   Security considerations:
+
+     JSON Resource Descriptor (JRD)는 JavaScript Object Notation (JSON)
+     객체이다. 이는 이 형식을 활용하려는 엔터티가 구문 분석해야 하는
+     텍스트 형식이다. JSON 객체를 구문 분석하는 데 사용되는 언어와
+     메커니즘에 따라, 공격자가 실행 중인 프로그램에 동작을 주입할
+     수 있다. 따라서 수신한 JRD를 적절히 구문 분석하여 유효한 JSON
+     객체만 존재하고 JavaScript 또는 기타 코드가 예기치 않게
+     주입되거나 실행되지 않도록 주의해야 한다.
+
+   Interoperability considerations:
+
+     이 미디어 유형은 JavaScript Object Notation (JSON) 객체이며,
+     JSON 객체를 소비할 수 있는 모든 소프트웨어 애플리케이션에서
+     소비될 수 있다.
+
+   Published specification: <a href="./rfc7033">RFC 7033</a>
+
+   Applications that use this media type:
+
+     JSON Resource Descriptor (JRD)는 WebFinger 프로토콜(<a href="./rfc7033">RFC 7033</a>)에서
+     HTTPS를 통해 클라이언트와 WebFinger 리소스 사이의 정보 교환을
+     가능하게 하기 위해 사용된다.
+
+   Fragment identifier considerations:
+
+     fragment identifiers의 구문과 의미론은 "application/json"에
+     대해 지정된 대로여야 한다(SHOULD). (이 문서의 출판 시점에는
+     "application/json"에 대해 정의된 fragment identification 구문이
+     없다.)
+
+   Additional information:
+
+     Deprecated alias names for this type: N/A
+
+     Magic number(s): N/A
+
+     File extension(s): jrd
+
+     Macintosh file type code(s): N/A
+
+   Person &amp; email address to contact for further information:
+
+     Paul E. Jones &lt;paulej@packetizer.com&gt;
+
+   Intended usage: COMMON
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 23]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   Restrictions on usage: N/A
+
+   Author: Paul E. Jones &lt;paulej@packetizer.com&gt;
+
+   Change controller:
+
+   IESG는 이 등록에 대한 변경 제어권을 가진다.
+
+   Provisional registration? (standards tree only): N/A
+
+<span class="h3"><a class="selflink" id="section-10.3" href="#section-10.3">10.3</a>.  링크 관계 유형 등록하기</span>
+
+   <a href="./rfc5988">RFC 5988</a>은 WebFinger 애플리케이션이 재사용하는 "Link Relation
+   Types" 레지스트리를 수립했다.
+
+   WebFinger 애플리케이션이 사용하는 링크 관계 유형은 <a href="./rfc5988#section-6.2.1">RFC 5988의
+   제</a> <a href="./rfc5988#section-6.2.1">6.2.1절</a> 절차에 따라 "Link Relation Types" 레지스트리에
+   등록된다. 등록의 "Notes" 항목은 링크 관계 유형과 연관된 속성
+   값이 해당 레지스트리에 대한 링크와 함께 "WebFinger Properties"
+   레지스트리에 등록되어 있는지를 표시해야 한다(SHOULD).
+
+<span class="h3"><a class="selflink" id="section-10.4" href="#section-10.4">10.4</a>.  "WebFinger Properties" 레지스트리의 수립</span>
+
+   WebFinger는 subject 또는 링크의 속성과 관련 값을 식별하기 위해
+   URI를 활용한다(<a href="#section-8.3">8.3절</a> 및 <a href="#section-8.6">8.6절</a> 참조). 이 명세는 property
+   identifiers를 기록하기 위해 새로운 "WebFinger Properties"
+   레지스트리를 수립한다.
+
+<span class="h4"><a class="selflink" id="section-10.4.1" href="#section-10.4.1">10.4.1</a>.  등록 템플릿</span>
+
+   WebFinger properties의 등록 템플릿은 다음과 같다:
+
+          o Property Identifier:
+
+          o Link Type:
+
+          o Description:
+
+          o Reference:
+
+          o Notes: [optional]
+
+   "Property Identifier"는 등록되는 속성을 식별하는 URI여야 한다.
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 24]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   "Link Type"은 이 property identifier가 함께 사용되는 링크 관계
+   유형의 이름을 포함한다. 속성이 subject별 속성인 경우, 이 필드는
+   "N/A"로 지정된다.
+
+   "Description"은 속성의 목적을 설명하기 위한 것이다.
+
+   "Reference" 필드는 등록된 속성을 정의하는 명세를 가리킨다.
+
+   선택 사항인 "Notes" 필드는 구현자에게 가치가 있을 수 있는 속성에
+   관한 유용한 정보를 전달하기 위한 것이다.
+
+<span class="h4"><a class="selflink" id="section-10.4.2" href="#section-10.4.2">10.4.2</a>.  등록 절차</span>
+
+   IETF는 WebFinger 프로토콜과 이를 사용하는 모든 애플리케이션에
+   대한 공개 논의에 사용할 수 있는 메일링 리스트 webfinger@ietf.org를
+   만들었다. WebFinger property를 등록하기 전에 메일링 리스트에서의
+   논의가 강력히 권장된다. IESG는 webfinger@ietf.org 메일링 리스트를
+   모니터링하고 등록을 검토할 Designated Experts [<a href="#ref-13" title="">13</a>]를 임명했다.
+
+   WebFinger property는 Designated Experts의 검토 후 Specification
+   Required(<a href="./rfc5226">RFC 5226</a> [<a href="#ref-13" title="">13</a>] 참조)로 등록된다. 검토에는 보통
+   약 2주에서 4주 정도가 걸릴 것으로 예상된다. 그러나 Designated
+   Experts가 해당 명세가 출판될 것이라고 만족하는 경우, Designated
+   Experts는 명세 출판 전에 등록을 승인할 수 있다. 등록 요청을
+   평가할 때, Designated Experts는 동일한 의미를 갖는 서로 다른 두
+   속성을 등록하지 않도록 노력해야 한다. 제안된 속성이 이미 정의된
+   속성과 유사한 경우, Designated Experts는 새 속성이 기존 속성과
+   충분히 구별되도록 템플릿의 description 또는 notes 절에 충분한
+   텍스트가 포함될 것을 요구해야 한다.
+
+   등록 절차는 위에 정의된 대로 완성된 등록 템플릿을
+   webfinger@ietf.org로 보내는 것으로 시작된다. 메일링 리스트에서
+   합의에 도달하면, 등록 템플릿은 iana@iana.org로 보내진다. 그러면
+   IANA는 Designated Experts에게 연락하고 그 결과를 등록자에게
+   전달한다. WebFinger 메일링 리스트는 커뮤니티 논의와 의견 입력의
+   기회를 제공하며, Designated Experts는 그 의견을 검토에 반영할 수
+   있다. 거부에는 설명이 포함되어야 하며, 해당하는 경우 다시 제출할
+   때 요청이 성공하도록 만드는 방법에 대한 제안도 포함되어야 한다.
+
+
+
+
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 25]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-26" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   WebFinger property를 등록하는 명세는 위에 제시된 완성된 등록
+   템플릿을 포함해야 한다(MUST). 등록 절차가 성공적으로 완료되면,
+   IANA는 "WebFinger Properties" 레지스트리에서 해당 레코드를
+   생성하거나 수정한다.
+
+<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>.  감사의 말</span>
+
+   이 문서는 APPSAWG 작업 그룹의 많은 구성원들에 의한 광범위한
+   논의와 검토의 혜택을 받았다. 저자들은 특히 Eran Hammer-
+   Lahav, Blaine Cook, Brad Fitzpatrick, Laurent-Walter Goix, Joe
+   Clarke, Peter Saint-Andre, Dick Hardt, Tim Bray, James Snell, Melvin
+   Carvalho, Evan Prodromou, Mark Nottingham, Elf Pavlik, Bjoern
+   Hoehrmann, Subramanian Moonesamy, Joe Gregorio, John Bradley, 그리고
+   우리가 의심할 여지 없이, 그러나 본의 아니게 놓친 다른 이들의
+   귀중한 의견에 감사를 표하고자 한다.
+
+   저자들은 또한 APPSAWG 작업 그룹의 의장들, 특히 이 문서를
+   진행하는 데 도움을 준 Salvatore Loreto에게 감사를 표하고자 한다.
+   또한 Applications Area Directors인 Barry Leiba와 Pete Resnick에게도
+   그들의 지원과 철저한 검토에 대해 감사드린다.
+
+<span class="h2"><a class="selflink" id="section-12" href="#section-12">12</a>.  참고문헌</span>
+
+<span class="h3"><a class="selflink" id="section-12.1" href="#section-12.1">12.1</a>.  규범적 참고문헌</span>
+
+   [<a id="ref-1">1</a>]   Bradner, S., "Key words for use in RFCs to Indicate Requirement
+         Levels", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>, 1997년 3월.
+
+   [<a id="ref-2">2</a>]   Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L.,
+         Leach, P., and T. Berners-Lee, "Hypertext Transfer Protocol
+         -- HTTP/1.1", <a href="./rfc2616">RFC 2616</a>, 1999년 6월.
+
+   [<a id="ref-3">3</a>]   Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
+         Uniform Resource Identifiers (URIs)", <a href="./rfc5785">RFC 5785</a>, 2010년 4월.
+
+   [<a id="ref-4">4</a>]   Nottingham, M., "Web Linking", <a href="./rfc5988">RFC 5988</a>, 2010년 10월.
+
+   [<a id="ref-5">5</a>]   Crockford, D., "The application/json Media Type for JavaScript
+         Object Notation (JSON)", <a href="./rfc4627">RFC 4627</a>, 2006년 7월.
+
+   [<a id="ref-6">6</a>]   Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+         Resource Identifier (URI): Generic Syntax", STD 66, <a href="./rfc3986">RFC 3986</a>,
+         2005년 1월.
+
+   [<a id="ref-7">7</a>]   Van Kesteren, A., "Cross-Origin Resource Sharing", W3C CORS,
+         2010년 7월, &lt;<a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a>&gt;.
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 26]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-27" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+   [<a id="ref-8">8</a>]   IANA, "Link Relations",
+         &lt;<a href="http://www.iana.org/assignments/link-relations/">http://www.iana.org/assignments/link-relations/</a>&gt;.
+
+   [<a id="ref-9">9</a>]   IANA, "MIME Media Types",
+         &lt;<a href="http://www.iana.org/assignments/media-types">http://www.iana.org/assignments/media-types</a>&gt;.
+
+   [<a id="ref-10">10</a>]  Freed, N., Klensin, J., and T. Hansen, "Media Type
+         Specifications and Registration Procedures", <a href="https://www.rfc-editor.org/bcp/bcp13">BCP 13</a>, <a href="./rfc6838">RFC 6838</a>,
+         2013년 1월.
+
+   [<a id="ref-11">11</a>]  Phillips, A., Ed., and M. Davis, Ed., "Tags for Identifying
+         Languages", <a href="https://www.rfc-editor.org/bcp/bcp47">BCP 47</a>, <a href="./rfc5646">RFC 5646</a>, 2009년 9월.
+
+   [<a id="ref-12">12</a>]  Rescorla, E., "HTTP Over TLS", <a href="./rfc2818">RFC 2818</a>, 2000년 5월.
+
+   [<a id="ref-13">13</a>]  Narten, T. and H. Alvestrand, "Guidelines for Writing an IANA
+         Considerations Section in RFCs", <a href="https://www.rfc-editor.org/bcp/bcp26">BCP 26</a>, <a href="./rfc5226">RFC 5226</a>, 2008년 5월.
+
+<span class="h3"><a class="selflink" id="section-12.2" href="#section-12.2">12.2</a>.  정보성 참고문헌</span>
+
+   [<a id="ref-14">14</a>]  Perreault, S., "vCard Format Specification", <a href="./rfc6350">RFC 6350</a>, 2011년
+         8월.
+
+   [<a id="ref-15">15</a>]  Sakimura, N., Bradley, J., Jones, M., de Medeiros, B.,
+         Mortimore, C., and E. Jay, "OpenID Connect Messages 1.0",
+         2013년 7월,
+         &lt;<a href="http://openid.net/specs/openid-connect-messages-1_0.html">http://openid.net/specs/openid-connect-messages-1_0.html</a>&gt;.
+
+   [<a id="ref-16">16</a>]  Hammer-Lahav, E., Ed., and B. Cook, "Web Host Metadata", <a href="./rfc6415">RFC</a>
+         <a href="./rfc6415">6415</a>, 2011년 10월.
+
+   [<a id="ref-17">17</a>]  Hammer-Lahav, E. and W. Norris, "Extensible Resource Descriptor
+         (XRD) Version 1.0",
+         &lt;<a href="http://docs.oasis-open.org/xri/xrd/v1.0/xrd-1.0.html">http://docs.oasis-open.org/xri/xrd/v1.0/xrd-1.0.html</a>&gt;.
+
+   [<a id="ref-18">18</a>]  Saint-Andre, P., <a style="text-decoration: none" href='https://www.google.com/search?sitesearch=datatracker.ietf.org%2Fdoc%2Fhtml%2F&amp;q=inurl:draft-+%22The+%27acct%27+URI+Scheme%22'>"The 'acct' URI Scheme"</a>, Work in Progress,
+         2013년 7월.
+
+   [<a id="ref-19">19</a>]  Duerst, M., Masinter, L., and J. Zawinski, "The 'mailto' URI
+         Scheme", <a href="./rfc6068">RFC 6068</a>, 2010년 10월.
+
+   [<a id="ref-20">20</a>]  Balduzzi, M., Platzer, C., Thorsten, H., Kirda, E., Balzarotti,
+         D., and C. Kruegel "Abusing Social Networks for Automated User
+         Profiling", Recent Advances in Intrusion Detection, Springer
+         Berlin Heidelberg, 2010년 3월,
+         &lt;<a href="https://www.eurecom.fr/en/publication/3042/download/rs-publi-3042_1.pdf">https://www.eurecom.fr/en/publication/3042/download/</a>
+         <a href="https://www.eurecom.fr/en/publication/3042/download/rs-publi-3042_1.pdf">rs-publi-3042_1.pdf</a>&gt;.
+
+
+
+
+<span class="grey">Jones 외                   표준 트랙                        [페이지 27]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-28" ></span>
+<span class="grey"><a href="./rfc7033">RFC 7033</a>                        WebFinger                  2013년 9월</span>
+
+
+저자 주소
+
+   Paul E. Jones
+   Cisco Systems, Inc.
+   7025 Kit Creek Rd.
+   Research Triangle Park, NC 27709
+   USA
+
+   Phone: +1 919 476 2048
+   EMail: paulej@packetizer.com
+   IM: xmpp:paulej@packetizer.com
+
+
+   Gonzalo Salgueiro
+   Cisco Systems, Inc.
+   7025 Kit Creek Rd.
+   Research Triangle Park, NC 27709
+   USA
+
+   Phone: +1 919 392 3266
+   EMail: gsalguei@cisco.com
+   IM: xmpp:gsalguei@cisco.com
+
+
+   Michael B. Jones
+   Microsoft
+
+   EMail: mbj@microsoft.com
+   URI: <a href="http://self-issued.info/">http://self-issued.info/</a>
+
+
+   Joseph Smarr
+   Google
+
+   EMail: jsmarr@google.com
+   URI: <a href="http://josephsmarr.com/">http://josephsmarr.com/</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Jones 외                   표준 트랙                        [페이지 28]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
