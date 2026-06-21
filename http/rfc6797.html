@@ -1,0 +1,2466 @@
+<pre>Internet Engineering Task Force (IETF)                         J. Hodges
+Request for Comments: 6797                                        PayPal
+분류: 표준 트랙                                                C. Jackson
+ISSN: 2070-1721                               Carnegie Mellon University
+                                                                A. Barth
+                                                            Google, Inc.
+                                                           2012년 11월
+
+
+                 <span class="h1">HTTP Strict Transport Security (HSTS)</span>
+
+초록
+
+   이 명세는 웹 사이트가 자신을 보안 연결을 통해서만 접근 가능하다고
+   선언하거나, 사용자가 자신의 사용자 에이전트에게 지정된 사이트와
+   보안 연결을 통해서만 상호작용하도록 지시할 수 있게 하는 메커니즘을
+   정의한다. 이 전체 정책을 HTTP Strict Transport Security(HSTS)라고
+   한다. 이 정책은 웹 사이트가 Strict-Transport-Security HTTP 응답
+   헤더 필드를 통해 선언하거나, 예를 들어 사용자 에이전트 구성과 같은
+   다른 수단을 통해 선언한다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 Internet Engineering Task Force(IETF)의 산물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 이 문서는 공개 검토를
+   거쳤으며 Internet Engineering Steering Group(IESG)에 의해
+   출판 승인을 받았다. 인터넷 표준에 관한 추가 정보는
+   <a href="./rfc5741#section-2">RFC 5741의 섹션&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 그리고 이에 대한 피드백 제공 방법에
+   관한 정보는 다음에서 얻을 수 있다.
+   <a href="http://www.rfc-editor.org/info/rfc6797">http://www.rfc-editor.org/info/rfc6797</a>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+Copyright Notice
+
+   Copyright (c) 2012 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+Table of Contents
+
+   <a href="#section-1">1</a>. 소개 ..........................................................<a href="#page-4">4</a>
+      <a href="#section-1.1">1.1</a>. 이 명세의 구성 ...........................................<a href="#page-6">6</a>
+      <a href="#section-1.2">1.2</a>. 문서 규약 .................................................<a href="#page-6">6</a>
+   <a href="#section-2">2</a>. 개요 ..........................................................<a href="#page-6">6</a>
+      <a href="#section-2.1">2.1</a>. 사용 사례 .................................................<a href="#page-6">6</a>
+      <a href="#section-2.2">2.2</a>. HTTP Strict Transport Security 정책 효과 ..................<a href="#page-6">6</a>
+      <a href="#section-2.3">2.3</a>. 위협 모델 .................................................<a href="#page-6">6</a>
+           <a href="#section-2.3.1">2.3.1</a>. 대응되는 위협 .....................................<a href="#page-7">7</a>
+                  <a href="#section-2.3.1.1">2.3.1.1</a>. 수동 네트워크 공격자 ....................<a href="#page-7">7</a>
+                  <a href="#section-2.3.1.2">2.3.1.2</a>. 능동 네트워크 공격자 ....................<a href="#page-7">7</a>
+                  <a href="#section-2.3.1.3">2.3.1.3</a>. 웹 사이트 개발 및 배포 버그 ............<a href="#page-8">8</a>
+           <a href="#section-2.3.2">2.3.2</a>. 대응되지 않는 위협 .................................<a href="#page-8">8</a>
+                  <a href="#section-2.3.2.1">2.3.2.1</a>. 피싱 .....................................<a href="#page-8">8</a>
+                  <a href="#section-2.3.2.2">2.3.2.2</a>. 악성코드 및 브라우저 취약점 ............<a href="#page-8">8</a>
+      <a href="#section-2.4">2.4</a>. 요구사항 ..................................................<a href="#page-9">9</a>
+           <a href="#section-2.4.1">2.4.1</a>. 전체 요구사항 .....................................<a href="#page-9">9</a>
+                  <a href="#section-2.4.1.1">2.4.1.1</a>. 세부 핵심 요구사항 ......................<a href="#page-9">9</a>
+                  <a href="#section-2.4.1.2">2.4.1.2</a>. 세부 부수 요구사항 .....................<a href="#page-10">10</a>
+   <a href="#section-3">3</a>. 적합성 기준 ..................................................<a href="#page-10">10</a>
+   <a href="#section-4">4</a>. 용어 .........................................................<a href="#page-11">11</a>
+   <a href="#section-5">5</a>. HSTS 메커니즘 개요 ...........................................<a href="#page-13">13</a>
+      <a href="#section-5.1">5.1</a>. HSTS 호스트 선언 ........................................<a href="#page-13">13</a>
+      <a href="#section-5.2">5.2</a>. HSTS 정책 ...............................................<a href="#page-13">13</a>
+      <a href="#section-5.3">5.3</a>. 사용자 에이전트에 의한 HSTS 정책 저장 및 유지관리 .......<a href="#page-14">14</a>
+      <a href="#section-5.4">5.4</a>. 사용자 에이전트 HSTS 정책 강제 ..........................<a href="#page-14">14</a>
+   <a href="#section-6">6</a>. 구문 .........................................................<a href="#page-14">14</a>
+      <a href="#section-6.1">6.1</a>. Strict-Transport-Security HTTP 응답 헤더 필드 ............<a href="#page-15">15</a>
+           <a href="#section-6.1.1">6.1.1</a>. max-age 지시자 .................................<a href="#page-16">16</a>
+           <a href="#section-6.1.2">6.1.2</a>. includeSubDomains 지시자 .......................<a href="#page-16">16</a>
+      <a href="#section-6.2">6.2</a>. 예 ......................................................<a href="#page-16">16</a>
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   <a href="#section-7">7</a>. 서버 처리 모델 ...............................................<a href="#page-17">17</a>
+      <a href="#section-7.1">7.1</a>. 보안 전송 기반 HTTP 요청 유형 ...........................<a href="#page-17">17</a>
+      <a href="#section-7.2">7.2</a>. HTTP 요청 유형 ..........................................<a href="#page-18">18</a>
+   <a href="#section-8">8</a>. 사용자 에이전트 처리 모델 ....................................<a href="#page-18">18</a>
+      8.1. Strict-Transport-Security 응답 헤더 필드
+           처리 ....................................................<a href="#page-19">19</a>
+           <a href="#section-8.1.1">8.1.1</a>. HSTS 호스트 기록 - 저장 모델 ....................<a href="#page-20">20</a>
+      <a href="#section-8.2">8.2</a>. 알려진 HSTS 호스트 도메인 이름 매칭 ......................<a href="#page-20">20</a>
+      <a href="#section-8.3">8.3</a>. URI 로딩 및 포트 매핑 ...................................<a href="#page-21">21</a>
+      <a href="#section-8.4">8.4</a>. 보안 전송 설정 오류 .....................................<a href="#page-22">22</a>
+      <a href="#section-8.5">8.5</a>. HTTP-Equiv &lt;Meta&gt; 요소 속성 .............................<a href="#page-22">22</a>
+      <a href="#section-8.6">8.6</a>. Strict-Transport-Security 응답 헤더 필드 누락 ............<a href="#page-23">23</a>
+   <a href="#section-9">9</a>. 유효 요청 URI 구성 ...........................................<a href="#page-23">23</a>
+      <a href="#section-9.1">9.1</a>. ERU 기본 정의 ...........................................<a href="#page-23">23</a>
+      <a href="#section-9.2">9.2</a>. 유효 요청 URI 결정 ......................................<a href="#page-24">24</a>
+           <a href="#section-9.2.1">9.2.1</a>. 유효 요청 URI 예 ...............................<a href="#page-24">24</a>
+   <a href="#section-10">10</a>. 도메인 이름 IDNA-정규화 ....................................<a href="#page-25">25</a>
+   <a href="#section-11">11</a>. 서버 구현 및 배포 조언 .....................................<a href="#page-26">26</a>
+      <a href="#section-11.1">11.1</a>. 비적합 사용자 에이전트 고려사항 .......................<a href="#page-26">26</a>
+      <a href="#section-11.2">11.2</a>. HSTS 정책 만료 시간 고려사항 .........................<a href="#page-26">26</a>
+      11.3. 자체 서명 공개 키 인증서와 함께 HSTS 사용하기
+             .......................................................<a href="#page-27">27</a>
+      <a href="#section-11.4">11.4</a>. includeSubDomains의 영향 ..............................<a href="#page-28">28</a>
+            11.4.1. HSTS 호스트의 대체 포트 또는 하위 도메인에서
+                    비보안 HTTP 서비스를 제공할 때의 고려사항 ......<a href="#page-28">28</a>
+            11.4.2. HSTS 호스트의 하위 도메인에서 웹 애플리케이션을
+                    제공할 때의 고려사항 ...........................<a href="#page-29">29</a>
+   <a href="#section-12">12</a>. 사용자 에이전트 구현 조언 ...................................<a href="#page-30">30</a>
+      <a href="#section-12.1">12.1</a>. 사용자 구제 수단 없음 .................................<a href="#page-30">30</a>
+      <a href="#section-12.2">12.2</a>. 사용자가 선언한 HSTS 정책 ............................<a href="#page-30">30</a>
+      <a href="#section-12.3">12.3</a>. HSTS 사전 로드 목록 ...................................<a href="#page-31">31</a>
+      <a href="#section-12.4">12.4</a>. 혼합 보안 컨텍스트 로드 불허 .........................<a href="#page-31">31</a>
+      <a href="#section-12.5">12.5</a>. HSTS 정책 삭제 .......................................<a href="#page-31">31</a>
+   13. 애플리케이션을 위한 국제화 도메인 이름(IDNA):
+       의존성 및 마이그레이션 .......................................<a href="#page-32">32</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   <a href="#section-14">14</a>. 보안 고려사항 ...............................................<a href="#page-32">32</a>
+      <a href="#section-14.1">14.1</a>. 기반 보안 전송 고려사항 ..............................<a href="#page-32">32</a>
+      <a href="#section-14.2">14.2</a>. 비적합 사용자 에이전트 영향 ..........................<a href="#page-33">33</a>
+      14.3. 오류 없는 보안 전송을 통해서만 HSTS 정책을
+            설정하는 것의 영향 ......................................<a href="#page-33">33</a>
+      <a href="#section-14.4">14.4</a>. includeSubDomains의 필요성 ............................<a href="#page-34">34</a>
+      <a href="#section-14.5">14.5</a>. 서비스 거부 ...........................................<a href="#page-35">35</a>
+      <a href="#section-14.6">14.6</a>. 부트스트랩 MITM 취약점 ...............................<a href="#page-36">36</a>
+      <a href="#section-14.7">14.7</a>. 네트워크 시간 공격 ...................................<a href="#page-37">37</a>
+      14.8. 가짜 루트 CA 인증서 피싱 및 DNS 캐시
+            포이즈닝 공격 ...........................................<a href="#page-37">37</a>
+      <a href="#section-14.9">14.9</a>. HSTS 정책 저장소의 창의적 조작 .......................<a href="#page-37">37</a>
+      <a href="#section-14.10">14.10</a>. 국제화 도메인 이름 ..................................<a href="#page-38">38</a>
+   <a href="#section-15">15</a>. IANA 고려사항 ...............................................<a href="#page-39">39</a>
+   <a href="#section-16">16</a>. 참고문헌 ....................................................<a href="#page-39">39</a>
+      <a href="#section-16.1">16.1</a>. 규범적 참고문헌 ......................................<a href="#page-39">39</a>
+      <a href="#section-16.2">16.2</a>. 정보성 참고문헌 ......................................<a href="#page-40">40</a>
+   <a href="#appendix-A">부록 A</a>. 설계 결정 참고 사항 ......................................<a href="#page-44">44</a>
+   <a href="#appendix-B">부록 B</a>. HSTS 정책과 동일 출처
+               정책의 차이 ..........................................<a href="#page-45">45</a>
+   <a href="#appendix-C">부록 C</a>. 감사의 말 ...............................................<a href="#page-46">46</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   HTTP [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]는 다양한 전송 위에서 사용될 수 있으며, 일반적으로는
+   Transmission Control Protocol(TCP)을 사용한다. 그러나 TCP는 채널
+   무결성 보호, 기밀성 또는 안전한 호스트 식별을 제공하지 않는다.
+   따라서 Secure Sockets Layer(SSL) 프로토콜 [<a href="./rfc6101" title="&quot;The Secure Sockets Layer (SSL) Protocol Version 3.0&quot;">RFC6101</a>] 및 그
+   후속인 Transport Layer Security(TLS) [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]가 채널 지향
+   보안을 제공하기 위해 개발되었으며, 일반적으로 애플리케이션
+   프로토콜과 TCP 사이에 계층화된다. [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>]은 HTTP가 TLS 위에
+   계층화되는 방식을 명시하고 "https"의 Uniform Resource Identifier
+   (URI) 스킴을 정의한다. 그러나 실제로 HTTP 사용자 에이전트(UA)는
+   서버와의 협상 및 사용자 선호의 조합에 따라 일반적으로 TLS 또는
+   SSL3 중 하나를 사용한다.
+
+   UA는 웹 리소스와의 상호작용 특성과 관련하여 다양한 로컬 보안
+   정책을 적용하는데, 이는 부분적으로 주어진 웹 리소스의 호스트와
+   HTTP를 사용해 통신하는지 또는 보안 전송 기반 HTTP를 사용해
+   통신하는지에 따라 달라진다. 예를 들어 쿠키([<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>])에는 Secure
+   플래그가 지정될 수 있다. UA는 이러한 Secure 쿠키를 지정된
+   호스트로 보안 전송을 통해서만 보내야 한다. 이는 다른 규칙의
+   적용을 받기는 하지만, 전송 방식과 무관하게 호스트로 반환되는
+   비-Secure 쿠키와 대조된다.
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   UA는 일반적으로 TLS 서버 인증서 신뢰 체인을 검증할 수 없거나,
+   TLS 서버 인증서가 만료되었거나, TLS 호스트의 도메인 이름이 TLS
+   서버 인증서에 잘못 표시된 것처럼 보이는 경우 등 보안 연결 설정
+   문제를 사용자에게 알린다(<a href="./rfc2818#section-3.1">[RFC2818]의 섹션&nbsp;3.1</a> 참조). 종종 UA는
+   이러한 문제가 있는 상황에서도 사용자가 웹 리소스의 호스트와 계속
+   상호작용할지 선택할 수 있게 한다. 이 동작은 때때로 보안을
+   "클릭하여 통과"하는 것[<a href="#ref-GoodDhamijaEtAl05">GoodDhamijaEtAl05</a>]
+   [<a href="#ref-SunshineEgelmanEtAl09">SunshineEgelmanEtAl09</a>]이라고 불리며, 따라서 "클릭 통과
+   불안전성"으로 설명할 수 있다.
+
+   클릭 통과 불안전성으로 인해 가능해지는 핵심 취약점은 웹 리소스가
+   사용자의 세션을 관리하기 위해 사용할 수 있는 쿠키가 유출되는
+   것이다. 여기서 위협은 공격자가 쿠키를 획득한 뒤 사용자를
+   가장하여 합법적인 웹 리소스와 상호작용할 수 있다는 점이다.
+
+   Jackson과 Barth는 [<a href="#ref-ForceHTTPS">ForceHTTPS</a>]에서 웹 리소스가 UA와 해당 웹
+   리소스 간의 모든 상호작용이 안전하게 수행되어야 하며, 보안 전송
+   세션을 설정하는 데 문제가 있으면 이를 치명적인 것으로 취급하고
+   직접적인 사용자 구제 수단을 제공하지 않도록 선언할 수 있는
+   접근법을 제안했다. 목적은 클릭 통과 불안전성을 방지하고 다른
+   잠재적 위협에 대응하는 것이다.
+
+   이 명세는 [<a href="#ref-ForceHTTPS">ForceHTTPS</a>]에서 제안된 접근법을 구현하고 정제한다.
+   예를 들어 웹 리소스의 호스트에서 UA로 정책을 전달하기 위해 쿠키를
+   사용하는 대신, 이 목적을 위한 HTTP 응답 헤더 필드를 정의한다.
+   또한 웹 리소스의 호스트는 자신의 정책이 호스트 이름을 루트로 하는
+   전체 도메인 이름 하위 트리에 적용되도록 선언할 수 있다. 이를 통해
+   HTTP Strict Transport Security(HSTS)는 주어진 웹 리소스의 호스트
+   이름의 모든 하위 도메인에 적용되는 이른바 "도메인 쿠키"를 보호할
+   수 있다.
+
+   이 명세는 정책이 "전체 호스트" 기준으로 적용된다는 점에서
+   [<a href="#ref-JacksonBarth2008">JacksonBarth2008</a>]의 개념도 통합한다. 즉, 정책은 발행 호스트의
+   모든 TCP 포트 위의 HTTP(에만)에 적용된다.
+
+   이 명세가 정의하는 정책은 "The Web Origin Concept" [<a href="./rfc6454" title="&quot;The Web Origin Concept&quot;">RFC6454</a>]에
+   정의된 "동일 출처 정책"과 명확히 다르다는 점에 유의하라. 이러한
+   차이는 <a href="#appendix-B">부록 B</a>에 요약되어 있다.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  이 명세의 구성</span>
+
+   이 명세는 HSTS의 사용 사례, 정책 효과, 위협 모델 및 요구사항에
+   대한 개요(<a href="#section-2">섹션 2</a>)로 시작한다. 그런 다음 <a href="#section-3">섹션 3</a>은 적합성
+   요구사항을 정의한다. <a href="#section-4">섹션 4</a>는 이 문서와 관련된 용어를 정의한다.
+   HSTS 메커니즘 자체는 섹션 <a href="#section-5">5</a>부터 <a href="#section-15">15</a>까지에서 정식으로 명시된다.
+
+<span class="h3"><a class="selflink" id="section-1.2" href="#section-1.2">1.2</a>.  문서 규약</span>
+
+   참고:  이는 독자를 위한 참고 사항이다. 이는 명시적으로 염두에
+          두거나 고려해야 하는 사항이다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  개요</span>
+
+   이 섹션은 사용 사례를 논의하고 HSTS 정책을 요약하며, 이어서
+   위협 모델, 대응되지 않는 위협 및 도출된 요구사항을 논의한다.
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  사용 사례</span>
+
+   상위 수준의 사용 사례는 다음의 조합이다.
+
+   o  웹 브라우저 사용자는 다양한 웹 사이트(일부는 임의의 사이트,
+      일부는 알려진 사이트)와 안전한 방식으로 상호작용하기를 원한다.
+
+   o  웹 사이트 배포자는 자신과 사용자의 이익을 위해 자신의 사이트를
+      명시적으로 안전한 방식으로 제공하기를 원한다.
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a>.  HTTP Strict Transport Security 정책 효과</span>
+
+   HSTS 정책을 보유한 웹 리소스 호스트(HSTS 호스트라고 함)와의
+   상호작용에서 적합한 UA가 적용하는 HSTS 정책의 효과는 다음과 같이
+   요약된다.
+
+   1.  UA는 HSTS 호스트에 대한 비보안 URI 참조를 역참조하기 전에
+       보안 URI 참조로 변환한다.
+
+   2.  UA는 모든 보안 전송 오류 또는 경고가 발생할 때 모든 보안 전송
+       연결 시도를 종료한다.
+
+<span class="h3"><a class="selflink" id="section-2.3" href="#section-2.3">2.3</a>.  위협 모델</span>
+
+   HSTS는 세 가지 위협 범주, 즉 수동 네트워크 공격자, 능동 네트워크
+   공격자 및 불완전한 웹 개발자와 관련된다. 그러나 이는 다른 두
+   범주의 위협, 즉 피싱과 악성코드에 대한 해결책은 명시적으로
+   아니다. 대응되는 위협과 대응되지 않는 위협은 아래에서 간단히
+   논의한다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   독자는 세부 사항과 관련 인용을 위해 [<a href="#ref-ForceHTTPS">ForceHTTPS</a>]의 섹션 2를
+   참조할 수 있다.
+
+<span class="h4"><a class="selflink" id="section-2.3.1" href="#section-2.3.1">2.3.1</a>.  대응되는 위협</span>
+
+<span class="h5"><a class="selflink" id="section-2.3.1.1" href="#section-2.3.1.1">2.3.1.1</a>.  수동 네트워크 공격자</span>
+
+   사용자가 로컬 무선 네트워크(예: 802.11 기반 무선 LAN)에서 웹을
+   탐색할 때, 인근 공격자는 로컬 무선 네트워크 자체가 보안 처리되어
+   있는지 여부와 관계없이 HTTP와 같은 사용자의 암호화되지 않은
+   Internet Protocol 기반 연결을 도청할 수 있다 [<a href="#ref-BeckTews09">BeckTews09</a>].
+   자유롭게 구할 수 있는 무선 스니핑 도구 모음(예: [<a href="#ref-Aircrack-ng">Aircrack-ng</a>])은
+   로컬 무선 네트워크가 안전하게 운영되고 있더라도 이러한 수동 도청
+   공격을 가능하게 한다. 이러한 도구를 사용하는 수동 네트워크
+   공격자는 인증 자격 증명을 포함하는 쿠키를 획득하여 세션
+   식별자/쿠키를 훔치고 사용자의 웹 세션을 탈취할 수 있다
+   [<a href="#ref-ForceHTTPS">ForceHTTPS</a>]. 예를 들어 Firesheep(웹 브라우저 확장) [<a href="#ref-Firesheep">Firesheep</a>]과
+   같이 그 사용자가 다양한 웹 애플리케이션에 대한 다른 로컬 사용자의
+   세션 쿠키를 획득할 수 있게 하는 널리 사용 가능한 도구가 존재한다.
+
+   이러한 위협을 완화하기 위해 일부 웹 사이트는 "https" 스킴으로
+   구성된 URI [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>]를 통해 신호되는 것과 같은 종단 간 보안
+   전송을 사용한 접근을 지원하지만, 일반적으로 강제하지는 않는다.
+   이는 사용자가 보안 전송을 사용해 이러한 서비스에 접근하면 수동
+   네트워크 공격자로부터 보호된다고 믿게 만들 수 있다. 안타깝게도
+   실제 배포에서는 그렇지 않은 경우가 많다. 세션 식별자가 보안되지
+   않은 전송으로 제공되는 서비스 버전과의 상호운용성을 허용하기 위해
+   비-Secure 쿠키에 저장되는 경우가 많기 때문이다("Secure 쿠키"는
+   "Secure" 속성 [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>]을 포함하는 쿠키이다). 예를 들어 웹 사이트
+   (예컨대 이메일 서비스)의 세션 식별자가 비-Secure 쿠키에 저장되어
+   있으면, 사용자의 UA가 해당 사이트에 단 한 번의 비보안 HTTP 요청을
+   하는 것만으로도 공격자가 사용자의 세션을 탈취할 수 있다.
+
+<span class="h5"><a class="selflink" id="section-2.3.1.2" href="#section-2.3.1.2">2.3.1.2</a>.  능동 네트워크 공격자</span>
+
+   단호한 공격자는 사용자의 DNS 서버를 가장하거나, 무선 네트워크에서
+   네트워크 프레임을 스푸핑하거나 비슷한 이름의 악성 쌍둥이 접근
+   지점을 제공함으로써 능동 공격을 수행할 수 있다. 사용자가 무선 홈
+   라우터 뒤에 있는 경우, 공격자는 기본 비밀번호와 기타 취약점을
+   사용해 라우터를 재구성하려고 시도할 수 있다. 은행과 같은 일부
+   사이트는 이러한 능동 공격자로부터 자신과 사용자를 보호하기 위해
+   종단 간 보안 전송에 의존한다. 안타깝게도 브라우저는 보안 전송을
+   잘못 배포한 사이트, 예를 들어 자체 인증서를 생성하고 자체 서명한
+   사이트(또한 인증 기관(CA) 인증서를 사용자의 브라우저에 배포하지
+   않는 경우)를 사용 가능하게 하기 위해 사용자가 이러한 보호를 쉽게
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   벗어날 수 있게 한다.
+
+<span class="h5"><a class="selflink" id="section-2.3.1.3" href="#section-2.3.1.3">2.3.1.3</a>.  웹 사이트 개발 및 배포 버그</span>
+
+   다른 측면에서는 균일하게 안전한 사이트(즉, 모든 콘텐츠가 "https"
+   URI를 통해 구체화되는 사이트)의 보안은 계단식 스타일 시트나 SWF
+   (Shockwave Flash) 영화를 비보안 연결을 통해 로드하는 것과 같은
+   단순한 실수를 능동 공격자가 악용함으로써 완전히 손상될 수 있다.
+   계단식 스타일 시트와 SWF 영화는 모두 삽입된 페이지를 스크립트할 수
+   있으며, 이는 많은 웹 개발자를 놀라게 한다. 또한 일부 브라우저는
+   SWF 파일이 비보안 연결을 통해 삽입될 때 이른바 "혼합 콘텐츠 경고"를
+   발행하지 않는다. 사이트 개발자가 로그인 페이지의 "혼합 콘텐츠"를
+   주의 깊게 검토하더라도, 전체 사이트 어디든 단 하나의 비보안 삽입이
+   있으면 로그인 페이지의 보안이 손상된다. 공격자가 비보안으로 로드된
+   다른 사이트 페이지에 코드(예: 스크립트)를 삽입함으로써 로그인
+   페이지를 스크립트(즉, 제어)할 수 있기 때문이다.
+
+   참고:  위에서 사용된 "혼합 콘텐츠"([<a href="#ref-W3C.REC-wsc-ui-20100812">W3C.REC-wsc-ui-20100812</a>]의
+          섹션 5.3도 참조)는 이 명세에서 "혼합 보안 컨텍스트"라고
+          부르는 개념을 가리키며, XML 및 HTML과 같은 마크업 언어
+          맥락에서 사용되는 동일한 "혼합 콘텐츠" 용어와 혼동해서는
+          안 된다.
+
+<span class="h4"><a class="selflink" id="section-2.3.2" href="#section-2.3.2">2.3.2</a>.  대응되지 않는 위협</span>
+
+<span class="h5"><a class="selflink" id="section-2.3.2.1" href="#section-2.3.2.1">2.3.2.1</a>.  피싱</span>
+
+   피싱 공격은 공격자가 실제 사이트와 다른 도메인에 위치한 가짜
+   사이트를 호스팅하여 사용자에게 인증 자격 증명을 요구할 때 발생하며,
+   예를 들어 이메일 메시지의 링크를 보내 가짜 사이트로 트래픽을
+   유도할 수 있다. 사용자는 실제 사이트와 가짜 사이트를 구별하기
+   어렵기 때문에 피싱 공격은 매우 효과적일 수 있다. HSTS는 피싱 자체에
+   대한 방어가 아니다. 오히려 브라우저에 세션 무결성과 장기 인증
+   토큰을 보호하도록 지시함으로써 기존의 많은 피싱 방어를 보완한다
+   [<a href="#ref-ForceHTTPS">ForceHTTPS</a>].
+
+<span class="h5"><a class="selflink" id="section-2.3.2.2" href="#section-2.3.2.2">2.3.2.2</a>.  악성코드 및 브라우저 취약점</span>
+
+   HSTS는 브라우저 보안 메커니즘으로 구현되기 때문에 세션을 보호하기
+   위해 사용자의 시스템 신뢰성에 의존한다. 사용자의 시스템에서
+   실행되는 악성 코드는 HSTS 사용 여부와 관계없이 브라우저 세션을
+   손상시킬 수 있다.
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-2.4" href="#section-2.4">2.4</a>.  요구사항</span>
+
+   이 섹션은 위에서 논의한 사용 사례와 위협에서 도출된 다양한
+   요구사항을 식별하고 열거하며, HTTP Strict Transport Security가
+   대응하는 세부 핵심 요구사항과 직접 대응하지 않는 부수 요구사항도
+   나열한다.
+
+<span class="h4"><a class="selflink" id="section-2.4.1" href="#section-2.4.1">2.4.1</a>.  전체 요구사항</span>
+
+   o  웹 브라우저 사용자와 웹 사이트 배포자를 위해 수동 및 능동
+      네트워크 공격자, 웹 사이트 개발 및 배포 버그, 그리고 안전하지
+      않은 사용자 동작에서 비롯되는 위험을 최소화한다.
+
+<span class="h5"><a class="selflink" id="section-2.4.1.1" href="#section-2.4.1.1">2.4.1.1</a>.  세부 핵심 요구사항</span>
+
+   이러한 핵심 요구사항은 전체 요구사항에서 도출되며 이 명세에 의해
+   대응된다.
+
+   1.  웹 사이트는 UA에게 엄격한 보안 정책을 사용하여 접근되어야
+       한다고 선언할 수 있어야 한다.
+
+   2.  웹 사이트는 자신에게 비보안으로 접속하는 UA에게 보안 방식으로
+       접속하도록 지시할 수 있어야 한다.
+
+   3.  UA는 엄격한 보안 정책 사용을 신호하는 웹 사이트에 대한 지속
+       데이터를, 웹 사이트가 선언한 기간 동안 보존해야 한다. 또한
+       웹 사이트가 정보를 갱신할 수 있도록 UA는 "가장 최신"의 엄격한
+       보안 정책 정보를 캐시해야 한다.
+
+   4.  UA는 보안 정책이 활성화된 웹 사이트에 대해 모든 비보안 UA
+       "http" URI 로드를 "https" 보안 스킴을 사용하도록 다시 작성해야
+       한다.
+
+   5.  웹 사이트 관리자는 엄격한 보안 정책이 활성화된 상위 수준
+       도메인의 하위 도메인에 엄격한 보안 정책 적용을 신호할 수
+       있어야 하며, UA는 그러한 정책을 강제해야 한다.
+
+       예를 들어 example.com과 foo.example.com은 모두
+       bar.foo.example.com에 대한 정책을 설정할 수 있다.
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                         [Page 9]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   6.  UA는 엄격한 보안 정책이 활성화된 도메인이 동등한 수준의 도메인
+       및/또는 상위 수준 도메인에 보안 정책을 적용하는 것을 방지해야
+       한다.
+
+       예를 들어 bar.foo.example.com과 foo.example.com은 어느 쪽도
+       example.com에 대한 정책을 설정할 수 없으며, bar.foo.example.com은
+       foo.example.com에 대한 정책도 설정할 수 없다. 또한
+       foo.example.com은 sibling.example.com에 대한 정책을 설정할 수
+       없다.
+
+   7.  UA는 사용자가 보안 경고를 "클릭하여 통과"하는 것을 방지해야
+       한다. 보안 전송 예외가 발생할 때 연결 시도를 중단하는 것은
+       허용된다. <a href="#section-12.1">섹션 12.1</a>("사용자 구제 수단 없음")도 참조하라.
+
+   참고:  위의 첫 번째 핵심 요구사항을 균일하게 안전하게 충족하는
+          수단은 이 명세에서 구체적으로 다루지 않는다(<a href="#section-14.6">섹션 14.6</a>
+          ("부트스트랩 MITM 취약점") 참조). 이는 이 명세의 향후 개정판
+          또는 다른 명세에서 다루어질 수 있다. 또한 UA 구현이 첫 번째
+          핵심 요구사항을 더 완전하게 충족할 수 있는 수단이 있다는
+          점에 유의하라. <a href="#section-12">섹션 12</a>("사용자 에이전트 구현 조언")를
+          참조하라.
+
+<span class="h5"><a class="selflink" id="section-2.4.1.2" href="#section-2.4.1.2">2.4.1.2</a>.  세부 부수 요구사항</span>
+
+   이러한 부수 요구사항도 전체 요구사항에서 도출된다. 이들은 이
+   명세에서 규범적으로 다루어지지는 않지만, 이러한 요구사항을
+   충족하는 것이 복잡할 수 있음에도 UA 구현자가 재량에 따라 충족할 수
+   있다.
+
+   1.  "혼합 보안 컨텍스트" 로드를 허용하지 않는다(<a href="#section-2.3.1.3">섹션 2.3.1.3</a> 참조).
+
+   2.  사이트가 HSTS 정책을 신호하는지 여부와 관계없이, 엄격한 보안
+       정책이 활성화된 웹 사이트에 대한 사용자 선언을 용이하게 한다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  적합성 기준</span>
+
+   이 명세는 호스트와 사용자 에이전트를 대상으로 작성되었다.
+
+   적합한 호스트는 이 명세에 나열된 요구사항 중 호스트에 적용되는
+   모든 요구사항을 구현한 호스트이다.
+
+   적합한 사용자 에이전트는 이 명세에 나열된 요구사항 중 사용자
+   에이전트에 적용되는 모든 요구사항을 구현한 사용자 에이전트이다.
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 10]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   이 문서의 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", 그리고
+   "OPTIONAL"은 [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]에 설명된 대로 해석되어야 한다.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  용어</span>
+
+   용어는 이 섹션에서 정의된다.
+
+   ASCII 대소문자 비구분 비교:
+
+      두 문자열을 정확히, 코드포인트 단위로 비교하되, U+0041 ..
+      U+005A 범위의 문자(즉 LATIN CAPITAL LETTER A부터 LATIN CAPITAL
+      LETTER Z까지)와 U+0061 .. U+007A 범위의 대응 문자(즉 LATIN SMALL
+      LETTER A부터 LATIN SMALL LETTER Z까지)도 서로 일치하는 것으로
+      간주하는 것을 의미한다. 자세한 내용은 [<a href="#ref-Unicode" title="&quot;The Unicode Standard&quot;">Unicode</a>]를 참조하라.
+
+   codepoint:
+
+      Code Point의 구어적 축약형이며, Unicode 코드 공간의 임의 값,
+      즉 0부터 10FFFF(hex)까지의 정수 범위를 말한다 [<a href="#ref-Unicode" title="&quot;The Unicode Standard&quot;">Unicode</a>].
+
+   domain name:
+
+      "DNS 이름"이라고도 하며, [<a href="./rfc1035" title="&quot;Domain names - implementation and specification&quot;">RFC1035</a>]에서는 DNS 프로토콜 자체
+      (및 그 구현) 외부에서 점으로 구분된 일련의 레이블로 표현되는
+      것으로 정의된다. 예: "example.com" 또는 "yet.another.example.org".
+      이 명세의 맥락에서 도메인 이름은 [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]의 "부록 A.
+      URI에 대한 수집된 ABNF"에 있는 reg-name 생성 규칙을 만족하는
+      URI의 부분과, <a href="./rfc2616#section-14.23">[RFC2616]의 섹션&nbsp;14.23</a>에 있는 Host HTTP 헤더
+      필드 생성 규칙의 host 컴포넌트에 나타난다.
+
+      참고:  실제 URI 인스턴스에 나타나며 앞서 언급한 생성 규칙
+             컴포넌트와 일치하는 도메인 이름은 정규화된 전체 도메인
+             이름일 수도 있고 아닐 수도 있다.
+
+   domain name label:
+
+      도메인 이름에서 "점 사이"에 나타나는 부분이다. 즉
+      "foo.example.com"을 고려하면 "foo", "example", "com"이 모두
+      도메인 이름 레이블이다.
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 11]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   Effective Request URI:
+
+      주어진 HTTP 요청을 수신한 HTTP 호스트가 추론할 수 있는, 대상
+      리소스를 식별하는 URI이다. HTTP 요청은 종종 대상 리소스를
+      식별하는 완전한 "절대" URI를 포함하지 않기 때문에 이러한 추론이
+      필요하다. <a href="#section-9">섹션 9</a>("유효 요청 URI 구성")를 참조하라.
+
+   HTTP Strict Transport Security:
+
+      이 명세가 정의하는 UA 및 서버 측 보안 정책의 결합 전체에 대한
+      이름이다.
+
+   HTTP Strict Transport Security Host:
+
+      HSTS 정책의 HTTP 서버 측 측면을 구현하는 적합한 호스트이다. 이는
+      HSTS 호스트가 보안 전송을 통해 전송되는 HTTP 응답 메시지에서
+      "Strict-Transport-Security" HTTP 응답 헤더 필드를 반환함을
+      의미한다.
+
+   HTTP Strict Transport Security Policy:
+
+      이 명세에서 정의되는 동작의 결합된 전체 UA 및 서버 측 측면의
+      이름이다.
+
+   HSTS:
+
+      HTTP Strict Transport Security를 참조하라.
+
+   HSTS Host:
+
+      HTTP Strict Transport Security Host를 참조하라.
+
+   HSTS Policy:
+
+      HTTP Strict Transport Security Policy를 참조하라.
+
+   Known HSTS Host:
+
+      UA가 HSTS 정책을 적용하고 있는 HSTS 호스트이다. 즉 UA가 이
+      호스트를 Known HSTS Host로 기록한 것이다. 자세한 사항은
+      <a href="#section-8.1.1">섹션 8.1.1</a>("HSTS 호스트 기록 - 저장 모델")을 참조하라.
+
+   Local policy:
+
+      배포자가 지정하고 종종 구성 설정으로 나타나는 정책 규칙으로
+      구성된다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 12]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   MITM:
+
+      "man in the middle"의 약어이다. [<a href="./rfc4949" title="&quot;Internet Security Glossary, Version 2&quot;">RFC4949</a>]의 "man-in-the-middle
+      attack"을 참조하라.
+
+   Request URI:
+
+      UA가 HTTP 요청 메시지를 발행하도록 하기 위해 사용되는 URI이다.
+      "Effective Request URI"도 참조하라.
+
+   UA:
+
+      "user agent"의 약어이다. 이 명세의 목적상 UA는 일반적으로
+      사용자가 능동적으로 조작하는 HTTP 클라이언트 애플리케이션이다
+      [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>].
+
+   unknown HSTS Host:
+
+      사용자 에이전트가 기록하지 않은 HSTS 호스트이다.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  HSTS 메커니즘 개요</span>
+
+   이 섹션은 HSTS 호스트가 자신의 HSTS 정책을 UA에 전달하는 메커니즘과
+   UA가 HSTS 호스트로부터 수신한 HSTS 정책을 처리하는 방식을 개괄한다.
+   메커니즘의 세부 사항은 섹션 <a href="#section-6">6</a>부터 <a href="#section-15">15</a>까지에 명시된다.
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>.  HSTS 호스트 선언</span>
+
+   HTTP 호스트는 보안 전송(예: TLS)을 통해 Strict-Transport-Security
+   HTTP 응답 헤더 필드로 표현되고 전달되는 HSTS 정책을 UA에 발행함으로써
+   자신을 HSTS 호스트로 선언한다. 적합한 UA가 이 헤더를 오류 없이
+   수신하고 처리하면, UA는 해당 호스트를 Known HSTS Host로 간주한다.
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  HSTS 정책</span>
+
+   HSTS 정책은 UA가 Known HSTS Host와 보안 전송을 통해서만 통신하도록
+   지시하고 정책 보존 시간 기간을 지정한다.
+
+   HSTS 정책은 URI 참조, 사용자 입력(예: "location bar"를 통한 입력)
+   또는 기타 정보에 대한 UA 처리를 명시적으로 재정의한다. HSTS 정책이
+   없었다면 이러한 정보는 UA가 Known HSTS Host와 비보안으로 통신하도록
+   만들 수도 있다.
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 13]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   HSTS 정책은 선택적 지시자 -- includeSubDomains -- 를 포함할 수
+   있으며, 이는 이 HSTS 정책이 Known HSTS Host 도메인 이름의 하위
+   도메인인 모든 호스트에도 적용됨을 지정한다.
+
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  사용자 에이전트에 의한 HSTS 정책 저장 및 유지관리</span>
+
+   UA는 발행 HSTS 호스트의 도메인 이름만을 기준으로 HSTS 정책을
+   저장하고 색인화한다.
+
+   이는 UA가 주어진 HSTS 호스트의 HSTS 정책을, 해당 HSTS 호스트
+   도메인 이름의 상위 도메인 또는 하위 도메인인 다른 HSTS 호스트가
+   발행한 HSTS 정책과 별도로 유지한다는 의미이다. 오직 해당 HSTS
+   호스트만이 자신이 발행한 HSTS 정책을 갱신하거나 삭제되도록 할 수
+   있다. 이는 정책 시간 기간 및 하위 도메인 적용 가능성에 대한 새
+   값을 포함하는 Strict-Transport-Security HTTP 응답 헤더 필드를 UA에
+   전송함으로써 수행된다. 따라서 UA는 HSTS 호스트를 대신하여 "가장
+   최신"의 HSTS 정책 정보를 캐시한다. 시간 기간을 0으로 지정하면 UA에
+   해당 HSTS 호스트에 대한 HSTS 정책(명시된 includeSubDomains 지시자를
+   포함)을 삭제하라고 신호한다. 자세한 내용은 <a href="#section-8.1">섹션 8.1</a>
+   ("Strict-Transport-Security 응답 헤더 필드 처리")을 참조하라. 또한
+   <a href="#section-6.2">섹션 6.2</a>는 Strict-Transport-Security HTTP 응답 헤더 필드의 예를
+   제시한다.
+
+<span class="h3"><a class="selflink" id="section-5.4" href="#section-5.4">5.4</a>.  사용자 에이전트 HSTS 정책 강제</span>
+
+   주어진 호스트에 대한 HTTP 연결을 설정할 때, 어떤 방식으로
+   시작되었든 UA는 Known HSTS Host 캐시를 검사하여 주어진 호스트
+   도메인 이름의 상위 도메인 이름을 가진 항목이 있는지 확인한다.
+   항목이 발견되고, 그중 includeSubDomains 지시자가 명시된 항목이
+   있다면 HSTS 정책은 주어진 호스트에 적용된다. 그렇지 않으면 주어진
+   호스트 자체가 UA에 HSTS 호스트로 알려져 있는 경우에만 HSTS 정책이
+   주어진 호스트에 적용된다. 자세한 내용은 <a href="#section-8.3">섹션 8.3</a>("URI 로딩 및
+   포트 매핑")을 참조하라.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  구문</span>
+
+   이 섹션은 Strict-Transport-Security HTTP 응답 헤더 필드와 그
+   지시자의 구문을 정의하고 몇 가지 예를 제시한다.
+
+   <a href="#section-7">섹션 7</a>("서버 처리 모델")은 이어서 호스트가 이 헤더 필드를 사용하여
+   자신의 HSTS 정책을 선언하는 방식을 자세히 설명하고, <a href="#section-8">섹션 8</a>("사용자
+   에이전트 처리 모델")은 사용자 에이전트가 헤더 필드를 처리하고 HSTS
+   정책을 적용하는 방식을 자세히 설명한다.
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 14]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  Strict-Transport-Security HTTP 응답 헤더 필드</span>
+
+   Strict-Transport-Security HTTP 응답 헤더 필드(STS 헤더 필드)는 이
+   헤더 필드를 포함하는 응답 메시지를 내보내는 호스트와 관련하여 UA가
+   HSTS 정책을 MUST 강제해야 함을 UA에 나타낸다.
+
+   STS 헤더 필드에 대한 ABNF(Augmented Backus-Naur Form) 구문은 아래에
+   제시되어 있다. 이는 <a href="./rfc2616#section-2">[RFC2616]의 섹션&nbsp;2</a>에 정의된 Generic Grammar
+   ("implied linear whitespace", 즉 "implied *LWS"의 개념 포함)에 기반한다.
+
+     Strict-Transport-Security = "Strict-Transport-Security" ":"
+                                 [ directive ]  *( ";" [ directive ] )
+
+     directive                 = directive-name [ "=" directive-value ]
+     directive-name            = token
+     directive-value           = token | quoted-string
+
+   여기서:
+
+     token          = &lt;<a href="./rfc2616#section-2.2">[RFC2616], 섹션&nbsp;2.2</a>에 정의된 token&gt;
+     quoted-string  = &lt;<a href="./rfc2616#section-2.2">[RFC2616], 섹션&nbsp;2.2</a>에 정의된 quoted-string&gt;
+
+   이 명세에서 정의하는 두 지시자는 아래에 설명되어 있다. 지시자에
+   대한 전체 요구사항은 다음과 같다.
+
+   1.  지시자가 나타나는 순서는 중요하지 않다.
+
+   2.  모든 지시자는 STS 헤더 필드 안에 한 번만 나타나야 한다(MUST).
+       지시자는 그 정의에서 규정한 바에 따라 선택적이거나 필수이다.
+
+   3.  지시자 이름은 대소문자를 구분하지 않는다.
+
+   4.  UA는 이 명세에서 정의한 구문을 따르지 않는 지시자나 기타 헤더
+       필드 값 데이터를 포함하는 모든 STS 헤더 필드를 MUST 무시해야
+       한다.
+
+   5.  STS 헤더 필드가 UA가 인식하지 못하는 지시자를 포함하는 경우,
+       UA는 인식하지 못한 지시자를 MUST 무시해야 하며, STS 헤더 필드가
+       그 밖에는 위 요구사항(1부터 4까지)을 만족한다면 UA는 인식한
+       지시자를 MUST 처리해야 한다.
+
+   STS 헤더 필드의 의미적 기능을 확장하는 추가 지시자는 다른
+   명세에서 정의될 수 있으며, 그때 이들을 위한 레지스트리(IETF Review
+   [<a href="./rfc5226" title="">RFC5226</a>]의 IANA 정책 정의를 가짐)가 정의될 수 있다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 15]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   참고:  이러한 향후 지시자는 이 명세만을 구현하는 UA뿐 아니라 일반적인
+          비적합 UA에서도 무시될 것이다. 추가 논의는 <a href="#section-14.2">섹션 14.2</a>
+          ("비적합 사용자 에이전트 영향")를 참조하라.
+
+<span class="h4"><a class="selflink" id="section-6.1.1" href="#section-6.1.1">6.1.1</a>.  max-age 지시자</span>
+
+   REQUIRED "max-age" 지시자는 STS 헤더 필드 수신 후 UA가 해당
+   호스트(메시지를 받은 대상)를 Known HSTS Host로 간주하는 초 수를
+   지정한다. <a href="#section-8.1.1">섹션 8.1.1</a>("HSTS 호스트 기록 - 저장 모델")도 참조하라.
+   delta-seconds 생성 규칙은 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 명시되어 있다.
+
+   max-age 지시자의 REQUIRED 값 구문(필요한 경우 quoted-string
+   이스케이프 해제 후)은 다음과 같이 정의된다.
+
+    max-age-value = delta-seconds
+
+    delta-seconds = &lt;<a href="./rfc2616#section-3.3.2">[RFC2616], 섹션&nbsp;3.3.2</a>에 정의된 1*DIGIT&gt;
+
+   참고:  max-age 값이 0인 경우(즉, "max-age=0") UA에게 해당 호스트를
+          Known HSTS Host로 간주하는 것을 중지하라고 신호하며, 이때
+          해당 HSTS Host에 대해 includeSubDomains 지시자가 명시되어
+          있었다면 그것도 포함된다. <a href="#section-8.1">섹션 8.1</a>
+          ("Strict-Transport-Security 응답 헤더 필드 처리")도 참조하라.
+
+<span class="h4"><a class="selflink" id="section-6.1.2" href="#section-6.1.2">6.1.2</a>.  includeSubDomains 지시자</span>
+
+   OPTIONAL "includeSubDomains" 지시자는 값이 없는 지시자로, 존재하는
+   경우(즉, "명시된" 경우) HSTS 정책이 이 HSTS Host뿐 아니라 해당
+   호스트 도메인 이름의 모든 하위 도메인에도 적용됨을 UA에 신호한다.
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  예</span>
+
+   아래 HSTS 헤더 필드는 HSTS 정책이 1년 동안 유효하게 유지되어야
+   하며(1년은 대략 31536000초), 그 정책이 이를 발행한 HSTS Host의
+   도메인에만 적용됨을 규정한다.
+
+     Strict-Transport-Security: max-age=31536000
+
+   아래 HSTS 헤더 필드는 HSTS 정책이 약 6개월 동안 유효하게 유지되어야
+   하며, 그 정책이 발행 HSTS Host의 도메인과 그 모든 하위 도메인에
+   적용됨을 규정한다.
+
+     Strict-Transport-Security: max-age=15768000 ; includeSubDomains
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 16]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   max-age 지시자 값은 선택적으로 따옴표로 감쌀 수 있다.
+
+     Strict-Transport-Security: max-age="31536000"
+
+   아래 HSTS 헤더 필드는 UA가 이 헤더 필드를 보낸 HSTS Host와 관련된
+   전체 HSTS 정책을 삭제해야 함을 나타낸다.
+
+     Strict-Transport-Security: max-age=0
+
+   아래 HSTS 헤더 필드는 바로 위의 헤더 필드와 정확히 동일한 효과를
+   갖는다. max-age가 0일 때 HSTS 헤더 필드에 includeSubDomains 지시자가
+   존재해도 무시되기 때문이다.
+
+     Strict-Transport-Security: max-age=0; includeSubDomains
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  서버 처리 모델</span>
+
+   이 섹션은 HSTS Host가 구현하는 처리 모델을 설명한다. 이 모델은
+   두 측면으로 구성된다. 첫 번째는 보안 전송(TLS [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>] 또는 SSL
+   [<a href="./rfc6101" title="&quot;The Secure Sockets Layer (SSL) Protocol Version 3.0&quot;">RFC6101</a>]; <a href="#section-14.1">섹션 14.1</a>("기반 보안 전송 고려사항")도 참조)을
+   통해 수신한 HTTP 요청 메시지의 처리 규칙이고, 두 번째는 TCP와 같은
+   비보안 전송을 통해 수신한 HTTP 요청 메시지의 처리 규칙이다.
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  보안 전송 기반 HTTP 요청 유형</span>
+
+   보안 전송을 통해 전달된 HTTP 요청에 응답할 때, HSTS Host는 위
+   <a href="#section-6.1">섹션 6.1</a>("Strict-Transport-Security HTTP 응답 헤더 필드")에
+   명시된 문법을 MUST 만족하는 STS 헤더 필드를 응답 메시지에 포함해야
+   한다(SHOULD). STS 헤더 필드를 포함하는 경우, HSTS Host는 그러한
+   헤더 필드를 하나만 MUST 포함해야 한다.
+
+   주어진 UA의 맥락에서 주어진 호스트를 Known HSTS Host로 설정하는
+   것은, 보안 전송 위에서 실행되는 HTTP를 통해, 이 명세에 따라
+   올바르게 최소 하나의 유효한 STS 헤더 필드를 UA에 반환함으로써
+   달성될 수 있다(MAY). 클라이언트 측 사전 로드 Known HSTS Host 목록과
+   같은 다른 메커니즘도 사용될 수 있다(MAY). 예를 들어 <a href="#section-12">섹션 12</a>
+   ("사용자 에이전트 구현 조언")를 참조하라.
+
+   참고:  STS 헤더 필드 포함은 주어진 HSTS Host를 대신하여 STS 헤더
+          필드를 균일하게 내보내기 어려울 수 있는 다양한 서버 및
+          네트워크 측 캐시와 부하 분산 구성을 수용하기 위해 "SHOULD"로
+          규정되어 있다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 17]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  HTTP 요청 유형</span>
+
+   HSTS Host가 비보안 전송을 통해 HTTP 요청 메시지를 수신하는 경우,
+   HSTS Host는 상태 코드 301(<a href="./rfc2616#section-10.3.2">[RFC2616]의 섹션&nbsp;10.3.2</a>)과 같은
+   영구 리디렉션을 나타내는 상태 코드와, HTTP 요청의 원래 Effective
+   Request URI(<a href="#section-9">섹션 9</a>("유효 요청 URI 구성") 참조)를 필요에 따라
+   "https" URI 스킴을 갖도록 변경한 값 또는 로컬 정책에 따라 생성된
+   "https" URI 스킴을 가진 URI를 포함하는 Location 헤더 필드 값을
+   포함한 HTTP 응답 메시지를 보내야 한다(SHOULD).
+
+   참고:  위 동작이 "MUST"가 아니라 "SHOULD"인 이유는 다음과 같다.
+
+      *  서버 측 비보안-보안 리디렉션의 위험
+         [<a href="#ref-OWASP-TLSGuide">OWASP-TLSGuide</a>].
+
+      *  사이트 배포 특성. 예를 들어 제3자 컴포넌트를 포함하는 사이트는
+         비보안 전송으로 접근되는 경우 서버 측 비보안-보안 리디렉션을
+         수행할 때 올바르게 동작하지 않을 수 있지만, 보안 전송을 통해
+         균일하게 접근될 때는 올바르게 동작할 수 있다. 후자는 HSTS를
+         지원하는 UA가 이미 어떤 수단(예: 이전 상호작용 또는 UA 구성)을
+         통해 사이트를 Known HSTS Host로 기록한 경우에 해당한다.
+
+   HSTS Host는 비보안 전송을 통해 전달되는 HTTP 응답에 STS 헤더 필드를
+   MUST NOT 포함해야 한다.
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  사용자 에이전트 처리 모델</span>
+
+   이 섹션은 UA를 위한 HTTP Strict Transport Security 처리 모델을
+   설명한다. 이 모델에는 여러 측면이 있으며, 다음 하위 섹션들에서
+   열거된다.
+
+   이 처리 모델은 UA가 IDNA2008 [<a href="./rfc5890" title="&quot;Internationalized Domain Names for Applications (IDNA): Definitions and Document Framework&quot;">RFC5890</a>] 또는 <a href="#section-13">섹션 13</a>
+   ("애플리케이션을 위한 국제화 도메인 이름(IDNA): 의존성 및
+   마이그레이션")에서 언급한 바와 같이 가능한 경우 IDNA2003
+   [<a href="./rfc3490" title="&quot;Internationalizing Domain Names in Applications (IDNA)&quot;">RFC3490</a>]을 구현한다고 가정한다. 또한 이 명세의 맥락에서 조작되는
+   모든 도메인 이름은 이 섹션에 명시된 처리 전에 <a href="#section-10">섹션 10</a>
+   ("도메인 이름 IDNA-정규화")에 개괄된 대로 이미 IDNA-정규화되어
+   있다고 가정한다.
+
+      참고:  [<a href="./rfc3490" title="&quot;Internationalizing Domain Names in Applications (IDNA)&quot;">RFC3490</a>]은 예측 가능한 미래 동안 실제 배포와 지속적인
+             관련성이 있기 때문에 참조된다.
+
+   위 가정은 이 처리 모델이 또한 이 섹션에 명시된 처리 전에 도메인
+   이름의 IDNA-정규화와 함께 적절한 IDNA 및 Unicode 검증과 문자 목록
+   테스트가 해당 도메인 이름에 대해 이루어졌다고 구체적으로 가정함을
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 18]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   의미한다. 근거와 추가 세부 사항은 <a href="#section-14.10">섹션 14.10</a>("국제화 도메인
+   이름")의 IDNA 관련 보안 고려사항을 참조하라.
+
+<span class="h3"><a class="selflink" id="section-8.1" href="#section-8.1">8.1</a>.  Strict-Transport-Security 응답 헤더 필드 처리</span>
+
+   보안 전송을 통해 수신한 HTTP 응답이 <a href="#section-6.1">섹션 6.1</a>
+   ("Strict-Transport-Security HTTP 응답 헤더 필드")에 명시된 문법을
+   따르는 STS 헤더 필드를 포함하고, 기반 보안 전송 오류나 경고가
+   없다면(<a href="#section-8.4">섹션 8.4</a> 참조), UA는 다음 중 하나를 MUST 수행해야 한다.
+
+   o  호스트가 아직 그렇게 기록되어 있지 않다면 Known HSTS Host로
+      기록한다(<a href="#section-8.1.1">섹션 8.1.1</a>("HSTS 호스트 기록 - 저장 모델") 참조).
+
+   또는
+
+   o  max-age 및 includeSubDomains 헤더 필드 값 토큰 중 하나 또는 둘 다가
+      UA가 이미 유지하고 있는 정보와 다른 정보를 전달하는 경우, Known
+      HSTS Host에 대한 UA의 캐시된 정보를 갱신한다.
+
+      max-age 값은 본질적으로 STS 헤더 필드 수신 시점에 상대적인
+      "time to live" 값이다.
+
+      max-age 헤더 필드 값 토큰의 값이 0인 경우, 해당 HSTS Host가
+      알려져 있으면 UA는 자신의 캐시된 HSTS 정책 정보(명시된 경우
+      includeSubDomains 지시자 포함)를 MUST 제거해야 하며, 아직 알려져
+      있지 않다면 UA는 이 HSTS Host를 MUST NOT 기록해야 한다.
+
+      UA가 보안 전송을 통한 HTTP 응답 메시지에서 둘 이상의 STS 헤더
+      필드를 수신하는 경우, UA는 그러한 헤더 필드 중 첫 번째 것만
+      MUST 처리해야 한다.
+
+   그렇지 않은 경우:
+
+   o  HTTP 응답이 비보안 전송을 통해 수신되면, UA는 존재하는 모든 STS
+      헤더 필드를 MUST 무시해야 한다.
+
+   o  UA는 <a href="#section-6.1">섹션 6.1</a>("Strict-Transport-Security HTTP 응답 헤더
+      필드")에 명시된 문법을 따르지 않는 모든 STS 헤더 필드를 MUST
+      무시해야 한다.
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 19]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h4"><a class="selflink" id="section-8.1.1" href="#section-8.1.1">8.1.1</a>.  HSTS 호스트 기록 - 저장 모델</span>
+
+   Request-URI(호스트가 응답한 메시지의 것)에서 host 생성 규칙과
+   일치하는 부분 문자열이 <a href="./rfc3986#section-3.2.2">[RFC3986]의 섹션&nbsp;3.2.2</a>에 있는 IP-literal
+   또는 IPv4address 생성 규칙과 구문적으로 일치한다면, UA는 이
+   호스트를 Known HSTS Host로 MUST NOT 기록해야 한다.
+
+   그렇지 않고, 해당 부분 문자열이 <a href="#section-8.2">섹션 8.2</a>("Known HSTS Host 도메인
+   이름 매칭")에 명시된 매칭 절차에 따라 Known HSTS Host의 도메인
+   이름과 일치하지 않는다면, UA는 이 호스트를 Known HSTS Host로 MUST
+   기록해야 하며, HSTS Host의 도메인 이름을 캐시하고 주어진 max-age
+   값에 따라 사실상 규정된 이 정보의 만료 시간과 includeSubDomains
+   지시자의 명시 여부를 함께 기록해야 한다. <a href="#section-11.2">섹션 11.2</a>("HSTS 정책
+   만료 시간 고려사항")도 참조하라.
+
+   UA는 상위 도메인으로 매칭된 Known HSTS Host의 만료 시간이나
+   includeSubDomains 지시자를 MUST NOT 수정해야 한다.
+
+   Known HSTS Host는 그 캐시 항목의 만료 날짜가 과거이면 "만료"된
+   것이다. 언제든 캐시에 만료된 Known HSTS Host가 존재하면, UA는 모든
+   만료된 Known HSTS Host를 자신의 캐시에서 MUST 제거해야 한다.
+
+<span class="h3"><a class="selflink" id="section-8.2" href="#section-8.2">8.2</a>.  Known HSTS Host 도메인 이름 매칭</span>
+
+   주어진 도메인 이름은 두 가지 방식 중 하나 또는 둘 모두로 Known HSTS
+   Host의 도메인 이름과 매칭될 수 있다. 즉 일치 매칭 또는 상위 도메인
+   매칭이다. 또는 매칭이 없을 수도 있다.
+
+   아래 단계는 매칭이 있는지, 있다면 어떤 방식인지 결정한다.
+
+      주어진 도메인 이름을 UA의 만료되지 않은 각 Known HSTS Host의
+      도메인 이름과 비교한다. 각 Known HSTS Host의 도메인 이름에 대해,
+      비교는 주어진 도메인 이름과 레이블 단위(레이블만 비교)로
+      수행되며, 오른쪽 끝 레이블부터 시작해 오른쪽에서 왼쪽으로
+      계속되는 ASCII 대소문자 비구분 비교를 사용한다. <a href="./rfc5890#section-2.3.2.4">[RFC5890]의
+      섹션&nbsp;2.3.2.4</a>도 참조하라.
+
+      *  상위 도메인 매칭
+
+         전체 Known HSTS Host의 도메인 이름과 주어진 도메인 이름의
+         오른쪽 부분 사이에 레이블 대 레이블 매칭이 발견되면, 이 Known
+         HSTS Host의 도메인 이름은 주어진 도메인 이름에 대한 상위
+         도메인 매칭이다. 주어진 도메인 이름에 대해 여러 상위 도메인
+         매칭이 있을 수 있다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 20]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+         예:
+
+            주어진 도메인 이름(DN):  qaz.bar.foo.example.com
+
+            상위 도메인으로 매칭된
+            Known HSTS Host DN:           bar.foo.example.com
+
+            상위 도메인으로 매칭된
+            Known HSTS Host DN:               foo.example.com
+
+
+      *  일치 매칭
+
+         Known HSTS Host의 도메인 이름과 주어진 도메인 이름 사이에
+         레이블 대 레이블 매칭이 발견되고, 즉 더 이상 비교할 레이블이
+         없으면, 주어진 도메인 이름은 이 Known HSTS Host와 일치
+         매칭된다.
+
+         예:
+
+            주어진 도메인 이름:             foo.example.com
+
+            일치 매칭된
+            Known HSTS Host DN:               foo.example.com
+
+
+      *  그렇지 않고 매칭이 발견되지 않으면, 주어진 도메인 이름은
+         Known HSTS Host를 나타내지 않는다.
+
+<span class="h3"><a class="selflink" id="section-8.3" href="#section-8.3">8.3</a>.  URI 로딩 및 포트 매핑</span>
+
+   UA가 어떤 "http" URI [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]를 "로드"(또는 "역참조")할 준비를
+   할 때마다(HTTP 리디렉션 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]을 따르는 경우 포함), UA는 먼저
+   URI에 도메인 이름이 주어졌는지, 그리고 그것이 Known HSTS Host와
+   매칭되는지를 다음 단계로 MUST 결정해야 한다.
+
+   1.  URI의 authority 컴포넌트의 host 컴포넌트가 설명하는 부분
+       문자열을 URI에서 추출한다.
+
+   2.  부분 문자열이 null이면, 어떤 Known HSTS Host와도 매칭되지 않는다.
+
+   3.  그렇지 않고 부분 문자열이 non-null이며 <a href="./rfc3986#section-3.2.2">[RFC3986]의 섹션&nbsp;3.2.2</a>에
+       있는 IP-literal 또는 IPv4address 생성 규칙과 구문적으로
+       일치한다면, 어떤 Known HSTS Host와도 매칭되지 않는다.
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 21]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   4.  그렇지 않으면, 부분 문자열은 주어진 도메인 이름이며, <a href="#section-8.2">섹션 8.2</a>
+       ("Known HSTS Host 도메인 이름 매칭")의 절차를 사용하여 UA의
+       Known HSTS Hosts와 MUST 매칭되어야 한다.
+
+   5.  도메인 이름 매칭을 수행할 때 includeSubDomains 지시자가 명시된
+       상위 도메인 매칭이 발견되거나, includeSubDomains 지시자가 명시된
+       상위 도메인 매칭이 발견되지 않고 일치 매칭이 발견된 경우
+       (includeSubDomains 지시자 명시 여부와 무관), 로드를 진행하기 전에:
+
+          UA는 URI 스킴을 "https" [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>]로 MUST 대체해야 하며,
+
+          URI가 명시적 포트 컴포넌트 "80"을 포함하는 경우 UA는 포트
+          컴포넌트를 "443"으로 MUST 변환해야 하거나,
+
+          URI가 "80"이 아닌 명시적 포트 컴포넌트를 포함하는 경우 포트
+          컴포넌트 값은 MUST 보존되어야 하며, 그렇지 않고,
+
+          URI가 명시적 포트 컴포넌트를 포함하지 않는 경우 UA는 포트를
+          MUST NOT 추가해야 한다.
+
+          참고:  이러한 단계는 HSTS 정책이 HSTS Host의 모든 TCP 포트
+                 위의 HTTP에 적용되도록 보장한다.
+
+   참고:  명시적 포트가 제공된 경우(그리고 하위 도메인의 경우도 어느
+          정도), 지정된 포트에서 실제로 HTTP(즉, 비보안) 서버가 실행
+          중일 가능성이 상당히 높으며, 따라서 HTTPS 요청은 실패할
+          것이다(<a href="#appendix-A">부록 A</a>("설계 결정 참고 사항")의 항목 6 참조).
+
+<span class="h3"><a class="selflink" id="section-8.4" href="#section-8.4">8.4</a>.  보안 전송 설정 오류</span>
+
+   Known HSTS Host에 연결할 때, 기반 보안 전송에 "warning"이든 "fatal"이든
+   그 밖의 어떤 오류 수준이든 오류가 있으면 UA는 연결을 MUST 종료해야
+   한다(<a href="#section-12">섹션 12</a>("사용자 에이전트 구현 조언")도 참조). 예를 들어 이는
+   UA가 사용하는 인증서 유효성 검사에서 발견되는 모든 오류를 포함하며,
+   예컨대 Certificate Revocation Lists(CRLs) [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>]를 통한 검사,
+   Online Certificate Status Protocol(OCSP) [<a href="./rfc2560" title="&quot;X.509 Internet Public Key Infrastructure Online Certificate Status Protocol - OCSP&quot;">RFC2560</a>]을 통한 검사,
+   그리고 TLS 서버 신원 검사 [<a href="./rfc6125" title="&quot;Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)&quot;">RFC6125</a>]를 통한 검사가 포함된다.
+
+<span class="h3"><a class="selflink" id="section-8.5" href="#section-8.5">8.5</a>.  HTTP-Equiv &lt;Meta&gt; 요소 속성</span>
+
+   UA는 수신한 콘텐츠의 &lt;meta&gt; 요소 [<a href="#ref-W3C.REC-html401-19991224">W3C.REC-html401-19991224</a>]에 있는
+   http-equiv="Strict-Transport-Security" 속성 설정을 MUST NOT 따라야
+   한다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 22]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-8.6" href="#section-8.6">8.6</a>.  Strict-Transport-Security 응답 헤더 필드 누락</span>
+
+   UA가 Known HSTS Host로부터 보안 채널을 통해 HTTP 응답을 수신했지만
+   응답에 STS 헤더 필드가 누락된 경우, UA는 그 Known HSTS Host에 대한
+   지식의 max-age 값에 도달할 때까지 해당 호스트를 Known HSTS Host로
+   계속 취급해야 한다(MUST). 특정 Known HSTS Host에 대해 max-age 값은
+   사실상 무한할 수 있음에 유의하라. 예를 들어 Known HSTS Host가
+   사전 구성된 목록의 일부이고, 그 목록 항목이 절대 "age out"되지
+   않도록 구현되어 있다면 이에 해당한다.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  유효 요청 URI 구성</span>
+
+   이 섹션은 HSTS Host가 수신한 HTTP 요청에 대해 Effective Request URI를
+   어떻게 구성해야 하는지를 명시한다.
+
+   HTTP 요청은 대상 리소스에 대한 absoluteURI를 포함하지 않는 경우가
+   많다. 대신 URI는 Request-URI, Host 헤더 필드 및 연결 맥락에서
+   추론되어야 한다([<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>], 섹션 <a href="#section-3.2.1">3.2.1</a>, 5.1.2 및 5.2).
+   이 과정의 결과를 "effective request URI(ERU)"라고 한다. "target
+   resource"는 effective request URI로 식별되는 리소스이다.
+
+<span class="h3"><a class="selflink" id="section-9.1" href="#section-9.1">9.1</a>.  ERU 기본 정의</span>
+
+   HTTP 요청 메시지의 첫 줄인 Request-Line은 <a href="./rfc2616#section-5.1">[RFC2616], 섹션&nbsp;5.1</a>의
+   다음 ABNF로 명시된다.
+
+     Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
+
+   Request-Line 안의 Request-URI는 <a href="./rfc2616#section-5.1.2">[RFC2616], 섹션&nbsp;5.1.2</a>의 다음
+   ABNF로 명시된다.
+
+     Request-URI    = "*" | absoluteURI | abs_path | authority
+
+   Host 요청 헤더 필드는 <a href="./rfc2616#section-14.23">[RFC2616], 섹션&nbsp;14.23</a>의 다음 ABNF로
+   명시된다.
+
+     Host = "Host" ":" host [ ":" port ]
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 23]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-9.2" href="#section-9.2">9.2</a>.  유효 요청 URI 결정</span>
+
+   Request-URI가 absoluteURI이면, effective request URI는 Request-URI이다.
+
+   Request-URI가 abs_path 형식 또는 asterisk 형식을 사용하고 Host 헤더
+   필드가 존재하면, effective request URI는 다음을 연결하여 구성된다.
+
+   o  스킴 이름: 요청이 비보안 TCP 연결을 통해 수신된 경우 "http",
+      TLS/SSL로 보호된 TCP 연결을 통해 수신된 경우 "https", 그리고
+
+   o  옥텟 시퀀스 "://", 그리고
+
+   o  Host 헤더 필드의 host와 port(존재하는 경우), 그리고
+
+   o  Request-Line에서 얻은 Request-URI. 단 Request-URI가 단지 별표
+      "*"인 경우는 제외한다.
+
+   Request-URI가 abs_path 형식 또는 asterisk 형식을 사용하고 Host 헤더
+   필드가 존재하지 않으면, effective request URI는 정의되지 않는다.
+
+   그렇지 않고 Request-URI가 authority 형식을 사용하는 경우,
+   effective request URI는 정의되지 않는다.
+
+   Effective request URI는 <a href="./rfc2616#section-3.2.3">[RFC2616] 섹션&nbsp;3.2.3</a>에 설명된 규칙을 사용해
+   비교하되, 빈 경로 컴포넌트를 "/"의 절대 경로와 동등한 것으로
+   취급해서는 안 된다(MUST NOT).
+
+<span class="h4"><a class="selflink" id="section-9.2.1" href="#section-9.2.1">9.2.1</a>.  유효 요청 URI 예</span>
+
+   예 1: 다음 메시지의 effective request URI
+
+     GET /pub/WWW/TheProject.html HTTP/1.1
+     Host: www.example.org:8080
+
+   (비보안 TCP 연결을 통해 수신됨)는 "http"에 "://"를 더하고, authority
+   컴포넌트 "www.example.org:8080"을 더한 뒤, request-target
+   "/pub/WWW/TheProject.html"을 더한 것이다. 따라서 이는
+   "<a href="http://www.example.org:8080/pub/WWW/TheProject.html">http://www.example.org:8080/pub/WWW/TheProject.html</a>"이다.
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 24]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   예 2: 다음 메시지의 effective request URI
+
+     OPTIONS * HTTP/1.1
+     Host: www.example.org
+
+   (SSL/TLS로 보호된 TCP 연결을 통해 수신됨)는 "https"에 "://"를 더하고,
+   authority 컴포넌트 "www.example.org"를 더한 것이다. 따라서 이는
+   "https://www.example.org"이다.
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  도메인 이름 IDNA-정규화</span>
+
+   IDNA-정규화된 도메인 이름은 다음 단계로 생성되는 출력 문자열이다.
+   입력은 어떤 구분 문자(일반적으로 ".")를 사용해 연결된 "A-labels",
+   "U-labels", "NR-LDH labels"(<a href="./rfc5890#section-2">[RFC5890]의 섹션&nbsp;2</a> 참조)의 임의
+   조합으로 표면상 구성된 추정 도메인 이름 문자열이다.
+
+   1.  입력 추정 도메인 이름 문자열을 순서를 보존하는 개별 레이블
+       문자열의 시퀀스로 변환한다.
+
+   2.  IDNA2008을 구현할 때는 개별 레이블 문자열의 시퀀스 중에서
+       발견된 각 A-label과 U-label을 [<a href="./rfc5891" title="&quot;Internationalized Domain Names in Applications (IDNA): Protocol&quot;">RFC5891</a>]의 섹션 <a href="#section-5.3">5.3</a>부터 <a href="#section-5.5">5.5</a>까지에
+       정의된 절차를 사용하여 변환, 검증 및 테스트한다.
+
+       그렇지 않고 IDNA2003을 구현할 때는 <a href="./rfc3490#section-4">[RFC3490]의 섹션&nbsp;4</a>에 있는
+       "ToASCII" 변환을 사용해 각 레이블을 변환한다(<a href="./rfc3490#section-2">[RFC3490]의
+       섹션&nbsp;2</a>에 있는 "equivalence of labels" 정의도 참조).
+
+   3.  앞선 단계 동안 오류가 발생하지 않았다면, 시퀀스의 모든 레이블을
+       순서대로 하나의 문자열로 연결하고, 각 레이블과 다음 레이블
+       사이를 %x2E(".") 문자로 구분한다. 그 결과 문자열은
+       IDNA-정규화된 도메인 이름이라고 하며, <a href="#section-8">섹션 8</a>("사용자
+       에이전트 처리 모델")의 맥락에서 사용하기에 적절하다.
+
+       그렇지 않으면 오류가 발생한 것이다. 입력 추정 도메인 이름
+       문자열은 성공적으로 IDNA-정규화되지 않았다. 이 절차의 호출자는
+       적절한 오류 복구를 시도해야 한다.
+
+   추가 세부 사항과 고려사항은 이 명세의 섹션 <a href="#section-13">13</a>
+   ("애플리케이션을 위한 국제화 도메인 이름(IDNA): 의존성 및
+   마이그레이션") 및 14.10("국제화 도메인 이름")도 참조하라.
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 25]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-26" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>.  서버 구현 및 배포 조언</span>
+
+   이 섹션은 비규범적이다.
+
+<span class="h3"><a class="selflink" id="section-11.1" href="#section-11.1">11.1</a>.  비적합 사용자 에이전트 고려사항</span>
+
+   비적합 UA는 Strict-Transport-Security 헤더 필드를 무시한다. 따라서
+   비적합 사용자 에이전트는 <a href="#section-2.3.1">섹션 2.3.1</a>("대응되는 위협")에 설명된
+   위협에 대응하지 않는다. 추가 논의는 <a href="#section-14.2">섹션 14.2</a>("비적합 사용자
+   에이전트 영향")를 참조하라.
+
+<span class="h3"><a class="selflink" id="section-11.2" href="#section-11.2">11.2</a>.  HSTS 정책 만료 시간 고려사항</span>
+
+   서버 구현과 배포 웹 사이트는 설정하는 만료 시간이 미래를 향한
+   상수 값인지, 아니면 고정된 시점인지 고려해야 한다.
+
+   "미래를 향한 상수 값" 접근법은 UA에 동일한 max-age 값을 지속적으로
+   전송함으로써 달성할 수 있다.
+
+   예를 들어 max-age 값 7776000초는 90일이다.
+
+     Strict-Transport-Security: max-age=7776000
+
+   UA가 이 헤더를 수신할 때마다, 이 Known HSTS Host에 대한 지식을
+   언제 삭제해야 하는지에 대한 UA의 개념을 갱신해야 한다는 점에
+   유의하라.
+
+   "고정된 시점" 접근법은 원하는 만료 시간까지 남은 시간을 나타내는
+   max-age 값을 전송함으로써 달성할 수 있다. 이를 위해 HSTS Host는 각
+   HTTP 응답에서 새로 계산된 max-age 값을 보내야 한다.
+
+   여기서 고려할 점은 배포자가 신호된 HSTS 정책 만료 시간이 웹
+   사이트의 도메인 인증서 만료 시간과 일치하기를 원하는지 여부이다.
+
+   또한 서버 구현자는 배포 구성 시스템에서 기본 max-age 값으로 0을
+   사용하는 것을 고려해야 한다. 이렇게 하면 UA가 해당 호스트에 대해
+   HSTS 정책을 강제하도록 하기 위해 배포자가 의도적으로 max-age를
+   설정해야 하며, 임의의 0이 아닌 기간으로 HSTS를 부주의하게
+   활성화하는 것으로부터 보호받을 수 있다.
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 26]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-27" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-11.3" href="#section-11.3">11.3</a>.  자체 서명 공개 키와 함께 HSTS 사용하기</span>
+<span class="h3">       인증서</span>
+
+   다음 네 조건이 모두 참이라면...
+
+   o  웹 사이트/조직/기업이 웹 사이트를 위해 자체 보안 전송 공개 키
+      인증서를 생성하고 있으며,
+
+   o  해당 조직의 루트 인증 기관(CA) 인증서가 일반적으로 브라우저
+      및/또는 운영 체제 CA 인증서 저장소에 기본적으로 포함되어 있지
+      않고,
+
+   o  조직의 CA가 서명한 인증서(즉, "자체 서명 인증서")를 사용해
+      자신을 식별하는 호스트에서 HSTS 정책이 활성화되어 있으며,
+
+   o  이 인증서가 TLSA 프로토콜 명세 [<a href="./rfc6698" title="&quot;The DNS-Based Authentication of Named Entities (DANE) Transport Layer Security (TLS) Protocol: TLSA&quot;">RFC6698</a>]의 <a href="#section-4">섹션 4</a>에서 정의한
+      사용 가능한 TLS 인증서 연계와 일치하지 않는다면,
+
+   ...그 사이트에 대한 보안 연결은 HSTS 설계에 따라 실패할 것이다.
+   이는 위에서 논의한 다양한 능동 공격으로부터 보호하기 위한 것이다.
+
+   그러나 해당 조직이 자체 CA와 자체 서명 인증서를 HSTS와 함께
+   사용하기를 원한다면, 자신의 루트 CA 인증서를 사용자의 브라우저나
+   운영 체제 CA 루트 인증서 저장소에 배포함으로써 그렇게 할 수 있다.
+   또한 추가로 또는 대신 특정 호스트의 최종 엔터티 인증서를 사용자의
+   브라우저에 배포할 수도 있다. 이를 달성할 수 있는 다양한 방법이
+   있다(세부 사항은 이 명세의 범위를 벗어난다). 루트 CA 인증서가
+   브라우저에 설치되면, 해당 조직은 자신의 사이트(들)에 HSTS 정책을
+   사용할 수 있다.
+
+   또는 해당 조직은 TLSA 프로토콜을 배포할 수 있다. 그러면 TLSA도
+   사용하는 모든 브라우저가 TLSA를 통해 표시된 사용 가능한 TLS 인증서
+   연계가 식별하는 인증서를 신뢰할 수 있게 된다.
+
+   참고:  예를 들어 이메일을 통해 루트 CA 인증서를 사용자에게
+          상호작용적으로 배포하고 사용자가 이를 설치하도록 하는 것은,
+          사용자를 가능한 피싱 공격 형태에 취약하게 훈련시키는 것이라고
+          주장할 수 있다. <a href="#section-14.8">섹션 14.8</a>("가짜 루트 CA 인증서 피싱 및 DNS
+          캐시 포이즈닝 공격")을 참조하라. 따라서 이러한 인증서가
+          사용자의 시스템과 브라우저에 배포되고 설치되는 방식에는
+          주의해야 한다.
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 27]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-28" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-11.4" href="#section-11.4">11.4</a>.  includeSubDomains의 영향</span>
+
+   includeSubDomains 지시자는 신중한 고려가 필요한 실질적 영향을 갖는다.
+   두 가지 예시 시나리오는 다음과 같다.
+
+   o  HSTS Host가 자신의 HSTS Host 도메인 이름의 대체 포트 또는 여러
+      하위 도메인에서 보안되지 않은 HTTP 기반 서비스를 제공한다.
+
+   o  HSTS Host의 서로 다른 하위 도메인에서 별개의 웹 애플리케이션이
+      제공되어, UA가 HSTS Host의 도메인 이름에서 제공되는 웹
+      애플리케이션(있는 경우)과 반드시 상호작용하지 않고도 이러한 하위
+      도메인 웹 애플리케이션과 직접 상호작용하는 경우가 많다.
+
+   아래 섹션들은 이러한 각 시나리오를 차례로 논의한다.
+
+<span class="h4"><a class="selflink" id="section-11.4.1" href="#section-11.4.1">11.4.1</a>.  HSTS Host의 대체 포트 또는 하위 도메인에서</span>
+<span class="h4">         보안되지 않은 HTTP 서비스를 제공할 때의 고려사항</span>
+
+   예를 들어 인증 기관은 종종 CRL 배포와 OCSP 서비스 [<a href="./rfc2560" title="&quot;X.509 Internet Public Key Infrastructure Online Certificate Status Protocol - OCSP&quot;">RFC2560</a>]를
+   일반 HTTP를 통해 제공하며, 때로는 TLS/SSL로 보호될 수 있는 공개
+   웹 애플리케이션의 하위 도메인에서 제공한다. 예를 들어
+   &lt;https://ca.example.com/&gt;은 인증 기관인 "Example CA"의 공개 웹
+   애플리케이션이다. 고객은 이 웹 애플리케이션을 사용해 자신의 공개
+   키를 등록하고 인증서를 얻는다. "Example CA"는 "CRL Distribution
+   Points" 및 "Authority Information Access:OCSP" 인증서 필드의 값으로
+   &lt;<a href="http://crl-and-ocsp.ca.example.com/">http://crl-and-ocsp.ca.example.com/</a>&gt;을 포함하는 고객 인증서를 생성한다.
+
+   ca.example.com이 includeSubDomains 지시자가 포함된 HSTS 정책을
+   발행한다면, ca.example.com 웹 애플리케이션과 상호작용한 HSTS 구현
+   HTTP 기반 사용자 에이전트는 CRL을 가져오지 못하고 인증서에 대해
+   OCSP를 확인하지 못할 것이다. 이러한 서비스가 일반 HTTP를 통해
+   제공되기 때문이다.
+
+   이 경우 Example CA는 다음 중 하나를 선택할 수 있다.
+
+   o  includeSubDomains 지시자를 사용하지 않거나,
+
+   o  ca.example.com의 하위 도메인에서 제공되는 HTTP 기반 서비스도
+      TLS/SSL을 통해 균일하게 제공되도록 보장하거나,
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 28]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-29" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   o  일반 HTTP 기반 서비스를 다른 도메인 이름에서 제공한다. 예:
+      crl-and-ocsp.ca.example.NET, 또는
+
+   o  인증서 상태 정보를 배포하는 대안적 접근법을 활용하여 일반 HTTP를
+      통해 CRL 배포와 OCSP 서비스를 제공할 필요를 없앤다. 예: 흔히
+      구어적으로 "OCSP Stapling"이라고 불리는 "Certificate Status
+      Request" TLS 확장 [<a href="./rfc6066" title="&quot;Transport Layer Security (TLS) Extensions: Extension Definitions&quot;">RFC6066</a>].
+
+   참고:  위 항목들은 명시적으로 예일 뿐이며, 관련된 모든 복잡성을
+          다루려는 것은 아니다. 예를 들어 "OCSP Stapling"과 같은
+          접근법을 배포하는 데에는 CA, 인증서 배포자 및 애플리케이션
+          (예: 브라우저) 측의 많은 고려사항이 수반된다. 그러한 문제는
+          이 명세의 범위를 벗어난다.
+
+<span class="h4"><a class="selflink" id="section-11.4.2" href="#section-11.4.2">11.4.2</a>.  HSTS Host의 하위 도메인에서 웹 애플리케이션을 제공할 때의</span>
+<span class="h4">         고려사항</span>
+
+   이 시나리오에서는 HSTS Host가 includeSubDomains 지시자가 포함된 HSTS
+   정책을 선언하고, 또한 HSTS Host의 서로 다른 하위 도메인에서 별개의
+   웹 애플리케이션이 제공되어 UA가 HSTS Host와 반드시 상호작용하지
+   않고도 이러한 하위 도메인 웹 애플리케이션과 직접 상호작용하는
+   경우가 많다. 그러한 경우 UA는 HSTS 정책을 수신하거나 강제하지
+   않는다.
+
+   예를 들어 HSTS Host가 "example.com"이고, includeSubDomains 지시자가
+   포함된 STS 헤더 필드를 내보내도록 구성되어 있다고 하자. 그러나
+   example.com의 실제 웹 애플리케이션은 "www.example.com"에서 접근되며,
+   example.com은 사용자 에이전트를 단순히 "https://www.example.com/"으로
+   리디렉션한다.
+
+   STS 헤더 필드가 "example.com"에서만 내보내지지만 UA가 일반적으로
+   "www.example.com"을 북마크하고, 링크(웹 어디에서든)가 일반적으로
+   "www.example.com"으로 설정되며, 어떤 0이 아닌 비율의 상호작용에서
+   모든 사용자 에이전트가 "example.com"에 직접 접촉하지 않는다면,
+   일부 UA는 "example.com"을 HSTS Host로 기록하지 않을 것이며,
+   "www.example.com" 사용자 중 일부는 HSTS 정책의 보호를 받지 못할
+   것이다.
+
+   이를 해결하기 위해 HSTS Host는 includeSubDomains 지시자를 사용하는지
+   여부와 관계없이, 자신의 웹 애플리케이션(들)에 대한 잘 알려진 "진입점"을
+   구성하는 각 HSTS Host 도메인 또는 하위 도메인 이름에서 STS 헤더
+   필드가 직접 내보내지도록 구성되어야 한다.
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 29]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-30" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   따라서 예에서 STS 헤더 필드가 "example.com"과 "www.example.com" 모두에서
+   내보내지면 이 문제가 해결될 것이다. 또한 "foo.example.com"과 같이
+   "example.com"이 제공하는 웹 애플리케이션에 대한 다른 잘 알려진
+   진입점이 있다면, 이들도 STS 헤더 필드를 내보내도록 구성되어야 한다.
+
+<span class="h2"><a class="selflink" id="section-12" href="#section-12">12</a>.  사용자 에이전트 구현 조언</span>
+
+   이 섹션은 비규범적이다.
+
+   사용자와 웹 사이트에 더 효과적인 보호를 제공하고, UA의 HSTS 정책
+   캐싱을 관리하기 위한 제어를 제공하기 위해, UA 구현자는 다음과 같은
+   기능을 포함하는 것을 고려해야 한다.
+
+<span class="h3"><a class="selflink" id="section-12.1" href="#section-12.1">12.1</a>.  사용자 구제 수단 없음</span>
+
+   모든 경고 또는 오류가 발생했을 때 보안 연결 설정을 실패 처리하는
+   것(<a href="#section-8.4">섹션 8.4</a>("보안 전송 설정 오류")에 따름)은 "사용자 구제 수단
+   없음"으로 이루어져야 한다. 이는 사용자에게 진행할지 여부를 선택할
+   수 있는 대화상자가 표시되어서는 안 된다는 의미이다. 오히려 대상 웹
+   애플리케이션과 상호작용하는 것과 관련하여 사용자가 기다렸다가
+   다시 시도하는 것 외에는 더 이상 할 수 있는 일이 없는 서버 오류와
+   유사하게 처리되어야 한다.
+
+   본질적으로 "모든 경고 또는 오류"는 UA 구현이 연결 설정에 완전히
+   올바르지 않은 무언가가 있음을 사용자에게 알리게 만드는 모든 것을
+   의미한다.
+
+   이를 수행하지 않는 것, 즉 "경고/오류 대화상자를 클릭하여 통과"하는
+   것과 같은 사용자 구제 수단을 허용하는 것은 man-in-the-middle 공격의
+   원인이 된다. 웹 애플리케이션이 HSTS 정책을 발행한다면, 이는 모든
+   인증서 오류 또는 경고가 연결 종료를 유발하고, 사용자를 "속여" 잘못된
+   결정을 하게 하여 자신을 손상시킬 기회를 주지 않는 "사용자 구제 수단
+   없음" 접근법을 암묵적으로 선택하는 것이다.
+
+<span class="h3"><a class="selflink" id="section-12.2" href="#section-12.2">12.2</a>.  사용자가 선언한 HSTS 정책</span>
+
+   사용자가 선언한 HSTS 정책은 사용자가 주어진 도메인 이름이 HSTS
+   Host를 나타낸다고 명시적으로 선언할 수 있는 기능으로, 실제 상호작용
+   전에 이를 Known HSTS Host로 시딩한다. 이는 <a href="#section-14.6">섹션 14.6</a>
+   ("부트스트랩 MITM 취약점")에서 논의한 부트스트랩 MITM 취약점으로부터
+   보호하는 데 도움이 될 것이다.
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 30]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-31" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   참고:  이러한 기능은 사이트별 기준으로 올바르게 구현하기 어렵다.
+          [<a href="#ref-ForceHTTPS">ForceHTTPS</a>]의 섹션 5.5에 있는 "rewrite rules" 논의를
+          참조하라. 예를 들어 임의의 웹 사이트는 자신의 모든 URI를
+          "https" 스킴으로 구체화하지 않을 수 있으며, 따라서 UA가 이러한
+          URI만을 사용하여 사이트에 접근하려고 하면 "깨질" 수 있다. 또한
+          이 기능은 "HSTS 사전 로드 목록" 기능(<a href="#section-12.3">섹션 12.3</a> 참조)을
+          보완하지만, 그와는 독립적이라는 점에 유의하라.
+
+<span class="h3"><a class="selflink" id="section-12.3" href="#section-12.3">12.3</a>.  HSTS 사전 로드 목록</span>
+
+   HSTS 사전 로드 목록은 웹 사이트 관리자가 UA 공급업체를 통해 자신의
+   사이트(들)에 대한 HSTS 정책을 UA에 미리 구성하도록 할 수 있는
+   기능이다. 이른바 "pre-loaded list"로, 루트 CA 인증서가 브라우저에
+   "공장에서" 내장되는 방식과 유사하다. 이는 부트스트랩 MITM 취약점
+   (<a href="#section-14.6">섹션 14.6</a>)으로부터 보호하는 데 도움이 될 것이다.
+
+   참고:  이러한 기능은 "사용자가 선언한 HSTS 정책" 기능(<a href="#section-12.2">섹션 12.2</a>)을
+          보완할 것이다.
+
+<span class="h3"><a class="selflink" id="section-12.4" href="#section-12.4">12.4</a>.  혼합 보안 컨텍스트 로드 불허</span>
+
+   "혼합 보안 컨텍스트" 로드는 UA가 보안 전송을 통해 가져온 웹
+   애플리케이션 리소스가 이후 보안 전송을 사용하지 않고 하나 이상의
+   다른 리소스를 가져오게 할 때 발생한다. 이는 일반적으로 "혼합
+   콘텐츠" 로드라고도 한다([<a href="#ref-W3C.REC-wsc-ui-20100812">W3C.REC-wsc-ui-20100812</a>]의 <a href="#section-5.3">섹션 5.3</a>
+   ("Mixed Content") 참조). 그러나 XML 및 HTML과 같은 마크업 언어
+   맥락에서도 사용되는 동일한 "혼합 콘텐츠" 용어와 혼동해서는 안 된다.
+
+   참고:  UA 구현 전반에서 동작의 일관성을 제공하기 위해, 혼합 보안
+          컨텍스트의 개념은 추가 표준화 작업이 필요할 것이다. 예를
+          들어 해당 용어(들)를 더 명확히 정의하고, 이에 관한 구체적인
+          동작을 정의해야 한다.
+
+<span class="h3"><a class="selflink" id="section-12.5" href="#section-12.5">12.5</a>.  HSTS 정책 삭제</span>
+
+   HSTS 정책 삭제는 HSTS Host별 기준으로 UA의 캐시된 HSTS 정책을 삭제할
+   수 있는 기능이다.
+
+   참고:  이러한 기능을 추가할 때는 사용자 인터페이스와 보안 양쪽의
+          관점에서 매우 신중해야 한다. Known HSTS Host에 대한 캐시
+          항목을 삭제하는 것은 매우 의도적이고 충분히 고려된 행위여야
+          한다. 이는 사용자가 일상적으로 하는 데 익숙해지는 것이어서는
+          안 된다. 예를 들어 일을 처리하기 위해 단지 "클릭하여
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 31]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-32" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+          통과"하는 식이어서는 안 된다. 또한 구현은 공격자가 코드,
+          예를 들어 ECMAscript를 UA에 주입하여 UA의 Known HSTS Host
+          캐시에서 항목을 조용히 그리고 프로그래밍 방식으로 제거하도록
+          허용하는 일을 방지해야 한다.
+
+<span class="h2"><a class="selflink" id="section-13" href="#section-13">13</a>.  애플리케이션을 위한 국제화 도메인 이름(IDNA): 의존성</span>
+<span class="h2">     및 마이그레이션</span>
+
+   현대 인터넷의 텍스트 도메인 이름은 하나 이상의 "국제화된" 도메인
+   이름 레이블을 포함할 수 있다. 이러한 도메인 이름은 "국제화 도메인
+   이름"(IDN)이라고 불린다. IDN과 그 사용 프로토콜을 정의하는 명세
+   모음은 "Internationalized Domain Names for Applications(IDNA)"라고
+   명명된다. 현재 이러한 명세 모음은 두 가지가 있다. IDNA2008
+   [<a href="./rfc5890" title="&quot;Internationalized Domain Names for Applications (IDNA): Definitions and Document Framework&quot;">RFC5890</a>]과 그 전신인 IDNA2003 [<a href="./rfc3490" title="&quot;Internationalizing Domain Names in Applications (IDNA)&quot;">RFC3490</a>]이다.
+
+   IDNA2008은 IDNA2003을 대체하지만, 두 명세 사이에는 차이가 있으며,
+   따라서 한쪽에서 등록된 도메인 이름 레이블과 다른 쪽에서 등록된
+   레이블을 처리(예: 변환)할 때 차이가 생길 수 있다. IDNA2003 기반
+   도메인 이름 레이블이 실제 환경에 존재하는 일정한 전환 기간이 있을
+   것이다. 이들의 IDNA 전환을 용이하게 하기 위해, 사용자 에이전트는
+   IDNA2008 [<a href="./rfc5890" title="&quot;Internationalized Domain Names for Applications (IDNA): Definitions and Document Framework&quot;">RFC5890</a>]을 구현해야 하며(SHOULD), [<a href="./rfc5895" title="&quot;Mapping Characters for Internationalized Domain Names in Applications (IDNA) 2008&quot;">RFC5895</a>]([<a href="./rfc5894#section-7">RFC5894의
+   섹션&nbsp;7</a>도 참조) 또는 [<a href="#ref-UTS46" title="&quot;Unicode IDNA Compatibility Processing&quot;">UTS46</a>]을 구현할 수 있다(MAY).
+   사용자 에이전트가 IDNA2008을 구현하지 않는 경우, 사용자 에이전트는
+   IDNA2003을 구현해야 한다(MUST).
+
+<span class="h2"><a class="selflink" id="section-14" href="#section-14">14</a>.  보안 고려사항</span>
+
+   이 명세는 HSTS 정책의 표현, 전달 및 강제와 관련된다. 대응되는
+   위협과 대응되지 않는 위협을 포함한 전체 HSTS 정책 위협 모델은
+   <a href="#section-2.3">섹션 2.3</a>("위협 모델")에 제시되어 있다.
+
+   또한 아래 섹션들은 HSTS 정책의 운영상 파급 효과를 논의하고, 기능의
+   근거를 제공하며, 잠재적인 HSTS 정책 오용을 논의하고, HSTS 정책
+   체계에서 알려진 일부 취약점을 강조한다.
+
+<span class="h3"><a class="selflink" id="section-14.1" href="#section-14.1">14.1</a>.  기반 보안 전송 고려사항</span>
+
+   이 명세는 HTTP 아래에 있는 보안 전송과 독립적으로 만들어졌다.
+   그러나 <a href="#section-2">섹션 2</a>("개요")의 위협 분석과 요구사항은 실제로 TLS 또는
+   SSL을 기반 보안 전송으로 전제한다. 따라서 다른 보안 전송 프로토콜
+   위에서 실행되는 HTTP 맥락에서 HSTS를 사용하는 것은 해당 맥락에서
+   HSTS의 후속 보안 속성을 평가하기 위해, 그 보안 전송 프로토콜의 보안
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 32]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-33" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   모델과 HTTP가 그 위에 계층화되는 구체적인 방식을 함께 평가해야
+   한다.
+
+<span class="h3"><a class="selflink" id="section-14.2" href="#section-14.2">14.2</a>.  비적합 사용자 에이전트 영향</span>
+
+   비적합 사용자 에이전트는 Strict-Transport-Security 헤더 필드를
+   무시한다. 따라서 비적합 사용자 에이전트는 <a href="#section-2.3.1">섹션 2.3.1</a>
+   ("대응되는 위협")에 설명된 위협에 대응하지 않는다.
+
+   이는 웹 애플리케이션과 비적합 UA를 사용하는 그 사용자들이 다음 두
+   가지 모두에 취약해짐을 의미한다.
+
+   o  웹 사이트 개발 및 배포 버그로 인한 수동 네트워크 공격:
+
+         예를 들어 웹 애플리케이션이 웹 애플리케이션 서버에 대한
+         비보안 참조(예: "http")를 포함하고, 모든 쿠키에 "Secure"
+         플래그가 지정되어 있지 않다면, 쿠키는 수동 네트워크 스니핑과
+         잠재적인 사용자 자격 증명의 후속 오용에 취약해진다.
+
+   o  능동 네트워크 공격:
+
+         예를 들어 공격자가 "man in the middle"을 배치할 수 있다면,
+         보안 전송 연결 시도는 사용자에게 경고를 표시할 가능성이 높다.
+         그러나 HSTS 정책이 강제되지 않는 경우, 현재 일반적인 관행은
+         사용자가 "클릭하여 통과"하고 계속 진행하도록 허용하는 것이다.
+         이는 사용자와 웹 애플리케이션을 그러한 공격자의 악용에 노출시킨다.
+
+   이는 HSTS 정책이 없는 상황에서 모든 웹 애플리케이션과 그 사용자의
+   사실상 현 상태이다. 웹 애플리케이션 제공자는 일반적으로 자신의 웹
+   애플리케이션이 상호작용하는 UA의 유형이나 버전을 제어하지 못하므로,
+   그 함의는 HSTS Host 배포자가 HSTS 정책을 주장하지 않았을 때와 같은
+   수준의 주의를 기울여 웹 사이트 개발 및 배포 버그(<a href="#section-2.3.1.3">섹션 2.3.1.3</a>
+   참조)를 피해야 한다는 것이다.
+
+<span class="h3"><a class="selflink" id="section-14.3" href="#section-14.3">14.3</a>.  오류 없는 보안 전송을 통해서만 HSTS 정책을 설정하는 것의</span>
+<span class="h3">       영향</span>
+
+   <a href="#section-8">섹션 8</a>("사용자 에이전트 처리 모델")에 정의된 사용자 에이전트 처리
+   모델은 UA가 기반 보안 전송 오류나 경고가 없는 보안 전송 연결을 통해
+   STS 헤더 필드를 수신한 경우에만, 호스트가 처음 Known HSTS Host로
+   기록되거나 Known HSTS Host의 캐시된 정보가 갱신된다고 규정한다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 33]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-34" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   그 근거는 합법적으로 배포된 프록시이든 불법적인 주체이든 "man in the
+   middle"(MITM)이 있는 경우, 다양한 장난을 일으킬 수 있기 때문이다
+   (<a href="#appendix-A">부록 A</a>("설계 결정 참고 사항") 항목 3 및 <a href="#section-14.6">섹션 14.6</a>
+   ("부트스트랩 MITM 취약점")도 참조). 예를 들어 다음과 같다.
+
+   o  호스트가 자신의 서비스를 보안 전송을 통해 균일하게 제공하지 않는
+      경우, 서비스 거부 상황으로 이어질 수 있는 Known HSTS Host로서의
+      무단 기록(<a href="#section-14.5">섹션 14.5</a>("서비스 거부")도 참조).
+
+   o  UA에 반환되는 max-age 헤더 필드 매개변수 값을 조작하여 호스트의
+      Known HSTS Host 지정에 대한 time to live를 재설정하는 것. max-age가
+      0으로 반환되면, UA가 해당 호스트를 Known HSTS Host로 간주하지
+      않게 되어, 호스트에 대한 비보안 연결 또는 호스트가 자신의
+      서비스를 보안 전송으로만 제공하는 경우 잠재적인 서비스 거부로
+      이어질 수 있다.
+
+   그러나 이는 UA가 예를 들어 기업 인트라넷 내에서 MITM 비투명 TLS
+   프록시 "뒤에" 있고, 프록시 너머의 unknown HSTS Host와 상호작용하는
+   경우, 사용자에게 기존의 보안 연결 오류 대화상자가 표시될 수 있음을
+   의미한다. 위험을 받아들이고 사용자가 "클릭하여 통과"하더라도, 해당
+   호스트는 HSTS Host로 기록되지 않는다. 따라서 UA가 그러한 프록시
+   뒤에 있는 동안에는 사용자가 취약하며, 아직 알려지지 않은 HSTS
+   Host에 대해 기존의 보안 연결 오류 대화상자가 표시될 수 있다.
+
+   UA가 오류 없는 보안 전송을 통해 unknown HSTS Host에 성공적으로
+   연결하면, 해당 호스트는 Known HSTS Host로 기록될 것이다. 이는 이후
+   간섭하는 프록시 뒤에서 이루어지는 연결 시도가 실패하게 만든다.
+
+   위 논의는 호스트가 Known HSTS Host이고 경고와 오류가 있을 때마다
+   보안 연결을 "사용자 구제 수단 없음"으로 종료해야 한다는 <a href="#section-12">섹션 12</a>
+   ("사용자 에이전트 구현 조언")의 권고와 관련된다. 이러한 자세는
+   사용자가 보안 경고를 "클릭하여 통과"하여 자신을 위험에 빠뜨리는
+   것을 막아준다.
+
+<span class="h3"><a class="selflink" id="section-14.4" href="#section-14.4">14.4</a>.  includeSubDomains의 필요성</span>
+
+   includeSubDomains 지시자가 없으면, 웹 애플리케이션은 이른바 "도메인
+   쿠키"를 적절히 보호할 수 없다(이 쿠키에 "Secure" 플래그가 설정되어
+   있어 보안 채널에서만 전달되더라도). 이는 웹 애플리케이션이 자신의
+   모든 하위 도메인에 UA가 반환하기를 기대하는 쿠키이다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 34]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-35" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   예를 들어 example.com이 웹 애플리케이션의 최상위 DNS 이름을
+   나타낸다고 가정하자. 또한 이 쿠키가 전체 example.com 도메인에 대해
+   설정되어 있으며, 즉 "도메인 쿠키"이고, Secure 플래그가 설정되어
+   있다고 가정하자. example.com은 이 UA에 대해 Known HSTS Host이지만
+   includeSubDomains 지시자는 설정되어 있지 않다고 가정하자.
+
+   이제 공격자가 UA로 하여금 "https://uxdhbpahpdsf.example.com/"과 같이
+   웹 애플리케이션에 이미 존재할 가능성이 낮은 하위 도메인 이름을
+   요청하게 하고, 공격자가 DNS에 이를 등록하여 공격자의 제어 아래 있는
+   HTTP 서버를 가리키도록 관리했다면, 다음과 같은 일이 발생한다.
+
+   1.  UA는 "uxdhbpahpdsf.example.com"에 대해 이미 HSTS 정책을 설정해
+       두었을 가능성이 낮다.
+
+   2.  uxdhbpahpdsf.example.com으로 전송된 HTTP 요청은 Secure 플래그가
+       지정된 도메인 쿠키를 포함할 것이다.
+
+   3.  "uxdhbpahpdsf.example.com"이 TLS 설정 중 인증서를 반환하고,
+       사용자에게 표시될 수 있는 경고를 사용자가 "클릭하여 통과"하면
+       (그러한 도메인 이름에 필요한 인증서를 얻어 경고가 나타날 수도
+       있고 나타나지 않을 수도 있음), 공격자는 표면상 보호되고 있는
+       Secure 플래그 지정 도메인 쿠키를 획득할 수 있다.
+
+   "includeSubDomains" 지시자가 없으면, HSTS는 이러한 Secure 플래그
+   지정 도메인 쿠키를 보호할 수 없다.
+
+<span class="h3"><a class="selflink" id="section-14.5" href="#section-14.5">14.5</a>.  서비스 거부</span>
+
+   HSTS는 웹 사이트에 대해 특정 형태의 Denial-of-Service(DoS) 공격을
+   수행하는 데 사용될 수 있다. DoS 공격은 하나 이상의 네트워크 주체가
+   피해자 주체를 대상으로 삼아 피해자가 유용한 작업을 하지 못하도록
+   시도하는 공격이다. 이 섹션은 HSTS 관점에서 이러한 시나리오를
+   논의하지만, 이 목록이 완전한 것은 아니다. 전체 인터넷 DoS 고려사항
+   논의는 [<a href="./rfc4732" title="&quot;Internet Denial-of- Service Considerations&quot;">RFC4732</a>]도 참조하라.
+
+   o  HTTP를 통해 제공되는 웹 애플리케이션
+
+      공격자가 그러한 웹 애플리케이션의 호스트(들)에 대해 UA가 HSTS
+      정책을 설정하도록 만들 수 있다면, 보안 전송 없이 HTTP를 통해서만
+      제공되는 웹 애플리케이션(또는 그 중요한 부분)에 대해 DoS 공격을
+      수행할 기회가 있다.
+
+      이는 UA에서 웹 애플리케이션의 호스트에 대해 HSTS 정책이 설정되면
+      UA가 호스트와 통신할 때 보안 전송만 사용하기 때문이다. 호스트가
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 35]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-36" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+      보안 전송을 사용하지 않거나 웹 애플리케이션의 중요한 부분에 이를
+      사용하지 않는다면, 해당 웹 애플리케이션은 UA 사용자에게 사용할 수
+      없는 상태가 될 것이다.
+
+      참고:  이는 <a href="#section-12.5">섹션 12.5</a>("HSTS 정책 삭제")에서 언급한 것처럼 UA가
+             "HSTS 정책 삭제" 기능을 제공해야 하는 사용 사례이다.
+
+      피해자 호스트에 HSTS 정책을 설정하는 방법은 다양하다.
+
+      *  웹 애플리케이션에 "HTTP header injection"을 용이하게 하는 데
+         악용될 수 있는 HTTP 응답 분할 취약점 [<a href="#ref-CWE-113" title="&quot;CWE-113: Improper Neutralization of CRLF Sequences in HTTP Headers ('HTTP Response Splitting')&quot;">CWE-113</a>]이 있는 경우.
+
+      *  공격자가 비보안 피해자 사이트, 예를 들어
+         &lt;http://example.com/&gt;에서 &lt;https://example.com/&gt;으로의
+         리디렉션을 스푸핑할 수 있고, 후자가 공격자에 의해 제어되며
+         겉보기에는 유효한 인증서를 가지고 있는 경우. 이 상황에서
+         공격자는 example.com에 대해, 그리고 example.com의 모든 하위
+         도메인에 대해 HSTS 정책을 설정할 수 있다.
+
+      *  공격자가 사용자에게 피해자 호스트에 대한 HSTS 정책을 수동으로
+         구성하도록 설득할 수 있는 경우. 이는 사용자의 UA가 그러한
+         기능을 제공한다고 가정한다(<a href="#section-12">섹션 12</a>("사용자 에이전트 구현
+         조언") 참조). 또는 그러한 UA 구성이 스크립트 가능하다면,
+         공격자는 UA가 자신의 스크립트를 실행하게 하여 원하는 도메인에
+         대해 HSTS 정책을 설정하게 할 수 있다.
+
+   o  includeSubDomains의 부주의한 사용
+
+      includeSubDomains 지시자는 주어진 HSTS Host의 모든 하위 도메인을
+      Known HSTS Hosts로 자동 간주하도록 UA에 지시한다. 그러한 하위
+      도메인 중 올바르게 구성된 보안 전송을 지원하지 않는 것이 있다면,
+      그러한 UA에서는 해당 하위 도메인에 접근할 수 없게 된다.
+
+<span class="h3"><a class="selflink" id="section-14.6" href="#section-14.6">14.6</a>.  부트스트랩 MITM 취약점</span>
+
+   부트스트랩 MITM(man-in-the-middle) 취약점은 사용자가 "https" URI가
+   아니라 "http" URI를 사용하여 unknown HSTS Host를 수동으로 입력하거나
+   링크를 따라가는 상황에서 사용자와 HSTS Host가 마주하는 취약점이다.
+   UA가 지정된 서버와 상호작용하려는 초기 시도에서 비보안 채널을
+   사용하기 때문에, 이러한 초기 상호작용은 다양한 공격에 취약하다
+   ([<a href="#ref-ForceHTTPS">ForceHTTPS</a>]의 섹션 5.3 참조).
+
+   참고:  UA 구현이 이 취약점을 완화하기 위해 사용할 수 있는 다양한
+          기능/수단이 있다. <a href="#section-12">섹션 12</a>("사용자 에이전트 구현 조언")를
+          참조하라.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 36]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-37" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h3"><a class="selflink" id="section-14.7" href="#section-14.7">14.7</a>.  네트워크 시간 공격</span>
+
+   능동 네트워크 공격은 Network Time Protocol(NTP) [<a href="./rfc5905" title="&quot;Network Time Protocol Version 4: Protocol and Algorithms Specification&quot;">RFC5905</a>]과 같은
+   네트워크 시간 프로토콜을 전복할 수 있으며, 이는 NTP를 신뢰하거나
+   실시간 시계가 없는 클라이언트에 대해 HSTS의 효과를 떨어뜨린다.
+   네트워크 시간 공격은 이 명세의 범위를 벗어난다. 현대 운영 체제는
+   기본적으로 NTP를 사용한다는 점에 유의하라. <a href="./rfc4732#section-2.10">[RFC4732]의
+   섹션&nbsp;2.10</a>도 참조하라.
+
+<span class="h3"><a class="selflink" id="section-14.8" href="#section-14.8">14.8</a>.  가짜 루트 CA 인증서 피싱 및 DNS 캐시 포이즈닝 공격</span>
+
+   공격자는 가짜 루트 CA 인증서 피싱 및 DNS 캐시 포이즈닝 공격을 통해
+   HSTS로 보호되는 피해자 웹 애플리케이션에 속한 사용자의 로그인 자격
+   증명을 얻을 수 있다고 상상할 수 있다.
+
+   예를 들어 공격자는 먼저 HSTS 정책으로 보호되는 피해자 웹
+   애플리케이션의 사용자들에게, 피해자 웹 애플리케이션의 CA를
+   나타낸다고 (거짓으로) 주장하는 공격자 버전의 루트 CA 인증서를
+   설치하도록 설득할 수 있다. 이는 사용자에게 그러한 인증서로 연결되는
+   링크가 포함된 피싱 이메일 메시지를 보내는 방식으로 이루어질 수
+   있으며, 사용자가 클릭하면 브라우저가 설치를 제안할 수 있다.
+
+   그런 다음 공격자가 사용자들의 DNS 서버에 대해 공격(예: 캐시
+   포이즈닝)을 수행하고 자신의 가짜 웹 애플리케이션에 대해 HSTS 정책을
+   켤 수 있다면, 영향을 받은 사용자의 브라우저는 합법적인 웹
+   애플리케이션이 아니라 공격자의 웹 애플리케이션에 접근하게 된다.
+
+   이러한 유형의 공격은 HSTS 범위를 벗어나는 벡터를 활용한다. 그러나
+   HSTS에 더하여 DNS Security Extensions [<a href="./rfc4033" title="&quot;DNS Security Introduction and Requirements&quot;">RFC4033</a>]와 같은 보안
+   기능을 적절히 사용하고, 이메일 피싱 및 가짜 인증서 주입을 차단하는
+   기법을 웹 애플리케이션의 전체 배포 접근법에 포함함으로써 그러한
+   위협의 실현 가능성을 완화할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-14.9" href="#section-14.9">14.9</a>.  HSTS 정책 저장소의 창의적 조작</span>
+
+   HSTS Host는 자신의 호스트 이름과 그 하위 도메인을 선택할 수 있고,
+   이 정보가 적합한 UA의 HSTS 정책 저장소에 캐시되므로, 하나 이상의
+   HSTS Host를 제어하는 이들이 자신이 제어하는 도메인 이름에 정보를
+   인코딩하고, HSTS Host를 기록하는 과정에서 이러한 UA가 이 정보를
+   자연스럽게 캐시하도록 만들 수 있다. 이 정보는 정교하게 구성되고
+   로드된 웹 리소스를 통해 다른 호스트가 회수할 수 있으며, 이로 인해
+   UA가 인코딩된 도메인 이름(의 변형)에 쿼리를 보내게 된다. 이러한
+   쿼리는 UA가 이전에 원래 HSTS Host(및 하위 도메인)를 방문했는지를
+   드러낼 수 있다.
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 37]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-38" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   이러한 기법은 잠재적으로 또 다른 형태의 "웹 추적" [<a href="#ref-WebTracking">WebTracking</a>]으로
+   악용될 수 있다.
+
+<span class="h3"><a class="selflink" id="section-14.10" href="#section-14.10">14.10</a>.  국제화 도메인 이름</span>
+
+   인터넷 보안은 부분적으로 DNS와 DNS가 호스팅하는 도메인 이름에
+   의존한다. 도메인 이름은 사용자가 인터넷 호스트 및 기타 네트워크
+   리소스를 식별하고 연결하는 데 사용된다. 예를 들어 사용자가 입력한
+   국제화 도메인 이름(IDN)이 IDN에 대한 서로 다른 해석에 따라 서로
+   다른 호스트로 연결된다면, 인터넷 보안은 손상된다.
+
+   이 명세에 명시된 처리 모델은 자신이 조작하는 도메인 이름이
+   IDNA-정규화되어 있으며, 정규화 과정에서 필수 명세에 따라 모든
+   적절한 IDNA 및 Unicode 검증과 문자 목록 테스트가 올바르게 수행된
+   것으로 가정한다(예: <a href="#section-10">섹션 10</a>("도메인 이름 IDNA-정규화")에서 언급한
+   바와 같음). 이러한 단계는 다양한 잠재적 손상 상황을 피하기 위해
+   필요하다.
+
+   간단히 말해, 신중하고 일관된 Unicode 및 IDNA 검증이 부족하여
+   발생할 수 있는 문제의 예에는 예기치 않은 처리 예외, 잘림 오류,
+   버퍼 오버플로뿐 아니라 거짓 양성 및/또는 거짓 음성 도메인 이름 매칭
+   결과가 포함된다. 앞서 언급한 문제 중 어느 것이든 공격자가 다양한
+   방식으로 활용할 수 있다.
+
+   또한 IDNA2008 [<a href="./rfc5890" title="&quot;Internationalized Domain Names for Applications (IDNA): Definitions and Document Framework&quot;">RFC5890</a>]은 허용되지 않는 문자와 문자 매핑 관례
+   측면에서 IDNA2003 [<a href="./rfc3490" title="&quot;Internationalizing Domain Names in Applications (IDNA)&quot;">RFC3490</a>]과 다르다. 이 상황 역시 거짓 양성
+   및/또는 거짓 음성 도메인 이름 매칭 결과로 이어질 수 있으며, 그 결과
+   예를 들어 사용자가 의도하지 않은 호스트와 통신하거나 의도한
+   호스트에 도달하지 못할 수 있다.
+
+   자세한 내용은 [<a href="./rfc5890" title="&quot;Internationalized Domain Names for Applications (IDNA): Definitions and Document Framework&quot;">RFC5890</a>], [<a href="./rfc5891" title="&quot;Internationalized Domain Names in Applications (IDNA): Protocol&quot;">RFC5891</a>] 및 [<a href="./rfc3490" title="&quot;Internationalizing Domain Names in Applications (IDNA)&quot;">RFC3490</a>]의 보안 고려사항 섹션과,
+   이들이 규범적으로 참조하는 명세를 참조하라. 또한 [<a href="./rfc5894" title="&quot;Internationalized Domain Names for Applications (IDNA): Background, Explanation, and Rationale&quot;">RFC5894</a>]는 특히
+   IDNA2008에 대한 자세한 배경과 근거뿐 아니라 IDNA와 그 문제 전반에
+   대한 배경과 근거를 제공하므로, 앞의 명세들과 함께 참조해야 한다.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 38]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-39" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h2"><a class="selflink" id="section-15" href="#section-15">15</a>.  IANA 고려사항</span>
+
+   아래는 [<a href="./rfc3864" title="&quot;Registration Procedures for Message Header Fields&quot;">RFC3864</a>]에 따른 Internet Assigned Numbers Authority(IANA)
+   영구 메시지 헤더 필드 등록 정보이다.
+
+     헤더 필드 이름:           Strict-Transport-Security
+     적용 가능한 프로토콜:     http
+     상태:                      standard
+     작성자/변경 관리자:       IETF
+     명세 문서:                 이 문서
+
+<span class="h2"><a class="selflink" id="section-16" href="#section-16">16</a>.  참고문헌</span>
+
+<span class="h3"><a class="selflink" id="section-16.1" href="#section-16.1">16.1</a>.  규범적 참고문헌</span>
+
+   [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "요구 수준을 나타내기 위해 RFC에서 사용하는
+              핵심 단어", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>, 1997년 3월.
+
+   [<a id="ref-RFC2616">RFC2616</a>]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+              Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
+              Transfer Protocol -- HTTP/1.1", <a href="./rfc2616">RFC 2616</a>, 1999년 6월.
+
+   [<a id="ref-RFC2818">RFC2818</a>]  Rescorla, E., "HTTP Over TLS", <a href="./rfc2818">RFC 2818</a>, 2000년 5월.
+
+   [<a id="ref-RFC3490">RFC3490</a>]  Faltstrom, P., Hoffman, P., and A. Costello,
+              "애플리케이션에서 도메인 이름 국제화(IDNA)",
+              <a href="./rfc3490">RFC 3490</a>, 2003년 3월.
+
+   [<a id="ref-RFC3864">RFC3864</a>]  Klyne, G., Nottingham, M., and J. Mogul, "메시지 헤더
+              필드 등록 절차", <a href="https://www.rfc-editor.org/bcp/bcp90">BCP 90</a>, <a href="./rfc3864">RFC 3864</a>,
+              2004년 9월.
+
+   [<a id="ref-RFC3986">RFC3986</a>]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              <a href="./rfc3986">RFC 3986</a>, 2005년 1월.
+
+   [<a id="ref-RFC5246">RFC5246</a>]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+              (TLS) Protocol Version 1.2", <a href="./rfc5246">RFC 5246</a>, 2008년 8월.
+
+   [<a id="ref-RFC5890">RFC5890</a>]  Klensin, J., "애플리케이션을 위한 국제화 도메인 이름
+              (IDNA): 정의 및 문서 프레임워크",
+              <a href="./rfc5890">RFC 5890</a>, 2010년 8월.
+
+   [<a id="ref-RFC5891">RFC5891</a>]  Klensin, J., "애플리케이션에서의 국제화 도메인 이름
+              (IDNA): 프로토콜", <a href="./rfc5891">RFC 5891</a>, 2010년 8월.
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 39]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-40" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   [<a id="ref-RFC5895">RFC5895</a>]  Resnick, P. and P. Hoffman, "애플리케이션에서의
+              국제화 도메인 이름(IDNA) 2008을 위한 문자 매핑",
+              <a href="./rfc5895">RFC 5895</a>, 2010년 9월.
+
+   [<a id="ref-RFC6698">RFC6698</a>]  Hoffman, P. and J. Schlyter, "명명된 엔터티의 DNS 기반
+              인증(DANE) Transport Layer Security(TLS) 프로토콜: TLSA",
+              <a href="./rfc6698">RFC 6698</a>, 2012년 8월.
+
+   [<a id="ref-UTS46">UTS46</a>]    Davis, M. and M. Suignard, "Unicode IDNA Compatibility
+              Processing", Unicode Technical Standard #46,
+              &lt;<a href="http://unicode.org/reports/tr46/">http://unicode.org/reports/tr46/</a>&gt;.
+
+   [<a id="ref-Unicode">Unicode</a>]  The Unicode Consortium, "The Unicode Standard",
+              &lt;<a href="http://www.unicode.org/versions/latest/">http://www.unicode.org/versions/latest/</a>&gt;.
+
+   [<a id="ref-W3C.REC-html401-19991224">W3C.REC-html401-19991224</a>]
+              Raggett, D., Le Hors, A., and I. Jacobs, "HTML 4.01
+              Specification", World Wide Web Consortium Recommendation
+              REC-html401-19991224, 1999년 12월,
+              &lt;<a href="http://www.w3.org/TR/1999/REC-html401-19991224/">http://www.w3.org/TR/1999/REC-html401-19991224/</a>&gt;.
+
+<span class="h3"><a class="selflink" id="section-16.2" href="#section-16.2">16.2</a>.  정보성 참고문헌</span>
+
+   [<a id="ref-Aircrack-ng">Aircrack-ng</a>]
+              d'Otreppe, T., "Aircrack-ng", 접근일: 2010년 7월 11일,
+              &lt;<a href="http://www.aircrack-ng.org/">http://www.aircrack-ng.org/</a>&gt;.
+
+   [<a id="ref-BeckTews09">BeckTews09</a>]
+              Beck, M. and E. Tews, "WEP 및 WPA에 대한 실용적 공격",
+              Second ACM Conference on Wireless Network
+              Security Zurich, Switzerland, 2009,
+              &lt;<a href="http://dl.acm.org/citation.cfm?id=1514286">http://dl.acm.org/citation.cfm?id=1514286</a>&gt;.
+
+   [<a id="ref-CWE-113">CWE-113</a>]  "CWE-113: HTTP 헤더의 CRLF 시퀀스에 대한 부적절한
+              중화('HTTP Response Splitting')", Common Weakness
+              Enumeration &lt;<a href="http://cwe.mitre.org/">http://cwe.mitre.org/</a>&gt;, The Mitre
+              Corporation &lt;<a href="http://www.mitre.org/">http://www.mitre.org/</a>&gt;,
+              &lt;<a href="http://cwe.mitre.org/data/definitions/113.html">http://cwe.mitre.org/data/definitions/113.html</a>&gt;.
+
+   [<a id="ref-Firesheep">Firesheep</a>]
+              Various, "Firesheep", Wikipedia Online, ongoing, &lt;<a href="https://secure.wikimedia.org/wikipedia/en/w/index.php?title=Firesheep&amp;oldid=517474182">https://</a>
+              <a href="https://secure.wikimedia.org/wikipedia/en/w/index.php?title=Firesheep&amp;oldid=517474182">secure.wikimedia.org/wikipedia/en/w/</a>
+              <a href="https://secure.wikimedia.org/wikipedia/en/w/index.php?title=Firesheep&amp;oldid=517474182">index.php?title=Firesheep&amp;oldid=517474182</a>&gt;.
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 40]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-41" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   [<a id="ref-ForceHTTPS">ForceHTTPS</a>]
+              Jackson, C. and A. Barth, "ForceHTTPS:  고보안 웹
+              사이트를 네트워크 공격으로부터 보호하기", In Proceedings
+              of the 17th International World Wide Web Conference
+              (WWW2008) , 2008,
+              &lt;<a href="https://crypto.stanford.edu/forcehttps/">https://crypto.stanford.edu/forcehttps/</a>&gt;.
+
+   [<a id="ref-GoodDhamijaEtAl05">GoodDhamijaEtAl05</a>]
+              Good, N., Dhamija, R., Grossklags, J., Thaw, D.,
+              Aronowitz, S., Mulligan, D., and J. Konstan, "게이트에서
+              스파이웨어 막기: 개인정보, 고지 및 스파이웨어에 관한
+              사용자 연구", In Proceedings of Symposium On Usable Privacy
+              and Security (SOUPS) Pittsburgh, PA, USA, 2005년 7월,
+              &lt;<a href="http://www.law.berkeley.edu/files/Spyware_at_the_Gate.pdf">http://www.law.berkeley.edu/files/</a>
+              <a href="http://www.law.berkeley.edu/files/Spyware_at_the_Gate.pdf">Spyware_at_the_Gate.pdf</a>&gt;.
+
+   [<a id="ref-HTTP1_1-UPD">HTTP1_1-UPD</a>]
+              Fielding, R., Ed., and J. Reschke, Ed., "Hypertext
+              Transfer Protocol (HTTP/1.1): Message Syntax and Routing",
+              Work in Progress, 2012년 10월.
+
+   [<a id="ref-JacksonBarth2008">JacksonBarth2008</a>]
+              Jackson, C. and A. Barth, "Beware of Finer-Grained
+              Origins", Web 2.0 Security and Privacy Workshop, Oakland,
+              CA, USA, 2008,
+              &lt;<a href="http://seclab.stanford.edu/websec/origins/fgo.pdf">http://seclab.stanford.edu/websec/origins/fgo.pdf</a>&gt;.
+
+   [<a id="ref-OWASP-TLSGuide">OWASP-TLSGuide</a>]
+              Coates, M., Wichers, D., Boberski, M., and T. Reguly,
+              "Transport Layer Protection Cheat Sheet",
+              접근일: 2010년 7월 11일, &lt;<a href="http://www.owasp.org/index.php/Transport_Layer_Protection_Cheat_Sheet">http://www.owasp.org/index.php/</a>
+              <a href="http://www.owasp.org/index.php/Transport_Layer_Protection_Cheat_Sheet">Transport_Layer_Protection_Cheat_Sheet</a>&gt;.
+
+   [<a id="ref-RFC1035">RFC1035</a>]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, <a href="./rfc1035">RFC 1035</a>, 1987년 11월.
+
+   [<a id="ref-RFC2560">RFC2560</a>]  Myers, M., Ankney, R., Malpani, A., Galperin, S., and C.
+              Adams, "X.509 Internet Public Key Infrastructure Online
+              Certificate Status Protocol - OCSP", <a href="./rfc2560">RFC 2560</a>, 1999년 6월.
+
+   [<a id="ref-RFC4033">RFC4033</a>]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements",
+              <a href="./rfc4033">RFC 4033</a>, 2005년 3월.
+
+   [<a id="ref-RFC4732">RFC4732</a>]  Handley, M., Rescorla, E., and IAB, "Internet Denial-of-
+              Service Considerations", <a href="./rfc4732">RFC 4732</a>, 2006년 12월.
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 41]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-42" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   [<a id="ref-RFC4949">RFC4949</a>]  Shirey, R., "Internet Security Glossary, Version 2",
+              <a href="./rfc4949">RFC 4949</a>, 2007년 8월.
+
+   [<a id="ref-RFC5226">RFC5226</a>]  Narten, T. and H. Alvestrand, "RFC의 IANA 고려사항
+              섹션 작성 지침", <a href="https://www.rfc-editor.org/bcp/bcp26">BCP 26</a>, <a href="./rfc5226">RFC 5226</a>,
+              2008년 5월.
+
+   [<a id="ref-RFC5280">RFC5280</a>]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+              Housley, R., and W. Polk, "Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", <a href="./rfc5280">RFC 5280</a>, 2008년 5월.
+
+   [<a id="ref-RFC5894">RFC5894</a>]  Klensin, J., "애플리케이션을 위한 국제화 도메인 이름
+              (IDNA): 배경, 설명 및 근거", <a href="./rfc5894">RFC 5894</a>, 2010년 8월.
+
+   [<a id="ref-RFC5905">RFC5905</a>]  Mills, D., Martin, J., Burbank, J., and W. Kasch, "Network
+              Time Protocol Version 4: Protocol and Algorithms
+              Specification", <a href="./rfc5905">RFC 5905</a>, 2010년 6월.
+
+   [<a id="ref-RFC6066">RFC6066</a>]  Eastlake, D., "Transport Layer Security (TLS) Extensions:
+              Extension Definitions", <a href="./rfc6066">RFC 6066</a>, 2011년 1월.
+
+   [<a id="ref-RFC6101">RFC6101</a>]  Freier, A., Karlton, P., and P. Kocher, "The Secure
+              Sockets Layer (SSL) Protocol Version 3.0", <a href="./rfc6101">RFC 6101</a>,
+              2011년 8월.
+
+   [<a id="ref-RFC6125">RFC6125</a>]  Saint-Andre, P. and J. Hodges, "Transport Layer
+              Security(TLS) 맥락에서 X.509(PKIX) 인증서를 사용한
+              공개 키 기반구조 내 도메인 기반 애플리케이션 서비스 신원
+              표현 및 검증", <a href="./rfc6125">RFC 6125</a>, 2011년 3월.
+
+   [<a id="ref-RFC6265">RFC6265</a>]  Barth, A., "HTTP State Management Mechanism", <a href="./rfc6265">RFC 6265</a>,
+              2011년 4월.
+
+   [<a id="ref-RFC6454">RFC6454</a>]  Barth, A., "The Web Origin Concept", <a href="./rfc6454">RFC 6454</a>,
+              2011년 12월.
+
+   [<a id="ref-SunshineEgelmanEtAl09">SunshineEgelmanEtAl09</a>]
+              Sunshine, J., Egelman, S., Almuhimedi, H., Atri, N., and
+              L. Cranor, "Crying Wolf: An Empirical Study of SSL Warning
+              Effectiveness", In Proceedings of 18th USENIX Security
+              Symposium Montreal, Canada, 2009년 8월, &lt;<a href="http://www.usenix.org/events/sec09/tech/full_papers/sunshine.pdf">http://</a>
+              <a href="http://www.usenix.org/events/sec09/tech/full_papers/sunshine.pdf">www.usenix.org/events/sec09/tech/full_papers/</a>
+              <a href="http://www.usenix.org/events/sec09/tech/full_papers/sunshine.pdf">sunshine.pdf</a>&gt;.
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 42]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-43" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+   [<a id="ref-W3C.REC-wsc-ui-20100812">W3C.REC-wsc-ui-20100812</a>]
+              Roessler, T. and A. Saldhana, "Web Security Context: User
+              Interface Guidelines", World Wide Web Consortium
+              Recommendation REC-wsc-ui-20100812, 2010년 8월,
+              &lt;<a href="http://www.w3.org/TR/2010/REC-wsc-ui-20100812">http://www.w3.org/TR/2010/REC-wsc-ui-20100812</a>&gt;.
+
+   [<a id="ref-WebTracking">WebTracking</a>]
+              Schmucker, N., "Web Tracking", SNET2 Seminar Paper
+              - Summer Term, 2011, &lt;<a href="http://www.snet.tu-berlin.de/fileadmin/fg220/courses/SS11/snet-project/web-tracking_schmuecker.pdf">http://www.snet.tu-berlin.de/</a>
+              <a href="http://www.snet.tu-berlin.de/fileadmin/fg220/courses/SS11/snet-project/web-tracking_schmuecker.pdf">fileadmin/fg220/courses/SS11/snet-project/</a>
+              <a href="http://www.snet.tu-berlin.de/fileadmin/fg220/courses/SS11/snet-project/web-tracking_schmuecker.pdf">web-tracking_schmuecker.pdf</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 43]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-44" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">부록 A</a>.  설계 결정 참고 사항</span>
+
+   이 부록은 다양한 설계 결정을 문서화한다.
+
+   1.  쿠키는 HSTS 정책 표현에 적합하지 않다. UA에 저장되어 있는 동안
+       잠재적으로 변경될 수 있기 때문이다. 따라서 HTTP 헤더 필드가
+       사용된다.
+
+   2.  UA 구현 고려사항과 분류상의 어려움 때문에, "혼합 보안 컨텍스트
+       로드"(또는 "혼합 콘텐츠 로드")가 어떻게 처리되는지 명시하려는
+       시도를 하지 않기로 했다.
+
+   3.  HSTS Host는 새로운 HSTS 헤더 필드 매개변수 값을 통해 HSTS 정책에
+       대한 UA의 개념을 갱신할 수 있다. 서버에서 받은 "가장 최신" 정보를
+       UA가 존중하도록 선택한 이유는, 웹 사이트가 다년간의 max-age 값
+       및/또는 잘못된 includeSubDomains 지시자와 같은 잘못된 HSTS 정책을
+       보낼 가능성이 있기 때문이다. HSTS Host가 프로토콜을 통해 그러한
+       오류를 수정할 수 없다면, 사용자에게 어떤 형태로든 알림을 제공하고
+       사용자가 수동 개입해야 하며, 이는 웹 애플리케이션 제공자와
+       사용자 모두에게 사소하지 않은 문제가 될 수 있다.
+
+   4.  HSTS Host는 도메인 이름으로만 식별된다. 모든 형태의 명시적 IP
+       주소 식별은 제외된다. 이는 단순화를 위한 것이며, PKI 기반 보안과
+       함께 직접 IP 주소 식별을 사용하는 데 따르는 다양한 문제를
+       인식한 것이기도 하다.
+
+   5.  HSTS Host가 캐시된 HSTS 정책 time-to-live 값을 위해 단순한 정수
+       초 수를 제공하는 max-age 접근법은, 미래의 만료 시간을 명시하는
+       접근법과 비교하여 여러 이유로 선택되었다. 그 이유에는 시계
+       동기화가 필요 없다는 점, 날짜 및 시간 값 구문을 정의할 필요가
+       없다는 점(명세의 단순성), 구현 단순성이 포함된다.
+
+   6.  포트 매핑을 사용할지 결정할 때, 명시적 포트가 있는 URL의
+       역참조를 단순히 거부하는 선택지도 고려되었다. 그러나 역참조될
+       URI가 잘못되었을 가능성(그리고 실제로 그 포트에 유효한 HTTPS
+       서버가 있을 가능성)이, HTTP 서버에 대한 HTTPS 가져오기가
+       낭비될 수 있는 작은 비용을 감수할 가치가 있다고 판단했다.
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 44]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-45" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-B" href="#appendix-B">부록 B</a>.  HSTS 정책과 동일 출처 정책의 차이</span>
+
+   HSTS 정책은 다음과 같은 주요 특성을 가진다.
+
+      HSTS 정책은 UA-호스트 연결 설정의 보안 특성에 대한 요구사항을
+      호스트별 기준으로 규정한다.
+
+      호스트는 HSTS 정책을 UA에 명시적으로 선언한다. 적합한 UA는
+      호스트가 선언한 HSTS 정책을 구현할 의무가 있다.
+
+      HSTS 정책은 프로토콜을 통해 호스트에서 UA로 전달된다.
+
+      UA는 Known HSTS Hosts의 캐시를 유지한다.
+
+      UA는 Known HSTS Host에 HTTP 연결을 만들 때마다 호스트 포트 번호와
+      관계없이 HSTS 정책을 적용한다. 즉 Known HSTS Host의 모든 포트에
+      적용된다. 호스트는 HSTS 정책의 이 측면에 영향을 줄 수 없다.
+
+      호스트는 자신의 HSTS 정책이 호스트 도메인 이름의 모든 하위
+      도메인에 적용된다고 선택적으로 선언할 수 있다.
+
+   대조적으로, Same-Origin Policy(SOP) [<a href="./rfc6454" title="&quot;The Web Origin Concept&quot;">RFC6454</a>]는 다음과 같은 주요
+   특성을 가진다.
+
+      출처는 리소스를 식별하는 URI의 스킴, 호스트 및 포트이다.
+
+      UA는 URI를 역참조하여, URI가 식별하는 리소스의 표현을 로드할 수
+      있다. UA는 리소스 표현에 그 출처를 표시하며, 출처는 URI에서
+      도출된다.
+
+      SOP는 UA 내부에서 구현되는 원칙들의 모음을 가리키며, UA 내부의
+      리소스 표현 간 격리와 통신뿐 아니라 리소스 표현의 네트워크
+      리소스 접근을 지배한다.
+
+   요약하면, HSTS 정책과 SOP는 모두 UA에 의해 강제되지만, HSTS 정책은
+   호스트가 선택적으로 선언하며 출처 기반이 아닌 반면, SOP는 적합한
+   UA가 모든 호스트에서 로드한 모든 리소스 표현에 적용된다.
+
+
+
+
+
+
+
+
+
+<span class="grey">Hodges, et al.               표준 트랙                        [Page 45]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-46" ></span>
+<span class="grey"><a href="./rfc6797">RFC 6797</a>          HTTP Strict Transport Security (HSTS)    2012년 11월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-C" href="#appendix-C">부록 C</a>.  감사의 말</span>
+
+   저자들은 Devdatta Akhawe, Michael Barrett, Ben Campbell, Tobias
+   Gondrom, Paul Hoffman, Murray Kucherawy, Barry Leiba, James Manger,
+   Alexey Melnikov, Haevard Molland, Yoav Nir, Yngve N. Pettersen,
+   Laksh Raghavan, Marsh Ray, Julian Reschke, Eric Rescorla, Tom Ritter,
+   Peter Saint-Andre, Brian Smith, Robert Sparks, Maciej Stachowiak,
+   Sid Stamm, Andy Steingrubl, Brandon Sterne, Martin Thomson, Daniel
+   Veditz, Jan Wrobel, 그리고 모든 websec 워킹 그룹 참가자와 여러 검토와
+   유익한 기여를 해 준 다른 이들에게 감사한다.
+
+   유효 요청 URI 텍스트를 우아하게 다시 작성해 준 Julian Reschke에게
+   감사한다. 그는 HTTP/1.1 업데이트 [<a href="#ref-HTTP1_1-UPD">HTTP1_1-UPD</a>]에 ERU 개념을
+   통합하면서 이 작업을 수행했다. 이후 이 명세의 ERU 텍스트는 갱신된
+   HTTP/1.1(파트 1) 명세에 있는 Julian의 작업에서 가져와 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]
+   ABNF에 맞게 조정되었다.
+
+저자 주소
+
+   Jeff Hodges
+   PayPal
+   2211 North First Street
+   San Jose, California  95131
+   US
+
+   EMail: Jeff.Hodges@PayPal.com
+
+
+   Collin Jackson
+   Carnegie Mellon University
+
+   EMail: collin.jackson@sv.cmu.edu
+
+
+   Adam Barth
+   Google, Inc.
+
+   EMail: ietf@adambarth.com
+   URI:   <a href="http://www.adambarth.com/">http://www.adambarth.com/</a>
+
+
+
+
+
+
+
+
+
+
+
+Hodges, et al.               표준 트랙                        [Page 46]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
