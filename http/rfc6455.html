@@ -1,0 +1,3768 @@
+<pre>인터넷 엔지니어링 태스크 포스 (IETF)                          I. Fette
+Request for Comments: 6455                                  Google, Inc.
+범주: 표준 트랙                                             A. Melnikov
+ISSN: 2070-1721                                               Isode Ltd.
+                                                           2011년 12월
+
+
+                         <span class="h1">WebSocket 프로토콜</span>
+
+초록
+
+   WebSocket 프로토콜은 통제된 환경에서 신뢰할 수 없는 코드를
+   실행하는 클라이언트와, 해당 코드로부터의 통신을 허용하기로 한
+   원격 호스트 간의 양방향 통신을 가능하게 한다. 여기에 사용되는
+   보안 모델은 웹 브라우저에서 일반적으로 사용되는 출처 기반
+   보안 모델이다. 이 프로토콜은 TCP 위에 계층화된, 개시 핸드셰이크와
+   그 뒤를 따르는 기본 메시지 프레이밍으로 구성된다. 이 기술의
+   목표는 여러 HTTP 연결을 여는 것(예: XMLHttpRequest 또는
+   &lt;iframe&gt;과 롱 폴링 사용)에 의존하지 않고 서버와의 양방향
+   통신이 필요한 브라우저 기반 애플리케이션을 위한 메커니즘을
+   제공하는 것이다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물이다. 이는
+   IETF 커뮤니티의 합의를 나타낸다. 이 문서는 공개 검토를 거쳤으며
+   인터넷 엔지니어링 운영 그룹(IESG)에 의해 발행이 승인되었다.
+   인터넷 표준에 대한 추가 정보는 <a href="./rfc5741#section-2">RFC 5741의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 모든 정오표 및 이에 대한 피드백 제공 방법에
+   관한 정보는 다음에서 얻을 수 있다.
+   <a href="http://www.rfc-editor.org/info/rfc6455">http://www.rfc-editor.org/info/rfc6455</a>.
+
+Copyright Notice
+
+   Copyright (c) 2011 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   신뢰 법률 조항의 Section 4.e에 설명된 Simplified BSD License
+   텍스트를 포함하며, Simplified BSD License에 설명된 대로 보증 없이
+   제공된다.
+
+목차
+
+   <a href="#section-1">1</a>.  소개 . . . . . . . . . . . . . . . . . . . . . . . . . . . .  <a href="#page-4">4</a>
+     <a href="#section-1.1">1.1</a>.  배경 . . . . . . . . . . . . . . . . . . . . . . . . . . .  <a href="#page-4">4</a>
+     <a href="#section-1.2">1.2</a>.  프로토콜 개요  . . . . . . . . . . . . . . . . . . . . .  <a href="#page-5">5</a>
+     <a href="#section-1.3">1.3</a>.  개시 핸드셰이크  . . . . . . . . . . . . . . . . . . . .  <a href="#page-6">6</a>
+     <a href="#section-1.4">1.4</a>.  종료 핸드셰이크  . . . . . . . . . . . . . . . . . . . .  <a href="#page-9">9</a>
+     <a href="#section-1.5">1.5</a>.  설계 철학  . . . . . . . . . . . . . . . . . . . . . . .  <a href="#page-9">9</a>
+     <a href="#section-1.6">1.6</a>.  보안 모델 . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-10">10</a>
+     <a href="#section-1.7">1.7</a>.  TCP 및 HTTP와의 관계 . . . . . . . . . . . . . . . . . . <a href="#page-11">11</a>
+     <a href="#section-1.8">1.8</a>.  연결 설정  . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-11">11</a>
+     <a href="#section-1.9">1.9</a>.  WebSocket 프로토콜을 사용하는 서브프로토콜  . . . . . . <a href="#page-12">12</a>
+   <a href="#section-2">2</a>.  준수 요구사항 . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-12">12</a>
+     <a href="#section-2.1">2.1</a>.  용어 및 기타 규약  . . . . . . . . . . . . . . . . . . . <a href="#page-13">13</a>
+   <a href="#section-3">3</a>.  WebSocket URI . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-14">14</a>
+   <a href="#section-4">4</a>.  개시 핸드셰이크  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-14">14</a>
+     <a href="#section-4.1">4.1</a>.  클라이언트 요구사항  . . . . . . . . . . . . . . . . . . <a href="#page-14">14</a>
+     <a href="#section-4.2">4.2</a>.  서버 측 요구사항 . . . . . . . . . . . . . . . . . . . . <a href="#page-20">20</a>
+       <a href="#section-4.2.1">4.2.1</a>.  클라이언트의 개시 핸드셰이크 읽기 . . . . . . . . . <a href="#page-21">21</a>
+       <a href="#section-4.2.2">4.2.2</a>.  서버의 개시 핸드셰이크 보내기 . . . . . . . . . . . <a href="#page-22">22</a>
+     <a href="#section-4.3">4.3</a>.  핸드셰이크에 사용되는 새 헤더 필드의 통합 ABNF . . . . <a href="#page-25">25</a>
+     <a href="#section-4.4">4.4</a>.  여러 버전의 WebSocket 프로토콜 지원 . . . . . . . . . <a href="#page-26">26</a>
+   <a href="#section-5">5</a>.  데이터 프레이밍 . . . . . . . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+     <a href="#section-5.1">5.1</a>.  개요 . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+     <a href="#section-5.2">5.2</a>.  기본 프레이밍 프로토콜  . . . . . . . . . . . . . . . . <a href="#page-28">28</a>
+     <a href="#section-5.3">5.3</a>.  클라이언트-서버 마스킹 . . . . . . . . . . . . . . . . . <a href="#page-32">32</a>
+     <a href="#section-5.4">5.4</a>.  단편화  . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-33">33</a>
+     <a href="#section-5.5">5.5</a>.  제어 프레임 . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-36">36</a>
+       <a href="#section-5.5.1">5.5.1</a>.  Close  . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-36">36</a>
+       <a href="#section-5.5.2">5.5.2</a>.  Ping . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-37">37</a>
+       <a href="#section-5.5.3">5.5.3</a>.  Pong . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-37">37</a>
+     <a href="#section-5.6">5.6</a>.  데이터 프레임  . . . . . . . . . . . . . . . . . . . . . <a href="#page-38">38</a>
+     <a href="#section-5.7">5.7</a>.  예시 . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-38">38</a>
+     <a href="#section-5.8">5.8</a>.  확장성  . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-39">39</a>
+   <a href="#section-6">6</a>.  데이터 보내기 및 받기 . . . . . . . . . . . . . . . . . . . <a href="#page-39">39</a>
+     <a href="#section-6.1">6.1</a>.  데이터 보내기 . . . . . . . . . . . . . . . . . . . . . <a href="#page-39">39</a>
+     <a href="#section-6.2">6.2</a>.  데이터 받기 . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-40">40</a>
+   <a href="#section-7">7</a>.  연결 닫기 . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-41">41</a>
+     <a href="#section-7.1">7.1</a>.  정의  . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-41">41</a>
+       <a href="#section-7.1.1">7.1.1</a>.  WebSocket 연결 닫기 . . . . . . . . . . . . . . . . . <a href="#page-41">41</a>
+       <a href="#section-7.1.2">7.1.2</a>.  WebSocket 종료 핸드셰이크 시작  . . . . . . . . . . . <a href="#page-42">42</a>
+       <a href="#section-7.1.3">7.1.3</a>.  WebSocket 종료 핸드셰이크가 시작됨 . . . . . . . . . <a href="#page-42">42</a>
+       <a href="#section-7.1.4">7.1.4</a>.  WebSocket 연결이 닫힘 . . . . . . . . . . . . . . . . <a href="#page-42">42</a>
+       <a href="#section-7.1.5">7.1.5</a>.  WebSocket 연결 닫기 코드  . . . . . . . . . . . . . . <a href="#page-42">42</a>
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+       <a href="#section-7.1.6">7.1.6</a>.  WebSocket 연결 닫기 사유  . . . . . . . . . . . . . . . <a href="#page-43">43</a>
+       <a href="#section-7.1.7">7.1.7</a>.  WebSocket 연결 실패 처리  . . . . . . . . . . . . . . <a href="#page-43">43</a>
+     <a href="#section-7.2">7.2</a>.  비정상 종료  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-44">44</a>
+       <a href="#section-7.2.1">7.2.1</a>.  클라이언트가 시작한 종료 . . . . . . . . . . . . . . <a href="#page-44">44</a>
+       <a href="#section-7.2.2">7.2.2</a>.  서버가 시작한 종료 . . . . . . . . . . . . . . . . . <a href="#page-44">44</a>
+       <a href="#section-7.2.3">7.2.3</a>.  비정상 종료로부터 복구 . . . . . . . . . . . . . . . <a href="#page-44">44</a>
+     <a href="#section-7.3">7.3</a>.  연결의 정상 종료  . . . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+     <a href="#section-7.4">7.4</a>.  상태 코드 . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+       <a href="#section-7.4.1">7.4.1</a>.  정의된 상태 코드 . . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+       <a href="#section-7.4.2">7.4.2</a>.  예약된 상태 코드 범위  . . . . . . . . . . . . . . . <a href="#page-47">47</a>
+   <a href="#section-8">8</a>.  오류 처리 . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-48">48</a>
+     <a href="#section-8.1">8.1</a>.  UTF-8 인코딩 데이터의 오류 처리  . . . . . . . . . . . <a href="#page-48">48</a>
+   <a href="#section-9">9</a>.  확장 . . . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-48">48</a>
+     <a href="#section-9.1">9.1</a>.  확장 협상 . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-48">48</a>
+     <a href="#section-9.2">9.2</a>.  알려진 확장 . . . . . . . . . . . . . . . . . . . . . . <a href="#page-50">50</a>
+   <a href="#section-10">10</a>. 보안 고려사항  . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-50">50</a>
+     <a href="#section-10.1">10.1</a>. 비브라우저 클라이언트  . . . . . . . . . . . . . . . . . <a href="#page-50">50</a>
+     <a href="#section-10.2">10.2</a>. 출처 고려사항  . . . . . . . . . . . . . . . . . . . . . <a href="#page-50">50</a>
+     <a href="#section-10.3">10.3</a>. 인프라에 대한 공격(마스킹)  . . . . . . . . . . . . . . <a href="#page-51">51</a>
+     <a href="#section-10.4">10.4</a>. 구현별 한계 . . . . . . . . . . . . . . . . . . . . . . <a href="#page-52">52</a>
+     <a href="#section-10.5">10.5</a>. WebSocket 클라이언트 인증  . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+     <a href="#section-10.6">10.6</a>. 연결 기밀성 및 무결성 . . . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+     <a href="#section-10.7">10.7</a>. 유효하지 않은 데이터 처리 . . . . . . . . . . . . . . <a href="#page-53">53</a>
+     <a href="#section-10.8">10.8</a>. WebSocket 핸드셰이크의 SHA-1 사용  . . . . . . . . . . . <a href="#page-54">54</a>
+   <a href="#section-11">11</a>. IANA 고려사항  . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-54">54</a>
+     <a href="#section-11.1">11.1</a>. 새 URI 스킴 등록  . . . . . . . . . . . . . . . . . . . <a href="#page-54">54</a>
+       <a href="#section-11.1.1">11.1.1</a>. "ws" 스킴 등록  . . . . . . . . . . . . . . . . . . <a href="#page-54">54</a>
+       <a href="#section-11.1.2">11.1.2</a>. "wss" 스킴 등록 . . . . . . . . . . . . . . . . . . <a href="#page-55">55</a>
+     <a href="#section-11.2">11.2</a>. "WebSocket" HTTP Upgrade 키워드 등록 . . . . . . . . . . <a href="#page-56">56</a>
+     <a href="#section-11.3">11.3</a>. 새 HTTP 헤더 필드 등록 . . . . . . . . . . . . . . . . . <a href="#page-57">57</a>
+       <a href="#section-11.3.1">11.3.1</a>. Sec-WebSocket-Key  . . . . . . . . . . . . . . . . . . <a href="#page-57">57</a>
+       <a href="#section-11.3.2">11.3.2</a>. Sec-WebSocket-Extensions . . . . . . . . . . . . . . . <a href="#page-58">58</a>
+       <a href="#section-11.3.3">11.3.3</a>. Sec-WebSocket-Accept . . . . . . . . . . . . . . . . . <a href="#page-58">58</a>
+       <a href="#section-11.3.4">11.3.4</a>. Sec-WebSocket-Protocol . . . . . . . . . . . . . . . . <a href="#page-59">59</a>
+       <a href="#section-11.3.5">11.3.5</a>. Sec-WebSocket-Version  . . . . . . . . . . . . . . . . <a href="#page-60">60</a>
+     <a href="#section-11.4">11.4</a>. WebSocket 확장 이름 레지스트리  . . . . . . . . . . . . <a href="#page-61">61</a>
+     <a href="#section-11.5">11.5</a>. WebSocket 서브프로토콜 이름 레지스트리  . . . . . . . . <a href="#page-61">61</a>
+     <a href="#section-11.6">11.6</a>. WebSocket 버전 번호 레지스트리  . . . . . . . . . . . . <a href="#page-62">62</a>
+     <a href="#section-11.7">11.7</a>. WebSocket 닫기 코드 번호 레지스트리 . . . . . . . . . . <a href="#page-64">64</a>
+     <a href="#section-11.8">11.8</a>. WebSocket Opcode 레지스트리  . . . . . . . . . . . . . . <a href="#page-65">65</a>
+     <a href="#section-11.9">11.9</a>. WebSocket 프레이밍 헤더 비트 레지스트리 . . . . . . . . <a href="#page-66">66</a>
+   <a href="#section-12">12</a>. 다른 명세에서 WebSocket 프로토콜 사용 . . . . . . . . . . <a href="#page-66">66</a>
+   <a href="#section-13">13</a>. 감사의 말 . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-67">67</a>
+   <a href="#section-14">14</a>. 참고문헌 . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-68">68</a>
+     <a href="#section-14.1">14.1</a>. 규범적 참고문헌 . . . . . . . . . . . . . . . . . . . . <a href="#page-68">68</a>
+     <a href="#section-14.2">14.2</a>. 참고용 참고문헌 . . . . . . . . . . . . . . . . . . . . <a href="#page-69">69</a>
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  배경</span>
+
+   _이 절은 비규범적이다._
+
+   역사적으로 클라이언트와 서버 간의 양방향 통신이 필요한 웹
+   애플리케이션(예: 인스턴트 메시징 및 게임 애플리케이션)을 만들려면,
+   별도의 HTTP 호출로 상향 알림을 보내는 동안 서버의 업데이트를
+   폴링하도록 HTTP를 남용해야 했다 [<a href="./rfc6202" title="&quot;Known Issues and Best Practices for the Use of Long Polling and Streaming in Bidirectional HTTP&quot;">RFC6202</a>].
+
+   이는 다양한 문제를 초래한다.
+
+   o  서버는 각 클라이언트마다 여러 개의 서로 다른 기반 TCP 연결을
+      사용해야 한다. 클라이언트로 정보를 보내기 위한 하나와,
+      들어오는 각 메시지를 위한 새 연결이 그것이다.
+
+   o  전송 프로토콜은 오버헤드가 크며, 각 클라이언트-서버 메시지는
+      HTTP 헤더를 가진다.
+
+   o  클라이언트 측 스크립트는 응답을 추적하기 위해 나가는 연결에서
+      들어오는 연결로의 매핑을 유지해야 한다.
+
+   더 간단한 해결책은 양방향 트래픽 모두에 단일 TCP 연결을 사용하는
+   것이다. 이것이 WebSocket 프로토콜이 제공하는 것이다. WebSocket API
+   [<a href="#ref-WSAPI" title="&quot;The WebSocket API&quot;">WSAPI</a>]와 결합하여, 웹 페이지에서 원격 서버로의 양방향
+   통신을 위해 HTTP 폴링의 대안을 제공한다.
+
+   동일한 기법은 다양한 웹 애플리케이션에 사용할 수 있다. 게임,
+   주식 시세 표시기, 동시 편집을 지원하는 다중 사용자 애플리케이션,
+   서버 측 서비스를 실시간으로 노출하는 사용자 인터페이스 등이 그
+   예이다.
+
+   WebSocket 프로토콜은 기존 인프라(프록시, 필터링, 인증)의 이점을
+   얻기 위해 HTTP를 전송 계층으로 사용하는 기존 양방향 통신 기술을
+   대체하도록 설계되었다. 이러한 기술은 HTTP가 처음부터 양방향
+   통신에 사용되도록 의도된 것이 아니었기 때문에 효율성과 신뢰성
+   사이의 절충으로 구현되었다(추가 논의는 [<a href="./rfc6202" title="&quot;Known Issues and Best Practices for the Use of Long Polling and Streaming in Bidirectional HTTP&quot;">RFC6202</a>] 참조).
+   WebSocket 프로토콜은 기존 HTTP 인프라의 맥락에서 기존 양방향 HTTP
+   기술의 목표를 다루려고 시도한다. 따라서 현재 환경에 특화된
+   일부 복잡성이 생기더라도 HTTP 포트 80 및 443 위에서 작동하고
+   HTTP 프록시 및 중개자를 지원하도록 설계되었다. 그러나 이 설계가
+   WebSocket을 HTTP로 제한하지는 않으며, 향후 구현은 전체 프로토콜을
+   다시 만들지 않고도 전용 포트에서 더 간단한 핸드셰이크를 사용할 수
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   있다. 이 마지막 점은 중요하다. 대화형 메시징의 트래픽 패턴은 표준
+   HTTP 트래픽과 밀접하게 일치하지 않으며, 일부 구성 요소에 비정상적인
+   부하를 유발할 수 있기 때문이다.
+
+<span class="h3"><a class="selflink" id="section-1.2" href="#section-1.2">1.2</a>.  프로토콜 개요</span>
+
+   _이 절은 비규범적이다._
+
+   프로토콜에는 두 부분이 있다. 핸드셰이크와 데이터 전송이다.
+
+   클라이언트의 핸드셰이크는 다음과 같다.
+
+        GET /chat HTTP/1.1
+        Host: server.example.com
+        Upgrade: websocket
+        Connection: Upgrade
+        Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+        Origin: http://example.com
+        Sec-WebSocket-Protocol: chat, superchat
+        Sec-WebSocket-Version: 13
+
+   서버의 핸드셰이크는 다음과 같다.
+
+        HTTP/1.1 101 Switching Protocols
+        Upgrade: websocket
+        Connection: Upgrade
+        Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+        Sec-WebSocket-Protocol: chat
+
+   클라이언트의 선행 행은 Request-Line 형식을 따른다. 서버의 선행
+   행은 Status-Line 형식을 따른다. Request-Line 및 Status-Line
+   생성식은 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 정의되어 있다.
+
+   두 경우 모두 선행 행 뒤에는 순서 없는 헤더 필드 집합이 온다.
+   이러한 헤더 필드의 의미는 이 문서의 <a href="#section-4">Section 4</a>에 명시되어 있다.
+   쿠키 [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>]와 같은 추가 헤더 필드도 존재할 수 있다. 헤더의
+   형식과 파싱은 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 정의된 대로이다.
+
+   클라이언트와 서버가 모두 핸드셰이크를 보냈고, 핸드셰이크가
+   성공했다면 데이터 전송 부분이 시작된다. 이는 각 측이 상대방과
+   독립적으로 원하는 때에 데이터를 보낼 수 있는 양방향 통신 채널이다.
+
+   성공적인 핸드셰이크 후 클라이언트와 서버는 이 명세에서 "메시지"라고
+   부르는 개념적 단위로 데이터를 주고받는다. 전송선상에서 메시지는 하나
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   이상의 프레임으로 구성된다. WebSocket 메시지는 특정 네트워크 계층
+   프레이밍에 반드시 대응하지 않는다. 단편화된 메시지는 중개자에 의해
+   병합되거나 분할될 수 있기 때문이다.
+
+   프레임에는 관련된 유형이 있다. 같은 메시지에 속하는 각 프레임은
+   같은 유형의 데이터를 포함한다. 대체로 텍스트 데이터(UTF-8 [<a href="./rfc3629" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">RFC3629</a>]
+   텍스트로 해석됨), 이진 데이터(그 해석은 애플리케이션에 맡겨짐),
+   그리고 제어 프레임(애플리케이션을 위한 데이터를 전달하려는 것이
+   아니라 연결을 닫아야 함을 알리는 것과 같은 프로토콜 수준 신호를
+   위한 것)에 대한 유형이 있다. 이 프로토콜 버전은 여섯 가지 프레임
+   유형을 정의하고, 향후 사용을 위해 열 가지를 예약해 둔다.
+
+<span class="h3"><a class="selflink" id="section-1.3" href="#section-1.3">1.3</a>.  개시 핸드셰이크</span>
+
+   _이 절은 비규범적이다._
+
+   개시 핸드셰이크는 HTTP 기반 서버 측 소프트웨어 및 중개자와
+   호환되도록 의도되었다. 따라서 하나의 포트를 해당 서버와 통신하는
+   HTTP 클라이언트와 해당 서버와 통신하는 WebSocket 클라이언트가 모두
+   사용할 수 있다. 이를 위해 WebSocket 클라이언트의 핸드셰이크는
+   HTTP Upgrade 요청이다.
+
+        GET /chat HTTP/1.1
+        Host: server.example.com
+        Upgrade: websocket
+        Connection: Upgrade
+        Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+        Origin: http://example.com
+        Sec-WebSocket-Protocol: chat, superchat
+        Sec-WebSocket-Version: 13
+
+   [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]을 준수하여, 핸드셰이크의 헤더 필드는 클라이언트가
+   임의의 순서로 보낼 수 있으므로 서로 다른 헤더 필드가 수신되는
+   순서는 중요하지 않다.
+
+   GET 메서드 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]의 "Request-URI"는 WebSocket 연결의
+   엔드포인트를 식별하는 데 사용된다. 이는 하나의 IP 주소에서 여러
+   도메인을 서비스하고, 단일 서버가 여러 WebSocket 엔드포인트를
+   서비스할 수 있게 하기 위한 것이다.
+
+   클라이언트는 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 따라 자신의 핸드셰이크의 |Host| 헤더
+   필드에 호스트 이름을 포함하여, 클라이언트와 서버가 사용 중인
+   호스트가 무엇인지 서로 동의했는지 검증할 수 있게 한다.
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   WebSocket 프로토콜에서 옵션을 선택하기 위해 추가 헤더 필드가
+   사용된다. 이 버전에서 사용할 수 있는 일반적인 옵션은
+   서브프로토콜 선택자(|Sec-WebSocket-Protocol|), 클라이언트가
+   지원하는 확장 목록(|Sec-WebSocket-Extensions|), |Origin| 헤더
+   필드 등이다. |Sec-WebSocket-Protocol| 요청 헤더 필드는 어떤
+   서브프로토콜(WebSocket 프로토콜 위에 계층화된 애플리케이션 수준
+   프로토콜)이 클라이언트에 허용 가능한지를 나타내는 데 사용할 수
+   있다. 서버는 허용 가능한 프로토콜 중 하나를 선택하거나 선택하지
+   않으며, 선택한 프로토콜을 나타내기 위해 그 값을 자신의 핸드셰이크에
+   반향한다.
+
+        Sec-WebSocket-Protocol: chat
+
+   |Origin| 헤더 필드 [<a href="./rfc6454" title="&quot;The Web Origin Concept&quot;">RFC6454</a>]는 웹 브라우저에서 WebSocket API를
+   사용하는 스크립트에 의한 WebSocket 서버의 무단 교차 출처 사용을
+   방지하는 데 사용된다. 서버는 WebSocket 연결 요청을 생성한
+   스크립트 출처를 알게 된다. 서버가 이 출처로부터의 연결을 허용하고
+   싶지 않다면, 적절한 HTTP 오류 코드를 보내 연결을 거부할 수 있다.
+   이 헤더 필드는 브라우저 클라이언트가 보낸다. 비브라우저 클라이언트의
+   경우, 해당 클라이언트의 맥락에서 의미가 있다면 이 헤더 필드를 보낼
+   수 있다.
+
+   마지막으로, 서버는 클라이언트의 WebSocket 핸드셰이크를 수신했음을
+   클라이언트에게 증명해야 한다. 그래야 서버가 WebSocket 연결이 아닌
+   연결을 받아들이지 않는다. 이는 공격자가 XMLHttpRequest
+   [<a href="#ref-XMLHttpRequest">XMLHttpRequest</a>] 또는 폼 제출을 사용해 정교하게 만든 패킷을
+   WebSocket 서버에 보내 서버를 속이는 것을 방지한다.
+
+   핸드셰이크가 수신되었음을 증명하기 위해, 서버는 두 가지 정보를
+   가져와 결합하여 응답을 형성해야 한다. 첫 번째 정보는 클라이언트
+   핸드셰이크의 |Sec-WebSocket-Key| 헤더 필드에서 온다.
+
+        Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+
+   이 헤더 필드에 대해 서버는 그 값(헤더 필드에 있는 그대로의 값,
+   예를 들어 base64로 인코딩된 [<a href="./rfc4648" title="&quot;The Base16, Base32, and Base64 Data Encodings&quot;">RFC4648</a>] 버전에서 선행 및 후행
+   공백을 제외한 값)을 가져와, WebSocket 프로토콜을 이해하지 못하는
+   네트워크 엔드포인트에서는 사용될 가능성이 낮은 문자열 형식의
+   전역 고유 식별자(GUID, [<a href="./rfc4122" title="&quot;A Universally Unique IDentifier (UUID) URN Namespace&quot;">RFC4122</a>]) "258EAFA5-E914-47DA-
+   95CA-C5AB0DC85B11"와 연결해야 한다. 이 연결 결과에 대한 SHA-1
+   해시(160비트) [<a href="#ref-FIPS.180-3">FIPS.180-3</a>]를 base64로 인코딩한 값( <a href="./rfc4648#section-4">[RFC4648]의
+   Section&nbsp;4</a> 참조)이 그 후 서버의 핸드셰이크에서 반환된다.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   구체적으로, 위 예시에서처럼 |Sec-WebSocket-Key| 헤더 필드의 값이
+   "dGhlIHNhbXBsZSBub25jZQ=="라면, 서버는 문자열
+   "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"를 연결하여 문자열
+   "dGhlIHNhbXBsZSBub25jZQ==258EAFA5-E914-47DA-95CA-
+   C5AB0DC85B11"을 형성한다. 그 다음 서버는 이에 대한 SHA-1 해시를
+   취하여 0xb3 0x7a 0x4f 0x2c 0xc0 0x62 0x4f 0x16 0x90 0xf6
+   0x46 0x06 0xcf 0x38 0x59 0x45 0xb2 0xbe 0xc4 0xea 값을 얻는다.
+   이 값은 다시 base64로 인코딩되어( <a href="./rfc4648#section-4">[RFC4648]의 Section&nbsp;4</a> 참조)
+   "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=" 값을 만든다. 이 값은
+   |Sec-WebSocket-Accept| 헤더 필드에 반향된다.
+
+   서버의 핸드셰이크는 클라이언트 핸드셰이크보다 훨씬 단순하다.
+   첫 번째 행은 상태 코드 101을 가진 HTTP Status-Line이다.
+
+        HTTP/1.1 101 Switching Protocols
+
+   101이 아닌 모든 상태 코드는 WebSocket 핸드셰이크가 완료되지
+   않았으며 HTTP의 의미론이 여전히 적용됨을 나타낸다. 헤더는 상태
+   코드 뒤에 온다.
+
+   |Connection| 및 |Upgrade| 헤더 필드는 HTTP Upgrade를 완료한다.
+   |Sec-WebSocket-Accept| 헤더 필드는 서버가 연결을 받아들일 의사가
+   있는지를 나타낸다. 존재하는 경우, 이 헤더 필드는 |Sec-WebSocket-Key|로
+   보낸 클라이언트의 nonce와 미리 정의된 GUID를 함께 사용한 해시를
+   포함해야 한다. 그 밖의 값은 서버가 연결을 수락한 것으로 해석되어서는
+   안 된다.
+
+        HTTP/1.1 101 Switching Protocols
+        Upgrade: websocket
+        Connection: Upgrade
+        Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+
+   이러한 필드는 스크립트 페이지를 위한 WebSocket 클라이언트가
+   검사한다. |Sec-WebSocket-Accept| 값이 예상 값과 일치하지 않거나,
+   헤더 필드가 없거나, HTTP 상태 코드가 101이 아니면 연결은 설정되지
+   않으며 WebSocket 프레임은 전송되지 않는다.
+
+   옵션 필드도 포함될 수 있다. 이 프로토콜 버전에서 주요 옵션 필드는
+   |Sec-WebSocket-Protocol|이며, 이는 서버가 선택한 서브프로토콜을
+   나타낸다. WebSocket 클라이언트는 서버가 WebSocket 클라이언트의
+   핸드셰이크에 지정된 값 중 하나를 포함했는지 검증한다. 여러
+   서브프로토콜을 말할 수 있는 서버는 클라이언트의 핸드셰이크를
+   기반으로 하나를 선택하고 이를 자신의 핸드셰이크에 명시해야 한다.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+        Sec-WebSocket-Protocol: chat
+
+   서버는 [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>]에 설명된 대로 쿠키를 _설정_하기 위한 쿠키 관련
+   옵션 필드도 설정할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-1.4" href="#section-1.4">1.4</a>.  종료 핸드셰이크</span>
+
+   _이 절은 비규범적이다._
+
+   종료 핸드셰이크는 개시 핸드셰이크보다 훨씬 간단하다.
+
+   어느 피어든 종료 핸드셰이크를 시작하기 위해 지정된 제어 시퀀스를
+   포함하는 데이터를 가진 제어 프레임을 보낼 수 있다(자세한 내용은
+   <a href="#section-5.5.1">Section 5.5.1</a>). 이러한 프레임을 받으면, 다른 피어는 아직
+   Close 프레임을 보내지 않았다면 응답으로 Close 프레임을 보낸다.
+   _그_ 제어 프레임을 받으면, 첫 번째 피어는 더 이상의 데이터가 오지
+   않을 것임을 알고 연결을 닫는다.
+
+   연결이 닫혀야 함을 나타내는 제어 프레임을 보낸 뒤에는, 피어는
+   더 이상 데이터를 보내지 않는다. 연결이 닫혀야 함을 나타내는 제어
+   프레임을 받은 뒤에는, 피어는 이후 수신되는 모든 데이터를 폐기한다.
+
+   두 피어가 동시에 이 핸드셰이크를 시작해도 안전하다.
+
+   종료 핸드셰이크는 TCP 종료 핸드셰이크(FIN/ACK)를 보완하도록
+   의도되었다. 이는 TCP 종료 핸드셰이크가 특히 가로채는 프록시와
+   다른 중개자가 있는 경우 항상 종단 간에 신뢰할 수 있는 것은 아니기
+   때문이다.
+
+   Close 프레임을 보내고 응답으로 Close 프레임을 기다림으로써,
+   불필요하게 데이터가 손실될 수 있는 특정 경우를 피할 수 있다. 예를
+   들어, 일부 플랫폼에서는 소켓이 수신 큐에 데이터가 있는 상태로
+   닫히면 RST 패킷이 전송되고, 이는 RST를 받은 당사자의 recv()가
+   실패하게 만든다. 읽을 대기 데이터가 있었더라도 마찬가지이다.
+
+<span class="h3"><a class="selflink" id="section-1.5" href="#section-1.5">1.5</a>.  설계 철학</span>
+
+   _이 절은 비규범적이다._
+
+   WebSocket 프로토콜은 프레이밍이 최소화되어야 한다는 원칙에 따라
+   설계되었다(존재하는 유일한 프레이밍은 프로토콜을 스트림 기반이
+   아니라 프레임 기반으로 만들고, Unicode 텍스트와 이진 프레임을
+   구분하도록 지원하기 위한 것이다). 메타데이터는 TCP 위에 메타데이터가
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                    [페이지 9]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   애플리케이션 계층에 의해 계층화되는 방식(예: HTTP)과 마찬가지로,
+   애플리케이션 계층이 WebSocket 위에 계층화할 것으로 기대된다.
+
+   개념적으로 WebSocket은 실제로는 TCP 위의 계층일 뿐이며 다음을
+   수행한다.
+
+   o  브라우저를 위해 웹 출처 기반 보안 모델을 추가한다.
+
+   o  한 포트의 여러 서비스와 한 IP 주소의 여러 호스트 이름을
+      지원하기 위해 주소 지정 및 프로토콜 명명 메커니즘을 추가한다.
+
+   o  TCP가 기반으로 하는 IP 패킷 메커니즘으로 돌아가기 위해 TCP 위에
+      프레이밍 메커니즘을 계층화하되, 길이 제한은 두지 않는다.
+
+   o  프록시 및 기타 중개자가 있는 환경에서 작동하도록 설계된 추가
+      인밴드 종료 핸드셰이크를 포함한다.
+
+   그 외에는 WebSocket이 아무것도 추가하지 않는다. 기본적으로 이는
+   웹의 제약을 고려할 때 가능한 한 원시 TCP를 스크립트에 노출하는
+   것에 가깝도록 의도되었다. 또한 핸드셰이크가 유효한 HTTP Upgrade
+   요청이 되도록 하여, 서버가 HTTP 서버와 포트를 공유할 수 있도록
+   설계되었다. 개념적으로는 다른 프로토콜을 사용해 클라이언트-서버
+   메시징을 설정할 수도 있지만, WebSocket의 의도는 HTTP 및 배포된
+   HTTP 인프라(예: 프록시)와 공존할 수 있는 비교적 간단한 프로토콜을
+   제공하는 것이며, 보안 고려사항을 감안할 때 그러한 인프라와 함께
+   사용하기에 안전한 범위 내에서 가능한 한 TCP에 가깝고, 사용을
+   단순화하고 단순한 것을 단순하게 유지하기 위한 표적 추가 사항(예:
+   메시지 의미론 추가)을 갖추는 것이다.
+
+   이 프로토콜은 확장 가능하도록 의도되었다. 향후 버전은 multiplexing과
+   같은 추가 개념을 도입할 가능성이 높다.
+
+<span class="h3"><a class="selflink" id="section-1.6" href="#section-1.6">1.6</a>.  보안 모델</span>
+
+   _이 절은 비규범적이다._
+
+   WebSocket 프로토콜은 웹 페이지에서 WebSocket 프로토콜을 사용할 때,
+   어떤 웹 페이지가 WebSocket 서버에 접속할 수 있는지를 제한하기 위해
+   웹 브라우저가 사용하는 출처 모델을 사용한다. 당연히 WebSocket
+   프로토콜이 전용 클라이언트에 의해 직접 사용되는 경우(즉, 웹
+   브라우저를 통해 웹 페이지에서 사용되는 것이 아닌 경우), 클라이언트가
+   임의의 출처 문자열을 제공할 수 있으므로 출처 모델은 유용하지 않다.
+
+   이 프로토콜은 SMTP [<a href="./rfc5321" title="&quot;Simple Mail Transfer Protocol&quot;">RFC5321</a>] 및 HTTP와 같은 기존 프로토콜의
+   서버와는 연결 설정에 실패하도록 의도되었으며, HTTP 서버가 원한다면
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 10]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   이 프로토콜 지원을 선택할 수 있도록 허용한다. 이는 엄격하고 정교한
+   핸드셰이크를 사용하고, 핸드셰이크가 끝나기 전에 연결에 삽입될 수
+   있는 데이터를 제한함으로써 달성된다(따라서 서버가 영향을 받을 수
+   있는 정도를 제한한다).
+
+   마찬가지로 다른 프로토콜, 특히 HTTP의 데이터가 WebSocket 서버로
+   전송될 때, 예를 들어 HTML "form"이 WebSocket 서버에 제출되는 경우와
+   같이, 연결 설정에 실패하도록 의도되었다. 이는 주로 서버가
+   핸드셰이크를 읽었음을 증명하도록 요구함으로써 달성된다. 서버는
+   핸드셰이크가 적절한 부분을 포함할 때에만 이를 증명할 수 있고, 그
+   적절한 부분은 WebSocket 클라이언트만 보낼 수 있다. 특히 이 명세를
+   작성하는 시점에서, |Sec-|로 시작하는 필드는 공격자가 웹 브라우저에서
+   XMLHttpRequest [<a href="#ref-XMLHttpRequest">XMLHttpRequest</a>]와 같은 HTML 및 JavaScript API만
+   사용해서는 설정할 수 없다.
+
+<span class="h3"><a class="selflink" id="section-1.7" href="#section-1.7">1.7</a>.  TCP 및 HTTP와의 관계</span>
+
+   _이 절은 비규범적이다._
+
+   WebSocket 프로토콜은 독립적인 TCP 기반 프로토콜이다. HTTP와의
+   유일한 관계는 그 핸드셰이크가 HTTP 서버에 의해 Upgrade 요청으로
+   해석된다는 점이다.
+
+   기본적으로 WebSocket 프로토콜은 일반 WebSocket 연결에는 포트 80을,
+   전송 계층 보안(TLS) [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>] 위로 터널링된 WebSocket 연결에는
+   포트 443을 사용한다.
+
+<span class="h3"><a class="selflink" id="section-1.8" href="#section-1.8">1.8</a>.  연결 설정</span>
+
+   _이 절은 비규범적이다._
+
+   HTTP 서버와 공유되는 포트로 연결을 만들려는 경우(포트 80 및 443의
+   트래픽에서 발생할 가능성이 높은 상황), 그 연결은 HTTP 서버에는
+   Upgrade 제안을 포함한 일반 GET 요청처럼 보인다. 단일 호스트 이름에
+   대한 모든 트래픽을 하나의 IP 주소와 단일 서버만으로 처리하는 비교적
+   단순한 설정에서는, WebSocket 프로토콜 기반 시스템을 배포하는 실용적인
+   방법이 될 수 있다. 더 정교한 설정(예: 로드 밸런서와 여러 서버가 있는
+   경우)에서는 HTTP 서버와 분리된 WebSocket 연결 전용 호스트 집합을
+   관리하는 편이 아마 더 쉽다. 이 명세를 작성하는 시점에서, 포트 80과
+   443의 연결 성공률은 상당히 다르며, 포트 443의 연결이 성공할 가능성이
+   훨씬 높다는 점에 유의해야 한다. 다만 이는 시간이 지나며 바뀔 수 있다.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 11]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h3"><a class="selflink" id="section-1.9" href="#section-1.9">1.9</a>.  WebSocket 프로토콜을 사용하는 서브프로토콜</span>
+
+   _이 절은 비규범적이다._
+
+   클라이언트는 자신의 핸드셰이크에 |Sec-WebSocket-Protocol| 필드를
+   포함함으로써 서버가 특정 서브프로토콜을 사용하도록 요청할 수 있다.
+   이 필드가 지정된 경우, 연결이 설정되려면 서버가 응답에 같은 필드와
+   선택된 서브프로토콜 값 중 하나를 포함해야 한다.
+
+   이러한 서브프로토콜 이름은 <a href="#section-11.5">Section 11.5</a>에 따라 등록되어야 한다.
+   잠재적 충돌을 피하기 위해, 서브프로토콜 생성자의 도메인 이름의 ASCII
+   버전을 포함하는 이름을 사용하는 것이 권장된다. 예를 들어 Example
+   Corporation이 웹 전반의 여러 서버가 구현할 Chat 서브프로토콜을 만든다면,
+   이를 "chat.example.com"이라고 이름 붙일 수 있다. Example Organization이
+   경쟁 서브프로토콜을 "chat.example.org"라고 부른다면, 두 서브프로토콜은
+   서버가 클라이언트가 보낸 값에 따라 사용할 서브프로토콜을 동적으로
+   선택하면서 동시에 구현될 수 있다.
+
+   서브프로토콜은 서브프로토콜 이름을 변경함으로써 하위 호환되지 않는
+   방식으로 버전 관리될 수 있다. 예를 들어 "bookings.example.net"에서
+   "v2.bookings.example.net"으로 변경하는 식이다. 이러한 서브프로토콜은
+   WebSocket 클라이언트가 완전히 별개로 간주한다. 하위 호환되는 버전
+   관리는 같은 서브프로토콜 문자열을 재사용하되, 실제 서브프로토콜이
+   이런 종류의 확장성을 지원하도록 신중하게 설계함으로써 구현할 수 있다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  준수 요구사항</span>
+
+   이 명세의 모든 다이어그램, 예시 및 참고 사항은 명시적으로 비규범으로
+   표시된 모든 절과 마찬가지로 비규범적이다. 이 명세의 그 밖의 모든
+   내용은 규범적이다.
+
+   이 문서의 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", 및
+   "OPTIONAL"은 [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]에 설명된 대로 해석되어야 한다.
+
+   알고리즘의 일부로 명령형으로 표현된 요구사항(예: "strip any leading
+   space characters" 또는 "return false and abort these steps")은 그
+   알고리즘을 도입할 때 사용된 핵심 단어("MUST", "SHOULD", "MAY" 등)의
+   의미로 해석되어야 한다.
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 12]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   알고리즘 또는 특정 단계로 표현된 준수 요구사항은 최종 결과가 동등한
+   한 어떤 방식으로든 구현될 수 있다. (특히 이 명세에 정의된 알고리즘은
+   따라 하기 쉽게 의도된 것이며, 성능이 좋도록 의도된 것이 아니다.)
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  용어 및 기타 규약</span>
+
+   _ASCII_는 [<a href="#ref-ANSI.X3-4.1986">ANSI.X3-4.1986</a>]에 정의된 문자 인코딩 체계를
+   의미한다.
+
+   이 문서는 UTF-8 값을 참조하며 STD 63 [<a href="./rfc3629" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">RFC3629</a>]에 정의된
+   UTF-8 표기 형식을 사용한다.
+
+   명명된 알고리즘이나 정의와 같은 핵심 용어는 _이렇게_ 표시된다.
+
+   헤더 필드 또는 변수의 이름은 |이렇게| 표시된다.
+
+   변수 값은 /이렇게/ 표시된다.
+
+   이 문서는 _Fail the WebSocket Connection_ 절차를 참조한다. 이 절차는
+   <a href="#section-7.1.7">Section 7.1.7</a>에 정의되어 있다.
+
+   _문자열을 ASCII 소문자로 변환_한다는 것은 U+0041부터 U+005A 범위의
+   모든 문자(즉, LATIN CAPITAL LETTER A부터 LATIN CAPITAL LETTER Z까지)를
+   U+0061부터 U+007A 범위의 대응 문자(즉, LATIN SMALL LETTER A부터
+   LATIN SMALL LETTER Z까지)로 바꾸는 것을 의미한다.
+
+   _ASCII 대소문자 비구분_ 방식으로 두 문자열을 비교한다는 것은,
+   U+0041부터 U+005A 범위의 문자(즉, LATIN CAPITAL LETTER A부터
+   LATIN CAPITAL LETTER Z까지)와 U+0061부터 U+007A 범위의 대응 문자(즉,
+   LATIN SMALL LETTER A부터 LATIN SMALL LETTER Z까지)가 서로 일치하는
+   것으로 간주된다는 점을 제외하고, 코드 포인트별로 정확히 비교하는
+   것을 의미한다.
+
+   "URI"라는 용어는 이 문서에서 [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]에 정의된 대로 사용된다.
+
+   구현이 WebSocket 프로토콜의 일부로 데이터를 _보내야_ 하는 경우,
+   구현은 실제 전송을 임의로 지연할 수 있다. 예를 들어 더 적은 IP
+   패킷을 보내기 위해 데이터를 버퍼링할 수 있다.
+
+   이 문서는 서로 다른 절에서 [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]와 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]의
+   ABNF 변형을 모두 사용한다는 점에 유의하라.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 13]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  WebSocket URI</span>
+
+   이 명세는 <a href="./rfc5234">RFC 5234</a> [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]에 정의된 ABNF 구문과,
+   URI 명세 <a href="./rfc3986">RFC 3986</a> [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]에 정의된 용어 및 ABNF 생성식을
+   사용하여 두 가지 URI 스킴을 정의한다.
+
+          ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
+          wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
+
+          host = &lt;host, <a href="./rfc3986#section-3.2.2">[RFC3986], Section&nbsp;3.2.2</a>에 정의됨&gt;
+          port = &lt;port, <a href="./rfc3986#section-3.2.3">[RFC3986], Section&nbsp;3.2.3</a>에 정의됨&gt;
+          path = &lt;path-abempty, <a href="./rfc3986#section-3.3">[RFC3986], Section&nbsp;3.3</a>에 정의됨&gt;
+          query = &lt;query, <a href="./rfc3986#section-3.4">[RFC3986], Section&nbsp;3.4</a>에 정의됨&gt;
+
+   port 구성 요소는 OPTIONAL이다. "ws"의 기본값은 포트 80이고, "wss"의
+   기본값은 포트 443이다.
+
+   스킴 구성 요소가 "wss"와 대소문자를 구분하지 않고 일치하는 경우,
+   URI는 "secure"하다고 불린다(그리고 "secure 플래그가 설정되었다"고
+   말한다).
+
+   "resource-name"(<a href="#section-4.1">Section 4.1</a>의 /resource name/이라고도 함)은 다음을
+   연결하여 구성할 수 있다.
+
+   o  path 구성 요소가 비어 있으면 "/"
+
+   o  path 구성 요소
+
+   o  query 구성 요소가 비어 있지 않으면 "?"
+
+   o  query 구성 요소
+
+   단편 식별자는 WebSocket URI의 맥락에서 의미가 없으며 이러한 URI에
+   사용해서는 안 된다. 모든 URI 스킴과 마찬가지로, 문자 "#"이 단편의
+   시작을 나타내지 않는 경우에는 %23으로 이스케이프되어야 한다.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  개시 핸드셰이크</span>
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  클라이언트 요구사항</span>
+
+   _WebSocket Connection을 설정_하기 위해 클라이언트는 연결을 열고 이
+   절에 정의된 핸드셰이크를 보낸다. 연결은 처음에 CONNECTING 상태에
+   있는 것으로 정의된다. 클라이언트는 <a href="#section-3">Section 3</a>에서 논의한 WebSocket
+   URI의 구성 요소인 /host/, /port/, /resource name/, 및 /secure/
+   플래그와, 사용할 /protocols/ 및 /extensions/ 목록을 제공해야 한다.
+   또한 클라이언트가 웹 브라우저라면 /origin/을 제공한다.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 14]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   특정 통신사에 묶인 모바일 단말기의 브라우저와 같은 통제된 환경에서
+   실행되는 클라이언트는 연결 관리를 네트워크상의 다른 에이전트에
+   맡길 수 있다. 이러한 상황에서 이 명세의 목적상 클라이언트는 단말기
+   소프트웨어와 그러한 에이전트를 모두 포함하는 것으로 간주된다.
+
+   클라이언트가 (/host/, /port/, /resource name/, 및 /secure/ 플래그)의
+   집합과, 사용할 /protocols/ 및 /extensions/ 목록, 그리고 웹
+   브라우저의 경우 /origin/이 주어져 _WebSocket Connection을 설정_하려는
+   경우, 클라이언트는 연결을 열고, 개시 핸드셰이크를 보내며, 응답으로
+   서버의 핸드셰이크를 읽어야 한다. 연결을 어떻게 열어야 하는지,
+   개시 핸드셰이크에서 무엇을 보내야 하는지, 서버의 응답을 어떻게
+   해석해야 하는지에 대한 정확한 요구사항은 이 절에 다음과 같이
+   제시된다. 다음 텍스트에서는 그 절에 정의된 "/host/" 및 "/secure/
+   flag"와 같은 <a href="#section-3">Section 3</a>의 용어를 사용한다.
+
+   1.  이 알고리즘에 전달된 WebSocket URI의 구성 요소(/host/, /port/,
+       /resource name/, 및 /secure/ 플래그)는 <a href="#section-3">Section 3</a>에 명시된
+       WebSocket URI 명세에 따라 유효해야 한다. 구성 요소 중 하나라도
+       유효하지 않으면, 클라이언트는 _Fail the WebSocket Connection_을
+       수행하고 이 단계를 중단해야 한다.
+
+   2.  클라이언트가 /host/ 및 /port/ 쌍으로 식별되는 원격 호스트(IP
+       주소)에 이미 WebSocket 연결을 가지고 있다면, 원격 호스트가 다른
+       이름으로 알려져 있더라도, 클라이언트는 그 연결이 설정되거나 그
+       연결이 실패할 때까지 기다려야 한다. CONNECTING 상태의 연결은
+       하나를 초과해서는 안 된다. 같은 IP 주소로 여러 연결이 동시에
+       시도되는 경우, 클라이언트는 다음 단계를 통과하는 연결이 한 번에
+       하나를 넘지 않도록 이를 직렬화해야 한다.
+
+       클라이언트가 원격 호스트의 IP 주소를 결정할 수 없는 경우(예:
+       모든 통신이 DNS 질의를 직접 수행하는 프록시 서버를 통해 이루어지는
+       경우), 클라이언트는 이 단계의 목적상 각 호스트 이름이 서로 다른
+       원격 호스트를 가리킨다고 가정해야 하며, 대신 동시에 대기 중인
+       연결의 총 수를 합리적으로 낮은 수로 제한하는 것이 좋다(예를 들어,
+       클라이언트는 a.example.com과 b.example.com에 대한 동시 대기
+       연결을 허용할 수 있지만, 단일 호스트에 대해 30개의 동시 연결이
+       요청되면 허용하지 않을 수 있다). 예를 들어 웹 브라우저 맥락에서는,
+       클라이언트가 동시 대기 연결 수의 한계를 설정할 때 사용자가 열어
+       둔 탭 수를 고려해야 한다.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 15]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+       참고: 이는 스크립트가 단순히 원격 호스트에 많은 수의 WebSocket
+       연결을 여는 방식으로 서비스 거부 공격을 수행하기 어렵게 만든다.
+       서버는 공격을 받을 때 연결을 닫기 전에 잠시 멈춤으로써 자신의
+       부하를 더 줄일 수 있다. 그렇게 하면 클라이언트가 재연결하는
+       속도가 줄어들기 때문이다.
+
+       참고: 클라이언트가 단일 원격 호스트와 가질 수 있는 설정된
+       WebSocket 연결 수에는 제한이 없다. 서버는 기존 연결 수가 과도한
+       호스트/IP 주소의 연결을 거부하거나, 높은 부하를 겪을 때 리소스를
+       과도하게 사용하는 연결을 끊을 수 있다.
+
+   3.  _프록시 사용_: 클라이언트가 WebSocket 프로토콜을 사용하여
+       /host/ 및 /port/ 포트의 호스트에 연결할 때 프록시를 사용하도록
+       구성되어 있다면, 클라이언트는 해당 프록시에 연결하고 /host/로
+       주어진 호스트 및 /port/로 주어진 포트에 TCP 연결을 열도록 요청하는
+       것이 좋다.
+
+          예시: 예를 들어 클라이언트가 모든 트래픽에 HTTP 프록시를
+          사용한다면, server example.com의 포트 80에 연결하려 할 때
+          프록시 서버에 다음 행을 보낼 수 있다.
+
+              CONNECT example.com:80 HTTP/1.1
+              Host: example.com
+
+          비밀번호가 있는 경우 연결은 다음과 같을 수 있다.
+
+              CONNECT example.com:80 HTTP/1.1
+              Host: example.com
+              Proxy-authorization: Basic ZWRuYW1vZGU6bm9jYXBlcyE=
+
+       클라이언트가 프록시를 사용하도록 구성되어 있지 않다면, /host/로
+       주어진 호스트 및 /port/로 주어진 포트로 직접 TCP 연결을 여는 것이
+       좋다.
+
+       참고: WebSocket 연결에 대해 다른 프록시와 별개로 프록시를 선택할
+       수 있는 명시적 UI를 노출하지 않는 구현은, 사용 가능하다면 SOCKS5
+       [<a href="./rfc1928" title="&quot;SOCKS Protocol Version 5&quot;">RFC1928</a>] 프록시를 WebSocket 연결에 사용하고, 그렇지 않으면 HTTP
+       연결용으로 구성된 프록시보다 HTTPS 연결용으로 구성된 프록시를
+       선호할 것이 권장된다.
+
+       프록시 자동 구성 스크립트의 목적상, 함수에 전달할 URI는
+       <a href="#section-3">Section 3</a>에 주어진 WebSocket URI 정의를 사용하여 /host/, /port/,
+       /resource name/, 및 /secure/ 플래그로 구성해야 한다.
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 16]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+       참고: WebSocket 프로토콜은 프록시 자동 구성 스크립트에서 스킴으로
+       식별할 수 있다("ws"는 암호화되지 않은 연결, "wss"는 암호화된
+       연결).
+
+   4.  직접 연결이 실패했거나 사용된 프록시가 오류를 반환했기 때문에
+       연결을 열 수 없었다면, 클라이언트는 _Fail the WebSocket
+       Connection_을 수행하고 연결 시도를 중단해야 한다.
+
+   5.  /secure/가 true이면, 클라이언트는 연결을 연 뒤 핸드셰이크 데이터를
+       보내기 전에 그 연결 위에서 TLS 핸드셰이크를 수행해야 한다
+       [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>]. 이것이 실패하면(예: 서버의 인증서를 검증할 수 없는
+       경우), 클라이언트는 _Fail the WebSocket Connection_을 수행하고
+       연결을 중단해야 한다. 그렇지 않으면, 이 채널의 모든 이후 통신은
+       암호화된 터널 [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]을 통해 실행되어야 한다.
+
+       클라이언트는 TLS 핸드셰이크에서 Server Name Indication 확장을
+       사용해야 한다 [<a href="./rfc6066" title="&quot;Transport Layer Security (TLS) Extensions: Extension Definitions&quot;">RFC6066</a>].
+
+   서버와의 연결(프록시를 통한 연결 또는 TLS 암호화 터널을 통한 연결을
+   포함)이 설정되면, 클라이언트는 서버에 개시 핸드셰이크를 보내야 한다.
+   핸드셰이크는 HTTP Upgrade 요청과 필수 및 선택 헤더 필드 목록으로
+   구성된다. 이 핸드셰이크의 요구사항은 다음과 같다.
+
+   1.   핸드셰이크는 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 명시된 유효한 HTTP 요청이어야 한다.
+
+   2.   요청의 메서드는 GET이어야 하며, HTTP 버전은 최소 1.1이어야 한다.
+
+        예를 들어 WebSocket URI가 "ws://example.com/chat"이면, 전송되는
+        첫 번째 행은 "GET /chat HTTP/1.1"이어야 한다.
+
+   3.   요청의 "Request-URI" 부분은 <a href="#section-3">Section 3</a>에 정의된 /resource
+        name/(상대 URI)과 일치해야 하거나, 파싱했을 때 해당 ws/wss URI와
+        일치하는 /resource name/, /host/, 및 /port/를 가진 절대
+        http/https URI여야 한다.
+
+   4.   요청은 /host/와, 기본 포트를 사용하지 않는 경우 선택적으로
+        ":" 뒤에 /port/를 포함하는 값을 가진 |Host| 헤더 필드를 포함해야
+        한다.
+
+   5.   요청은 그 값에 "websocket" 키워드를 포함해야 하는 |Upgrade| 헤더
+        필드를 포함해야 한다.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 17]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   6.   요청은 그 값에 "Upgrade" 토큰을 포함해야 하는 |Connection| 헤더
+        필드를 포함해야 한다.
+
+   7.   요청은 이름이 |Sec-WebSocket-Key|인 헤더 필드를 포함해야 한다.
+        이 헤더 필드의 값은 무작위로 선택된 16바이트 값이 base64로
+        인코딩된 nonce여야 한다( <a href="./rfc4648#section-4">[RFC4648]의 Section&nbsp;4</a> 참조). nonce는 각
+        연결마다 무작위로 선택되어야 한다.
+
+        참고: 예를 들어 무작위로 선택된 값이 바이트 시퀀스 0x01 0x02
+        0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x0c 0x0d
+        0x0e 0x0f 0x10이었다면, 헤더 필드의 값은
+        "AQIDBAUGBwgJCgsMDQ4PEC=="가 된다.
+
+   8.   요청이 브라우저 클라이언트에서 오는 경우, 요청은 이름이
+        |Origin|인 헤더 필드 [<a href="./rfc6454" title="&quot;The Web Origin Concept&quot;">RFC6454</a>]를 포함해야 한다. 연결이 비브라우저
+        클라이언트에서 오는 경우, 그 클라이언트의 의미론이 여기서
+        브라우저 클라이언트를 위해 설명한 사용 사례와 일치한다면 요청은
+        이 헤더 필드를 포함할 수 있다. 이 헤더 필드의 값은 연결을
+        설정하는 코드가 실행되고 있는 맥락의 origin을 ASCII로 직렬화한
+        것이다. 이 헤더 필드 값이 어떻게 구성되는지에 대한 자세한 내용은
+        [<a href="./rfc6454" title="&quot;The Web Origin Concept&quot;">RFC6454</a>]를 참조하라.
+
+        예를 들어 www.example.com에서 다운로드한 코드가 ww2.example.com에
+        연결을 설정하려고 시도하면, 헤더 필드의 값은
+        "http://www.example.com"이 된다.
+
+   9.   요청은 이름이 |Sec-WebSocket-Version|인 헤더 필드를 포함해야 한다.
+        이 헤더 필드의 값은 13이어야 한다.
+
+        참고: 이 문서의 초안 버전(-09, -10, -11, 및 -12)이 게시되었지만
+        (대부분 편집상의 변경과 명확화로 구성되었고 전송 프로토콜의
+        변경은 아니었다), 값 9, 10, 11, 및 12는 Sec-WebSocket-Version의
+        유효한 값으로 사용되지 않았다. 이러한 값은 IANA 레지스트리에
+        예약되었지만 사용되지 않았고 앞으로도 사용되지 않을 것이다.
+
+   10.  요청은 이름이 |Sec-WebSocket-Protocol|인 헤더 필드를 포함할 수
+        있다. 존재하는 경우, 이 값은 클라이언트가 사용하고자 하는 하나
+        이상의 쉼표로 구분된 서브프로토콜을 선호도 순으로 나타낸다.
+        이 값을 구성하는 요소는 U+0021부터 U+007E 범위의 문자로 된
+        비어 있지 않은 문자열이어야 하며, [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 정의된
+        separator 문자를 포함해서는 안 되고, 모두 고유한 문자열이어야
+        한다. 이 헤더 필드 값의 ABNF는 1#token이며, 구성 요소 및 규칙의
+        정의는 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 주어진 것과 같다.
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 18]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   11.  요청은 이름이 |Sec-WebSocket-Extensions|인 헤더 필드를 포함할 수
+        있다. 존재하는 경우, 이 값은 클라이언트가 사용하고자 하는
+        프로토콜 수준 확장을 나타낸다. 이 헤더 필드의 해석 및 형식은
+        <a href="#section-9.1">Section 9.1</a>에 설명되어 있다.
+
+   12.  요청은 그 밖의 어떤 헤더 필드도 포함할 수 있다. 예를 들어 쿠키
+        [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>] 및/또는 |Authorization| 헤더 필드 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]와 같은
+        인증 관련 헤더 필드가 있을 수 있으며, 이들은 이를 정의하는
+        문서에 따라 처리된다.
+
+   클라이언트의 개시 핸드셰이크가 전송되면, 클라이언트는 더 이상의
+   데이터를 보내기 전에 서버의 응답을 기다려야 한다. 클라이언트는 서버의
+   응답을 다음과 같이 검증해야 한다.
+
+   1.  서버로부터 받은 상태 코드가 101이 아니면, 클라이언트는 HTTP
+       [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>] 절차에 따라 응답을 처리한다. 특히 클라이언트는 401
+       상태 코드를 받으면 인증을 수행할 수 있고, 서버는 3xx 상태 코드를
+       사용해 클라이언트를 리디렉션할 수 있다(하지만 클라이언트가 반드시
+       이를 따라야 하는 것은 아니다). 그렇지 않으면 다음과 같이 진행한다.
+
+   2.  응답에 |Upgrade| 헤더 필드가 없거나, |Upgrade| 헤더 필드에 값
+       "websocket"과 ASCII 대소문자 비구분으로 일치하지 않는 값이
+       포함되어 있으면, 클라이언트는 _Fail the WebSocket Connection_을
+       수행해야 한다.
+
+   3.  응답에 |Connection| 헤더 필드가 없거나, |Connection| 헤더 필드에
+       값 "Upgrade"와 ASCII 대소문자 비구분으로 일치하는 토큰이 포함되어
+       있지 않으면, 클라이언트는 _Fail the WebSocket Connection_을
+       수행해야 한다.
+
+   4.  응답에 |Sec-WebSocket-Accept| 헤더 필드가 없거나, |Sec-WebSocket-Accept|가
+       |Sec-WebSocket-Key|(base64 디코딩이 아닌 문자열로서)와 문자열
+       "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"을 연결한 것에 대한
+       base64 인코딩된 SHA-1(단, 선행 및 후행 공백은 무시)과 다른 값을
+       포함하면, 클라이언트는 _Fail the WebSocket Connection_을 수행해야
+       한다.
+
+   5.  응답이 |Sec-WebSocket-Extensions| 헤더 필드를 포함하고 이 헤더
+       필드가 클라이언트의 핸드셰이크에 없던 확장의 사용을 나타낸다면
+       (서버가 클라이언트가 요청하지 않은 확장을 나타낸 경우),
+       클라이언트는 _Fail the WebSocket Connection_을 수행해야 한다.
+       (어떤 확장이 요청되었는지를 결정하기 위한 이 헤더 필드의 파싱은
+       <a href="#section-9.1">Section 9.1</a>에서 논의된다.)
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 19]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   6.  응답이 |Sec-WebSocket-Protocol| 헤더 필드를 포함하고 이 헤더 필드가
+       클라이언트의 핸드셰이크에 없던 서브프로토콜의 사용을 나타낸다면
+       (서버가 클라이언트가 요청하지 않은 서브프로토콜을 나타낸 경우),
+       클라이언트는 _Fail the WebSocket Connection_을 수행해야 한다.
+
+   서버의 응답이 이 절 및 <a href="#section-4.2.2">Section 4.2.2</a>에 정의된 서버 핸드셰이크의
+   요구사항을 따르지 않으면, 클라이언트는 _Fail the WebSocket
+   Connection_을 수행해야 한다.
+
+   [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 따르면 HTTP 요청과 HTTP 응답 모두에서 모든 헤더 필드
+   이름은 대소문자를 구분하지 않는다는 점에 유의하라.
+
+   서버의 응답이 위에 제공된 대로 검증되면, _The WebSocket Connection is
+   Established_라고 말하며 WebSocket 연결은 OPEN 상태에 있다고 한다.
+   _Extensions In Use_는 (비어 있을 수 있는) 문자열로 정의되며, 그 값은
+   서버 핸드셰이크에서 제공된 |Sec-WebSocket-Extensions| 헤더 필드의
+   값과 같거나, 해당 헤더 필드가 서버 핸드셰이크에 없었다면 null 값이다.
+   _Subprotocol In Use_는 서버 핸드셰이크의 |Sec-WebSocket-Protocol| 헤더
+   필드 값으로 정의되며, 해당 헤더 필드가 서버 핸드셰이크에 없었다면
+   null 값이다. 또한 서버 핸드셰이크의 어떤 헤더 필드가 쿠키를 설정해야
+   함을 나타낸다면([<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>]에 정의된 대로), 이러한 쿠키는 _Cookies Set
+   During the Server's Opening Handshake_라고 불린다.
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  서버 측 요구사항</span>
+
+   서버는 연결 관리를 네트워크상의 다른 에이전트, 예를 들어 로드 밸런서와
+   역방향 프록시에 맡길 수 있다. 이러한 상황에서 이 명세의 목적상 서버는
+   TCP 연결을 종료하는 첫 번째 장치부터 요청을 처리하고 응답을 보내는
+   서버까지 서버 측 인프라의 모든 부분을 포함하는 것으로 간주된다.
+
+   예시: 데이터 센터에는 WebSocket 요청에 적절한 핸드셰이크로 응답한
+   뒤 실제로 데이터 프레임을 처리할 다른 서버로 연결을 전달하는 서버가
+   있을 수 있다. 이 명세의 목적상 "서버"는 두 컴퓨터의 조합이다.
+
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 20]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h4"><a class="selflink" id="section-4.2.1" href="#section-4.2.1">4.2.1</a>.  클라이언트의 개시 핸드셰이크 읽기</span>
+
+   클라이언트가 WebSocket 연결을 시작할 때, 클라이언트는 개시
+   핸드셰이크에서 자신의 부분을 보낸다. 서버는 서버 측 핸드셰이크를
+   생성하는 데 필요한 정보를 얻기 위해 이 핸드셰이크의 적어도 일부를
+   파싱해야 한다.
+
+   클라이언트의 개시 핸드셰이크는 다음 부분으로 구성된다. 서버가
+   핸드셰이크를 읽는 동안 클라이언트가 아래 설명과 일치하는 핸드셰이크를
+   보내지 않았음을 발견하면([<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 따라 헤더 필드의 순서는 중요하지
+   않음에 유의), 핸드셰이크 구성 요소에 대해 명시된 ABNF 문법 위반을
+   포함하지만 이에 한정되지 않는 모든 경우에, 서버는 클라이언트의
+   핸드셰이크 처리를 중지하고 적절한 오류 코드(예: 400 Bad Request)를
+   가진 HTTP 응답을 반환해야 한다.
+
+   1.   HTTP/1.1 이상의 GET 요청이며, <a href="#section-3">Section 3</a>에 정의된 /resource
+        name/(또는 /resource name/을 포함하는 절대 HTTP/HTTPS URI)으로
+        해석되어야 하는 "Request-URI" [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]를 포함한다.
+
+   2.   서버의 authority를 포함하는 |Host| 헤더 필드.
+
+   3.   값 "websocket"을 포함하는 |Upgrade| 헤더 필드이며, ASCII
+        대소문자 비구분 값으로 처리된다.
+
+   4.   토큰 "Upgrade"를 포함하는 |Connection| 헤더 필드이며, ASCII
+        대소문자 비구분 값으로 처리된다.
+
+   5.   base64로 인코딩된( <a href="./rfc4648#section-4">[RFC4648]의 Section&nbsp;4</a> 참조) 값이 디코딩될 때
+        길이가 16바이트인 |Sec-WebSocket-Key| 헤더 필드.
+
+   6.   값이 13인 |Sec-WebSocket-Version| 헤더 필드.
+
+   7.   선택적으로 |Origin| 헤더 필드. 이 헤더 필드는 모든 브라우저
+        클라이언트가 보낸다. 이 헤더 필드가 없는 연결 시도는 브라우저
+        클라이언트에서 온 것으로 해석하지 않는 것이 좋다.
+
+   8.   선택적으로 |Sec-WebSocket-Protocol| 헤더 필드. 클라이언트가
+        말하고자 하는 프로토콜을 선호도 순서로 나타내는 값 목록을 가진다.
+
+   9.   선택적으로 |Sec-WebSocket-Extensions| 헤더 필드. 클라이언트가
+        말하고자 하는 확장을 나타내는 값 목록을 가진다. 이 헤더 필드의
+        해석은 <a href="#section-9.1">Section 9.1</a>에서 논의된다.
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 21]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   10.  선택적으로, 쿠키를 보내거나 서버에 인증을 요청하는 데 사용되는
+        헤더 필드와 같은 기타 헤더 필드. 알 수 없는 헤더 필드는
+        [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 따라 무시된다.
+
+<span class="h4"><a class="selflink" id="section-4.2.2" href="#section-4.2.2">4.2.2</a>.  서버의 개시 핸드셰이크 보내기</span>
+
+   클라이언트가 서버에 WebSocket 연결을 설정할 때, 서버는 연결을
+   수락하고 서버의 개시 핸드셰이크를 보내기 위해 다음 단계를 완료해야
+   한다.
+
+   1.  연결이 HTTPS(HTTP-over-TLS) 포트에서 이루어지고 있다면, 그 연결
+       위에서 TLS 핸드셰이크를 수행한다. 이것이 실패하면(예: 클라이언트가
+       확장 client hello "server_name" 확장에서 서버가 호스팅하지 않는
+       호스트 이름을 나타낸 경우), 연결을 닫는다. 그렇지 않으면, 연결에
+       대한 모든 이후 통신(서버의 핸드셰이크 포함)은 암호화된 터널
+       [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]을 통해 실행되어야 한다.
+
+   2.  서버는 추가 클라이언트 인증을 수행할 수 있다. 예를 들어
+       [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 설명된 대로 해당 |WWW-Authenticate| 헤더 필드와 함께
+       401 상태 코드를 반환할 수 있다.
+
+   3.  서버는 3xx 상태 코드 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]를 사용하여 클라이언트를
+       리디렉션할 수 있다. 이 단계는 위에서 설명한 선택적 인증 단계와
+       함께, 그 전에, 또는 그 후에 발생할 수 있음에 유의하라.
+
+   4.  다음 정보를 설정한다.
+
+       /origin/
+          클라이언트 핸드셰이크의 |Origin| 헤더 필드는 연결을 설정하는
+          스크립트의 출처를 나타낸다. origin은 ASCII로 직렬화되고
+          소문자로 변환된다. 서버는 들어오는 연결을 수락할지 결정하는
+          일부로 이 정보를 사용할 수 있다. 서버가 origin을 검증하지
+          않으면, 어디에서든 연결을 수락하게 된다. 서버가 이 연결을
+          수락하고 싶지 않다면, 적절한 HTTP 오류 코드(예: 403 Forbidden)를
+          반환하고 이 절에 설명된 WebSocket 핸드셰이크를 중단해야 한다.
+          자세한 내용은 <a href="#section-10">Section 10</a>을 참조하라.
+
+       /key/
+          클라이언트 핸드셰이크의 |Sec-WebSocket-Key| 헤더 필드는
+          디코딩하면 길이가 16바이트인 base64 인코딩 값을 포함한다.
+          이 (인코딩된) 값은 연결 수락을 나타내기 위해 서버의 핸드셰이크를
+          생성할 때 사용된다. 서버가 |Sec-WebSocket-Key| 값을 base64
+          디코딩할 필요는 없다.
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 22]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+       /version/
+          클라이언트 핸드셰이크의 |Sec-WebSocket-Version| 헤더 필드는
+          클라이언트가 통신하려고 시도하는 WebSocket 프로토콜의 버전을
+          포함한다. 이 버전이 서버가 이해하는 버전과 일치하지 않으면,
+          서버는 이 절에 설명된 WebSocket 핸드셰이크를 중단하고 대신
+          적절한 HTTP 오류 코드(예: 426 Upgrade Required)와 서버가 이해할
+          수 있는 버전을 나타내는 |Sec-WebSocket-Version| 헤더 필드를
+          보내야 한다.
+
+       /resource name/
+          서버가 제공하는 서비스의 식별자. 서버가 여러 서비스를 제공한다면,
+          그 값은 클라이언트 핸드셰이크에서 GET 메서드의 "Request-URI"
+          [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 주어진 resource name에서 파생되어야 한다. 요청한
+          서비스를 사용할 수 없다면, 서버는 적절한 HTTP 오류 코드(예:
+          404 Not Found)를 보내고 WebSocket 핸드셰이크를 중단해야 한다.
+
+       /subprotocol/
+          서버가 사용할 준비가 된 서브프로토콜을 나타내는 단일 값 또는
+          null. 선택된 값은 클라이언트의 핸드셰이크에서 파생되어야 하며,
+          구체적으로는 서버가 이 연결에 사용할 의사가 있는 |Sec-WebSocket-
+          Protocol| 필드의 값 중 하나를 선택해야 한다(있는 경우).
+          클라이언트의 핸드셰이크에 그러한 헤더 필드가 없었거나 서버가
+          클라이언트가 요청한 어떤 서브프로토콜에도 동의하지 않으면,
+          유일하게 허용 가능한 값은 null이다. 그러한 필드가 없는 것은
+          null 값과 동등하다(즉, 서버가 제안된 서브프로토콜 중 하나에
+          동의하고 싶지 않다면, 응답에 |Sec-WebSocket-Protocol| 헤더
+          필드를 되돌려 보내서는 안 된다). 이러한 목적에서 빈 문자열은
+          null 값과 같지 않으며 이 필드의 합법적인 값이 아니다. 이 헤더
+          필드 값의 ABNF는 (token)이며, 구성 요소 및 규칙의 정의는
+          [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 주어진 것과 같다.
+
+       /extensions/
+          서버가 사용할 준비가 된 프로토콜 수준 확장을 나타내는 (비어
+          있을 수 있는) 목록. 서버가 여러 확장을 지원한다면, 그 값은
+          클라이언트의 핸드셰이크에서 파생되어야 하며, 구체적으로는
+          |Sec-WebSocket-Extensions| 필드의 값 중 하나 이상을 선택해야
+          한다. 그러한 필드가 없는 것은 null 값과 동등하다. 이러한 목적에서
+          빈 문자열은 null 값과 같지 않다. 클라이언트가 나열하지 않은
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 23]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+          확장은 나열되어서는 안 된다. 이러한 값을 선택하고 해석하는
+          방법은 <a href="#section-9.1">Section 9.1</a>에서 논의된다.
+
+   5.  서버가 들어오는 연결을 수락하기로 선택하면, 다음을 나타내는 유효한
+       HTTP 응답으로 회신해야 한다.
+
+       1.  <a href="./rfc2616">RFC 2616</a> [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 따른 101 응답 코드를 가진 Status-Line.
+           이러한 응답은 "HTTP/1.1 101 Switching Protocols"와 같을 수
+           있다.
+
+       2.  <a href="./rfc2616">RFC</a> <a href="./rfc2616">2616</a> [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 따른 값 "websocket"을 가진
+           |Upgrade| 헤더 필드.
+
+       3.  값 "Upgrade"를 가진 |Connection| 헤더 필드.
+
+       4.  |Sec-WebSocket-Accept| 헤더 필드. 이 헤더 필드의 값은 위
+           <a href="#section-4.2.2">Section 4.2.2</a>의 단계 4에서 정의된 /key/와 문자열 "258EAFA5-
+           E914-47DA-95CA-C5AB0DC85B11"를 연결하고, 이 연결된 값의
+           SHA-1 해시를 취해 20바이트 값을 얻은 뒤, 이 20바이트 해시를
+           base64로 인코딩( <a href="./rfc4648#section-4">[RFC4648]의 Section&nbsp;4</a> 참조)하여 구성된다.
+
+           이 헤더 필드의 ABNF [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]는 다음과 같이 정의된다.
+
+           Sec-WebSocket-Accept     = base64-value-non-empty
+           base64-value-non-empty = (1*base64-data [ base64-padding ]) |
+                                    base64-padding
+           base64-data      = 4base64-character
+           base64-padding   = (2base64-character "==") |
+                              (3base64-character "=")
+           base64-character = ALPHA | DIGIT | "+" | "/"
+
+   참고: 예를 들어 클라이언트 핸드셰이크의 |Sec-WebSocket-Key| 헤더
+   필드 값이 "dGhlIHNhbXBsZSBub25jZQ=="라면, 서버는 문자열
+   "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"를 덧붙여 문자열
+   "dGhlIHNhbXBsZSBub25jZQ==258EAFA5-E914-47DA-95CA-
+   C5AB0DC85B11"을 형성한다. 그런 다음 서버는 이 문자열의 SHA-1 해시를
+   취하여 0xb3 0x7a 0x4f 0x2c 0xc0 0x62 0x4f 0x16 0x90
+   0xf6 0x46 0x06 0xcf 0x38 0x59 0x45 0xb2 0xbe 0xc4 0xea 값을
+   얻는다. 이 값은 다시 base64로 인코딩되어
+   "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=" 값을 만들며, 이 값은
+   |Sec-WebSocket-Accept| 헤더 필드에 반환된다.
+
+       5.  선택적으로, <a href="#section-4.2.2">Section 4.2.2</a>의 단계 4에 정의된 /subprotocol/
+           값을 가진 |Sec-WebSocket-Protocol| 헤더 필드.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 24]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+       6.  선택적으로, <a href="#section-4.2.2">Section 4.2.2</a>의 단계 4에 정의된 /extensions/
+           값을 가진 |Sec-WebSocket-Extensions| 헤더 필드. 여러 확장을
+           사용할 경우, 이들을 모두 단일 |Sec-WebSocket-Extensions| 헤더
+           필드에 나열하거나 여러 |Sec-WebSocket-Extensions| 헤더 필드
+           인스턴스에 나누어 담을 수 있다.
+
+   이것으로 서버의 핸드셰이크가 완료된다. 서버가 WebSocket 핸드셰이크를
+   중단하지 않고 이 단계를 끝내면, 서버는 WebSocket 연결이 설정되었고
+   WebSocket 연결이 OPEN 상태에 있다고 간주한다. 이 시점에서 서버는
+   데이터 보내기(및 받기)를 시작할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  핸드셰이크에 사용되는 새 헤더 필드의 통합 ABNF</span>
+
+   이 절은 "implied *LWS rule"을 포함하여 <a href="./rfc2616#section-2.1">[RFC2616]의 Section&nbsp;2.1</a>의
+   ABNF 구문/규칙을 사용한다.
+
+   다음 ABNF 규약이 이 절에서 사용된다는 점에 유의하라. 규칙의 일부
+   이름은 해당 헤더 필드의 이름에 대응한다. 이러한 규칙은 해당 헤더
+   필드의 값을 표현한다. 예를 들어 Sec-WebSocket-Key ABNF 규칙은
+   |Sec-WebSocket-Key| 헤더 필드 값의 구문을 설명한다. 이름에 "-Client"
+   접미사가 붙은 ABNF 규칙은 클라이언트가 서버에 보내는 요청에서만
+   사용된다. 이름에 "-Server" 접미사가 붙은 ABNF 규칙은 서버가
+   클라이언트에 보내는 응답에서만 사용된다. 예를 들어 ABNF 규칙
+   Sec-WebSocket-Protocol-Client는 클라이언트가 서버에 보내는
+   |Sec-WebSocket-Protocol| 헤더 필드 값의 구문을 설명한다.
+
+   다음 새 헤더 필드는 클라이언트에서 서버로의 핸드셰이크 중에 보낼 수
+   있다.
+
+      Sec-WebSocket-Key = base64-value-non-empty
+      Sec-WebSocket-Extensions = extension-list
+      Sec-WebSocket-Protocol-Client = 1#token
+      Sec-WebSocket-Version-Client = version
+
+      base64-value-non-empty = (1*base64-data [ base64-padding ]) |
+                                base64-padding
+      base64-data      = 4base64-character
+      base64-padding   = (2base64-character "==") |
+                         (3base64-character "=")
+      base64-character = ALPHA | DIGIT | "+" | "/"
+      extension-list = 1#extension
+      extension = extension-token *( ";" extension-param )
+      extension-token = registered-token
+      registered-token = token
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 25]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-26" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+      extension-param = token [ "=" (token | quoted-string) ]
+           ; quoted-string 구문 변형을 사용할 때, quoted-string
+           ; 이스케이프 해제 후의 값은 'token' ABNF를 준수해야 한다.
+      NZDIGIT       =  "1" | "2" | "3" | "4" | "5" | "6" |
+                       "7" | "8" | "9"
+      version = DIGIT | (NZDIGIT DIGIT) |
+                ("1" DIGIT DIGIT) | ("2" DIGIT DIGIT)
+                ; 선행 0 없이 0-255 범위로 제한됨
+
+   다음 새 헤더 필드는 서버에서 클라이언트로의 핸드셰이크 중에 보낼 수
+   있다.
+
+      Sec-WebSocket-Extensions = extension-list
+      Sec-WebSocket-Accept     = base64-value-non-empty
+      Sec-WebSocket-Protocol-Server = token
+      Sec-WebSocket-Version-Server = 1#version
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a>.  여러 버전의 WebSocket 프로토콜 지원</span>
+
+   이 절은 클라이언트와 서버에서 여러 버전의 WebSocket 프로토콜을
+   지원하는 방법에 대한 몇 가지 지침을 제공한다.
+
+   WebSocket 버전 광고 기능(|Sec-WebSocket-Version| 헤더 필드)을
+   사용하여, 클라이언트는 처음에 자신이 선호하는 WebSocket 프로토콜
+   버전을 요청할 수 있다(이 버전이 반드시 클라이언트가 지원하는 최신
+   버전일 필요는 없다). 서버가 요청된 버전을 지원하고 핸드셰이크
+   메시지가 그 밖에는 유효하다면, 서버는 그 버전을 수락한다. 서버가
+   요청된 버전을 지원하지 않으면, 서버는 사용할 의사가 있는 모든 버전을
+   포함하는 |Sec-WebSocket-Version| 헤더 필드(또는 여러
+   |Sec-WebSocket-Version| 헤더 필드)로 응답해야 한다. 이 시점에서
+   클라이언트가 광고된 버전 중 하나를 지원한다면, 새 버전 값을 사용하여
+   WebSocket 핸드셰이크를 반복할 수 있다.
+
+   다음 예시는 위에서 설명한 버전 협상을 보여준다.
+
+      GET /chat HTTP/1.1
+      Host: server.example.com
+      Upgrade: websocket
+      Connection: Upgrade
+      ...
+      Sec-WebSocket-Version: 25
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 26]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-27" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   서버의 응답은 다음과 같을 수 있다.
+
+      HTTP/1.1 400 Bad Request
+      ...
+      Sec-WebSocket-Version: 13, 8, 7
+
+   서버의 마지막 응답은 다음과 같을 수도 있음에 유의하라.
+
+      HTTP/1.1 400 Bad Request
+      ...
+      Sec-WebSocket-Version: 13
+      Sec-WebSocket-Version: 8, 7
+
+   이제 클라이언트는 버전 13을 준수하는 핸드셰이크를 반복한다.
+
+      GET /chat HTTP/1.1
+      Host: server.example.com
+      Upgrade: websocket
+      Connection: Upgrade
+      ...
+      Sec-WebSocket-Version: 13
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  데이터 프레이밍</span>
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>.  개요</span>
+
+   WebSocket 프로토콜에서 데이터는 프레임의 시퀀스를 사용하여 전송된다.
+   네트워크 중개자(예: 가로채는 프록시)를 혼동시키지 않기 위해, 그리고
+   <a href="#section-10.3">Section 10.3</a>에서 더 논의되는 보안상의 이유로, 클라이언트는 서버에
+   보내는 모든 프레임을 마스킹해야 한다(자세한 내용은 <a href="#section-5.3">Section 5.3</a>
+   참조). (마스킹은 WebSocket 프로토콜이 TLS 위에서 실행되는지 여부와
+   관계없이 수행됨에 유의하라.) 서버는 마스킹되지 않은 프레임을 받으면
+   연결을 닫아야 한다. 이 경우 서버는 <a href="#section-7.4.1">Section 7.4.1</a>에 정의된 대로
+   상태 코드 1002(프로토콜 오류)를 가진 Close 프레임을 보낼 수 있다.
+   서버는 클라이언트에 보내는 어떤 프레임도 마스킹해서는 안 된다.
+   클라이언트는 마스킹된 프레임을 감지하면 연결을 닫아야 한다. 이 경우
+   <a href="#section-7.4.1">Section 7.4.1</a>에 정의된 대로 상태 코드 1002(프로토콜 오류)를
+   사용할 수 있다. (이 규칙들은 향후 명세에서 완화될 수 있다.)
+
+   기본 프레이밍 프로토콜은 opcode, payload length, 그리고 "Extension
+   data"와 "Application data"를 위한 지정된 위치를 가진 프레임 유형을
+   정의하며, 이 둘은 함께 "Payload data"를 정의한다. 특정 비트와
+   opcode는 프로토콜의 향후 확장을 위해 예약되어 있다.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 27]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-28" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   데이터 프레임은 개시 핸드셰이크 완료 후, 그리고 해당 엔드포인트가
+   Close 프레임(<a href="#section-5.5.1">Section 5.5.1</a>)을 보내기 전까지 언제든지
+   클라이언트 또는 서버에 의해 전송될 수 있다.
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  기본 프레이밍 프로토콜</span>
+
+   데이터 전송 부분의 이 전송 형식은 이 절에서 자세히 제공되는 ABNF
+   [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]로 설명된다. (이 문서의 다른 절과 달리, 이 절의 ABNF는
+   비트 그룹을 대상으로 동작한다는 점에 유의하라. 각 비트 그룹의 길이는
+   주석에 표시된다. 전송선상에서 인코딩될 때, 최상위 비트는 ABNF에서
+   가장 왼쪽에 있다.) 프레이밍의 고수준 개요는 다음 그림에 제시되어
+   있다. 아래 그림과 이 절 뒤에 명시된 ABNF 사이에 충돌이 있는 경우,
+   그림이 권위를 가진다.
+
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-------+-+-------------+-------------------------------+
+     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+     | |1|2|3|       |K|             |                               |
+     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+     |     Extended payload length continued, if payload len == 127  |
+     + - - - - - - - - - - - - - - - +-------------------------------+
+     |                               |Masking-key, if MASK set to 1  |
+     +-------------------------------+-------------------------------+
+     | Masking-key (continued)       |          Payload Data         |
+     +-------------------------------- - - - - - - - - - - - - - - - +
+     :                     Payload Data continued ...                :
+     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+     |                     Payload Data continued ...                |
+     +---------------------------------------------------------------+
+
+   FIN:  1비트
+
+      이것이 메시지의 마지막 단편임을 나타낸다. 첫 번째 단편이 마지막
+      단편일 수도 있다.
+
+   RSV1, RSV2, RSV3:  각각 1비트
+
+      0이 아닌 값에 대한 의미를 정의하는 확장이 협상되지 않는 한 0이어야
+      한다. 0이 아닌 값이 수신되었고 협상된 확장 중 어떤 것도 그러한
+      0이 아닌 값의 의미를 정의하지 않는다면, 수신 엔드포인트는
+      _Fail the WebSocket Connection_을 수행해야 한다.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 28]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-29" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Opcode:  4비트
+
+      "Payload data"의 해석을 정의한다. 알 수 없는 opcode가 수신되면,
+      수신 엔드포인트는 _Fail the WebSocket Connection_을 수행해야 한다.
+      다음 값들이 정의되어 있다.
+
+      *  %x0은 continuation frame을 나타낸다.
+
+      *  %x1은 text frame을 나타낸다.
+
+      *  %x2는 binary frame을 나타낸다.
+
+      *  %x3-7은 향후 non-control frame을 위해 예약되어 있다.
+
+      *  %x8은 connection close를 나타낸다.
+
+      *  %x9는 ping을 나타낸다.
+
+      *  %xA는 pong을 나타낸다.
+
+      *  %xB-F는 향후 control frame을 위해 예약되어 있다.
+
+   Mask:  1비트
+
+      "Payload data"가 마스킹되었는지를 정의한다. 1로 설정되면 masking-key에
+      masking key가 존재하며, 이는 <a href="#section-5.3">Section 5.3</a>에 따라 "Payload data"의
+      마스킹을 해제하는 데 사용된다. 클라이언트에서 서버로 보내는 모든
+      프레임은 이 비트가 1로 설정된다.
+
+   Payload length:  7비트, 7+16비트 또는 7+64비트
+
+      "Payload data"의 길이(바이트 단위)이다. 0-125이면 그것이 payload
+      length이다. 126이면 뒤따르는 2바이트를 16비트 부호 없는 정수로
+      해석한 값이 payload length이다. 127이면 뒤따르는 8바이트를
+      64비트 부호 없는 정수(최상위 비트는 0이어야 함)로 해석한 값이
+      payload length이다. 다중 바이트 길이 수량은 네트워크 바이트 순서로
+      표현된다. 모든 경우에 길이를 인코딩하는 데 최소 바이트 수를 사용해야
+      한다는 점에 유의하라. 예를 들어 길이가 124바이트인 문자열의 길이는
+      시퀀스 126, 0, 124로 인코딩될 수 없다. payload length는
+      "Extension data"의 길이 + "Application data"의 길이이다.
+      "Extension data"의 길이는 0일 수 있으며, 이 경우 payload length는
+      "Application data"의 길이이다.
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 29]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-30" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Masking-key:  0 또는 4바이트
+
+      클라이언트에서 서버로 보내는 모든 프레임은 프레임 안에 포함된
+      32비트 값으로 마스킹된다. 이 필드는 mask bit가 1로 설정된 경우
+      존재하고, mask bit가 0으로 설정된 경우 존재하지 않는다. 클라이언트-
+      서버 마스킹에 대한 자세한 정보는 <a href="#section-5.3">Section 5.3</a>을 참조하라.
+
+   Payload data:  (x+y)바이트
+
+      "Payload data"는 "Extension data"와 "Application data"를 연결한
+      것으로 정의된다.
+
+   Extension data:  x바이트
+
+      "Extension data"는 확장이 협상되지 않은 한 0바이트이다. 모든 확장은
+      "Extension data"의 길이, 또는 그 길이를 계산할 수 있는 방법, 그리고
+      개시 핸드셰이크 중 확장 사용을 어떻게 협상해야 하는지를 명시해야
+      한다. 존재하는 경우 "Extension data"는 전체 payload length에 포함된다.
+
+   Application data:  y바이트
+
+      임의의 "Application data"이며, 모든 "Extension data" 이후 프레임의
+      나머지를 차지한다. "Application data"의 길이는 payload length에서
+      "Extension data"의 길이를 뺀 값과 같다.
+
+   기본 프레이밍 프로토콜은 다음 ABNF [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]로 형식적으로
+   정의된다. 이 데이터의 표현은 ASCII 문자가 아니라 이진이라는 점에
+   유의하는 것이 중요하다. 따라서 길이가 1비트이고 %x0 / %x1 값을
+   가지는 필드는 ASCII 인코딩에서 문자 "0" 또는 "1"을 나타내는 전체
+   바이트(octet)가 아니라, 값이 0 또는 1인 단일 비트로 표현된다.
+   마찬가지로 길이가 4비트이고 %x0-F 사이의 값을 가지는 필드는 다시
+   4비트로 표현되며, 이러한 값을 가진 ASCII 문자나 전체 바이트(octet)로
+   표현되지 않는다. [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]는 문자 인코딩을 명시하지 않는다.
+   "규칙은 terminal value들의 문자열, 때로는 문자라고 불리는 것으로
+   해소된다. ABNF에서 문자는 단지 음이 아닌 정수일 뿐이다. 특정 맥락에서는
+   값을 문자 집합(예: ASCII)으로 매핑(인코딩)하는 구체적인 방식이
+   명시될 것이다." 여기서 명시된 인코딩은 각 terminal value가 지정된
+   비트 수로 인코딩되는 이진 인코딩이며, 이 비트 수는 각 필드마다 다르다.
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 30]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-31" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+    ws-frame                = frame-fin           ; 1 bit in length
+                              frame-rsv1          ; 1 bit in length
+                              frame-rsv2          ; 1 bit in length
+                              frame-rsv3          ; 1 bit in length
+                              frame-opcode        ; 4 bits in length
+                              frame-masked        ; 1 bit in length
+                              frame-payload-length   ; either 7, 7+16,
+                                                     ; or 7+64 bits in
+                                                     ; length
+                              [ frame-masking-key ]  ; 32 bits in length
+                              frame-payload-data     ; n*8 bits in
+                                                     ; length, where
+                                                     ; n &gt;= 0
+
+    frame-fin               = %x0 ; more frames of this message follow
+                            / %x1 ; final frame of this message
+                                  ; 1 bit in length
+
+    frame-rsv1              = %x0 / %x1
+                              ; 1 bit in length, MUST be 0 unless
+                              ; negotiated otherwise
+
+    frame-rsv2              = %x0 / %x1
+                              ; 1 bit in length, MUST be 0 unless
+                              ; negotiated otherwise
+
+    frame-rsv3              = %x0 / %x1
+                              ; 1 bit in length, MUST be 0 unless
+                              ; negotiated otherwise
+
+    frame-opcode            = frame-opcode-non-control /
+                              frame-opcode-control /
+                              frame-opcode-cont
+
+    frame-opcode-cont       = %x0 ; frame continuation
+
+    frame-opcode-non-control= %x1 ; text frame
+                            / %x2 ; binary frame
+                            / %x3-7
+                            ; 4 bits in length,
+                            ; reserved for further non-control frames
+
+    frame-opcode-control    = %x8 ; connection close
+                            / %x9 ; ping
+                            / %xA ; pong
+                            / %xB-F ; reserved for further control
+                                    ; frames
+                                    ; 4 bits in length
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 31]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-32" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+    frame-masked            = %x0
+                            ; frame is not masked, no frame-masking-key
+                            / %x1
+                            ; frame is masked, frame-masking-key present
+                            ; 1 bit in length
+
+    frame-payload-length    = ( %x00-7D )
+                            / ( %x7E frame-payload-length-16 )
+                            / ( %x7F frame-payload-length-63 )
+                            ; 7, 7+16, or 7+64 bits in length,
+                            ; respectively
+
+    frame-payload-length-16 = %x0000-FFFF ; 16 bits in length
+
+    frame-payload-length-63 = %x0000000000000000-7FFFFFFFFFFFFFFF
+                            ; 64 bits in length
+
+    frame-masking-key       = 4( %x00-FF )
+                              ; present only if frame-masked is 1
+                              ; 32 bits in length
+
+    frame-payload-data      = (frame-masked-extension-data
+                               frame-masked-application-data)
+                            ; when frame-masked is 1
+                              / (frame-unmasked-extension-data
+                                frame-unmasked-application-data)
+                            ; when frame-masked is 0
+
+    frame-masked-extension-data     = *( %x00-FF )
+                            ; reserved for future extensibility
+                            ; n*8 bits in length, where n &gt;= 0
+
+    frame-masked-application-data   = *( %x00-FF )
+                            ; n*8 bits in length, where n &gt;= 0
+
+    frame-unmasked-extension-data   = *( %x00-FF )
+                            ; reserved for future extensibility
+                            ; n*8 bits in length, where n &gt;= 0
+
+    frame-unmasked-application-data = *( %x00-FF )
+                            ; n*8 bits in length, where n &gt;= 0
+
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  클라이언트-서버 마스킹</span>
+
+   마스킹된 프레임은 <a href="#section-5.2">Section 5.2</a>에 정의된 대로 frame-masked 필드가
+   1로 설정되어 있어야 한다.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 32]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-33" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   masking key는 <a href="#section-5.2">Section 5.2</a>에서 frame-masking-key로 정의된 대로 프레임
+   안에 완전히 포함된다. 이는 같은 절에서 frame-payload-data로 정의된
+   "Payload data"를 마스킹하는 데 사용되며, 여기에는 "Extension data"와
+   "Application data"가 포함된다.
+
+   masking key는 클라이언트가 무작위로 선택한 32비트 값이다. 마스킹된
+   프레임을 준비할 때, 클라이언트는 허용된 32비트 값 집합에서 새로운
+   masking key를 선택해야 한다. masking key는 예측 불가능해야 한다.
+   따라서 masking key는 강한 엔트로피 원천에서 파생되어야 하며, 특정
+   프레임의 masking key가 서버/프록시가 후속 프레임의 masking key를
+   예측하기 쉽게 만들어서는 안 된다. masking key의 예측 불가능성은
+   악의적 애플리케이션 작성자가 전송선상에 나타나는 바이트를 선택하지
+   못하게 하는 데 필수적이다. <a href="./rfc4086">RFC 4086</a> [<a href="./rfc4086" title="&quot;Randomness Requirements for Security&quot;">RFC4086</a>]은 보안에 민감한
+   애플리케이션에 적합한 엔트로피 원천이 무엇인지 논의한다.
+
+   마스킹은 "Payload data"의 길이에 영향을 주지 않는다. 마스킹된
+   데이터를 마스킹되지 않은 데이터로 변환하거나 그 반대로 변환하려면,
+   다음 알고리즘을 적용한다. 같은 알고리즘은 변환 방향과 관계없이
+   적용된다. 예를 들어 데이터를 마스킹할 때와 마스킹을 해제할 때 같은
+   단계가 적용된다.
+
+   변환된 데이터의 octet i("transformed-octet-i")는 원래 데이터의 octet
+   i("original-octet-i")와 masking key의 인덱스 i modulo 4에 있는 octet
+   ("masking-key-octet-j")의 XOR이다.
+
+     j                   = i MOD 4
+     transformed-octet-i = original-octet-i XOR masking-key-octet-j
+
+   프레이밍에서 frame-payload-length로 표시되는 payload length는 masking
+   key의 길이를 포함하지 않는다. 이는 "Payload data"의 길이, 즉 masking
+   key 뒤에 오는 바이트 수이다.
+
+<span class="h3"><a class="selflink" id="section-5.4" href="#section-5.4">5.4</a>.  단편화</span>
+
+   단편화의 주된 목적은 메시지가 시작될 때 그 메시지의 크기를 알 수
+   없는 경우에도, 그 메시지를 버퍼링하지 않고 보낼 수 있게 하는 것이다.
+   메시지를 단편화할 수 없다면, 엔드포인트는 첫 번째 바이트를 보내기
+   전에 길이를 셀 수 있도록 전체 메시지를 버퍼링해야 할 것이다. 단편화를
+   사용하면 서버 또는 중개자는 합리적인 크기의 버퍼를 선택하고, 버퍼가
+   가득 차면 단편을 네트워크에 기록할 수 있다.
+
+   단편화의 부차적인 사용 사례는 multiplexing을 위한 것이다. 하나의
+   논리 채널에서 큰 메시지가 출력 채널을 독점하는 것이 바람직하지 않기
+   때문에, multiplexing은 출력 채널을 더 잘 공유하도록 메시지를 더 작은
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 33]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-34" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   단편으로 나눌 수 있어야 한다. (multiplexing 확장은 이 문서에 설명되어
+   있지 않음에 유의하라.)
+
+   확장에서 달리 명시하지 않는 한, 프레임은 의미론적 의미를 갖지 않는다.
+   클라이언트와 서버가 확장을 협상하지 않았거나, 일부 확장이 협상되었지만
+   중개자가 협상된 모든 확장을 이해하고 이러한 확장이 있는 상태에서
+   프레임을 병합 및/또는 분할하는 방법을 알고 있다면, 중개자는 프레임을
+   병합 및/또는 분할할 수 있다. 이것의 한 가지 함의는 확장이 없는 경우
+   송신자와 수신자가 특정 프레임 경계의 존재에 의존해서는 안 된다는
+   점이다.
+
+   다음 규칙은 단편화에 적용된다.
+
+   o  단편화되지 않은 메시지는 FIN 비트가 설정되고(<a href="#section-5.2">Section 5.2</a>) opcode가
+      0이 아닌 단일 프레임으로 구성된다.
+
+   o  단편화된 메시지는 FIN 비트가 clear되고 opcode가 0이 아닌 단일
+      프레임으로 시작하며, 그 뒤에 FIN 비트가 clear되고 opcode가 0으로
+      설정된 0개 이상의 프레임이 이어지고, FIN 비트가 설정되고 opcode가
+      0인 단일 프레임으로 종료된다. 단편화된 메시지는 개념적으로 각
+      단편의 payload를 순서대로 연결한 값과 같은 payload를 가진 하나의
+      더 큰 메시지와 동등하다. 그러나 확장이 있는 경우, 확장이 존재하는
+      "Extension data"의 해석을 정의하므로 이는 참이 아닐 수 있다. 예를
+      들어 "Extension data"는 첫 번째 단편의 시작 부분에만 존재하고
+      이후 단편에 적용될 수도 있으며, 각 단편에 존재하면서 해당 특정
+      단편에만 적용되는 "Extension data"가 있을 수도 있다. "Extension
+      data"가 없는 경우, 다음 예시는 단편화가 어떻게 작동하는지를 보여준다.
+
+      예시: 텍스트 메시지가 세 단편으로 전송되는 경우, 첫 번째 단편은
+      opcode가 0x1이고 FIN 비트가 clear되며, 두 번째 단편은 opcode가
+      0x0이고 FIN 비트가 clear되고, 세 번째 단편은 opcode가 0x0이고
+      FIN 비트가 설정된다.
+
+   o  제어 프레임(<a href="#section-5.5">Section 5.5</a> 참조)은 단편화된 메시지 중간에 삽입될
+      수 있다. 제어 프레임 자체는 단편화되어서는 안 된다.
+
+   o  메시지 단편은 송신자가 보낸 순서대로 수신자에게 전달되어야 한다.
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 34]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-35" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   o  어떤 메시지의 단편도, 그 interleaving을 해석할 수 있는 확장이
+      협상되지 않은 한, 다른 메시지의 단편 사이에 interleave되어서는
+      안 된다.
+
+   o  엔드포인트는 단편화된 메시지 중간의 제어 프레임을 처리할 수 있어야
+      한다.
+
+   o  송신자는 non-control 메시지에 대해 임의의 크기 단편을 만들 수 있다.
+
+   o  클라이언트와 서버는 단편화된 메시지와 단편화되지 않은 메시지를
+      모두 수신할 수 있도록 지원해야 한다.
+
+   o  제어 프레임은 단편화될 수 없으므로, 중개자는 제어 프레임의 단편화를
+      변경하려고 시도해서는 안 된다.
+
+   o  예약된 비트 값이 사용되고 그 값의 의미를 중개자가 알지 못하는 경우,
+      중개자는 메시지의 단편화를 변경해서는 안 된다.
+
+   o  확장이 협상되었고 중개자가 협상된 확장의 의미론을 알지 못하는
+      연결의 맥락에서는, 중개자는 어떤 메시지의 단편화도 변경해서는
+      안 된다. 마찬가지로, WebSocket 연결을 초래한 WebSocket 핸드셰이크를
+      보지 못했고(그 내용에 대해 통지받지도 못한) 중개자는 그러한
+      연결의 어떤 메시지의 단편화도 변경해서는 안 된다.
+
+   o  이러한 규칙의 결과로, 메시지의 모든 단편은 첫 번째 단편의 opcode로
+      설정된 것과 같은 유형이다. 제어 프레임은 단편화될 수 없으므로,
+      메시지의 모든 단편에 대한 유형은 text, binary 또는 예약된 opcode
+      중 하나여야 한다.
+
+   참고: 제어 프레임을 삽입할 수 없다면, 예를 들어 큰 메시지 뒤에 있는
+   ping의 지연 시간이 매우 길어질 것이다. 따라서 단편화된 메시지 중간의
+   제어 프레임을 처리해야 한다는 요구사항이 있다.
+
+   구현 참고: 확장이 없는 경우, 수신자는 프레임을 처리하기 위해 전체
+   프레임을 버퍼링할 필요가 없다. 예를 들어 스트리밍 API가 사용된다면,
+   프레임의 일부를 애플리케이션에 전달할 수 있다. 그러나 이 가정이 향후
+   모든 WebSocket 확장에 대해 참이 아닐 수 있음에 유의하라.
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 35]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-36" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h3"><a class="selflink" id="section-5.5" href="#section-5.5">5.5</a>.  제어 프레임</span>
+
+   제어 프레임은 opcode의 최상위 비트가 1인 opcode로 식별된다. 현재
+   제어 프레임에 대해 정의된 opcode에는 0x8(Close), 0x9(Ping), 및
+   0xA(Pong)가 포함된다. opcode 0xB-0xF는 아직 정의되지 않은 향후 제어
+   프레임을 위해 예약되어 있다.
+
+   제어 프레임은 WebSocket에 대한 상태를 전달하는 데 사용된다. 제어
+   프레임은 단편화된 메시지 중간에 삽입될 수 있다.
+
+   모든 제어 프레임은 payload length가 125바이트 이하이어야 하며,
+   단편화되어서는 안 된다.
+
+<span class="h4"><a class="selflink" id="section-5.5.1" href="#section-5.5.1">5.5.1</a>.  Close</span>
+
+   Close 프레임은 opcode 0x8을 포함한다.
+
+   Close 프레임은 닫는 이유를 나타내는 body(프레임의 "Application data"
+   부분)를 포함할 수 있다. 예를 들어 엔드포인트가 종료 중이거나,
+   엔드포인트가 너무 큰 프레임을 받았거나, 엔드포인트가 해당 엔드포인트가
+   기대하는 형식에 맞지 않는 프레임을 받은 경우가 있다. body가 있다면,
+   body의 처음 두 바이트는 <a href="#section-7.4">Section 7.4</a>에 정의된 값 /code/를 가진 상태
+   코드를 나타내는 2바이트 부호 없는 정수(네트워크 바이트 순서)여야 한다.
+   이 2바이트 정수 뒤에는 값 /reason/을 가진 UTF-8 인코딩 데이터가 포함될
+   수 있으며, 그 해석은 이 명세에서 정의하지 않는다. 이 데이터가 반드시
+   사람이 읽을 수 있는 것은 아니지만, 디버깅이나 연결을 연 스크립트와
+   관련된 정보를 전달하는 데 유용할 수 있다. 이 데이터는 사람이 읽을 수
+   있음이 보장되지 않으므로, 클라이언트는 이를 최종 사용자에게 보여주어서는
+   안 된다.
+
+   클라이언트에서 서버로 보내는 Close 프레임은 <a href="#section-5.3">Section 5.3</a>에 따라
+   마스킹되어야 한다.
+
+   애플리케이션은 Close 프레임을 보낸 뒤 더 이상 데이터 프레임을 보내서는
+   안 된다.
+
+   엔드포인트가 Close 프레임을 받고 이전에 Close 프레임을 보내지 않았다면,
+   엔드포인트는 응답으로 Close 프레임을 보내야 한다. (Close 프레임을 응답으로
+   보낼 때, 엔드포인트는 일반적으로 받은 상태 코드를 echo한다.) 가능한 한
+   빨리 그렇게 하는 것이 좋다. 엔드포인트는 현재 메시지가 전송될 때까지
+   Close 프레임 전송을 지연할 수 있다(예를 들어 단편화된 메시지의 대부분이
+   이미 전송된 경우, 엔드포인트는 Close 프레임을 보내기 전에 남은 단편을
+   보낼 수 있다). 그러나 이미 Close 프레임을 보낸 엔드포인트가 데이터를
+   계속 처리할 것이라는 보장은 없다.
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 36]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-37" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Close 메시지를 보내고 받은 뒤, 엔드포인트는 WebSocket 연결이 닫힌
+   것으로 간주하고 기반 TCP 연결을 닫아야 한다. 서버는 기반 TCP 연결을
+   즉시 닫아야 한다. 클라이언트는 서버가 연결을 닫을 때까지 기다리는
+   것이 좋지만, Close 메시지를 보내고 받은 뒤에는 언제든지 연결을 닫을
+   수 있다. 예를 들어 합리적인 시간 동안 서버로부터 TCP Close를 받지
+   못한 경우가 그렇다.
+
+   클라이언트와 서버가 동시에 Close 메시지를 보낸다면, 두 엔드포인트
+   모두 Close 메시지를 보내고 받은 것이며 WebSocket 연결이 닫힌 것으로
+   간주하고 기반 TCP 연결을 닫아야 한다.
+
+<span class="h4"><a class="selflink" id="section-5.5.2" href="#section-5.5.2">5.5.2</a>.  Ping</span>
+
+   Ping 프레임은 opcode 0x9를 포함한다.
+
+   Ping 프레임은 "Application data"를 포함할 수 있다.
+
+   Ping 프레임을 수신하면, 엔드포인트는 이미 Close 프레임을 받은 경우가
+   아니라면 응답으로 Pong 프레임을 보내야 한다. 가능한 한 빨리 Pong
+   프레임으로 응답하는 것이 좋다. Pong 프레임은 <a href="#section-5.5.3">Section 5.5.3</a>에서
+   논의된다.
+
+   엔드포인트는 연결이 설정된 뒤 연결이 닫히기 전까지 언제든지 Ping
+   프레임을 보낼 수 있다.
+
+   참고: Ping 프레임은 keepalive 또는 원격 엔드포인트가 여전히 응답하는지
+   확인하는 수단으로 사용될 수 있다.
+
+<span class="h4"><a class="selflink" id="section-5.5.3" href="#section-5.5.3">5.5.3</a>.  Pong</span>
+
+   Pong 프레임은 opcode 0xA를 포함한다.
+
+   <a href="#section-5.5.2">Section 5.5.2</a>는 Ping 및 Pong 프레임 모두에 적용되는 요구사항을
+   자세히 설명한다.
+
+   Ping 프레임에 대한 응답으로 보내는 Pong 프레임은 응답 대상인 Ping
+   프레임의 메시지 body에서 발견된 "Application data"와 동일한
+   "Application data"를 가져야 한다.
+
+   엔드포인트가 Ping 프레임을 받고 이전 Ping 프레임에 대한 응답으로 아직
+   Pong 프레임을 보내지 않았다면, 엔드포인트는 가장 최근에 처리된 Ping
+   프레임에 대해서만 Pong 프레임을 보내기로 선택할 수 있다.
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 37]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-38" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Pong 프레임은 요청 없이도 보내질 수 있다. 이는 단방향 heartbeat로
+   동작한다. 요청 없이 보낸 Pong 프레임에 대한 응답은 기대되지 않는다.
+
+<span class="h3"><a class="selflink" id="section-5.6" href="#section-5.6">5.6</a>.  데이터 프레임</span>
+
+   데이터 프레임(예: non-control frame)은 opcode의 최상위 비트가 0인
+   opcode로 식별된다. 현재 데이터 프레임에 대해 정의된 opcode에는
+   0x1(Text), 0x2(Binary)가 포함된다. opcode 0x3-0x7은 아직 정의되지
+   않은 향후 non-control frame을 위해 예약되어 있다.
+
+   데이터 프레임은 애플리케이션 계층 및/또는 확장 계층 데이터를
+   전달한다. opcode는 데이터의 해석을 결정한다.
+
+   Text
+
+      "Payload data"는 UTF-8로 인코딩된 텍스트 데이터이다. 특정 텍스트
+      프레임은 부분 UTF-8 시퀀스를 포함할 수 있음에 유의하라. 그러나
+      전체 메시지는 유효한 UTF-8을 포함해야 한다. 재조립된 메시지의
+      유효하지 않은 UTF-8은 <a href="#section-8.1">Section 8.1</a>에 설명된 대로 처리된다.
+
+   Binary
+
+      "Payload data"는 임의의 이진 데이터이며, 그 해석은 전적으로
+      애플리케이션 계층에 맡겨진다.
+
+<span class="h3"><a class="selflink" id="section-5.7" href="#section-5.7">5.7</a>.  예시</span>
+
+   o  단일 프레임의 마스킹되지 않은 텍스트 메시지
+
+      *  0x81 0x05 0x48 0x65 0x6c 0x6c 0x6f ("Hello"를 포함)
+
+   o  단일 프레임의 마스킹된 텍스트 메시지
+
+      *  0x81 0x85 0x37 0xfa 0x21 0x3d 0x7f 0x9f 0x4d 0x51 0x58
+         ("Hello"를 포함)
+
+   o  단편화된 마스킹되지 않은 텍스트 메시지
+
+      *  0x01 0x03 0x48 0x65 0x6c ("Hel"을 포함)
+
+      *  0x80 0x02 0x6c 0x6f ("lo"를 포함)
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 38]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-39" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   o  마스킹되지 않은 Ping 요청과 마스킹된 Ping 응답
+
+      *  0x89 0x05 0x48 0x65 0x6c 0x6c 0x6f ("Hello"의 body를 포함하지만,
+         body의 내용은 임의적임)
+
+      *  0x8a 0x85 0x37 0xfa 0x21 0x3d 0x7f 0x9f 0x4d 0x51 0x58
+         ("Hello"의 body를 포함하며, ping의 body와 일치함)
+
+   o  단일 마스킹되지 않은 프레임의 256바이트 이진 메시지
+
+      *  0x82 0x7E 0x0100 [256바이트의 이진 데이터]
+
+   o  단일 마스킹되지 않은 프레임의 64KiB 이진 메시지
+
+      *  0x82 0x7F 0x0000000000010000 [65536바이트의 이진 데이터]
+
+<span class="h3"><a class="selflink" id="section-5.8" href="#section-5.8">5.8</a>.  확장성</span>
+
+   이 프로토콜은 기본 프로토콜에 기능을 추가할 확장을 허용하도록
+   설계되었다. 연결의 엔드포인트는 개시 핸드셰이크 중에 모든 확장의
+   사용을 협상해야 한다. 이 명세는 확장에서 사용할 수 있도록 opcode
+   0x3부터 0x7 및 0xB부터 0xF, "Extension data" 필드, 그리고 프레임
+   헤더의 frame-rsv1, frame-rsv2, frame-rsv3 비트를 제공한다. 확장의
+   협상은 <a href="#section-9.1">Section 9.1</a>에서 더 자세히 논의된다. 아래에는 확장의
+   예상되는 몇 가지 사용이 제시되어 있다. 이 목록은 완전하지도 않고
+   지시적이지도 않다.
+
+   o  "Extension data"는 "Application data" 앞의 "Payload data"에 배치될
+      수 있다.
+
+   o  예약된 비트는 프레임별 필요에 할당될 수 있다.
+
+   o  예약된 opcode 값이 정의될 수 있다.
+
+   o  더 많은 opcode 값이 필요한 경우 예약된 비트가 opcode 필드에
+      할당될 수 있다.
+
+   o  더 큰 opcode 또는 더 많은 프레임별 비트를 정의하기 위해, "Payload
+      data"에서 추가 비트를 할당하는 예약 비트 또는 "extension" opcode가
+      정의될 수 있다.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  데이터 보내기 및 받기</span>
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  데이터 보내기</span>
+
+   WebSocket 연결을 통해 /data/로 구성된 _WebSocket Message를 보내기_ 위해,
+   엔드포인트는 다음 단계를 수행해야 한다.
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 39]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-40" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   1.  엔드포인트는 WebSocket 연결이 OPEN 상태에 있음을 보장해야 한다
+       (Sections <a href="#section-4.1">4.1</a> 및 <a href="#section-4.2.2">4.2.2</a> 참조). 어느 시점에서든 WebSocket
+       연결의 상태가 변경되면, 엔드포인트는 다음 단계를 중단해야 한다.
+
+   2.  엔드포인트는 <a href="#section-5.2">Section 5.2</a>에 정의된 대로 /data/를 WebSocket
+       프레임에 캡슐화해야 한다. 보낼 데이터가 크거나, 엔드포인트가
+       데이터 전송을 시작하려는 시점에 데이터 전체를 사용할 수 없다면,
+       엔드포인트는 대안으로 <a href="#section-5.4">Section 5.4</a>에 정의된 대로 일련의
+       프레임에 데이터를 캡슐화할 수 있다.
+
+   3.  데이터를 포함하는 첫 번째 프레임의 opcode(frame-opcode)는 수신자가
+       text 또는 binary 데이터로 해석해야 하는 데이터에 대해 <a href="#section-5.2">Section 5.2</a>의
+       적절한 값으로 설정되어야 한다.
+
+   4.  데이터를 포함하는 마지막 프레임의 FIN 비트(frame-fin)는 <a href="#section-5.2">Section 5.2</a>에
+       정의된 대로 1로 설정되어야 한다.
+
+   5.  데이터가 클라이언트에 의해 전송되는 경우, 프레임은 <a href="#section-5.3">Section 5.3</a>에
+       정의된 대로 마스킹되어야 한다.
+
+   6.  WebSocket 연결에 대해 확장(<a href="#section-9">Section 9</a>)이 협상된 경우, 해당 확장의
+       정의에 따라 추가 고려사항이 적용될 수 있다.
+
+   7.  형성된 프레임은 기반 네트워크 연결을 통해 전송되어야 한다.
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  데이터 받기</span>
+
+   WebSocket 데이터를 받기 위해, 엔드포인트는 기반 네트워크 연결을
+   수신한다. 들어오는 데이터는 <a href="#section-5.2">Section 5.2</a>에 정의된 대로 WebSocket
+   프레임으로 파싱되어야 한다. 제어 프레임(<a href="#section-5.5">Section 5.5</a>)이 수신되면,
+   해당 프레임은 <a href="#section-5.5">Section 5.5</a>에 정의된 대로 처리되어야 한다. 데이터
+   프레임(<a href="#section-5.6">Section 5.6</a>)을 받으면, 엔드포인트는 <a href="#section-5.2">Section 5.2</a>의
+   opcode(frame-opcode)에 정의된 대로 데이터의 /type/을 기록해야 한다.
+   이 프레임의 "Application data"는 메시지의 /data/로 정의된다.
+   프레임이 단편화되지 않은 메시지(<a href="#section-5.4">Section 5.4</a>)를 구성하면,
+   /type/ 유형과 /data/ 데이터를 가진 _A WebSocket Message Has Been
+   Received_라고 한다. 프레임이 단편화된 메시지의 일부인 경우, 후속
+   데이터 프레임의 "Application data"를 연결하여 /data/를 형성한다.
+   FIN 비트(frame-fin)로 표시된 대로 마지막 단편이 수신되면, 단편들의
+   "Application data"를 연결하여 구성된 /data/와
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 40]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-41" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   /type/(단편화된 메시지의 첫 번째 프레임에서 기록된 값)을 가진
+   _A WebSocket Message Has Been Received_라고 한다. 이후 데이터 프레임은
+   새 WebSocket 메시지에 속하는 것으로 해석되어야 한다.
+
+   확장(<a href="#section-9">Section 9</a>)은 데이터가 읽히는 방식의 의미론을 변경할 수 있으며,
+   특히 무엇이 메시지 경계를 구성하는지를 포함한다. 확장은 payload에서
+   "Application data" 앞에 "Extension data"를 추가하는 것 외에도,
+   "Application data"를 수정할 수 있다(예: 압축).
+
+   서버는 <a href="#section-5.3">Section 5.3</a>에 설명된 대로 클라이언트로부터 수신한 데이터
+   프레임에 대해 마스킹을 제거해야 한다.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  연결 닫기</span>
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  정의</span>
+
+<span class="h4"><a class="selflink" id="section-7.1.1" href="#section-7.1.1">7.1.1</a>.  WebSocket 연결 닫기</span>
+
+   _WebSocket Connection을 닫기_ 위해, 엔드포인트는 기반 TCP 연결을 닫는다.
+   엔드포인트는 적용 가능한 경우 TLS 세션과 함께 TCP 연결을 깨끗하게
+   닫는 방법을 사용하는 것이 좋으며, 수신되었을 수 있는 뒤따르는 모든
+   바이트를 폐기한다. 엔드포인트는 공격을 받는 경우와 같이 필요한 경우
+   사용 가능한 어떤 수단으로든 연결을 닫을 수 있다.
+
+   대부분의 정상적인 경우, 기반 TCP 연결은 먼저 서버가 닫는 것이 좋다.
+   그렇게 하면 TIME_WAIT 상태를 클라이언트가 아니라 서버가 보유하게 된다
+   (클라이언트가 이를 보유하면 2 maximum segment lifetimes(2MSL) 동안
+   연결을 다시 열 수 없게 되지만, 서버에는 새 SYN이 더 높은 seq 번호와
+   함께 오면 TIME_WAIT 연결이 즉시 다시 열리므로 이에 상응하는 영향이
+   없다). 비정상적인 경우(예: 합리적인 시간 동안 서버로부터 TCP Close를
+   받지 못한 경우) 클라이언트가 TCP Close를 시작할 수 있다. 따라서
+   서버가 _Close the WebSocket Connection_ 지시를 받으면 즉시 TCP Close를
+   시작하는 것이 좋고, 클라이언트가 같은 지시를 받으면 서버로부터 TCP
+   Close를 기다리는 것이 좋다.
+
+   Berkeley sockets를 사용해 C에서 깨끗한 종료를 얻는 방법의 예로,
+   소켓에 대해 SHUT_WR로 shutdown()을 호출하고, 피어도 정상 종료를
+   수행했음을 나타내는 반환값 0을 얻을 때까지 recv()를 호출한 다음,
+   마지막으로 소켓에 대해 close()를 호출할 수 있다.
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 41]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-42" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h4"><a class="selflink" id="section-7.1.2" href="#section-7.1.2">7.1.2</a>.  WebSocket 종료 핸드셰이크 시작</span>
+
+   상태 코드(<a href="#section-7.4">Section 7.4</a>) /code/와 선택적 닫기 사유(<a href="#section-7.1.6">Section 7.1.6</a>)
+   /reason/으로 _WebSocket Closing Handshake를 시작_하려면, 엔드포인트는
+   <a href="#section-5.5.1">Section 5.5.1</a>에 설명된 Close 제어 프레임을 보내야 하며, 그 상태
+   코드는 /code/로 설정되고 닫기 사유는 /reason/으로 설정된다. 엔드포인트가
+   Close 제어 프레임을 보내고 받으면, 그 엔드포인트는 <a href="#section-7.1.1">Section 7.1.1</a>에
+   정의된 대로 _Close the WebSocket Connection_을 수행하는 것이 좋다.
+
+<span class="h4"><a class="selflink" id="section-7.1.3" href="#section-7.1.3">7.1.3</a>.  WebSocket 종료 핸드셰이크가 시작됨</span>
+
+   Close 제어 프레임을 보내거나 받으면, _The WebSocket Closing Handshake is
+   Started_라고 말하며 WebSocket 연결은 CLOSING 상태에 있다고 한다.
+
+<span class="h4"><a class="selflink" id="section-7.1.4" href="#section-7.1.4">7.1.4</a>.  WebSocket 연결이 닫힘</span>
+
+   기반 TCP 연결이 닫히면, _The WebSocket Connection is Closed_라고 말하며
+   WebSocket 연결은 CLOSED 상태에 있다고 한다. TCP 연결이 WebSocket 종료
+   핸드셰이크가 완료된 뒤 닫힌 경우, WebSocket 연결은 _cleanly_ 닫혔다고
+   말한다.
+
+   WebSocket 연결을 설정할 수 없었다면, 이 역시 _The WebSocket Connection
+   is Closed_라고 말하지만 _cleanly_는 아니다.
+
+<span class="h4"><a class="selflink" id="section-7.1.5" href="#section-7.1.5">7.1.5</a>.  WebSocket 연결 닫기 코드</span>
+
+   Sections <a href="#section-5.5.1">5.5.1</a> 및 <a href="#section-7.4">7.4</a>에 정의된 대로, Close 제어 프레임은 닫기
+   사유를 나타내는 상태 코드를 포함할 수 있다. WebSocket 연결의 닫기는
+   어느 엔드포인트에 의해서든 시작될 수 있으며, 동시에 시작될 수도 있다.
+   _The WebSocket Connection Close Code_는 이 프로토콜을 구현하는
+   애플리케이션이 처음 받은 Close 제어 프레임에 포함된 상태 코드
+   (<a href="#section-7.4">Section 7.4</a>)로 정의된다. 이 Close 제어 프레임에 상태 코드가 없으면,
+   _The WebSocket Connection Close Code_는 1005로 간주된다. _The WebSocket
+   Connection is Closed_이고 엔드포인트가 Close 제어 프레임을 받지 못한
+   경우(예: 기반 전송 연결이 손실된 경우), _The WebSocket Connection Close
+   Code_는 1006으로 간주된다.
+
+   참고: 두 엔드포인트가 _The WebSocket Connection Close Code_의 값에
+   동의하지 않을 수 있다. 예를 들어 원격 엔드포인트가 Close 프레임을
+   보냈지만 로컬 애플리케이션이 아직 해당 Close 프레임을 포함하는 데이터를
+   자신의 소켓 수신 버퍼에서 읽지 않았고, 로컬 애플리케이션이 독립적으로
+   연결을 닫고 Close 프레임을 보내기로 결정했다면, 두 엔드포인트 모두 Close
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 42]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-43" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   프레임을 보내고 받은 것이며 더 이상의 Close 프레임을 보내지 않을 것이다.
+   각 엔드포인트는 상대방이 보낸 상태 코드를 _The WebSocket Connection
+   Close Code_로 보게 된다. 따라서 두 엔드포인트가 독립적으로 거의 같은
+   시점에 _Start the WebSocket Closing Handshake_를 수행한 경우,
+   _The WebSocket Connection Close Code_의 값에 두 엔드포인트가 동의하지
+   않을 수 있다.
+
+<span class="h4"><a class="selflink" id="section-7.1.6" href="#section-7.1.6">7.1.6</a>.  WebSocket 연결 닫기 사유</span>
+
+   Sections <a href="#section-5.5.1">5.5.1</a> 및 <a href="#section-7.4">7.4</a>에 정의된 대로, Close 제어 프레임은 닫기
+   사유를 나타내는 상태 코드와 그 뒤의 UTF-8 인코딩 데이터를 포함할 수
+   있으며, 해당 데이터의 해석은 엔드포인트에 맡겨지고 이 프로토콜에서는
+   정의하지 않는다. WebSocket 연결의 닫기는 어느 엔드포인트에 의해서든
+   시작될 수 있으며, 동시에 시작될 수도 있다. _The WebSocket Connection
+   Close Reason_은 이 프로토콜을 구현하는 애플리케이션이 처음 받은 Close
+   제어 프레임에 포함된 상태 코드(<a href="#section-7.4">Section 7.4</a>) 뒤의 UTF-8 인코딩
+   데이터로 정의된다. Close 제어 프레임에 그러한 데이터가 없다면,
+   _The WebSocket Connection Close Reason_은 빈 문자열이다.
+
+   참고: <a href="#section-7.1.5">Section 7.1.5</a>에 언급된 것과 같은 논리에 따라, 두 엔드포인트가
+   _The WebSocket Connection Close Reason_에 동의하지 않을 수 있다.
+
+<span class="h4"><a class="selflink" id="section-7.1.7" href="#section-7.1.7">7.1.7</a>.  WebSocket 연결 실패 처리</span>
+
+   특정 알고리즘과 명세는 엔드포인트가 _Fail the WebSocket Connection_을
+   수행하도록 요구한다. 이를 수행하기 위해, 클라이언트는 _Close the
+   WebSocket Connection_을 수행해야 하며, 적절한 방식으로 문제를 사용자에게
+   보고할 수 있다(이는 특히 개발자에게 유용할 수 있다). 마찬가지로,
+   이를 수행하기 위해 서버는 _Close the WebSocket Connection_을 수행해야
+   하며, 문제를 로그로 기록하는 것이 좋다.
+
+   엔드포인트가 _Fail the WebSocket Connection_을 수행해야 하는 시점 전에
+   _The WebSocket Connection is Established_였다면, 엔드포인트는 _Close the
+   WebSocket Connection_으로 진행하기 전에 적절한 상태 코드(<a href="#section-7.4">Section 7.4</a>)를
+   가진 Close 프레임을 보내는 것이 좋다. 엔드포인트는 애초에 WebSocket
+   연결이 실패하게 만든 오류의 성격상 상대방이 Close 프레임을 수신하고
+   처리할 수 없을 가능성이 높다고 판단하면 Close 프레임 전송을 생략할 수
+   있다. 엔드포인트는 _Fail the WebSocket Connection_ 지시를 받은 뒤에는
+   원격 엔드포인트로부터의 데이터(응답 Close 프레임 포함)를 계속 처리하려고
+   시도해서는 안 된다.
+
+   위에 표시된 경우나 애플리케이션 계층(예: WebSocket API를 사용하는
+   스크립트)에 의해 명시된 경우를 제외하고, 클라이언트는 연결을 닫지 않는
+   것이 좋다.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 43]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-44" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  비정상 종료</span>
+
+<span class="h4"><a class="selflink" id="section-7.2.1" href="#section-7.2.1">7.2.1</a>.  클라이언트가 시작한 종료</span>
+
+   특정 알고리즘, 특히 개시 핸드셰이크 중의 알고리즘은 클라이언트가
+   _Fail the WebSocket Connection_을 수행하도록 요구한다. 이를 수행하기
+   위해, 클라이언트는 <a href="#section-7.1.7">Section 7.1.7</a>에 정의된 대로 _Fail the WebSocket
+   Connection_을 수행해야 한다.
+
+   어느 시점에서든 기반 전송 계층 연결이 예기치 않게 손실되면,
+   클라이언트는 _Fail the WebSocket Connection_을 수행해야 한다.
+
+   위에 표시된 경우나 애플리케이션 계층(예: WebSocket API를 사용하는
+   스크립트)에 의해 명시된 경우를 제외하고, 클라이언트는 연결을 닫지 않는
+   것이 좋다.
+
+<span class="h4"><a class="selflink" id="section-7.2.2" href="#section-7.2.2">7.2.2</a>.  서버가 시작한 종료</span>
+
+   특정 알고리즘은 개시 핸드셰이크 중 서버가 _Abort the WebSocket
+   Connection_을 수행하도록 요구하거나 권장한다. 이를 수행하기 위해,
+   서버는 단순히 _Close the WebSocket Connection_(<a href="#section-7.1.1">Section 7.1.1</a>)을
+   수행해야 한다.
+
+<span class="h4"><a class="selflink" id="section-7.2.3" href="#section-7.2.3">7.2.3</a>.  비정상 종료로부터 복구</span>
+
+   비정상 종료는 여러 이유로 발생할 수 있다. 이러한 종료는 일시적인
+   오류의 결과일 수 있으며, 이 경우 재연결은 양호한 연결과 정상 동작의
+   재개로 이어질 수 있다. 이러한 종료는 비일시적인 문제의 결과일 수도
+   있으며, 이 경우 배포된 각 클라이언트가 비정상 종료를 겪고 즉시
+   지속적으로 재연결을 시도한다면, 서버는 많은 클라이언트가 재연결을
+   시도함으로써 사실상 서비스 거부 공격에 해당하는 상황을 겪을 수 있다.
+   이러한 시나리오의 최종 결과는 서비스가 적시에 복구할 수 없거나 복구가
+   훨씬 더 어려워지는 것일 수 있다.
+
+   이를 방지하기 위해, 클라이언트는 이 절에 설명된 대로 비정상 종료 후
+   재연결을 시도할 때 어떤 형태의 backoff를 사용하는 것이 좋다.
+
+   첫 번째 재연결 시도는 무작위 시간만큼 지연하는 것이 좋다. 이 무작위
+   지연을 선택하는 매개변수는 클라이언트가 결정하도록 남겨둔다. 0초에서
+   5초 사이에서 무작위로 선택한 값은 합리적인 초기 지연이지만, 클라이언트는
+   구현 경험과 특정 애플리케이션에 따라 지연 길이를 선택할 다른 구간을
+   선택할 수 있다.
+
+   첫 번째 재연결 시도가 실패하면, 이후 재연결 시도는 truncated binary
+   exponential backoff와 같은 방법을 사용하여 점점 더 긴 시간만큼 지연하는
+   것이 좋다.
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 44]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-45" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h3"><a class="selflink" id="section-7.3" href="#section-7.3">7.3</a>.  연결의 정상 종료</span>
+
+   서버는 원할 때마다 WebSocket 연결을 닫을 수 있다. 클라이언트는
+   WebSocket 연결을 임의로 닫지 않는 것이 좋다. 어느 경우든, 엔드포인트는
+   _Start the WebSocket Closing Handshake_(<a href="#section-7.1.2">Section 7.1.2</a>) 절차를 따라
+   종료를 시작한다.
+
+<span class="h3"><a class="selflink" id="section-7.4" href="#section-7.4">7.4</a>.  상태 코드</span>
+
+   설정된 연결을 닫을 때(예: 개시 핸드셰이크가 완료된 후 Close 프레임을
+   보낼 때), 엔드포인트는 닫기 사유를 나타낼 수 있다. 이 사유에 대한
+   엔드포인트의 해석과 이 사유가 주어졌을 때 엔드포인트가 취해야 할
+   조치는 이 명세에서 정의하지 않는다. 이 명세는 미리 정의된 상태 코드
+   집합을 정의하고, 확장, 프레임워크 및 최종 애플리케이션이 사용할 수
+   있는 범위를 명시한다. 상태 코드와 관련 텍스트 메시지는 Close 프레임의
+   선택적 구성 요소이다.
+
+<span class="h4"><a class="selflink" id="section-7.4.1" href="#section-7.4.1">7.4.1</a>.  정의된 상태 코드</span>
+
+   엔드포인트는 Close 프레임을 보낼 때 다음 미리 정의된 상태 코드를
+   사용할 수 있다.
+
+   1000
+
+      1000은 정상 종료를 나타내며, 이는 연결이 설정된 목적이 충족되었음을
+      의미한다.
+
+   1001
+
+      1001은 엔드포인트가 "going away" 상태임을 나타낸다. 예를 들어
+      서버가 내려가거나 브라우저가 페이지를 떠난 경우이다.
+
+   1002
+
+      1002는 엔드포인트가 프로토콜 오류로 인해 연결을 종료하고 있음을
+      나타낸다.
+
+   1003
+
+      1003은 엔드포인트가 수락할 수 없는 유형의 데이터를 받았기 때문에
+      연결을 종료하고 있음을 나타낸다(예: 텍스트 데이터만 이해하는
+      엔드포인트가 이진 메시지를 받으면 이를 보낼 수 있다).
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 45]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-46" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   1004
+
+      예약됨. 구체적인 의미는 향후 정의될 수 있다.
+
+   1005
+
+      1005는 예약된 값이며, 엔드포인트가 Close 제어 프레임의 상태 코드로
+      설정해서는 안 된다. 이는 상태 코드가 실제로 존재하지 않았음을
+      나타내는 상태 코드를 기대하는 애플리케이션에서 사용하도록 지정되어
+      있다.
+
+   1006
+
+      1006은 예약된 값이며, 엔드포인트가 Close 제어 프레임의 상태 코드로
+      설정해서는 안 된다. 이는 예를 들어 Close 제어 프레임을 보내거나
+      받지 않고 연결이 비정상적으로 닫혔음을 나타내는 상태 코드를 기대하는
+      애플리케이션에서 사용하도록 지정되어 있다.
+
+   1007
+
+      1007은 엔드포인트가 메시지의 유형과 일치하지 않는 데이터를 메시지
+      안에서 받았기 때문에 연결을 종료하고 있음을 나타낸다(예: 텍스트
+      메시지 안의 non-UTF-8 [<a href="./rfc3629" title="&quot;UTF-8, a transformation format of ISO 10646&quot;">RFC3629</a>] 데이터).
+
+   1008
+
+      1008은 엔드포인트가 자신의 정책을 위반하는 메시지를 받았기 때문에
+      연결을 종료하고 있음을 나타낸다. 이는 더 적합한 다른 상태 코드
+      (예: 1003 또는 1009)가 없거나 정책에 대한 구체적인 세부사항을
+      숨길 필요가 있을 때 반환할 수 있는 일반 상태 코드이다.
+
+   1009
+
+      1009는 엔드포인트가 처리하기에 너무 큰 메시지를 받았기 때문에
+      연결을 종료하고 있음을 나타낸다.
+
+   1010
+
+      1010은 엔드포인트(클라이언트)가 서버가 하나 이상의 확장을 협상할
+      것으로 기대했지만, 서버가 WebSocket 핸드셰이크의 응답 메시지에서
+      이를 반환하지 않았기 때문에 연결을 종료하고 있음을 나타낸다.
+      필요한 확장 목록은 Close 프레임의 /reason/ 부분에 나타나는 것이
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 46]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-47" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+      좋다. 이 상태 코드는 서버가 사용하지 않음에 유의하라. 서버는 대신
+      WebSocket 핸드셰이크를 실패시킬 수 있기 때문이다.
+
+   1011
+
+      1011은 서버가 요청을 이행하지 못하게 한 예기치 않은 조건을
+      만났기 때문에 연결을 종료하고 있음을 나타낸다.
+
+   1015
+
+      1015는 예약된 값이며, 엔드포인트가 Close 제어 프레임의 상태 코드로
+      설정해서는 안 된다. 이는 TLS 핸드셰이크 수행 실패로 인해 연결이
+      닫혔음을 나타내는 상태 코드를 기대하는 애플리케이션에서 사용하도록
+      지정되어 있다(예: 서버 인증서를 검증할 수 없는 경우).
+
+<span class="h4"><a class="selflink" id="section-7.4.2" href="#section-7.4.2">7.4.2</a>.  예약된 상태 코드 범위</span>
+
+   0-999
+
+      0-999 범위의 상태 코드는 사용되지 않는다.
+
+   1000-2999
+
+      1000-2999 범위의 상태 코드는 이 프로토콜, 그 향후 개정판 및 영구적이고
+      쉽게 접근 가능한 공개 명세에 명시된 확장에서 정의하기 위해 예약되어
+      있다.
+
+   3000-3999
+
+      3000-3999 범위의 상태 코드는 라이브러리, 프레임워크 및 애플리케이션에서
+      사용하기 위해 예약되어 있다. 이러한 상태 코드는 IANA에 직접 등록된다.
+      이 코드들의 해석은 이 프로토콜에서 정의하지 않는다.
+
+   4000-4999
+
+      4000-4999 범위의 상태 코드는 private use를 위해 예약되어 있으므로
+      등록될 수 없다. 이러한 코드는 WebSocket 애플리케이션 간의 사전 합의에
+      의해 사용될 수 있다. 이 코드들의 해석은 이 프로토콜에서 정의하지
+      않는다.
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 47]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-48" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  오류 처리</span>
+
+<span class="h3"><a class="selflink" id="section-8.1" href="#section-8.1">8.1</a>.  UTF-8 인코딩 데이터의 오류 처리</span>
+
+   엔드포인트가 바이트 스트림을 UTF-8로 해석하려 하지만 그 바이트 스트림이
+   실제로 유효한 UTF-8 스트림이 아님을 발견하면, 해당 엔드포인트는
+   _Fail the WebSocket Connection_을 수행해야 한다. 이 규칙은 개시
+   핸드셰이크 중과 이후 데이터 교환 중 모두에 적용된다.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  확장</span>
+
+   WebSocket 클라이언트는 이 명세에 대한 확장을 요청할 수 있으며,
+   WebSocket 서버는 클라이언트가 요청한 확장의 일부 또는 전부를 수락할
+   수 있다. 서버는 클라이언트가 요청하지 않은 어떤 확장으로도 응답해서는
+   안 된다. 클라이언트와 서버 간의 협상에 확장 매개변수가 포함되는 경우,
+   해당 매개변수는 그 매개변수가 적용되는 확장의 명세에 따라 선택되어야
+   한다.
+
+<span class="h3"><a class="selflink" id="section-9.1" href="#section-9.1">9.1</a>.  확장 협상</span>
+
+   클라이언트는 |Sec-WebSocket-Extensions| 헤더 필드를 포함하여 확장을
+   요청한다. 이 헤더 필드는 HTTP 헤더 필드의 일반 규칙(<a href="./rfc2616#section-4.2">[RFC2616],
+   Section&nbsp;4.2</a> 참조)을 따르며, 헤더 필드의 값은 다음 ABNF [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]로
+   정의된다. 이 절은 "implied *LWS rule"을 포함하여 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]의 ABNF
+   구문/규칙을 사용한다는 점에 유의하라. 협상 중 클라이언트 또는 서버가
+   아래 ABNF를 준수하지 않는 값을 받으면, 그러한 잘못된 형식의 데이터를
+   받은 수신자는 즉시 _Fail the WebSocket Connection_을 수행해야 한다.
+
+         Sec-WebSocket-Extensions = extension-list
+         extension-list = 1#extension
+         extension = extension-token *( ";" extension-param )
+         extension-token = registered-token
+         registered-token = token
+         extension-param = token [ "=" (token | quoted-string) ]
+             ;quoted-string 구문 변형을 사용할 때, quoted-string
+             ;이스케이프 해제 후의 값은 'token' ABNF를 준수해야 한다.
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 48]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-49" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   다른 HTTP 헤더 필드와 마찬가지로, 이 헤더 필드는 여러 행으로 나뉘거나
+   결합될 수 있음에 유의하라. 따라서 다음은 동등하다.
+
+         Sec-WebSocket-Extensions: foo
+         Sec-WebSocket-Extensions: bar; baz=2
+
+   이는 다음과 정확히 동등하다.
+
+         Sec-WebSocket-Extensions: foo, bar; baz=2
+
+   사용되는 모든 extension-token은 등록된 토큰이어야 한다(<a href="#section-11.4">Section 11.4</a>
+   참조). 특정 확장에 제공되는 매개변수는 그 확장에 대해 정의되어 있어야
+   한다. 클라이언트는 광고된 확장을 사용하겠다고 제안하는 것일 뿐이며,
+   서버가 그 확장을 사용하고자 함을 나타내지 않는 한 이를 사용해서는
+   안 된다는 점에 유의하라.
+
+   확장의 순서는 중요하다는 점에 유의하라. 여러 확장 간의 상호작용은
+   확장을 정의하는 문서에서 정의될 수 있다. 그러한 정의가 없는 경우,
+   해석은 클라이언트가 요청에서 나열한 헤더 필드들이 사용하고자 하는
+   헤더 필드의 선호도를 나타내며, 먼저 나열된 옵션이 가장 선호되는 것으로
+   보는 것이다. 서버가 응답에 나열한 확장은 연결에서 실제로 사용 중인
+   확장을 나타낸다. 확장이 데이터 및/또는 프레이밍을 수정한다면, 데이터에
+   대한 작업 순서는 개시 핸드셰이크에서 서버의 응답에 확장이 나열된
+   순서와 같다고 가정해야 한다.
+
+   예를 들어 "foo"와 "bar"라는 두 확장이 있고, 서버가 보낸
+   |Sec-WebSocket-Extensions| 헤더 필드의 값이 "foo, bar"라면, 데이터에
+   대한 작업은 bar(foo(data))로 수행된다. 이는 데이터 자체에 대한 변경
+   (예: 압축)이든 "stack"될 수 있는 프레이밍에 대한 변경이든 마찬가지이다.
+
+   허용 가능한 확장 헤더 필드의 비규범적 예시(긴 행은 가독성을 위해
+   접었음에 유의):
+
+         Sec-WebSocket-Extensions: deflate-stream
+         Sec-WebSocket-Extensions: mux; max-channels=4; flow-control,
+          deflate-stream
+         Sec-WebSocket-Extensions: private-extension
+
+   서버는 클라이언트가 요청한 하나 이상의 확장을 포함하는
+   |Sec-WebSocket-Extensions| 헤더 필드를 포함하여 하나 이상의 확장을
+   수락한다. 확장 매개변수의 해석, 그리고 클라이언트가 요청한 매개변수
+   집합에 대한 서버의 유효한 응답을 구성하는 것은 각 확장에 의해 정의될
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 49]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-50" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   것이다.
+
+<span class="h3"><a class="selflink" id="section-9.2" href="#section-9.2">9.2</a>.  알려진 확장</span>
+
+   확장은 구현이 추가 프로토콜 기능을 선택적으로 사용할 수 있게 하는
+   메커니즘을 제공한다. 이 문서는 어떤 확장도 정의하지 않지만, 구현은
+   별도로 정의된 확장을 사용할 수 있다.
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  보안 고려사항</span>
+
+   이 절은 WebSocket 프로토콜에 적용되는 몇 가지 보안 고려사항을 설명한다.
+   구체적인 보안 고려사항은 이 절의 하위 절에서 설명된다.
+
+<span class="h3"><a class="selflink" id="section-10.1" href="#section-10.1">10.1</a>.  비브라우저 클라이언트</span>
+
+   WebSocket 프로토콜은 예를 들어 |Origin| 헤더 필드(아래 참조)를
+   검사함으로써, 웹 브라우저와 같은 신뢰된 애플리케이션 내부에서 실행되는
+   악의적인 JavaScript로부터 보호한다. 추가 세부사항은 <a href="#section-1.6">Section 1.6</a>을
+   참조하라. 이러한 가정은 더 강력한 기능을 가진 클라이언트의 경우에는
+   참이 아니다.
+
+   이 프로토콜은 웹 페이지의 스크립트가 사용하도록 의도되었지만, 호스트가
+   직접 사용할 수도 있다. 그러한 호스트는 자신을 대신하여 동작하므로
+   가짜 |Origin| 헤더 필드를 보내 서버를 오도할 수 있다. 따라서 서버는
+   자신이 알려진 출처의 스크립트와 직접 통신하고 있다고 가정할 때 주의해야
+   하며, 예상치 못한 방식으로 접근될 수 있음을 고려해야 한다. 특히 서버는
+   어떤 입력도 유효하다고 신뢰해서는 안 된다.
+
+   예시: 서버가 SQL 쿼리의 일부로 입력을 사용한다면, 서버가 SQL injection에
+   취약해지지 않도록 모든 입력 텍스트는 SQL 서버에 전달되기 전에
+   이스케이프되어야 한다.
+
+<span class="h3"><a class="selflink" id="section-10.2" href="#section-10.2">10.2</a>.  출처 고려사항</span>
+
+   임의의 웹 페이지가 아니라 특정 사이트만의 입력을 처리하도록 의도된
+   서버는 |Origin| 필드가 예상하는 origin인지 검증하는 것이 좋다. 표시된
+   origin이 서버에 허용될 수 없다면, 서버는 HTTP 403 Forbidden 상태 코드를
+   포함하는 응답으로 WebSocket 핸드셰이크에 응답하는 것이 좋다.
+
+   |Origin| 헤더 필드는 신뢰되지 않은 당사자가 일반적으로 신뢰된
+   클라이언트의 맥락에서 실행되는 JavaScript 애플리케이션의 작성자인
+   공격 사례로부터 보호한다. 클라이언트 자체는 서버에 접속할 수 있으며,
+   |Origin| 헤더 필드의 메커니즘을 통해 이러한 통신 권한을 JavaScript
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 50]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-51" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   애플리케이션으로 확장할지를 결정할 수 있다. 의도는 비브라우저가 연결을
+   설정하지 못하게 하는 것이 아니라, 잠재적으로 악의적인 JavaScript의
+   제어를 받는 신뢰된 브라우저가 WebSocket 핸드셰이크를 위조할 수 없도록
+   보장하는 것이다.
+
+<span class="h3"><a class="selflink" id="section-10.3" href="#section-10.3">10.3</a>.  인프라에 대한 공격(마스킹)</span>
+
+   엔드포인트가 WebSocket을 통한 공격의 대상이 되는 것 외에도, 프록시와
+   같은 웹 인프라의 다른 부분도 공격의 대상이 될 수 있다.
+
+   이 프로토콜이 개발되는 동안, 실제 배포된 caching proxy의 poisoning으로
+   이어진 프록시에 대한 공격 유형을 시연하기 위한 실험이 수행되었다
+   [<a href="#ref-TALKING" title="&quot;Talking to Yourself for Fun and Profit&quot;">TALKING</a>]. 공격의 일반적인 형태는 "공격자"가 제어하는 서버에 연결을
+   설정하고, WebSocket 프로토콜이 연결을 설정할 때 하는 것과 유사하게
+   HTTP 연결에서 UPGRADE를 수행한 다음, 그 UPGRADE된 연결을 통해 특정
+   알려진 리소스에 대한 GET 요청처럼 보이는 데이터를 보내는 것이었다
+   (공격에서는 이것이 널리 배포된 hit 추적용 스크립트나 광고 제공
+   네트워크의 리소스 같은 것일 가능성이 높다). 원격 서버는 가짜 GET
+   요청에 대한 응답처럼 보이는 것으로 응답하고, 이 응답은 배포된 중개자의
+   0이 아닌 비율에 의해 캐시되어 캐시를 poisoning하게 된다. 이 공격의
+   순효과는 사용자가 공격자가 제어하는 웹사이트를 방문하도록 설득될 수
+   있다면, 공격자가 해당 사용자와 같은 캐시 뒤에 있는 다른 사용자들의
+   캐시를 잠재적으로 poisoning하고 다른 origin에서 악성 스크립트를 실행해
+   웹 보안 모델을 손상시킬 수 있다는 것이다.
+
+   배포된 중개자에 대한 이러한 공격을 피하기 위해서는, 애플리케이션이
+   제공한 데이터 앞에 HTTP와 호환되지 않는 프레이밍을 붙이는 것만으로는
+   충분하지 않다. 각 비준수 중개자가 그러한 non-HTTP 프레이밍을 건너뛰고
+   프레임 payload에 대해 잘못 동작하지 않는다는 것을 완전히 찾아내고
+   테스트하는 것은 불가능하기 때문이다. 따라서 채택된 방어는 클라이언트에서
+   서버로 가는 모든 데이터를 마스킹하여, 원격 스크립트(공격자)가 전송되는
+   데이터가 전송선상에서 어떻게 나타나는지 제어하지 못하게 하고, 따라서
+   중개자가 HTTP 요청으로 잘못 해석할 수 있는 메시지를 구성하지 못하게
+   하는 것이다.
+
+   클라이언트는 데이터를 제공하는 최종 애플리케이션이 예측할 수 없는
+   알고리즘을 사용하여 각 프레임마다 새 masking key를 선택해야 한다.
+   예를 들어 각 masking은 암호학적으로 강한 난수 생성기에서 가져올 수
+   있다. 같은 key가 사용되거나 다음 key가 어떻게 선택되는지 해독 가능한
+   패턴이 있다면, 공격자는 마스킹되었을 때 HTTP 요청처럼 보일 수 있는
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 51]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-52" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   메시지를 보낼 수 있다(공격자가 전송선상에서 보고 싶은 메시지를 다음에
+   사용될 masking key로 마스킹하면, 클라이언트가 이를 적용할 때 masking
+   key가 사실상 데이터를 unmask하게 된다).
+
+   또한 클라이언트로부터 프레임 전송이 시작되면, 그 프레임의 payload
+   (애플리케이션이 제공한 데이터)는 애플리케이션이 수정할 수 없어야 한다.
+   그렇지 않으면 공격자는 초기 데이터가 알려진 값(예: 모두 0)인 긴
+   프레임을 보내고, 데이터의 첫 부분을 수신할 때 사용 중인 masking key를
+   계산한 다음, 아직 프레임에서 전송되지 않은 데이터를 수정하여 마스킹되었을
+   때 HTTP 요청처럼 보이게 할 수 있다. (이는 알려져 있거나 예측 가능한
+   masking key를 사용하는 것에 대해 이전 단락에서 설명한 문제와 본질적으로
+   동일하다.) 추가 데이터를 보내야 하거나 보낼 데이터가 어떤 식으로든
+   변경된다면, 그 새 데이터 또는 변경된 데이터는 새 프레임으로 보내야 하며
+   따라서 새 masking key를 사용해야 한다. 요컨대 프레임 전송이 시작되면,
+   그 내용은 원격 스크립트(애플리케이션)에 의해 수정 가능해서는 안 된다.
+
+   보호하려는 위협 모델은 클라이언트가 HTTP 요청처럼 보이는 데이터를 보내는
+   경우이다. 따라서 마스킹해야 하는 채널은 클라이언트에서 서버로 가는
+   데이터이다. 서버에서 클라이언트로 가는 데이터는 응답처럼 보이게 만들 수
+   있지만, 이러한 요청을 달성하려면 클라이언트도 요청을 위조할 수 있어야
+   한다. 따라서 양방향 모두에서 데이터를 마스킹할 필요는 없다고 판단되었다
+   (서버에서 클라이언트로 가는 데이터는 마스킹되지 않는다).
+
+   마스킹이 제공하는 보호에도 불구하고, 비준수 HTTP 프록시는 여전히
+   마스킹을 적용하지 않는 클라이언트와 서버에 의해 이러한 유형의 poisoning
+   공격에 취약할 것이다.
+
+<span class="h3"><a class="selflink" id="section-10.4" href="#section-10.4">10.4</a>.  구현별 한계</span>
+
+   여러 프레임에서 재조립한 후의 프레임 크기 또는 전체 메시지 크기에 대해
+   구현 및/또는 플랫폼별 제한이 있는 구현은 그 제한을 초과하지 않도록
+   스스로를 보호해야 한다. (예를 들어 악의적인 엔드포인트는 단일 큰 프레임
+   (예: 크기 2**60)을 보내거나, 단편화된 메시지의 일부인 작은 프레임의 긴
+   스트림을 보내는 방식으로 피어의 메모리를 고갈시키거나 서비스 거부 공격을
+   수행하려고 시도할 수 있다.) 이러한 구현은 여러 프레임에서 재조립한 후의
+   프레임 크기와 전체 메시지 크기에 제한을 부과하는 것이 좋다.
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 52]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-53" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h3"><a class="selflink" id="section-10.5" href="#section-10.5">10.5</a>.  WebSocket 클라이언트 인증</span>
+
+   이 프로토콜은 WebSocket 핸드셰이크 중에 서버가 클라이언트를 인증할 수
+   있는 특정한 방법을 규정하지 않는다. WebSocket 서버는 쿠키, HTTP 인증,
+   또는 TLS 인증과 같이 일반 HTTP 서버에서 사용할 수 있는 어떤 클라이언트
+   인증 메커니즘도 사용할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-10.6" href="#section-10.6">10.6</a>.  연결 기밀성 및 무결성</span>
+
+   연결 기밀성과 무결성은 TLS 위에서 WebSocket 프로토콜을 실행함으로써
+   제공된다(wss URI). WebSocket 구현은 TLS를 지원해야 하며, 피어와
+   통신할 때 이를 사용하는 것이 좋다.
+
+   TLS를 사용하는 연결의 경우, TLS가 제공하는 이점의 정도는 TLS
+   핸드셰이크 중 협상된 알고리즘의 강도에 크게 의존한다. 예를 들어 일부
+   TLS 암호 메커니즘은 연결 기밀성을 제공하지 않는다. 합리적인 수준의
+   보호를 달성하기 위해 클라이언트는 Strong TLS 알고리즘만 사용하는 것이
+   좋다. "Web Security Context: User Interface Guidelines"
+   [<a href="#ref-W3C.REC-wsc-ui-20100812">W3C.REC-wsc-ui-20100812</a>]는 Strong TLS 알고리즘을 구성하는 것이
+   무엇인지 논의한다. [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]은 <a href="#appendix-A.5">Appendix A.5</a> 및
+   <a href="#appendix-D.3">Appendix D.3</a>에서 추가 지침을 제공한다.
+
+<span class="h3"><a class="selflink" id="section-10.7" href="#section-10.7">10.7</a>.  유효하지 않은 데이터 처리</span>
+
+   들어오는 데이터는 클라이언트와 서버 모두가 항상 검증해야 한다.
+   언제든지 엔드포인트가 이해하지 못하는 데이터나 엔드포인트가 입력의
+   안전성을 판단하는 어떤 기준을 위반하는 데이터에 직면하거나, 엔드포인트가
+   예상하는 값에 대응하지 않는 개시 핸드셰이크(예: 클라이언트 요청의
+   잘못된 path 또는 origin)를 보게 되면, 엔드포인트는 TCP 연결을 끊을 수
+   있다. 성공적인 WebSocket 핸드셰이크 후 유효하지 않은 데이터가 수신된
+   경우, 엔드포인트는 _Close the WebSocket Connection_으로 진행하기 전에
+   적절한 상태 코드(<a href="#section-7.4">Section 7.4</a>)를 가진 Close 프레임을 보내는 것이 좋다.
+   적절한 상태 코드를 가진 Close 프레임을 사용하면 문제 진단에 도움이 될
+   수 있다. WebSocket 핸드셰이크 중 유효하지 않은 데이터가 전송된 경우,
+   서버는 적절한 HTTP [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>] 상태 코드를 반환하는 것이 좋다.
+
+   잘못된 인코딩을 사용하여 텍스트 데이터를 보낼 때 흔한 보안 문제
+   유형이 발생한다. 이 프로토콜은 Text 데이터 유형(Binary 또는 다른
+   유형과 반대되는) 메시지가 UTF-8로 인코딩된 데이터를 포함한다고
+   명시한다. 길이는 여전히 표시되며 이 프로토콜을 구현하는 애플리케이션은
+   프레임이 실제로 어디에서 끝나는지 결정하기 위해 길이를 사용해야 하지만,
+   부적절한 인코딩으로 데이터를 보내면 이 프로토콜 위에 구축된
+   애플리케이션이 가질 수 있는 가정이 여전히 깨질 수 있으며, 데이터의
+   오해석부터 데이터 손실 또는 잠재적 보안 버그에 이르는 결과로 이어질 수
+   있다.
+
+<span class="h3"><a class="selflink" id="section-10.8" href="#section-10.8">10.8</a>.  WebSocket 핸드셰이크의 SHA-1 사용</span>
+
+   이 문서에 설명된 WebSocket 핸드셰이크는 충돌 저항성이나 두 번째
+   pre-image 공격에 대한 저항성([<a href="./rfc4270" title="&quot;Attacks on Cryptographic Hashes in Internet Protocols&quot;">RFC4270</a>]에 설명된 것과 같은) 등
+   SHA-1의 어떤 보안 속성에도 의존하지 않는다.
+
+<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>.  IANA 고려사항</span>
+
+<span class="h3"><a class="selflink" id="section-11.1" href="#section-11.1">11.1</a>.  새 URI 스킴 등록</span>
+
+<span class="h4"><a class="selflink" id="section-11.1.1" href="#section-11.1.1">11.1.1</a>.  "ws" 스킴 등록</span>
+
+   |ws| URI는 WebSocket 서버와 resource name을 식별한다.
+
+   URI scheme name
+      ws
+
+   Status
+      Permanent
+
+   URI scheme syntax
+      URI 명세 [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]의 ABNF [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>] 구문 및 ABNF terminal을
+      사용한다.
+
+           "ws:" "//" authority path-abempty [ "?" query ]
+
+   &lt;path-abempty&gt; 및 &lt;query&gt; [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>] 구성 요소는 원하는 서비스의
+   종류를 식별하기 위해 서버에 보내지는 resource name을 형성한다.
+   다른 구성 요소는 [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]에 설명된 의미를 가진다.
+
+   URI scheme semantics
+      이 스킴의 유일한 작업은 WebSocket 프로토콜을 사용하여 연결을 여는
+      것이다.
+
+   Encoding considerations
+      위에 정의된 구문에서 제외되는 host 구성 요소의 문자는 [<a href="./rfc3987" title="&quot;Internationalized Resource Identifiers (IRIs)&quot;">RFC3987</a>]
+      또는 그 대체 문서에 명시된 대로 Unicode에서 ASCII로 변환되어야
+      한다. 스킴 기반 정규화의 목적상, host 구성 요소의 Internationalized
+      Domain Name(IDN) 형식과 punycode로의 변환은 동등한 것으로 간주된다
+      (<a href="./rfc3987#section-5.3.3">[RFC3987]의 Section&nbsp;5.3.3</a> 참조).
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 54]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-55" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+      위에 정의된 구문에서 제외되는 다른 구성 요소의 문자는 먼저 문자를
+      UTF-8로 인코딩한 다음, URI [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>] 및 Internationalized Resource
+      Identifier(IRI) [<a href="./rfc3987" title="&quot;Internationalized Resource Identifiers (IRIs)&quot;">RFC3987</a>] 명세에 정의된 percent-encoded 형식을
+      사용하여 해당 바이트를 대체함으로써 Unicode에서 ASCII로 변환되어야
+      한다.
+
+   Applications/protocols that use this URI scheme name
+      WebSocket Protocol
+
+   Interoperability considerations
+      WebSocket을 사용하려면 HTTP 버전 1.1 이상을 사용해야 한다.
+
+   Security considerations
+      "Security Considerations" 절을 참조하라.
+
+   Contact
+      HYBI WG &lt;hybi@ietf.org&gt;
+
+   Author/Change controller
+      IETF &lt;iesg@ietf.org&gt;
+
+   References
+      <a href="./rfc6455">RFC 6455</a>
+
+<span class="h4"><a class="selflink" id="section-11.1.2" href="#section-11.1.2">11.1.2</a>.  "wss" 스킴 등록</span>
+
+   |wss| URI는 WebSocket 서버와 resource name을 식별하며, 해당 연결의
+   트래픽이 TLS를 통해 보호되어야 함을 나타낸다(데이터 기밀성 및 무결성과
+   엔드포인트 인증 같은 TLS의 표준 이점 포함).
+
+   URI scheme name
+      wss
+
+   Status
+      Permanent
+
+   URI scheme syntax
+      URI 명세 [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]의 ABNF [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>] 구문 및 ABNF terminal을
+      사용한다.
+
+           "wss:" "//" authority path-abempty [ "?" query ]
+
+   &lt;path-abempty&gt; 및 &lt;query&gt; 구성 요소는 원하는 서비스의 종류를
+   식별하기 위해 서버에 보내지는 resource name을 형성한다. 다른 구성
+   요소는 [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]에 설명된 의미를 가진다.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 55]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-56" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   URI scheme semantics
+      이 스킴의 유일한 작업은 TLS를 사용해 암호화된 WebSocket 프로토콜을
+      사용하여 연결을 여는 것이다.
+
+   Encoding considerations
+      위에 정의된 구문에서 제외되는 host 구성 요소의 문자는 [<a href="./rfc3987" title="&quot;Internationalized Resource Identifiers (IRIs)&quot;">RFC3987</a>]
+      또는 그 대체 문서에 명시된 대로 Unicode에서 ASCII로 변환되어야
+      한다. 스킴 기반 정규화의 목적상 host 구성 요소의 IDN 형식과
+      punycode로의 변환은 동등한 것으로 간주된다(<a href="./rfc3987#section-5.3.3">[RFC3987]의 Section</a>
+      <a href="./rfc3987#section-5.3.3">5.3.3</a> 참조).
+
+      위에 정의된 구문에서 제외되는 다른 구성 요소의 문자는 먼저 문자를
+      UTF-8로 인코딩한 다음, URI [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>] 및 IRI [<a href="./rfc3987" title="&quot;Internationalized Resource Identifiers (IRIs)&quot;">RFC3987</a>] 명세에
+      정의된 percent-encoded 형식을 사용하여 해당 바이트를 대체함으로써
+      Unicode에서 ASCII로 변환되어야 한다.
+
+   Applications/protocols that use this URI scheme name
+      TLS 위의 WebSocket Protocol
+
+   Interoperability considerations
+      WebSocket을 사용하려면 HTTP 버전 1.1 이상을 사용해야 한다.
+
+   Security considerations
+      "Security Considerations" 절을 참조하라.
+
+   Contact
+      HYBI WG &lt;hybi@ietf.org&gt;
+
+   Author/Change controller
+      IETF &lt;iesg@ietf.org&gt;
+
+   References
+      <a href="./rfc6455">RFC 6455</a>
+
+<span class="h3"><a class="selflink" id="section-11.2" href="#section-11.2">11.2</a>.  "WebSocket" HTTP Upgrade 키워드 등록</span>
+
+   이 절은 <a href="./rfc2817">RFC 2817</a> [<a href="./rfc2817" title="&quot;Upgrading to TLS Within HTTP/1.1&quot;">RFC2817</a>]에 따라 HTTP Upgrade Tokens
+   Registry에 등록된 키워드를 정의한다.
+
+   Name of token
+      WebSocket
+
+   Author/Change controller
+      IETF &lt;iesg@ietf.org&gt;
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 56]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-57" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Contact
+      HYBI &lt;hybi@ietf.org&gt;
+
+   References
+      <a href="./rfc6455">RFC 6455</a>
+
+<span class="h3"><a class="selflink" id="section-11.3" href="#section-11.3">11.3</a>.  새 HTTP 헤더 필드 등록</span>
+
+<span class="h4"><a class="selflink" id="section-11.3.1" href="#section-11.3.1">11.3.1</a>.  Sec-WebSocket-Key</span>
+
+   이 절은 Permanent Message Header Field Names 레지스트리 [<a href="./rfc3864" title="&quot;Registration Procedures for Message Header Fields&quot;">RFC3864</a>]에
+   등록된 헤더 필드를 설명한다.
+
+   Header field name
+      Sec-WebSocket-Key
+
+   Applicable protocol
+      http
+
+   Status
+      standard
+
+   Author/Change controller
+      IETF
+
+   Specification document(s)
+      <a href="./rfc6455">RFC 6455</a>
+
+   Related information
+      이 헤더 필드는 WebSocket 개시 핸드셰이크에만 사용된다.
+
+   |Sec-WebSocket-Key| 헤더 필드는 WebSocket 개시 핸드셰이크에 사용된다.
+   이는 클라이언트에서 서버로 전송되어, 서버가 유효한 WebSocket 개시
+   핸드셰이크를 수신했음을 증명하는 데 사용하는 정보의 일부를 제공한다.
+   이는 서버가 의심하지 않는 WebSocket 서버에 데이터를 보내도록 남용되는
+   비-WebSocket 클라이언트(예: HTTP 클라이언트)로부터의 연결을 수락하지
+   않도록 보장하는 데 도움이 된다.
+
+   |Sec-WebSocket-Key| 헤더 필드는 HTTP 요청에 두 번 이상 나타나서는 안 된다.
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 57]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-58" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h4"><a class="selflink" id="section-11.3.2" href="#section-11.3.2">11.3.2</a>.  Sec-WebSocket-Extensions</span>
+
+   이 절은 Permanent Message Header Field Names 레지스트리에 등록하기 위한
+   헤더 필드를 설명한다 [<a href="./rfc3864" title="&quot;Registration Procedures for Message Header Fields&quot;">RFC3864</a>].
+
+   Header field name
+      Sec-WebSocket-Extensions
+
+   Applicable protocol
+      http
+
+   Status
+      standard
+
+   Author/Change controller
+      IETF
+
+   Specification document(s)
+      <a href="./rfc6455">RFC 6455</a>
+
+   Related information
+      이 헤더 필드는 WebSocket 개시 핸드셰이크에만 사용된다.
+
+   |Sec-WebSocket-Extensions| 헤더 필드는 WebSocket 개시 핸드셰이크에
+   사용된다. 이는 처음에 클라이언트에서 서버로 전송되고, 이후 서버에서
+   클라이언트로 전송되어, 연결이 지속되는 동안 사용할 프로토콜 수준
+   확장 집합에 합의한다.
+
+   |Sec-WebSocket-Extensions| 헤더 필드는 HTTP 요청에 여러 번 나타날 수
+   있다(이는 모든 값을 포함하는 단일 |Sec-WebSocket-Extensions| 헤더
+   필드와 논리적으로 동일하다. 그러나 |Sec-WebSocket-Extensions| 헤더
+   필드는 HTTP 응답에 두 번 이상 나타나서는 안 된다.
+
+<span class="h4"><a class="selflink" id="section-11.3.3" href="#section-11.3.3">11.3.3</a>.  Sec-WebSocket-Accept</span>
+
+   이 절은 Permanent Message Header Field Names 레지스트리 [<a href="./rfc3864" title="&quot;Registration Procedures for Message Header Fields&quot;">RFC3864</a>]에
+   등록된 헤더 필드를 설명한다.
+
+   Header field name
+      Sec-WebSocket-Accept
+
+   Applicable protocol
+      http
+
+   Status
+      standard
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 58]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-59" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Author/Change controller
+      IETF
+
+   Specification document(s)
+      <a href="./rfc6455">RFC 6455</a>
+
+   Related information
+      이 헤더 필드는 WebSocket 개시 핸드셰이크에만 사용된다.
+
+   |Sec-WebSocket-Accept| 헤더 필드는 WebSocket 개시 핸드셰이크에 사용된다.
+   이는 서버에서 클라이언트로 전송되어 서버가 WebSocket 연결을 시작할
+   의사가 있음을 확인한다.
+
+   |Sec-WebSocket-Accept| 헤더는 HTTP 응답에 두 번 이상 나타나서는 안 된다.
+
+<span class="h4"><a class="selflink" id="section-11.3.4" href="#section-11.3.4">11.3.4</a>.  Sec-WebSocket-Protocol</span>
+
+   이 절은 Permanent Message Header Field Names 레지스트리 [<a href="./rfc3864" title="&quot;Registration Procedures for Message Header Fields&quot;">RFC3864</a>]에
+   등록된 헤더 필드를 설명한다.
+
+   Header field name
+      Sec-WebSocket-Protocol
+
+   Applicable protocol
+      http
+
+   Status
+      standard
+
+   Author/Change controller
+      IETF
+
+   Specification document(s)
+      <a href="./rfc6455">RFC 6455</a>
+
+   Related information
+      이 헤더 필드는 WebSocket 개시 핸드셰이크에만 사용된다.
+
+   |Sec-WebSocket-Protocol| 헤더 필드는 WebSocket 개시 핸드셰이크에 사용된다.
+   이는 클라이언트에서 서버로, 그리고 서버에서 클라이언트로 다시 전송되어
+   연결의 서브프로토콜을 확인한다. 이를 통해 스크립트는 서브프로토콜을
+   선택하고 서버가 그 서브프로토콜을 제공하기로 동의했음을 확신할 수 있다.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 59]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-60" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   |Sec-WebSocket-Protocol| 헤더 필드는 HTTP 요청에 여러 번 나타날 수 있다
+   (이는 모든 값을 포함하는 단일 |Sec-WebSocket-Protocol| 헤더 필드와
+   논리적으로 동일하다). 그러나 |Sec-WebSocket-Protocol| 헤더 필드는 HTTP
+   응답에 두 번 이상 나타나서는 안 된다.
+
+<span class="h4"><a class="selflink" id="section-11.3.5" href="#section-11.3.5">11.3.5</a>.  Sec-WebSocket-Version</span>
+
+   이 절은 Permanent Message Header Field Names 레지스트리 [<a href="./rfc3864" title="&quot;Registration Procedures for Message Header Fields&quot;">RFC3864</a>]에
+   등록된 헤더 필드를 설명한다.
+
+   Header field name
+      Sec-WebSocket-Version
+
+   Applicable protocol
+      http
+
+   Status
+      standard
+
+   Author/Change controller
+      IETF
+
+   Specification document(s)
+      <a href="./rfc6455">RFC 6455</a>
+
+   Related information
+      이 헤더 필드는 WebSocket 개시 핸드셰이크에만 사용된다.
+
+   |Sec-WebSocket-Version| 헤더 필드는 WebSocket 개시 핸드셰이크에 사용된다.
+   이는 클라이언트에서 서버로 전송되어 연결의 프로토콜 버전을 나타낸다.
+   이를 통해 서버는 개시 핸드셰이크와 data에서 보내지는 후속 데이터를
+   올바르게 해석하고, 서버가 그 데이터를 안전한 방식으로 해석할 수 없으면
+   연결을 닫을 수 있다. |Sec-WebSocket-Version| 헤더 필드는 또한
+   클라이언트로부터 받은 버전이 서버가 이해하는 버전과 일치하지 않을 때,
+   WebSocket 핸드셰이크 오류 시 서버에서 클라이언트로 전송된다. 이러한
+   경우 헤더 필드는 서버가 지원하는 프로토콜 버전을 포함한다.
+
+   더 높은 버전 번호가 반드시 더 낮은 버전 번호와 하위 호환될 것이라는
+   기대는 없다는 점에 유의하라.
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 60]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-61" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   |Sec-WebSocket-Version| 헤더 필드는 HTTP 응답에 여러 번 나타날 수 있다
+   (이는 모든 값을 포함하는 단일 |Sec-WebSocket-Version| 헤더 필드와
+   논리적으로 동일하다). 그러나 |Sec-WebSocket-Version| 헤더 필드는 HTTP
+   요청에 두 번 이상 나타나서는 안 된다.
+
+<span class="h3"><a class="selflink" id="section-11.4" href="#section-11.4">11.4</a>.  WebSocket 확장 이름 레지스트리</span>
+
+   이 명세는 <a href="./rfc5226">RFC 5226</a> [<a href="./rfc5226" title="">RFC5226</a>]에 제시된 원칙에 따라
+   WebSocket 프로토콜과 함께 사용할 WebSocket Extension name을 위한 새
+   IANA 레지스트리를 만든다.
+
+   이 레지스트리의 일부로, IANA는 다음 정보를 유지한다.
+
+   Extension Identifier
+      <a href="#section-11.3.2">이 명세의 Section 11.3.2</a>에 등록된 |Sec-WebSocket-Extensions|
+      헤더 필드에서 사용될 확장의 식별자. 값은 이 명세의
+      <a href="#section-9.1">Section 9.1</a>에 정의된 extension-token 요구사항을 준수해야 한다.
+
+   Extension Common Name
+      일반적으로 확장이 불리는 이름.
+
+   Extension Definition
+      WebSocket 프로토콜과 함께 사용되는 확장이 정의된 문서에 대한 참조.
+
+   Known Incompatible Extensions
+      이 확장과 호환되지 않는 것으로 알려진 확장 식별자 목록.
+
+   WebSocket Extension name은 "First Come First Served" IANA 등록 정책
+   [<a href="./rfc5226" title="">RFC5226</a>]의 적용을 받는다.
+
+   이 레지스트리에는 초기 값이 없다.
+
+<span class="h3"><a class="selflink" id="section-11.5" href="#section-11.5">11.5</a>.  WebSocket 서브프로토콜 이름 레지스트리</span>
+
+   이 명세는 <a href="./rfc5226">RFC 5226</a> [<a href="./rfc5226" title="">RFC5226</a>]에 제시된 원칙에 따라
+   WebSocket 프로토콜과 함께 사용할 WebSocket Subprotocol name을 위한 새
+   IANA 레지스트리를 만든다.
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 61]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-62" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   이 레지스트리의 일부로, IANA는 다음 정보를 유지한다.
+
+   Subprotocol Identifier
+      <a href="#section-11.3.4">이 명세의 Section 11.3.4</a>에 등록된 |Sec-WebSocket-Protocol| 헤더
+      필드에서 사용될 서브프로토콜의 식별자. 값은 이 명세의
+      <a href="#section-4.1">Section 4.1</a>의 항목 10에 주어진 요구사항을 준수해야 한다. 즉,
+      값은 <a href="./rfc2616">RFC 2616</a> [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>]에 정의된 token이어야 한다.
+
+   Subprotocol Common Name
+      일반적으로 서브프로토콜이 불리는 이름.
+
+   Subprotocol Definition
+      WebSocket 프로토콜과 함께 사용되는 서브프로토콜이 정의된 문서에
+      대한 참조.
+
+   WebSocket Subprotocol name은 "First Come First Served" IANA 등록 정책
+   [<a href="./rfc5226" title="">RFC5226</a>]의 적용을 받는다.
+
+<span class="h3"><a class="selflink" id="section-11.6" href="#section-11.6">11.6</a>.  WebSocket 버전 번호 레지스트리</span>
+
+   이 명세는 <a href="./rfc5226">RFC 5226</a> [<a href="./rfc5226" title="">RFC5226</a>]에 제시된 원칙에 따라
+   WebSocket 프로토콜과 함께 사용할 WebSocket Version Number를 위한 새
+   IANA 레지스트리를 만든다.
+
+   이 레지스트리의 일부로, IANA는 다음 정보를 유지한다.
+
+   Version Number
+      |Sec-WebSocket-Version|에서 사용될 버전 번호는 이 명세의
+      <a href="#section-4.1">Section 4.1</a>에 명시되어 있다. 값은 0부터 255까지(포함) 범위의
+      음이 아닌 정수여야 한다.
+
+   Reference
+      새 버전 번호를 요청하는 RFC 또는 버전 번호가 있는 초안 이름(아래
+      참조).
+
+   Status
+      "Interim" 또는 "Standard". 설명은 아래를 참조하라.
+
+   버전 번호는 "Interim" 또는 "Standard" 중 하나로 지정된다.
+
+   "Standard" 버전 번호는 RFC에 문서화되어 있으며, 이 RFC가 정의한
+   버전과 같은 WebSocket 프로토콜의 주요하고 안정적인 버전을 식별하는 데
+   사용된다. "Standard" 버전 번호는 "IETF Review" IANA 등록 정책
+   [<a href="./rfc5226" title="">RFC5226</a>]의 적용을 받는다.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 62]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-63" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   "Interim" 버전 번호는 Internet-Draft에 문서화되어 있으며, 이 RFC의
+   발행 이전에 개발된 버전과 같이 배포된 WebSocket 프로토콜 버전을
+   구현자가 식별하고 상호 운용하는 데 도움을 주기 위해 사용된다.
+   "Interim" 버전 번호는 "Expert Review" IANA 등록 정책 [<a href="./rfc5226" title="">RFC5226</a>]의
+   적용을 받으며, HYBI 워킹 그룹 의장들(또는 워킹 그룹이 종료된 경우
+   IETF Applications Area의 Area Director들)이 초기 Designated Expert가
+   된다.
+
+   IANA는 다음과 같이 레지스트리에 초기 값을 추가했다.
+
+   +--------+-----------------------------------------+----------+
+   |Version |                Reference                |  Status  |
+   | Number |                                         |          |
+   +--------+-----------------------------------------+----------+
+   | 0      + <a href="./draft-ietf-hybi-thewebsocketprotocol-00">draft-ietf-hybi-thewebsocketprotocol-00</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 1      + <a href="./draft-ietf-hybi-thewebsocketprotocol-01">draft-ietf-hybi-thewebsocketprotocol-01</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 2      + <a href="./draft-ietf-hybi-thewebsocketprotocol-02">draft-ietf-hybi-thewebsocketprotocol-02</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 3      + <a href="./draft-ietf-hybi-thewebsocketprotocol-03">draft-ietf-hybi-thewebsocketprotocol-03</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 4      + <a href="./draft-ietf-hybi-thewebsocketprotocol-04">draft-ietf-hybi-thewebsocketprotocol-04</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 5      + <a href="./draft-ietf-hybi-thewebsocketprotocol-05">draft-ietf-hybi-thewebsocketprotocol-05</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 6      + <a href="./draft-ietf-hybi-thewebsocketprotocol-06">draft-ietf-hybi-thewebsocketprotocol-06</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 7      + <a href="./draft-ietf-hybi-thewebsocketprotocol-07">draft-ietf-hybi-thewebsocketprotocol-07</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 8      + <a href="./draft-ietf-hybi-thewebsocketprotocol-08">draft-ietf-hybi-thewebsocketprotocol-08</a> | Interim  |
+   +--------+-----------------------------------------+----------+
+   | 9      +                Reserved                 |          |
+   +--------+-----------------------------------------+----------+
+   | 10     +                Reserved                 |          |
+   +--------+-----------------------------------------+----------+
+   | 11     +                Reserved                 |          |
+   +--------+-----------------------------------------+----------+
+   | 12     +                Reserved                 |          |
+   +--------+-----------------------------------------+----------+
+   | 13     +                <a href="./rfc6455">RFC 6455</a>                 | Standard |
+   +--------+-----------------------------------------+----------+
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 63]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-64" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+<span class="h3"><a class="selflink" id="section-11.7" href="#section-11.7">11.7</a>.  WebSocket 닫기 코드 번호 레지스트리</span>
+
+   이 명세는 <a href="./rfc5226">RFC 5226</a> [<a href="./rfc5226" title="">RFC5226</a>]에 제시된 원칙에 따라
+   WebSocket Connection Close Code Number를 위한 새 IANA 레지스트리를 만든다.
+
+   이 레지스트리의 일부로, IANA는 다음 정보를 유지한다.
+
+   Status Code
+      Status Code는 이 문서의 <a href="#section-7.4">Section 7.4</a>에 따라 WebSocket 연결 종료의
+      사유를 나타낸다. 상태 코드는 1000부터 4999까지(포함)의 정수이다.
+
+   Meaning
+      상태 코드의 의미. 각 상태 코드는 고유한 의미를 가져야 한다.
+
+   Contact
+      상태 코드를 예약하는 엔터티의 연락처.
+
+   Reference
+      상태 코드를 요청하고 그 의미를 정의하는 안정적인 문서. 이는
+      1000-2999 범위의 상태 코드에는 필수이고, 3000-3999 범위의 상태
+      코드에는 권장된다.
+
+   WebSocket Close Code Number는 범위에 따라 서로 다른 등록 요구사항의
+   적용을 받는다. 이 프로토콜 및 그 후속 버전 또는 확장에서 사용할 상태
+   코드 요청은 "Standards Action", "Specification Required"("Designated
+   Expert"를 함의함), 또는 "IESG Review" IANA 등록 정책 중 하나의 적용을
+   받으며, 1000-2999 범위에서 부여되는 것이 좋다. 라이브러리, 프레임워크
+   및 애플리케이션에서 사용할 상태 코드 요청은 "First Come First Served"
+   IANA 등록 정책의 적용을 받으며, 3000-3999 범위에서 부여되는 것이 좋다.
+   4000-4999의 상태 코드 범위는 Private Use로 지정된다. 요청은 WebSocket
+   프로토콜(또는 프로토콜의 향후 버전), 확장, 또는 라이브러리/프레임워크/
+   애플리케이션 중 무엇에 사용할 상태 코드를 요청하는지 나타내야 한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 64]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-65" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   IANA는 다음과 같이 레지스트리에 초기 값을 추가했다.
+
+     |Status Code | Meaning         | Contact       | Reference |
+    -+------------+-----------------+---------------+-----------|
+     | 1000       | Normal Closure  | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1001       | Going Away      | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1002       | Protocol error  | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1003       | Unsupported Data| hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1004       | ---Reserved---- | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1005       | No Status Rcvd  | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1006       | Abnormal Closure| hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1007       | Invalid frame   | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+     |            | payload data    |               |           |
+    -+------------+-----------------+---------------+-----------|
+     | 1008       | Policy Violation| hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1009       | Message Too Big | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1010       | Mandatory Ext.  | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+     | 1011       | Internal Server | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+     |            | Error           |               |           |
+    -+------------+-----------------+---------------+-----------|
+     | 1015       | TLS handshake   | hybi@ietf.org | <a href="./rfc6455">RFC 6455</a>  |
+    -+------------+-----------------+---------------+-----------|
+
+<span class="h3"><a class="selflink" id="section-11.8" href="#section-11.8">11.8</a>.  WebSocket Opcode 레지스트리</span>
+
+   이 명세는 <a href="./rfc5226">RFC 5226</a> [<a href="./rfc5226" title="">RFC5226</a>]에 제시된 원칙에 따라
+   WebSocket Opcode를 위한 새 IANA 레지스트리를 만든다.
+
+   이 레지스트리의 일부로, IANA는 다음 정보를 유지한다.
+
+   Opcode
+      opcode는 <a href="#section-5.2">Section 5.2</a>에 정의된 대로 WebSocket 프레임의 프레임
+      유형을 나타낸다. opcode는 0부터 15까지(포함)의 정수이다.
+
+   Meaning
+      opcode 값의 의미.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 65]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-66" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Reference
+      opcode를 요청하는 명세.
+
+   WebSocket Opcode 번호는 "Standards Action" IANA 등록 정책 [<a href="./rfc5226" title="">RFC5226</a>]의
+   적용을 받는다.
+
+   IANA는 다음과 같이 레지스트리에 초기 값을 추가했다.
+
+     |Opcode  | Meaning                             | Reference |
+    -+--------+-------------------------------------+-----------|
+     | 0      | Continuation Frame                  | <a href="./rfc6455">RFC 6455</a>  |
+    -+--------+-------------------------------------+-----------|
+     | 1      | Text Frame                          | <a href="./rfc6455">RFC 6455</a>  |
+    -+--------+-------------------------------------+-----------|
+     | 2      | Binary Frame                        | <a href="./rfc6455">RFC 6455</a>  |
+    -+--------+-------------------------------------+-----------|
+     | 8      | Connection Close Frame              | <a href="./rfc6455">RFC 6455</a>  |
+    -+--------+-------------------------------------+-----------|
+     | 9      | Ping Frame                          | <a href="./rfc6455">RFC 6455</a>  |
+    -+--------+-------------------------------------+-----------|
+     | 10     | Pong Frame                          | <a href="./rfc6455">RFC 6455</a>  |
+    -+--------+-------------------------------------+-----------|
+
+<span class="h3"><a class="selflink" id="section-11.9" href="#section-11.9">11.9</a>.  WebSocket 프레이밍 헤더 비트 레지스트리</span>
+
+   이 명세는 <a href="./rfc5226">RFC 5226</a> [<a href="./rfc5226" title="">RFC5226</a>]에 제시된 원칙에 따라
+   WebSocket Framing Header Bit를 위한 새 IANA 레지스트리를 만든다. 이
+   레지스트리는 <a href="#section-5.2">Section 5.2</a>에서 RSV1, RSV2, 및 RSV3로 표시된 비트의
+   할당을 제어한다.
+
+   이러한 비트는 이 명세의 향후 버전 또는 확장을 위해 예약되어 있다.
+
+   WebSocket Framing Header Bit 할당은 "Standards Action" IANA 등록 정책
+   [<a href="./rfc5226" title="">RFC5226</a>]의 적용을 받는다.
+
+<span class="h2"><a class="selflink" id="section-12" href="#section-12">12</a>.  다른 명세에서 WebSocket 프로토콜 사용</span>
+
+   WebSocket 프로토콜은 다른 명세가 동적인 작성자 정의 콘텐츠를 위한
+   일반 메커니즘을 제공하는 데 사용하도록 의도되었다. 예를 들어 scripted
+   API를 정의하는 명세에서 사용할 수 있다.
+
+   그러한 명세는 먼저 다음을 제공하여 _Establish a WebSocket
+   Connection_을 수행해야 한다.
+
+   o  /host/와 /port/로 구성된 목적지.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 66]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-67" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   o  하나의 호스트와 포트에서 여러 서비스를 식별할 수 있게 하는
+      /resource name/.
+
+   o  연결이 암호화되어야 하면 true이고, 그렇지 않으면 false인 /secure/
+      플래그.
+
+   o  연결에 대한 책임을 지게 되는 origin [<a href="./rfc6454" title="&quot;The Web Origin Concept&quot;">RFC6454</a>]의 ASCII 직렬화.
+
+   o  선택적으로, WebSocket 연결 위에 계층화될 프로토콜을 식별하는 문자열.
+
+   /host/, /port/, /resource name/, 및 /secure/ 플래그는 보통 WebSocket
+   URI의 구성 요소를 파싱하는 단계를 사용하여 URI에서 얻어진다. URI가
+   WebSocket을 지정하지 않으면 이러한 단계는 실패한다.
+
+   언제든지 연결을 닫아야 한다면, 명세는 _Close the WebSocket Connection_
+   알고리즘(<a href="#section-7.1.1">Section 7.1.1</a>)을 사용해야 한다.
+
+   <a href="#section-7.1.4">Section 7.1.4</a>는 언제 _The WebSocket Connection is Closed_가 되는지
+   정의한다.
+
+   연결이 열려 있는 동안, 명세는 _A WebSocket Message Has Been Received_
+   (<a href="#section-6.2">Section 6.2</a>)가 되는 경우를 처리해야 한다.
+
+   열린 연결에 어떤 데이터 /data/를 보내려면, 명세는 _Send a WebSocket
+   Message_(<a href="#section-6.1">Section 6.1</a>)를 수행해야 한다.
+
+<span class="h2"><a class="selflink" id="section-13" href="#section-13">13</a>.  감사의 말</span>
+
+   이 프로토콜의 원래 저자이자 편집자였던 Ian Hickson에게 특별한 감사를
+   표한다. 이 명세의 초기 설계는 WHATWG와 WHATWG 메일링 리스트의 많은
+   사람들의 참여로부터 도움을 받았다. 그 명세에 대한 기여는 절별로
+   추적되지 않지만, 그 명세에 기여한 모든 사람의 목록은 WHATWG HTML
+   명세의 <a href="http://whatwg.org/html5">http://whatwg.org/html5</a>에 제공되어 있다.
+
+   이 명세의 "Data Framing" 절에 상당한 양의 텍스트를 제공한 John
+   Tamplin에게도 특별한 감사를 표한다.
+
+   이 명세의 "Data Masking" 절에 상당한 양의 텍스트와 배경 연구를 제공한
+   Adam Barth에게도 특별한 감사를 표한다.
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 67]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-68" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   Apps Area 검토를 해 준 Lisa Dusseault(그리고 이 작업을 시작하는 데 도움을
+   준 것), Gen-Art 검토를 해 준 Richard Barnes, Transport Area 검토를 해
+   준 Magnus Westerlund에게 특별한 감사를 표한다. 이 작업이 완료로 나아가도록
+   뒤에서 지칠 줄 모르고 일한 HYBI WG의 전·현직 WG 의장 Joe Hildebrand,
+   Salvatore Loreto, Gabriel Montenegro에게 특별한 감사를 표한다. 마지막으로,
+   담당 Area Director인 Peter Saint-Andre에게도 특별히 감사한다.
+
+   HYBI WG 메일링 리스트의 논의에 참여하고 아이디어를 제공했거나 자세한
+   검토를 제공한 다음 사람들에게 감사한다(목록은 불완전할 가능성이 있다):
+   Greg Wilkins, John Tamplin, Willy Tarreau, Maciej Stachowiak, Jamie
+   Lokier, Scott Ferguson, Bjoern Hoehrmann, Julian Reschke, Dave
+   Cridland, Andy Green, Eric Rescorla, Inaki Baz Castillo, Martin
+   Thomson, Roberto Peon, Patrick McManus, Zhong Yu, Bruce Atherton,
+   Takeshi Yoshino, Martin J. Duerst, James Graham, Simon Pieters, Roy T.
+   Fielding, Mykyta Yevstifeyev, Len Holgate, Paul Colomiets, Piotr
+   Kulaga, Brian Raymor, Jan Koehler, Joonas Lehtolahti, Sylvain
+   Hellegouarch, Stephen Farrell, Sean Turner, Pete Resnick, Peter
+   Thorson, Joe Mason, John Fallows, and Alexander Philippou. 위에 나열된
+   사람들이 반드시 이 작업의 최종 결과를 지지한 것은 아님에 유의하라.
+
+<span class="h2"><a class="selflink" id="section-14" href="#section-14">14</a>.  참고문헌</span>
+
+<span class="h3"><a class="selflink" id="section-14.1" href="#section-14.1">14.1</a>.  규범적 참고문헌</span>
+
+   [<a id="ref-ANSI.X3-4.1986">ANSI.X3-4.1986</a>]
+              American National Standards Institute, "Coded Character
+              Set - 7-bit American Standard Code for Information
+              Interchange", ANSI X3.4, 1986.
+
+   [<a id="ref-FIPS.180-3">FIPS.180-3</a>]
+              National Institute of Standards and Technology, "Secure
+              Hash Standard", FIPS PUB 180-3, October 2008,
+              &lt;<a href="http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf">http://csrc.nist.gov/publications/fips/fips180-3/</a>
+              <a href="http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf">fips180-3_final.pdf</a>&gt;.
+
+   [<a id="ref-RFC1928">RFC1928</a>]  Leech, M., Ganis, M., Lee, Y., Kuris, R., Koblas, D., and
+              L. Jones, "SOCKS Protocol Version 5", <a href="./rfc1928">RFC 1928</a>,
+              March 1996.
+
+   [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>, March 1997.
+
+   [<a id="ref-RFC2616">RFC2616</a>]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+              Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
+              Transfer Protocol -- HTTP/1.1", <a href="./rfc2616">RFC 2616</a>, June 1999.
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 68]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-69" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   [<a id="ref-RFC2817">RFC2817</a>]  Khare, R. and S. Lawrence, "Upgrading to TLS Within
+              HTTP/1.1", <a href="./rfc2817">RFC 2817</a>, May 2000.
+
+   [<a id="ref-RFC2818">RFC2818</a>]  Rescorla, E., "HTTP Over TLS", <a href="./rfc2818">RFC 2818</a>, May 2000.
+
+   [<a id="ref-RFC3629">RFC3629</a>]  Yergeau, F., "UTF-8, a transformation format of ISO
+              10646", STD 63, <a href="./rfc3629">RFC 3629</a>, November 2003.
+
+   [<a id="ref-RFC3864">RFC3864</a>]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
+              Procedures for Message Header Fields", <a href="https://www.rfc-editor.org/bcp/bcp90">BCP 90</a>, <a href="./rfc3864">RFC 3864</a>,
+              September 2004.
+
+   [<a id="ref-RFC3986">RFC3986</a>]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              <a href="./rfc3986">RFC 3986</a>, January 2005.
+
+   [<a id="ref-RFC3987">RFC3987</a>]  Duerst, M. and M. Suignard, "Internationalized Resource
+              Identifiers (IRIs)", <a href="./rfc3987">RFC 3987</a>, January 2005.
+
+   [<a id="ref-RFC4086">RFC4086</a>]  Eastlake, D., Schiller, J., and S. Crocker, "Randomness
+              Requirements for Security", <a href="https://www.rfc-editor.org/bcp/bcp106">BCP 106</a>, <a href="./rfc4086">RFC 4086</a>, June 2005.
+
+   [<a id="ref-RFC4648">RFC4648</a>]  Josefsson, S., "The Base16, Base32, and Base64 Data
+              Encodings", <a href="./rfc4648">RFC 4648</a>, October 2006.
+
+   [<a id="ref-RFC5226">RFC5226</a>]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
+              IANA Considerations Section in RFCs", <a href="https://www.rfc-editor.org/bcp/bcp26">BCP 26</a>, <a href="./rfc5226">RFC 5226</a>,
+              May 2008.
+
+   [<a id="ref-RFC5234">RFC5234</a>]  Crocker, D. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, <a href="./rfc5234">RFC 5234</a>, January 2008.
+
+   [<a id="ref-RFC5246">RFC5246</a>]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+              (TLS) Protocol Version 1.2", <a href="./rfc5246">RFC 5246</a>, August 2008.
+
+   [<a id="ref-RFC6066">RFC6066</a>]  Eastlake, D., "Transport Layer Security (TLS) Extensions:
+              Extension Definitions", <a href="./rfc6066">RFC 6066</a>, January 2011.
+
+   [<a id="ref-RFC6454">RFC6454</a>]  Barth, A., "The Web Origin Concept", <a href="./rfc6454">RFC 6454</a>,
+              December 2011.
+
+<span class="h3"><a class="selflink" id="section-14.2" href="#section-14.2">14.2</a>.  참고용 참고문헌</span>
+
+   [<a id="ref-RFC4122">RFC4122</a>]  Leach, P., Mealling, M., and R. Salz, "A Universally
+              Unique IDentifier (UUID) URN Namespace", <a href="./rfc4122">RFC 4122</a>,
+              July 2005.
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 69]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-70" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+   [<a id="ref-RFC4270">RFC4270</a>]  Hoffman, P. and B. Schneier, "Attacks on Cryptographic
+              Hashes in Internet Protocols", <a href="./rfc4270">RFC 4270</a>, November 2005.
+
+   [<a id="ref-RFC5321">RFC5321</a>]  Klensin, J., "Simple Mail Transfer Protocol", <a href="./rfc5321">RFC 5321</a>,
+              October 2008.
+
+   [<a id="ref-RFC6202">RFC6202</a>]  Loreto, S., Saint-Andre, P., Salsano, S., and G. Wilkins,
+              "Known Issues and Best Practices for the Use of Long
+              Polling and Streaming in Bidirectional HTTP", <a href="./rfc6202">RFC 6202</a>,
+              April 2011.
+
+   [<a id="ref-RFC6265">RFC6265</a>]  Barth, A., "HTTP State Management Mechanism", <a href="./rfc6265">RFC 6265</a>,
+              April 2011.
+
+   [<a id="ref-TALKING">TALKING</a>]  Huang, L-S., Chen, E., Barth, A., Rescorla, E., and C.
+              Jackson, "Talking to Yourself for Fun and Profit", 2010,
+              &lt;<a href="http://w2spconf.com/2011/papers/websocket.pdf">http://w2spconf.com/2011/papers/websocket.pdf</a>&gt;.
+
+   [<a id="ref-W3C.REC-wsc-ui-20100812">W3C.REC-wsc-ui-20100812</a>]
+              Roessler, T. and A. Saldhana, "Web Security Context: User
+              Interface Guidelines", World Wide Web Consortium
+              Recommendation REC-wsc-ui-20100812, August 2010,
+              &lt;<a href="http://www.w3.org/TR/2010/REC-wsc-ui-20100812/">http://www.w3.org/TR/2010/REC-wsc-ui-20100812/</a>&gt;.
+
+              Latest version available at
+              &lt;<a href="http://www.w3.org/TR/wsc-ui/">http://www.w3.org/TR/wsc-ui/</a>&gt;.
+
+   [<a id="ref-WSAPI">WSAPI</a>]    Hickson, I., "The WebSocket API", W3C Working Draft WD-
+              websockets-20110929, September 2011,
+              &lt;<a href="http://www.w3.org/TR/2011/WD-websockets-20110929/">http://www.w3.org/TR/2011/WD-websockets-20110929/</a>&gt;.
+
+              Latest version available at
+              &lt;<a href="http://www.w3.org/TR/websockets/">http://www.w3.org/TR/websockets/</a>&gt;.
+
+   [<a id="ref-XMLHttpRequest">XMLHttpRequest</a>]
+              van Kesteren, A., Ed., "XMLHttpRequest", W3C Candidate
+              Recommendation CR-XMLHttpRequest-20100803, August 2010,
+              &lt;<a href="http://www.w3.org/TR/2010/CR-XMLHttpRequest-20100803/">http://www.w3.org/TR/2010/CR-XMLHttpRequest-20100803/</a>&gt;.
+
+              Latest version available at
+              &lt;<a href="http://www.w3.org/TR/XMLHttpRequest/">http://www.w3.org/TR/XMLHttpRequest/</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Fette &amp; Melnikov             표준 트랙                   [페이지 70]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-71" ></span>
+<span class="grey"><a href="./rfc6455">RFC 6455</a>                 WebSocket 프로토콜            2011년 12월</span>
+
+
+저자 주소
+
+   Ian Fette
+   Google, Inc.
+
+   EMail: ifette+ietf@google.com
+   URI:   <a href="http://www.ianfette.com/">http://www.ianfette.com/</a>
+
+
+   Alexey Melnikov
+   Isode Ltd.
+   5 Castle Business Village
+   36 Station Road
+   Hampton, Middlesex  TW12 2BX
+   UK
+
+   EMail: Alexey.Melnikov@isode.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fette &amp; Melnikov             표준 트랙                   [페이지 71]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
