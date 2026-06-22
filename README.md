@@ -24,6 +24,8 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 통합 자원 식별자 및 미디어 타입
 - [Uniform Resource Identifier (URI): Generic Syntax](https://ko.htmlspecs.com/uri/)（[Source](https://www.rfc-editor.org/rfc/rfc3986.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Internationalized Resource Identifiers (IRIs)](https://ko.htmlspecs.com/iri/)（[Source](https://www.rfc-editor.org/rfc/rfc3987.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Media Type Specifications and Registration Procedures](https://ko.htmlspecs.com/media-types/)（[Source](https://www.rfc-editor.org/rfc/rfc6838.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### 국제화 및 지역화
 - [ECMAScript® 2027 Internationalization API Specification](https://ko.htmlspecs.com/ecma402/)（[Source](https://tc39.es/ecma402/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
@@ -33,6 +35,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Character Model for the World Wide Web: String Matching](https://ko.htmlspecs.com/charmod-norm/)（[Source](https://www.w3.org/TR/2021/NOTE-charmod-norm-20210811/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [String Searching](https://ko.htmlspecs.com/string-search/)（[Source](https://www.w3.org/TR/2025/DNOTE-string-search-20250107/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [Language enablement index](https://ko.htmlspecs.com/typography/)（[Source](https://www.w3.org/TR/2024/DNOTE-typography-20241115/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
+- [Tags for Identifying Languages (BCP 47)](https://ko.htmlspecs.com/bcp47/)（[Source](https://www.rfc-editor.org/rfc/rfc5646.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### 데이터 형식, 시맨틱 웹 및 API 설명
 - [The JavaScript Object Notation (JSON) Data Interchange Format](https://ko.htmlspecs.com/json/)（[Source](https://www.rfc-editor.org/rfc/rfc8259.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
@@ -59,6 +62,11 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [GraphQL](https://ko.htmlspecs.com/graphql/)（[Source](https://spec.graphql.org/draft/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [OpenAPI Specification v3.2.0](https://ko.htmlspecs.com/openapi/)（[Source](https://spec.openapis.org/oas/latest.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [URI Template](https://ko.htmlspecs.com/uri-template/)（[Source](https://www.rfc-editor.org/rfc/rfc6570.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+
+### 구문 표기법 및 시간 형식
+- [Augmented BNF for Syntax Specifications: ABNF](https://ko.htmlspecs.com/abnf/)（[Source](https://www.rfc-editor.org/rfc/rfc5234.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Case-Sensitive String Support in ABNF](https://ko.htmlspecs.com/abnf-case-sensitive/)（[Source](https://www.rfc-editor.org/rfc/rfc7405.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Date and Time on the Internet: Timestamps](https://ko.htmlspecs.com/rfc3339/)（[Source](https://www.rfc-editor.org/rfc/rfc3339.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### 수학
 - [MathML Core](https://ko.htmlspecs.com/mathml-core/)（[Source](https://www.w3.org/TR/2025/CR-mathml-core-20250624/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
@@ -320,6 +328,15 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Verifiable Credentials Data Model v2.0](https://ko.htmlspecs.com/vc-data-model-2.0/)（[Source](https://www.w3.org/TR/2025/REC-vc-data-model-2.0-20250515/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Securing Verifiable Credentials using JOSE and COSE](https://ko.htmlspecs.com/vc-jose-cose/)（[Source](https://www.w3.org/TR/2025/REC-vc-jose-cose-20250515/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Verifiable Credential Rendering Methods v1.0](https://ko.htmlspecs.com/vc-render-method/)（[Source](https://www.w3.org/TR/2026/WD-vc-render-method-20260405/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+
+### OAuth 및 인가 프로토콜
+- [The OAuth 2.0 Authorization Framework](https://ko.htmlspecs.com/oauth2/)（[Source](https://www.rfc-editor.org/rfc/rfc6749.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://ko.htmlspecs.com/oauth2-bearer/)（[Source](https://www.rfc-editor.org/rfc/rfc6750.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Proof Key for Code Exchange by OAuth Public Clients](https://ko.htmlspecs.com/pkce/)（[Source](https://www.rfc-editor.org/rfc/rfc7636.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [Best Current Practice for OAuth 2.0 Security](https://ko.htmlspecs.com/oauth2-security-bcp/)（[Source](https://www.rfc-editor.org/rfc/rfc9700.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [OAuth 2.0 Demonstrating Proof of Possession (DPoP)](https://ko.htmlspecs.com/dpop/)（[Source](https://www.rfc-editor.org/rfc/rfc9449.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [OAuth 2.0 Authorization Server Metadata](https://ko.htmlspecs.com/oauth2-as-metadata/)（[Source](https://www.rfc-editor.org/rfc/rfc8414.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [OAuth 2.0 Dynamic Client Registration Protocol](https://ko.htmlspecs.com/oauth2-dyn-reg/)（[Source](https://www.rfc-editor.org/rfc/rfc7591.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
 ### 프라이버시, 권한 및 추적 방지
 - [Permissions](https://ko.htmlspecs.com/permissions/)（[Source](https://www.w3.org/TR/2025/WD-permissions-20251006/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
