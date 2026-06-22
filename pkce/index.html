@@ -1,0 +1,1114 @@
+<pre>인터넷 엔지니어링 태스크 포스 (IETF)                  N. Sakimura, Ed.
+의견 요청 번호: 7636                     노무라 종합연구소
+범주: 표준 트랙                                     J. Bradley
+ISSN: 2070-1721                                            Ping Identity
+                                                              N. Agarwal
+                                                                  Google
+                                                          2015년 9월
+
+
+          <span class="h1">OAuth 공개 클라이언트를 위한 코드 교환 증명 키</span>
+
+초록
+
+   인가 코드 그랜트를 사용하는 OAuth 2.0 공개 클라이언트는
+   인가 코드 가로채기 공격에 취약하다. 이 명세는 그 공격과
+   함께 코드 교환 증명 키(PKCE, "pixy"로 발음함)를 사용하여
+   그 위협을 완화하는 기법을 설명한다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 공개 검토를
+   거쳤으며, 인터넷 엔지니어링 운영 그룹(IESG)에 의해
+   출판이 승인되었다. 인터넷 표준에 대한 자세한 정보는
+   <a href="./rfc5741#section-2">RFC 5741의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 그리고 이에 대한 피드백
+   제공 방법에 관한 정보는
+   <a href="http://www.rfc-editor.org/info/rfc7636">http://www.rfc-editor.org/info/rfc7636</a>에서 얻을 수 있다.
+
+Copyright Notice
+
+   Copyright (c) 2015 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>. 소개 ..........................................................<a href="#page-3">3</a>
+      <a href="#section-1.1">1.1</a>. 프로토콜 흐름 .............................................<a href="#page-5">5</a>
+   <a href="#section-2">2</a>. 표기 규약 .....................................................<a href="#page-6">6</a>
+   <a href="#section-3">3</a>. 용어 ..........................................................<a href="#page-7">7</a>
+      <a href="#section-3.1">3.1</a>. 약어 ......................................................<a href="#page-7">7</a>
+   <a href="#section-4">4</a>. 프로토콜 ......................................................<a href="#page-8">8</a>
+      <a href="#section-4.1">4.1</a>. 클라이언트가 코드 검증자를 생성 ..........................<a href="#page-8">8</a>
+      <a href="#section-4.2">4.2</a>. 클라이언트가 코드 챌린지를 생성 ..........................<a href="#page-8">8</a>
+      4.3. 클라이언트가 인가 요청과 함께 코드 챌린지를
+           전송 .....................................................<a href="#page-9">9</a>
+      <a href="#section-4.4">4.4</a>. 서버가 코드를 반환 .......................................<a href="#page-9">9</a>
+           <a href="#section-4.4.1">4.4.1</a>. 오류 응답 .........................................<a href="#page-9">9</a>
+      4.5. 클라이언트가 인가 코드와 코드 검증자를 토큰
+           엔드포인트로 전송 .......................................<a href="#page-10">10</a>
+      4.6. 서버가 토큰 반환 전에 code_verifier를
+           검증 ....................................................<a href="#page-10">10</a>
+   <a href="#section-5">5</a>. 호환성 .......................................................<a href="#page-11">11</a>
+   <a href="#section-6">6</a>. IANA 고려사항 ................................................<a href="#page-11">11</a>
+      <a href="#section-6.1">6.1</a>. OAuth 매개변수 레지스트리 ...............................<a href="#page-11">11</a>
+      <a href="#section-6.2">6.2</a>. PKCE 코드 챌린지 메서드 레지스트리 ......................<a href="#page-11">11</a>
+           <a href="#section-6.2.1">6.2.1</a>. 등록 템플릿 .....................................<a href="#page-12">12</a>
+           <a href="#section-6.2.2">6.2.2</a>. 초기 레지스트리 내용 ............................<a href="#page-13">13</a>
+   <a href="#section-7">7</a>. 보안 고려사항 ................................................<a href="#page-13">13</a>
+      <a href="#section-7.1">7.1</a>. code_verifier의 엔트로피 .................................<a href="#page-13">13</a>
+      <a href="#section-7.2">7.2</a>. 도청자에 대한 보호 .....................................<a href="#page-13">13</a>
+      <a href="#section-7.3">7.3</a>. code_challenge에 솔트 적용 ..............................<a href="#page-14">14</a>
+      <a href="#section-7.4">7.4</a>. OAuth 보안 고려사항 .....................................<a href="#page-14">14</a>
+      <a href="#section-7.5">7.5</a>. TLS 보안 고려사항 .......................................<a href="#page-15">15</a>
+   <a href="#section-8">8</a>. 참고문헌 .....................................................<a href="#page-15">15</a>
+      <a href="#section-8.1">8.1</a>. 규범적 참고문헌 .........................................<a href="#page-15">15</a>
+      <a href="#section-8.2">8.2</a>. 정보성 참고문헌 .........................................<a href="#page-16">16</a>
+   <a href="#appendix-A">부록 A</a>.  패딩 없는 Base64url 인코딩 구현에 관한 참고
+                사항  ...............................................<a href="#page-17">17</a>
+   <a href="#appendix-B">부록 B</a>.  S256 code_challenge_method의 예 .......................<a href="#page-17">17</a>
+   감사의 말 .......................................................<a href="#page-19">19</a>
+   저자 주소 .......................................................<a href="#page-20">20</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>] 공개 클라이언트는
+   인가 코드 가로채기 공격에 취약하다.
+
+   이 공격에서 공격자는 클라이언트 운영 체제 내 애플리케이션
+   간 통신과 같이 전송 계층 보안(TLS)으로 보호되지 않는
+   통신 경로 안에서 인가 엔드포인트가 반환한 인가 코드를
+   가로챈다.
+
+   공격자가 인가 코드에 대한 접근 권한을 얻으면, 이를 사용해
+   액세스 토큰을 얻을 수 있다.
+
+   그림 1은 공격을 도식적으로 보여준다. 단계 (1)에서
+   스마트폰과 같은 최종 장치에서 실행되는 네이티브
+   애플리케이션은 브라우저/운영 체제를 통해 OAuth 2.0 인가
+   요청을 발행한다. 이 경우 리디렉션 엔드포인트 URI는
+   일반적으로 사용자 지정 URI 스킴을 사용한다. 단계 (1)은
+   가로챌 수 없는 보안 API를 통해 발생하지만, 고급 공격
+   시나리오에서는 잠재적으로 관찰될 수 있다. 그런 다음
+   요청은 단계 (2)에서 OAuth 2.0 인가 서버로 전달된다. OAuth는
+   TLS 사용을 요구하므로, 이 통신은 TLS로 보호되며 가로챌 수
+   없다. 인가 서버는 단계 (3)에서 인가 코드를 반환한다. 단계
+   (4)에서 인가 코드는 단계 (1)에서 제공된 리디렉션
+   엔드포인트 URI를 통해 요청자에게 반환된다.
+
+   악성 앱이 합법적인 OAuth 2.0 앱에 더해 사용자 지정 스킴의
+   핸들러로 자신을 등록할 수 있다는 점에 유의하라. 그렇게
+   하면 악성 앱은 이제 단계 (4)에서 인가 코드를 가로챌 수
+   있게 된다. 이를 통해 공격자는 각각 단계 (5) 및 (6)에서
+   액세스 토큰을 요청하고 얻을 수 있다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+    +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+    | 최종 장치(예: 스마트폰)        |
+    |                                |
+    | +-------------+   +----------+ | (6) 액세스 토큰  +----------+
+    | |합법적인     |   | 악성     |&lt;--------------------|          |
+    | |OAuth 2.0 앱 |   | 앱       |--------------------&gt;|          |
+    | +-------------+   +----------+ | (5) 인가        |          |
+    |        |    ^          ^       |        그랜트    |          |
+    |        |     \         |       |                   |          |
+    |        |      \   (4)  |       |                   |          |
+    |    (1) |       \  Authz|       |                   |  Authz   |
+    |   Authz|        \ Code |       |                   |  Server  |
+    | Request|         \     |       |                   |          |
+    |        |          \    |       |                   |          |
+    |        |           \   |       |                   |          |
+    |        v            \  |       |                   |          |
+    | +----------------------------+ |                   |          |
+    | |                            | | (3) Authz Code    |          |
+    | |     운영 체제/             |&lt;--------------------|          |
+    | |         브라우저           |--------------------&gt;|          |
+    | |                            | | (2) Authz Request |          |
+    | +----------------------------+ |                   +----------+
+    +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+
+             그림 1: 인가 코드 가로채기 공격
+
+   이 공격이 동작하려면 여러 사전 조건이 충족되어야 한다.
+
+   1. 공격자가 클라이언트 장치에 악성 애플리케이션을 등록하고,
+      다른 애플리케이션도 사용하는 사용자 지정 URI 스킴을
+      등록하는 데 성공한다. 운영 체제는 여러 애플리케이션이
+      사용자 지정 URI 스킴을 등록할 수 있도록 허용해야 한다.
+
+   2. OAuth 2.0 인가 코드 그랜트가 사용된다.
+
+   3. 공격자는 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>] "client_id"와
+      "client_secret"(프로비저닝된 경우)에 접근할 수 있다. 모든
+      OAuth 2.0 네이티브 앱 클라이언트 인스턴스는 같은
+      "client_id"를 사용한다. 클라이언트 바이너리 애플리케이션에
+      프로비저닝된 시크릿은 기밀로 간주될 수 없다.
+
+   4. 다음 조건 중 하나가 충족된다.
+
+      4a. 공격자(설치된 애플리케이션을 통해)가 인가
+          엔드포인트의 응답만 관찰할 수 있다.
+          "code_challenge_method" 값이 "plain"일 때에는 이
+          공격만 완화된다.
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+      4b. 더 정교한 공격 시나리오에서는 공격자가 인가
+          엔드포인트에 대한 요청(응답에 더해)을 관찰할 수
+          있다. 그러나 공격자는 중간자 역할을 할 수는 없다.
+          이는 OS에서 http 로그 정보가 유출되어 발생했다.
+          이를 완화하려면 "code_challenge_method" 값을 "S256" 또는
+          암호학적으로 안전한 "code_challenge_method" 확장에서
+          정의한 값으로 설정해야 한다.
+
+   이는 긴 사전 조건 목록이지만, 설명한 공격은 실제 환경에서
+   관찰되었으며 OAuth 2.0 배포에서 고려되어야 한다. OAuth 2.0
+   위협 모델(<a href="./rfc6819#section-4.4.1">[RFC6819]의 Section&nbsp;4.4.1</a>)은 완화 기법을
+   설명하지만, 유감스럽게도 클라이언트 인스턴스별 시크릿 또는
+   클라이언트 인스턴스별 리디렉션 URI에 의존하므로 적용할 수
+   없다.
+
+   이 공격을 완화하기 위해 이 확장은 "code verifier"라고
+   부르는 동적으로 생성되는 암호학적 난수 키를 활용한다.
+   모든 인가 요청마다 고유한 코드 검증자가 생성되며, 그 변환된
+   값인 "code challenge"가 인가 코드를 얻기 위해 인가 서버로
+   전송된다. 그런 다음 얻어진 인가 코드는 "code verifier"와
+   함께 토큰 엔드포인트로 전송되며, 서버는 이를 이전에 수신한
+   요청 코드와 비교하여 클라이언트가 "code verifier"를
+   소유하고 있음을 증명할 수 있다. 공격자는 이 일회성 키를
+   알지 못하므로 이것이 완화책으로 동작한다. 해당 키는 TLS를
+   통해 전송되어 가로챌 수 없기 때문이다.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  프로토콜 흐름</span>
+
+                                                 +-------------------+
+                                                 |   Authz Server    |
+       +--------+                                | +---------------+ |
+       |        |--(A)- Authorization Request ----&gt;|               | |
+       |        |       + t(code_verifier), t_m  | | Authorization | |
+       |        |                                | |    Endpoint   | |
+       |        |&lt;-(B)---- Authorization Code -----|               | |
+       |        |                                | +---------------+ |
+       | Client |                                |                   |
+       |        |                                | +---------------+ |
+       |        |--(C)-- Access Token Request ----&gt;|               | |
+       |        |          + code_verifier       | |    Token      | |
+       |        |                                | |   Endpoint    | |
+       |        |&lt;-(D)------ Access Token ---------|               | |
+       +--------+                                | +---------------+ |
+                                                 +-------------------+
+
+                     그림 2: 추상 프로토콜 흐름
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   이 명세는 그림 2에 추상 형태로 표시된 OAuth 2.0 인가 및
+   액세스 토큰 요청에 추가 매개변수를 더한다.
+
+   A. 클라이언트는 "code_verifier"라는 이름의 시크릿을 생성하고
+      기록하며, 변환된 버전 "t(code_verifier)"("code_challenge"라
+      부름)를 도출한다. 이는 변환 메서드 "t_m"과 함께 OAuth 2.0
+      인가 요청으로 전송된다.
+
+   B. 인가 엔드포인트는 일반적으로 응답하지만
+      "t(code_verifier)"와 변환 메서드를 기록한다.
+
+   C. 그런 다음 클라이언트는 평소와 같이 액세스 토큰 요청에서
+      인가 코드를 전송하지만, (A)에서 생성한 "code_verifier"
+      시크릿을 포함한다.
+
+   D. 인가 서버는 "code_verifier"를 변환하고 이를 (B)의
+      "t(code_verifier)"와 비교한다. 서로 같지 않으면 접근은
+      거부된다.
+
+   (B)에서 인가 코드를 가로챈 공격자는 "code_verifier" 시크릿을
+   보유하고 있지 않으므로 이를 액세스 토큰으로 교환할 수 없다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  표기 규약</span>
+
+   이 문서의 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+   RECOMMENDED", "MAY", "OPTIONAL"은 "RFC에서 요구 수준을 나타내기
+   위해 사용하는 핵심 단어" [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]에 설명된 대로 해석된다.
+   이 단어들이 대문자로 표기되지 않고 사용된 경우에는 자연어
+   의미로 해석된다.
+
+   이 명세는 [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]의 증강 배커스-나우어 형식(ABNF)
+   표기법을 사용한다.
+
+   STRING은 0개 이상의 ASCII [<a href="./rfc20" title="&quot;ASCII format for network interchange&quot;">RFC20</a>] 문자 시퀀스를 나타낸다.
+
+   OCTETS는 0개 이상의 옥텟 시퀀스를 나타낸다.
+
+   ASCII(STRING)은 STRING의 ASCII [<a href="./rfc20" title="&quot;ASCII format for network interchange&quot;">RFC20</a>] 표현의 옥텟을 나타내며,
+   여기서 STRING은 0개 이상의 ASCII 문자 시퀀스이다.
+
+   BASE64URL-ENCODE(OCTETS)는 <a href="#appendix-A">부록 A</a>에 따른 OCTETS의 base64url
+   인코딩을 나타내며, STRING을 생성한다.
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   BASE64URL-DECODE(STRING)은 <a href="#appendix-A">부록 A</a>에 따른 STRING의 base64url
+   디코딩을 나타내며, 옥텟 시퀀스를 생성한다.
+
+   SHA256(OCTETS)는 OCTETS의 SHA2 256비트 해시 [<a href="./rfc6234" title="&quot;US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)&quot;">RFC6234</a>]를
+   나타낸다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  용어</span>
+
+   OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에서 정의된 용어에 더해, 이 명세는 다음
+   용어를 정의한다.
+
+   code verifier
+      인가 요청과 토큰 요청을 서로 연결하는 데 사용되는
+      암호학적으로 임의인 문자열.
+
+   code challenge
+      code verifier에서 파생되어 인가 요청에서 전송되고 나중에
+      검증되는 챌린지.
+
+   code challenge method
+      code challenge를 도출하는 데 사용된 메서드.
+
+   Base64url Encoding
+      <a href="./rfc4648#section-5">[RFC4648]의 Section&nbsp;5</a>에 정의된 URL 및 파일 이름에 안전한
+      문자 집합을 사용하는 Base64 인코딩으로, 모든 후행 '='
+      문자를 생략하고(<a href="./rfc4648#section-3.2">[RFC4648]의 Section&nbsp;3.2</a>가 허용한 대로),
+      줄바꿈, 공백 또는 기타 추가 문자를 포함하지 않는다.
+      (패딩 없는 base64url 인코딩 구현에 관한 참고 사항은
+      <a href="#appendix-A">부록 A</a>를 참조하라.)
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  약어</span>
+
+   ABNF   증강 배커스-나우어 형식
+
+   Authz  인가
+
+   PKCE   코드 교환 증명 키
+
+   MITM   중간자
+
+   MTI    구현 필수
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  프로토콜</span>
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  클라이언트가 코드 검증자를 생성</span>
+
+   클라이언트는 먼저 각 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>] 인가 요청마다 다음과
+   같은 방식으로 코드 검증자 "code_verifier"를 생성한다.
+
+   code_verifier = <a href="./rfc3986#section-2.3">[RFC3986]의 Section&nbsp;2.3</a>에 있는 예약되지 않은 문자
+   [A-Z] / [a-z] / [0-9] / "-" / "." / "_" / "~"를 사용하는
+   고엔트로피 암호학적 난수 STRING이며, 최소 길이는 43자이고
+   최대 길이는 128자이다.
+
+   "code_verifier"의 ABNF는 다음과 같다.
+
+   code-verifier = 43*128unreserved
+   unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+   ALPHA = %x41-5A / %x61-7A
+   DIGIT = %x30-39
+
+   참고: 코드 검증자는 값을 추측하는 것이 비현실적일 만큼
+   충분한 엔트로피를 가져야 한다. 적절한 난수 생성기의 출력을
+   사용하여 32옥텟 시퀀스를 생성하는 것이 RECOMMENDED된다.
+   그런 다음 옥텟 시퀀스를 base64url로 인코딩하여 코드
+   검증자로 사용할 43옥텟 URL 안전 문자열을 생성한다.
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  클라이언트가 코드 챌린지를 생성</span>
+
+   그런 다음 클라이언트는 코드 검증자에 대해 다음 변환 중
+   하나를 사용하여 코드 검증자에서 파생된 코드 챌린지를
+   생성한다.
+
+   plain
+      code_challenge = code_verifier
+
+   S256
+      code_challenge = BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
+
+   클라이언트가 "S256"을 사용할 수 있으면 "S256"을 MUST
+   사용한다. "S256"은 서버에서 구현 필수(MTI)이기 때문이다.
+   클라이언트는 어떤 기술적 이유로 "S256"을 지원할 수 없고,
+   서버가 "plain"을 지원한다는 것을 대역 외 구성을 통해 알고
+   있는 경우에만 "plain"을 사용할 수 있다.
+
+   plain 변환은 기존 배포와 S256 변환을 사용할 수 없는 제한된
+   환경과의 호환성을 위한 것이다.
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   "code_challenge"의 ABNF는 다음과 같다.
+
+   code-challenge = 43*128unreserved
+   unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+   ALPHA = %x41-5A / %x61-7A
+   DIGIT = %x30-39
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  클라이언트가 인가 요청과 함께 코드 챌린지를 전송</span>
+
+   클라이언트는 다음 추가 매개변수를 사용하여 OAuth 2.0 인가
+   요청(<a href="./rfc6749#section-4.1.1">[RFC6749]의 Section&nbsp;4.1.1</a>)의 일부로 코드 챌린지를
+   전송한다.
+
+   code_challenge
+      REQUIRED.  코드 챌린지.
+
+   code_challenge_method
+      OPTIONAL, 요청에 없으면 기본값은 "plain"이다. 코드 검증자
+      변환 메서드는 "S256" 또는 "plain"이다.
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a>.  서버가 코드를 반환</span>
+
+   서버가 인가 응답에서 인가 코드를 발행할 때, 이후 검증할 수
+   있도록 "code_challenge" 및 "code_challenge_method" 값을 인가
+   코드와 MUST 연결해야 한다.
+
+   일반적으로 "code_challenge" 및 "code_challenge_method" 값은
+   "code" 자체 안에 암호화된 형태로 저장되지만, 대안으로
+   코드와 연결되어 서버에 저장될 수도 있다. 서버는 다른
+   엔터티가 추출할 수 있는 형태로 클라이언트 요청에
+   "code_challenge" 값을 MUST NOT 포함해야 한다.
+
+   서버가 발행된 "code"와 "code_challenge"를 연결하는 정확한
+   방법은 이 명세의 범위 밖이다.
+
+<span class="h4"><a class="selflink" id="section-4.4.1" href="#section-4.4.1">4.4.1</a>.  오류 응답</span>
+
+   서버가 OAuth 공개 클라이언트에 대해 코드 교환 증명 키(PKCE)를
+   요구하는데 클라이언트가 요청에 "code_challenge"를 보내지
+   않으면, 인가 엔드포인트는 "error" 값이 "invalid_request"로
+   설정된 인가 오류 응답을 MUST 반환해야 한다.
+   "error_description" 또는 "error_uri"의 응답은 오류의 성격,
+   예를 들어 코드 챌린지가 필요하다는 점을 SHOULD 설명해야 한다.
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                    [Page 9]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   PKCE를 지원하는 서버가 요청된 변환을 지원하지 않으면, 인가
+   엔드포인트는 "error" 값이 "invalid_request"로 설정된 인가
+   오류 응답을 MUST 반환해야 한다. "error_description" 또는
+   "error_uri"의 응답은 오류의 성격, 예를 들어 변환 알고리즘이
+   지원되지 않는다는 점을 SHOULD 설명해야 한다.
+
+<span class="h3"><a class="selflink" id="section-4.5" href="#section-4.5">4.5</a>.  클라이언트가 인가 코드와 코드 검증자를</span>
+<span class="h3">      토큰 엔드포인트로 전송</span>
+
+   인가 코드를 수신하면, 클라이언트는 토큰 엔드포인트에 액세스
+   토큰 요청을 보낸다. OAuth 2.0 액세스 토큰 요청(<a href="./rfc6749#section-4.1.3">[RFC6749]의
+   Section&nbsp;4.1.3</a>)에 정의된 매개변수에 더해, 다음 매개변수를
+   전송한다.
+
+   code_verifier
+      REQUIRED.  코드 검증자
+
+   "code_challenge_method"는 인가 코드가 발행될 때 인가 코드에
+   바인딩된다. 이는 토큰 엔드포인트가 "code_verifier"를 검증할
+   때 MUST 사용해야 하는 메서드이다.
+
+<span class="h3"><a class="selflink" id="section-4.6" href="#section-4.6">4.6</a>.  서버가 토큰 반환 전에 code_verifier를 검증</span>
+
+   토큰 엔드포인트에서 요청을 수신하면, 서버는 수신한
+   "code_verifier"에서 코드 챌린지를 계산하고, 클라이언트가
+   지정한 "code_challenge_method" 메서드에 따라 먼저 변환한 뒤
+   이전에 연결된 "code_challenge"와 비교하여 이를 검증한다.
+
+   <a href="#section-4.3">Section 4.3</a>의 "code_challenge_method"가 "S256"이면, 수신한
+   "code_verifier"를 SHA-256으로 해시하고 base64url로 인코딩한
+   뒤 "code_challenge"와 비교한다. 즉:
+
+   BASE64URL-ENCODE(SHA256(ASCII(code_verifier))) == code_challenge
+
+   <a href="#section-4.3">Section 4.3</a>의 "code_challenge_method"가 "plain"이면, 이들은
+   직접 비교된다. 즉:
+
+   code_verifier == code_challenge.
+
+   값이 같으면 토큰 엔드포인트는 정상적으로 처리를 MUST
+   계속해야 한다(OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에서 정의한 대로). 값이
+   같지 않으면 <a href="./rfc6749#section-5.2">[RFC6749]의 Section&nbsp;5.2</a>에 설명된 대로
+   "invalid_grant"를 나타내는 오류 응답을 MUST 반환해야 한다.
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 10]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  호환성</span>
+
+   이 명세의 서버 구현은 이 확장을 구현하지 않은 OAuth2.0
+   클라이언트를 MAY 허용할 수 있다. "code_verifier"가 인가
+   요청에서 클라이언트로부터 수신되지 않으면, 하위 호환성을
+   지원하는 서버는 이 확장 없이 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>] 프로토콜로
+   되돌아간다.
+
+   OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>] 서버 응답은 이 명세에 의해 변경되지 않으므로,
+   이 명세의 클라이언트 구현은 서버가 이 명세를 구현했는지
+   여부를 알 필요가 없으며, 모든 서버에 대해 <a href="#section-4">Section 4</a>에
+   정의된 추가 매개변수를 SHOULD 전송해야 한다.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  IANA 고려사항</span>
+
+   IANA는 이 문서에 따라 다음 등록을 수행했다.
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  OAuth 매개변수 레지스트리</span>
+
+   이 명세는 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에 정의된 IANA "OAuth
+   Parameters" 레지스트리에 다음 매개변수를 등록한다.
+
+   o  매개변수 이름: code_verifier
+   o  매개변수 사용 위치: 토큰 요청
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc7636">RFC 7636</a> (이 문서)
+
+   o  매개변수 이름: code_challenge
+   o  매개변수 사용 위치: 인가 요청
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc7636">RFC 7636</a> (이 문서)
+
+   o  매개변수 이름: code_challenge_method
+   o  매개변수 사용 위치: 인가 요청
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc7636">RFC 7636</a> (이 문서)
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  PKCE 코드 챌린지 메서드 레지스트리</span>
+
+   이 명세는 "PKCE Code Challenge Methods" 레지스트리를
+   설정한다. 새 레지스트리는 "OAuth Parameters" 레지스트리의
+   하위 레지스트리여야 한다.
+
+   인가 엔드포인트에서 사용하기 위한 추가
+   "code_challenge_method" 유형은 요청에 대한 한 명 이상의 지정
+   전문가(DE)의 검토를 포함하는 Specification Required 정책
+   [<a href="./rfc5226" title="">RFC5226</a>]을 사용하여 등록된다. DE는
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 11]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   oauth-ext-review@ietf.org 메일링 리스트에서 요청에 대한 최소
+   2주간의 검토가 이루어지고, 그 리스트의 논의가 수렴한 뒤에
+   요청에 응답하도록 보장한다. 출판 전에 값 할당을 허용하기
+   위해, 지정 전문가(들)는 허용 가능한 명세가 출판될 것이라고
+   만족하면 등록을 승인할 수 있다.
+
+   등록 요청 및 oauth-ext-review@ietf.org 메일링 리스트에서의
+   논의는 "Request for PKCE code_challenge_method: example"과 같은
+   적절한 제목을 사용해야 한다.
+
+   지정 전문가(들)는 등록 요청을 평가할 때 메일링 리스트의
+   논의뿐 아니라 챌린지 메서드의 전반적인 보안 속성도 고려해야
+   한다. 새 메서드는 인가 엔드포인트에 대한 요청에서
+   code_verifier 값을 공개하지 않아야 한다. 거부에는 설명이
+   포함되어야 하며, 해당되는 경우 요청을 성공적으로 만들기
+   위한 제안도 포함되어야 한다.
+
+<span class="h4"><a class="selflink" id="section-6.2.1" href="#section-6.2.1">6.2.1</a>.  등록 템플릿</span>
+
+   코드 챌린지 메서드 매개변수 이름:
+      요청된 이름(예: "example"). 이 명세의 핵심 목표 중 하나는
+      결과 표현을 간결하게 만드는 것이므로, 설득력 있는 이유가
+      없는 한 이름은 짧게, 즉 8자를 넘지 않도록 하는 것이
+      RECOMMENDED된다. 이 이름은 대소문자를 구분한다. 지정
+      전문가(들)가 이 특정 경우에 예외를 허용할 설득력 있는
+      이유가 있다고 명시하지 않는 한, 이름은 대소문자를
+      구분하지 않는 방식으로 다른 등록된 이름과 일치해서는 안
+      된다.
+
+   변경 관리자:
+      표준 트랙 RFC의 경우 "IESG"라고 명시한다. 그 외에는 책임
+      당사자의 이름을 제공한다. 기타 세부 정보(예: 우편 주소,
+      이메일 주소, 홈페이지 URI)도 포함될 수 있다.
+
+   명세 문서:
+      매개변수를 명세하는 문서에 대한 참조이며, 문서의 사본을
+      검색하는 데 사용할 수 있는 URI를 포함하는 것이 바람직하다.
+      관련 절의 표시도 포함될 수 있지만 필수는 아니다.
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 12]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+<span class="h4"><a class="selflink" id="section-6.2.2" href="#section-6.2.2">6.2.2</a>.  초기 레지스트리 내용</span>
+
+   이 문서에 따라 IANA는 <a href="#section-4.2">Section 4.2</a>에 정의된 코드 챌린지
+   메서드 매개변수 이름을 이 레지스트리에 등록했다.
+
+   o  코드 챌린지 메서드 매개변수 이름: plain
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc7636#section-4.2">RFC 7636의 Section&nbsp;4.2</a> (이 문서)
+
+   o  코드 챌린지 메서드 매개변수 이름: S256
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc7636#section-4.2">RFC 7636의 Section&nbsp;4.2</a> (이 문서)
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  보안 고려사항</span>
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  code_verifier의 엔트로피</span>
+
+   보안 모델은 코드 검증자가 공격자에게 알려지거나 추측되지
+   않는다는 사실에 의존한다. 이 원칙을 준수하는 것은 매우
+   중요하다. 따라서 코드 검증자는 공격자가 추측하기에
+   실용적이지 않도록 암호학적으로 임의이고 높은 엔트로피를
+   가지는 방식으로 생성되어야 한다.
+
+   클라이언트는 최소 256비트의 엔트로피를 가진 "code_verifier"를
+   SHOULD 생성해야 한다. 이는 적절한 난수 생성기로 32옥텟
+   시퀀스를 생성하게 하여 수행할 수 있다. 그런 다음 옥텟
+   시퀀스를 base64url로 인코딩하여 필요한 엔트로피를 가진
+   "code_challenge"로 사용할 43옥텟 URL 안전 문자열을 생성할
+   수 있다.
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  도청자에 대한 보호</span>
+
+   클라이언트는 "S256" 메서드를 시도한 뒤 "plain"으로 다운그레이드
+   해서는 MUST NOT 된다. PKCE를 지원하는 서버는 "S256"을 지원해야
+   하며, PKCE를 지원하지 않는 서버는 알 수 없는 "code_verifier"를
+   단순히 무시한다. 따라서 "S256"이 제시되었을 때의 오류는
+   서버가 잘못되었거나 MITM 공격자가 다운그레이드 공격을
+   시도하고 있다는 것만 의미할 수 있다.
+
+   "S256" 메서드는 "code_challenge"를 관찰하거나 가로채는
+   도청자로부터 보호한다. 챌린지는 검증자 없이는 사용할 수
+   없기 때문이다. "plain" 메서드에서는 "code_challenge"가
+   장치나 http 요청에서 공격자에게 관찰될 가능성이 있다.
+   이 경우 코드 챌린지는 코드 검증자와 동일하므로, "plain"
+   메서드는 초기 요청의 도청으로부터 보호하지 않는다.
+
+   "S256" 사용은 "code_verifier" 값이 공격자에게 공개되는 것을
+   방지한다.
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 13]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   이 때문에 "plain"은 SHOULD NOT 사용되어야 하며, 요청 경로가
+   이미 보호되는 배포된 구현과의 호환성을 위해서만 존재한다.
+   새 구현에서는 어떤 기술적 이유로 "S256"을 지원할 수 없는
+   경우가 아니라면 "plain" 메서드를 SHOULD NOT 사용해야 한다.
+
+   "S256" 코드 챌린지 메서드 또는 다른 암호학적으로 안전한
+   코드 챌린지 메서드 확장이 SHOULD 사용되어야 한다. "plain"
+   코드 챌린지 메서드는 운영 체제와 전송 보안이 요청을
+   공격자에게 공개하지 않는다는 데 의존한다.
+
+   코드 챌린지 메서드가 "plain"이고 무상태 서버를 달성하기
+   위해 코드 챌린지가 인가 "code" 내부에 반환되어야 하는 경우,
+   이는 서버만 해독하고 추출할 수 있는 방식으로 MUST 암호화되어야
+   한다.
+
+<span class="h3"><a class="selflink" id="section-7.3" href="#section-7.3">7.3</a>.  code_challenge에 솔트 적용</span>
+
+   구현 복잡성을 줄이기 위해 코드 챌린지 생성에는 솔트가
+   사용되지 않는다. 코드 검증자가 무차별 대입 공격을 방지할
+   충분한 엔트로피를 포함하기 때문이다. 공개적으로 알려진 값을
+   코드 검증자(256비트 엔트로피 포함)에 이어 붙인 뒤 SHA256으로
+   해시하여 코드 챌린지를 생성하더라도, code verifier의 유효한
+   값을 무차별 대입하는 데 필요한 시도 횟수를 늘리지는 않는다.
+
+   "S256" 변환은 비밀번호를 해시하는 것과 비슷하지만, 중요한
+   차이점이 있다. 비밀번호는 상대적으로 낮은 엔트로피의 단어인
+   경향이 있어 오프라인에서 해시되고 그 해시가 사전에서 조회될
+   수 있다. 해시하기 전에 고유하지만 공개적인 값을 각
+   비밀번호에 이어 붙이면, 공격자가 검색해야 하는 사전 공간이
+   크게 확장된다.
+
+   현대의 그래픽 프로세서는 이제 공격자가 디스크에서 조회하는
+   것보다 더 빠르게 실시간으로 해시를 계산할 수 있게 한다.
+   이는 낮은 엔트로피 비밀번호에 대해서도 무차별 대입 공격의
+   복잡도를 높이는 데 있어 솔트의 가치를 없앤다.
+
+<span class="h3"><a class="selflink" id="section-7.4" href="#section-7.4">7.4</a>.  OAuth 보안 고려사항</span>
+
+   [<a href="./rfc6819" title="&quot;OAuth 2.0 Threat Model and Security Considerations&quot;">RFC6819</a>]에 제시된 모든 OAuth 보안 분석이 적용되므로,
+   독자는 이를 SHOULD 주의 깊게 따라야 한다.
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 14]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+<span class="h3"><a class="selflink" id="section-7.5" href="#section-7.5">7.5</a>.  TLS 보안 고려사항</span>
+
+   현재 보안 고려사항은 "전송 계층 보안(TLS) 및 데이터그램 전송
+   계층 보안(DTLS)의 안전한 사용을 위한 권고" [<a href="#ref-BCP195" title="&quot;Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)&quot;">BCP195</a>]에서
+   찾을 수 있다. 이는 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]의 TLS 버전 권고를
+   대체한다.
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  참고문헌</span>
+
+<span class="h3"><a class="selflink" id="section-8.1" href="#section-8.1">8.1</a>.  규범적 참고문헌</span>
+
+   [<a id="ref-BCP195">BCP195</a>]   Sheffer, Y., Holz, R., and P. Saint-Andre,
+              "전송 계층 보안(TLS) 및 데이터그램 전송 계층 보안
+              (DTLS)의 안전한 사용을 위한 권고", <a href="https://www.rfc-editor.org/bcp/bcp195">BCP 195</a>, <a href="./rfc7525">RFC 7525</a>, 2015년 5월,
+              &lt;<a href="http://www.rfc-editor.org/info/bcp195">http://www.rfc-editor.org/info/bcp195</a>&gt;.
+
+   [<a id="ref-RFC20">RFC20</a>]    Cerf, V., "네트워크 교환을 위한 ASCII 형식", STD 80,
+              <a href="./rfc20">RFC 20</a>, DOI 10.17487/RFC0020, 1969년 10월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc20">http://www.rfc-editor.org/info/rfc20</a>&gt;.
+
+   [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "RFC에서 요구 수준을 나타내기 위해
+              사용하는 핵심 단어", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>,
+              DOI 10.17487/RFC2119, 1997년 3월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc2119">http://www.rfc-editor.org/info/rfc2119</a>&gt;.
+
+   [<a id="ref-RFC3986">RFC3986</a>]  Berners-Lee, T., Fielding, R., and L. Masinter, "통일
+              자원 식별자(URI): 일반 구문", STD 66, <a href="./rfc3986">RFC</a>
+              <a href="./rfc3986">3986</a>, DOI 10.17487/RFC3986, 2005년 1월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc3986">http://www.rfc-editor.org/info/rfc3986</a>&gt;.
+
+   [<a id="ref-RFC4648">RFC4648</a>]  Josefsson, S., "Base16, Base32 및 Base64 데이터
+              인코딩", <a href="./rfc4648">RFC 4648</a>, DOI 10.17487/RFC4648, 2006년 10월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc4648">http://www.rfc-editor.org/info/rfc4648</a>&gt;.
+
+   [<a id="ref-RFC5226">RFC5226</a>]  Narten, T. and H. Alvestrand, "RFC의 IANA 고려사항
+              절 작성 지침", <a href="https://www.rfc-editor.org/bcp/bcp26">BCP 26</a>, <a href="./rfc5226">RFC 5226</a>,
+              DOI 10.17487/RFC5226, 2008년 5월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc5226">http://www.rfc-editor.org/info/rfc5226</a>&gt;.
+
+   [<a id="ref-RFC5234">RFC5234</a>]  Crocker, D., Ed. and P. Overell, "구문 명세를 위한
+              증강 BNF: ABNF", STD 68, <a href="./rfc5234">RFC 5234</a>,
+              DOI 10.17487/RFC5234, 2008년 1월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc5234">http://www.rfc-editor.org/info/rfc5234</a>&gt;.
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 15]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   [<a id="ref-RFC6234">RFC6234</a>]  Eastlake 3rd, D. and T. Hansen, "미국 보안 해시
+              알고리즘(SHA 및 SHA 기반 HMAC과 HKDF)", <a href="./rfc6234">RFC 6234</a>,
+              DOI 10.17487/RFC6234, 2011년 5월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc6234">http://www.rfc-editor.org/info/rfc6234</a>&gt;.
+
+   [<a id="ref-RFC6749">RFC6749</a>]  Hardt, D., Ed., "OAuth 2.0 인가 프레임워크",
+              <a href="./rfc6749">RFC 6749</a>, DOI 10.17487/RFC6749, 2012년 10월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc6749">http://www.rfc-editor.org/info/rfc6749</a>&gt;.
+
+<span class="h3"><a class="selflink" id="section-8.2" href="#section-8.2">8.2</a>.  정보성 참고문헌</span>
+
+   [<a id="ref-RFC6819">RFC6819</a>]  Lodderstedt, T., Ed., McGloin, M., and P. Hunt, "OAuth 2.0
+              위협 모델과 보안 고려사항", <a href="./rfc6819">RFC 6819</a>,
+              DOI 10.17487/RFC6819, 2013년 1월,
+              &lt;<a href="http://www.rfc-editor.org/info/rfc6819">http://www.rfc-editor.org/info/rfc6819</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 16]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">부록 A</a>.  패딩 없는 Base64url 인코딩 구현에 관한 참고 사항</span>
+
+   이 부록은 패딩을 사용하는 표준 base64 인코딩 함수를 기반으로
+   패딩 없는 base64url 인코딩 함수를 구현하는 방법을 설명한다.
+
+   구체적으로, 이러한 함수를 구현하는 C# 예제 코드는 아래에
+   표시되어 있다. 다른 언어에서도 유사한 코드를 사용할 수 있다.
+
+     static string base64urlencode(byte [] arg)
+     {
+       string s = Convert.ToBase64String(arg); // 일반 base64 인코더
+       s = s.Split('=')[0]; // 후행 '='를 모두 제거
+       s = s.Replace('+', '-'); // 인코딩의 62번째 문자
+       s = s.Replace('/', '_'); // 인코딩의 63번째 문자
+       return s;
+     }
+
+   인코딩되지 않은 값과 인코딩된 값 사이의 예시 대응 관계는
+   다음과 같다. 아래의 옥텟 시퀀스는 아래 문자열로 인코딩되며,
+   이를 디코딩하면 해당 옥텟 시퀀스가 재현된다.
+
+   3 236 255 224 193
+
+   A-z_4ME
+
+<span class="h2"><a class="selflink" id="appendix-B" href="#appendix-B">부록 B</a>.  S256 code_challenge_method의 예</span>
+
+   클라이언트는 적절한 난수 생성기의 출력을 사용하여 32옥텟
+   시퀀스를 생성한다. 이 예에서 값을 나타내는 옥텟(JSON 배열
+   표기법 사용)은 다음과 같다.
+
+      [116, 24, 223, 180, 151, 153, 224, 37, 79, 250, 96, 125, 216, 173,
+      187, 186, 22, 212, 37, 77, 105, 214, 191, 240, 91, 88, 5, 88, 83,
+      132, 141, 121]
+
+   이 옥텟 시퀀스를 base64url로 인코딩하면 code_verifier의 값이
+   제공된다.
+
+       dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+   그런 다음 code_verifier는 SHA256 해시 함수를 통해 해시되어
+   다음을 생성한다.
+
+     [19, 211, 30, 150, 26, 26, 216, 236, 47, 22, 177, 12, 76, 152, 46,
+      8, 118, 168, 120, 173, 109, 241, 68, 86, 110, 225, 137, 74, 203,
+      112, 249, 195]
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 17]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+   이 옥텟 시퀀스를 base64url로 인코딩하면 code_challenge의 값이
+   제공된다.
+
+       E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+
+   인가 요청은 다음을 포함한다.
+
+       code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+       &amp;code_challenge_method=S256
+
+   그런 다음 인가 서버는 클라이언트에 부여되는 코드와 함께
+   code_challenge 및 code_challenge_method를 기록한다.
+
+   token_endpoint에 대한 요청에서 클라이언트는 인가 응답에서
+   받은 코드와 더불어 추가 매개변수를 포함한다.
+
+       code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+   인가 서버는 코드 그랜트에 대한 정보를 검색한다. 기록된
+   code_challenge_method가 S256인 것을 기반으로, 그런 다음
+   code_verifier의 값을 해시하고 base64url로 인코딩한다.
+
+   BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
+
+   계산된 값은 그런 다음 "code_challenge"의 값과 비교된다.
+
+   BASE64URL-ENCODE(SHA256(ASCII(code_verifier))) == code_challenge
+
+   두 값이 같으면, 인가 서버는 요청에 다른 오류가 없는 한
+   토큰을 제공할 수 있다. 값이 같지 않으면 요청은 거부되어야
+   하며 오류가 반환되어야 한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 18]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+감사의 말
+
+   이 명세의 최초 초안 버전은 OpenID Foundation의 OpenID
+   AB/Connect Working Group에 의해 작성되었다.
+
+   이 명세는 수십 명의 적극적이고 헌신적인 참가자를 포함하는
+   OAuth Working Group의 작업이다. 특히 다음 개인들은 최종
+   명세를 형성하고 구성한 아이디어, 피드백, 문구에 기여했다.
+
+      Anthony Nadalin, Microsoft
+      Axel Nenker, Deutsche Telekom
+      Breno de Medeiros, Google
+      Brian Campbell, Ping Identity
+      Chuck Mortimore, Salesforce
+      Dirk Balfanz, Google
+      Eduardo Gueiros, Jive Communications
+      Hannes Tschonfenig, ARM
+      James Manger, Telstra
+      Justin Richer, MIT Kerberos
+      Josh Mandel, Boston Children's Hospital
+      Lewis Adam, Motorola Solutions
+      Madjid Nakhjiri, Samsung
+      Michael B. Jones, Microsoft
+      Paul Madsen, Ping Identity
+      Phil Hunt, Oracle
+      Prateek Mishra, Oracle
+      Ryo Ito, mixi
+      Scott Tomilson, Ping Identity
+      Sergey Beryozkin
+      Takamichi Saito
+      Torsten Lodderstedt, Deutsche Telekom
+      William Denniss, Google
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Sakimura, et al.             표준 트랙                   [Page 19]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="./rfc7636">RFC 7636</a>                       OAUTH PKCE                 2015년 9월</span>
+
+
+저자 주소
+
+   Nat Sakimura (편집자)
+   노무라 종합연구소
+   1-6-5 Marunouchi, Marunouchi Kitaguchi Bldg.
+   Chiyoda-ku, Tokyo  100-0005
+   일본
+
+   전화: +81-3-5533-2111
+   이메일: n-sakimura@nri.co.jp
+   URI:   <a href="http://nat.sakimura.org/">http://nat.sakimura.org/</a>
+
+
+   John Bradley
+   Ping Identity
+   Casilla 177, Sucursal Talagante
+   Talagante, RM
+   칠레
+
+   전화: +44 20 8133 3718
+   이메일: ve7jtb@ve7jtb.com
+   URI:   <a href="http://www.thread-safe.com/">http://www.thread-safe.com/</a>
+
+
+   Naveen Agarwal
+   Google
+   1600 Amphitheatre Parkway
+   Mountain View, CA  94043
+   미국
+
+   전화: +1 650-253-0000
+   이메일: naa@google.com
+   URI:   <a href="http://google.com/">http://google.com/</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sakimura, et al.             표준 트랙                   [Page 20]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
