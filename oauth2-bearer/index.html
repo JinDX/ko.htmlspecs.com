@@ -1,0 +1,982 @@
+<pre>인터넷 엔지니어링 태스크 포스 (IETF)                          M. Jones
+의견 요청서: 6750                                             Microsoft
+범주: 표준 트랙                                                D. Hardt
+ISSN: 2070-1721                                                  독립
+                                                            2012년 10월
+
+
+       <span class="h1">OAuth 2.0 인가 프레임워크: 베어러 토큰 사용</span>
+
+초록
+
+   이 명세는 OAuth 2.0으로 보호되는 리소스에 접근하기 위해 HTTP
+   요청에서 베어러 토큰을 사용하는 방법을 설명한다. 베어러 토큰을
+   소유한 모든 당사자("베어러")는 암호화 키의 소유를 증명하지 않고도
+   해당 리소스에 대한 접근 권한을 얻기 위해 이를 사용할 수 있다.
+   오용을 방지하려면, 베어러 토큰은 저장 중 및 전송 중에 공개되지
+   않도록 보호되어야 한다.
+
+이 메모의 상태
+
+   이것은 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 공개 검토를 거쳤으며,
+   인터넷 엔지니어링 운영 그룹(IESG)에 의해 발행이 승인되었다.
+   인터넷 표준에 대한 추가 정보는 <a href="./rfc5741#section-2">RFC 5741의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 모든 정오표, 그리고 이에 대한 피드백 제공
+   방법에 관한 정보는
+   <a href="http://www.rfc-editor.org/info/rfc6750">http://www.rfc-editor.org/info/rfc6750</a>.
+
+Copyright Notice
+
+   Copyright (c) 2012 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (<a href="http://trustee.ietf.org/license-info">http://trustee.ietf.org/license-info</a>) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>. 소개 .........................................................<a href="#page-2">2</a>
+      <a href="#section-1.1">1.1</a>. 표기 규칙 ................................................<a href="#page-3">3</a>
+      <a href="#section-1.2">1.2</a>. 용어 .....................................................<a href="#page-3">3</a>
+      <a href="#section-1.3">1.3</a>. 개요 .....................................................<a href="#page-3">3</a>
+   <a href="#section-2">2</a>. 인증된 요청 ..................................................<a href="#page-4">4</a>
+      <a href="#section-2.1">2.1</a>. Authorization 요청 헤더 필드 .............................<a href="#page-5">5</a>
+      <a href="#section-2.2">2.2</a>. 폼 인코딩 본문 매개변수 ..................................<a href="#page-5">5</a>
+      <a href="#section-2.3">2.3</a>. URI 질의 매개변수 ........................................<a href="#page-6">6</a>
+   <a href="#section-3">3</a>. WWW-Authenticate 응답 헤더 필드 ..............................<a href="#page-7">7</a>
+      <a href="#section-3.1">3.1</a>. 오류 코드 ................................................<a href="#page-9">9</a>
+   <a href="#section-4">4</a>. 예시 접근 토큰 응답 .........................................<a href="#page-10">10</a>
+   <a href="#section-5">5</a>. 보안 고려사항 ...............................................<a href="#page-10">10</a>
+      <a href="#section-5.1">5.1</a>. 보안 위협 ...............................................<a href="#page-10">10</a>
+      <a href="#section-5.2">5.2</a>. 위협 완화 ...............................................<a href="#page-11">11</a>
+      <a href="#section-5.3">5.3</a>. 권고사항 요약 ...........................................<a href="#page-13">13</a>
+   <a href="#section-6">6</a>. IANA 고려사항 ...............................................<a href="#page-14">14</a>
+      <a href="#section-6.1">6.1</a>. OAuth 접근 토큰 유형 등록 ...............................<a href="#page-14">14</a>
+           <a href="#section-6.1.1">6.1.1</a>. "Bearer" OAuth 접근 토큰 유형 ....................<a href="#page-14">14</a>
+      <a href="#section-6.2">6.2</a>. OAuth 확장 오류 등록 ....................................<a href="#page-14">14</a>
+           <a href="#section-6.2.1">6.2.1</a>. "invalid_request" 오류 값 .........................<a href="#page-14">14</a>
+           <a href="#section-6.2.2">6.2.2</a>. "invalid_token" 오류 값 ...........................<a href="#page-15">15</a>
+           <a href="#section-6.2.3">6.2.3</a>. "insufficient_scope" 오류 값 ......................<a href="#page-15">15</a>
+   <a href="#section-7">7</a>. 참고문헌 ....................................................<a href="#page-15">15</a>
+      <a href="#section-7.1">7.1</a>. 규범적 참고문헌 .........................................<a href="#page-15">15</a>
+      <a href="#section-7.2">7.2</a>. 정보성 참고문헌 .........................................<a href="#page-17">17</a>
+   <a href="#appendix-A">부록 A</a>. 감사의 말 ...............................................<a href="#page-18">18</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   OAuth는 클라이언트가 리소스 소유자의 자격 증명을 직접 사용하는
+   대신, "The OAuth 2.0 Authorization Framework" [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에서
+   "클라이언트에게 발급된 접근 인가를 나타내는 문자열"로 정의된
+   접근 토큰을 얻어 보호된 리소스에 접근할 수 있게 한다.
+
+   토큰은 리소스 소유자의 승인을 받아 인가 서버가 클라이언트에게
+   발급한다. 클라이언트는 접근 토큰을 사용하여 리소스 서버에
+   호스팅된 보호된 리소스에 접근한다. 이 명세는 OAuth 접근 토큰이
+   베어러 토큰인 경우 보호된 리소스 요청을 수행하는 방법을 설명한다.
+
+   이 명세는 보호된 리소스에 접근하기 위해 Transport Layer Security
+   (TLS) [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]를 사용하여 HTTP/1.1 [<a href="./rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>] 위에서 베어러
+   토큰을 사용하는 방법을 정의한다. TLS는 이 명세와 함께 구현하고
+   사용하는 것이 필수이며, 다른 명세가 다른 프로토콜과 함께 사용할
+   수 있도록 이 명세를 확장할 수 있다. 접근 토큰과 함께 사용하도록
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   설계되었으며, OAuth 보호 리소스에 접근하기 위한 OAuth 2.0 인가
+   [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>] 흐름의 결과로 생성되지만, 이 명세는 실제로 어떤 출처의
+   베어러 토큰으로든 해당 베어러 토큰에 의해 보호되는 임의의
+   리소스에 접근할 수 있는 일반적인 HTTP 인가 방법을 정의한다.
+   Bearer 인증 스킴은 주로 WWW-Authenticate 및 Authorization HTTP
+   헤더를 사용하는 서버 인증을 위한 것이지만, 프록시 인증에
+   사용하는 것을 배제하지 않는다.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  표기 규칙</span>
+
+   이 문서의 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
+   "OPTIONAL"은 "Key words for use in RFCs to Indicate Requirement
+   Levels" [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]에 설명된 대로 해석해야 한다.
+
+   이 문서는 [<a href="./rfc5234" title="&quot;Augmented BNF for Syntax Specifications: ABNF&quot;">RFC5234</a>]의 Augmented Backus-Naur Form (ABNF) 표기법을
+   사용한다. 또한 다음 규칙은 HTTP/1.1 [<a href="./rfc2617" title="&quot;HTTP Authentication: Basic and Digest Access Authentication&quot;">RFC2617</a>]에서 포함된다:
+   auth-param 및 auth-scheme; 그리고 "Uniform Resource Identifier
+   (URI): Generic Syntax" [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]에서 URI-reference.
+
+   달리 명시하지 않는 한, 모든 프로토콜 매개변수 이름과 값은
+   대소문자를 구분한다.
+
+<span class="h3"><a class="selflink" id="section-1.2" href="#section-1.2">1.2</a>.  용어</span>
+
+   베어러 토큰
+      토큰을 소유한 모든 당사자("베어러")가 그 토큰을 소유한 다른
+      어떤 당사자와도 동일한 방식으로 토큰을 사용할 수 있다는
+      속성을 가진 보안 토큰. 베어러 토큰을 사용하는 데에는
+      베어러가 암호화 키 자료의 소유를 증명할 필요가 없다
+      (소유 증명).
+
+   그 밖의 모든 용어는 "The OAuth 2.0 Authorization Framework"
+   [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에 정의된 바와 같다.
+
+<span class="h3"><a class="selflink" id="section-1.3" href="#section-1.3">1.3</a>.  개요</span>
+
+   OAuth는 클라이언트가 리소스 소유자를 대신하여 보호된 리소스에
+   접근할 수 있는 방법을 제공한다. 일반적인 경우, 클라이언트가
+   보호된 리소스에 접근하려면 먼저 리소스 소유자로부터 인가
+   부여를 얻은 다음, 그 인가 부여를 접근 토큰으로 교환해야 한다.
+   접근 토큰은 인가 부여에 의해 허용된 부여의 범위, 기간 및 기타
+   속성을 나타낸다. 클라이언트는 접근 토큰을 리소스 서버에 제시하여
+   보호된 리소스에 접근한다. 어떤 경우에는 클라이언트가 리소스
+   소유자로부터 먼저 인가 부여를 얻지 않고도 자신의 자격 증명을
+   인가 서버에 직접 제시하여 접근 토큰을 얻을 수 있다.
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   접근 토큰은 리소스 서버가 이해하는 단일 토큰으로 서로 다른 인가
+   구조(예: 사용자 이름과 비밀번호, assertion)를 대체하는 추상화를
+   제공한다. 이 추상화는 짧은 기간 동안 유효한 접근 토큰을 발급할
+   수 있게 하며, 리소스 서버가 다양한 인증 스킴을 이해해야 할
+   필요를 제거한다.
+
+     +--------+                               +---------------+
+     |        |--(A)- Authorization Request -&gt;|   Resource    |
+     |        |                               |     Owner     |
+     |        |&lt;-(B)-- Authorization Grant ---|               |
+     |        |                               +---------------+
+     |        |
+     |        |                               +---------------+
+     |        |--(C)-- Authorization Grant --&gt;| Authorization |
+     | Client |                               |     Server    |
+     |        |&lt;-(D)----- Access Token -------|               |
+     |        |                               +---------------+
+     |        |
+     |        |                               +---------------+
+     |        |--(E)----- Access Token ------&gt;|    Resource   |
+     |        |                               |     Server    |
+     |        |&lt;-(F)--- Protected Resource ---|               |
+     +--------+                               +---------------+
+
+                     그림 1: 추상 프로토콜 흐름
+
+   그림 1에 표시된 추상 OAuth 2.0 흐름은 클라이언트, 리소스 소유자,
+   인가 서버 및 리소스 서버([<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에 설명됨) 사이의 상호작용을
+   설명한다. 다음 두 단계는 이 문서에서 명세된다:
+
+   (E)  클라이언트는 리소스 서버에서 보호된 리소스를 요청하고,
+        접근 토큰을 제시하여 인증한다.
+
+   (F)  리소스 서버는 접근 토큰을 검증하고, 유효한 경우 요청을
+        처리한다.
+
+   이 문서는 또한 단계 (D)에서 반환되는 접근 토큰에 의미론적
+   요구사항을 부과한다.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  인증된 요청</span>
+
+   이 절은 리소스 서버에 대한 리소스 요청에서 베어러 접근 토큰을
+   보내는 세 가지 방법을 정의한다. 클라이언트는 각 요청에서 토큰을
+   전송하기 위해 둘 이상의 방법을 사용해서는 안 된다.
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  Authorization 요청 헤더 필드</span>
+
+   HTTP/1.1 [<a href="./rfc2617" title="&quot;HTTP Authentication: Basic and Digest Access Authentication&quot;">RFC2617</a>]에서 정의된 "Authorization" 요청 헤더 필드에
+   접근 토큰을 보낼 때, 클라이언트는 접근 토큰을 전송하기 위해
+   "Bearer" 인증 스킴을 사용한다.
+
+   예:
+
+     GET /resource HTTP/1.1
+     Host: server.example.com
+     Authorization: Bearer mF_9.B5f-4.1JqM
+
+   이 스킴에 대한 "Authorization" 헤더 필드의 구문은 <a href="./rfc2617#section-2">[RFC2617]의
+   Section&nbsp;2</a>에 정의된 Basic 스킴의 사용 방식을 따른다. Basic과
+   마찬가지로, 이는 <a href="./rfc2617#section-1.2">[RFC2617]의 Section&nbsp;1.2</a>에 정의된 일반 구문을
+   따르지는 않지만, HTTP 1.1 [<a href="#ref-HTTP-AUTH" title="&quot;Hypertext Transfer Protocol (HTTP/1.1): Authentication&quot;">HTTP-AUTH</a>]을 위해 개발 중인 일반
+   인증 프레임워크와 호환된다. 다만 기존 배포를 반영하기 위해
+   그 안에 제시된 선호 관행을 따르지는 않는다. Bearer 자격 증명의
+   구문은 다음과 같다:
+
+     b64token    = 1*( ALPHA / DIGIT /
+                       "-" / "." / "_" / "~" / "+" / "/" ) *"="
+     credentials = "Bearer" 1*SP b64token
+
+   클라이언트는 "Bearer" HTTP 인가 스킴이 포함된 "Authorization"
+   요청 헤더 필드를 사용하여 베어러 토큰으로 인증된 요청을 하는
+   것이 좋다. 리소스 서버는 이 방법을 지원해야 한다.
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a>.  폼 인코딩 본문 매개변수</span>
+
+   HTTP 요청 entity-body에 접근 토큰을 보낼 때, 클라이언트는
+   "access_token" 매개변수를 사용하여 접근 토큰을 request-body에
+   추가한다. 클라이언트는 다음 조건이 모두 충족되지 않는 한 이
+   방법을 사용해서는 안 된다:
+
+   o  HTTP 요청 entity-header에 "Content-Type" 헤더 필드가 포함되고,
+      그 값이 "application/x-www-form-urlencoded"로 설정되어 있다.
+
+   o  entity-body가 HTML 4.01 [<a href="#ref-W3C.REC-html401-19991224">W3C.REC-html401-19991224</a>]에서 정의된
+      "application/x-www-form-urlencoded" content-type의 인코딩
+      요구사항을 따른다.
+
+   o  HTTP 요청 entity-body가 단일 파트이다.
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   o  entity-body에 인코딩될 내용은 전적으로 ASCII [<a href="#ref-USASCII" title="&quot;Coded Character Set -- 7-bit American Standard Code for Information Interchange&quot;">USASCII</a>] 문자로
+      구성되어야 한다.
+
+   o  HTTP 요청 메서드는 request-body에 대해 정의된 의미론이 있는
+      것이어야 한다. 특히 이는 "GET" 메서드를 사용해서는 안 됨을
+      의미한다.
+
+   entity-body에는 다른 요청별 매개변수가 포함될 수 있으며, 이 경우
+   "access_token" 매개변수는 "&amp;" 문자(ASCII 코드 38)를 사용하여
+   요청별 매개변수와 올바르게 구분되어야 한다.
+
+   예를 들어, 클라이언트는 전송 계층 보안을 사용하여 다음 HTTP
+   요청을 수행한다:
+
+     POST /resource HTTP/1.1
+     Host: server.example.com
+     Content-Type: application/x-www-form-urlencoded
+
+     access_token=mF_9.B5f-4.1JqM
+
+   "application/x-www-form-urlencoded" 방법은 참여 브라우저가
+   "Authorization" 요청 헤더 필드에 접근할 수 없는 애플리케이션
+   컨텍스트를 제외하고는 사용하지 않는 것이 좋다. 리소스 서버는
+   이 방법을 지원할 수 있다.
+
+<span class="h3"><a class="selflink" id="section-2.3" href="#section-2.3">2.3</a>.  URI 질의 매개변수</span>
+
+   HTTP 요청 URI에 접근 토큰을 보낼 때, 클라이언트는 "Uniform
+   Resource Identifier (URI): Generic Syntax" [<a href="./rfc3986" title="&quot;Uniform Resource Identifier (URI): Generic Syntax&quot;">RFC3986</a>]에서 정의된
+   요청 URI 질의 컴포넌트에 "access_token" 매개변수를 사용하여
+   접근 토큰을 추가한다.
+
+   예를 들어, 클라이언트는 전송 계층 보안을 사용하여 다음 HTTP
+   요청을 수행한다:
+
+     GET /resource?access_token=mF_9.B5f-4.1JqM HTTP/1.1
+     Host: server.example.com
+
+   HTTP 요청 URI 질의에는 다른 요청별 매개변수가 포함될 수 있으며,
+   이 경우 "access_token" 매개변수는 "&amp;" 문자(ASCII 코드 38)를
+   사용하여 요청별 매개변수와 올바르게 구분되어야 한다.
+
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   예:
+
+    https://server.example.com/resource?access_token=mF_9.B5f-4.1JqM&amp;p=q
+
+   URI Query Parameter 방법을 사용하는 클라이언트는 "no-store" 옵션이
+   포함된 Cache-Control 헤더도 보내는 것이 좋다. 이러한 요청에 대한
+   서버 성공(2XX 상태) 응답에는 "private" 옵션이 포함된
+   Cache-Control 헤더가 포함되는 것이 좋다.
+
+   URI 방법과 관련된 보안 약점(<a href="#section-5">Section 5</a> 참조), 특히 접근 토큰이
+   포함된 URL이 기록될 가능성이 높다는 점 때문에, 접근 토큰을
+   "Authorization" 요청 헤더 필드나 HTTP 요청 entity-body로 전송하는
+   것이 불가능하지 않은 한 이 방법은 사용하지 않는 것이 좋다.
+   리소스 서버는 이 방법을 지원할 수 있다.
+
+   이 방법은 현재 사용을 문서화하기 위해 포함되었다. 보안상의
+   결함(<a href="#section-5">Section 5</a> 참조) 때문에 그 사용은 권장되지 않으며, "Architecture
+   of the World Wide Web, Volume One" [<a href="#ref-W3C.REC-webarch-20041215">W3C.REC-webarch-20041215</a>]에 따른
+   URI 네임스페이스 모범 사례에 반하여 예약된 질의 매개변수 이름을
+   사용한다는 점에서도 권장되지 않는다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  WWW-Authenticate 응답 헤더 필드</span>
+
+   보호된 리소스 요청이 인증 자격 증명을 포함하지 않거나 보호된
+   리소스에 대한 접근을 가능하게 하는 접근 토큰을 포함하지 않는
+   경우, 리소스 서버는 HTTP "WWW-Authenticate" 응답 헤더 필드를
+   포함해야 한다. 다른 조건에 대한 응답에도 이를 포함할 수 있다.
+   "WWW-Authenticate" 헤더 필드는 HTTP/1.1 [<a href="./rfc2617" title="&quot;HTTP Authentication: Basic and Digest Access Authentication&quot;">RFC2617</a>]에서 정의한
+   프레임워크를 사용한다.
+
+   이 명세에서 정의하는 모든 challenge는 auth-scheme 값 "Bearer"를
+   사용해야 한다. 이 스킴 뒤에는 하나 이상의 auth-param 값이 따라야
+   한다. 이 명세에서 사용하거나 정의하는 auth-param 속성은 다음과
+   같다. 다른 auth-param 속성도 사용할 수 있다.
+
+   보호 범위를 나타내기 위해 HTTP/1.1 [<a href="./rfc2617" title="&quot;HTTP Authentication: Basic and Digest Access Authentication&quot;">RFC2617</a>]에 설명된 방식으로
+   "realm" 속성을 포함할 수 있다. "realm" 속성은 한 번을 초과하여
+   나타나서는 안 된다.
+
+   "scope" 속성은 <a href="./rfc6749#section-3.3">[RFC6749]의 Section&nbsp;3.3</a>에 정의되어 있다.
+   "scope" 속성은 요청된 리소스에 접근하기 위해 접근 토큰에 필요한
+   범위를 나타내는, 공백으로 구분된 대소문자 구분 scope 값 목록이다.
+   "scope" 값은 구현에서 정의되며, 이를 위한 중앙 레지스트리는 없다.
+   허용되는 값은 인가 서버에서 정의한다. "scope" 값의 순서는
+   중요하지 않다. 어떤 경우에는 보호된 리소스를 사용할 수 있는
+   충분한 접근 범위를 가진 새 접근 토큰을 요청할 때 "scope" 값이
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   사용될 것이다. "scope" 속성 사용은 OPTIONAL이다. "scope" 속성은
+   한 번을 초과하여 나타나서는 안 된다. "scope" 값은 프로그램적
+   사용을 위한 것이며 최종 사용자에게 표시하기 위한 것이 아니다.
+
+   다음은 두 가지 예시 scope 값이다. 이들은 각각 OpenID Connect
+   [<a href="#ref-OpenID.Messages">OpenID.Messages</a>] 및 Open Authentication Technology Committee
+   (OATC) Online Multimedia Authorization Protocol [<a href="#ref-OMAP" title="&quot;Online Multimedia Authorization Protocol: An Industry Standard for Authorized Access to Internet Multimedia Resources&quot;">OMAP</a>] OAuth 2.0
+   사용 사례에서 가져온 것이다:
+
+     scope="openid profile email"
+     scope="urn:example:channel=HBO&amp;urn:example:rating=G,PG-13"
+
+   보호된 리소스 요청에 접근 토큰이 포함되어 있었고 인증에 실패한
+   경우, 리소스 서버는 접근 요청이 거부된 이유를 클라이언트에
+   제공하기 위해 "error" 속성을 포함하는 것이 좋다. 매개변수 값은
+   <a href="#section-3.1">Section 3.1</a>에 설명되어 있다. 또한 리소스 서버는 개발자에게
+   사람이 읽을 수 있는 설명을 제공하기 위해 "error_description"
+   속성을 포함할 수 있는데, 이는 최종 사용자에게 표시하기 위한 것이
+   아니다. 또한 오류를 설명하는 사람이 읽을 수 있는 웹 페이지를
+   식별하는 절대 URI가 포함된 "error_uri" 속성을 포함할 수 있다.
+   "error", "error_description", "error_uri" 속성은 한 번을 초과하여
+   나타나서는 안 된다.
+
+   "scope" 속성 값([<a href="./rfc6749#appendix-A.4">RFC6749]의 Appendix&nbsp;A.4</a>에 명세됨)은 scope 값을
+   나타내기 위한 %x21 / %x23-5B / %x5D-7E와 scope 값 사이의 구분자
+   %x20 집합 밖의 문자를 포함해서는 안 된다. "error" 및
+   "error_description" 속성 값([<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]의 Appendixes A.7 및 A.8에
+   명세됨)은 %x20-21 / %x23-5B / %x5D-7E 집합 밖의 문자를 포함해서는
+   안 된다. "error_uri" 속성 값([<a href="./rfc6749#appendix-A.9">RFC6749]의 Appendix&nbsp;A.9</a>에 명세됨)은
+   URI-reference 구문을 따라야 하며, 따라서 %x21 / %x23-5B / %x5D-7E
+   집합 밖의 문자를 포함해서는 안 된다.
+
+   예를 들어, 인증이 없는 보호된 리소스 요청에 대한 응답은 다음과
+   같다:
+
+     HTTP/1.1 401 Unauthorized
+     WWW-Authenticate: Bearer realm="example"
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   그리고 만료된 접근 토큰을 사용한 인증 시도가 포함된 보호된 리소스
+   요청에 대한 응답은 다음과 같다:
+
+     HTTP/1.1 401 Unauthorized
+     WWW-Authenticate: Bearer realm="example",
+                       error="invalid_token",
+                       error_description="The access token expired"
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  오류 코드</span>
+
+   요청이 실패하면, 리소스 서버는 적절한 HTTP 상태 코드(일반적으로
+   400, 401, 403 또는 405)를 사용하여 응답하고, 응답에 다음 오류
+   코드 중 하나를 포함한다:
+
+   invalid_request
+         요청에 필수 매개변수가 없거나, 지원되지 않는 매개변수 또는
+         매개변수 값이 포함되어 있거나, 동일한 매개변수가 반복되거나,
+         접근 토큰을 포함하기 위해 둘 이상의 방법을 사용하거나,
+         기타 형식이 잘못되었다. 리소스 서버는 HTTP 400 (Bad Request)
+         상태 코드로 응답하는 것이 좋다.
+
+   invalid_token
+         제공된 접근 토큰이 만료되었거나, 철회되었거나, 형식이
+         잘못되었거나, 다른 이유로 유효하지 않다. 리소스는 HTTP 401
+         (Unauthorized) 상태 코드로 응답하는 것이 좋다. 클라이언트는
+         새 접근 토큰을 요청하고 보호된 리소스 요청을 다시 시도할
+         수 있다.
+
+   insufficient_scope
+         요청은 접근 토큰이 제공하는 것보다 더 높은 권한을 요구한다.
+         리소스 서버는 HTTP 403 (Forbidden) 상태 코드로 응답하는 것이
+         좋으며, 보호된 리소스에 접근하는 데 필요한 범위가 포함된
+         "scope" 속성을 포함할 수 있다.
+
+   요청에 인증 정보가 전혀 없는 경우(예: 클라이언트가 인증이
+   필요하다는 것을 알지 못했거나, 지원되지 않는 인증 방법을 사용해
+   시도한 경우), 리소스 서버는 오류 코드나 기타 오류 정보를
+   포함하지 않는 것이 좋다.
+
+   예:
+
+     HTTP/1.1 401 Unauthorized
+     WWW-Authenticate: Bearer realm="example"
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                         [Page 9]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  예시 접근 토큰 응답</span>
+
+   일반적으로 베어러 토큰은 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>] 접근 토큰 응답의
+   일부로 클라이언트에게 반환된다. 이러한 응답의 예는 다음과 같다:
+
+     HTTP/1.1 200 OK
+     Content-Type: application/json;charset=UTF-8
+     Cache-Control: no-store
+     Pragma: no-cache
+
+     {
+       "access_token":"mF_9.B5f-4.1JqM",
+       "token_type":"Bearer",
+       "expires_in":3600,
+       "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA"
+     }
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  보안 고려사항</span>
+
+   이 절은 베어러 토큰을 사용할 때 토큰 처리와 관련된 보안 위협을
+   설명하고, 이러한 위협을 완화하는 방법을 설명한다.
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>.  보안 위협</span>
+
+   다음 목록은 어떤 형태의 토큰을 사용하는 프로토콜에 대한 몇 가지
+   일반적인 위협을 제시한다. 이 위협 목록은 NIST Special Publication
+   800-63 [<a href="#ref-NIST800-63" title="&quot;NIST Special Publication 800-63-1, INFORMATION SECURITY&quot;">NIST800-63</a>]에 기반한다. 이 문서는 OAuth 2.0 Authorization
+   명세 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]를 기반으로 하므로, 거기나 관련 문서에 설명된
+   위협에 대한 논의는 제외한다.
+
+   토큰 생성/수정:  공격자는 가짜 토큰을 생성하거나 기존 토큰의
+      내용(예: 인증 또는 속성 statement)을 수정하여 리소스 서버가
+      클라이언트에게 부적절한 접근을 허용하게 할 수 있다. 예를 들어,
+      공격자는 유효 기간을 연장하도록 토큰을 수정할 수 있다. 악의적
+      클라이언트는 assertion을 수정하여 자신이 볼 수 없어야 하는
+      정보에 접근할 수 있다.
+
+   토큰 공개:  토큰에는 민감한 정보를 포함하는 인증 및 속성
+      statement가 들어 있을 수 있다.
+
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 10]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   토큰 리디렉션:  공격자는 한 리소스 서버가 사용하도록 생성된 토큰을
+      사용하여, 그 토큰이 자신을 위한 것이라고 잘못 믿는 다른
+      리소스 서버에 접근한다.
+
+   토큰 재사용:  공격자는 과거에 해당 리소스 서버에서 이미 사용된
+      토큰을 사용하려고 시도한다.
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  위협 완화</span>
+
+   디지털 서명 또는 Message Authentication Code (MAC)를 사용하여
+   토큰의 내용을 보호하면 광범위한 위협을 완화할 수 있다. 또는
+   베어러 토큰은 정보를 직접 인코딩하는 대신 인가 정보에 대한
+   참조를 포함할 수 있다. 이러한 참조는 공격자가 추측할 수 없어야
+   한다. 참조를 사용하는 경우, 참조를 인가 정보로 해석하기 위해
+   서버와 토큰 발급자 사이의 추가 상호작용이 필요할 수 있다. 이러한
+   상호작용의 메커니즘은 이 명세에서 정의하지 않는다.
+
+   이 문서는 토큰의 인코딩이나 내용을 명세하지 않는다. 따라서 토큰
+   무결성 보호를 보장하는 수단에 대한 상세 권고사항은 이 문서의
+   범위를 벗어난다. 토큰 무결성 보호는 토큰이 수정되는 것을 방지할
+   수 있을 만큼 충분해야 한다.
+
+   토큰 리디렉션을 처리하려면, 인가 서버가 의도된 수신자(대상)의
+   ID를 토큰에 포함하는 것이 중요하다. 일반적으로 이는 단일 리소스
+   서버(또는 리소스 서버 목록)이다. 토큰 사용을 특정 범위로 제한하는
+   것도 권장된다.
+
+   인가 서버는 TLS를 구현해야 한다. 구현해야 할 버전은 시간이 지나며
+   달라질 것이고, 구현 시점의 광범위한 배포 및 알려진 보안 취약성에
+   따라 달라진다. 이 문서를 작성하는 시점에 TLS version 1.2
+   [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]가 가장 최신 버전이지만, 실제 배포는 매우 제한적이며
+   구현 툴킷에서 쉽게 사용할 수 없을 수도 있다. TLS version 1.0
+   [<a href="./rfc2246" title="&quot;The TLS Protocol Version 1.0&quot;">RFC2246</a>]은 가장 널리 배포된 버전이며 가장 넓은 상호운용성을
+   제공할 것이다.
+
+   토큰 공개를 방지하려면, 기밀성과 무결성 보호를 제공하는
+   ciphersuite를 사용하는 TLS [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]로 기밀성 보호를 적용해야 한다.
+   이는 클라이언트와 인가 서버 사이의 통신 상호작용 및 클라이언트와
+   리소스 서버 사이의 상호작용이 기밀성과 무결성 보호를 활용해야
+   함을 요구한다. TLS는 이 명세와 함께 구현하고 사용하는 것이
+   필수이므로, 통신 채널을 통한 토큰 공개를 방지하는 데 선호되는
+   접근 방식이다. 클라이언트가 토큰의 내용을 관찰하지 못하도록
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 11]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   차단되는 경우에는 TLS 보호 사용에 더해 토큰 암호화를 적용해야
+   한다. 토큰 공개에 대한 추가 방어로, 클라이언트는 보호된 리소스에
+   요청할 때 Certificate Revocation List (CRL) [<a href="./rfc5280" title="&quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;">RFC5280</a>] 확인을 포함하여
+   TLS 인증서 체인을 검증해야 한다.
+
+   쿠키는 일반적으로 평문으로 전송된다. 따라서 쿠키에 포함된 모든
+   정보는 공개될 위험이 있다. 그러므로 베어러 토큰은 평문으로
+   전송될 수 있는 쿠키에 저장해서는 안 된다. 쿠키에 대한 보안
+   고려사항은 "HTTP State Management Mechanism" [<a href="./rfc6265" title="&quot;HTTP State Management Mechanism&quot;">RFC6265</a>]을 참조한다.
+
+   로드 밸런서를 활용하는 배포를 포함하여 어떤 배포에서는, 리소스를
+   제공하는 실제 서버보다 앞에서 리소스 서버에 대한 TLS 연결이
+   종료된다. 이는 TLS 연결이 종료되는 프런트엔드 서버와 리소스를
+   제공하는 백엔드 서버 사이에서 토큰이 보호되지 않은 상태로 남게
+   할 수 있다. 이러한 배포에서는 프런트엔드 서버와 백엔드 서버
+   사이에서 토큰의 기밀성을 보장하기 위해 충분한 조치를 사용해야
+   한다. 토큰 암호화가 그러한 가능한 조치 중 하나이다.
+
+   토큰 캡처 및 재사용을 처리하기 위해 다음 권고사항을 제시한다.
+   첫째, 토큰의 수명은 제한되어야 한다. 이를 달성하는 한 가지
+   방법은 토큰의 보호된 부분 안에 유효 시간 필드를 넣는 것이다.
+   짧은 수명(1시간 이하)의 토큰을 사용하면 토큰이 유출되었을 때의
+   영향을 줄일 수 있다는 점에 유의한다. 둘째, 클라이언트와 인가
+   서버 사이 및 클라이언트와 리소스 서버 사이의 교환에는 기밀성
+   보호가 적용되어야 한다. 그 결과, 통신 경로상의 어떤 도청자도
+   토큰 교환을 관찰할 수 없다. 따라서 그러한 경로상의 공격자는
+   토큰을 재사용할 수 없다. 또한 토큰을 리소스 서버에 제시할 때,
+   클라이언트는 "HTTP Over TLS" [<a href="./rfc2818" title="&quot;HTTP Over TLS&quot;">RFC2818</a>]의 <a href="#section-3.1">Section 3.1</a>에 따라 그
+   리소스 서버의 ID를 검증해야 한다. 클라이언트는 보호된 리소스에
+   이러한 요청을 할 때 TLS 인증서 체인을 검증해야 한다는 점에
+   유의한다. 인증되지 않고 인가되지 않은 리소스 서버에 토큰을
+   제시하거나 인증서 체인 검증에 실패하면 공격자가 토큰을 훔쳐
+   보호된 리소스에 무단 접근할 수 있다.
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 12]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  권고사항 요약</span>
+
+   베어러 토큰 보호:  클라이언트 구현은 베어러 토큰이 의도하지 않은
+      당사자에게 유출되지 않도록 보장해야 한다. 그들은 토큰을 사용해
+      보호된 리소스에 접근할 수 있기 때문이다. 이것이 베어러 토큰을
+      사용할 때의 주요 보안 고려사항이며, 뒤따르는 모든 더 구체적인
+      권고사항의 기초가 된다.
+
+   TLS 인증서 체인 검증:  클라이언트는 보호된 리소스에 요청할 때
+      TLS 인증서 체인을 검증해야 한다. 그렇게 하지 않으면 DNS 하이재킹
+      공격으로 토큰이 탈취되고 의도하지 않은 접근이 발생할 수 있다.
+
+   항상 TLS(https) 사용:  클라이언트는 베어러 토큰으로 요청할 때
+      항상 TLS [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>] (https) 또는 동등한 전송 보안을 사용해야
+      한다. 그렇게 하지 않으면 토큰이 수많은 공격에 노출되어
+      공격자가 의도하지 않은 접근을 얻을 수 있다.
+
+   베어러 토큰을 쿠키에 저장하지 않기:  구현은 평문으로 전송될 수
+      있는 쿠키(쿠키의 기본 전송 모드)에 베어러 토큰을 저장해서는
+      안 된다. 베어러 토큰을 쿠키에 저장하는 구현은 교차 사이트
+      요청 위조에 대한 예방 조치를 취해야 한다.
+
+   짧은 수명의 베어러 토큰 발급:  토큰 서버는 특히 웹 브라우저 안에서
+      실행되는 클라이언트나 정보 유출이 발생할 수 있는 기타 환경의
+      클라이언트에 토큰을 발급할 때, 짧은 수명(1시간 이하)의 베어러
+      토큰을 발급하는 것이 좋다. 짧은 수명의 베어러 토큰을 사용하면
+      토큰이 유출되었을 때의 영향을 줄일 수 있다.
+
+   범위가 지정된 베어러 토큰 발급:  토큰 서버는 대상 제한을 포함하여
+      그 사용 범위를 의도된 의존 당사자 또는 의존 당사자 집합으로
+      제한하는 베어러 토큰을 발급하는 것이 좋다.
+
+   페이지 URL에 베어러 토큰을 전달하지 않기:  베어러 토큰은 페이지
+      URL(예: 질의 문자열 매개변수)로 전달하지 않는 것이 좋다. 대신,
+      베어러 토큰은 기밀성 조치가 취해진 HTTP 메시지 헤더나 메시지
+      본문으로 전달하는 것이 좋다. 브라우저, 웹 서버 및 기타
+      소프트웨어는 브라우저 기록, 웹 서버 로그 및 기타 데이터
+      구조에서 URL을 충분히 안전하게 보호하지 못할 수 있다. 베어러
+      토큰이 페이지 URL로 전달되면, 공격자가 기록 데이터, 로그 또는
+      기타 안전하지 않은 위치에서 토큰을 훔칠 수 있다.
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 13]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  IANA 고려사항</span>
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  OAuth 접근 토큰 유형 등록</span>
+
+   이 명세는 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에 정의된 OAuth Access Token Types 레지스트리에
+   다음 접근 토큰 유형을 등록한다.
+
+<span class="h4"><a class="selflink" id="section-6.1.1" href="#section-6.1.1">6.1.1</a>.  "Bearer" OAuth 접근 토큰 유형</span>
+
+   유형 이름:
+      Bearer
+
+   추가 Token Endpoint Response 매개변수:
+      (없음)
+
+   HTTP Authentication Scheme(s):
+      Bearer
+
+   변경 관리자:
+      IETF
+
+   명세 문서:
+      <a href="./rfc6750">RFC 6750</a>
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  OAuth 확장 오류 등록</span>
+
+   이 명세는 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에 정의된 OAuth Extensions Error 레지스트리에
+   다음 오류 값을 등록한다.
+
+<span class="h4"><a class="selflink" id="section-6.2.1" href="#section-6.2.1">6.2.1</a>.  "invalid_request" 오류 값</span>
+
+   오류 이름:
+      invalid_request
+
+   오류 사용 위치:
+      리소스 접근 오류 응답
+
+   관련 프로토콜 확장:
+      Bearer 접근 토큰 유형
+
+   변경 관리자:
+      IETF
+
+   명세 문서:
+      <a href="./rfc6750">RFC 6750</a>
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 14]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+<span class="h4"><a class="selflink" id="section-6.2.2" href="#section-6.2.2">6.2.2</a>.  "invalid_token" 오류 값</span>
+
+   오류 이름:
+      invalid_token
+
+   오류 사용 위치:
+      리소스 접근 오류 응답
+
+   관련 프로토콜 확장:
+      Bearer 접근 토큰 유형
+
+   변경 관리자:
+      IETF
+
+   명세 문서:
+      <a href="./rfc6750">RFC 6750</a>
+
+<span class="h4"><a class="selflink" id="section-6.2.3" href="#section-6.2.3">6.2.3</a>.  "insufficient_scope" 오류 값</span>
+
+   오류 이름:
+      insufficient_scope
+
+   오류 사용 위치:
+      리소스 접근 오류 응답
+
+   관련 프로토콜 확장:
+      Bearer 접근 토큰 유형
+
+   변경 관리자:
+      IETF
+
+   명세 문서:
+      <a href="./rfc6750">RFC 6750</a>
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  참고문헌</span>
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  규범적 참고문헌</span>
+
+   [<a id="ref-RFC2119">RFC2119</a>]    Bradner, S., "요구 수준을 나타내기 위해 RFC에서
+                사용하는 핵심 단어", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>, 1997년 3월.
+
+   [<a id="ref-RFC2246">RFC2246</a>]    Dierks, T. and C. Allen, "TLS 프로토콜 버전 1.0",
+                <a href="./rfc2246">RFC 2246</a>, 1999년 1월.
+
+   [<a id="ref-RFC2616">RFC2616</a>]    Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+                Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
+                Transfer Protocol -- HTTP/1.1", <a href="./rfc2616">RFC 2616</a>, 1999년 6월.
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 15]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+   [<a id="ref-RFC2617">RFC2617</a>]    Franks, J., Hallam-Baker, P., Hostetler, J., Lawrence,
+                S., Leach, P., Luotonen, A., and L. Stewart, "HTTP
+                Authentication: Basic and Digest Access Authentication",
+                <a href="./rfc2617">RFC 2617</a>, 1999년 6월.
+
+   [<a id="ref-RFC2818">RFC2818</a>]    Rescorla, E., "HTTP Over TLS", <a href="./rfc2818">RFC 2818</a>, 2000년 5월.
+
+   [<a id="ref-RFC3986">RFC3986</a>]    Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+                Resource Identifier (URI): Generic Syntax", STD 66,
+                <a href="./rfc3986">RFC 3986</a>, 2005년 1월.
+
+   [<a id="ref-RFC5234">RFC5234</a>]    Crocker, D. and P. Overell, "구문 명세를 위한
+                Augmented BNF: ABNF", STD 68, <a href="./rfc5234">RFC 5234</a>, 2008년 1월.
+
+   [<a id="ref-RFC5246">RFC5246</a>]    Dierks, T. and E. Rescorla, "The Transport Layer
+                Security (TLS) Protocol Version 1.2", <a href="./rfc5246">RFC 5246</a>,
+                2008년 8월.
+
+   [<a id="ref-RFC5280">RFC5280</a>]    Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+                Housley, R., and W. Polk, "인터넷 X.509 공개 키
+                인프라 인증서 및 인증서 폐기 목록(CRL) 프로파일",
+                <a href="./rfc5280">RFC 5280</a>, 2008년 5월.
+
+   [<a id="ref-RFC6265">RFC6265</a>]    Barth, A., "HTTP State Management Mechanism", <a href="./rfc6265">RFC 6265</a>,
+                2011년 4월.
+
+   [<a id="ref-RFC6749">RFC6749</a>]    Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
+                <a href="./rfc6749">RFC 6749</a>, 2012년 10월.
+
+   [<a id="ref-USASCII">USASCII</a>]    American National Standards Institute, "Coded Character
+                Set -- 7-bit American Standard Code for Information
+                Interchange", ANSI X3.4, 1986.
+
+   [<a id="ref-W3C.REC-html401-19991224">W3C.REC-html401-19991224</a>]
+                Raggett, D., Le Hors, A., and I. Jacobs, "HTML 4.01
+                Specification", World Wide Web Consortium
+                Recommendation REC-html401-19991224, 1999년 12월,
+                &lt;<a href="http://www.w3.org/TR/1999/REC-html401-19991224">http://www.w3.org/TR/1999/REC-html401-19991224</a>&gt;.
+
+   [<a id="ref-W3C.REC-webarch-20041215">W3C.REC-webarch-20041215</a>]
+                Jacobs, I. and N. Walsh, "Architecture of the World Wide
+                Web, Volume One", World Wide Web Consortium
+                Recommendation REC-webarch-20041215, 2004년 12월,
+                &lt;<a href="http://www.w3.org/TR/2004/REC-webarch-20041215">http://www.w3.org/TR/2004/REC-webarch-20041215</a>&gt;.
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 16]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  정보성 참고문헌</span>
+
+   [<a id="ref-HTTP-AUTH">HTTP-AUTH</a>]  Fielding, R., Ed., and J. Reschke, Ed., "Hypertext
+                Transfer Protocol (HTTP/1.1): Authentication", 진행 중인
+                작업, 2012년 10월.
+
+   [<a id="ref-NIST800-63">NIST800-63</a>] Burr, W., Dodson, D., Newton, E., Perlner, R., Polk, T.,
+                Gupta, S., and E. Nabbus, "NIST Special Publication
+                800-63-1, INFORMATION SECURITY", 2011년 12월,
+                &lt;<a href="http://csrc.nist.gov/publications/">http://csrc.nist.gov/publications/</a>&gt;.
+
+   [<a id="ref-OMAP">OMAP</a>]       Huff, J., Schlacht, D., Nadalin, A., Simmons, J.,
+                Rosenberg, P., Madsen, P., Ace, T., Rickelton-Abdi, C.,
+                and B. Boyer, "Online Multimedia Authorization Protocol:
+                An Industry Standard for Authorized Access to Internet
+                Multimedia Resources", 2012년 4월,
+                &lt;<a href="http://www.oatc.us/Standards/Download.aspx">http://www.oatc.us/Standards/Download.aspx</a>&gt;.
+
+   [<a id="ref-OpenID.Messages">OpenID.Messages</a>]
+                Sakimura, N., Bradley, J., Jones, M., de Medeiros, B.,
+                Mortimore, C., and E. Jay, "OpenID Connect Messages
+                1.0", 2012년 6월, &lt;<a href="http://openid.net/specs/openid-connect-messages-1_0.html">http://openid.net/specs/</a>
+                <a href="http://openid.net/specs/openid-connect-messages-1_0.html">openid-connect-messages-1_0.html</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones &amp; Hardt                표준 트랙                        [Page 17]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="./rfc6750">RFC 6750</a>              OAuth 2.0 베어러 토큰 사용          2012년 10월</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">부록 A</a>.  감사의 말</span>
+
+   다음 사람들은 이 문서의 예비 버전에 기여했다: Blaine Cook (BT),
+   Brian Eaton (Google), Yaron Y. Goland (Microsoft), Brent Goldman
+   (Facebook), Raffi Krikorian (Twitter), Luke Shepard (Facebook), and
+   Allen Tom (Yahoo!). 여기의 내용과 개념은 OAuth 커뮤니티, Web
+   Resource Authorization Profiles (WRAP) 커뮤니티 및 OAuth Working
+   Group의 산물이다. David Recordon은 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]으로
+   발전한 명세의 초기 초안을 바탕으로 이 명세의 예비 버전을 만들었다.
+   Michael B. Jones는 이어서 David의 예비 문서 일부를 사용하여 이
+   명세의 첫 번째 버전(00)을 만들었고, 이후의 모든 버전을 편집했다.
+
+   OAuth Working Group에는 이 문서에 대한 아이디어와 문구를 제안한
+   매우 활발한 기여자가 수십 명 있으며, 여기에는 Michael Adams,
+   Amanda Anganes, Andrew Arnott, Derek Atkins, Dirk Balfanz, John
+   Bradley, Brian Campbell, Francisco Corella, Leah Culver, Bill de
+   hOra, Breno de Medeiros, Brian Ellin, Stephen Farrell, Igor Faynberg,
+   George Fletcher, Tim Freeman, Evan Gilbert, Yaron Y. Goland, Eran
+   Hammer, Thomas Hardjono, Dick Hardt, Justin Hart, Phil Hunt, John
+   Kemp, Chasen Le Hara, Barry Leiba, Amos Jeffries, Michael B. Jones,
+   Torsten Lodderstedt, Paul Madsen, Eve Maler, James Manger, Laurence
+   Miao, William J. Mills, Chuck Mortimore, Anthony Nadalin, Axel
+   Nennker, Mark Nottingham, David Recordon, Julian Reschke, Rob
+   Richards, Justin Richer, Peter Saint-Andre, Nat Sakimura, Rob Sayre,
+   Marius Scurtescu, Naitik Shah, Justin Smith, Christian Stuebner,
+   Jeremy Suriel, Doug Tangren, Paul Tarjan, Hannes Tschofenig, Franklin
+   Tse, Sean Turner, Paul Walker, Shane Weeden, Skylar Woodward, and
+   Zachary Zeltsan이 포함된다.
+
+저자 주소
+
+   Michael B. Jones
+   Microsoft
+
+   EMail: mbj@microsoft.com
+   URI:   <a href="http://self-issued.info/">http://self-issued.info/</a>
+
+
+   Dick Hardt
+   Independent
+
+   EMail: dick.hardt@gmail.com
+   URI:   <a href="http://dickhardt.org/">http://dickhardt.org/</a>
+
+
+
+
+
+
+Jones &amp; Hardt                표준 트랙                        [Page 18]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
