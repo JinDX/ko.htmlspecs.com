@@ -1,0 +1,1251 @@
+<pre>인터넷 엔지니어링 태스크 포스 (IETF)                          M. Jones
+의견 요청: 8414                                             Microsoft
+분류: 표준 트랙                                             N. Sakimura
+ISSN: 2070-1721                                                      NRI
+                                                              J. Bradley
+                                                                  Yubico
+                                                               2018년 6월
+
+
+                <span class="h1">OAuth 2.0 인가 서버 메타데이터</span>
+
+초록
+
+   이 명세는 OAuth 2.0 클라이언트가 OAuth 2.0 인가 서버와
+   상호 작용하는 데 필요한 정보를 얻기 위해 사용할 수 있는
+   메타데이터 형식을 정의하며, 여기에는 엔드포인트 위치와
+   인가 서버 기능이 포함된다.
+
+이 메모의 상태
+
+   이 문서는 인터넷 표준 트랙 문서이다.
+
+   이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물이다.
+   이는 IETF 커뮤니티의 합의를 나타낸다. 공개 검토를 거쳤으며
+   인터넷 엔지니어링 운영 그룹(IESG)에 의해 출판 승인을 받았다.
+   인터넷 표준에 대한 추가 정보는 <a href="./rfc7841#section-2">RFC 7841의 Section&nbsp;2</a>에서 확인할 수 있다.
+
+   이 문서의 현재 상태, 정오표, 그리고 피드백 제공 방법에 대한
+   정보는 <a href="https://www.rfc-editor.org/info/rfc8414">https://www.rfc-editor.org/info/rfc8414</a>에서 얻을 수 있다.
+
+Copyright Notice
+
+   Copyright (c) 2018 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to <a href="https://www.rfc-editor.org/bcp/bcp78">BCP 78</a> and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (<a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a>) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 1]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+목차
+
+   <a href="#section-1">1</a>. 소개 ..........................................................<a href="#page-2">2</a>
+      <a href="#section-1.1">1.1</a>. 요구사항 표기법 및 규약 ................................<a href="#page-3">3</a>
+      <a href="#section-1.2">1.2</a>. 용어 ....................................................<a href="#page-3">3</a>
+   <a href="#section-2">2</a>. 인가 서버 메타데이터 ..........................................<a href="#page-4">4</a>
+      <a href="#section-2.1">2.1</a>. 서명된 인가 서버 메타데이터 .............................<a href="#page-8">8</a>
+   <a href="#section-3">3</a>. 인가 서버 메타데이터 얻기 .....................................<a href="#page-8">8</a>
+      <a href="#section-3.1">3.1</a>. 인가 서버 메타데이터 요청 ...............................<a href="#page-9">9</a>
+      <a href="#section-3.2">3.2</a>. 인가 서버 메타데이터 응답 ..............................<a href="#page-10">10</a>
+      <a href="#section-3.3">3.3</a>. 인가 서버 메타데이터 검증 ..............................<a href="#page-11">11</a>
+   <a href="#section-4">4</a>. 문자열 작업 ..................................................<a href="#page-11">11</a>
+   <a href="#section-5">5</a>. 호환성 참고 사항 .............................................<a href="#page-11">11</a>
+   <a href="#section-6">6</a>. 보안 고려사항 ................................................<a href="#page-12">12</a>
+      <a href="#section-6.1">6.1</a>. TLS 요구사항 ............................................<a href="#page-12">12</a>
+      <a href="#section-6.2">6.2</a>. 사칭 공격 ...............................................<a href="#page-12">12</a>
+      <a href="#section-6.3">6.3</a>. 표준 형식으로 메타데이터 게시 ..........................<a href="#page-13">13</a>
+      <a href="#section-6.4">6.4</a>. 보호되는 리소스 .........................................<a href="#page-13">13</a>
+   <a href="#section-7">7</a>. IANA 고려사항 ................................................<a href="#page-14">14</a>
+      <a href="#section-7.1">7.1</a>. OAuth 인가 서버 메타데이터 레지스트리 ...................<a href="#page-14">14</a>
+           <a href="#section-7.1.1">7.1.1</a>. 등록 템플릿 .....................................<a href="#page-15">15</a>
+           <a href="#section-7.1.2">7.1.2</a>. 초기 레지스트리 내용 ............................<a href="#page-16">16</a>
+      <a href="#section-7.2">7.2</a>. 갱신된 등록 지침 ........................................<a href="#page-19">19</a>
+      <a href="#section-7.3">7.3</a>. Well-Known URI 레지스트리 ...............................<a href="#page-19">19</a>
+           <a href="#section-7.3.1">7.3.1</a>. 레지스트리 내용 .................................<a href="#page-19">19</a>
+   <a href="#section-8">8</a>. 참고문헌 .....................................................<a href="#page-20">20</a>
+      <a href="#section-8.1">8.1</a>. 규범적 참고문헌 .........................................<a href="#page-20">20</a>
+      <a href="#section-8.2">8.2</a>. 정보성 참고문헌 .........................................<a href="#page-22">22</a>
+   감사의 말 ......................................................<a href="#page-23">23</a>
+   저자 주소 ......................................................<a href="#page-23">23</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  소개</span>
+
+   이 명세는 "OpenID Connect Discovery 1.0" [<a href="#ref-OpenID.Discovery">OpenID.Discovery</a>]에서
+   정의한 메타데이터 형식을 일반화하여, OpenID Connect Discovery와
+   호환되면서 더 넓은 OAuth 2.0 사용 사례 집합에 적용할 수 있게
+   한다. 이는 "OAuth 2.0 Dynamic Client Registration Protocol"
+   [<a href="./rfc7591" title="&quot;OAuth 2.0 Dynamic Client Registration Protocol&quot;">RFC7591</a>]이 "OpenID Connect Dynamic Client Registration 1.0"
+   [<a href="#ref-OpenID.Registration">OpenID.Registration</a>]에서 정의한 동적 클라이언트 등록
+   메커니즘을 호환 가능한 방식으로 일반화한 것과 의도적으로
+   병렬을 이룬다.
+
+   인가 서버에 대한 메타데이터는 잘 알려진 위치에서 JSON
+   [<a href="./rfc8259" title="&quot;The JavaScript Object Notation (JSON) Data Interchange Format&quot;">RFC8259</a>] 문서로 검색되며, 이 문서는 엔드포인트 위치와
+   인가 서버 기능을 선언한다. 이 과정은 <a href="#section-3">Section 3</a>에서 설명한다.
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 2]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   이 메타데이터는 서버 오리진이 HTTPS를 통해 자기 주장 방식으로
+   전달할 수도 있고, JSON Web Token(JWT) [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>] 안의 클레임으로
+   표현되는 서명된 메타데이터 값 집합으로 전달할 수도 있다. JWT
+   경우에는 issuer가 인가 서버에 대한 데이터의 유효성을 보증한다.
+   이는 OAuth Dynamic Client Registration [<a href="./rfc7591" title="&quot;OAuth 2.0 Dynamic Client Registration Protocol&quot;">RFC7591</a>]에서
+   Software Statement가 수행하는 역할과 유사하다.
+
+   클라이언트가 인가 서버를 선택하는 수단은 범위 밖이다. 어떤
+   경우에는 issuer 식별자가 클라이언트에 수동으로 구성될 수 있다.
+   다른 경우에는 예를 들어 "OpenID Connect Discovery 1.0"
+   [<a href="#ref-OpenID.Discovery">OpenID.Discovery</a>]의 <a href="#section-2">Section 2</a>에 설명된 것처럼 WebFinger
+   [<a href="./rfc7033" title="&quot;WebFinger&quot;">RFC7033</a>] 사용을 통해 동적으로 발견될 수 있다.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  요구사항 표기법 및 규약</span>
+
+   이 문서의 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",
+   "NOT RECOMMENDED", "MAY", 그리고 "OPTIONAL"은 여기에 표시된
+   것처럼 모두 대문자로 나타날 때에만 <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a> [<a href="./rfc2119" title="&quot;Key words for use in RFCs to Indicate Requirement Levels&quot;">RFC2119</a>]
+   [<a href="./rfc8174" title="&quot;Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words&quot;">RFC8174</a>]에 설명된 대로 해석되어야 한다.
+
+   이 명세에서 JSON Web Signature(JWS) [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>] 및 JSON Web
+   Encryption(JWE) [<a href="#ref-JWE" title="&quot;JSON Web Encryption (JWE)&quot;">JWE</a>] 데이터 구조를 사용하는 모든 경우에는 JWS
+   Compact Serialization 또는 JWE Compact Serialization을 사용한다.
+   JWS JSON Serialization 및 JWE JSON Serialization은 사용하지
+   않는다.
+
+<span class="h3"><a class="selflink" id="section-1.2" href="#section-1.2">1.2</a>.  용어</span>
+
+   이 명세는 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]에서 정의한 "Access Token",
+   "Authorization Code", "Authorization Endpoint", "Authorization
+   Grant", "Authorization Server", "Client", "Client Authentication",
+   "Client Identifier", "Client Secret", "Grant Type", "Protected
+   Resource", "Redirection URI", "Refresh Token", "Resource Owner",
+   "Resource Server", "Response Type", 그리고 "Token Endpoint"라는
+   용어, JSON Web Token(JWT) [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>]에서 정의한 "Claim Name",
+   "Claim Value", "JSON Web Token (JWT)"이라는 용어, 그리고
+   "OAuth 2.0 Multiple Response Type Encoding Practices"
+   [<a href="#ref-OAuth.Responses">OAuth.Responses</a>]에서 정의한 "Response Mode"라는 용어를
+   사용한다.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 3]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  인가 서버 메타데이터</span>
+
+   인가 서버는 자신의 구성을 설명하는 메타데이터를 가질 수 있다.
+   다음 인가 서버 메타데이터 값들은 이 명세에서 사용되며,
+   <a href="#section-7.1">Section 7.1</a>에서 수립한 IANA "OAuth Authorization Server
+   Metadata" 레지스트리에 등록된다.
+
+   issuer
+      REQUIRED.  인가 서버의 issuer 식별자이며, "https" 스킴을
+      사용하고 query 또는 fragment 구성요소가 없는 URL이다. 인가
+      서버 메타데이터는 <a href="#section-3">Section 3</a>에 설명된 것처럼 이 issuer
+      식별자로부터 파생된, <a href="./rfc5785">RFC 5785</a> [<a href="./rfc5785" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">RFC5785</a>]에 따른
+      ".well-known" 위치에 게시된다. issuer 식별자는 "OAuth 2.0
+      Mix-Up Mitigation" [<a href="#ref-MIX-UP" title="&quot;OAuth 2.0 Mix-Up Mitigation&quot;">MIX-UP</a>]에 설명된 것처럼 인가 서버
+      mix-up 공격을 방지하는 데 사용된다.
+
+   authorization_endpoint
+      인가 서버의 authorization endpoint [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]의 URL이다.
+      authorization endpoint를 사용하는 grant type이 지원되지 않는
+      경우가 아니라면 REQUIRED이다.
+
+   token_endpoint
+      인가 서버의 token endpoint [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]의 URL이다. implicit
+      grant type만 지원되는 경우가 아니라면 REQUIRED이다.
+
+   jwks_uri
+      OPTIONAL.  인가 서버의 JWK Set [<a href="#ref-JWK" title="&quot;JSON Web Key (JWK)&quot;">JWK</a>] 문서의 URL이다. 참조된
+      문서는 클라이언트가 인가 서버의 서명을 검증하는 데 사용하는
+      서명 키를 포함한다. 이 URL은 "https" 스킴을 사용해야 한다.
+      JWK Set은 클라이언트가 서버로 요청을 암호화하는 데 사용하는
+      서버의 암호화 키도 포함할 수 있다. 서명 키와 암호화 키가
+      모두 제공되는 경우, 참조된 JWK Set의 모든 키에는 각 키의
+      의도된 용도를 나타내기 위한 "use"(public key use) 파라미터
+      값이 REQUIRED이다.
+
+   registration_endpoint
+      OPTIONAL.  인가 서버의 OAuth 2.0 Dynamic Client Registration
+      endpoint [<a href="./rfc7591" title="&quot;OAuth 2.0 Dynamic Client Registration Protocol&quot;">RFC7591</a>]의 URL이다.
+
+   scopes_supported
+      RECOMMENDED.  이 인가 서버가 지원하는 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]
+      "scope" 값 목록을 포함하는 JSON 배열이다. 서버는 이 파라미터를
+      사용하더라도 지원되는 일부 scope 값을 광고하지 않도록 선택할
+      수 있다.
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 4]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   response_types_supported
+      REQUIRED.  이 인가 서버가 지원하는 OAuth 2.0 "response_type"
+      값 목록을 포함하는 JSON 배열이다. 사용되는 배열 값은
+      "OAuth 2.0 Dynamic Client Registration Protocol" [<a href="./rfc7591" title="&quot;OAuth 2.0 Dynamic Client Registration Protocol&quot;">RFC7591</a>]에서
+      정의한 "response_types" 파라미터에 사용되는 값과 동일하다.
+
+   response_modes_supported
+      OPTIONAL.  "OAuth 2.0 Multiple Response Type Encoding Practices"
+      [<a href="#ref-OAuth.Responses">OAuth.Responses</a>]에 명시된 대로, 이 인가 서버가 지원하는
+      OAuth 2.0 "response_mode" 값 목록을 포함하는 JSON 배열이다.
+      생략하면 기본값은 "["query", "fragment"]"이다. response mode
+      값 "form_post"도 "OAuth 2.0 Form Post Response Mode"
+      [<a href="#ref-OAuth.Post">OAuth.Post</a>]에서 정의한다.
+
+   grant_types_supported
+      OPTIONAL.  이 인가 서버가 지원하는 OAuth 2.0 grant type 값
+      목록을 포함하는 JSON 배열이다. 사용되는 배열 값은 "OAuth 2.0
+      Dynamic Client Registration Protocol" [<a href="./rfc7591" title="&quot;OAuth 2.0 Dynamic Client Registration Protocol&quot;">RFC7591</a>]에서 정의한
+      "grant_types" 파라미터에 사용되는 값과 동일하다. 생략하면
+      기본값은 "["authorization_code", "implicit"]"이다.
+
+   token_endpoint_auth_methods_supported
+      OPTIONAL.  이 token endpoint가 지원하는 client authentication
+      method 목록을 포함하는 JSON 배열이다. client authentication
+      method 값은 <a href="./rfc7591#section-2">[RFC7591]의 Section&nbsp;2</a>에서 정의한
+      "token_endpoint_auth_method" 파라미터에 사용된다. 생략하면
+      기본값은 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]의 <a href="#section-2.3.1">Section 2.3.1</a>에 명시된 HTTP Basic
+      Authentication Scheme인 "client_secret_basic"이다.
+
+   token_endpoint_auth_signing_alg_values_supported
+      OPTIONAL.  "private_key_jwt" 및 "client_secret_jwt" 인증
+      메서드에 대해 token endpoint에서 클라이언트를 인증하는 데
+      사용되는 JWT [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>]의 서명에 대해 token endpoint가 지원하는 JWS
+      서명 알고리즘("alg" 값) 목록을 포함하는 JSON 배열이다. 이
+      메타데이터 항목은 이러한 인증 메서드 중 하나가
+      "token_endpoint_auth_methods_supported" 항목에 지정되어 있는
+      경우 반드시 존재해야 한다. 이 항목이 생략되면 기본 알고리즘은
+      암시되지 않는다. 서버는 "RS256"을 지원하는 것이 좋다. 값
+      "none"은 사용해서는 안 된다.
+
+   service_documentation
+      OPTIONAL.  개발자가 인가 서버를 사용할 때 알고 싶어 하거나
+      알아야 할 수 있는 사람이 읽을 수 있는 정보를 포함하는 페이지의
+      URL이다. 특히 인가 서버가 Dynamic Client Registration을
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 5]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+      지원하지 않는다면, 클라이언트를 등록하는 방법에 대한 정보를 이
+      문서에서 제공해야 한다.
+
+   ui_locales_supported
+      OPTIONAL.  사용자 인터페이스에 대해 지원되는 언어와 문자 체계를
+      <a href="https://www.rfc-editor.org/bcp/bcp47">BCP 47</a> [<a href="./rfc5646" title="&quot;Tags for Identifying Languages&quot;">RFC5646</a>]의 language tag 값 JSON 배열로 표현한 것이다.
+      생략하면 지원되는 언어 및 문자 체계 집합은 명시되지 않는다.
+
+   op_policy_uri
+      OPTIONAL.  인가 서버가 클라이언트를 등록하는 사람에게 제공하는
+      URL로, 클라이언트가 인가 서버가 제공하는 데이터를 어떻게 사용할
+      수 있는지에 대한 인가 서버의 요구사항을 읽기 위한 것이다.
+      등록 과정은 이 URL이 제공된 경우 클라이언트를 등록하는 사람에게
+      이 URL을 표시하는 것이 좋다. <a href="#section-5">Section 5</a>에 설명된 것처럼
+      식별자 "op_policy_uri"가 OpenID 전용처럼 보이지만, 이
+      명세에서의 사용은 실제로 OpenID Connect에 한정되지 않는
+      일반적인 OAuth 2.0 기능을 가리킨다.
+
+   op_tos_uri
+      OPTIONAL.  인가 서버가 클라이언트를 등록하는 사람에게 제공하는
+      URL로, 인가 서버의 서비스 약관을 읽기 위한 것이다. 등록 과정은
+      이 URL이 제공된 경우 클라이언트를 등록하는 사람에게 이 URL을
+      표시하는 것이 좋다. <a href="#section-5">Section 5</a>에 설명된 것처럼 식별자
+      "op_tos_uri"가 OpenID 전용처럼 보이지만, 이 명세에서의 사용은
+      실제로 OpenID Connect에 한정되지 않는 일반적인 OAuth 2.0
+      기능을 가리킨다.
+
+   revocation_endpoint
+      OPTIONAL.  인가 서버의 OAuth 2.0 revocation endpoint
+      [<a href="./rfc7009" title="&quot;OAuth 2.0 Token Revocation&quot;">RFC7009</a>]의 URL이다.
+
+   revocation_endpoint_auth_methods_supported
+      OPTIONAL.  이 revocation endpoint가 지원하는 client
+      authentication method 목록을 포함하는 JSON 배열이다. 유효한
+      client authentication method 값은 IANA "OAuth Token Endpoint
+      Authentication Methods" 레지스트리 [<a href="#ref-IANA.OAuth.Parameters">IANA.OAuth.Parameters</a>]에
+      등록된 값이다. 생략하면 기본값은 OAuth 2.0 [<a href="./rfc6749" title="&quot;The OAuth 2.0 Authorization Framework&quot;">RFC6749</a>]의
+      <a href="#section-2.3.1">Section 2.3.1</a>에 명시된 HTTP Basic Authentication Scheme인
+      "client_secret_basic"이다.
+
+   revocation_endpoint_auth_signing_alg_values_supported
+      OPTIONAL.  revocation endpoint에서 "private_key_jwt" 및
+      "client_secret_jwt" 인증 메서드에 대해 클라이언트를 인증하는
+      데 사용되는 JWT [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>]의 서명에 대해 revocation endpoint가
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 6]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+      지원하는 JWS 서명 알고리즘("alg" 값) 목록을 포함하는 JSON
+      배열이다. 이 메타데이터 항목은 이러한 인증 메서드 중 하나가
+      "revocation_endpoint_auth_methods_supported" 항목에 지정되어
+      있는 경우 반드시 존재해야 한다. 이 항목이 생략되면 기본
+      알고리즘은 암시되지 않는다. 값 "none"은 사용해서는 안 된다.
+
+   introspection_endpoint
+      OPTIONAL.  인가 서버의 OAuth 2.0 introspection endpoint
+      [<a href="./rfc7662" title="&quot;OAuth 2.0 Token Introspection&quot;">RFC7662</a>]의 URL이다.
+
+   introspection_endpoint_auth_methods_supported
+      OPTIONAL.  이 introspection endpoint가 지원하는 client
+      authentication method 목록을 포함하는 JSON 배열이다. 유효한
+      client authentication method 값은 IANA "OAuth Token Endpoint
+      Authentication Methods" 레지스트리 [<a href="#ref-IANA.OAuth.Parameters">IANA.OAuth.Parameters</a>]에
+      등록된 값 또는 IANA "OAuth Access Token Types" 레지스트리
+      [<a href="#ref-IANA.OAuth.Parameters">IANA.OAuth.Parameters</a>]에 등록된 값이다. (이 값들은
+      <a href="#section-7.2">Section 7.2</a> 때문에 서로 구별되며 앞으로도 구별된 상태로
+      유지된다.) 생략하면 지원되는 인증 메서드 집합은 다른 수단으로
+      결정되어야 한다.
+
+   introspection_endpoint_auth_signing_alg_values_supported
+      OPTIONAL.  introspection endpoint에서 "private_key_jwt" 및
+      "client_secret_jwt" 인증 메서드에 대해 클라이언트를 인증하는
+      데 사용되는 JWT [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>]의 서명에 대해 introspection endpoint가
+      지원하는 JWS 서명 알고리즘("alg" 값) 목록을 포함하는 JSON
+      배열이다. 이 메타데이터 항목은 이러한 인증 메서드 중 하나가
+      "introspection_endpoint_auth_methods_supported" 항목에 지정되어
+      있는 경우 반드시 존재해야 한다. 이 항목이 생략되면 기본
+      알고리즘은 암시되지 않는다. 값 "none"은 사용해서는 안 된다.
+
+   code_challenge_methods_supported
+      OPTIONAL.  이 인가 서버가 지원하는 Proof Key for Code Exchange
+      (PKCE) [<a href="./rfc7636" title="&quot;Proof Key for Code Exchange by OAuth Public Clients&quot;">RFC7636</a>] code challenge method 목록을 포함하는 JSON
+      배열이다. Code challenge method 값은 <a href="./rfc7636#section-4.3">[RFC7636]의
+      Section&nbsp;4.3</a>에서 정의한 "code_challenge_method" 파라미터에
+      사용된다. 유효한 code challenge method 값은 IANA "PKCE Code
+      Challenge Methods" 레지스트리 [<a href="#ref-IANA.OAuth.Parameters">IANA.OAuth.Parameters</a>]에 등록된
+      값이다. 생략하면 인가 서버는 PKCE를 지원하지 않는다.
+
+   추가 인가 서버 메타데이터 파라미터도 사용될 수 있다. 일부는
+   OpenID Connect Discovery 1.0 [<a href="#ref-OpenID.Discovery">OpenID.Discovery</a>]과 같은 다른
+   명세에서 정의된다.
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 7]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  서명된 인가 서버 메타데이터</span>
+
+   JSON 요소 외에도, 메타데이터 값은 인가 서버에 대한 메타데이터
+   값을 하나의 묶음으로 주장하는 JSON Web Token(JWT) [<a href="#ref-JWT" title="&quot;JSON Web Token (JWT)&quot;">JWT</a>]인
+   "signed_metadata" 값으로 제공될 수도 있다. 서명된 메타데이터에서
+   사용할 수 있는 클레임 집합은 <a href="#section-2">Section 2</a>에서 정의된다. 서명된
+   메타데이터는 JSON Web Signature(JWS) [<a href="#ref-JWS" title="&quot;JSON Web Signature (JWS)&quot;">JWS</a>]를 사용하여 디지털
+   서명되거나 MAC되어야 하며, 서명된 메타데이터의 클레임을 증명하는
+   당사자를 나타내는 "iss"(issuer) 클레임을 반드시 포함해야 한다.
+   메타데이터 소비자는 이 기능을 지원하지 않는 경우 서명된
+   메타데이터를 무시할 수 있다. 메타데이터 소비자가 서명된
+   메타데이터를 지원하는 경우, 서명된 메타데이터로 전달되는
+   메타데이터 값은 일반 JSON 요소를 사용하여 전달되는 해당 값보다
+   우선해야 한다.
+
+   서명된 메타데이터는 이 OPTIONAL 멤버를 사용하여 인가 서버
+   메타데이터 JSON 객체에 포함된다.
+
+   signed_metadata
+      인가 서버에 대한 메타데이터 값을 클레임으로 포함하는 JWT이다.
+      이는 전체 서명된 JWT로 구성된 문자열 값이다. "signed_metadata"
+      메타데이터 값은 JWT의 클레임으로 나타나지 않는 것이 좋다.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  인가 서버 메타데이터 얻기</span>
+
+   메타데이터를 지원하는 인가 서버는 <a href="#section-2">Section 2</a>에 명시된
+   메타데이터를 포함하는 JSON 문서를, well-known URI 문자열을 인가
+   서버의 issuer 식별자 안에서 host 구성요소와 path 구성요소(있는
+   경우) 사이에 삽입하여 형성한 경로에서 제공해야 한다. 기본적으로
+   사용되는 well-known URI 문자열은
+   "/.well-known/oauth-authorization-server"이다. 이 경로는 "https"
+   스킴을 사용해야 한다. ".well-known"의 문법과 의미는 <a href="./rfc5785">RFC 5785</a>
+   [<a href="./rfc5785" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">RFC5785</a>]에서 정의된다. 사용되는 well-known URI suffix는 IANA
+   "Well-Known URIs" 레지스트리 [<a href="#ref-IANA.well-known">IANA.well-known</a>]에 등록되어야
+   한다.
+
+   OAuth 인가 서버를 애플리케이션별 방식으로 활용하는 서로 다른
+   애플리케이션은 해당 애플리케이션에서 사용하는 인가 서버
+   메타데이터를 게시하기 위해 서로 다른 well-known URI suffix를
+   정의하고 등록할 수 있다. 예를 들어 예시 애플리케이션이 OAuth
+   인가 서버를 예시 전용 방식으로 사용하고, 게시해야 하는 예시 전용
+   메타데이터 값이 있다면, "example-configuration" URI suffix를
+   등록하고 사용하여 인가 서버의 issuer 식별자에서 host와 path
+   구성요소 사이에 "/.well-known/example-configuration"을 삽입하여
+   형성한 경로에 메타데이터 문서를 게시할 수 있다. 또는 이러한
+   애플리케이션 다수는 일반 목적 OAuth 인가 서버에 올바른 선택인
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 8]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   기본 well-known URI 문자열 "/.well-known/oauth-authorization-server"를
+   사용하고, 애플리케이션 전용 문자열은 등록하지 않을 것이다.
+
+   이 명세를 사용하는 OAuth 2.0 애플리케이션은 이 목적을 위해 어떤
+   well-known URI suffix를 사용할지 명시해야 한다. 동일한 인가
+   서버는 자신의 issuer 식별자로부터 파생된 여러 well-known 위치에
+   메타데이터를 게시하도록 선택할 수 있으며, 예를 들어
+   "/.well-known/example-configuration"과
+   "/.well-known/oauth-authorization-server" 양쪽 모두에 메타데이터를
+   게시할 수 있다.
+
+   일부 OAuth 애플리케이션은 well-known URI suffix
+   "openid-configuration"을 사용하도록 선택할 것이다. <a href="#section-5">Section 5</a>에
+   설명된 것처럼 식별자 "/.well-known/openid-configuration"이 OpenID
+   전용처럼 보이지만, 이 명세에서의 사용은 실제로 OpenID Connect에
+   한정되지 않는 일반적인 OAuth 2.0 기능을 가리킨다.
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  인가 서버 메타데이터 요청</span>
+
+   인가 서버 메타데이터 문서는 이전에 지정된 경로에서 HTTP "GET"
+   요청을 사용하여 질의해야 한다.
+
+   issuer 식별자가 "https://example.com"이고 well-known URI suffix가
+   "oauth-authorization-server"인 경우, issuer 식별자에 path
+   구성요소가 없으므로 클라이언트는 메타데이터를 얻기 위해 다음
+   요청을 수행한다.
+
+     GET /.well-known/oauth-authorization-server HTTP/1.1
+     Host: example.com
+
+   issuer 식별자 값에 path 구성요소가 포함되어 있는 경우,
+   "/.well-known/" 및 well-known URI suffix를 host 구성요소와 path
+   구성요소 사이에 삽입하기 전에 끝의 "/"를 제거해야 한다. issuer
+   식별자가 "https://example.com/issuer1"이고 well-known URI suffix가
+   "oauth-authorization-server"인 경우, issuer 식별자에 path
+   구성요소가 포함되어 있으므로 클라이언트는 메타데이터를 얻기 위해
+   다음 요청을 수행한다.
+
+     GET /.well-known/oauth-authorization-server/issuer1 HTTP/1.1
+     Host: example.com
+
+   path 구성요소를 사용하면 호스트당 여러 issuer를 지원할 수 있다.
+   이는 일부 멀티 테넌트 호스팅 구성에서 필요하다. 이 ".well-known"
+   사용은 호스트당 여러 issuer를 지원하기 위한 것이며, <a href="./rfc5785">RFC 5785</a>
+   [<a href="./rfc5785" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">RFC5785</a>]에서의 사용과 달리 호스트에 대한 일반 정보를 제공하지
+   않는다.
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                    [Page 9]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a>.  인가 서버 메타데이터 응답</span>
+
+   응답은 필요한 모든 엔드포인트와 공개 키 위치 정보를 포함하여 인가
+   서버의 구성에 대한 클레임 집합이다. 성공 응답은 200 OK HTTP 상태
+   코드를 사용해야 하며, <a href="#section-2">Section 2</a>에서 정의한 메타데이터 값의
+   부분집합인 클레임 집합을 멤버로 포함하는 JSON 객체를
+   "application/json" 콘텐츠 타입으로 반환해야 한다. 다른 클레임도
+   반환될 수 있다.
+
+   여러 값을 반환하는 클레임은 JSON 배열로 표현된다. 요소가 0개인
+   클레임은 응답에서 생략되어야 한다.
+
+   오류 응답은 적용 가능한 HTTP 상태 코드 값을 사용한다.
+
+   다음은 비규범적 예시 응답이다.
+
+     HTTP/1.1 200 OK
+     Content-Type: application/json
+
+     {
+      "issuer":
+        "https://server.example.com",
+      "authorization_endpoint":
+        "https://server.example.com/authorize",
+      "token_endpoint":
+        "https://server.example.com/token",
+      "token_endpoint_auth_methods_supported":
+        ["client_secret_basic", "private_key_jwt"],
+      "token_endpoint_auth_signing_alg_values_supported":
+        ["RS256", "ES256"],
+      "userinfo_endpoint":
+        "https://server.example.com/userinfo",
+      "jwks_uri":
+        "https://server.example.com/jwks.json",
+      "registration_endpoint":
+        "https://server.example.com/register",
+      "scopes_supported":
+        ["openid", "profile", "email", "address",
+         "phone", "offline_access"],
+      "response_types_supported":
+        ["code", "code token"],
+      "service_documentation":
+        "http://server.example.com/service_documentation.html",
+      "ui_locales_supported":
+        ["en-US", "en-GB", "en-CA", "fr-FR", "fr-CA"]
+     }
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 10]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.3" href="#section-3.3">3.3</a>.  인가 서버 메타데이터 검증</span>
+
+   반환된 "issuer" 값은 메타데이터를 검색하는 데 사용된 URL을 만들기
+   위해 well-known URI 문자열이 삽입된 인가 서버의 issuer 식별자
+   값과 동일해야 한다. 이 값들이 동일하지 않으면 응답에 포함된
+   데이터는 사용되어서는 안 된다.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  문자열 작업</span>
+
+   일부 OAuth 2.0 메시지를 처리하려면 메시지의 값을 알려진 값과
+   비교해야 한다. 예를 들어 메타데이터 응답의 멤버 이름을 "issuer"와
+   같은 특정 멤버 이름과 비교할 수 있다. 그러나 Unicode [<a href="#ref-UNICODE" title="&quot;The Unicode Standard&quot;">UNICODE</a>]
+   문자열 비교에는 중요한 보안 영향이 있다.
+
+   따라서 JSON 문자열과 기타 Unicode 문자열 사이의 비교는 아래에
+   명시된 대로 수행해야 한다.
+
+   1.  JSON이 적용한 이스케이프를 제거하여 Unicode 코드 포인트
+       배열을 생성한다.
+
+   2.  Unicode Normalization [<a href="#ref-USA15" title="&quot;Unicode Normalization Forms&quot;">USA15</a>]은 JSON 문자열 또는 비교 대상
+       문자열 어느 쪽에도 어떤 시점에서도 적용해서는 안 된다.
+
+   3.  두 문자열 사이의 비교는 Unicode 코드 포인트 대 코드 포인트
+       동일성 비교로 수행해야 한다.
+
+   이는 <a href="./rfc8259#section-8.3">[RFC8259]의 Section&nbsp;8.3</a>에 설명된 동일성 비교 절차와
+   같다는 점에 유의하라.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  호환성 참고 사항</span>
+
+   식별자 "/.well-known/openid-configuration", "op_policy_uri", 그리고
+   "op_tos_uri"는 원래 "OpenID Connect Discovery 1.0"
+   [<a href="#ref-OpenID.Discovery">OpenID.Discovery</a>]에서 정의된 OpenID Connect [<a href="#ref-OpenID.Core">OpenID.Core</a>]
+   명세군을 가리키는 문자열을 포함한다. OpenID 전용처럼 보이는 이
+   식별자들을 재사용하더라도, 이 명세에서의 사용은 실제로 OpenID
+   Connect에 한정되지 않는 일반적인 OAuth 2.0 기능을 가리킨다.
+
+   <a href="#section-3">Section 3</a>에서 정의한 issuer 식별자를 인가 서버 메타데이터
+   위치로 변환하는 알고리즘은, issuer 식별자에 path 구성요소가
+   없다는 조건에서 "OpenID Connect Discovery 1.0"
+   [<a href="#ref-OpenID.Discovery">OpenID.Discovery</a>]의 <a href="#section-4">Section 4</a>에 정의된 해당 변환과
+   동등하다. 그러나 path 구성요소가 있을 때는 서로 다르다. 왜냐하면
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 11]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   OpenID Connect Discovery 1.0은 well-known URI 문자열이 issuer
+   식별자 뒤에 추가된다고 명시하지만(예:
+   "https://example.com/issuer1/.well-known/openid-configuration"),
+   이 명세는 well-known URI 문자열이 issuer 식별자의 path 구성요소
+   앞에 삽입된다고 명시하기 때문이다(예:
+   "https://example.com/.well-known/openid-configuration/issuer1").
+
+   앞으로 OAuth 인가 서버 메타데이터 위치는 이 명세에서 정의한
+   변환을 사용하는 것이 좋다. 그러나 OpenID Connect Discovery 1.0
+   변환이 이미 사용되고 있는 기존 환경에 배포된 경우, 전환 기간
+   동안 path 구성요소를 포함하는 issuer 식별자에 대한 메타데이터를
+   두 위치 모두에 게시할 필요가 있을 수 있다. 이 전환 기간 동안
+   애플리케이션은 먼저 이 명세에서 정의한 변환을 적용하고 결과
+   위치에서 인가 서버 메타데이터 검색을 시도해야 한다. 그 위치에서
+   검색이 실패하는 경우에만 OpenID Connect Discovery 1.0에서 정의한
+   변환을 사용하여 얻은 대체 위치에서 검색을 시도해야 한다. 이
+   하위 호환 동작은 애플리케이션이 사용하는 well-known URI suffix가
+   "openid-configuration"인 경우에만 필요할 것이다.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  보안 고려사항</span>
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  TLS 요구사항</span>
+
+   구현은 TLS를 지원해야 한다. 어떤 버전을 구현해야 하는지는 시간이
+   지남에 따라, 그리고 구현 당시의 광범위한 배포 현황과 알려진 보안
+   취약점에 따라 달라진다. 인가 서버는 TLS 버전 1.2 [<a href="./rfc5246" title="&quot;The Transport Layer Security (TLS) Protocol Version 1.2&quot;">RFC5246</a>]를
+   지원해야 하며, 보안 요구사항을 충족하는 추가 TLS 메커니즘을
+   지원할 수 있다. TLS를 사용할 때 클라이언트는 <a href="./rfc6125">RFC 6125</a>
+   [<a href="./rfc6125" title="&quot;Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)&quot;">RFC6125</a>]에 따라 TLS/SSL 서버 인증서 검사를 수행해야 한다.
+   구현 보안 고려사항은 "Recommendations for Secure Use of Transport
+   Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"
+   [<a href="#ref-BCP195" title="&quot;Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)&quot;">BCP195</a>]에서 확인할 수 있다.
+
+   정보 공개와 변조를 방지하기 위해, 기밀성과 무결성 보호를
+   제공하는 cipher suite가 포함된 TLS를 사용하여 기밀성 보호를
+   적용해야 한다.
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  사칭 공격</span>
+
+   인가 서버 메타데이터 요청을 할 때, 클라이언트는 <a href="#section-6.1">Section 6.1</a>에
+   설명된 대로 TLS 인증서 검사를 수행해야 한다. 서버 인증서가
+   issuer 식별자 URL에 대해 유효한지 확인하면 중간자 공격 및 DNS
+   기반
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 12]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   공격을 방지할 수 있다. 이러한 공격은 클라이언트가 공격자의 키와
+   엔드포인트를 사용하도록 속일 수 있으며, 이는 합법적인 인가 서버를
+   사칭할 수 있게 한다. 공격자가 이를 달성할 수 있다면, 사칭 중인
+   인가 서버를 사용해 영향을 받은 클라이언트가 접근 권한을 가진
+   리소스에 접근할 수 있다.
+
+   공격자는 또한 사칭 대상 인가 서버의 issuer 식별자 URL을 사용한
+   "issuer" 클레임을 포함하되, 자신의 엔드포인트와 서명 키를 포함한
+   메타데이터 문서를 게시함으로써 인가 서버를 사칭하려고 시도할 수
+   있다. 클라이언트가 이를 수락하면 공격자는 해당 인가 서버를
+   사칭할 수 있게 된다. 이를 방지하려면 클라이언트는 메타데이터
+   요청의 접두사로 사용하는 issuer 식별자 URL이 클라이언트가 받은
+   인가 서버 메타데이터 문서의 "issuer" 메타데이터 값과 정확히
+   일치하는지 확인해야 한다.
+
+<span class="h3"><a class="selflink" id="section-6.3" href="#section-6.3">6.3</a>.  표준 형식으로 메타데이터 게시</span>
+
+   인가 서버에 대한 정보를 표준 형식으로 게시하면 합법적인
+   클라이언트와 공격자 모두가 인가 서버를 더 쉽게 사용할 수 있다.
+   인가 서버가 자체적인 방식으로 메타데이터를 게시하든, 이 명세에서
+   정의한 표준 형식으로 게시하든, 이 정보를 사용해 수행될 수 있는
+   공격에 대한 동일한 방어를 적용해야 한다.
+
+<span class="h3"><a class="selflink" id="section-6.4" href="#section-6.4">6.4</a>.  보호되는 리소스</span>
+
+   모든 사용 사례에서 인가 서버와 함께 사용할 적절한 보호되는
+   리소스를 안전하게 결정하는 것은 이 명세의 범위 밖이다. 이 명세는
+   클라이언트가 인가 서버와 함께 사용할 적절한 보호되는 리소스를
+   결정할 수단을 가지고 있으며, 각 인가 서버에 대해 올바른
+   메타데이터를 사용하고 있다고 가정한다. 구현자는 클라이언트가
+   부적절한 보호되는 리소스를 사용하면 공격자가 인가 서버나
+   클라이언트에 탐지되지 않은 채 유효한 보호되는 리소스에 대한
+   중간자 프록시로 동작할 수 있을 수 있음을 알아야 한다.
+
+   인가 서버와 함께 사용할 적절한 보호되는 리소스를 결정하는 방법은
+   일반적으로 애플리케이션에 따라 달라진다. 예를 들어 일부 인가
+   서버는 고정된 보호되는 리소스 또는 보호되는 리소스 집합과 함께
+   사용되며, 그 위치는 잘 알려져 있거나 인가 서버가 메타데이터
+   값으로 게시할 수 있다. 다른 경우에는 인가 서버와 함께 사용할 수
+   있는 리소스 집합이 관리 작업에 의해 동적으로 변경될 수 있다.
+   인가 서버와 보호되는 리소스 사이의 적절한 연관을 결정하는 여러
+   다른 수단도 가능하다.
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 13]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  IANA 고려사항</span>
+
+   다음 등록 절차는 이 명세가 수립한 레지스트리에 사용된다.
+
+   값은 oauth-ext-review@ietf.org 메일링 리스트에서 2주간 검토된
+   후, 한 명 이상의 Designated Expert의 조언에 따라 Specification
+   Required [<a href="./rfc8126" title="">RFC8126</a>] 기준으로 등록된다. 그러나 출판 전에 값
+   할당을 허용하기 위해, Designated Expert는 그러한 명세가 출판될
+   것이라고 만족하는 경우 등록을 승인할 수 있다.
+
+   검토를 위해 메일링 리스트로 보내는 등록 요청은 적절한 제목을
+   사용해야 한다(예: "Request to register OAuth Authorization Server
+   Metadata: example").
+
+   검토 기간 내에 Designated Expert는 등록 요청을 승인하거나
+   거부하며, 이 결정을 검토 목록과 IANA에 전달한다. 거부에는 설명과,
+   적용 가능한 경우 요청을 성공시키는 방법에 대한 제안이 포함되어야
+   한다. 21일보다 긴 기간 동안 결정되지 않은 등록 요청은 해결을 위해
+   IESG의 주의로 가져갈 수 있다(iesg@ietf.org 메일링 리스트 사용).
+
+   Designated Expert가 적용해야 할 기준에는 제안된 등록이 기존
+   기능을 중복하는지 여부, 일반적으로 적용 가능할 가능성이 있는지
+   또는 단일 애플리케이션에만 유용한지 여부, 그리고 등록이 타당한지
+   여부를 판단하는 것이 포함된다.
+
+   IANA는 Designated Expert로부터의 레지스트리 갱신만 수락해야 하며,
+   모든 등록 요청을 검토 메일링 리스트로 안내해야 한다.
+
+   이 명세를 사용하는 서로 다른 애플리케이션의 관점을 대표할 수 있는
+   여러 Designated Expert를 임명하여, 등록 결정에 대한 폭넓은
+   정보를 바탕으로 한 검토가 가능하도록 하는 것이 제안된다. 특정
+   Designated Expert에게 등록 결정이 이해 상충을 만들 수 있다고
+   인식될 수 있는 경우, 해당 Designated Expert는 다른 Designated
+   Expert들의 판단에 맡겨야 한다.
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  OAuth 인가 서버 메타데이터 레지스트리</span>
+
+   이 명세는 OAuth 2.0 인가 서버 메타데이터 이름을 위한 IANA
+   "OAuth Authorization Server Metadata" 레지스트리를 수립한다.
+   레지스트리는 인가 서버 메타데이터 멤버와 이를 정의하는 명세에
+   대한 참조를 기록한다.
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 14]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   Designated Expert는 다음 중 하나를 해야 한다.
+
+   (a) 등록되는 메타데이터 이름과 값이 큰따옴표('"')와 백슬래시
+   ('\')를 제외한 출력 가능한 ASCII 문자만 사용하도록 요구한다
+   (코드 포인트 U+0021, U+0023부터 U+005B까지, 그리고 U+005D부터
+   U+007E까지의 Unicode 문자), 또는
+
+   (b) 다른 코드 포인트를 사용하는 새 메타데이터 멤버나 값이
+   정의되는 경우, 그 정의가 이를 표현하는 데 사용되는 Unicode 코드
+   포인트의 정확한 시퀀스를 명시하도록 요구한다. 또한 JSON 문자열에서
+   이스케이프된 문자로만 표현될 수 있는 Unicode 코드 포인트를
+   사용하는 제안된 등록은 수락되어서는 안 된다.
+
+<span class="h4"><a class="selflink" id="section-7.1.1" href="#section-7.1.1">7.1.1</a>.  등록 템플릿</span>
+
+   메타데이터 이름:
+      요청된 이름(예: "issuer"). 이 이름은 대소문자를 구분한다.
+      Designated Expert가 예외를 허용해야 할 설득력 있는 이유가
+      있다고 명시하지 않는 한, 이름은 대소문자를 구분하지 않는 방식
+      (Unicode toLowerCase() 연산을 두 문자열에 모두 적용하면 일치하게
+      되는 방식)으로 다른 등록된 이름과 일치해서는 안 된다.
+
+   메타데이터 설명:
+      메타데이터에 대한 간단한 설명(예: "Issuer identifier URL").
+
+   변경 관리자:
+      표준 트랙 RFC의 경우 "IESG"를 나열한다. 그 외의 경우에는
+      책임 당사자의 이름을 제공한다. 기타 세부사항(예: 우편 주소,
+      이메일 주소, 홈페이지 URI)도 포함할 수 있다.
+
+   명세 문서:
+      파라미터를 명시하는 문서 또는 문서들에 대한 참조이며, 문서
+      사본을 검색하는 데 사용할 수 있는 URI를 포함하는 것이 바람직하다.
+      관련 섹션 표시도 포함할 수 있지만 필수는 아니다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 15]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+<span class="h4"><a class="selflink" id="section-7.1.2" href="#section-7.1.2">7.1.2</a>.  초기 레지스트리 내용</span>
+
+   o  메타데이터 이름: issuer
+   o  메타데이터 설명: 인가 서버의 issuer 식별자 URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: authorization_endpoint
+   o  메타데이터 설명: 인가 서버의 authorization endpoint URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: token_endpoint
+   o  메타데이터 설명: 인가 서버의 token endpoint URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: jwks_uri
+   o  메타데이터 설명: 인가 서버의 JWK Set 문서 URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: registration_endpoint
+   o  메타데이터 설명: 인가 서버의 OAuth 2.0 Dynamic Client
+      Registration Endpoint URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: scopes_supported
+   o  메타데이터 설명: 이 인가 서버가 지원하는 OAuth 2.0 "scope"
+      값 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: response_types_supported
+   o  메타데이터 설명: 이 인가 서버가 지원하는 OAuth 2.0
+      "response_type" 값 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: response_modes_supported
+   o  메타데이터 설명: 이 인가 서버가 지원하는 OAuth 2.0
+      "response_mode" 값 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 16]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   o  메타데이터 이름: grant_types_supported
+   o  메타데이터 설명: 이 인가 서버가 지원하는 OAuth 2.0 grant type
+      값 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: token_endpoint_auth_methods_supported
+   o  메타데이터 설명: 이 token endpoint가 지원하는 client
+      authentication method 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: token_endpoint_auth_signing_alg_values_supported
+   o  메타데이터 설명: token endpoint에서 클라이언트를 인증하는 데
+      사용되는 JWT의 서명에 대해 token endpoint가 지원하는 JWS
+      서명 알고리즘 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: service_documentation
+   o  메타데이터 설명: 개발자가 인가 서버를 사용할 때 알고 싶어
+      하거나 알아야 할 수 있는 사람이 읽을 수 있는 정보를 포함하는
+      페이지의 URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: ui_locales_supported
+   o  메타데이터 설명: 사용자 인터페이스에 대해 지원되는 언어와
+      문자 체계로, <a href="https://www.rfc-editor.org/bcp/bcp47">BCP 47</a>의 language tag 값 JSON 배열로 표현됨
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: op_policy_uri
+   o  메타데이터 설명: 인가 서버가 제공하는 데이터를 클라이언트가
+      어떻게 사용할 수 있는지에 대한 인가 서버의 요구사항을 읽도록
+      인가 서버가 클라이언트를 등록하는 사람에게 제공하는 URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: op_tos_uri
+   o  메타데이터 설명: 인가 서버의 서비스 약관을 읽도록 인가 서버가
+      클라이언트를 등록하는 사람에게 제공하는 URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 17]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   o  메타데이터 이름: revocation_endpoint
+   o  메타데이터 설명: 인가 서버의 OAuth 2.0 revocation endpoint URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: revocation_endpoint_auth_methods_supported
+   o  메타데이터 설명: 이 revocation endpoint가 지원하는 client
+      authentication method 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름:
+      revocation_endpoint_auth_signing_alg_values_supported
+   o  메타데이터 설명: revocation endpoint에서 클라이언트를 인증하는
+      데 사용되는 JWT의 서명에 대해 revocation endpoint가 지원하는
+      JWS 서명 알고리즘 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: introspection_endpoint
+   o  메타데이터 설명: 인가 서버의 OAuth 2.0 introspection endpoint URL
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: introspection_endpoint_auth_methods_supported
+   o  메타데이터 설명: 이 introspection endpoint가 지원하는 client
+      authentication method 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름:
+      introspection_endpoint_auth_signing_alg_values_supported
+   o  메타데이터 설명: introspection endpoint에서 클라이언트를 인증하는
+      데 사용되는 JWT의 서명에 대해 introspection endpoint가 지원하는
+      JWS 서명 알고리즘 목록을 포함하는 JSON 배열
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+   o  메타데이터 이름: code_challenge_methods_supported
+   o  메타데이터 설명: 이 인가 서버가 지원하는 PKCE code challenge
+      method
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2">RFC 8414의 Section&nbsp;2</a>
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 18]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   o  메타데이터 이름: signed_metadata
+   o  메타데이터 설명: 인가 서버에 대한 메타데이터 값을 클레임으로
+      포함하는 서명된 JWT
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-2.1">RFC 8414의 Section&nbsp;2.1</a>
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  갱신된 등록 지침</span>
+
+   이 명세는 "OAuth Parameters" 레지스트리 [<a href="#ref-IANA.OAuth.Parameters">IANA.OAuth.Parameters</a>]에
+   속한 다음 두 IANA 레지스트리의 Designated Expert를 위한 지침에
+   추가된다.
+
+   o  OAuth Access Token Types
+   o  OAuth Token Endpoint Authentication Methods
+
+   IANA는 이러한 레지스트리의 Reference 섹션에 이 명세에 대한 링크를
+   추가했다.
+
+   이러한 레지스트리에 대해, Designated Expert는 한 레지스트리에
+   이미 존재하는 값에 대한 다른 레지스트리의 등록 요청을 거부해야
+   한다. 이는 "introspection_endpoint_auth_methods_supported"
+   파라미터가 어느 레지스트리의 값이든 사용할 수 있도록 허용하기
+   때문에 필요하다. 그렇게 하면 두 레지스트리의 값이 계속 상호
+   배타적이므로 모호성이 발생하지 않는다.
+
+<span class="h3"><a class="selflink" id="section-7.3" href="#section-7.3">7.3</a>.  Well-Known URI 레지스트리</span>
+
+   이 명세는 <a href="#section-3">Section 3</a>에서 정의한 well-known URI를 <a href="./rfc5785">RFC 5785</a>
+   [<a href="./rfc5785" title="&quot;Defining Well-Known Uniform Resource Identifiers (URIs)&quot;">RFC5785</a>]가 수립한 IANA "Well-Known URIs" 레지스트리
+   [<a href="#ref-IANA.well-known">IANA.well-known</a>]에 등록한다.
+
+<span class="h4"><a class="selflink" id="section-7.3.1" href="#section-7.3.1">7.3.1</a>.  레지스트리 내용</span>
+
+   o  URI suffix: oauth-authorization-server
+   o  변경 관리자: IESG
+   o  명세 문서: <a href="./rfc8414#section-3">RFC 8414의 Section&nbsp;3</a>
+   o  관련 정보: (없음)
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 19]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  참고문헌</span>
+
+<span class="h3"><a class="selflink" id="section-8.1" href="#section-8.1">8.1</a>.  규범적 참고문헌</span>
+
+   [<a id="ref-BCP195">BCP195</a>]   Sheffer, Y., Holz, R., and P. Saint-Andre,
+              "Transport Layer Security(TLS) 및 Datagram Transport
+              Layer Security(DTLS)의 안전한 사용을 위한 권고사항",
+              <a href="https://www.rfc-editor.org/bcp/bcp195">BCP 195</a>, <a href="./rfc7525">RFC 7525</a>, 2015년 5월,
+              &lt;<a href="http://www.rfc-editor.org/info/bcp195">http://www.rfc-editor.org/info/bcp195</a>&gt;.
+
+   [<a id="ref-IANA.OAuth.Parameters">IANA.OAuth.Parameters</a>]
+              IANA, "OAuth Parameters",
+              &lt;<a href="https://www.iana.org/assignments/oauth-parameters">https://www.iana.org/assignments/oauth-parameters</a>&gt;.
+
+   [<a id="ref-JWE">JWE</a>]      Jones, M. and J. Hildebrand, "JSON Web Encryption (JWE)",
+              <a href="./rfc7516">RFC 7516</a>, DOI 10.17487/RFC7516, 2015년 5월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7516">https://www.rfc-editor.org/info/rfc7516</a>&gt;.
+
+   [<a id="ref-JWK">JWK</a>]      Jones, M., "JSON Web Key (JWK)", <a href="./rfc7517">RFC 7517</a>,
+              DOI 10.17487/RFC7517, 2015년 5월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7517">https://www.rfc-editor.org/info/rfc7517</a>&gt;.
+
+   [<a id="ref-JWS">JWS</a>]      Jones, M., Bradley, J., and N. Sakimura, "JSON Web
+              Signature (JWS)", <a href="./rfc7515">RFC 7515</a>, DOI 10.17487/RFC7515, 2015년
+              5월, &lt;<a href="https://www.rfc-editor.org/info/rfc7515">https://www.rfc-editor.org/info/rfc7515</a>&gt;.
+
+   [<a id="ref-JWT">JWT</a>]      Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+              (JWT)", <a href="./rfc7519">RFC 7519</a>, DOI 10.17487/RFC7519, 2015년 5월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7519">https://www.rfc-editor.org/info/rfc7519</a>&gt;.
+
+   [<a id="ref-OAuth.Post">OAuth.Post</a>]
+              Jones, M. and B. Campbell, "OAuth 2.0 Form Post Response
+              Mode", 2015년 4월, &lt;<a href="http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html">http://openid.net/specs/</a>
+              <a href="http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html">oauth-v2-form-post-response-mode-1_0.html</a>&gt;.
+
+   [<a id="ref-OAuth.Responses">OAuth.Responses</a>]
+              de Medeiros, B., Ed., Scurtescu, M., Tarjan, P., and M.
+              Jones, "OAuth 2.0 Multiple Response Type Encoding
+              Practices", 2014년 2월, &lt;<a href="http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html">http://openid.net/specs/</a>
+              <a href="http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html">oauth-v2-multiple-response-types-1_0.html</a>&gt;.
+
+   [<a id="ref-RFC2119">RFC2119</a>]  Bradner, S., "요구사항 수준을 나타내기 위해 RFC에서
+              사용하는 핵심 단어", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc2119">RFC 2119</a>,
+              DOI 10.17487/RFC2119, 1997년 3월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;.
+
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 20]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   [<a id="ref-RFC5246">RFC5246</a>]  Dierks, T. and E. Rescorla, "Transport Layer Security
+              (TLS) 프로토콜 버전 1.2", <a href="./rfc5246">RFC 5246</a>,
+              DOI 10.17487/RFC5246, 2008년 8월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc5246">https://www.rfc-editor.org/info/rfc5246</a>&gt;.
+
+   [<a id="ref-RFC5646">RFC5646</a>]  Phillips, A., Ed. and M. Davis, Ed., "언어 식별을 위한
+              태그", <a href="https://www.rfc-editor.org/bcp/bcp47">BCP 47</a>, <a href="./rfc5646">RFC 5646</a>, DOI 10.17487/RFC5646,
+              2009년 9월, &lt;<a href="https://www.rfc-editor.org/info/rfc5646">https://www.rfc-editor.org/info/rfc5646</a>&gt;.
+
+   [<a id="ref-RFC5785">RFC5785</a>]  Nottingham, M. and E. Hammer-Lahav, "Well-Known Uniform
+              Resource Identifier(URI) 정의", <a href="./rfc5785">RFC 5785</a>,
+              DOI 10.17487/RFC5785, 2010년 4월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc5785">https://www.rfc-editor.org/info/rfc5785</a>&gt;.
+
+   [<a id="ref-RFC6125">RFC6125</a>]  Saint-Andre, P. and J. Hodges, "Transport Layer
+              Security(TLS)의 맥락에서 X.509(PKIX) 인증서를 사용하는
+              인터넷 공개 키 기반 구조 내 도메인 기반 애플리케이션
+              서비스 식별자의 표현 및 검증", <a href="./rfc6125">RFC 6125</a>,
+              DOI 10.17487/RFC6125, 2011년 3월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc6125">https://www.rfc-editor.org/info/rfc6125</a>&gt;.
+
+   [<a id="ref-RFC6749">RFC6749</a>]  Hardt, D., Ed., "OAuth 2.0 인가 프레임워크",
+              <a href="./rfc6749">RFC 6749</a>, DOI 10.17487/RFC6749, 2012년 10월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc6749">https://www.rfc-editor.org/info/rfc6749</a>&gt;.
+
+   [<a id="ref-RFC7009">RFC7009</a>]  Lodderstedt, T., Ed., Dronia, S., and M. Scurtescu, "OAuth
+              2.0 토큰 폐기", <a href="./rfc7009">RFC 7009</a>, DOI 10.17487/RFC7009,
+              2013년 8월, &lt;<a href="https://www.rfc-editor.org/info/rfc7009">https://www.rfc-editor.org/info/rfc7009</a>&gt;.
+
+   [<a id="ref-RFC7033">RFC7033</a>]  Jones, P., Salgueiro, G., Jones, M., and J. Smarr,
+              "WebFinger", <a href="./rfc7033">RFC 7033</a>, DOI 10.17487/RFC7033, 2013년
+              9월, &lt;<a href="https://www.rfc-editor.org/info/rfc7033">https://www.rfc-editor.org/info/rfc7033</a>&gt;.
+
+   [<a id="ref-RFC7591">RFC7591</a>]  Richer, J., Ed., Jones, M., Bradley, J., Machulak, M., and
+              P. Hunt, "OAuth 2.0 Dynamic Client Registration Protocol",
+              <a href="./rfc7591">RFC 7591</a>, DOI 10.17487/RFC7591, 2015년 7월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7591">https://www.rfc-editor.org/info/rfc7591</a>&gt;.
+
+   [<a id="ref-RFC7636">RFC7636</a>]  Sakimura, N., Ed., Bradley, J., and N. Agarwal, "OAuth
+              공개 클라이언트를 위한 Proof Key for Code Exchange",
+              <a href="./rfc7636">RFC 7636</a>, DOI 10.17487/RFC7636, 2015년 9월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7636">https://www.rfc-editor.org/info/rfc7636</a>&gt;.
+
+   [<a id="ref-RFC7662">RFC7662</a>]  Richer, J., Ed., "OAuth 2.0 토큰 인트로스펙션",
+              <a href="./rfc7662">RFC 7662</a>, DOI 10.17487/RFC7662, 2015년 10월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc7662">https://www.rfc-editor.org/info/rfc7662</a>&gt;.
+
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 21]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+   [<a id="ref-RFC8126">RFC8126</a>]  Cotton, M., Leiba, B., and T. Narten, "RFC의 IANA 고려사항
+              섹션 작성 지침", <a href="https://www.rfc-editor.org/bcp/bcp26">BCP 26</a>,
+              <a href="./rfc8126">RFC 8126</a>, DOI 10.17487/RFC8126, 2017년 6월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;.
+
+   [<a id="ref-RFC8174">RFC8174</a>]  Leiba, B., "<a href="./rfc2119">RFC</a> <a href="./rfc2119">2119</a> 핵심 단어의 대문자와 소문자
+              모호성", <a href="https://www.rfc-editor.org/bcp/bcp14">BCP 14</a>, <a href="./rfc8174">RFC 8174</a>, DOI 10.17487/RFC8174,
+              2017년 5월, &lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;.
+
+   [<a id="ref-RFC8259">RFC8259</a>]  Bray, T., Ed., "JavaScript Object Notation(JSON) 데이터
+              교환 형식", STD 90, <a href="./rfc8259">RFC 8259</a>,
+              DOI 10.17487/RFC8259, 2017년 12월,
+              &lt;<a href="https://www.rfc-editor.org/info/rfc8259">https://www.rfc-editor.org/info/rfc8259</a>&gt;.
+
+   [<a id="ref-UNICODE">UNICODE</a>]  The Unicode Consortium, "The Unicode Standard",
+              &lt;<a href="http://www.unicode.org/versions/latest/">http://www.unicode.org/versions/latest/</a>&gt;.
+
+   [<a id="ref-USA15">USA15</a>]    Davis, M., Ed. and K. Whistler, Ed., "Unicode
+              Normalization Forms", Unicode Standard Annex #15, 2018년
+              5월, &lt;<a href="http://www.unicode.org/reports/tr15/">http://www.unicode.org/reports/tr15/</a>&gt;.
+
+<span class="h3"><a class="selflink" id="section-8.2" href="#section-8.2">8.2</a>.  정보성 참고문헌</span>
+
+   [<a id="ref-IANA.well-known">IANA.well-known</a>]
+              IANA, "Well-Known URIs",
+              &lt;<a href="https://www.iana.org/assignments/well-known-uris">https://www.iana.org/assignments/well-known-uris</a>&gt;.
+
+   [<a id="ref-MIX-UP">MIX-UP</a>]   Jones, M., Bradley, J., and N. Sakimura, "OAuth 2.0 Mix-Up
+              Mitigation", 진행 중인 작업, <a href="./draft-ietf-oauth-mix-up-mitigation-01">draft-ietf-oauth-mix-up-</a>
+              <a href="./draft-ietf-oauth-mix-up-mitigation-01">mitigation-01</a>, 2016년 7월.
+
+   [<a id="ref-OpenID.Core">OpenID.Core</a>]
+              Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., and
+              C. Mortimore, "OpenID Connect Core 1.0", 2014년 11월,
+              &lt;<a href="http://openid.net/specs/openid-connect-core-1_0.html">http://openid.net/specs/openid-connect-core-1_0.html</a>&gt;.
+
+   [<a id="ref-OpenID.Discovery">OpenID.Discovery</a>]
+              Sakimura, N., Bradley, J., Jones, M., and E. Jay, "OpenID
+              Connect Discovery 1.0", 2014년 11월,
+              &lt;<a href="http://openid.net/specs/openid-connect-discovery-1_0.html">http://openid.net/specs/</a>
+              <a href="http://openid.net/specs/openid-connect-discovery-1_0.html">openid-connect-discovery-1_0.html</a>&gt;.
+
+   [<a id="ref-OpenID.Registration">OpenID.Registration</a>]
+              Sakimura, N., Bradley, J., and M. Jones, "OpenID Connect
+              Dynamic Client Registration 1.0", 2014년 11월,
+              &lt;<a href="http://openid.net/specs/openid-connect-registration-1_0.html">http://openid.net/specs/</a>
+              <a href="http://openid.net/specs/openid-connect-registration-1_0.html">openid-connect-registration-1_0.html</a>&gt;.
+
+
+
+
+<span class="grey">Jones, et al.                표준 트랙                   [Page 22]</span></pre>
+<hr class='noprint' /><!--NewPage-->
+<pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="./rfc8414">RFC 8414</a>         OAuth 2.0 인가 서버 메타데이터       2018년 6월</span>
+
+
+감사의 말
+
+   이 명세는 OpenID Foundation의 OpenID Connect 워킹 그룹이 만든
+   OpenID Connect Discovery 1.0 명세를 기반으로 한다. 이 명세는 OAuth
+   인가 서버 메타데이터를 게시하기 위해 OpenID Connect Discovery가
+   정의한 메타데이터 형식의 사실상 사용을 표준화한다.
+
+   저자들은 이 명세를 검토해 준 다음 사람들에게 감사한다: Shwetha
+   Bhandari, Ben Campbell, Brian Campbell, Brian Carpenter, William
+   Denniss, Vladimir Dzhuvinov, Donald Eastlake, Samuel Erdtman, George
+   Fletcher, Dick Hardt, Phil Hunt, Alexey Melnikov, Tony Nadalin, Mark
+   Nottingham, Eric Rescorla, Justin Richer, Adam Roach, Hannes
+   Tschofenig, and Hans Zandbelt.
+
+저자 주소
+
+   Michael B. Jones
+   Microsoft
+
+   Email: mbj@microsoft.com
+   URI:   <a href="http://self-issued.info/">http://self-issued.info/</a>
+
+
+   Nat Sakimura
+   Nomura Research Institute, Ltd.
+
+   Email: n-sakimura@nri.co.jp
+   URI:   <a href="http://nat.sakimura.org/">http://nat.sakimura.org/</a>
+
+
+   John Bradley
+   Yubico
+
+   Email: <a href="./rfc8414">RFC8414</a>@ve7jtb.com
+   URI:   <a href="http://www.thread-safe.com/">http://www.thread-safe.com/</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Jones, et al.                표준 트랙                   [Page 23]
+</pre>
+<script src="https://htmlspecs.com/dropdown.js"></script>
