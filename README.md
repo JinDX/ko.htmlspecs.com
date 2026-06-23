@@ -233,8 +233,8 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 그래픽, 이미지, GPU 및 WebXR
 - [Accelerated Shape Detection in Images](https://ko.htmlspecs.com/shape-detection-api/)（[Source](https://wicg.github.io/shape-detection-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [WebGPU](https://ko.htmlspecs.com/webgpu/)（[Source](https://www.w3.org/TR/2026/CRD-webgpu-20260615/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL/)（[Source](https://www.w3.org/TR/2026/CRD-WGSL-20260619/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebGPU](https://ko.htmlspecs.com/webgpu/)（[Source](https://www.w3.org/TR/2026/CRD-webgpu-20260623/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL/)（[Source](https://www.w3.org/TR/2026/CRD-WGSL-20260622/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebGL Specification](https://ko.htmlspecs.com/webgl/)（[Source](https://registry.khronos.org/webgl/specs/latest/1.0/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebGL 2.0 Specification](https://ko.htmlspecs.com/webgl2/)（[Source](https://registry.khronos.org/webgl/specs/latest/2.0/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Scalable Vector Graphics (SVG) 2](https://ko.htmlspecs.com/SVG2/)（[Source](https://www.w3.org/TR/2018/CR-SVG2-20181004/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
@@ -305,7 +305,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Referrer Policy](https://ko.htmlspecs.com/referrer-policy/)（[Source](https://www.w3.org/TR/2017/CR-referrer-policy-20170126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Fetch Metadata Request Headers](https://ko.htmlspecs.com/fetch-metadata/)（[Source](https://www.w3.org/TR/2025/WD-fetch-metadata-20250401/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Mixed Content](https://ko.htmlspecs.com/mixed-content/)（[Source](https://www.w3.org/TR/2023/CRD-mixed-content-20230223/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [Trusted Types](https://ko.htmlspecs.com/trusted-types/)（[Source](https://www.w3.org/TR/2026/WD-trusted-types-20260224/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Trusted Types](https://ko.htmlspecs.com/trusted-types/)（[Source](https://www.w3.org/TR/2026/WD-trusted-types-20260623/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Clear Site Data](https://ko.htmlspecs.com/clear-site-data/)（[Source](https://www.w3.org/TR/2017/WD-clear-site-data-20171130/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [JSON Web Token (JWT)](https://ko.htmlspecs.com/jwt/)（[Source](https://www.rfc-editor.org/rfc/rfc7519.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON Web Signature (JWS)](https://ko.htmlspecs.com/jws/)（[Source](https://www.rfc-editor.org/rfc/rfc7515.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
@@ -357,7 +357,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Private Aggregation API](https://ko.htmlspecs.com/private-aggregation-api/)（[Source](https://patcg-individual-drafts.github.io/private-aggregation-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 결제 및 디지털 상품
-- [Payment Request API](https://ko.htmlspecs.com/payment-request/)（[Source](https://www.w3.org/TR/2026/CRD-payment-request-20260327/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [Payment Request API](https://ko.htmlspecs.com/payment-request/)（[Source](https://www.w3.org/TR/2026/CRD-payment-request-20260622/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Web-based Payment Handler API](https://ko.htmlspecs.com/web-based-payment-handler/)（[Source](https://www.w3.org/TR/2026/WD-web-based-payment-handler-20260423/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Payment Method Manifest](https://ko.htmlspecs.com/payment-method-manifest/)（[Source](https://www.w3.org/TR/2017/WD-payment-method-manifest-20171212/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Goods API](https://ko.htmlspecs.com/digital-goods/)（[Source](https://wicg.github.io/digital-goods/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
