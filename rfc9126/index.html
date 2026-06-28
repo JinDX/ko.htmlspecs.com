@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="ko" class="RFC">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>RFC 9126: OAuth 2.0 푸시된 인가 요청</title>
+    <meta content="Torsten Lodderstedt" name="author">
+    <meta content="Brian Campbell" name="author">
+    <meta content="Nat Sakimura" name="author">
+    <meta content="Dave Tonge" name="author">
+    <meta content="Filip Skokan" name="author">
+    <meta content="
+       이 문서는 푸시된 인가 요청(PAR) 엔드포인트를 정의하며, 이를 통해
+클라이언트는 OAuth 2.0 인가 요청의 페이로드를 직접 요청을 통해
+인가 서버로 푸시할 수 있고, 이후 인가 엔드포인트 호출에서
+해당 데이터에 대한 참조로 사용되는 요청 URI를 제공받는다. 
+    " name="description">
+    <meta content="xml2rfc 3.9.1" name="generator">
+    <meta content="security" name="keyword">
+    <meta content="oauth2" name="keyword">
+    <meta content="9126" name="rfc.number">
+    <!-- Generator version information:
+  xml2rfc 3.9.1
+    Python 3.6.10
+    appdirs 1.4.4
+    ConfigArgParse 1.2.3
+    google-i18n-address 2.3.5
+    html5lib 1.0.1
+    intervaltree 3.0.2
+    Jinja2 2.11.2
+    kitchen 1.2.6
+    lxml 4.4.2
+    pycairo 1.19.0
+    pycountry 19.8.18
+    pyflakes 2.1.1
+    PyYAML 5.3.1
+    requests 2.22.0
+    setuptools 40.6.2
+    six 1.14.0
+    WeasyPrint 51
+-->
+    <link href="rfc9126.xml" rel="alternate" type="application/rfc+xml">
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        /*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necssary during the development of the v3
+  formatters.
+
+*/
+
+        /* fonts */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+        /* Sans-serif */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Serif');
+        /* Serif (print) */
+        @import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+        /* Monospace */
+
+        @viewport {
+            zoom: 1.0;
+            width: extend-to-zoom;
+        }
+
+        @-ms-viewport {
+            width: extend-to-zoom;
+            zoom: 1.0;
+        }
+
+        /* general and mobile first */
+        html {}
+
+        body {
+            max-width: 90%;
+            margin: 1.5em auto;
+            color: #222;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        #title,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1em 0 0.5em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        #title {
+            clear: both;
+            border-bottom: 1px solid #ddd;
+            margin: 0 0 0.5em 0;
+            padding: 1em 0 0.5em;
+        }
+
+        .author {
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 1em 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: -20px;
+            /* provide offset for in-page anchors */
+            padding-top: 33px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h5,
+        h6 {
+            font-size: 14px;
+        }
+
+        #n-copyright-notice {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
+        }
+
+        /* general structure */
+        p {
+            padding: 0;
+            margin: 0 0 1em 0;
+            text-align: left;
+        }
+
+        div,
+        span {
+            position: relative;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignRight.art-text pre {
+            padding: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+        }
+
+        .alignRight>*:first-child {
+            border: none;
+            margin: 0;
+            float: right;
+            clear: both;
+        }
+
+        .alignRight>*:nth-child(2) {
+            clear: both;
+            display: block;
+            border: none;
+        }
+
+        svg {
+            display: block;
+        }
+
+        .alignCenter.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignCenter.art-text pre {
+            padding: 0;
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+        }
+
+        .alignCenter>*:first-child {
+            border: none;
+            /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+            display: table;
+            margin: 0 auto;
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 1em 2em;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-left: 1em;
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        .ulCompact li {
+            margin: 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+        }
+
+        ul.empty li,
+        .ulEmpty li {
+            margin-top: 0.5em;
+        }
+
+        ul.ulBare,
+        li.ulBare {
+            margin-left: 0em !important;
+        }
+
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact {
+            line-height: 100%;
+            margin: 0 0 0 2em;
+        }
+
+        /* definition lists */
+        dl {}
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        /* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+        dl>dd {
+            margin-bottom: .8em;
+            min-height: 1.3em;
+        }
+
+        dl.compact>dd,
+        .dlCompact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+        }
+
+        a[href] {
+            color: #22e;
+            /* Arlen: WCAG 2019 */
+        }
+
+        a[href]:hover {
+            background-color: #f2f2f2;
+        }
+
+        figcaption a[href],
+        a[href].selfRef {
+            color: #222;
+        }
+
+        /* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+        /* Figures */
+        tt,
+        code,
+        pre,
+        code {
+            background-color: #f9f9f9;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        pre {
+            border: 1px solid #eee;
+            margin: 0;
+            padding: 1em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        figure blockquote {
+            margin: 0.8em 0.4em 0.4em;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0 0 1em 0;
+        }
+
+        @media screen {
+            pre {
+                overflow-x: auto;
+                max-width: 100%;
+                max-width: calc(100% - 22px);
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 1.2em 2em;
+        }
+
+        blockquote {
+            background-color: #f9f9f9;
+            color: #111;
+            /* Arlen: WCAG 2019 */
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 1em 0;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.5em 0.75em;
+        }
+
+        th {
+            text-align: left;
+            background-color: #e9e9e9;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f5f5f5;
+        }
+
+        table caption {
+            font-style: italic;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        table p {
+            /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+            margin: 0;
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            color: #666;
+            /* Arlen: AHDJ 2019 */
+            text-decoration: none;
+            visibility: hidden;
+            user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        @media screen {
+
+            aside:hover>a.pilcrow,
+            p:hover>a.pilcrow,
+            blockquote:hover>a.pilcrow,
+            div:hover>a.pilcrow,
+            li:hover>a.pilcrow,
+            pre:hover>a.pilcrow {
+                visibility: visible;
+            }
+
+            a.pilcrow:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        #identifiers dt {
+            width: 3em;
+            clear: left;
+        }
+
+        #identifiers dd {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        #identifiers .authors .author {
+            display: inline-block;
+            margin-right: 1.5em;
+        }
+
+        #identifiers .authors .org {
+            font-style: italic;
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #666;
+            /* Arlen: WCAG 2019 */
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+        }
+
+        .docInfo .prepared {
+            float: left;
+        }
+
+        .docInfo .prepared {
+            float: right;
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+        }
+
+        nav.toc ul {
+            margin: 0 0.5em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav.toc li {
+            line-height: 1.3em;
+            margin: 0.75em 0;
+            padding-left: 1.2em;
+            text-indent: -1.2em;
+        }
+
+        /* references */
+        .references dt {
+            text-align: right;
+            font-weight: bold;
+            min-width: 7em;
+        }
+
+        .references dd {
+            margin-left: 8em;
+            overflow: auto;
+        }
+
+        .refInstance {
+            margin-bottom: 1.25em;
+        }
+
+        .references .ascii {
+            margin-bottom: 0.25em;
+        }
+
+        /* index */
+        .index ul {
+            margin: 0 0 0 1em;
+            padding: 0;
+            list-style: none;
+        }
+
+        .index ul ul {
+            margin: 0;
+        }
+
+        .index li {
+            margin: 0;
+            text-indent: -2em;
+            padding-left: 2em;
+            padding-bottom: 5px;
+        }
+
+        .indexIndex {
+            margin: 0.5em 0 1em;
+        }
+
+        .index a {
+            font-weight: 700;
+        }
+
+        /* make the index two-column on all but the smallest screens */
+        @media (min-width: 600px) {
+            .index ul {
+                -moz-column-count: 2;
+                -moz-column-gap: 20px;
+            }
+
+            .index ul ul {
+                -moz-column-count: 1;
+                -moz-column-gap: 0;
+            }
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            margin: 1em 0;
+        }
+
+        address.vcard .nameRole {
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        address.vcard .label {
+            font-family: "Noto Sans", Arial, Helvetica, sans-serif;
+            margin: 0.5em 0;
+        }
+
+        address.vcard .type {
+            display: none;
+        }
+
+        .alternative-contact {
+            margin: 1.5em 0 1em;
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        /* temporary notes */
+        .rfcEditorRemove::before {
+            position: absolute;
+            top: 0.2em;
+            right: 0.2em;
+            padding: 0.2em;
+            content: "The RFC Editor will remove this note";
+            color: #9e2a00;
+            /* Arlen: WCAG 2019 */
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+        }
+
+        .rfcEditorRemove {
+            position: relative;
+            padding-top: 1.8em;
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            border-radius: 3px;
+        }
+
+        .cref {
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        /* alternative layout for smaller screens */
+        @media screen and (max-width: 1023px) {
+            body {
+                padding-top: 2em;
+            }
+
+            #title {
+                padding: 1em 0;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: -18px;
+                /* provide offset for in-page anchors */
+                padding-top: 38px;
+            }
+
+            #identifiers dd {
+                max-width: 60%;
+            }
+
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 0;
+                margin: 0;
+                background-color: inherit;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #toc h2 {
+                margin: -1px 0 0 0;
+                padding: 4px 0 4px 6px;
+                padding-right: 1em;
+                min-width: 190px;
+                font-size: 1.1em;
+                text-align: right;
+                background-color: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            #toc h2::before {
+                /* css hamburger */
+                float: right;
+                position: relative;
+                width: 1em;
+                height: 1px;
+                left: -164px;
+                margin: 6px 0 0 0;
+                background: white none repeat scroll 0 0;
+                box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                content: "";
+            }
+
+            #toc nav {
+                display: none;
+                padding: 0.5em 1em 1em;
+                overflow: auto;
+                height: calc(100vh - 48px);
+                border-left: 1px solid #ddd;
+            }
+        }
+
+        /* alternative layout for wide screens */
+        @media screen and (min-width: 1024px) {
+            body {
+                max-width: 724px;
+                margin: 42px auto;
+                padding-left: 1.5em;
+                padding-right: 29em;
+            }
+
+            #toc {
+                position: fixed;
+                top: 42px;
+                right: 42px;
+                width: 25%;
+                margin: 0;
+                padding: 0 1em;
+                z-index: 1;
+            }
+
+            #toc h2 {
+                border-top: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 1em;
+                font-weight: normal;
+                margin: 0;
+                padding: 0.25em 1em 1em 0;
+            }
+
+            #toc nav {
+                display: block;
+                height: calc(90vh - 84px);
+                bottom: 0;
+                padding: 0.5em 0 0;
+                overflow: auto;
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc,
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            #toc {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            figure,
+            pre {
+                page-break-inside: avoid;
+            }
+
+            figure {
+                overflow: scroll;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            h2+*,
+            h3+*,
+            h4+*,
+            h5+*,
+            h6+* {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        /* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+        /*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+            /* The follwing is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+            /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+        }
+
+        /* Changes introduced to fix issues found during implementation */
+        /* Make sure links are clickable even if overlapped by following H* */
+        a {
+            z-index: 2;
+        }
+
+        /* Separate body from document info even without intervening H1 */
+        section {
+            clear: both;
+        }
+
+
+        /* Top align author divs, to avoid names without organization dropping level with org names */
+        .author {
+            vertical-align: top;
+        }
+
+        /* Leave room in document info to show Internet-Draft on one line */
+        #identifiers dt {
+            width: 8em;
+        }
+
+        /* Don't waste quite as much whitespace between label and value in doc info */
+        #identifiers dd {
+            margin-left: 1em;
+        }
+
+        /* Give floating toc a background color (needed when it's a div inside section */
+        #toc {
+            background-color: white;
+        }
+
+        /* Make the collapsed ToC header render white on gray also when it's a link */
+        @media screen and (max-width: 1023px) {
+
+            #toc h2 a,
+            #toc h2 a:link,
+            #toc h2 a:focus,
+            #toc h2 a:hover,
+            #toc a.toplink,
+            #toc a.toplink:hover {
+                color: white;
+                background-color: #444;
+                text-decoration: none;
+            }
+        }
+
+        /* Give the bottom of the ToC some whitespace */
+        @media screen and (min-width: 1024px) {
+            #toc {
+                padding: 0 0 1em 1em;
+            }
+        }
+
+        /* Style section numbers with more space between number and title */
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        /* prevent monospace from becoming overly large */
+        tt,
+        code,
+        pre,
+        code {
+            font-size: 95%;
+        }
+
+        /* Fix the height/width aspect for ascii art*/
+        pre.sourcecode,
+        .art-text pre {
+            line-height: 1.12;
+        }
+
+
+        /* Add styling for a link in the ToC that points to the top of the document */
+        a.toplink {
+            float: right;
+            margin-right: 0.5em;
+        }
+
+        /* Fix the dl styling to match the RFC 7992 attributes */
+        dl>dt,
+        dl.dlParallel>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.dlNewline>dt {
+            float: none;
+        }
+
+        /* Provide styling for table cell text alignment */
+        table td.text-left,
+        table th.text-left {
+            text-align: left;
+        }
+
+        table td.text-center,
+        table th.text-center {
+            text-align: center;
+        }
+
+        table td.text-right,
+        table th.text-right {
+            text-align: right;
+        }
+
+        /* Make the alternative author contact informatio look less like just another
+   author, and group it closer with the primary author contact information */
+        .alternative-contact {
+            margin: 0.5em 0 0.25em 0;
+        }
+
+        address .non-ascii {
+            margin: 0 0 0 2em;
+        }
+
+        /* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+        table {
+            width: auto;
+        }
+
+        /* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+        .references dd {
+            overflow: visible;
+        }
+
+        /* Control caption placement */
+        caption {
+            caption-side: bottom;
+        }
+
+        /* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+        address.vcard {
+            max-width: 30em;
+            margin-right: auto;
+        }
+
+        /* For address alignment dependent on LTR or RTL scripts */
+        address div.left {
+            text-align: left;
+        }
+
+        address div.right {
+            text-align: right;
+        }
+
+        /* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+        table.right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Give the table caption label the same styling as the figcaption */
+        caption a[href] {
+            color: #222;
+        }
+
+        @media print {
+            .toplink {
+                display: none;
+            }
+
+            /* avoid overwriting the top border line with the ToC header */
+            #toc {
+                padding-top: 1px;
+            }
+
+            /* Avoid page breaks inside dl and author address entries */
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+        }
+
+        /* Tweak the bcp14 keyword presentation */
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Tweak the invisible space above H* in order not to overlay links in text above */
+        h2 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 31px;
+        }
+
+        h3 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        h4 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        /* Float artwork pilcrow to the right */
+        @media screen {
+            .artwork a.pilcrow {
+                display: block;
+                line-height: 0.7;
+                margin-top: 0.15em;
+            }
+        }
+
+        /* Make pilcrows on dd visible */
+        @media screen {
+            dd:hover>a.pilcrow {
+                visibility: visible;
+            }
+        }
+
+        /* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+        .alignLeft.art-text,
+        .alignCenter.art-text,
+        .alignRight.art-text {
+            margin-bottom: 0;
+        }
+
+        .alignLeft,
+        .alignCenter,
+        .alignRight {
+            margin: 1em 0 0 0;
+        }
+
+        /* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+        @media print {
+            a.pilcrow {
+                display: none;
+            }
+        }
+
+        /* Styling for the external metadata */
+        div#external-metadata {
+            background-color: #eee;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            display: none;
+        }
+
+        div#internal-metadata {
+            padding: 0.5em;
+            /* to match the external-metadata padding */
+        }
+
+        /* Styling for title RFC Number */
+        h1#rfcnum {
+            clear: both;
+            margin: 0 0 -1em;
+            padding: 1em 0 0 0;
+        }
+
+        /* Make .olPercent look the same as <ol><li> */
+        dl.olPercent>dd {
+            margin-bottom: 0.25em;
+            min-height: initial;
+        }
+
+        /* Give aside some styling to set it apart */
+        aside {
+            border-left: 1px solid #ddd;
+            margin: 1em 0 1em 2em;
+            padding: 0.2em 2em;
+        }
+
+        aside>dl,
+        aside>ol,
+        aside>ul,
+        aside>table,
+        aside>p {
+            margin-bottom: 0.5em;
+        }
+
+        /* Additional page break settings */
+        @media print {
+
+            figcaption,
+            table caption {
+                page-break-before: avoid;
+            }
+        }
+
+        /* Font size adjustments for print */
+        @media print {
+            body {
+                font-size: 10pt;
+                line-height: normal;
+                max-width: 96%;
+            }
+
+            h1 {
+                font-size: 1.72em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2*1.2 */
+            h2 {
+                font-size: 1.44em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2 */
+            h3 {
+                font-size: 1.2em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2 */
+            h4 {
+                font-size: 1em;
+                padding-top: 1.5em;
+            }
+
+            h5,
+            h6 {
+                font-size: 1em;
+                margin: initial;
+                padding: 0.5em 0 0.3em;
+            }
+        }
+
+        /* Sourcecode margin in print, when there's no pilcrow */
+        @media print {
+
+            .artwork,
+            .sourcecode {
+                margin-bottom: 1em;
+            }
+        }
+
+        /* Avoid narrow tables forcing too narrow table captions, which may render badly */
+        table {
+            min-width: 20em;
+        }
+
+        /* ol type a */
+        ol.type-a {
+            list-style-type: lower-alpha;
+        }
+
+        ol.type-A {
+            list-style-type: upper-alpha;
+        }
+
+        ol.type-i {
+            list-style-type: lower-roman;
+        }
+
+        ol.type-I {
+            list-style-type: lower-roman;
+        }
+
+        /* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background sligthtly */
+        table {
+            border: 1px solid #ddd;
+        }
+
+        td {
+            border-top: 1px solid #ddd;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f8f8f8;
+        }
+
+        /* Use style rules to govern display of the TOC. */
+        @media screen and (max-width: 1023px) {
+            #toc nav {
+                display: none;
+            }
+
+            #toc.active nav {
+                display: block;
+            }
+        }
+
+        /* Add support for keepWithNext */
+        .keepWithNext {
+            break-after: avoid-page;
+            break-after: avoid-page;
+        }
+
+        /* Add support for keepWithPrevious */
+        .keepWithPrevious {
+            break-before: avoid-page;
+        }
+
+        /* Change the approach to avoiding breaks inside artwork etc. */
+        figure,
+        pre,
+        table,
+        .artwork,
+        .sourcecode {
+            break-before: avoid-page;
+            break-after: auto;
+        }
+
+        /* Avoid breaks between <dt> and <dd> */
+        dl {
+            break-before: auto;
+            break-inside: auto;
+        }
+
+        dt {
+            break-before: auto;
+            break-after: avoid-page;
+        }
+
+        dd {
+            break-before: avoid-page;
+            break-after: auto;
+            orphans: 3;
+            widows: 3
+        }
+
+        span.break,
+        dd.break {
+            margin-bottom: 0;
+            min-height: 0;
+            break-before: auto;
+            break-inside: auto;
+            break-after: auto;
+        }
+
+        /* Undo break-before ToC */
+        @media print {
+            #toc {
+                break-before: auto;
+            }
+        }
+
+        /* Text in compact lists should not get extra bottim margin space,
+   since that would makes the list not compact */
+        ul.compact p,
+        .ulCompact p,
+        ol.compact p,
+        .olCompact p {
+            margin: 0;
+        }
+
+        /* But the list as a whole needs the extra space at the end */
+        section ul.compact,
+        section .ulCompact,
+        section ol.compact,
+        section .olCompact {
+            margin-bottom: 1em;
+            /* same as p not within ul.compact etc. */
+        }
+
+        /* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+        tt,
+        code {
+            background-color: transparent;
+        }
+
+        p tt,
+        p code,
+        li tt,
+        li code {
+            background-color: #f8f8f8;
+        }
+
+        /* Tweak the pre margin -- 0px doesn't come out well */
+        pre {
+            margin-top: 0.5px;
+        }
+
+        /* Tweak the comact list text */
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact,
+        dl.compact,
+        .dlCompact {
+            line-height: normal;
+        }
+
+        /* Don't add top margin for nested lists */
+        li>ul,
+        li>ol,
+        li>dl,
+        dd>ul,
+        dd>ol,
+        dd>dl,
+        dl>dd>dl {
+            margin-top: initial;
+        }
+
+        /* Elements that should not be rendered on the same line as a <dt> */
+        /* This should match the element list in writer.text.TextWriter.render_dl() */
+        dd>div.artwork:first-child,
+        dd>aside:first-child,
+        dd>figure:first-child,
+        dd>ol:first-child,
+        dd>div:first-child>pre.sourcecode,
+        dd>table:first-child,
+        dd>ul:first-child {
+            clear: left;
+        }
+
+        /* fix for weird browser behaviour when <dd/> is empty */
+        dt+dd:empty::before {
+            content: "\00a0";
+        }
+
+        /* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+        li>p {
+            margin-bottom: 0.5em
+        }
+
+        /* Don't let p margin spill out from inside list items */
+        li>p:last-of-type {
+            margin-bottom: 0;
+        }
+    </style>
+    <link href="https://www.rfc-editor.org/rfc/rfc-local.css" rel="stylesheet" type="text/css">
+    <link href="https://dx.doi.org/10.17487/rfc9126" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-oauth-par-10" rel="prev">
+</head>
+
+<body>
+    <script src="https://www.rfc-editor.org/js/metadata.min.js"></script>
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">RFC 9126</td>
+                <td class="center">OAuth PAR</td>
+                <td class="right">2021년 9월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Lodderstedt 외</td>
+                <td class="center">표준 트랙</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-stream">스트림:</dt>
+            <dd class="stream">인터넷 엔지니어링 태스크 포스(IETF)</dd>
+            <dt class="label-rfc">RFC:</dt>
+            <dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc9126" class="eref">9126</a></dd>
+            <dt class="label-category">분류:</dt>
+            <dd class="category">표준 트랙</dd>
+            <dt class="label-published">발행:</dt>
+            <dd class="published">
+                <time datetime="2021-09" class="published">2021년 9월</time>
+            </dd>
+            <dt class="label-issn">ISSN:</dt>
+            <dd class="issn">2070-1721</dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">T. Lodderstedt</div>
+                    <div class="org">yes.com</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">B. Campbell</div>
+                    <div class="org">Ping Identity</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">N. Sakimura</div>
+                    <div class="org">NAT.Consulting</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">D. Tonge</div>
+                    <div class="org">Moneyhub Financial Technology</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">F. Skokan</div>
+                    <div class="org">Auth0</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="rfcnum">RFC 9126</h1>
+    <h1 id="title">OAuth 2.0 푸시된 인가 요청</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">이 문서는 푸시된 인가 요청(PAR) 엔드포인트를 정의하며, 이를 통해
+            클라이언트는 OAuth 2.0 인가 요청의 페이로드를 직접 요청을 통해
+            인가 서버로 푸시할 수 있고, 이후 인가 엔드포인트 호출에서
+            해당 데이터에 대한 참조로 사용되는 요청 URI를 제공받는다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 문서는 인터넷 표준 트랙 문서이다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-boilerplate.1-2">
+                이 문서는 인터넷 엔지니어링 태스크 포스
+                (IETF)의 산출물이다. 이는 IETF 커뮤니티의 합의를 나타낸다.
+                공개 검토를 거쳤으며, 인터넷 엔지니어링 운영 그룹
+                (IESG)에 의해 게시가 승인되었다. 인터넷 표준에 대한 추가
+                정보는 RFC 7841의 섹션 2에서 확인할 수 있다.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-3">
+                이 문서의 현재 상태, 정오표, 그리고
+                이에 대한 피드백 제공 방법에 관한 정보는
+                <span><a
+                        href="https://www.rfc-editor.org/info/rfc9126">https://www.rfc-editor.org/info/rfc9126</a></span>에서
+                확인할 수 있다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2021 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Simplified BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Simplified BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="toc ulEmpty ulBare compact">
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>. <a
+                                href="#name-introduction" class="xref">소개</a></p>
+                        <ul class="ulEmpty ulBare toc compact">
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.1.2.1">
+                                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1"
+                                        class="xref">1.1</a>. <a href="#name-introductory-example" class="xref">도입
+                                        예제</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.1.2.2">
+                                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2"
+                                        class="xref">1.2</a>. <a href="#name-conventions-and-terminology"
+                                        class="xref">규약 및 용어</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>. <a
+                                href="#name-pushed-authorization-reques" class="xref">푸시된 인가 요청
+                                엔드포인트</a></p>
+                        <ul class="ulEmpty ulBare toc compact">
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.2.2.1">
+                                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>. <a
+                                        href="#name-request" class="xref">요청</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.2.2.2">
+                                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>. <a
+                                        href="#name-successful-response" class="xref">성공 응답</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.2.2.3">
+                                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>. <a
+                                        href="#name-error-response" class="xref">오류 응답</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.2.2.4">
+                                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="xref">2.4</a>. <a
+                                        href="#name-management-of-client-redire" class="xref">클라이언트
+                                        리디렉션 URI의 관리</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>. <a
+                                href="#name-the-request-request-paramet" class="xref">"request" 요청
+                                매개변수</a></p>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>. <a
+                                href="#name-authorization-request" class="xref">인가 요청</a></p>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>. <a
+                                href="#name-authorization-server-metada" class="xref">인가 서버 메타데이터</a>
+                        </p>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>. <a
+                                href="#name-client-metadata" class="xref">클라이언트 메타데이터</a></p>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>. <a
+                                href="#name-security-considerations" class="xref">보안 고려사항</a></p>
+                        <ul class="ulEmpty ulBare toc compact">
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.7.2.1">
+                                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>. <a
+                                        href="#name-request-uri-guessing" class="xref">요청 URI 추측</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.7.2.2">
+                                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>. <a
+                                        href="#name-open-redirection" class="xref">오픈 리디렉션</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.7.2.3">
+                                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="xref">7.3</a>. <a
+                                        href="#name-request-object-replay" class="xref">Request Object 재생</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.7.2.4">
+                                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="xref">7.4</a>. <a
+                                        href="#name-client-policy-change" class="xref">클라이언트 정책 변경</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.7.2.5">
+                                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="xref">7.5</a>. <a
+                                        href="#name-request-uri-swapping" class="xref">요청 URI 바꾸기</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>. <a
+                                href="#name-privacy-considerations" class="xref">개인정보 고려사항</a></p>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.9">
+                        <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>. <a
+                                href="#name-iana-considerations" class="xref">IANA 고려사항</a></p>
+                        <ul class="ulEmpty ulBare toc compact">
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.9.2.1">
+                                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="xref">9.1</a>. <a
+                                        href="#name-oauth-authorization-server-" class="xref">OAuth 인가 서버
+                                        메타데이터</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.9.2.2">
+                                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="xref">9.2</a>. <a
+                                        href="#name-oauth-dynamic-client-regist" class="xref">OAuth 동적 클라이언트
+                                        등록 메타데이터</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.9.2.3">
+                                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="xref">9.3</a>. <a
+                                        href="#name-oauth-uri-registration" class="xref">OAuth URI 등록</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.10">
+                        <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a
+                                href="#name-references" class="xref">참고문헌</a></p>
+                        <ul class="ulEmpty ulBare toc compact">
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.10.2.1">
+                                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="xref">10.1</a>. <a
+                                        href="#name-normative-references" class="xref">규범적 참고문헌</a></p>
+                            </li>
+                            <li class="ulEmpty ulBare toc compact" id="section-toc.1-1.10.2.2">
+                                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="xref">10.2</a>. <a
+                                        href="#name-informative-references" class="xref">정보성 참고문헌</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.11">
+                        <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="xref"></a><a
+                                href="#name-acknowledgements" class="xref">감사의 말</a></p>
+                    </li>
+                    <li class="toc ulEmpty ulBare compact" id="section-toc.1-1.12">
+                        <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="xref"></a><a
+                                href="#name-authors-addresses" class="xref">저자 주소</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <div id="Introduction">
+        <section id="section-1">
+            <h2 id="name-introduction">
+                <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                    class="section-name selfRef">소개</a>
+            </h2>
+            <p id="section-1-1">이 문서는 푸시된 인가 요청(PAR) 엔드포인트를 정의하며, 이는
+                OAuth <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span> 클라이언트가
+                인가 요청의 페이로드를 인가 서버로 직접 푸시할 수 있게 한다.
+                교환 결과로 요청 URI 값이 수신되며, 이는 이후 사용자 에이전트를 통한
+                인가 엔드포인트 호출에서 인가 요청 페이로드 데이터에 대한 참조로 사용된다.<a href="#section-1-1" class="pilcrow">¶</a></p>
+            <p id="section-1-2">OAuth <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에서 인가
+                요청 매개변수는 일반적으로 사용자 에이전트에서 리디렉션을 통해 URI 쿼리
+                매개변수로 전송된다. 이는 단순하지만 다음과 같은 문제도 발생시킨다:<a href="#section-1-2" class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="section-1-3.1">암호학적 무결성 및 진정성 보호가 없다.
+                    예를 들어 공격자는 scope 값을 변경하여 요청된 접근 범위를 수정하거나 결제 트랜잭션의
+                    컨텍스트를 바꿀 수 있다. 클라이언트나 사용자가 일부 그러한 변경을 탐지할 수 있게 하는
+                    프로토콜 기능이 있기는 하지만, 프로세스 초기에 수정을 방지하는 것이 더 견고한
+                    해결책이다.<a href="#section-1-3.1" class="pilcrow">¶</a>
+                </li>
+                <li class="normal" id="section-1-3.2">요청 매개변수의 기밀성을 보장하는 메커니즘이 없다.
+                    인가 엔드포인트에는 HTTPS가 요구되지만, 요청 데이터는 사용자 에이전트를 통해
+                    평문으로 지나가며, 쿼리 문자열 데이터는 부주의하게 웹 서버 로그 및 referrer를 통해
+                    다른 사이트로 유출될 수 있다. 인가 요청에 개인 식별 정보나 기타 규제 대상 데이터가
+                    전송되는 경우(신원, 오픈 뱅킹 및 유사 시나리오에서는 충분히 그럴 수 있음), 이러한
+                    유출의 영향은 상당할 수 있다.<a href="#section-1-3.2" class="pilcrow">¶</a>
+                </li>
+                <li class="normal" id="section-1-3.3">인가 요청 URL은 특히 세분화된 인가 데이터가 필요한
+                    시나리오에서 상당히 길어질 수 있으며, 이로 인해 요청 처리 오류가 발생할 수 있다.<a href="#section-1-3.3" class="pilcrow">¶</a>
+                </li>
+            </ul>
+            <p id="section-1-4">JWT-Secured Authorization Request (JAR) <span>[<a href="#RFC9101"
+                        class="xref">RFC9101</a>]</span>는 OAuth 클라이언트가 인가 요청 매개변수를
+                Request Object로 감쌀 수 있게 하여 보안 문제에 대한 해결책을 제공한다. Request Object는
+                서명되고 선택적으로 암호화된 JSON Web Token (JWT) <span>[<a href="#RFC7519" class="xref">RFC7519</a>]</span>이다.
+
+                크기 제한에 대처하기 위해 JAR는 <code>request_uri</code> 매개변수를 도입하며, 이를 통해
+                클라이언트는 Request Object 자체 대신 Request Object에 대한 참조를 전송할 수 있다.<a href="#section-1-4" class="pilcrow">¶</a>
+            </p>
+            <p id="section-1-5">이 문서는 인가 요청의 페이로드를 인가 서버로 직접 푸시하고, 이후 인가 요청에서
+                인가 서버에서 사용할 수 있는 <code>request_uri</code> 값으로 교환하는 상호운용 가능한 방법을
+                제공함으로써 JAR를 보완한다.<a href="#section-1-5" class="pilcrow">¶</a></p>
+            <p id="section-1-6">PAR는 클라이언트에 기밀성과 무결성이 보호되는 인가 요청을 위한 간단한 수단을
+                제공함으로써 OAuth 보안을 증진한다. 특히 암호학적으로 확인된 부인 방지와 같이 더 높은
+                보안 수준을 요구하는 클라이언트는 <span>[<a href="#RFC9101" class="xref">RFC9101</a>]</span>에서
+                정의한 JWT 기반 Request Object를
+
+                PAR와 함께 사용할 수 있다.<a href="#section-1-6" class="pilcrow">¶</a>
+            </p>
+            <p id="section-1-7">PAR는 사용자 상호작용이 발생하기 전에 인가 서버가 클라이언트를 인증할 수 있게
+                한다.
+                인가 프로세스 중 클라이언트의 신원에 대한 신뢰도가 높아지면 인가 서버가 프로세스 훨씬
+                초기 단계에서 불법 요청을 거부할 수 있으므로, 클라이언트를 스푸핑하거나 인가 요청을
+                변조 또는 오용하려는 시도를 방지할 수 있다.<a href="#section-1-7" class="pilcrow">¶</a></p>
+            <p id="section-1-8">위에서 설명한 요청 크기 제한에 대처하기 위해, <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc6749#section-3.1" class="relref">섹션 3.1</a> of [<a
+                        href="#RFC6749" class="xref">RFC6749</a>]</span> 및
+                <span>[<a href="#OIDC" class="xref">OIDC</a>]</span>의 섹션 3.1.2.1에서 설명한 바와 같이
+                사용자 에이전트를 통한 인가 엔드포인트로의 HTTP <code>POST</code> 요청도 사용할 수 있음에
+                유의하라. 그러나 이는 <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에 따라 선택 사항일 뿐이며, 지원되는 경우에도
+                전통적인 웹 애플리케이션에는 실현 가능한 선택지이지만 설치형 모바일 애플리케이션에서
+                사용하기에는 지나치게 어렵다. <span>[<a href="#RFC8252" class="xref">RFC8252</a>]</span>에서
+                설명한 것처럼, 이러한 앱은 플랫폼별 API를 사용하여 시스템 브라우저에서 인가 요청 URI를
+                연다. 하지만 모바일 앱이 브라우저를 실행하면 그 결과 최초 요청은 <code>GET</code> 메서드
+                사용으로 제한된다. 인가 요청에 <code>POST</code>를 사용하려면, 앱은 먼저 상당한 크기의
+                인가 요청 페이로드를 어떻게든 전달하면서 <code>GET</code>을 통해 앱이 제어하는 URI를
+                열도록 브라우저를 지시한 다음, 그 결과 응답이 인가 서버를 향한 교차 사이트 양식
+                <code>POST</code>를 시작할 콘텐츠와 스크립트를 포함하게 해야 한다. PAR는 사용하기 더
+                간단하고 위에서 설명한 추가 보안 이점이 있다.<a href="#section-1-8" class="pilcrow">¶</a>
+            </p>
+            <div id="introductory-example">
+                <section id="section-1.1">
+                    <h3 id="name-introductory-example">
+                        <a href="#section-1.1" class="section-number selfRef">1.1. </a><a
+                            href="#name-introductory-example" class="section-name selfRef">도입 예제</a>
+                    </h3>
+                    <p id="section-1.1-1">전통적인 OAuth 2.0에서, 클라이언트는 일반적으로 사용자 에이전트가
+                        다음과 같은 HTTP 요청을 인가 서버의 인가 엔드포인트로 보내도록 지시하여 인가
+                        요청을 시작한다(추가 줄바꿈과 들여쓰기는 표시 목적만을 위한 것임):<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+                    <div id="section-1.1-2">
+                        <pre class="sourcecode lang-http-message"> GET /authorize?response_type=code
+  &amp;client_id=CLIENT1234&amp;state=duk681S8n00GsJpe7n9boxdzen
+  &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
+ Host: as.example.com
+</pre><a href="#section-1.1-2" class="pilcrow">¶</a>
+                    </div>
+                    <p id="section-1.1-3">이러한 요청은 다음 예제에서 보이듯이 클라이언트가 PAR 엔드포인트로
+                        <code>POST</code> 요청을 보내 인가 서버로 직접 푸시할 수도 있다
+                        (추가 줄바꿈과 공백은 표시 목적만을 위한 것임).
+                        요청이 인가 서버로 직접 이루어지므로 클라이언트는 인증할 수 있다
+                        (예: 표시된 것처럼 JWT 클라이언트 assertion 기반 인증 사용).<a href="#section-1.1-3" class="pilcrow">¶</a>
+                    </p>
+                    <div id="section-1.1-4">
+                        <pre class="sourcecode lang-http-message"> POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ &amp;response_type=code
+ &amp;client_id=CLIENT1234&amp;state=duk681S8n00GsJpe7n9boxdzen
+ &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+ &amp;client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &amp;client_assertion=eyJraWQiOiI0MiIsImFsZyI6IkVTMjU2In0.eyJpc3MiOiJDTE
+  lFTlQxMjM0Iiwic3ViIjoiQ0xJRU5UMTIzNCIsImF1ZCI6Imh0dHBzOi8vc2VydmVyL
+  mV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY4ODc4fQ.Igw8QrpAWRNPDGoWGRmJumLBM
+  wbLjeIYwqWUu-ywgvvufl_0sQJftNs3bzjIrP0BV9rRG-3eI1Ksh0kQ1CwvzA
+
+</pre><a href="#section-1.1-4" class="pilcrow">¶</a>
+                    </div>
+                    <p id="section-1.1-5">인가 서버는 요청 URI로 응답한다:<a href="#section-1.1-5" class="pilcrow">¶</a></p>
+                    <div id="section-1.1-6">
+                        <pre class="sourcecode lang-http-message"> HTTP/1.1 201 Created
+ Cache-Control: no-cache, no-store
+ Content-Type: application/json
+
+ {
+   "request_uri": "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
+   "expires_in": 90
+ }
+</pre><a href="#section-1.1-6" class="pilcrow">¶</a>
+                    </div>
+                    <p id="section-1.1-7">클라이언트는 요청 URI 값을 사용하여, 사용자 에이전트가 다음과 같은
+                        HTTP 요청을 인가 서버의 인가 엔드포인트로 보내도록 지시함으로써 이후의 인가 요청을
+                        생성한다(추가 줄바꿈과 들여쓰기는 표시 목적만을 위한 것임):<a href="#section-1.1-7" class="pilcrow">¶</a></p>
+                    <div id="section-1.1-8">
+                        <pre class="sourcecode lang-http-message"> GET /authorize?client_id=CLIENT1234
+  &amp;request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+ Host: as.example.com
+</pre><a href="#section-1.1-8" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+            <div id="conventions-and-terminology">
+                <section id="section-1.2">
+                    <h3 id="name-conventions-and-terminology">
+                        <a href="#section-1.2" class="section-number selfRef">1.2. </a><a
+                            href="#name-conventions-and-terminology" class="section-name selfRef">규약 및
+                            용어</a>
+                    </h3>
+                    <p id="section-1.2-1">
+                        이 문서의 핵심 단어 "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span
+                            class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span
+                            class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span
+                            class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span
+                            class="bcp14">NOT RECOMMENDED</span>",
+                        "<span class="bcp14">MAY</span>" 및 "<span class="bcp14">OPTIONAL</span>"은
+                        여기에 보이는 것처럼 모두 대문자로 나타날 때에만,
+                        BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174"
+                                class="xref">RFC8174</a>]</span>에
+                        설명된 대로 해석되어야 한다.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-1.2-2">이 명세는 "The OAuth 2.0 Authorization Framework"
+                        <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에서 정의한 "access token",
+                        "authorization server", "authorization endpoint",
+                        "authorization request", "token endpoint",
+                        및
+                        "client"라는 용어를 사용한다.<a href="#section-1.2-2" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="pushed-authorization-request-endpoint">
+        <section id="section-2">
+            <h2 id="name-pushed-authorization-reques">
+                <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-pushed-authorization-reques"
+                    class="section-name selfRef">푸시된 인가 요청 엔드포인트</a>
+            </h2>
+            <p id="section-2-1">푸시된 인가 요청 엔드포인트는 인가 서버의 HTTP API로, HTTP 요청 메시지 본문에서
+                <code>application/x-www-form-urlencoded</code> 형식을 사용하여 매개변수를 포함한 HTTP
+                <code>POST</code> 요청을 수락한다. 이 형식은 <span><a href="https://www.rfc-editor.org/rfc/rfc6749#appendix-B"
+                        class="relref">부록
+                        B</a> of [<a href="#RFC6749" class="xref">RFC6749</a>]</span>에 설명된 것처럼 UTF-8의
+                문자 인코딩을 가진다. PAR 엔드포인트 URL은 "https" 스킴을 사용해야 한다(<span class="bcp14">MUST</span>).<a href="#section-2-1"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-2">PAR를 지원하는 인가 서버는 <a href="#RFC8414" class="xref">RFC8414</a>]</span>의 인가 서버 메타데이터 문서에
+                <a href="#as_metadata" class="xref">섹션 5</a>에서 정의한
+                <code>pushed_authorization_request_endpoint</code> 매개변수를 사용하여 푸시된 인가 요청
+                엔드포인트의 URL을 포함하는 것이 좋다(<span class="bcp14">SHOULD</span>).<a href="#section-2-2" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-3">엔드포인트는 <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에서 인가 엔드포인트용으로 정의한 인가
+                요청 매개변수와, 인가 엔드포인트에 대해 정의된 모든 적용 가능한 확장을 수락한다. 그러한
+                확장의 예에는 Proof Key for Code Exchange (PKCE) <span>[<a href="#RFC7636" class="xref">RFC7636</a>]</span>,
+                Resource Indicators <span>[<a href="#RFC8707" class="xref">RFC8707</a>]</span>, 및 OpenID Connect (OIDC)
+                <span>[<a href="#OIDC" class="xref">OIDC</a>]</span>가 포함된다. 엔드포인트는 또한
+                <span>[<a href="#RFC9101" class="xref">RFC9101</a>]</span> 및 이 문서의
+                <a href="#request_parameter" class="xref">섹션 3</a>에 따라 인가 요청 매개변수 집합을 Request Object로 전송하는 것을
+                지원할 수도 있다(<span class="bcp14">MAY</span>).<a href="#section-2-3" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-4"><span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에서 토큰 엔드포인트 요청에 대해 정의한 클라이언트
+                인증 규칙(적용 가능한 인증 방법 포함)은 PAR 엔드포인트에도 적용된다. 적용 가능한 경우,
+                <code>token_endpoint_auth_method</code> 클라이언트 메타데이터 매개변수
+                <span>[<a href="#RFC7591" class="xref">RFC7591</a>]</span>는 PAR 엔드포인트 요청을 포함하여 인가 서버로 직접
+                요청을 할 때 클라이언트가 사용할 등록된 인증 방법을 나타낸다.
+                마찬가지로, <code>token_endpoint_auth_methods_supported</code> 인가 서버 메타데이터
+                <span>[<a href="#RFC8414" class="xref">RFC8414</a>]</span> 매개변수는 PAR 엔드포인트 요청을
+                포함하여 클라이언트로부터의 직접 요청을 수락할 때 인가 서버가 지원하는 클라이언트 인증
+                방법을 나열한다.<a href="#section-2-4" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-5">역사적인 이유로, JWT 클라이언트 assertion 기반 인증(<span><a
+                        href="https://www.rfc-editor.org/rfc/rfc7523#section-2.2" class="relref">섹션 2.2</a> of [<a
+                        href="#RFC7523" class="xref">RFC7523</a>]</span>에서 정의되며, <span>[<a href="#OIDC"
+                        class="xref">OIDC</a>]</span>의 섹션 9에 따른 <code>private_key_jwt</code> 또는
+                <code>client_secret_jwt</code> 인증 방법 이름을 사용함)를 사용할 때 적절한 audience
+                값에 대해 잠재적인 모호성이 있다. 그 모호성을 해결하기 위해,
+                <span>[<a href="#RFC8414" class="xref">RFC8414</a>]</span>에 따른 인가 서버의 issuer 식별자
+                URL을 audience 값으로 사용하는 것이 좋다(<span class="bcp14">SHOULD</span>). 상호운용성을 촉진하기 위해, 인가 서버는 자신을 의도된
+                audience로 식별하는 값으로 자신의 issuer 식별자, 토큰 엔드포인트 URL, 또는 푸시된 인가
+                요청 엔드포인트 URL을 수락해야 한다(<span class="bcp14">MUST</span>).<a href="#section-2-5" class="pilcrow">¶</a>
+            </p>
+            <div id="request">
+                <section id="section-2.1">
+                    <h3 id="name-request">
+                        <a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-request"
+                            class="section-name selfRef">요청</a>
+                    </h3>
+                    <p id="section-2.1-1">클라이언트는 인가 요청을 구성하는 매개변수를 PAR 엔드포인트로 직접
+                        전송한다. 전형적인 매개변수 집합에는 아래 예제에 보이는 것처럼 <code>client_id</code>,
+                        <code>response_type</code>, <code>redirect_uri</code>, <code>scope</code>, <code>state</code>,
+                        <code>code_challenge</code>, 및 <code>code_challenge_method</code>가 포함될 수 있다.
+                        그러나 푸시된 인가 요청은 <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에서 정의한 것과 모든 적용 가능한
+                        확장을 포함하여, 인가 엔드포인트에서 사용 가능한 모든 매개변수로 구성될 수 있다.
+                        <code>request_uri</code> 인가 요청 매개변수는 예외이며, 제공되어서는 안 된다(<span class="bcp14">MUST NOT</span>).<a
+                            href="#section-2.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.1-2">요청에는 또한 해당 클라이언트에 적합한 경우 클라이언트 인증에
+                        필요한 추가 매개변수(예: <code>client_secret</code> 또는
+                        <code>client_assertion</code> 및 <code>client_assertion_type</code>)가 포함된다.
+                        이러한 매개변수는 토큰 엔드포인트에서 사용하도록 정의 및 등록되지만, 클라이언트
+                        인증에만 적용된다. 푸시된 인가 요청에 존재할 때, 이들은 클라이언트 인증에만
+                        의존되며 인가 요청 자체와는 관련이 없다. 클라이언트 인증과 관련되지 않은 토큰
+                        엔드포인트 매개변수는 푸시된 인가 요청에 대해 정의된 의미가 없다.
+                        <code>client_id</code> 매개변수는 인가 요청과 토큰 엔드포인트 요청 모두에서 동일한
+                        의미로 정의되며, 필수 인가 요청 매개변수로서 푸시된 인가 요청에서도 마찬가지로
+                        요구된다.<a href="#section-2.1-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.1-3">클라이언트는 <span><a href="https://www.rfc-editor.org/rfc/rfc6749#appendix-B"
+                                class="relref">부록 B</a> of [<a href="#RFC6749" class="xref">RFC6749</a>]</span>에
+                        설명된 대로 UTF-8 문자 인코딩을 사용하여 <code>x-www-form-urlencoded</code>로 형식화된
+                        매개변수로 HTTP <code>POST</code> 요청의 메시지 본문을 구성한다.
+                        적용 가능한 경우, 클라이언트는 토큰 엔드포인트 요청과 동일한 규칙을 사용하여
+                        요청 헤더 또는 요청 본문에 자신의 인증 자격 증명을 추가한다.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+                    <p id="section-2.1-4">이는 다음 예제로 설명된다(메시지 본문의 추가 줄바꿈은 표시 목적만을
+                        위한 것임):<a href="#section-2.1-4" class="pilcrow">¶</a></p>
+                    <div id="section-2.1-5">
+                        <pre class="sourcecode lang-http-message"> POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ response_type=code&amp;state=af0ifjsldkj&amp;client_id=s6BhdRkqt3
+ &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+ &amp;code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+ &amp;code_challenge_method=S256&amp;scope=account-information
+ &amp;client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &amp;client_assertion=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3Mi
+  OiJzNkJoZFJrcXQzIiwic3ViIjoiczZCaGRSa3F0MyIsImF1ZCI6Imh0dHBzOi8vc
+  2VydmVyLmV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY5Njc3fQ.te4IdnP_DK4hWrh
+  TWA6fyhy3fxlAQZAhfA4lmzRdpoP5uZb-E90R5YxzN1YDA8mnVdpgj_Bx1lG5r6se
+  f5TlckApA3hahhC804dcqlE4naEmLISmN1pds2WxTMOUzZY8aKKSDzNTDqhyTgE-K
+  dTb3RafRj7tdZb09zWs7c_moOvfVcQIoy5zz1BvLQKW1Y8JsYvdpu2AvpxRPbcP8W
+  yeW9B6PL6_fy3pXYKG3e-qUcvPa9kan-mo9EoSgt-YTDQjK1nZMdXIqTluK9caVJE
+  RWW0fD1Y11_tlOcJn-ya7v7d8YmFyJpkhZfm8x1FoeH0djEicXTixEkdRuzsgUCm6
+  GQ
+</pre><a href="#section-2.1-5" class="pilcrow">¶</a>
+                    </div>
+                    <p id="section-2.1-6">인가 서버는 요청을 다음과 같이 처리해야 한다(<span class="bcp14">MUST</span>):<a
+                            href="#section-2.1-6" class="pilcrow">¶</a></p>
+                    <ol start="1" type="1" class="normal type-1" id="section-2.1-7">
+                        <li id="section-2.1-7.1">토큰 엔드포인트에서와 같은 방식으로 클라이언트를 인증한다
+                            (<span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-2.3" class="relref">섹션
+                                    2.3</a> of [<a href="#RFC6749" class="xref">RFC6749</a>]</span>).<a
+                                href="#section-2.1-7.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-2.1-7.2"><code>request_uri</code> 인가 요청 매개변수가 제공되면 요청을
+                            거부한다.<a href="#section-2.1-7.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-2.1-7.3">푸시된 요청을 인가 엔드포인트로 전송된 인가 요청과 같이
+                            검증한다. 예를 들어 인가 서버는 redirect URI가 클라이언트에 대해 구성된 redirect
+                            URI 중 하나와 일치하는지 확인하고, 또한 클라이언트가 접근을 요청하는 scope에
+                            대해 권한이 있는지 확인한다. 이 검증을 통해 인가 서버는 승인되지 않았거나
+                            사기성인 요청을 조기에 거부할 수 있다. 인가 서버는 푸시된 요청을 처리할 때
+                            수행할 수 없는 검증 단계를 생략할 수 있다(<span class="bcp14">MAY</span>).
+                            그러나 그러한 확인은 인가 엔드포인트에서 인가 요청을 처리할 때 수행되어야 한다
+                            (<span class="bcp14">MUST</span>).<a href="#section-2.1-7.3" class="pilcrow">¶</a>
+                        </li>
+                    </ol>
+                    <p id="section-2.1-8">인가 서버는 인증 자격 증명이 있는 클라이언트가 각 푸시된 인가 요청마다
+                        인가 요청별 redirect URI를 설정하도록 허용할 수 있다(<span class="bcp14">MAY</span>).
+                        <a href="#redirect_uri_mgmt" class="xref">섹션 2.4</a>에서 더 자세히 설명하듯이, 이는 <span>[<a href="#RFC6749"
+                                class="xref">RFC6749</a>]</span>와 달리 이 명세가 실제 인가
+                        요청이 수행되기 전에 인가 서버가 클라이언트를 인증하고 클라이언트 요청을 검증할 수
+                        있는 능력을 제공하기 때문에 가능하다.<a href="#section-2.1-8" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="par-response">
+                <section id="section-2.2">
+                    <h3 id="name-successful-response">
+                        <a href="#section-2.2" class="section-number selfRef">2.2. </a><a
+                            href="#name-successful-response" class="section-name selfRef">성공 응답</a>
+                    </h3>
+                    <p id="section-2.2-1">검증이 성공하면, 서버는 요청 URI를 생성하고 <code>201</code> HTTP
+                        상태 코드와 함께 응답에 제공해야 한다(<span class="bcp14">MUST</span>).
+                        다음 매개변수는 <span>[<a href="#RFC8259" class="xref">RFC8259</a>]</span>에서 정의한
+                        <code>application/json</code> 미디어 타입을 사용하여 HTTP 응답의 메시지 본문에
+                        최상위 멤버로 포함된다.<a href="#section-2.2-1" class="pilcrow">¶</a>
+                    </p>
+                    <span class="break"></span>
+                    <dl class="dlNewline" id="section-2.2-2">
+                        <dt id="section-2.2-2.1">request_uri</dt>
+                        <dd style="margin-left: 1.5em" id="section-2.2-2.2">게시된 인가 요청에 대응하는
+                            요청 URI. 이 URI는 이후 인가 요청에서 해당 요청 데이터에 대한 일회용 참조이다.
+                            인가 프로세스가 인가 요청 데이터를 얻는 방식은 인가 서버의 재량이며, 이 명세의
+                            범위를 벗어난다. 이 URI를 통해 다른 당사자에게 인가 요청 데이터를 제공할
+                            필요는 없다.<a href="#section-2.2-2.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-2.2-2.3">expires_in</dt>
+                        <dd style="margin-left: 1.5em" id="section-2.2-2.4"> 요청 URI의 수명을 초 단위의
+                            양의 정수로 나타내는 JSON 숫자. 요청 URI 수명은 인가 서버의 재량이지만 일반적으로
+                            비교적 짧다(예: 5초에서 600초 사이).<a href="#section-2.2-2.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <p id="section-2.2-3"><code>request_uri</code> 값의 형식은 인가 서버의 재량이지만,
+                        유효한 값을 예측하거나 추측하는 것이 계산상 불가능하도록 암호학적으로 강한 의사난수
+                        알고리즘을 사용해 생성된 일부를 포함해야 한다(<span class="bcp14">MUST</span>)
+                        (구체적인 사항은 <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-10.10" class="relref">섹션
+                                10.10</a> of [<a href="#RFC6749" class="xref">RFC6749</a>]</span> 참조).
+                        인가 서버는 해당 인가 요청 데이터를 참조하는 URI의 무작위 부분으로
+                        <code>&lt;reference-value&gt;</code>를 사용하여
+                        <code>urn:ietf:params:oauth:request_uri:&lt;reference-value&gt;</code> 형식으로
+                        <code>request_uri</code> 값을 구성할 수 있다(<span class="bcp14">MAY</span>).<a href="#section-2.2-3"
+                            class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.2-4"><code>request_uri</code> 값은 인가 요청을 게시한 클라이언트에
+                        바인딩되어야 한다(<span class="bcp14">MUST</span>).<a href="#section-2.2-4" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.2-5">다음은 그러한 응답의 예이다:<a href="#section-2.2-5" class="pilcrow">¶</a></p>
+                    <div id="section-2.2-6">
+                        <pre class="sourcecode lang-http-message"> HTTP/1.1 201 Created
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
+
+ {
+  "request_uri":
+    "urn:ietf:params:oauth:request_uri:6esc_11ACC5bwc014ltc14eY22c",
+  "expires_in": 60
+ }
+</pre><a href="#section-2.2-6" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+            <div id="error_response">
+                <section id="section-2.3">
+                    <h3 id="name-error-response">
+                        <a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-error-response"
+                            class="section-name selfRef">오류 응답</a>
+                    </h3>
+                    <p id="section-2.3-1">인가 서버는 <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-5.2"
+                                class="relref">섹션 5.2</a>
+                            of [<a href="#RFC6749" class="xref">RFC6749</a>]</span>에서 토큰 엔드포인트의 오류
+                        응답에 대해 지정한 것과 동일한 형식으로 오류 응답을 반환하며, 그 안의 적절한 오류
+                        코드 또는 <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.1.2.1" class="relref">섹션
+                                4.1.2.1</a> of [<a href="#RFC6749" class="xref">RFC6749</a>]</span>의 오류 코드를 사용한다.
+                        <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.1.2.1" class="relref">섹션
+                                4.1.2.1</a> of [<a href="#RFC6749" class="xref">RFC6749</a>]</span>이 요청 클라이언트로
+                        오류를 자동 리디렉션하는 것을 금지하여 오류 코드를 정의하지 않는 경우(예: 요청이
+                        누락, 유효하지 않음, 또는 불일치하는 리디렉션 URI 때문에 실패한 경우)에는
+                        <code>invalid_request</code> 오류 코드를 기본 오류 코드로 사용할 수 있다. OAuth 확장이
+                        푸시된 인가 요청의 초기 처리에 관련된 경우, 해당 확장에서 정의한 오류 코드도 사용할
+                        수 있다. 푸시된 인가 요청의 초기 처리는 리소스 소유자 상호작용을 포함하지 않으므로,
+                        <span>[<a href="#OIDC" class="xref">OIDC</a>]</span>에서 정의한 <code>consent_required</code>와 같은 사용자
+                        상호작용 관련 오류 코드는 절대 반환되지 않는다.<a href="#section-2.3-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.3-2">인가 서버 또는 클라이언트 정책(<span>[<a href="#RFC9101" class="xref">RFC9101</a>], <a
+                                href="https://www.rfc-editor.org/rfc/rfc9101#section-10.5" class="relref">섹션
+                                10.5</a></span> 참조)에 의해 클라이언트가 서명된 Request
+                        Object를 사용해야 하는 경우, 인가 서버는 <a href="#request_parameter" class="xref">섹션 3</a>에 제시된 정의를 준수하는 요청만
+                        수락해야 하며(<span class="bcp14">MUST</span>), 그 외의 모든 요청은 HTTP 상태 코드
+                        400 및 오류 코드 <code>invalid_request</code>로 거부해야 한다(<span class="bcp14">MUST</span>).<a
+                            href="#section-2.3-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.3-3">위의 내용에 더하여, PAR 엔드포인트는 다음 HTTP 상태 코드도 사용할 수
+                        있다:<a href="#section-2.3-3" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-2.3-4">
+                        <dt id="section-2.3-4.1">405:</dt>
+                        <dd style="margin-left: 3.0em" id="section-2.3-4.2"> 요청이
+                            <code>POST</code> 메서드를 사용하지 않은 경우, 인가 서버는 HTTP 405 (Method Not
+                            Allowed) 상태 코드로 응답한다.<a href="#section-2.3-4.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-2.3-4.3">413:</dt>
+                        <dd style="margin-left: 3.0em" id="section-2.3-4.4"> 요청 크기가 인가 서버가 허용하는
+                            상한을 초과한 경우, 인가 서버는 HTTP 413 (Payload Too Large) 상태 코드로
+                            응답한다.<a href="#section-2.3-4.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-2.3-4.5">429:</dt>
+                        <dd style="margin-left: 3.0em" id="section-2.3-4.6"> 특정 기간 동안 클라이언트의 요청
+                            수가 인가 서버가 허용하는 수를 초과한 경우, 인가 서버는 HTTP 429 (Too Many Requests)
+                            상태 코드로 응답한다.<a href="#section-2.3-4.6" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <p id="section-2.3-5">다음은 PAR 엔드포인트의 오류 응답 예이다:<a href="#section-2.3-5" class="pilcrow">¶</a></p>
+                    <div id="section-2.3-6">
+                        <pre class="sourcecode lang-http-message"> HTTP/1.1 400 Bad Request
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
+
+ {
+   "error": "invalid_request",
+   "error_description":
+     "The redirect_uri is not valid for the given client"
+ }
+</pre><a href="#section-2.3-6" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+            <div id="redirect_uri_mgmt">
+                <section id="section-2.4">
+                    <h3 id="name-management-of-client-redire">
+                        <a href="#section-2.4" class="section-number selfRef">2.4. </a><a
+                            href="#name-management-of-client-redire" class="section-name selfRef">클라이언트
+                            리디렉션 URI의 관리</a>
+                    </h3>
+                    <p id="section-2.4-1">OAuth 2.0 <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>은
+                        특정 상황에서 클라이언트가 등록되지 않은 <code>redirect_uri</code> 값을 사용하거나,
+                        인가 서버가 인가 엔드포인트에서 클라이언트가 제시한 <code>redirect_uri</code> 값에
+                        자체 매칭 의미론을 적용할 수 있게 한다. 그러나 OAuth security BCP
+                        <span>[<a href="#I-D.ietf-oauth-security-topics" class="xref">OAUTH-SECURITY-TOPICS</a>]</span>와
+                        OAuth 2.1 명세 <span>[<a href="#I-D.ietf-oauth-v2-1" class="xref">OAUTH-V2</a>]</span>는 인가 서버가
+                        <code>redirect_uri</code>
+                        매개변수를 특정 클라이언트에 대해 이전에 설정된 redirect URI 집합과 정확히 일치시킬
+                        것을 요구한다. 이는 클라이언트 사칭 시도의 조기 탐지 수단이며, 토큰 유출과 오픈
+                        리디렉션을 방지한다. 단점으로는 redirect URI가 일반적으로 클라이언트 정책에서 가장
+                        변동성이 큰 부분이므로 클라이언트 관리를 더 번거롭게 만들 수 있다.<a href="#section-2.4-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.4-2">인가 서버와 인증 자격 증명을 설정한 클라이언트에 대해 PAR를 사용할
+                        때는 정확한 매칭 요구사항을 완화할 수 있다(<span class="bcp14">MAY</span>). 이는
+                        전통적인 인가 요청과 달리, 인가 프로세스가 시작되기 전에 인가 서버가 클라이언트를
+                        인증하여 합법적인 클라이언트와 상호작용하고 있음을 보장하기 때문에 가능하다.
+                        인가 서버는 그러한 클라이언트가 인가 서버에 이전에 등록되지 않은
+                        <code>redirect_uri</code> 값을 지정하도록 허용할 수 있다(<span class="bcp14">MAY</span>). 이는 클라이언트에 더 많은
+                        유연성(예: 런타임에 인가
+                        서버별로 서로 다른 <code>redirect_uri</code> 값을 생성)을 제공하고 클라이언트 관리를
+                        단순화할 수 있다. 제공된 <code>redirect_uri</code> 값에 제한을 적용할지는 인가 서버의
+                        재량이다. 예를 들어, 인가 서버는 특정 URI 접두사를 요구하거나 런타임에 쿼리
+                        매개변수만 달라지는 것을 허용할 수 있다(<span class="bcp14">MAY</span>).<a href="#section-2.4-2"
+                            class="pilcrow">¶</a>
+                    </p>
+                    <aside id="section-2.4-3">
+                        <p id="section-2.4-3.1">참고: 트랜잭션별 redirect URI를 설정하는 기능은 클라이언트 ID와
+                            해당 자격 증명 및 정책이 신뢰할 수 있는 제3자에 의해 관리되는 상황에서도
+                            유용하다. 예를 들어 클라이언트 권한을 포함한 클라이언트 인증서를 통해 관리되는
+                            경우가 있다. 그러한 외부 관리 클라이언트는 추가 등록 단계 없이 해당 제3자를
+                            신뢰하는 인가 서버와 상호작용할 수 있다.<a href="#section-2.4-3.1" class="pilcrow">¶</a></p>
+                    </aside>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="request_parameter">
+        <section id="section-3">
+            <h2 id="name-the-request-request-paramet">
+                <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-request-request-paramet"
+                    class="section-name selfRef">"request" 요청 매개변수</a>
+            </h2>
+            <p id="section-3-1">클라이언트는 JAR <span>[<a href="#RFC9101" class="xref">RFC9101</a>]</span>에서
+                정의한 <code>request</code> 매개변수를 사용하여 Request Object JWT를 인가 서버로 푸시할 수
+                있다(<span class="bcp14">MAY</span>). JAR <span>[<a href="#RFC9101" class="xref">RFC9101</a>]</span>에서
+                정의한 Request Object의 처리, 서명, 암호화 규칙이 적용된다. 특정 클라이언트 인증 방법에서
+                요구되는 요청 매개변수는 <code>application/x-www-form-urlencoded</code> 요청에 직접 포함되며,
+                폼 본문에서 <code>request</code> 이외의 유일한 매개변수이다(예: 상호 TLS 클라이언트 인증
+                <span>[<a href="#RFC8705" class="xref">RFC8705</a>]</span>은 <code>client_id</code> HTTP 요청
+                매개변수를 사용하고, JWT assertion 기반 클라이언트 인증 <span>[<a href="#RFC7523" class="xref">RFC7523</a>]</span>은
+                <code>client_assertion</code> 및
+                <code>client_assertion_type</code>을 사용한다). 그 밖의 모든 요청 매개변수, 즉 인가 요청
+                자체와 관련된 매개변수는 인가 요청을 나타내는 JWT의 claim으로 나타나야 한다(<span class="bcp14">MUST</span>).<a href="#section-3-1"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-2">다음은 <a href="#request" class="xref">섹션 2.1</a>의 예제와 동일한 인가 요청 페이로드를 가진 서명된 Request
+                Object를 사용한 푸시된 인가 요청의 예이다. 클라이언트는 JWT 클라이언트 assertion 기반
+                인증 <span>[<a href="#RFC7523" class="xref">RFC7523</a>]</span>으로 인증된다
+                (추가 줄바꿈과 공백은 표시 목적만을 위한 것임):<a href="#section-3-2" class="pilcrow">¶</a></p>
+            <div id="section-3-3">
+                <pre class="sourcecode lang-http-message"> POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &amp;client_assertion=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3Mi
+  OiJzNkJoZFJrcXQzIiwic3ViIjoiczZCaGRSa3F0MyIsImF1ZCI6Imh0dHBzOi8vc
+  2VydmVyLmV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY5Njc3fQ.te4IdnP_DK4hWrh
+  TWA6fyhy3fxlAQZAhfA4lmzRdpoP5uZb-E90R5YxzN1YDA8mnVdpgj_Bx1lG5r6se
+  f5TlckApA3hahhC804dcqlE4naEmLISmN1pds2WxTMOUzZY8aKKSDzNTDqhyTgE-K
+  dTb3RafRj7tdZb09zWs7c_moOvfVcQIoy5zz1BvLQKW1Y8JsYvdpu2AvpxRPbcP8W
+  yeW9B6PL6_fy3pXYKG3e-qUcvPa9kan-mo9EoSgt-YTDQjK1nZMdXIqTluK9caVJE
+  RWW0fD1Y11_tlOcJn-ya7v7d8YmFyJpkhZfm8x1FoeH0djEicXTixEkdRuzsgUCm6
+  GQ
+ &amp;request=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJzNkJoZ
+  FJrcXQzIiwiYXVkIjoiaHR0cHM6Ly9zZXJ2ZXIuZXhhbXBsZS5jb20iLCJleHAiOj
+  E2MjU4Njk2NzcsInJlc3BvbnNlX3R5cGUiOiJjb2RlIiwiY2xpZW50X2lkIjoiczZ
+  CaGRSa3F0MyIsInJlZGlyZWN0X3VyaSI6Imh0dHBzOi8vY2xpZW50LmV4YW1wbGUu
+  b3JnL2NiIiwic2NvcGUiOiJhY2NvdW50LWluZm9ybWF0aW9uIiwic3RhdGUiOiJhZ
+  jBpZmpzbGRraiIsImNvZGVfY2hhbGxlbmdlIjoiSzItbHRjODNhY2M0aDBjOXc2RV
+  NDX3JFTVRKM2J3dy11Q0hhb2VLMXQ4VSIsImNvZGVfY2hhbGxlbmdlX21ldGhvZCI
+  6IlMyNTYifQ.l9R3RC9bFBHry_8acObQjEf4fX5yfJkWUPfak3J3iiBm0aaQznPw5
+  BZ0B3VQZ9_KYdPt5bTkaflS5fSDklM3_7my9MyOSKFYmf46INk6ju_qUuC2crkOQX
+  ZWYJB-0bnYEbdHpUjazFSUvN49cEGstNQeE-dKDWHNgEojgcuNA_pjKfL9VYp1dEA
+  6-WjXZ_OlJ7R_mBWpjFAzc0UkQwqX5hfOJoGTqB2tE4a4aB2z8iYlUJp0DeeYp_hP
+  N6svtmdvte73p5bLGDFpRIlmrBQIAQuxiS0skORpXlS0cBcgHimXVnXOJG7E-A_lS
+  _5y54dVLQPA1jKYx-fxbYSG7dp2fw
+ &amp;client_id=s6BhdRkqt3
+</pre><a href="#section-3-3" class="pilcrow">¶</a>
+            </div>
+            <p id="section-3-4">인가 서버는 <a href="#request" class="xref">섹션 2.1</a>에 정의된 처리 규칙에
+                더해 다음 단계를 수행해야 한다(<span class="bcp14">MUST</span>):<a href="#section-3-4" class="pilcrow">¶</a></p>
+            <ol start="1" type="1" class="normal type-1" id="section-3-5">
+                <li id="section-3-5.1">적용 가능한 경우, JAR <span>[<a href="#RFC9101" class="xref">RFC9101</a>], <a
+                            href="https://www.rfc-editor.org/rfc/rfc9101#section-6.1" class="relref">섹션
+                            6.1</a></span>에 명시된 대로 Request Object를 복호화한다.<a href="#section-3-5.1" class="pilcrow">¶</a>
+                </li>
+                <li id="section-3-5.2">JAR <span>[<a href="#RFC9101" class="xref">RFC9101</a>], <a
+                            href="https://www.rfc-editor.org/rfc/rfc9101#section-6.2" class="relref">섹션
+                            6.2</a></span>에 명시된 대로 Request Object 서명을 검증한다.<a href="#section-3-5.2"
+                        class="pilcrow">¶</a>
+                </li>
+                <li id="section-3-5.3">클라이언트가 인가 서버와 인증 자격 증명을 설정한 경우, 인증된
+                    <code>client_id</code>가 Request Object의 <code>client_id</code> claim과 일치하지 않으면
+                    요청을 거부한다. 또한 <code>iss</code> claim이 <code>client_id</code>와 일치하도록 요구할지는
+                    인가 서버의 재량이다.<a href="#section-3-5.3" class="pilcrow">¶</a>
+                </li>
+            </ol>
+            <p id="section-3-6">JSON Web Key (JWK) 형식 <span>[<a href="#RFC7517" class="xref">RFC7517</a>]</span>으로 표현된
+                다음 RSA 키 쌍은 위 예제의
+                Request Object 서명을 검증하거나 재생성하는 데 사용할 수 있다(값 내부의 추가 줄바꿈과
+                들여쓰기는 표시 목적만을 위한 것임):<a href="#section-3-6" class="pilcrow">¶</a></p>
+            <div id="section-3-7">
+                <pre class="sourcecode lang-json"> {
+   "kty": "RSA",
+   "kid":"k2bdc",
+   "n": "y9Lqv4fCp6Ei-u2-ZCKq83YvbFEk6JMs_pSj76eMkddWRuWX2aBKGHAtKlE
+         5P7_vn__PCKZWePt3vGkB6ePgzAFu08NmKemwE5bQI0e6kIChtt_6KzT5Oa
+         aXDFI6qCLJmk51Cc4VYFaxgqevMncYrzaW_50mZ1yGSFIQzLYP8bijAHGVj
+         dEFgZaZEN9lsn_GdWLaJpHrB3ROlS50E45wxrlg9xMncVb8qDPuXZarvghL
+         L0HzOuYRadBJVoWZowDNTpKpk2RklZ7QaBO7XDv3uR7s_sf2g-bAjSYxYUG
+         sqkNA9b3xVW53am_UZZ3tZbFTIh557JICWKHlWj5uzeJXaw",
+   "e": "AQAB",
+   "d": "LNwG_pCKrwowALpCpRdcOKlSVqylSurZhE6CpkRiE9cpDgGKIkO9CxPlXOL
+         zjqxXuQc8MdMqRQZTnAwgd7HH0B6gncrruV3NewI-XQV0ckldTjqNfOTz1V
+         Rs-jE-57KAXI3YBIhu-_0YpIDzdk_wBuAk661Svn0GsPQe7m9DoxdzenQu9
+         O_soewUhlPzRrTH0EeIqYI715rwI3TYaSzoWBmEPD2fICyj18FF0MPy_SQz
+         k3noVUUIzfzLnnJiWy_p63QBCMqjRoSHHdMnI4z9iVpIwJWQ3jO5n_2lC2-
+         cSgwjmKsFzDBbQNJc7qMG1N6EssJUwgGJxz1eAUFf0w4YAQ",
+   "qi": "J-mG0swR4FTy3atrcQ7dd0hhYn1E9QndN-
+         -sDG4EQO0RnFj6wIefCvwIc4
+         7hCtVeFnCTPYJNc_JyV-mU-9vlzS5GSNuyR5qdpsMZXUMpEvQcwKt23ffPZ
+         YGaqfKyEesmf_Wi8fFcE68H9REQjnniKrXm7w2-IuG_IrVJA9Ox-uU",
+   "q": "4hlMYAGa0dvogdK1jnxQ7J_Lqpqi99e-AeoFvoYpMPhthChTzwFZO9lQmUo
+         BpMqVQTws_s7vWGmt7ZAB3ywkurf0pV7BD0fweJiUzrWk4KJjxtmP_auuxr
+         jvm3s2FUGn6f0wRY9Z8Hj9A7C72DnYCjuZiJQMYCWDsZ8-d-L1a-s",
+   "p": "5sd9Er3I2FFT9R-gy84_oakEyCmgw036B_nfYEEOCwpSvi2z7UcIVK3bSEL
+         5WCW6BNgB3HDWhq8aYPirwQnqm0K9mX1E-4xM10WWZ-rP3XjYpQeS0Snru5
+         LFVWsAzi-FX7BOqBibSAXLdEGXcXa44l08iec_bPD3xduq5V_1YoE",
+   "dq": "Nz2PF3XM6bEc4XsluKZO70ErdYdKgdtIJReUR7Rno_tOZpejwlPGBYVW19
+         zpAeYtCT82jxroB2XqhLxGeMxEPQpsz2qTKLSe4BgHY2ml2uxSDGdjcsrbb
+         NoKUKaN1CuyZszhWl1n0AT_bENl4bJgQj_Fh0UEsQj5YBBUJt5gr_k",
+   "dp": "Zc877jirkkLOtyTs2vxyNe9KnMNAmOidlUc2tE_-0gAL4Lpo1hSwKCtKwe
+         ZJ-gkqt1hT-dwNx_0Xtg_-NXsadMRMwJnzBMYwYAfjApUkfqABc0yUCJJl3
+         KozRCugf1WXkU9GZAH2_x8PUopdNUEa70ISowPRh04HANKX4fkjWAE"
+  }
+</pre><a href="#section-3-7" class="pilcrow">¶</a>
+            </div>
+        </section>
+    </div>
+    <div id="authorization-request">
+        <section id="section-4">
+            <h2 id="name-authorization-request">
+                <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-authorization-request"
+                    class="section-name selfRef">인가 요청</a>
+            </h2>
+            <p id="section-4-1">클라이언트는 인가 서버가 반환한 <code>request_uri</code> 값을 사용하여
+                <span>[<a href="#RFC9101" class="xref">RFC9101</a>]</span>에서 정의한 인가 요청을 작성한다. 이는 클라이언트가
+                사용자 에이전트에게 다음 HTTP 요청을 하도록 지시하는 다음 예제에 나타나 있다(추가 줄바꿈과
+                들여쓰기는 표시 목적만을 위한 것임):<a href="#section-4-1" class="pilcrow">¶</a>
+            </p>
+            <div id="section-4-2">
+                <pre class="sourcecode lang-http-message"> GET /authorize?client_id=s6BhdRkqt3&amp;request_uri=urn%3Aietf%3Aparams
+  %3Aoauth%3Arequest_uri%3A6esc_11ACC5bwc014ltc14eY22c HTTP/1.1
+ Host: as.example.com
+</pre><a href="#section-4-2" class="pilcrow">¶</a>
+            </div>
+            <p id="section-4-3">인가 요청 콘텐츠의 일부, 예를 들어 <code>code_challenge</code> 매개변수 값은
+                특정 인가 요청에 고유하므로, 클라이언트는 <code>request_uri</code> 값을 한 번만 사용해야 한다
+                (<span class="bcp14">MUST</span>). 인가 서버는 <code>request_uri</code> 값을 일회용으로 취급하는
+                것이 좋지만(<span class="bcp14">SHOULD</span>), 사용자가 자신의 사용자 에이전트를 다시 로드/새로고침하는
+                경우 중복 요청을 허용할 수 있다(<span class="bcp14">MAY</span>). 만료된 <code>request_uri</code>는 유효하지 않은 것으로 거부되어야
+                한다(<span class="bcp14">MUST</span>).<a href="#section-4-3" class="pilcrow">¶</a>
+            </p>
+            <p id="section-4-4">인가 서버는 푸시된 요청에서 발생한 인가 요청을 다른 인가 요청과 같이
+                검증해야 한다(<span class="bcp14">MUST</span>). 인가 서버는 요청이 푸시된 요청임을 검증할 수
+                있고, 요청 또는 인가 서버의 정책이 생략된 단계의 결과에 영향을 미칠 방식으로 수정되지
+                않았음을 검증할 수 있다면, 요청이 푸시되었을 때 수행한 검증 단계를 생략할 수 있다(<span class="bcp14">MAY</span>).<a href="#section-4-4"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-4-5">인가 서버 정책은 전역적으로 또는 클라이언트별로, PAR가 클라이언트가 인가 요청
+                데이터를 전달할 수 있는 유일한 수단이라고 규정할 수 있다(<span class="bcp14">MAY</span>).
+                이 경우 인가 서버는 PAR 엔드포인트에서 얻은 값을 가진 <code>request_uri</code> 매개변수가 없는
+                인가 엔드포인트 요청 처리를 <code>invalid_request</code> 오류 코드로 거부한다.<a href="#section-4-5" class="pilcrow">¶</a>
+            </p>
+            <aside id="section-4-6">
+                <p id="section-4-6.1">참고: 인가 서버와 클라이언트는 원하는 동작을 신호하기 위해
+                    <a href="#as_metadata" class="xref">5</a> 및 <a href="#c_metadata" class="xref">6</a> 섹션에 정의된 메타데이터를
+                    사용할 수 있다(<span class="bcp14">MAY</span>).<a href="#section-4-6.1" class="pilcrow">¶</a>
+                </p>
+            </aside>
+        </section>
+    </div>
+    <div id="as_metadata">
+        <section id="section-5">
+            <h2 id="name-authorization-server-metada">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-authorization-server-metada"
+                    class="section-name selfRef">인가 서버 메타데이터</a>
+            </h2>
+            <p id="section-5-1">다음 인가 서버 메타데이터 매개변수 <span>[<a href="#RFC8414" class="xref">RFC8414</a>]</span>는 PAR와 관련한
+                서버의 기능 및 정책을 신호하기 위해
+                도입된다.<a href="#section-5-1" class="pilcrow">¶</a></p>
+            <span class="break"></span>
+            <dl class="dlNewline" id="section-5-2">
+                <dt id="section-5-2.1">pushed_authorization_request_endpoint</dt>
+                <dd style="margin-left: 1.5em" id="section-5-2.2">클라이언트가 인가 요청을 게시하여 인가
+                    서버에서 사용할 수 있는 <code>request_uri</code> 값으로 교환할 수 있는 푸시된 인가 요청
+                    엔드포인트의 URL.<a href="#section-5-2.2" class="pilcrow">¶</a>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-2.3">require_pushed_authorization_requests</dt>
+                <dd style="margin-left: 1.5em" id="section-5-2.4">인가 서버가 인가 요청 데이터를 PAR를 통해서만
+                    수락하는지 여부를 나타내는 Boolean 매개변수. 생략된 경우 기본값은
+                    <code>false</code>이다.<a href="#section-5-2.4" class="pilcrow">¶</a>
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+            <p id="section-5-3"><code>pushed_authorization_request_endpoint</code>가 존재하는 것만으로도
+                클라이언트는 PAR 흐름을 사용할 수 있음을 판단하기에 충분하다는 점에 유의하라. PAR
+                엔드포인트에서 얻은 <code>request_uri</code> 값은 <code>request_uri_parameter_supported</code>
+                또는 <code>require_request_uri_registration</code> <span>[<a href="#OIDC.Disco"
+                        class="xref">OIDC.Disco</a>]</span>와 같은 다른 인가 서버 메타데이터와 관계없이 인가
+                엔드포인트에서 사용할 수 있다.<a href="#section-5-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="c_metadata">
+        <section id="section-6">
+            <h2 id="name-client-metadata">
+                <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-client-metadata"
+                    class="section-name selfRef">클라이언트 메타데이터</a>
+            </h2>
+            <p id="section-6-1">Dynamic Client Registration Protocol <span>[<a href="#RFC7591"
+                        class="xref">RFC7591</a>]</span>은 OAuth 2.0 클라이언트 메타데이터를 인가 서버에
+                동적으로 등록하기 위한 API를 정의한다. <span>[<a href="#RFC7591" class="xref">RFC7591</a>]</span>에서 정의한 메타데이터 및 그에 등록된
+                확장은 Dynamic
+                Client Registration Protocol이 사용되지 않는 경우에도 인가 서버 구현에 유용한 클라이언트에
+                대한 일반 데이터 모델을 암시한다. 그러한 구현은 일반적으로 클라이언트 구성을 관리할 수
+                있는 일종의 사용자 인터페이스를 갖는다. 다음 클라이언트 메타데이터 매개변수는 해당
+                클라이언트에 대해 푸시된 인가 요청이 요구되는지 나타내기 위해 이 문서에서 도입된다.<a href="#section-6-1" class="pilcrow">¶</a></p>
+            <span class="break"></span>
+            <dl class="dlNewline" id="section-6-2">
+                <dt id="section-6-2.1">require_pushed_authorization_requests</dt>
+                <dd style="margin-left: 1.5em" id="section-6-2.2">클라이언트가 인가 요청을 시작하기 위해 사용할 수
+                    있는 유일한 수단이 PAR인지 여부를 나타내는 Boolean 매개변수. 생략된 경우 기본값은
+                    <code>false</code>이다.<a href="#section-6-2.2" class="pilcrow">¶</a>
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+    </div>
+    <div id="security-considerations">
+        <section id="section-7">
+            <h2 id="name-security-considerations">
+                <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations"
+                    class="section-name selfRef">보안 고려사항</a>
+            </h2>
+            <div id="request-uri-guessing">
+                <section id="section-7.1">
+                    <h3 id="name-request-uri-guessing">
+                        <a href="#section-7.1" class="section-number selfRef">7.1. </a><a
+                            href="#name-request-uri-guessing" class="section-name selfRef">요청 URI 추측</a>
+                    </h3>
+                    <p id="section-7.1-1">공격자는 유효한 요청 URI 값을 추측하여 재생하고 해당 클라이언트를
+                        사칭하려고 시도할 수 있다.
+
+                        인가 서버는 JAR <span>[<a href="#RFC9101" class="xref">RFC9101</a>], <a
+                                href="https://www.rfc-editor.org/rfc/rfc9101#section-10.2" class="relref">섹션
+                                10.2</a></span>의 요청 URI 엔트로피에 관한 조항 (d)에 제시된 고려사항을
+                        반영해야 한다(<span class="bcp14">MUST</span>).<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="open-redirection">
+                <section id="section-7.2">
+                    <h3 id="name-open-redirection">
+                        <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-open-redirection"
+                            class="section-name selfRef">오픈 리디렉션</a>
+                    </h3>
+                    <p id="section-7.2-1">공격자는 인가 코드를 얻거나 사용자를 향한 다른 공격을 시작하기 위해
+                        자신이 제어하는 사이트를 가리키는 redirect URI를 등록하려고 시도할 수 있다.
+                        인가 서버는 인증된 클라이언트로부터 푸시된 인가 요청에 있는 새로운 redirect URI만
+                        수락해야 한다(<span class="bcp14">MUST</span>).<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="request-object-replay">
+                <section id="section-7.3">
+                    <h3 id="name-request-object-replay">
+                        <a href="#section-7.3" class="section-number selfRef">7.3. </a><a
+                            href="#name-request-object-replay" class="section-name selfRef">Request Object 재생</a>
+                    </h3>
+                    <p id="section-7.3-1">공격자는 합법적인 인가 요청에서 캡처한 요청 URI를 재생할 수 있다.
+                        이러한 공격에 대처하기 위해, 인가 서버는 요청 URI를 일회용으로 만드는 것이 좋다
+                        (<span class="bcp14">SHOULD</span>).<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="client-policy-change">
+                <section id="section-7.4">
+                    <h3 id="name-client-policy-change">
+                        <a href="#section-7.4" class="section-number selfRef">7.4. </a><a
+                            href="#name-client-policy-change" class="section-name selfRef">클라이언트 정책 변경</a>
+                    </h3>
+                    <p id="section-7.4-1">Request Object의 등록과 특정 Request Object를 사용하는 인가 요청
+                        사이에 클라이언트 정책이 변경될 수 있다. 따라서 인가 요청을 처리할 때 인가 서버가
+                        요청 매개변수를 클라이언트 정책과 대조하여 확인하는 것이 권장된다.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="request-uri-swapping">
+                <section id="section-7.5">
+                    <h3 id="name-request-uri-swapping">
+                        <a href="#section-7.5" class="section-number selfRef">7.5. </a><a
+                            href="#name-request-uri-swapping" class="section-name selfRef">요청 URI 바꾸기</a>
+                    </h3>
+                    <p id="section-7.5-1">공격자는 한 요청에서 요청 URI를 캡처한 다음 이를 다른 인가 요청에
+                        대체할 수 있다. 예를 들어 OpenID Connect 컨텍스트에서, 공격자는 높은 수준의 인증
+                        보증을 요구하는 요청 URI를 더 낮은 수준의 보증을 요구하는 것으로 교체할 수 있다.
+                        클라이언트는 이 공격을 방지하기 위해 푸시된 Request Object에서 PKCE <span>[<a href="#RFC7636"
+                                class="xref">RFC7636</a>]</span>,
+                        고유한 <code>state</code> 매개변수 <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>,
+                        또는 OIDC "nonce" 매개변수 <span>[<a href="#OIDC" class="xref">OIDC</a>]</span>를 사용하는
+                        것이 좋다(<span class="bcp14">SHOULD</span>).<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="privacy-considerations">
+        <section id="section-8">
+            <h2 id="name-privacy-considerations">
+                <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-privacy-considerations"
+                    class="section-name selfRef">개인정보 고려사항</a>
+            </h2>
+            <p id="section-8-1">OAuth 2.0은 한 엔터티가 두 다른 엔터티 사이에서 데이터 접근에 대한 사용자
+                인가를 중개하는 본질 때문에 광범위한 개인정보 영향을 가진 복잡하고 유연한 프레임워크이다.
+                OAuth 전체의 개인정보 고려사항은 이 문서의 범위를 벗어나며, 이 문서는 더 큰 프레임워크
+                안에서 하나의 메시지 시퀀스를 시작하는 대안적 방법만 정의한다. 그러나 PAR를 사용하면
+                인가 요청 데이터가 평문으로 사용자 에이전트를 통과하는 URL의 쿼리 구성요소가 아니라,
+                HTTP 요청의 메시지 본문에서 보안 연결을 통해 클라이언트와 인가 서버 사이에 직접 전달되므로
+                부주의한 정보 공개 가능성을 줄여 개인정보 보호를 개선할 수 있다.<a href="#section-8-1" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="iana_considerations">
+        <section id="section-9">
+            <h2 id="name-iana-considerations">
+                <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations"
+                    class="section-name selfRef">IANA 고려사항</a>
+            </h2>
+            <div id="oauth-authorization-server-metadata">
+                <section id="section-9.1">
+                    <h3 id="name-oauth-authorization-server-">
+                        <a href="#section-9.1" class="section-number selfRef">9.1. </a><a
+                            href="#name-oauth-authorization-server-" class="section-name selfRef">OAuth 인가
+                            서버 메타데이터</a>
+                    </h3>
+                    <p id="section-9.1-1">IANA는 <span>[<a href="#RFC8414" class="xref">RFC8414</a>]</span>에 의해 설정된
+                        <span>[<a href="#IANA.OAuth.Parameters" class="xref">IANA.OAuth.Parameters</a>]</span>의 IANA
+                        "OAuth Authorization
+                        Server Metadata" 레지스트리에 다음 값을 등록했다.<a href="#section-9.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <span class="break"></span>
+                    <dl class="dlParallel dlCompact" id="section-9.1-2">
+                        <dt id="section-9.1-2.1">메타데이터 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-2.2">
+                            <code>pushed_authorization_request_endpoint</code><a href="#section-9.1-2.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.1-2.3">메타데이터 설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-2.4">인가 서버의 푸시된
+                            인가 요청 엔드포인트의 URL.<a href="#section-9.1-2.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.1-2.5">변경 관리 주체:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-2.6">IESG<a href="#section-9.1-2.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.1-2.7">명세 문서:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-2.8">
+                            RFC 9126의 <a href="#as_metadata" class="xref">섹션 5</a><a href="#section-9.1-2.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlParallel dlCompact" id="section-9.1-3">
+                        <dt id="section-9.1-3.1">메타데이터 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-3.2">
+                            <code>require_pushed_authorization_requests</code><a href="#section-9.1-3.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.1-3.3">메타데이터 설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-3.4">인가 서버가 인가 요청을
+                            PAR를 통해서만 수락하는지 여부를 나타낸다.<a href="#section-9.1-3.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.1-3.5">변경 관리 주체:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-3.6">IESG<a href="#section-9.1-3.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.1-3.7">명세 문서:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.1-3.8">
+                            RFC 9126의 <a href="#as_metadata" class="xref">섹션 5</a><a href="#section-9.1-3.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+            <div id="oauth-dynamic-client-registration-metadata">
+                <section id="section-9.2">
+                    <h3 id="name-oauth-dynamic-client-regist">
+                        <a href="#section-9.2" class="section-number selfRef">9.2. </a><a
+                            href="#name-oauth-dynamic-client-regist" class="section-name selfRef">OAuth 동적 클라이언트
+                            등록 메타데이터</a>
+                    </h3>
+                    <p id="section-9.2-1">IANA는 <span>[<a href="#RFC7591" class="xref">RFC7591</a>]</span>에 의해 설정된
+                        <span>[<a href="#IANA.OAuth.Parameters" class="xref">IANA.OAuth.Parameters</a>]</span>의 IANA
+                        "OAuth Dynamic Client
+                        Registration Metadata" 레지스트리에 다음 값을 등록했다.<a href="#section-9.2-1" class="pilcrow">¶</a>
+                    </p>
+                    <span class="break"></span>
+                    <dl class="dlParallel dlCompact" id="section-9.2-2">
+                        <dt id="section-9.2-2.1">클라이언트 메타데이터 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.2-2.2">
+                            <code>require_pushed_authorization_requests</code><a href="#section-9.2-2.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.2-2.3">클라이언트 메타데이터 설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.2-2.4">클라이언트가 인가 요청을 시작하기 위해
+                            PAR를 사용해야 하는지 여부를 나타낸다.<a href="#section-9.2-2.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.2-2.5">변경 관리 주체:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.2-2.6">IESG<a href="#section-9.2-2.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.2-2.7">명세 문서:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.2-2.8">
+                            RFC 9126의 <a href="#c_metadata" class="xref">섹션 6</a><a href="#section-9.2-2.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+            <div id="oauth-uri-registration">
+                <section id="section-9.3">
+                    <h3 id="name-oauth-uri-registration">
+                        <a href="#section-9.3" class="section-number selfRef">9.3. </a><a
+                            href="#name-oauth-uri-registration" class="section-name selfRef">OAuth URI 등록</a>
+                    </h3>
+                    <p id="section-9.3-1">IANA는 <span>[<a href="#RFC6755" class="xref">RFC6755</a>]</span>에 의해
+                        설정된 <span>[<a href="#IANA.OAuth.Parameters" class="xref">IANA.OAuth.Parameters</a>]</span>의
+                        "OAuth URI" 레지스트리에 다음 값을 등록했다.<a href="#section-9.3-1" class="pilcrow">¶</a>
+                    </p>
+                    <span class="break"></span>
+                    <dl class="dlParallel dlCompact" id="section-9.3-2">
+                        <dt id="section-9.3-2.1">URN:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.3-2.2">
+                            <code>urn:ietf:params:oauth:request_uri:</code><a href="#section-9.3-2.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.3-2.3">일반 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.3-2.4">OAuth 요청 URI를 위한
+                            URN 하위 네임스페이스.<a href="#section-9.3-2.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.3-2.5">변경 관리 주체:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.3-2.6">IESG<a href="#section-9.3-2.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-9.3-2.7">명세 문서:</dt>
+                        <dd style="margin-left: 1.5em" id="section-9.3-2.8">
+                            RFC 9126의 <a href="#par-response" class="xref">섹션 2.2</a><a href="#section-9.3-2.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+        </section>
+    </div>
+    <section id="section-10">
+        <h2 id="name-references">
+            <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references"
+                class="section-name selfRef">참고문헌</a>
+        </h2>
+        <section id="section-10.1">
+            <h3 id="name-normative-references">
+                <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references"
+                    class="section-name selfRef">규범적 참고문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="RFC2119">[RFC2119]</dt>
+                <dd>
+                    <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"RFC에서
+                        요구사항 수준을 나타내기 위해 사용하는 핵심 단어"</span>, <span class="seriesInfo">BCP 14</span>, <span
+                        class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time
+                        datetime="1997-03" class="refDate">1997년 3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6749">[RFC6749]</dt>
+                <dd>
+                    <span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"OAuth 2.0 인가
+                        프레임워크"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC6749</span>, <time datetime="2012-10" class="refDate">2012년 10월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6749">https://www.rfc-editor.org/info/rfc6749</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8174">[RFC8174]</dt>
+                <dd>
+                    <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"RFC 2119 핵심 단어에서
+                        대문자와 소문자의 모호성"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC
+                        8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05"
+                        class="refDate">2017년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8259">[RFC8259]</dt>
+                <dd>
+                    <span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"JavaScript Object Notation
+                        (JSON) 데이터 교환 형식"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC
+                        8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12"
+                        class="refDate">2017년 12월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8259">https://www.rfc-editor.org/info/rfc8259</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8414">[RFC8414]</dt>
+                <dd>
+                    <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Sakimura, N.</span>, and <span
+                        class="refAuthor">J. Bradley</span>, <span class="refTitle">"OAuth 2.0 인가 서버
+                        메타데이터"</span>, <span class="seriesInfo">RFC 8414</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC8414</span>, <time datetime="2018-06" class="refDate">2018년 6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8414">https://www.rfc-editor.org/info/rfc8414</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC9101">[RFC9101]</dt>
+                <dd>
+                    <span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Bradley, J.</span>, and <span
+                        class="refAuthor">M. Jones</span>, <span class="refTitle">"OAuth 2.0 인가
+                        프레임워크: JWT-Secured Authorization Request (JAR)"</span>, <span class="seriesInfo">RFC
+                        9101</span>, <span class="seriesInfo">DOI 10.17487/RFC9101</span>, <time datetime="2021-08"
+                        class="refDate">2021년 8월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc9101">https://www.rfc-editor.org/info/rfc9101</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+        <section id="section-10.2">
+            <h3 id="name-informative-references">
+                <a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references"
+                    class="section-name selfRef">정보성 참고문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="IANA.OAuth.Parameters">[IANA.OAuth.Parameters]</dt>
+                <dd>
+                    <span class="refAuthor">IANA</span>, <span class="refTitle">"OAuth Parameters"</span>, <span>&lt;<a
+                            href="http://www.iana.org/assignments/oauth-parameters">http://www.iana.org/assignments/oauth-parameters</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="I-D.ietf-oauth-security-topics">[OAUTH-SECURITY-TOPICS]</dt>
+                <dd>
+                    <span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Bradley, J.</span>, <span
+                        class="refAuthor">Labunets, A.</span>, and <span class="refAuthor">D. Fett</span>, <span
+                        class="refTitle">"OAuth 2.0 Security Best Current Practice"</span>, <span class="refContent">진행
+                        중인 작업</span>, <span class="seriesInfo">Internet-Draft,
+                        draft-ietf-oauth-security-topics-18</span>, <time datetime="2021-04-13" class="refDate">2021년 4월
+                        13일</time>, <span>&lt;<a
+                            href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-18">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-18</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="I-D.ietf-oauth-v2-1">[OAUTH-V2]</dt>
+                <dd>
+                    <span class="refAuthor">Hardt, D.</span>, <span class="refAuthor">Parecki, A.</span>, and <span
+                        class="refAuthor">T. Lodderstedt</span>, <span class="refTitle">"OAuth 2.1 인가
+                        프레임워크"</span>, <span class="refContent">진행 중인 작업</span>, <span
+                        class="seriesInfo">Internet-Draft, draft-ietf-oauth-v2-1-03</span>, <time datetime="2021-09-08"
+                        class="refDate">2021년 9월 8일</time>, <span>&lt;<a
+                            href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-03">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-03</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="OIDC">[OIDC]</dt>
+                <dd>
+                    <span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Bradley, J.</span>, <span
+                        class="refAuthor">Jones, M.</span>, <span class="refAuthor">de Medeiros, B.</span>, and <span
+                        class="refAuthor">C. Mortimore</span>, <span class="refTitle">"OpenID Connect Core 1.0
+                        incorporating errata set 1"</span>, <time datetime="2014-11" class="refDate">2014년
+                        11월</time>, <span>&lt;<a
+                            href="http://openid.net/specs/openid-connect-core-1_0.html">http://openid.net/specs/openid-connect-core-1_0.html</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="OIDC.Disco">[OIDC.Disco]</dt>
+                <dd>
+                    <span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Bradley, J.</span>, <span
+                        class="refAuthor">Jones, M.</span>, and <span class="refAuthor">E. Jay</span>, <span
+                        class="refTitle">"OpenID Connect Discovery 1.0 incorporating errata set 1"</span>, <time
+                        datetime="2014-11" class="refDate">2014년 11월</time>, <span>&lt;<a
+                            href="http://openid.net/specs/openid-connect-discovery-1_0.html">http://openid.net/specs/openid-connect-discovery-1_0.html</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6755">[RFC6755]</dt>
+                <dd>
+                    <span class="refAuthor">Campbell, B.</span> and <span class="refAuthor">H. Tschofenig</span>, <span
+                        class="refTitle">"OAuth를 위한 IETF URN 하위 네임스페이스"</span>, <span class="seriesInfo">RFC
+                        6755</span>, <span class="seriesInfo">DOI 10.17487/RFC6755</span>, <time datetime="2012-10"
+                        class="refDate">2012년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6755">https://www.rfc-editor.org/info/rfc6755</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7517">[RFC7517]</dt>
+                <dd>
+                    <span class="refAuthor">Jones, M.</span>, <span class="refTitle">"JSON Web Key (JWK)"</span>, <span
+                        class="seriesInfo">RFC 7517</span>, <span class="seriesInfo">DOI 10.17487/RFC7517</span>, <time
+                        datetime="2015-05" class="refDate">2015년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7517">https://www.rfc-editor.org/info/rfc7517</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7519">[RFC7519]</dt>
+                <dd>
+                    <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span
+                        class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>,
+                    <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI 10.17487/RFC7519</span>,
+                    <time datetime="2015-05" class="refDate">2015년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7519">https://www.rfc-editor.org/info/rfc7519</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7523">[RFC7523]</dt>
+                <dd>
+                    <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Campbell, B.</span>, and <span
+                        class="refAuthor">C. Mortimore</span>, <span class="refTitle">"OAuth 2.0 클라이언트 인증 및 인가
+                        그랜트를 위한 JSON Web Token (JWT) 프로파일"</span>, <span class="seriesInfo">RFC
+                        7523</span>, <span class="seriesInfo">DOI 10.17487/RFC7523</span>, <time datetime="2015-05"
+                        class="refDate">2015년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7523">https://www.rfc-editor.org/info/rfc7523</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7591">[RFC7591]</dt>
+                <dd>
+                    <span class="refAuthor">Richer, J., Ed.</span>, <span class="refAuthor">Jones, M.</span>, <span
+                        class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Machulak, M.</span>, and <span
+                        class="refAuthor">P. Hunt</span>, <span class="refTitle">"OAuth 2.0 동적 클라이언트 등록
+                        프로토콜"</span>, <span class="seriesInfo">RFC 7591</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC7591</span>, <time datetime="2015-07" class="refDate">2015년 7월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7591">https://www.rfc-editor.org/info/rfc7591</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7636">[RFC7636]</dt>
+                <dd>
+                    <span class="refAuthor">Sakimura, N., Ed.</span>, <span class="refAuthor">Bradley, J.</span>, and
+                    <span class="refAuthor">N. Agarwal</span>, <span class="refTitle">"OAuth 공개 클라이언트를 위한
+                        Proof Key for Code Exchange"</span>, <span class="seriesInfo">RFC 7636</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC7636</span>, <time datetime="2015-09" class="refDate">2015년
+                        9월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7636">https://www.rfc-editor.org/info/rfc7636</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8252">[RFC8252]</dt>
+                <dd>
+                    <span class="refAuthor">Denniss, W.</span> and <span class="refAuthor">J. Bradley</span>, <span
+                        class="refTitle">"네이티브 앱을 위한 OAuth 2.0"</span>, <span class="seriesInfo">BCP 212</span>,
+                    <span class="seriesInfo">RFC 8252</span>, <span class="seriesInfo">DOI 10.17487/RFC8252</span>,
+                    <time datetime="2017-10" class="refDate">2017년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8252">https://www.rfc-editor.org/info/rfc8252</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8705">[RFC8705]</dt>
+                <dd>
+                    <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span
+                        class="refAuthor">Sakimura, N.</span>, and <span class="refAuthor">T. Lodderstedt</span>, <span
+                        class="refTitle">"OAuth 2.0 상호 TLS 클라이언트 인증 및 인증서 바인딩 접근
+                        토큰"</span>, <span class="seriesInfo">RFC 8705</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC8705</span>, <time datetime="2020-02" class="refDate">2020년 2월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8705">https://www.rfc-editor.org/info/rfc8705</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8707">[RFC8707]</dt>
+                <dd>
+                    <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, and <span
+                        class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"OAuth 2.0을 위한 Resource
+                        Indicators"</span>, <span class="seriesInfo">RFC 8707</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC8707</span>, <time datetime="2020-02" class="refDate">2020년 2월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8707">https://www.rfc-editor.org/info/rfc8707</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+    </section>
+    <div id="Acknowledgements">
+        <section id="appendix-A">
+            <h2 id="name-acknowledgements">
+                <a href="#name-acknowledgements" class="section-name selfRef">감사의 말</a>
+            </h2>
+            <p id="appendix-A-1">이 명세는 OpenID Foundation의 Financial-grade API Working Group에서 수행한
+                <a href="https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md">Pushed
+                    Request Object</a>
+                작업을 기반으로 한다. 귀중한 기여를 해 준 WG 구성원들에게 감사한다.<a href="#appendix-A-1" class="pilcrow">¶</a>
+            </p>
+            <p id="appendix-A-2">이 문서에 대한 귀중한 피드백을 제공해 준
+                <span class="contact-name">Vladimir Dzhuvinov</span>,
+                <span class="contact-name">Aaron Parecki</span>,
+                <span class="contact-name">Justin Richer</span>,
+                <span class="contact-name">Sascha Preibisch</span>,
+                <span class="contact-name">Daniel Fett</span>,
+                <span class="contact-name">Michael B. Jones</span>,
+                <span class="contact-name">Annabelle Backman</span>,
+                <span class="contact-name">Joseph Heenan</span>,
+                <span class="contact-name">Sean Glencross</span>,
+                <span class="contact-name">Maggie Hung</span>,
+                <span class="contact-name">Neil Madden</span>,
+                <span class="contact-name">Karsten Meyer zu Selhausen</span>,
+                <span class="contact-name">Roman Danyliw</span>,
+                <span class="contact-name">Meral Shirazipour</span>,
+                및
+                <span class="contact-name">Takahiko Kawasaki</span>
+                에게 감사한다.<a href="#appendix-A-2" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="authors-addresses">
+        <section id="appendix-B">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Torsten Lodderstedt</span></div>
+                <div dir="auto" class="left"><span class="org">yes.com</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:torsten@lodderstedt.net" class="email">torsten@lodderstedt.net</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Brian Campbell</span></div>
+                <div dir="auto" class="left"><span class="org">Ping Identity</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:bcampbell@pingidentity.com" class="email">bcampbell@pingidentity.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Nat Sakimura</span></div>
+                <div dir="auto" class="left"><span class="org">NAT.Consulting</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:nat@sakimura.org" class="email">nat@sakimura.org</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Dave Tonge</span></div>
+                <div dir="auto" class="left"><span class="org">Moneyhub Financial Technology</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:dave@tonge.org" class="email">dave@tonge.org</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Filip Skokan</span></div>
+                <div dir="auto" class="left"><span class="org">Auth0</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:panva.ip@gmail.com" class="email">panva.ip@gmail.com</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script>const toc = document.getElementById("toc");
+        toc.querySelector("h2").addEventListener("click", e => {
+            toc.classList.toggle("active");
+        });
+        toc.querySelector("nav").addEventListener("click", e => {
+            toc.classList.remove("active");
+        });
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
