@@ -348,6 +348,10 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### OAuth 및 인가 프로토콜
 - [The OAuth 2.0 Authorization Framework](https://ko.htmlspecs.com/oauth2/)（[Source](https://www.rfc-editor.org/rfc/rfc6749.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [OAuth 2.0 Pushed Authorization Requests](https://ko.htmlspecs.com/rfc9126/)（[Source](https://www.rfc-editor.org/rfc/rfc9126.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [OAuth 2.0 JWT-Secured Authorization Request (JAR)](https://ko.htmlspecs.com/rfc9101/)（[Source](https://www.rfc-editor.org/rfc/rfc9101.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [OAuth 2.0 Rich Authorization Requests](https://ko.htmlspecs.com/rfc9396/)（[Source](https://www.rfc-editor.org/rfc/rfc9396.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [OAuth 2.0 Token Exchange](https://ko.htmlspecs.com/rfc8693/)（[Source](https://www.rfc-editor.org/rfc/rfc8693.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://ko.htmlspecs.com/oauth2-bearer/)（[Source](https://www.rfc-editor.org/rfc/rfc6750.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Proof Key for Code Exchange by OAuth Public Clients](https://ko.htmlspecs.com/pkce/)（[Source](https://www.rfc-editor.org/rfc/rfc7636.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Best Current Practice for OAuth 2.0 Security](https://ko.htmlspecs.com/oauth2-security-bcp/)（[Source](https://www.rfc-editor.org/rfc/rfc9700.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
