@@ -1,0 +1,3882 @@
+<!DOCTYPE html>
+<html lang="ko" class="RFC">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>RFC 8693: OAuth 2.0 토큰 교환</title>
+    <meta content="Michael B. Jones" name="author">
+    <meta content="Anthony Nadalin" name="author">
+    <meta content="Brian Campbell" name="author">
+    <meta content="John Bradley" name="author">
+    <meta content="Chuck Mortimore" name="author">
+    <meta content="
+       
+ 이 명세는 HTTP 및 JSON 기반의
+ 보안 토큰 서비스(STS)를 위한 프로토콜을 정의하며,
+ OAuth 2.0 인가 서버에서 보안 토큰을 요청하고 획득하는 방법을 정의합니다.
+ 가장 및 위임을 사용하는 보안 토큰도 포함합니다.
+       
+    " name="description">
+    <meta content="xml2rfc 2.38.0" name="generator">
+    <meta content="JSON Web Token" name="keyword">
+    <meta content="JWT" name="keyword">
+    <meta content="Delegation" name="keyword">
+    <meta content="Impersonation" name="keyword">
+    <meta content="STS" name="keyword">
+    <meta content="Security Token Service" name="keyword">
+    <meta content="Exchange" name="keyword">
+    <meta content="Token" name="keyword">
+    <meta content="OAuth" name="keyword">
+    <meta content="8693" name="rfc.number">
+    <link href="rfc8693.xml" type="application/rfc+xml" rel="alternate">
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        /*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necssary during the development of the v3
+  formatters.
+
+*/
+
+        /* fonts */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+        /* Sans-serif */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Serif');
+        /* Serif (print) */
+        @import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+        /* Monospace */
+
+        @viewport {
+            zoom: 1.0;
+            width: extend-to-zoom;
+        }
+
+        @-ms-viewport {
+            width: extend-to-zoom;
+            zoom: 1.0;
+        }
+
+        /* general and mobile first */
+        html {}
+
+        body {
+            max-width: 90%;
+            margin: 1.5em auto;
+            color: #222;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        #title,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1em 0 0.5em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        #title {
+            clear: both;
+            border-bottom: 1px solid #ddd;
+            margin: 0 0 0.5em 0;
+            padding: 1em 0 0.5em;
+        }
+
+        .author {
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 1em 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: -20px;
+            /* provide offset for in-page anchors */
+            padding-top: 33px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h5,
+        h6 {
+            font-size: 14px;
+        }
+
+        #n-copyright-notice {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
+        }
+
+        /* general structure */
+        p {
+            padding: 0;
+            margin: 0 0 1em 0;
+            text-align: left;
+        }
+
+        div,
+        span {
+            position: relative;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignRight.art-text pre {
+            padding: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+        }
+
+        .alignRight>*:first-child {
+            border: none;
+            margin: 0;
+            float: right;
+            clear: both;
+        }
+
+        .alignRight>*:nth-child(2) {
+            clear: both;
+            display: block;
+            border: none;
+        }
+
+        svg {
+            display: block;
+        }
+
+        .alignCenter.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignCenter.art-text pre {
+            padding: 0;
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+        }
+
+        .alignCenter>*:first-child {
+            border: none;
+            /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+            display: table;
+            margin: 0 auto;
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 1em 2em;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-left: 1em;
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        .ulCompact li {
+            margin: 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+        }
+
+        ul.empty li,
+        .ulEmpty li {
+            margin-top: 0.5em;
+        }
+
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact {
+            line-height: 100%;
+            margin: 0 0 0 2em;
+        }
+
+        /* definition lists */
+        dl {}
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        /* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+        dl>dd {
+            margin-bottom: .8em;
+            min-height: 1.3em;
+        }
+
+        dl.compact>dd,
+        .dlCompact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+        }
+
+        a[href] {
+            color: #22e;
+            /* Arlen: WCAG 2019 */
+        }
+
+        a[href]:hover {
+            background-color: #f2f2f2;
+        }
+
+        figcaption a[href],
+        a[href].selfRef {
+            color: #222;
+        }
+
+        /* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+        /* Figures */
+        tt,
+        code,
+        pre,
+        code {
+            background-color: #f9f9f9;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        pre {
+            border: 1px solid #eee;
+            margin: 0;
+            padding: 1em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        figure blockquote {
+            margin: 0.8em 0.4em 0.4em;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0 0 1em 0;
+        }
+
+        @media screen {
+            pre {
+                overflow-x: auto;
+                max-width: 100%;
+                max-width: calc(100% - 22px);
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 1.2em 2em;
+        }
+
+        blockquote {
+            background-color: #f9f9f9;
+            color: #111;
+            /* Arlen: WCAG 2019 */
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 1em 0;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.5em 0.75em;
+        }
+
+        th {
+            text-align: left;
+            background-color: #e9e9e9;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f5f5f5;
+        }
+
+        table caption {
+            font-style: italic;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        table p {
+            /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+            margin: 0;
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            color: #666;
+            /* Arlen: AHDJ 2019 */
+            text-decoration: none;
+            visibility: hidden;
+            user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        @media screen {
+
+            aside:hover>a.pilcrow,
+            p:hover>a.pilcrow,
+            blockquote:hover>a.pilcrow,
+            div:hover>a.pilcrow,
+            li:hover>a.pilcrow,
+            pre:hover>a.pilcrow {
+                visibility: visible;
+            }
+
+            a.pilcrow:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        #identifiers dt {
+            width: 3em;
+            clear: left;
+        }
+
+        #identifiers dd {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        #identifiers .authors .author {
+            display: inline-block;
+            margin-right: 1.5em;
+        }
+
+        #identifiers .authors .org {
+            font-style: italic;
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #666;
+            /* Arlen: WCAG 2019 */
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+        }
+
+        .docInfo .prepared {
+            float: left;
+        }
+
+        .docInfo .prepared {
+            float: right;
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+        }
+
+        nav.toc ul {
+            margin: 0 0.5em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav.toc li {
+            line-height: 1.3em;
+            margin: 0.75em 0;
+            padding-left: 1.2em;
+            text-indent: -1.2em;
+        }
+
+        /* references */
+        .references dt {
+            text-align: right;
+            font-weight: bold;
+            min-width: 7em;
+        }
+
+        .references dd {
+            margin-left: 8em;
+            overflow: auto;
+        }
+
+        .refInstance {
+            margin-bottom: 1.25em;
+        }
+
+        .references .ascii {
+            margin-bottom: 0.25em;
+        }
+
+        /* index */
+        .index ul {
+            margin: 0 0 0 1em;
+            padding: 0;
+            list-style: none;
+        }
+
+        .index ul ul {
+            margin: 0;
+        }
+
+        .index li {
+            margin: 0;
+            text-indent: -2em;
+            padding-left: 2em;
+            padding-bottom: 5px;
+        }
+
+        .indexIndex {
+            margin: 0.5em 0 1em;
+        }
+
+        .index a {
+            font-weight: 700;
+        }
+
+        /* make the index two-column on all but the smallest screens */
+        @media (min-width: 600px) {
+            .index ul {
+                -moz-column-count: 2;
+                -moz-column-gap: 20px;
+            }
+
+            .index ul ul {
+                -moz-column-count: 1;
+                -moz-column-gap: 0;
+            }
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            margin: 1em 0;
+        }
+
+        address.vcard .nameRole {
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        address.vcard .label {
+            font-family: "Noto Sans", Arial, Helvetica, sans-serif;
+            margin: 0.5em 0;
+        }
+
+        address.vcard .type {
+            display: none;
+        }
+
+        .alternative-contact {
+            margin: 1.5em 0 1em;
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        /* temporary notes */
+        .rfcEditorRemove::before {
+            position: absolute;
+            top: 0.2em;
+            right: 0.2em;
+            padding: 0.2em;
+            content: "The RFC Editor will remove this note";
+            color: #9e2a00;
+            /* Arlen: WCAG 2019 */
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+        }
+
+        .rfcEditorRemove {
+            position: relative;
+            padding-top: 1.8em;
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            border-radius: 3px;
+        }
+
+        .cref {
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        /* alternative layout for smaller screens */
+        @media screen and (max-width: 1023px) {
+            body {
+                padding-top: 2em;
+            }
+
+            #title {
+                padding: 1em 0;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: -18px;
+                /* provide offset for in-page anchors */
+                padding-top: 38px;
+            }
+
+            #identifiers dd {
+                max-width: 60%;
+            }
+
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 0;
+                margin: 0;
+                background-color: inherit;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #toc h2 {
+                margin: -1px 0 0 0;
+                padding: 4px 0 4px 6px;
+                padding-right: 1em;
+                min-width: 190px;
+                font-size: 1.1em;
+                text-align: right;
+                background-color: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            #toc h2::before {
+                /* css hamburger */
+                float: right;
+                position: relative;
+                width: 1em;
+                height: 1px;
+                left: -164px;
+                margin: 6px 0 0 0;
+                background: white none repeat scroll 0 0;
+                box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                content: "";
+            }
+
+            #toc nav {
+                display: none;
+                padding: 0.5em 1em 1em;
+                overflow: auto;
+                height: calc(100vh - 48px);
+                border-left: 1px solid #ddd;
+            }
+        }
+
+        /* alternative layout for wide screens */
+        @media screen and (min-width: 1024px) {
+            body {
+                max-width: 724px;
+                margin: 42px auto;
+                padding-left: 1.5em;
+                padding-right: 29em;
+            }
+
+            #toc {
+                position: fixed;
+                top: 42px;
+                right: 42px;
+                width: 25%;
+                margin: 0;
+                padding: 0 1em;
+                z-index: 1;
+            }
+
+            #toc h2 {
+                border-top: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 1em;
+                font-weight: normal;
+                margin: 0;
+                padding: 0.25em 1em 1em 0;
+            }
+
+            #toc nav {
+                display: block;
+                height: calc(90vh - 84px);
+                bottom: 0;
+                padding: 0.5em 0 0;
+                overflow: auto;
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc,
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            #toc {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            figure,
+            pre {
+                page-break-inside: avoid;
+            }
+
+            figure {
+                overflow: scroll;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            h2+*,
+            h3+*,
+            h4+*,
+            h5+*,
+            h6+* {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        /* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+        /*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+            /* The follwing is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+            /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+        }
+
+        /* Changes introduced to fix issues found during implementation */
+        /* Make sure links are clickable even if overlapped by following H* */
+        a {
+            z-index: 2;
+        }
+
+        /* Separate body from document info even without intervening H1 */
+        section {
+            clear: both;
+        }
+
+
+        /* Top align author divs, to avoid names without organization dropping level with org names */
+        .author {
+            vertical-align: top;
+        }
+
+        /* Leave room in document info to show Internet-Draft on one line */
+        #identifiers dt {
+            width: 8em;
+        }
+
+        /* Don't waste quite as much whitespace between label and value in doc info */
+        #identifiers dd {
+            margin-left: 1em;
+        }
+
+        /* Give floating toc a background color (needed when it's a div inside section */
+        #toc {
+            background-color: white;
+        }
+
+        /* Make the collapsed ToC header render white on gray also when it's a link */
+        @media screen and (max-width: 1023px) {
+
+            #toc h2 a,
+            #toc h2 a:link,
+            #toc h2 a:focus,
+            #toc h2 a:hover,
+            #toc a.toplink,
+            #toc a.toplink:hover {
+                color: white;
+                background-color: #444;
+                text-decoration: none;
+            }
+        }
+
+        /* Give the bottom of the ToC some whitespace */
+        @media screen and (min-width: 1024px) {
+            #toc {
+                padding: 0 0 1em 1em;
+            }
+        }
+
+        /* Style section numbers with more space between number and title */
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        /* prevent monospace from becoming overly large */
+        tt,
+        code,
+        pre,
+        code {
+            font-size: 95%;
+        }
+
+        /* Fix the height/width aspect for ascii art*/
+        pre.sourcecode,
+        .art-text pre {
+            line-height: 1.12;
+        }
+
+
+        /* Add styling for a link in the ToC that points to the top of the document */
+        a.toplink {
+            float: right;
+            margin-right: 0.5em;
+        }
+
+        /* Fix the dl styling to match the RFC 7992 attributes */
+        dl>dt,
+        dl.dlParallel>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.dlNewline>dt {
+            float: none;
+        }
+
+        /* Provide styling for table cell text alignment */
+        table td.text-left,
+        table th.text-left {
+            text-align: left;
+        }
+
+        table td.text-center,
+        table th.text-center {
+            text-align: center;
+        }
+
+        table td.text-right,
+        table th.text-right {
+            text-align: right;
+        }
+
+        /* Make the alternative author contact informatio look less like just another
+   author, and group it closer with the primary author contact information */
+        .alternative-contact {
+            margin: 0.5em 0 0.25em 0;
+        }
+
+        address .non-ascii {
+            margin: 0 0 0 2em;
+        }
+
+        /* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+        table {
+            width: auto;
+        }
+
+        /* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+        .references dd {
+            overflow: visible;
+        }
+
+        /* Control caption placement */
+        caption {
+            caption-side: bottom;
+        }
+
+        /* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+        address.vcard {
+            max-width: 30em;
+            margin-right: auto;
+        }
+
+        /* For address alignment dependent on LTR or RTL scripts */
+        address div.left {
+            text-align: left;
+        }
+
+        address div.right {
+            text-align: right;
+        }
+
+        /* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+        table.right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Give the table caption label the same styling as the figcaption */
+        caption a[href] {
+            color: #222;
+        }
+
+        @media print {
+            .toplink {
+                display: none;
+            }
+
+            /* avoid overwriting the top border line with the ToC header */
+            #toc {
+                padding-top: 1px;
+            }
+
+            /* Avoid page breaks inside dl and author address entries */
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+        }
+
+        /* Avoid wrapping of URLs in references */
+        @media screen {
+            .references a {
+                white-space: nowrap;
+            }
+        }
+
+        /* Tweak the bcp14 keyword presentation */
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Tweak the invisible space above H* in order not to overlay links in text above */
+        h2 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 31px;
+        }
+
+        h3 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        h4 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        /* Float artwork pilcrow to the right */
+        @media screen {
+            .artwork a.pilcrow {
+                display: block;
+                line-height: 0.7;
+                margin-top: 0.15em;
+            }
+        }
+
+        /* Make pilcrows on dd visible */
+        @media screen {
+            dd:hover>a.pilcrow {
+                visibility: visible;
+            }
+        }
+
+        /* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+        .alignLeft.art-text,
+        .alignCenter.art-text,
+        .alignRight.art-text {
+            margin-bottom: 0;
+        }
+
+        .alignLeft,
+        .alignCenter,
+        .alignRight {
+            margin: 1em 0 0 0;
+        }
+
+        /* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+        @media print {
+            a.pilcrow {
+                display: none;
+            }
+        }
+
+        /* Styling for the external metadata */
+        div#external-metadata {
+            background-color: #eee;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            display: none;
+        }
+
+        div#internal-metadata {
+            padding: 0.5em;
+            /* to match the external-metadata padding */
+        }
+
+        /* Styling for title RFC Number */
+        h1#rfcnum {
+            clear: both;
+            margin: 0 0 -1em;
+            padding: 1em 0 0 0;
+        }
+
+        /* Make .olPercent look the same as <ol><li> */
+        dl.olPercent>dd {
+            margin: 0 0 0.25em 0;
+            min-height: initial;
+        }
+
+        /* Give aside some styling to set it apart */
+        aside {
+            border-left: 1px solid #ddd;
+            margin: 1em 0 1em 2em;
+            padding: 0.2em 2em;
+        }
+
+        aside>dl,
+        aside>ol,
+        aside>ul,
+        aside>table,
+        aside>p {
+            margin-bottom: 0.5em;
+        }
+
+        /* Additional page break settings */
+        @media print {
+
+            figcaption,
+            table caption {
+                page-break-before: avoid;
+            }
+        }
+
+        /* Font size adjustments for print */
+        @media print {
+            body {
+                font-size: 10pt;
+                line-height: normal;
+                max-width: 96%;
+            }
+
+            h1 {
+                font-size: 1.72em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2*1.2 */
+            h2 {
+                font-size: 1.44em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2 */
+            h3 {
+                font-size: 1.2em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2 */
+            h4 {
+                font-size: 1em;
+                padding-top: 1.5em;
+            }
+
+            h5,
+            h6 {
+                font-size: 1em;
+                margin: initial;
+                padding: 0.5em 0 0.3em;
+            }
+        }
+
+        /* Sourcecode margin in print, when there's no pilcrow */
+        @media print {
+
+            .artwork,
+            .sourcecode {
+                margin-bottom: 1em;
+            }
+        }
+
+        /*
+  The margin-left: 0 on <dd> removes all distinction
+  between levels from nested <dl>s.  Undo that.
+*/
+        dl.olPercent>dd,
+        dd {
+            margin-left: revert;
+        }
+
+        /* Avoid narrow tables forcing too narrow table captions, which may render badly */
+        table {
+            min-width: 20em;
+        }
+    </style>
+    <link href="https://www.rfc-editor.org/rfc/rfc-local.css" rel="stylesheet" type="text/css">
+    <link href="https://dx.doi.org/10.17487/rfc8693" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-oauth-token-exchange-19" rel="prev">
+</head>
+
+<body>
+    <script src="https://www.rfc-editor.org/js/metadata.min.js"></script>
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">RFC 8693</td>
+                <td class="center">OAuth 2.0 토큰 교환</td>
+                <td class="right">2020년 1월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Jones 외.</td>
+                <td class="center">표준 트랙</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-stream">스트림:</dt>
+            <dd class="stream">인터넷 엔지니어링 태스크 포스(IETF)</dd>
+            <dt class="label-rfc">RFC:</dt>
+            <dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc8693" class="eref">8693</a></dd>
+            <dt class="label-category">범주:</dt>
+            <dd class="category">표준 트랙</dd>
+            <dt class="label-published">발행:</dt>
+            <dd class="published">
+                <time datetime="2020-01" class="published">2020년 1월</time>
+            </dd>
+            <dt class="label-issn">ISSN:</dt>
+            <dd class="issn">2070-1721</dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">M. Jones</div>
+                    <div class="org">Microsoft</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">A. Nadalin</div>
+                    <div class="org">Microsoft</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">B. Campbell, <span class="editor">편집자</span>
+                    </div>
+                    <div class="org">Ping Identity</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">J. Bradley</div>
+                    <div class="org">Yubico</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">C. Mortimore</div>
+                    <div class="org">Visa</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="rfcnum">RFC 8693</h1>
+    <h1 id="title">OAuth 2.0 토큰 교환</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">
+            이 명세는 HTTP 및 JSON 기반의
+            보안 토큰 서비스(STS)를 위한 프로토콜을 정의하며,
+            OAuth 2.0 인가 서버에서 보안 토큰을 요청하고 획득하는 방법을 정의합니다.
+            가장 및 위임을 사용하는 보안 토큰도 포함합니다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 문서는 인터넷 표준 트랙 문서입니다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-boilerplate.1-2">
+                이 문서는 인터넷 엔지니어링 태스크 포스(IETF)의 산출물입니다.
+                이는 IETF 커뮤니티의 합의를 나타냅니다. 공개 검토를
+                받았으며 인터넷 엔지니어링 운영 그룹(IESG)에 의해
+                출판 승인을 받았습니다. 인터넷 표준에 관한 추가
+                정보는 RFC 7841의 섹션 2에서 확인할 수 있습니다.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-3">
+                이 문서의 현재 상태, 모든 정오표 및 이에 대한
+                피드백 제공 방법에 관한 정보는 다음에서 확인할 수 있습니다.
+                <span><a
+                        href="https://www.rfc-editor.org/info/rfc8693">https://www.rfc-editor.org/info/rfc8693</a></span>.<a
+                    href="#section-boilerplate.1-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2020 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Simplified BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Simplified BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="toc ulEmpty">
+                    <li class="toc ulEmpty" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1"><a href="#section-1" class="xref">1</a>. <a
+                                href="#name-introduction" class="xref">소개</a><a href="#section-toc.1-1.1.1"
+                                class="pilcrow">¶</a></p>
+                        <ul class="toc ulEmpty">
+                            <li class="toc ulEmpty" id="section-toc.1-1.1.2.1">
+                                <p id="section-toc.1-1.1.2.1.1"><a href="#section-1.1" class="xref">1.1</a>. <a
+                                        href="#name-delegation-vs-impersonation" class="xref">위임과
+                                        가장의 의미론</a><a href="#section-toc.1-1.1.2.1.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.1.2.2">
+                                <p id="section-toc.1-1.1.2.2.1"><a href="#section-1.2" class="xref">1.2</a>. <a
+                                        href="#name-requirements-notation-and-c" class="xref">요구사항 표기와
+                                        규약</a><a href="#section-toc.1-1.1.2.2.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.1.2.3">
+                                <p id="section-toc.1-1.1.2.3.1"><a href="#section-1.3" class="xref">1.3</a>. <a
+                                        href="#name-terminology" class="xref">용어</a><a href="#section-toc.1-1.1.2.3.1"
+                                        class="pilcrow">¶</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>. <a
+                                href="#name-token-exchange-request-and-" class="xref">토큰 교환 요청 및
+                                응답</a><a href="#section-toc.1-1.2.1" class="pilcrow">¶</a></p>
+                        <ul class="toc ulEmpty">
+                            <li class="toc ulEmpty" id="section-toc.1-1.2.2.1">
+                                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>. <a
+                                        href="#name-request" class="xref">요청</a><a href="#section-toc.1-1.2.2.1.1"
+                                        class="pilcrow">¶</a></p>
+                                <ul class="toc ulEmpty">
+                                    <li class="toc ulEmpty" id="section-toc.1-1.2.2.1.2.1">
+                                        <p id="section-toc.1-1.2.2.1.2.1.1"><a href="#section-2.1.1"
+                                                class="xref">2.1.1</a>. <a href="#name-relationship-between-resour"
+                                                class="xref">리소스, 대상, 범위 간의 관계</a><a href="#section-toc.1-1.2.2.1.2.1.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.2.2.2">
+                                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>. <a
+                                        href="#name-response" class="xref">응답</a><a href="#section-toc.1-1.2.2.2.1"
+                                        class="pilcrow">¶</a></p>
+                                <ul class="toc ulEmpty">
+                                    <li class="toc ulEmpty" id="section-toc.1-1.2.2.2.2.1">
+                                        <p id="section-toc.1-1.2.2.2.2.1.1"><a href="#section-2.2.1"
+                                                class="xref">2.2.1</a>. <a href="#name-successful-response"
+                                                class="xref">성공 응답</a><a href="#section-toc.1-1.2.2.2.2.1.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.2.2.2.2.2">
+                                        <p id="section-toc.1-1.2.2.2.2.2.1"><a href="#section-2.2.2"
+                                                class="xref">2.2.2</a>. <a href="#name-error-response" class="xref">오류
+                                                응답</a><a href="#section-toc.1-1.2.2.2.2.2.1" class="pilcrow">¶</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.2.2.3">
+                                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>. <a
+                                        href="#name-example-token-exchange" class="xref">토큰 교환 예</a><a
+                                        href="#section-toc.1-1.2.2.3.1" class="pilcrow">¶</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>. <a
+                                href="#name-token-type-identifiers" class="xref">토큰 유형 식별자</a><a
+                                href="#section-toc.1-1.3.1" class="pilcrow">¶</a></p>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>. <a
+                                href="#name-json-web-token-claims-and-i" class="xref">JSON Web Token 클레임 및
+                                검사 응답 매개변수</a><a href="#section-toc.1-1.4.1" class="pilcrow">¶</a></p>
+                        <ul class="toc ulEmpty">
+                            <li class="toc ulEmpty" id="section-toc.1-1.4.2.1">
+                                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>. <a
+                                        href="#name-act-actor-claim" class="xref">"act" (행위자) 클레임</a><a
+                                        href="#section-toc.1-1.4.2.1.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.4.2.2">
+                                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>. <a
+                                        href="#name-scope-scopes-claim" class="xref">"scope" (범위) 클레임</a><a
+                                        href="#section-toc.1-1.4.2.2.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.4.2.3">
+                                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="xref">4.3</a>. <a
+                                        href="#name-client_id-client-identifier" class="xref">"client_id" (클라이언트
+                                        식별자) 클레임</a><a href="#section-toc.1-1.4.2.3.1" class="pilcrow">¶</a>
+                                </p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.4.2.4">
+                                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="xref">4.4</a>. <a
+                                        href="#name-may_act-authorized-actor-cl" class="xref">"may_act" (인가된
+                                        행위자) 클레임</a><a href="#section-toc.1-1.4.2.4.1" class="pilcrow">¶</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>. <a
+                                href="#name-security-considerations" class="xref">보안 고려사항</a><a
+                                href="#section-toc.1-1.5.1" class="pilcrow">¶</a></p>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>. <a
+                                href="#name-privacy-considerations" class="xref">개인정보 보호 고려사항</a><a
+                                href="#section-toc.1-1.6.1" class="pilcrow">¶</a></p>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>. <a
+                                href="#name-iana-considerations" class="xref">IANA 고려사항</a><a
+                                href="#section-toc.1-1.7.1" class="pilcrow">¶</a></p>
+                        <ul class="toc ulEmpty">
+                            <li class="toc ulEmpty" id="section-toc.1-1.7.2.1">
+                                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>. <a
+                                        href="#name-oauth-uri-registration" class="xref">OAuth URI 등록</a><a
+                                        href="#section-toc.1-1.7.2.1.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.7.2.2">
+                                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>. <a
+                                        href="#name-oauth-parameters-registrati" class="xref">OAuth 매개변수
+                                        등록</a><a href="#section-toc.1-1.7.2.2.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.7.2.3">
+                                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="xref">7.3</a>. <a
+                                        href="#name-oauth-access-token-type-reg" class="xref">OAuth 액세스 토큰 유형
+                                        등록</a><a href="#section-toc.1-1.7.2.3.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.7.2.4">
+                                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="xref">7.4</a>. <a
+                                        href="#name-json-web-token-claims-regis" class="xref">JSON Web Token 클레임
+                                        등록</a><a href="#section-toc.1-1.7.2.4.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.7.2.5">
+                                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="xref">7.5</a>. <a
+                                        href="#name-oauth-token-introspection-r" class="xref">OAuth 토큰 검사
+                                        응답 등록</a><a href="#section-toc.1-1.7.2.5.1" class="pilcrow">¶</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>. <a href="#name-references"
+                                class="xref">참고문헌</a><a href="#section-toc.1-1.8.1" class="pilcrow">¶</a></p>
+                        <ul class="toc ulEmpty">
+                            <li class="toc ulEmpty" id="section-toc.1-1.8.2.1">
+                                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="xref">8.1</a>. <a
+                                        href="#name-normative-references" class="xref">규범 참고문헌</a><a
+                                        href="#section-toc.1-1.8.2.1.1" class="pilcrow">¶</a></p>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.8.2.2">
+                                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="xref">8.2</a>. <a
+                                        href="#name-informative-references" class="xref">정보 참고문헌</a><a
+                                        href="#section-toc.1-1.8.2.2.1" class="pilcrow">¶</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.9">
+                        <p id="section-toc.1-1.9.1"><a href="#section-appendix.a" class="xref">부록 A</a>. <a
+                                href="#name-additional-token-exchange-e" class="xref">추가 토큰 교환
+                                예</a><a href="#section-toc.1-1.9.1" class="pilcrow">¶</a></p>
+                        <ul class="toc ulEmpty">
+                            <li class="toc ulEmpty" id="section-toc.1-1.9.2.1">
+                                <p id="section-toc.1-1.9.2.1.1"><a href="#section-a.1" class="xref">A.1</a>. <a
+                                        href="#name-impersonation-token-exchang" class="xref">가장 토큰
+                                        교환 예</a><a href="#section-toc.1-1.9.2.1.1" class="pilcrow">¶</a></p>
+                                <ul class="toc ulEmpty">
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.1.2.1">
+                                        <p id="section-toc.1-1.9.2.1.2.1.1"><a href="#section-a.1.1"
+                                                class="xref">A.1.1</a>. <a href="#name-token-exchange-request-2"
+                                                class="xref">토큰 교환 요청</a><a href="#section-toc.1-1.9.2.1.2.1.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.1.2.2">
+                                        <p id="section-toc.1-1.9.2.1.2.2.1"><a href="#section-a.1.2"
+                                                class="xref">A.1.2</a>. <a href="#name-subject-token-claims"
+                                                class="xref">주체 토큰 클레임</a><a href="#section-toc.1-1.9.2.1.2.2.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.1.2.3">
+                                        <p id="section-toc.1-1.9.2.1.2.3.1"><a href="#section-a.1.3"
+                                                class="xref">A.1.3</a>. <a href="#name-token-exchange-response-2"
+                                                class="xref">토큰 교환 응답</a><a href="#section-toc.1-1.9.2.1.2.3.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.1.2.4">
+                                        <p id="section-toc.1-1.9.2.1.2.4.1"><a href="#section-a.1.4"
+                                                class="xref">A.1.4</a>. <a href="#name-issued-token-claims"
+                                                class="xref">발급된 토큰 클레임</a><a href="#section-toc.1-1.9.2.1.2.4.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toc ulEmpty" id="section-toc.1-1.9.2.2">
+                                <p id="section-toc.1-1.9.2.2.1"><a href="#section-a.2" class="xref">A.2</a>. <a
+                                        href="#name-delegation-token-exchange-e" class="xref">위임 토큰 교환
+                                        예</a><a href="#section-toc.1-1.9.2.2.1" class="pilcrow">¶</a></p>
+                                <ul class="toc ulEmpty">
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.2.2.1">
+                                        <p id="section-toc.1-1.9.2.2.2.1.1"><a href="#section-a.2.1"
+                                                class="xref">A.2.1</a>. <a href="#name-token-exchange-request-4"
+                                                class="xref">토큰 교환 요청</a><a href="#section-toc.1-1.9.2.2.2.1.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.2.2.2">
+                                        <p id="section-toc.1-1.9.2.2.2.2.1"><a href="#section-a.2.2"
+                                                class="xref">A.2.2</a>. <a href="#name-subject-token-claims-3"
+                                                class="xref">주체 토큰 클레임</a><a href="#section-toc.1-1.9.2.2.2.2.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.2.2.3">
+                                        <p id="section-toc.1-1.9.2.2.2.3.1"><a href="#section-a.2.3"
+                                                class="xref">A.2.3</a>. <a href="#name-actor-token-claims"
+                                                class="xref">행위자 토큰 클레임</a><a href="#section-toc.1-1.9.2.2.2.3.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.2.2.4">
+                                        <p id="section-toc.1-1.9.2.2.2.4.1"><a href="#section-a.2.4"
+                                                class="xref">A.2.4</a>. <a href="#name-token-exchange-response-4"
+                                                class="xref">토큰 교환 응답</a><a href="#section-toc.1-1.9.2.2.2.4.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                    <li class="toc ulEmpty" id="section-toc.1-1.9.2.2.2.5">
+                                        <p id="section-toc.1-1.9.2.2.2.5.1"><a href="#section-a.2.5"
+                                                class="xref">A.2.5</a>. <a href="#name-issued-token-claims-3"
+                                                class="xref">발급된 토큰 클레임</a><a href="#section-toc.1-1.9.2.2.2.5.1"
+                                                class="pilcrow">¶</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.10">
+                        <p id="section-toc.1-1.10.1"><a href="#section-appendix.b" class="xref"></a><a
+                                href="#name-acknowledgements" class="xref">감사의 말</a><a href="#section-toc.1-1.10.1"
+                                class="pilcrow">¶</a></p>
+                    </li>
+                    <li class="toc ulEmpty" id="section-toc.1-1.11">
+                        <p id="section-toc.1-1.11.1"><a href="#section-appendix.c" class="xref"></a><a
+                                href="#name-authors-addresses" class="xref">저자 주소</a><a href="#section-toc.1-1.11.1"
+                                class="pilcrow">¶</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <div id="Introduction">
+        <section id="section-1">
+            <h2 id="name-introduction">
+                <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                    class="section-name selfRef">소개</a>
+            </h2>
+            <p id="section-1-1">
+                보안 토큰은 이기종 환경 또는 보안 도메인 간에
+                신원 및 보안 정보를 공유하는 데 도움이 되는 정보의 집합이다.
+                보안 토큰의 예로는 JSON Web Token
+                (JWT) <span>[<a href="#RFC7519" class="xref">JWT</a>]</span> 및 Security Assertion Markup Language
+                (SAML)
+                2.0 어서션 <span>[<a href="#OASIS.saml-core-2.0-os" class="xref">OASIS.saml-core-2.0-os</a>]</span>이 있다.
+                보안 토큰은
+                무결성을 달성하기 위해 일반적으로 서명되며, 때로는 기밀성을
+                달성하기 위해 암호화되기도 한다. 보안 토큰은 <span>[<a href="#RFC7521" class="xref">RFC7521</a>]</span>에서처럼
+                때때로 어서션이라고도 설명된다.<a href="#section-1-1" class="pilcrow">¶</a></p>
+            <p id="section-1-2">
+                보안 토큰 서비스(Security Token Service, STS)는 제공된
+                보안 토큰을 검증하고 이에 대한 응답으로 새 보안 토큰을
+                발급할 수 있는 서비스로, 클라이언트가 이기종 환경 또는 보안
+                도메인 전반의 리소스에 대해 적절한
+                액세스 자격 증명을 얻을 수 있게 한다.
+                웹 서비스 클라이언트는 토큰 교환을 위해 STS와 상호 작용하는
+                프로토콜로 WS-Trust <span>[<a href="#WS-Trust" class="xref">WS-Trust</a>]</span>를 사용해 왔다.
+                WS-Trust가
+                XML과 SOAP를 사용하는 반면, 현대 웹 개발의 흐름은
+                RESTful(Representational State Transfer) 패턴과 JSON으로 향해 왔다.
+                OAuth 2.0 Authorization Framework <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>와
+                OAuth 2.0 Bearer Tokens <span>[<a href="#RFC6750" class="xref">RFC6750</a>]</span>는
+                HTTP 및 RESTful 리소스에 대한 서드파티
+                애플리케이션의 액세스를 인가하기 위한 인기 있는 표준으로 부상했다.
+                전통적인 OAuth 2.0 상호 작용은 리소스 소유자 인가의 어떤
+                표현을 액세스 토큰으로 교환하는 것을 포함하며,
+                이는 실제로 매우 유용한 패턴임이 입증되었다. 그러나
+                그 입력과 출력은 보안 토큰 교환 프레임워크를 완전히
+                수용하기에는 다소 지나치게 제한적이다.<a href="#section-1-2" class="pilcrow">¶</a></p>
+            <p id="section-1-3">
+                이 명세는 OAuth 2.0을 확장하는 프로토콜을 정의하여
+                클라이언트가 STS 역할을 하는 인가 서버로부터 보안 토큰을
+                요청하고 획득할 수 있게 한다.
+                OAuth 2.0과 유사하게, 이 명세는 클라이언트 개발자의 단순성에 초점을 맞추며,
+                현대 개발 환경에서 거의 보편적으로 사용할 수 있는 HTTP 클라이언트와
+                JSON 파서만을 요구한다. 이 명세에서 정의하는 STS 프로토콜은
+                그 자체로는 RESTful하지 않지만(STS는 REST
+                접근 방식에 특별히 잘 맞지 않는다), RESTful 시스템 작업에 익숙한 개발자에게
+                친숙해야 하는 통신 패턴과 데이터 형식을 활용한다.<a href="#section-1-3" class="pilcrow">¶</a></p>
+            <p id="section-1-4">
+                토큰 교환 요청을 위한 새로운 grant type과 이러한 요청을
+                토큰 엔드포인트에 보낼 때의 관련 특정 매개변수는 이 명세에서 정의한다.
+                토큰 교환 응답은 토큰 엔드포인트에서 오는 일반적인 OAuth 2.0 응답이며,
+                여기에 클라이언트에 정보를 제공하기 위해 본 문서에서 정의하는 몇 가지 추가 매개변수가 붙는다.<a href="#section-1-4" class="pilcrow">¶</a></p>
+            <p id="section-1-5">
+                토큰 교환 요청을 수행하는 엔티티는 토큰 교환 상호 작용의
+                맥락에서 클라이언트로 간주된다. 그러나 이는
+                이 프로파일의 사용을 전통적인 OAuth 클라이언트로 제한하지 않는다. 예를 들어 OAuth 리소스 서버는
+                보호된 리소스 요청에서 받은 액세스 토큰을 백엔드
+                서비스 호출에 포함하기에 적절한 새 토큰으로 바꾸기 위해
+                토큰 교환 중에 클라이언트 역할을 맡을 수 있다.
+                새 토큰은 다운스트림 서비스에 대해 더 좁은 범위가 지정된
+                액세스 토큰일 수도 있고, 전혀 다른 종류의 토큰일 수도 있다.<a href="#section-1-5" class="pilcrow">¶</a></p>
+            <p id="section-1-6">
+                이 명세의 범위는 OAuth 2.0을 활용하는
+                STS 스타일 토큰 교환을 위한 기본 요청-응답 프로토콜의 정의로 제한된다.
+                위임 의미론을 표현할 수 있게 하는 몇 가지 새로운 JWT 클레임이 정의되지만,
+                토큰 자체의 구체적인 구문, 의미론 및 보안 특성
+                (인가 서버에 제시되는 토큰과 클라이언트가 얻는 토큰 모두)은
+                명시적으로 범위 밖이며, 구현이 배포될 수 있는 신뢰 모델에 대해서는
+                어떠한 요구사항도 부과하지 않는다. 추가 프로파일은
+                서명 및/또는 토큰 암호화가 필요한지 또는 proof-of-possession 스타일
+                토큰이 요구되거나 발급될 것인지 등, 관련 당사자와 신뢰의 구체적인 성격에 관한
+                더 상세한 요구사항을 제공할 수 있다. 그러나 이러한 세부 사항은
+                개별 배포의 특정 요구에 따라 내려지는 정책 결정인 경우가 많으며,
+                그에 따라 구성되거나 구현될 것이다.<a href="#section-1-6" class="pilcrow">¶</a></p>
+            <p id="section-1-7">
+                획득한 보안 토큰은 여러 맥락에서 사용될 수 있으며,
+                그 구체적인 사항 역시 이 명세의 범위를 벗어난다.<a href="#section-1-7" class="pilcrow">¶</a></p>
+            <div id="DelegationImpersonation">
+                <section id="section-1.1">
+                    <h3 id="name-delegation-vs-impersonation">
+                        <a href="#section-1.1" class="section-number selfRef">1.1. </a><a
+                            href="#name-delegation-vs-impersonation" class="section-name selfRef">위임과
+                            가장의 의미론</a>
+                    </h3>
+                    <p id="section-1.1-1">
+                        STS의 일반적인 사용 사례(이전 절에서 암시한 것처럼) 중 하나는
+                        리소스 서버 A가 요청 사용자 B를 대신하여 백엔드 서비스 C를
+                        호출할 수 있게 하는 것이다. 로컬 사이트 정책과
+                        인가 인프라에 따라, A가 자신의
+                        자격 증명을 사용해 C에 액세스하면서 A가
+                        B를 대신하여 행동한다는 어떤 형태의 주석("위임")을 함께 두는 것이 바람직할 수도 있고,
+                        A에게 C에 대한 제한된 액세스
+                        자격 증명을 부여하되 그 자격 증명이 계속 B를 인가된
+                        엔티티로 식별하게 하는 것("가장")이 바람직할 수도 있다. 위임과 가장은
+                        여러 참여자가 관련된 다른 시나리오에서도 유용한
+                        개념일 수 있다.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-2">
+                        주체 A가 주체 B를 가장하면, A는 어떤 정의된 권리 맥락 안에서
+                        B가 가진 모든 권리를 부여받으며
+                        그 맥락에서 B와 구별되지 않는다.
+                        따라서 주체 A가 주체 B를 가장하는 경우, 그러한 토큰을
+                        받는 어떤 엔티티의 관점에서도 그들은
+                        실제로 B와 상대하고 있는 것이다. 신원 시스템의 일부 구성원이
+                        가장이 이루어지고 있음을 인지할 수도 있지만,
+                        그것은 요구사항이 아니다.
+                        모든 의도와 목적에서, A가 B를 가장할 때 A는 토큰이 인가한 권리의
+                        맥락 안에서 B이다. A가 B를 가장할 수 있는 능력은
+                        토큰의 내용이나 대역 외 메커니즘을 통해
+                        범위나 시간, 심지어 일회성 사용 제한으로 제한될 수 있다.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-3">
+                        위임 의미론은
+                        가장 의미론과 다르지만, 둘은 밀접하게 관련되어 있다.
+                        위임 의미론에서는 주체 A가 여전히 B와 별개의
+                        자신의 신원을 가지며, B가 자신의 권리 일부를 A에게
+                        위임했을 수 있지만 수행되는 모든 행위는
+                        B를 대표하는 A에 의해 이루어진다는 점이 명시적으로 이해된다.
+                        어떤 의미에서 A는 B의 대리인이다.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-4">
+                        위임과 가장이 모든 상황을 포괄하는 것은 아니다.
+                        예를 들어 어떤 주체가 직접 자신을 위해 행동하는 경우,
+                        위임도 가장도 적용되지 않는다. 그러나 이들은
+                        토큰 교환에서 작동하는 더 일반적인 의미론이므로,
+                        이 명세에서 더 직접적으로 다룬다.<a href="#section-1.1-4" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-1.1-5">
+                        위임 의미론은 일반적으로 토큰 안에 토큰의
+                        기본 주체와 그 주체가 자신의 일부 권리를 위임한 행위자에 대한
+                        정보를 모두 포함함으로써 표현된다.
+                        그러한 토큰은 여러 주체에 대한 정보로 구성되어 있으므로
+                        복합 토큰이라고 불리기도 한다. 일반적으로 요청에서 <code>subject_token</code>은
+                        토큰이 요청되는 대상 당사자의 신원을
+                        나타내며, <code>actor_token</code>은
+                        발급된 토큰의 액세스 권리가 위임되는 당사자의
+                        신원을 나타낸다.
+                        인가 서버가 발급한 복합 토큰은 두
+                        당사자 모두에 대한 정보를 포함한다.
+                        복합 토큰을 언제, 그리고 발급할지 여부는 인가 서버와
+                        적용 가능한 정책 및 구성의 재량이다.<a href="#section-1.1-5" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-6">
+                        복합 토큰을 표현하는 구체적인 방식과
+                        그러한 토큰이 발급될지 여부조차도 구현의 세부 사항과
+                        토큰의 종류에 따라 달라진다. JWT가 아닌 복합 토큰의 표현은
+                        이 명세의 범위를 벗어난다. 그러나 <code>actor_token</code> 요청
+                        매개변수는 원하는 행위자에 대한 정보를 제공하는
+                        수단을 제공하며, JWT
+                        <code>act</code> 클레임은
+                        위임 체인의 표현을 제공할 수 있다.<a href="#section-1.1-6" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="RNC">
+                <section id="section-1.2">
+                    <h3 id="name-requirements-notation-and-c">
+                        <a href="#section-1.2" class="section-number selfRef">1.2. </a><a
+                            href="#name-requirements-notation-and-c" class="section-name selfRef">요구사항 표기와
+                            규약</a>
+                    </h3>
+                    <p id="section-1.2-1">
+                        이 문서에서 키워드 "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span
+                            class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span
+                            class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span
+                            class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span
+                            class="bcp14">NOT RECOMMENDED</span>",
+                        "<span class="bcp14">MAY</span>", 및 "<span class="bcp14">OPTIONAL</span>"는
+                        여기에 표시된 것처럼 모두 대문자로 나타날 때, 그리고 그 경우에만
+                        BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174"
+                                class="xref">RFC8174</a>]</span>에
+                        설명된 대로 해석된다.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="Terminology">
+                <section id="section-1.3">
+                    <h3 id="name-terminology">
+                        <a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-terminology"
+                            class="section-name selfRef">용어</a>
+                    </h3>
+                    <p id="section-1.3-1">
+                        이 명세는 OAuth 2.0 <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에서 정의한
+                        "access token type", "authorization server", "client", "client identifier",
+                        "resource server", "token endpoint", "token request", 및 "token response"라는 용어와,
+                        JSON Web Token (JWT) <span>[<a href="#RFC7519" class="xref">JWT</a>]</span>에서 정의한
+                        "Base64url Encoding", "Claim", 및 "JWT Claims Set"라는 용어를 사용한다.<a href="#section-1.3-1"
+                            class="pilcrow">¶</a></p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="Messages">
+        <section id="section-2">
+            <h2 id="name-token-exchange-request-and-">
+                <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-token-exchange-request-and-"
+                    class="section-name selfRef">토큰 교환 요청 및 응답</a>
+            </h2>
+            <div id="Request">
+                <section id="section-2.1">
+                    <h3 id="name-request">
+                        <a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-request"
+                            class="section-name selfRef">요청</a>
+                    </h3>
+                    <p id="section-2.1-1">
+                        클라이언트는 <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.5" class="relref">[<a
+                                    href="#RFC6749" class="xref">RFC6749</a>]의
+                                섹션 4.5</a></span>에 정의된 extension grant type 메커니즘을 사용하여
+                        인가 서버의 토큰 엔드포인트에 토큰 요청을 보냄으로써
+                        보안 토큰을 요청한다.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-2.1-2">
+                        인가 서버에 대한 클라이언트 인증은 OAuth 2.0이 제공하는 일반적인
+                        메커니즘을 사용하여 수행된다.
+                        <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1" class="relref">[<a
+                                    href="#RFC6749" class="xref">RFC6749</a>]의
+                                섹션 2.3.1</a></span>은
+                        클라이언트의 비밀번호 기반 인증을 정의하지만,
+                        클라이언트 인증은 확장 가능하며 다른 메커니즘도 가능하다.
+                        예를 들어, <span>[<a href="#RFC7523" class="xref">RFC7523</a>]</span>은 bearer
+                        JSON Web Token (JWT) <span>[<a href="#RFC7519" class="xref">JWT</a>]</span>을 사용한
+                        클라이언트 인증을 정의한다.
+                        지원되는 클라이언트 인증 방법과
+                        인증되지 않았거나 식별되지 않은 클라이언트를 허용할지 여부는
+                        인가 서버의 재량에 따르는 배포 결정이다.
+                        클라이언트 인증을 생략하면
+                        손상된 토큰을 보유한 누구든지 STS를 통해 그 손상된 토큰을
+                        다른 토큰으로 활용할 수 있다는 점에 유의한다. 따라서 클라이언트
+                        인증은 어떤 엔티티가 다른
+                        엔티티를 가장하거나 다른 엔티티로부터 위임을 받을 수 있는지에 관해
+                        STS가 추가 인가 검사를 수행할 수 있게 한다.<a href="#section-2.1-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.1-3">
+                        클라이언트는 HTTP <code>POST</code> 메서드를 사용하여 extension
+                        grant type과 함께 토큰 엔드포인트로 토큰 교환 요청을 보낸다.
+                        다음 매개변수는
+                        <span><a href="https://www.rfc-editor.org/rfc/rfc6749#appendix-B" class="relref">[<a
+                                    href="#RFC6749" class="xref">RFC6749</a>]의
+                                부록 B</a></span>에 설명된 대로 UTF-8 문자 인코딩을 사용한
+                        <code>application/x-www-form-urlencoded</code>
+                        형식으로 HTTP 요청 entity-body에 포함된다.<a href="#section-2.1-3" class="pilcrow">¶</a>
+                    </p>
+                    <dl class="dlNewline" id="section-2.1-4">
+                        <dt id="section-2.1-4.1">grant_type</dt>
+                        <dd id="section-2.1-4.2">
+                            <span class="bcp14">REQUIRED</span>. 값
+                            <code>urn:ietf:params:oauth:grant-type:token-exchange</code>는
+                            토큰 교환이 수행되고 있음을 나타낸다.<a href="#section-2.1-4.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.3">resource</dt>
+                        <dd id="section-2.1-4.4">
+                            <span class="bcp14">OPTIONAL</span>.
+                            클라이언트가 요청한 보안 토큰을 사용하려는 대상 서비스 또는 리소스를 나타내는 URI이다.
+                            이는 인가 서버가 대상에 맞게 적절한 정책을 적용할 수 있게 한다.
+                            예를 들어 발급할 토큰의 유형과 내용을 결정하거나, 토큰을 암호화할지 여부와
+                            암호화 방법을 결정할 수 있다.
+                            많은 경우 클라이언트는 상호 작용하는 시스템의 논리적 조직을 알지 못하며,
+                            토큰을 사용하려는 서비스의 URI만 알게 된다.
+                            <code>resource</code> 매개변수는 클라이언트가
+                            토큰 교환 요청에서 보통 https URL로 위치를 제공함으로써,
+                            해당 리소스에 접근할 때 사용될 것과 동일한 형식으로
+                            발급된 토큰을 어디에서 사용하려는지 인가 서버에
+                            표시할 수 있게 한다.
+                            인가 서버는 일반적으로 resource URI 값에서
+                            적절한 정책으로 매핑하는 기능을 가진다. <code>resource</code> 매개변수의 값은
+                            <span><a href="https://www.rfc-editor.org/rfc/rfc3986#section-4.3" class="relref">[<a
+                                        href="#RFC3986" class="xref">RFC3986</a>]의
+                                    섹션 4.3</a></span>에 명시된
+                            절대 URI여야 <span class="bcp14">MUST</span> 하며,
+                            쿼리 구성요소를 포함할 수 <span class="bcp14">MAY</span> 있지만
+                            프래그먼트 구성요소를 포함해서는 <span class="bcp14">MUST
+                                NOT</span> 안 된다.
+                            여러 <code>resource</code> 매개변수를 사용하여
+                            발급된 토큰이 나열된 여러 리소스에서 사용될 예정임을 나타낼 수 있다.
+                            <code>resource</code> 매개변수에 관한 추가
+                            배경과 사용은 <span>[<a href="#I-D.ietf-oauth-resource-indicators"
+                                    class="xref">OAUTH-RESOURCE</a>]</span>를 참조한다.<a href="#section-2.1-4.4"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.5">audience</dt>
+                        <dd id="section-2.1-4.6">
+                            <span class="bcp14">OPTIONAL</span>. 클라이언트가 요청한 보안 토큰을 사용하려는
+                            대상 서비스의 논리적 이름이다. 이는
+                            <code>resource</code> 매개변수와 유사한 목적을 수행하지만,
+                            클라이언트가 대상 서비스에 대한 논리적 이름을
+                            제공한다. 이름의 해석은 그 값이 클라이언트와
+                            인가 서버 모두가 이해하는 것이어야 함을 요구한다.
+                            OAuth 클라이언트 식별자, SAML 엔티티
+                            식별자 <span>[<a href="#OASIS.saml-core-2.0-os"
+                                    class="xref">OASIS.saml-core-2.0-os</a>]</span>, 및 OpenID Connect
+                            Issuer Identifier <span>[<a href="#OpenID.Core" class="xref">OpenID.Core</a>]</span>는
+                            <code>audience</code> 매개변수 값으로
+                            사용될 수 있는 것의 예이다.
+                            그러나 주어진 인가 서버와 함께 사용되는 <code>audience</code> 값은
+                            해당 서버 안에서 고유해야 하며, 이는 그것들이
+                            의도한 값 유형으로 올바르게 해석되도록 보장하기 위함이다.
+                            여러 <code>audience</code> 매개변수를 사용하여
+                            발급된 토큰이 나열된 여러 대상에서 사용될 예정임을 나타낼 수 있다.
+                            <code>audience</code>와 <code>resource</code> 매개변수를 함께 사용하여
+                            논리적 이름과 리소스 URI가 섞인 여러 대상 서비스를 나타낼 수 있다.<a href="#section-2.1-4.6" class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.7">scope</dt>
+                        <dd id="section-2.1-4.8">
+                            <span class="bcp14">OPTIONAL</span>. <span><a
+                                    href="https://www.rfc-editor.org/rfc/rfc6749#section-3.3" class="relref">[<a
+                                        href="#RFC6749" class="xref">RFC6749</a>]의 섹션 3.3</a></span>에 정의된 대로,
+                            공백으로 구분되고 대소문자를 구분하는 문자열 목록으로,
+                            클라이언트가 토큰이 사용될 서비스 또는 리소스의 맥락에서
+                            요청한 보안 토큰의 원하는 범위를 지정할 수 있게 한다.
+                            scope의 값과 관련 의미론은 서비스별로 다르며,
+                            관련 서비스 문서에 설명될 것으로 예상된다.<a href="#section-2.1-4.8" class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.9">requested_token_type</dt>
+                        <dd id="section-2.1-4.10">
+                            <span class="bcp14">OPTIONAL</span>.
+                            요청한 보안 토큰의 유형에 대한
+                            <a href="#TokenTypeIdentifiers" class="xref">섹션 3</a>에 설명된 식별자이다.
+                            요청한 유형이 지정되지 않은 경우, 발급되는 토큰 유형은
+                            인가 서버의 재량이며,
+                            <code>resource</code> 또는
+                            <code>audience</code> 매개변수가 나타내는
+                            서비스 또는 리소스의 요구사항에 대한 지식에 의해
+                            결정될 수 있다.<a href="#section-2.1-4.10" class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.11">subject_token</dt>
+                        <dd id="section-2.1-4.12">
+                            <span class="bcp14">REQUIRED</span>.
+                            요청이 이루어지는 대상 당사자의
+                            신원을 나타내는 보안 토큰이다.
+                            일반적으로 이 토큰의 주체는 요청에 대한 응답으로
+                            발급되는 보안 토큰의 주체가 된다.<a href="#section-2.1-4.12" class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.13">subject_token_type</dt>
+                        <dd id="section-2.1-4.14">
+                            <span class="bcp14">REQUIRED</span>.
+                            <code>subject_token</code> 매개변수 안의
+                            보안 토큰 유형을 나타내는
+                            <a href="#TokenTypeIdentifiers" class="xref">섹션 3</a>에 설명된 식별자이다.<a href="#section-2.1-4.14"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.15">actor_token</dt>
+                        <dd id="section-2.1-4.16">
+                            <span class="bcp14">OPTIONAL</span>.
+                            행동하는 당사자의 신원을 나타내는
+                            보안 토큰이다. 일반적으로 이는 요청한 보안 토큰을 사용하고
+                            주체를 대신하여 행동하도록 인가된 당사자가 된다.<a href="#section-2.1-4.16" class="pilcrow">¶</a>
+                        </dd>
+                        <dt id="section-2.1-4.17">actor_token_type</dt>
+                        <dd id="section-2.1-4.18">
+                            <code>actor_token</code> 매개변수 안의
+                            보안 토큰 유형을 나타내는
+                            <a href="#TokenTypeIdentifiers" class="xref">섹션 3</a>에 설명된 식별자이다.
+                            이는 요청에 <code>actor_token</code> 매개변수가
+                            존재할 때 <span class="bcp14">REQUIRED</span>이지만,
+                            그렇지 않은 경우 포함되어서는 <span class="bcp14">MUST NOT</span> 안 된다.<a href="#section-2.1-4.18"
+                                class="pilcrow">¶</a>
+                        </dd>
+                    </dl>
+                    <p id="section-2.1-5">
+                        요청을 처리할 때, 인가 서버는 표시된 토큰 유형에 대해
+                        적절한 검증 절차를 수행해야 <span class="bcp14">MUST</span> 하며,
+                        actor token이 존재하는 경우 그 표시된 토큰 유형에 대해서도
+                        적절한 검증 절차를 수행해야 한다.
+                        특정 토큰의 유효성 기준과 세부 사항은
+                        이 문서의 범위를 벗어나며 해당 토큰 유형과 그 내용에
+                        특화되어 있다.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+                    <p id="section-2.1-6">
+                        토큰 유형에 특화된 일회성 사용 또는 기타 의미론이 없는 경우,
+                        토큰 교환을 수행하는 행위는 subject token 또는 actor token의
+                        유효성에 아무런 영향을 주지 않는다.
+                        또한 교환은 일회성 이벤트이며 입력 토큰과 출력 토큰 사이에
+                        긴밀한 연결을 만들지 않는다. 따라서 예를 들어 출력 토큰의
+                        만료 시간이 입력 토큰의 만료 시간에 영향을 받을 수는 있지만,
+                        입력 토큰의 갱신 또는 연장이
+                        출력 토큰의 속성에 반영될 것으로 기대되지는 않는다.
+                        토큰 폐기 이벤트를 전파하는 것이 여전히 적절하거나 바람직할 수 있다.
+                        그러나 그렇게 하는 것은 STS 프로토콜의 일반적인 속성이 아니며,
+                        특정 구현, 토큰 유형 또는 배포에 특화될 것이다.<a href="#section-2.1-6" class="pilcrow">¶</a></p>
+                    <section id="section-2.1.1">
+                        <h4 id="name-relationship-between-resour">
+                            <a href="#section-2.1.1" class="section-number selfRef">2.1.1. </a><a
+                                href="#name-relationship-between-resour" class="section-name selfRef">리소스,
+                                대상, 범위 간의 관계</a>
+                        </h4>
+                        <p id="section-2.1.1-1">
+                            토큰을 요청할 때 클라이언트는 <code>audience</code> 및
+                            <code>resource</code> 매개변수를 통해 해당 토큰을 사용하려는
+                            원하는 대상 서비스(들)를 나타낼 수 있으며,
+                            <code>scope</code> 매개변수를 사용하여 요청한 토큰의
+                            원하는 범위를 나타낼 수도 있다.
+
+                            그러한 요청의 의미론은 클라이언트가 요청한 모든 대상 서비스에서
+                            사용 가능한 요청 범위의 토큰을 요청한다는 것이다. 사실상 토큰의
+                            요청된 액세스 권리는 모든 대상 서비스에 대한 모든 범위의
+                            데카르트 곱이다.<a href="#section-2.1.1-1" class="pilcrow">¶</a>
+                        </p>
+                        <p id="section-2.1.1-2">
+                            인가 서버는 어떤 토큰 요청도 이행하기를 꺼리거나 이행할 수 없을 수 있지만,
+                            매우 광범위한 액세스 권리가 요청될 때는
+                            이행 불가능한 요청일 가능성이 훨씬 더 높다.
+                            따라서 배포 내 시스템 간 관계에 대한 구체적인 지식이 없는 경우,
+                            클라이언트는 요청하는 액세스의 폭, 특히 대상 서비스의 수에
+                            신중해야 한다. 인가 서버는 <a href="#ErrorResponse" class="xref">섹션 2.2.2</a>에서 정의한
+                            <code>invalid_target</code> 오류 코드를 사용하여
+                            클라이언트가 동시에 너무 많은 대상 서비스에 대한 액세스를
+                            요청했음을 알릴 수 있다.<a href="#section-2.1.1-2" class="pilcrow">¶</a>
+                        </p>
+                    </section>
+                </section>
+            </div>
+            <div id="Response">
+                <section id="section-2.2">
+                    <h3 id="name-response">
+                        <a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-response"
+                            class="section-name selfRef">응답</a>
+                    </h3>
+                    <p id="section-2.2-1">
+                        인가 서버는 토큰 교환 요청에 대해
+                        <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-5" class="relref">[<a
+                                    href="#RFC6749" class="xref">RFC6749</a>]의
+                                섹션 5</a></span>에 명시된 것처럼 토큰 엔드포인트에서 오는 일반적인
+                        OAuth 2.0 응답으로 응답한다. 추가 세부 사항과
+                        설명은 다음 하위 절에서 제공된다.<a href="#section-2.2-1" class="pilcrow">¶</a>
+                    </p>
+                    <div id="SuccessfulResponse">
+                        <section id="section-2.2.1">
+                            <h4 id="name-successful-response">
+                                <a href="#section-2.2.1" class="section-number selfRef">2.2.1. </a><a
+                                    href="#name-successful-response" class="section-name selfRef">성공
+                                    응답</a>
+                            </h4>
+                            <p id="section-2.2.1-1">
+                                요청이 유효하고 인가 서버의 모든 정책 및 기타 기준을 충족하는 경우,
+                                성공 토큰 응답은 <span>[<a href="#RFC8259" class="xref">RFC8259</a>]</span>에 명시된
+                                "application/json" 미디어 유형과 HTTP 200 상태 코드를 사용하여
+                                다음 매개변수를 HTTP 응답의 entity-body에 추가함으로써
+                                구성된다.
+                                매개변수는 각 매개변수를 최상위 수준에 추가하여
+                                JavaScript Object Notation (JSON) 구조로 직렬화된다.
+                                매개변수 이름과 문자열 값은 JSON 문자열로 포함된다.
+                                숫자 값은 JSON 숫자로 포함된다. 매개변수의 순서는
+                                중요하지 않으며 달라질 수 있다.<a href="#section-2.2.1-1" class="pilcrow">¶</a>
+                            </p>
+                            <dl class="dlNewline" id="section-2.2.1-2">
+                                <dt id="section-2.2.1-2.1">access_token</dt>
+                                <dd id="section-2.2.1-2.2">
+                                    <span class="bcp14">REQUIRED</span>. 토큰 교환 요청에 대한 응답으로
+                                    인가 서버가 발급한 보안 토큰이다.
+                                    <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-5.1"
+                                            class="relref">[<a href="#RFC6749" class="xref">RFC6749</a>]의 섹션
+                                            5.1</a></span>의
+                                    <code>access_token</code> 매개변수는 여기서 요청된
+                                    토큰을 전달하는 데 사용되며, 이는 이 토큰 교환 프로토콜이 토큰 엔드포인트에 대해 정의된
+                                    기존 OAuth 2.0 요청
+                                    및 응답 구조를 사용할 수 있게 한다.
+                                    식별자 <code>access_token</code>은 역사적
+                                    이유로 사용되며, 발급된 토큰이 OAuth 액세스 토큰일 필요는 없다.<a href="#section-2.2.1-2.2"
+                                        class="pilcrow">¶</a>
+                                </dd>
+                                <dt id="section-2.2.1-2.3">issued_token_type</dt>
+                                <dd id="section-2.2.1-2.4">
+                                    <span class="bcp14">REQUIRED</span>. 발급된 보안 토큰의 표현에 대한
+                                    <a href="#TokenTypeIdentifiers" class="xref">섹션 3</a>에 설명된 식별자이다.<a
+                                        href="#section-2.2.1-2.4" class="pilcrow">¶</a>
+                                </dd>
+                                <dt id="section-2.2.1-2.5">token_type</dt>
+                                <dd id="section-2.2.1-2.6">
+                                    <span class="bcp14">REQUIRED</span>. <span><a
+                                            href="https://www.rfc-editor.org/rfc/rfc6749#section-7.1" class="relref">[<a
+                                                href="#RFC6749" class="xref">RFC6749</a>]의 섹션 7.1</a></span>에 명시된 대로,
+                                    발급된 액세스 토큰을 사용하는 방법을 지정하는
+                                    대소문자를 구분하지 않는 값이다.
+                                    이는 보호된 리소스에 액세스하기 위해
+                                    액세스 토큰을 어떻게 활용할지에 관한 정보를 클라이언트에 제공한다.
+                                    예를 들어 <span>[<a href="#RFC6750" class="xref">RFC6750</a>]</span>에 명시된
+                                    <code>Bearer</code> 값은
+                                    발급된 보안 토큰이 bearer token이며, 클라이언트가
+                                    토큰 자체의 내용 이외에 추가적인 자격 증명 없이 그대로
+                                    제시할 수 있음을 나타낸다. 이
+                                    매개변수의 의미는 <code>issued_token_type</code>
+                                    매개변수의 의미와 다르다는 점에 유의한다. 후자는
+                                    발급된 보안 토큰의 표현을 선언한다. "token type"이라는 용어는
+                                    일반적으로 이 명세의 모든 <code>*_token_type</code> 매개변수에서처럼
+                                    보안 토큰의 구조적 또는 구문적 표현을 의미하는 데
+                                    더 자주 사용된다.
+                                    발급된 토큰이 액세스 토큰이 아니거나 액세스 토큰으로 사용할 수 없는 경우,
+                                    해당 맥락에서 OAuth 2.0 <code>token_type</code>
+                                    식별자가 적용되지 않음을 나타내기 위해
+                                    <code>token_type</code> 값 <code>N_A</code>가 사용된다.<a href="#section-2.2.1-2.6"
+                                        class="pilcrow">¶</a>
+                                </dd>
+                                <dt id="section-2.2.1-2.7">expires_in</dt>
+                                <dd id="section-2.2.1-2.8">
+                                    <span class="bcp14">RECOMMENDED</span>. 인가 서버가 발급한 토큰의
+                                    유효 수명을 초 단위로 나타낸다.
+                                    클라이언트는 종종 토큰의 내용을 검사할 의향이나
+                                    기능이 없으며, 이 매개변수는 토큰 유형에 구애받지 않는
+                                    일관된 방식으로 토큰이 얼마나 오래 유효할 것으로
+                                    기대할 수 있는지를 나타낸다.
+                                    예를 들어 값 1800은 응답이 생성된 시점부터 30분 후에
+                                    토큰이 만료됨을 의미한다.<a href="#section-2.2.1-2.8" class="pilcrow">¶</a>
+                                </dd>
+                                <dt id="section-2.2.1-2.9">scope</dt>
+                                <dd id="section-2.2.1-2.10">
+                                    발급된 보안 토큰의 범위가 클라이언트가 요청한 범위와
+                                    동일한 경우 <span class="bcp14">OPTIONAL</span>이며,
+                                    그렇지 않으면 <span class="bcp14">REQUIRED</span>이다.<a href="#section-2.2.1-2.10"
+                                        class="pilcrow">¶</a>
+                                </dd>
+                                <dt id="section-2.2.1-2.11">refresh_token</dt>
+                                <dd id="section-2.2.1-2.12">
+                                    <span class="bcp14">OPTIONAL</span>.
+                                    교환이 하나의 임시 자격 증명(subject_token)을
+                                    다른 맥락에서 사용하기 위한 다른 임시 자격 증명(발급된 토큰)으로
+                                    바꾸는 것일 때는 일반적으로 refresh token이 발급되지 않는다.
+                                    refresh token은 토큰 교환의 클라이언트가
+                                    원래 자격 증명이 더 이상 유효하지 않은 경우에도
+                                    리소스에 액세스할 수 있는 능력이 필요한 경우에 발급될 수 있다.
+                                    (예: 사용자 부재 또는 오프라인 시나리오로, 클라이언트와
+                                    활성 세션을 유지하는 사용자가 더 이상 없는 경우).
+                                    이 명세의 프로파일 또는 배포는 클라이언트가
+                                    <code>urn:ietf:params:oauth:grant-type:token-exchange</code>
+                                    grant type 요청에 대한 응답으로 refresh token을 기대해야 하는 조건을
+                                    명확히 문서화해야 한다.<a href="#section-2.2.1-2.12" class="pilcrow">¶</a>
+                                </dd>
+                            </dl>
+                        </section>
+                    </div>
+                    <div id="ErrorResponse">
+                        <section id="section-2.2.2">
+                            <h4 id="name-error-response">
+                                <a href="#section-2.2.2" class="section-number selfRef">2.2.2. </a><a
+                                    href="#name-error-response" class="section-name selfRef">오류 응답</a>
+                            </h4>
+                            <p id="section-2.2.2-1">
+                                요청 자체가 유효하지 않거나 <code>subject_token</code> 또는
+                                <code>actor_token</code> 중 하나가 어떤 이유로든 유효하지 않거나
+                                정책상 허용되지 않는 경우, 인가 서버는
+                                <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-5.2" class="relref">[<a
+                                            href="#RFC6749" class="xref">RFC6749</a>]의
+                                        섹션 5.2</a></span>에 명시된 대로
+                                오류 응답을 구성해야 <span class="bcp14">MUST</span> 한다.
+                                <code>error</code> 매개변수의 값은
+                                <code>invalid_request</code> 오류 코드여야 <span class="bcp14">MUST</span> 한다.<a
+                                    href="#section-2.2.2-1" class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.2.2-2">
+                                인가 서버가 <code>resource</code> 또는 <code>audience</code> 매개변수로
+                                표시된 어떤 대상 서비스에 대해서도 토큰을 발급하기를 꺼리거나 발급할 수 없는 경우,
+                                오류 응답에는 <code>invalid_target</code> 오류 코드를 사용해야 <span class="bcp14">SHOULD</span> 한다.<a
+                                    href="#section-2.2.2-2" class="pilcrow">¶</a></p>
+                            <p id="section-2.2.2-3">
+                                인가 서버는
+                                <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-5.2" class="relref">[<a
+                                            href="#RFC6749" class="xref">RFC6749</a>]의
+                                        섹션 5.2</a></span>에서 논의한 것처럼 <code>error_description</code>을 사용하여
+                                오류 사유에 관한 추가 정보를 포함할 수 <span class="bcp14">MAY</span> 있다.<a href="#section-2.2.2-3"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.2.2-4">
+                                다른 오류 코드도 적절한 경우 사용할 수 있다.<a href="#section-2.2.2-4" class="pilcrow">¶</a></p>
+                        </section>
+                    </div>
+                </section>
+            </div>
+            <div id="MainExample">
+                <section id="section-2.3">
+                    <h3 id="name-example-token-exchange">
+                        <a href="#section-2.3" class="section-number selfRef">2.3. </a><a
+                            href="#name-example-token-exchange" class="section-name selfRef">토큰 교환 예</a>
+                    </h3>
+                    <p id="section-2.3-1">
+                        다음 예는 OAuth 리소스 서버가
+                        교환 중 클라이언트 역할을 맡는 가상의 토큰 교환을 보여 준다. 리소스 서버는
+                        보호된 리소스 요청에서 받은 액세스 토큰을,
+                        백엔드 서비스를 호출하는 데 사용할 새 토큰으로 교환한다
+                        (예제의 추가 줄바꿈과 들여쓰기는 표시 목적일 뿐이다).<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+                    <p id="section-2.3-2">
+                        <a href="#main-prr" class="xref">그림 1</a>은
+                        <span><a href="https://www.rfc-editor.org/rfc/rfc6750#section-2.1" class="relref">[<a
+                                    href="#RFC6750" class="xref">RFC6750</a>]의
+                                섹션 2.1</a></span>에 명시된 대로,
+                        Authorization 헤더에 OAuth 액세스 토큰을 포함한 보호된
+                        리소스 요청을 리소스 서버가 수신하는 모습을 보여 준다.<a href="#section-2.3-2" class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-protected-resource-request"></span>
+                    <div id="main-prr">
+                        <figure id="figure-1">
+                            <div class="artwork art-text alignLeft" id="section-2.3-3.1">
+                                <pre>
+ GET /resource HTTP/1.1
+ Host: frontend.example.com
+ Authorization: Bearer accVkjcJyb4BWCxGsndESCJQbdFMogUC5PbRDqceLTC
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-1" class="selfRef">그림 1</a>:
+                                <a href="#name-protected-resource-request" class="selfRef">보호된 리소스
+                                    요청</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-2.3-4">
+                        <a href="#main-tereq" class="xref">그림 2</a>에서 리소스 서버는
+                        토큰 교환을 위한 클라이언트 역할을 맡으며,
+                        <a href="#main-prr" class="xref">그림 1</a>의 요청에서 가져온 액세스 토큰은
+                        <a href="#Request" class="xref">섹션 2.1</a>에 명시된 요청을 사용하여
+                        인가 서버로 전송된다. <code>subject_token</code> 매개변수의 값은
+                        액세스 토큰을 전달하고,
+                        <code>subject_token_type</code> 매개변수의 값은
+                        그것이 OAuth 2.0 액세스 토큰임을 나타낸다. 클라이언트 역할을 하는
+                        리소스 서버는 HTTP Basic 인증 스킴을 사용하여
+                        자신의 식별자와 비밀값으로
+                        인가 서버에 인증한다.
+                        <code>resource</code> 매개변수는 발급된 토큰이 사용될
+                        백엔드 서비스의 위치인 &lt;https://backend.example.com/api&gt;를 나타낸다.<a href="#section-2.3-4"
+                            class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-token-exchange-request"></span>
+                    <div id="main-tereq">
+                        <figure id="figure-2">
+                            <div class="artwork art-text alignLeft" id="section-2.3-5.1">
+                                <pre>
+ POST /as/token.oauth2 HTTP/1.1
+ Host: as.example.com
+ Authorization: Basic cnMwODpsb25nLXNlY3VyZS1yYW5kb20tc2VjcmV0
+ Content-Type: application/x-www-form-urlencoded
+
+ grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange
+ &amp;resource=https%3A%2F%2Fbackend.example.com%2Fapi
+ &amp;subject_token=accVkjcJyb4BWCxGsndESCJQbdFMogUC5PbRDqceLTC
+ &amp;subject_token_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-2" class="selfRef">그림 2</a>:
+                                <a href="#name-token-exchange-request" class="selfRef">토큰 교환 요청</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-2.3-6">
+                        인가 서버는 토큰 교환 요청에 제시된 클라이언트 자격 증명과
+                        <code>subject_token</code>을 검증한다.
+                        <code>resource</code> 매개변수로부터
+                        인가 서버는 요청에 적용할 적절한 정책을 결정할 수 있으며
+                        &lt;https://backend.example.com&gt;에서 사용하기에 적합한 토큰을 발급한다.
+                        <a href="#main-teresp" class="xref">그림 3</a>에 표시된 응답의
+                        <code>access_token</code> 매개변수는 새 토큰을 포함하며,
+                        이 토큰 자체는 1분 동안 유효한 bearer OAuth
+                        액세스 토큰이다. 그 토큰은 우연히
+                        JWT이지만, 클라이언트에게는 그 구조와 형식이 불투명하므로
+                        <code>issued_token_type</code>은
+                        그것이 액세스 토큰임만 나타낸다.<a href="#section-2.3-6" class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-token-exchange-response"></span>
+                    <div id="main-teresp">
+                        <figure id="figure-3">
+                            <div class="artwork art-text alignLeft" id="section-2.3-7.1">
+                                <pre>
+ HTTP/1.1 200 OK
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
+
+ {
+  "access_token":"eyJhbGciOiJFUzI1NiIsImtpZCI6IjllciJ9.eyJhdWQiOiJo
+    dHRwczovL2JhY2tlbmQuZXhhbXBsZS5jb20iLCJpc3MiOiJodHRwczovL2FzLmV
+    4YW1wbGUuY29tIiwiZXhwIjoxNDQxOTE3NTkzLCJpYXQiOjE0NDE5MTc1MzMsIn
+    N1YiI6ImJkY0BleGFtcGxlLmNvbSIsInNjb3BlIjoiYXBpIn0.40y3ZgQedw6rx
+    f59WlwHDD9jryFOr0_Wh3CGozQBihNBhnXEQgU85AI9x3KmsPottVMLPIWvmDCM
+    y5-kdXjwhw",
+  "issued_token_type":
+      "urn:ietf:params:oauth:token-type:access_token",
+  "token_type":"Bearer",
+  "expires_in":60
+ }
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-3" class="selfRef">그림 3</a>:
+                                <a href="#name-token-exchange-response" class="selfRef">토큰 교환 응답</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-2.3-8">
+                        그런 다음 리소스 서버는 <a href="#main-beprr" class="xref">그림
+                            4</a>에 예시된 것처럼 새로 획득한 액세스 토큰을 사용하여
+                        백엔드 서버에 요청을 보낼 수 있다.<a href="#section-2.3-8" class="pilcrow">¶</a></p>
+                    <span id="name-backend-protected-resource-"></span>
+                    <div id="main-beprr">
+                        <figure id="figure-4">
+                            <div class="artwork art-text alignLeft" id="section-2.3-9.1">
+                                <pre>
+ GET /api HTTP/1.1
+ Host: backend.example.com
+ Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjllciJ9.eyJhdWQ
+    iOiJodHRwczovL2JhY2tlbmQuZXhhbXBsZS5jb20iLCJpc3MiOiJodHRwczovL2
+    FzLmV4YW1wbGUuY29tIiwiZXhwIjoxNDQxOTE3NTkzLCJpYXQiOjE0NDE5MTc1M
+    zMsInN1YiI6ImJkY0BleGFtcGxlLmNvbSIsInNjb3BlIjoiYXBpIn0.40y3ZgQe
+    dw6rxf59WlwHDD9jryFOr0_Wh3CGozQBihNBhnXEQgU85AI9x3KmsPottVMLPIW
+    vmDCMy5-kdXjwhw
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-4" class="selfRef">그림 4</a>:
+                                <a href="#name-backend-protected-resource-" class="selfRef">백엔드 보호 리소스
+                                    요청</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-2.3-10">
+                        추가 예는 <a href="#AdditionalExamples" class="xref">부록 A</a>에서 확인할 수 있다.<a href="#section-2.3-10"
+                            class="pilcrow">¶</a></p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="TokenTypeIdentifiers">
+        <section id="section-3">
+            <h2 id="name-token-type-identifiers">
+                <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-token-type-identifiers"
+                    class="section-name selfRef">토큰 유형 식별자</a>
+            </h2>
+            <p id="section-3-1">
+                이 명세의 여러 매개변수는
+                해당 토큰을 설명하기 위한 값으로 식별자를 사용한다.
+                구체적으로, 이들은 요청의
+                <code>requested_token_type</code>,
+                <code>subject_token_type</code>, 및 <code>actor_token_type</code>
+                매개변수와 응답의 <code>issued_token_type</code> 멤버이다.
+                토큰 유형 식별자는 URI이다.
+                토큰 교환은 다른 당사자가 발급한 토큰과
+                주어진 인가 서버의 토큰 모두와 함께 작동할 수 있다. 전자의 경우
+                토큰 유형 식별자는 인가 서버가 파싱할 수 있도록 구문(예: JWT 또는 SAML 2.0)을
+                나타낸다. 후자의 경우에는
+                주어진 인가 서버가 그것을 무엇으로 발급했는지
+                (예: <code>access_token</code> 또는 <code>refresh_token</code>)를 나타낸다.<a href="#section-3-1"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-2">
+                다음 토큰 유형 식별자는 이 명세에서 정의한다.
+                다른 토큰 유형을 나타내기 위해 다른 URI를 사용할 수 <span class="bcp14">MAY</span> 있다.<a href="#section-3-2"
+                    class="pilcrow">¶</a></p>
+            <dl class="dlNewline" id="section-3-3">
+                <dt id="section-3-3.1">urn:ietf:params:oauth:token-type:access_token</dt>
+                <dd id="section-3-3.2">
+                    토큰이 주어진 인가 서버가 발급한 OAuth 2.0 액세스 토큰임을 나타낸다.<a href="#section-3-3.2" class="pilcrow">¶</a>
+                </dd>
+                <dt id="section-3-3.3">urn:ietf:params:oauth:token-type:refresh_token</dt>
+                <dd id="section-3-3.4">
+                    토큰이 주어진 인가 서버가 발급한 OAuth 2.0 refresh token임을 나타낸다.<a href="#section-3-3.4" class="pilcrow">¶</a>
+                </dd>
+                <dt id="section-3-3.5">urn:ietf:params:oauth:token-type:id_token</dt>
+                <dd id="section-3-3.6">
+                    토큰이 <span>[<a href="#OpenID.Core" class="xref">OpenID.Core</a>]</span>의 섹션 2에 정의된 ID Token임을 나타낸다.<a
+                        href="#section-3-3.6" class="pilcrow">¶</a>
+                </dd>
+                <dt id="section-3-3.7">urn:ietf:params:oauth:token-type:saml1</dt>
+                <dd id="section-3-3.8">
+                    토큰이 base64url로 인코딩된 SAML 1.1 <span>[<a href="#OASIS.saml-core-1.1"
+                            class="xref">OASIS.saml-core-1.1</a>]</span> 어서션임을 나타낸다.<a href="#section-3-3.8"
+                        class="pilcrow">¶</a>
+                </dd>
+                <dt id="section-3-3.9">urn:ietf:params:oauth:token-type:saml2</dt>
+                <dd id="section-3-3.10">
+                    토큰이 base64url로 인코딩된 SAML 2.0 <span>[<a href="#OASIS.saml-core-2.0-os"
+                            class="xref">OASIS.saml-core-2.0-os</a>]</span> 어서션임을 나타낸다.<a href="#section-3-3.10"
+                        class="pilcrow">¶</a>
+                </dd>
+            </dl>
+            <p id="section-3-4">
+                <span><a href="https://www.rfc-editor.org/rfc/rfc7519#section-9" class="relref">[<a href="#RFC7519"
+                            class="xref">JWT</a>]의 섹션 9</a></span>에서 정의한
+                값 <code>urn:ietf:params:oauth:token-type:jwt</code>는 토큰이 JWT임을 나타낸다.<a href="#section-3-4"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-5">
+                액세스 토큰과 JWT 사이의 구분은 미묘하다.
+                액세스 토큰은 위임된 인가 결정을 나타내지만, JWT는 토큰 형식이다.
+                액세스 토큰은 JWT로 형식화될 수 있지만 반드시 그래야 하는 것은 아니다. 그리고
+                JWT가 액세스 토큰일 수도 있지만, 모든 JWT가 액세스 토큰인 것은 아니다.
+
+                이 명세의 의도는 <code>urn:ietf:params:oauth:token-type:access_token</code>이
+                해당 인가 서버가 발급한 전형적인 OAuth 액세스 토큰임을 나타내는 지표로서,
+                클라이언트에게 불투명하며,
+                해당 인가 서버에서 얻은 다른 액세스 토큰과 같은 방식으로 사용 가능하다는 것이다.
+                (그것이 JWT일 수도 있지만, 클라이언트는 그 사실을 알지 못하고 알 필요도 없다.)
+                반면 <code>urn:ietf:params:oauth:token-type:jwt</code>는
+                JWT가 구체적으로 요청되거나 전송되고 있음을 나타내기 위한 것이다
+                (예컨대 <span>[<a href="#RFC7523" class="xref">RFC7523</a>]</span>이 가능하게 하는 것처럼,
+                다른 인가 서버에서 액세스 토큰을 얻기 위한 인가 grant로 JWT가 사용되는
+                교차 도메인 사용 사례일 수 있다).<a href="#section-3-5" class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-6">
+                이진 성격의 토큰의 경우, 그것을 전달하는 데 사용되는 URI는
+                HTTP 및 OAuth와 함께 사용하기에 적합한 base64 또는 기타
+                인코딩의 의미론과 연결되어야 한다는 점에 유의한다.<a href="#section-3-6" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="JWTClaims">
+        <section id="section-4">
+            <h2 id="name-json-web-token-claims-and-i">
+                <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-json-web-token-claims-and-i"
+                    class="section-name selfRef">JSON Web Token 클레임 및 검사 응답 매개변수</a>
+            </h2>
+            <p id="section-4-1">
+                토큰 안에서 위임을 표현하고,
+                위임 또는 가장에 대한 인가를 표현하기 위한 정의된 메커니즘을 갖는 것은 유용하다.
+                여기에 설명된 토큰 교환 프로토콜은
+                어떤 유형의 토큰과도 함께 사용할 수 있지만, 이 절은 이러한
+                의미론을 JWT와 OAuth 2.0 Token Introspection <span>[<a href="#RFC7662" class="xref">RFC7662</a>]</span> 응답에서
+                구체적으로 표현하기 위한
+                클레임을 정의한다.
+                다른 유형의 토큰에 대한 유사한 정의도 가능하지만
+                이 명세의 범위를 벗어난다.<a href="#section-4-1" class="pilcrow">¶</a></p>
+            <p id="section-4-2">
+                여기에 설정되지 않았지만 예제와 설명에서 사용되는 클레임,
+                예컨대 <code>iss</code>, <code>sub</code>,
+                <code>exp</code> 등은 <span>[<a href="#RFC7519" class="xref">JWT</a>]</span>에서 정의한다는 점에 유의한다.<a
+                    href="#section-4-2" class="pilcrow">¶</a>
+            </p>
+            <div id="actor">
+                <section id="section-4.1">
+                    <h3 id="name-act-actor-claim">
+                        <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-act-actor-claim"
+                            class="section-name selfRef">"act" (행위자) 클레임</a>
+                    </h3>
+                    <p id="section-4.1-1">
+                        <code>act</code> (actor) 클레임은
+                        JWT 안에서 위임이 발생했음을 표현하고 권한이 위임된
+                        행동 당사자를 식별하는 수단을 제공한다. <code>act</code> 클레임 값은 JSON
+                        객체이며, 그 JSON 객체의 멤버는 행위자를 식별하는 클레임이다.
+                        <code>act</code> 클레임을 구성하는 클레임은 행위자를 식별하고,
+                        가능하면 행위자에 대한 추가 정보를
+                        제공한다. 예를 들어,
+                        두 클레임 <code>iss</code>와 <code>sub</code>의 조합이
+                        행위자를 고유하게 식별하는 데 필요할 수 있다.<a href="#section-4.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-4.1-2">
+                        그러나 <code>act</code> 클레임 안의 클레임은 행위자의 신원에만 관련되며,
+                        최상위 클레임과 같은 방식으로 포함하는 JWT의 유효성과는 관련되지 않는다.
+                        따라서 비신원 클레임(예: <code>exp</code>, <code>nbf</code>,
+                        및 <code>aud</code>)은
+                        <code>act</code> 클레임 안에서 사용될 때 의미가 없으므로 사용되지 않는다.<a href="#section-4.1-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-4.1-3"><a href="#act-ex" class="xref">그림 5</a>는 JWT Claims Set 안의
+                        <code>act</code> (actor) 클레임을 보여 준다.
+                        토큰 자체의 클레임은 user@example.com에 관한 것이고,
+                        <code>act</code> 클레임은 admin@example.com이
+                        현재 행위자임을 나타낸다.<a href="#section-4.1-3" class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-actor-claim"></span>
+                    <div id="act-ex">
+                        <figure id="figure-5">
+                            <div id="section-4.1-4.1">
+                                <pre class="sourcecode lang-json">
+ {
+   "aud":"https://consumer.example.com",
+   "iss":"https://issuer.example.com",
+   "exp":1443904177,
+   "nbf":1443904077,
+   "sub":"user@example.com",
+   "act":
+   {
+     "sub":"admin@example.com"
+   }
+ }</pre>
+                            </div>
+                            <figcaption><a href="#figure-5" class="selfRef">그림 5</a>:
+                                <a href="#name-actor-claim" class="selfRef">행위자 클레임</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-4.1-5">
+                        위임 체인은 하나의 <code>act</code> 클레임을 다른 <code>act</code> 클레임 안에
+                        중첩하여 표현할 수 있다. 가장 바깥쪽 <code>act</code> 클레임은 현재 행위자를 나타내며,
+                        중첩된 <code>act</code> 클레임은 이전 행위자를 나타낸다.
+                        가장 오래된 행위자는 가장 깊게 중첩된다. 중첩된 <code>act</code> 클레임은
+                        최초 요청 및 주체를
+                        현재 행위자에 도달하기 전에 수행된 다양한 위임 단계와 연결하는
+                        이력 추적 역할을 한다. 이러한 의미에서 현재 행위자는
+                        전체 인가/위임 이력을 포함하는 것으로 간주되며,
+                        여기에서 설명하는 중첩 구조로 자연스럽게 이어진다.<a href="#section-4.1-5" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-4.1-6">
+                        액세스 제어 정책을 적용할 목적으로, 토큰의 소비자는
+                        토큰의 최상위 클레임과 <code>act</code> 클레임이 현재 행위자로 식별한
+                        당사자만 고려해야 <span class="bcp14">MUST</span> 한다.
+                        중첩된 <code>act</code> 클레임이 식별한 이전 행위자는
+                        정보 제공용일 뿐이며 액세스 제어 결정에서 고려되어서는 안 된다.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
+                    <p id="section-4.1-7">
+                        <a href="#acts-ex" class="xref">그림 6</a>의 다음 예는 JWT Claims Set 안의 중첩된
+                        <code>act</code> (actor) 클레임을 보여 준다.
+                        토큰 자체의 클레임은 user@example.com에 관한 것이고,
+                        <code>act</code> 클레임은
+                        시스템 &lt;https://service16.example.com&gt;이 현재 행위자이며
+                        &lt;https://service77.example.com&gt;가 이전 행위자였음을 나타낸다.
+                        그러한 토큰은 service16이 service77의 호출에서 토큰을 수신하고,
+                        인가 서버가 새로 발급된 토큰에 그 상황을 기록하면서
+                        service26을 호출하기에 적합한 토큰으로 교환한 결과로
+                        생성될 수 있다.<a href="#section-4.1-7" class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-nested-actor-claim"></span>
+                    <div id="acts-ex">
+                        <figure id="figure-6">
+                            <div id="section-4.1-8.1">
+                                <pre class="sourcecode lang-json">
+ {
+   "aud":"https://service26.example.com",
+   "iss":"https://issuer.example.com",
+   "exp":1443904100,
+   "nbf":1443904000,
+   "sub":"user@example.com",
+   "act":
+   {
+     "sub":"https://service16.example.com",
+     "act":
+     {
+       "sub":"https://service77.example.com"
+     }
+   }
+ }
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-6" class="selfRef">그림 6</a>:
+                                <a href="#name-nested-actor-claim" class="selfRef">중첩된 행위자 클레임</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-4.1-9">
+                        OAuth 토큰 검사 응답의 최상위 멤버로 포함될 때, <code>act</code>는
+                        같은 이름의 클레임과 동일한 의미론 및 형식을 가진다.<a href="#section-4.1-9" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="scopes">
+                <section id="section-4.2">
+                    <h3 id="name-scope-scopes-claim">
+                        <a href="#section-4.2" class="section-number selfRef">4.2. </a><a
+                            href="#name-scope-scopes-claim" class="section-name selfRef">"scope" (범위) 클레임</a>
+                    </h3>
+                    <p id="section-4.2-1">
+                        <code>scope</code> 클레임의 값은
+                        <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-3.3" class="relref">[<a
+                                    href="#RFC6749" class="xref">RFC6749</a>]의 섹션
+                                3.3</a></span>에 설명된 형식으로,
+                        토큰과 관련된 범위의 공백으로 구분된 목록을 포함하는
+                        JSON 문자열이다.<a href="#section-4.2-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-4.2-2"><a href="#scope-ex" class="xref">그림 7</a>은
+                        JWT Claims Set 안의 <code>scope</code> 클레임을 보여 준다.<a href="#section-4.2-2" class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-scopes-claim"></span>
+                    <div id="scope-ex">
+                        <figure id="figure-7">
+                            <div id="section-4.2-3.1">
+                                <pre class="sourcecode lang-json">
+ {
+   "aud":"https://consumer.example.com",
+   "iss":"https://issuer.example.com",
+   "exp":1443904177,
+   "nbf":1443904077,
+   "sub":"dgaf4mvfs75Fci_FL3heQA",
+   "scope":"email profile phone address"
+ }
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-7" class="selfRef">그림 7</a>:
+                                <a href="#name-scopes-claim" class="selfRef">범위 클레임</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-4.2-4">
+                        <span><a href="#RFC7662" class="xref">OAuth 2.0 Token Introspection</a> [<a href="#RFC7662"
+                                class="xref">RFC7662</a>]</span>는 이미 토큰과 관련된 범위를 전달하기 위해
+                        <code>scope</code> 매개변수를 정의한다.<a href="#section-4.2-4" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="client_id">
+                <section id="section-4.3">
+                    <h3 id="name-client_id-client-identifier">
+                        <a href="#section-4.3" class="section-number selfRef">4.3. </a><a
+                            href="#name-client_id-client-identifier" class="section-name selfRef">"client_id" (클라이언트
+                            식별자) 클레임</a>
+                    </h3>
+                    <p id="section-4.3-1">
+                        <code>client_id</code> 클레임은
+                        토큰을 요청한 <span><a href="#RFC6749" class="xref">OAuth 2.0</a> [<a href="#RFC6749"
+                                class="xref">RFC6749</a>]</span> 클라이언트의
+                        클라이언트 식별자를 전달한다.<a href="#section-4.3-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-4.3-2">
+                        <a href="#client_id-ex" class="xref">그림 8</a>의 다음 예는
+                        식별자가 "s6BhdRkqt3"인 OAuth 2.0 클라이언트를 나타내는
+                        JWT Claims Set 안의 <code>client_id</code> 클레임을 보여 준다.<a href="#section-4.3-2"
+                            class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-client-identifier-claim"></span>
+                    <div id="client_id-ex">
+                        <figure id="figure-8">
+                            <div id="section-4.3-3.1">
+                                <pre class="sourcecode lang-json">
+ {
+   "aud":"https://consumer.example.com",
+   "iss":"https://issuer.example.com",
+   "exp":1443904177,
+   "sub":"user@example.com",
+   "client_id":"s6BhdRkqt3"
+ }
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-8" class="selfRef">그림 8</a>:
+                                <a href="#name-client-identifier-claim" class="selfRef">클라이언트 식별자 클레임</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-4.3-4">
+                        <span><a href="#RFC7662" class="xref">OAuth 2.0 Token Introspection</a> [<a href="#RFC7662"
+                                class="xref">RFC7662</a>]</span>는 이미 토큰을 요청한 OAuth 2.0 클라이언트의
+                        클라이언트 식별자로 <code>client_id</code>
+                        매개변수를 정의한다.<a href="#section-4.3-4" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="may_act">
+                <section id="section-4.4">
+                    <h3 id="name-may_act-authorized-actor-cl">
+                        <a href="#section-4.4" class="section-number selfRef">4.4. </a><a
+                            href="#name-may_act-authorized-actor-cl" class="section-name selfRef">"may_act" (인가된
+                            행위자) 클레임</a>
+                    </h3>
+                    <p id="section-4.4-1">
+                        <code>may_act</code> 클레임은 한 당사자가
+                        행위자가 되어 다른 당사자를 대신하여 행동하도록 인가되었다는 진술을 만든다.
+                        예를 들어 <code>subject_token</code>이
+                        토큰 교환 요청에서 토큰 엔드포인트에 제시될 때,
+                        subject token 안의 <code>may_act</code> 클레임은
+                        클라이언트(또는 <code>actor_token</code>에서 식별된 당사자)가
+                        요청된 위임 또는 가장에 참여하도록 인가되었는지를
+                        인가 서버가 결정하는 데 사용될 수 있다.
+                        클레임 값은 JSON 객체이며, JSON 객체의 멤버는
+                        클레임을 포함한 JWT가 식별하는 당사자를 위해
+                        행동할 자격이 있다고 주장되는 당사자를 식별하는 클레임이다.
+                        <code>may_act</code>
+                        클레임을 구성하는 클레임은 인가된 행위자를 식별하고
+                        가능하면 그에 관한 추가 정보를 제공한다.
+                        예를 들어 두 클레임 <code>iss</code>와
+                        <code>sub</code>의 조합은 인가된 행위자를 고유하게 식별하는 데
+                        때때로 필요하며,
+                        <code>email</code> 클레임은 해당 당사자에 관한 추가로 유용한 정보를
+                        제공하는 데 사용될 수 있다.<a href="#section-4.4-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-4.4-2">
+                        그러나 <code>may_act</code> 클레임 안의 클레임은 그 당사자의 신원에만 관련되며,
+                        최상위 클레임과 같은 방식으로 포함하는 JWT의 유효성과는
+                        관련되지 않는다.
+                        따라서 <code>exp</code>, <code>nbf</code>, 및
+                        <code>aud</code>와 같은 클레임은 <code>may_act</code>
+                        클레임 안에서 사용될 때 의미가 없으므로 사용되지 않는다.<a href="#section-4.4-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-4.4-3"><a href="#may_act-ex" class="xref">그림 9</a>는
+                        JWT Claims Set 안의 <code>may_act</code> 클레임을 보여 준다.
+                        토큰 자체의 클레임은 user@example.com에 관한 것이고,
+                        <code>may_act</code> 클레임은
+                        admin@example.com이 user@example.com을 대신하여 행동하도록 인가되었음을 나타낸다.<a href="#section-4.4-3"
+                            class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-authorized-actor-claim"></span>
+                    <div id="may_act-ex">
+                        <figure id="figure-9">
+                            <div id="section-4.4-4.1">
+                                <pre class="sourcecode lang-json">
+ {
+   "aud":"https://consumer.example.com",
+   "iss":"https://issuer.example.com",
+   "exp":1443904177,
+   "nbf":1443904077,
+   "sub":"user@example.com",
+   "may_act":
+   {
+     "sub":"admin@example.com"
+   }
+ }
+</pre>
+                            </div>
+                            <figcaption><a href="#figure-9" class="selfRef">그림 9</a>:
+                                <a href="#name-authorized-actor-claim" class="selfRef">인가된 행위자 클레임</a>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <p id="section-4.4-5">
+                        OAuth 토큰 검사 응답의 최상위 멤버로 포함될 때,
+                        <code>may_act</code>는
+                        같은 이름의 클레임과 동일한 의미론 및 형식을 가진다.<a href="#section-4.4-5" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="Security">
+        <section id="section-5">
+            <h2 id="name-security-considerations">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations"
+                    class="section-name selfRef">보안 고려사항</a>
+            </h2>
+            <p id="section-5-1">
+                <span><a href="https://www.rfc-editor.org/rfc/rfc6749#section-10" class="relref">[<a href="#RFC6749"
+                            class="xref">RFC6749</a>]의 섹션 10</a></span>,
+                즉 The OAuth 2.0 Authorization Framework의 보안 고려사항에 있는
+                많은 지침도 여기에서 적용된다.
+                또한 <span>[<a href="#RFC6819" class="xref">RFC6819</a>]</span>는
+                OAuth에 대한 추가 보안 고려사항을 제공하며,
+                <span>[<a href="#I-D.ietf-oauth-security-topics" class="xref">OAUTH-SECURITY</a>]</span>는
+                OAuth 2.0이 원래 게시된 이후 배포 경험과 새로 등장한 위협에
+                기반한 최신 보안 지침을 제공한다.<a href="#section-5-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-5-2">
+                <span>[<a href="#RFC7519" class="xref">JWT</a>]</span>에서 논의되는 일반적인 보안 문제,
+                특히 URI 비교 및 인식되지 않은 값 처리와 관련된 문제도
+                모두 여기에 적용된다.<a href="#section-5-2" class="pilcrow">¶</a>
+            </p>
+            <p id="section-5-3">
+                또한 위임과 가장은 고유한
+                보안 문제를 도입한다. 한 주체에게 다른 주체의 권리가 위임될 때마다
+                남용 가능성은 우려 사항이다.
+                <code>scope</code> 클레임의 사용은
+                (제한된 토큰 수명과 같은 다른 일반적인 제약과 더불어)
+                그러한 남용 가능성을 완화하기 위해 제안된다. 이는
+                위임된 권리가 행사될 수 있는 맥락을 제한하기 때문이다.<a href="#section-5-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="Privacy">
+        <section id="section-6">
+            <h2 id="name-privacy-considerations">
+                <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-privacy-considerations"
+                    class="section-name selfRef">개인정보 보호 고려사항</a>
+            </h2>
+            <p id="section-6-1">
+                여기에 설명된 기능의 맥락에서 사용되는 토큰은
+                개인정보에 민감한 정보를 포함할 수 있으며, 그러한 정보가
+                의도하지 않은 당사자에게 공개되는 것을 방지하기 위해,
+                Transport Layer Security (TLS)와 같은 암호화된 채널을 통해서만
+                전송되어야 <span class="bcp14">MUST</span> 한다. 특정
+                정보가 클라이언트에게 공개되는 것을 방지하는 것이 바람직한 경우,
+                토큰은 의도한 수신자를 위해 암호화되어야 <span class="bcp14">MUST</span> 한다.
+                배포는 필요한 최소한의 데이터 양을 결정하고,
+                그러한 정보만 발급된 토큰에 포함해야 <span class="bcp14">SHOULD</span> 한다.
+                일부 경우 데이터 최소화에는 익명 또는 가명 사용자를
+                나타내는 것만 포함될 수 있다.<a href="#section-6-1" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="IANA">
+        <section id="section-7">
+            <h2 id="name-iana-considerations">
+                <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations"
+                    class="section-name selfRef">IANA 고려사항</a>
+            </h2>
+            <div id="URIReg">
+                <section id="section-7.1">
+                    <h3 id="name-oauth-uri-registration">
+                        <a href="#section-7.1" class="section-number selfRef">7.1. </a><a
+                            href="#name-oauth-uri-registration" class="section-name selfRef">OAuth URI 등록</a>
+                    </h3>
+                    <p id="section-7.1-1">
+                        IANA는
+                        "OAuth Parameters" 레지스트리
+                        <span>[<a href="#IANA.OAuth.Parameters" class="xref">IANA.OAuth.Parameters</a>]</span>의
+                        "OAuth URI" 하위 레지스트리에 다음 값을 등록했다. "OAuth URI" 하위 레지스트리는
+                        <span>[<a href="#RFC6755" class="xref">RFC6755</a>]</span>에 의해
+                        설정되었다.<a href="#section-7.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <ul>
+                        <li id="section-7.1-2.1">URN: urn:ietf:params:oauth:grant-type:token-exchange<a
+                                href="#section-7.1-2.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-2.2">일반 이름: OAuth 2.0용 토큰 교환 grant type<a href="#section-7.1-2.2"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-2.3">변경 관리자: IESG<a href="#section-7.1-2.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-2.4">명세 문서: RFC 8693의 <a href="#Request" class="xref">섹션 2.1</a><a
+                                href="#section-7.1-2.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.1-3.1">URN: urn:ietf:params:oauth:token-type:access_token<a
+                                href="#section-7.1-3.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-3.2">일반 이름: OAuth 2.0 액세스 토큰의 토큰 유형 URI<a href="#section-7.1-3.2"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-3.3">변경 관리자: IESG<a href="#section-7.1-3.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-3.4">명세 문서: RFC 8693의 <a href="#TokenTypeIdentifiers" class="xref">섹션
+                                3</a><a href="#section-7.1-3.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.1-4.1">URN: urn:ietf:params:oauth:token-type:refresh_token<a
+                                href="#section-7.1-4.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-4.2">일반 이름: OAuth 2.0 refresh token의 토큰 유형 URI<a href="#section-7.1-4.2"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-4.3">변경 관리자: IESG<a href="#section-7.1-4.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-4.4">명세 문서: RFC 8693의 <a href="#TokenTypeIdentifiers" class="xref">섹션
+                                3</a><a href="#section-7.1-4.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.1-5.1">URN: urn:ietf:params:oauth:token-type:id_token<a
+                                href="#section-7.1-5.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-5.2">일반 이름: ID Token의 토큰 유형 URI<a href="#section-7.1-5.2"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-5.3">변경 관리자: IESG<a href="#section-7.1-5.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-5.4">명세 문서: RFC 8693의 <a href="#TokenTypeIdentifiers" class="xref">섹션
+                                3</a><a href="#section-7.1-5.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.1-6.1">URN: urn:ietf:params:oauth:token-type:saml1<a href="#section-7.1-6.1"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-6.2">일반 이름: base64url로 인코딩된 SAML 1.1
+                            어서션의 토큰 유형 URI<a href="#section-7.1-6.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-6.3">변경 관리자: IESG<a href="#section-7.1-6.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-6.4">명세 문서: RFC 8693의 <a href="#TokenTypeIdentifiers" class="xref">섹션
+                                3</a><a href="#section-7.1-6.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.1-7.1">URN: urn:ietf:params:oauth:token-type:saml2<a href="#section-7.1-7.1"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-7.2">일반 이름: base64url로 인코딩된 SAML 2.0
+                            어서션의 토큰 유형 URI<a href="#section-7.1-7.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-7.3">변경 관리자: IESG<a href="#section-7.1-7.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.1-7.4">명세 문서: RFC 8693의 <a href="#TokenTypeIdentifiers" class="xref">섹션
+                                3</a><a href="#section-7.1-7.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div id="OAuthParametersReg">
+                <section id="section-7.2">
+                    <h3 id="name-oauth-parameters-registrati">
+                        <a href="#section-7.2" class="section-number selfRef">7.2. </a><a
+                            href="#name-oauth-parameters-registrati" class="section-name selfRef">OAuth 매개변수
+                            등록</a>
+                    </h3>
+                    <p id="section-7.2-1">
+                        IANA는
+                        "OAuth Parameters" 레지스트리
+                        <span>[<a href="#IANA.OAuth.Parameters" class="xref">IANA.OAuth.Parameters</a>]</span>의
+                        "OAuth Parameters" 하위 레지스트리에
+                        다음 값을 등록했다.
+                        "OAuth Parameters" 하위 레지스트리는
+                        <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에 의해
+                        설정되었다.<a href="#section-7.2-1" class="pilcrow">¶</a>
+                    </p>
+                    <ul>
+                        <li id="section-7.2-2.1">매개변수 이름: audience<a href="#section-7.2-2.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-2.2">매개변수 사용 위치: 토큰 요청<a href="#section-7.2-2.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-2.3">변경 관리자: IESG<a href="#section-7.2-2.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-2.4">명세 문서: RFC 8693의 <a href="#Request" class="xref">섹션
+                                2.1</a><a href="#section-7.2-2.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.2-3.1">매개변수 이름: requested_token_type<a href="#section-7.2-3.1"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-3.2">매개변수 사용 위치: 토큰 요청<a href="#section-7.2-3.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-3.3">변경 관리자: IESG<a href="#section-7.2-3.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-3.4">명세 문서: RFC 8693의 <a href="#Request" class="xref">섹션
+                                2.1</a><a href="#section-7.2-3.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.2-4.1">매개변수 이름: subject_token<a href="#section-7.2-4.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-4.2">매개변수 사용 위치: 토큰 요청<a href="#section-7.2-4.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-4.3">변경 관리자: IESG<a href="#section-7.2-4.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-4.4">명세 문서: RFC 8693의 <a href="#Request" class="xref">섹션
+                                2.1</a><a href="#section-7.2-4.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.2-5.1">매개변수 이름: subject_token_type<a href="#section-7.2-5.1"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-5.2">매개변수 사용 위치: 토큰 요청<a href="#section-7.2-5.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-5.3">변경 관리자: IESG<a href="#section-7.2-5.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-5.4">명세 문서: RFC 8693의 <a href="#Request" class="xref">섹션
+                                2.1</a><a href="#section-7.2-5.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.2-6.1">매개변수 이름: actor_token<a href="#section-7.2-6.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-6.2">매개변수 사용 위치: 토큰 요청<a href="#section-7.2-6.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-6.3">변경 관리자: IESG<a href="#section-7.2-6.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-6.4">명세 문서: RFC 8693의 <a href="#Request" class="xref">섹션
+                                2.1</a><a href="#section-7.2-6.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.2-7.1">매개변수 이름: actor_token_type<a href="#section-7.2-7.1"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-7.2">매개변수 사용 위치: 토큰 요청<a href="#section-7.2-7.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-7.3">변경 관리자: IESG<a href="#section-7.2-7.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-7.4">명세 문서: RFC 8693의 <a href="#Request" class="xref">섹션
+                                2.1</a><a href="#section-7.2-7.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.2-8.1">매개변수 이름: issued_token_type<a href="#section-7.2-8.1"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-8.2">매개변수 사용 위치: 토큰 응답<a href="#section-7.2-8.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-8.3">변경 관리자: IESG<a href="#section-7.2-8.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.2-8.4">명세 문서: RFC 8693의 <a href="#SuccessfulResponse" class="xref">섹션
+                                2.2.1</a><a href="#section-7.2-8.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div id="TokenTypeReg">
+                <section id="section-7.3">
+                    <h3 id="name-oauth-access-token-type-reg">
+                        <a href="#section-7.3" class="section-number selfRef">7.3. </a><a
+                            href="#name-oauth-access-token-type-reg" class="section-name selfRef">OAuth 액세스 토큰
+                            유형 등록</a>
+                    </h3>
+                    <p id="section-7.3-1">
+                        IANA는
+                        "OAuth Parameters" 레지스트리
+                        <span>[<a href="#IANA.OAuth.Parameters" class="xref">IANA.OAuth.Parameters</a>]</span>의
+                        "OAuth Access Token Types" 하위 레지스트리에
+                        다음 액세스 토큰 유형을 등록했다.
+                        "OAuth Access Token
+                        Types" 하위 레지스트리는
+                        <span>[<a href="#RFC6749" class="xref">RFC6749</a>]</span>에 의해
+                        설정되었다.<a href="#section-7.3-1" class="pilcrow">¶</a>
+                    </p>
+                    <ul>
+                        <li id="section-7.3-2.1">유형 이름: N_A<a href="#section-7.3-2.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.3-2.2">추가 토큰 엔드포인트 응답 매개변수: 없음<a href="#section-7.3-2.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.3-2.3">HTTP 인증 스킴: 없음<a href="#section-7.3-2.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.3-2.4">변경 관리자: IESG<a href="#section-7.3-2.4" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.3-2.5">명세 문서: RFC 8693의 <a href="#SuccessfulResponse" class="xref">섹션
+                                2.2.1</a><a href="#section-7.3-2.5" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div id="ClaimsReg">
+                <section id="section-7.4">
+                    <h3 id="name-json-web-token-claims-regis">
+                        <a href="#section-7.4" class="section-number selfRef">7.4. </a><a
+                            href="#name-json-web-token-claims-regis" class="section-name selfRef">JSON Web Token 클레임
+                            등록</a>
+                    </h3>
+                    <p id="section-7.4-1">
+                        IANA는
+                        "JSON Web Token
+                        (JWT)" 레지스트리
+                        <span>[<a href="#IANA.JWT" class="xref">IANA.JWT</a>]</span>의
+                        "JSON Web Token Claims" 하위 레지스트리에
+                        다음 클레임을 등록했다. "JSON Web Token Claims"
+                        하위 레지스트리는
+                        <span>[<a href="#RFC7519" class="xref">JWT</a>]</span>에 의해 설정되었다.<a href="#section-7.4-1"
+                            class="pilcrow">¶</a>
+                    </p>
+                    <ul>
+                        <li id="section-7.4-2.1">클레임 이름: act<a href="#section-7.4-2.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-2.2">클레임 설명: 행위자<a href="#section-7.4-2.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-2.3">변경 관리자: IESG<a href="#section-7.4-2.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-2.4">명세 문서: RFC 8693의 <a href="#actor" class="xref">섹션
+                                4.1</a><a href="#section-7.4-2.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.4-3.1">클레임 이름: scope<a href="#section-7.4-3.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-3.2">클레임 설명: 범위 값<a href="#section-7.4-3.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-3.3">변경 관리자: IESG<a href="#section-7.4-3.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-3.4">명세 문서: RFC 8693의 <a href="#scopes" class="xref">섹션
+                                4.2</a><a href="#section-7.4-3.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.4-4.1">클레임 이름: client_id<a href="#section-7.4-4.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-4.2">클레임 설명: 클라이언트 식별자<a href="#section-7.4-4.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-4.3">변경 관리자: IESG<a href="#section-7.4-4.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-4.4">명세 문서: RFC 8693의 <a href="#client_id" class="xref">섹션
+                                4.3</a><a href="#section-7.4-4.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.4-5.1">클레임 이름: may_act<a href="#section-7.4-5.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-5.2">클레임 설명: 인가된 행위자 - 행위자가 되도록 인가된 당사자<a href="#section-7.4-5.2"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-5.3">변경 관리자: IESG<a href="#section-7.4-5.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.4-5.4">명세 문서: RFC 8693의 <a href="#may_act" class="xref">섹션
+                                4.4</a><a href="#section-7.4-5.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div id="IntrospectionReg">
+                <section id="section-7.5">
+                    <h3 id="name-oauth-token-introspection-r">
+                        <a href="#section-7.5" class="section-number selfRef">7.5. </a><a
+                            href="#name-oauth-token-introspection-r" class="section-name selfRef">OAuth 토큰
+                            검사 응답 등록</a>
+                    </h3>
+                    <p id="section-7.5-1">
+                        IANA는
+                        "OAuth Parameters" 레지스트리
+                        <span>[<a href="#IANA.OAuth.Parameters" class="xref">IANA.OAuth.Parameters</a>]</span>의
+                        "OAuth Token Introspection Response" 레지스트리에
+                        다음 값을 등록했다.
+                        "OAuth Token
+                        Introspection Response" 레지스트리는
+                        <span>[<a href="#RFC7662" class="xref">RFC7662</a>]</span>에 의해
+                        설정되었다.<a href="#section-7.5-1" class="pilcrow">¶</a>
+                    </p>
+                    <ul>
+                        <li id="section-7.5-2.1">이름: act<a href="#section-7.5-2.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.5-2.2">설명: 행위자<a href="#section-7.5-2.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.5-2.3">변경 관리자: IESG<a href="#section-7.5-2.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.5-2.4">명세 문서: RFC 8693의 <a href="#actor" class="xref">섹션
+                                4.1</a><a href="#section-7.5-2.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li id="section-7.5-3.1">이름: may_act<a href="#section-7.5-3.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.5-3.2">설명: 인가된 행위자 - 행위자가 되도록 인가된 당사자<a href="#section-7.5-3.2"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.5-3.3">변경 관리자: IESG<a href="#section-7.5-3.3" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-7.5-3.4">명세 문서: RFC 8693의 <a href="#may_act" class="xref">섹션
+                                4.4</a><a href="#section-7.5-3.4" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </section>
+    </div>
+    <section id="section-8">
+        <h2 id="name-references">
+            <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references"
+                class="section-name selfRef">참고문헌</a>
+        </h2>
+        <section id="section-8.1">
+            <h3 id="name-normative-references">
+                <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references"
+                    class="section-name selfRef">규범 참고문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="IANA.JWT">[IANA.JWT]</dt>
+                <dd>
+                    <span class="refAuthor">IANA</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>,
+                    <span>&lt;<a
+                            href="https://www.iana.org/assignments/jwt">https://www.iana.org/assignments/jwt</a>&gt;</span>.
+                </dd>
+                <dt id="IANA.OAuth.Parameters">[IANA.OAuth.Parameters]</dt>
+                <dd>
+                    <span class="refAuthor">IANA</span>, <span class="refTitle">"OAuth Parameters"</span>, <span>&lt;<a
+                            href="https://www.iana.org/assignments/oauth-parameters">https://www.iana.org/assignments/oauth-parameters</a>&gt;</span>.
+                </dd>
+                <dt id="RFC7519">[JWT]</dt>
+                <dd>
+                    <span class="refAuthor">Jones, M.</span><span class="refAuthor">, Bradley, J.</span><span
+                        class="refAuthor">, and N. Sakimura</span>, <span class="refTitle">"JSON Web Token
+                        (JWT)"</span>, <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC7519</span>, <time datetime="2015-05">2015년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7519">https://www.rfc-editor.org/info/rfc7519</a>&gt;</span>.
+                </dd>
+                <dt id="RFC2119">[RFC2119]</dt>
+                <dd>
+                    <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"RFC에서 요구 수준을
+                        나타내기 위한 핵심 단어"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC
+                        2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time
+                        datetime="1997-03">1997년 3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>.
+                </dd>
+                <dt id="RFC3986">[RFC3986]</dt>
+                <dd>
+                    <span class="refAuthor">Berners-Lee, T.</span><span class="refAuthor">, Fielding, R.</span><span
+                        class="refAuthor">, and L. Masinter</span>, <span class="refTitle">"Uniform Resource Identifier
+                        (URI): Generic Syntax"</span>, <span class="seriesInfo">STD 66</span>, <span
+                        class="seriesInfo">RFC 3986</span>, <span class="seriesInfo">DOI 10.17487/RFC3986</span>, <time
+                        datetime="2005-01">2005년 1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;</span>.
+                </dd>
+                <dt id="RFC6749">[RFC6749]</dt>
+                <dd>
+                    <span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"The OAuth 2.0 Authorization
+                        Framework"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC6749</span>, <time datetime="2012-10">2012년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6749">https://www.rfc-editor.org/info/rfc6749</a>&gt;</span>.
+                </dd>
+                <dt id="RFC7662">[RFC7662]</dt>
+                <dd>
+                    <span class="refAuthor">Richer, J., Ed.</span>, <span class="refTitle">"OAuth 2.0 Token
+                        Introspection"</span>, <span class="seriesInfo">RFC 7662</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC7662</span>, <time datetime="2015-10">2015년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7662">https://www.rfc-editor.org/info/rfc7662</a>&gt;</span>.
+                </dd>
+                <dt id="RFC8174">[RFC8174]</dt>
+                <dd>
+                    <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"RFC 2119 핵심 단어에서
+                        대문자와 소문자의 모호성"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC
+                        8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time
+                        datetime="2017-05">2017년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>.
+                </dd>
+                <dt id="RFC8259">[RFC8259]</dt>
+                <dd>
+                    <span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation
+                        (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span
+                        class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time
+                        datetime="2017-12">2017년 12월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8259">https://www.rfc-editor.org/info/rfc8259</a>&gt;</span>.
+                </dd>
+            </dl>
+        </section>
+        <section id="section-8.2">
+            <h3 id="name-informative-references">
+                <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references"
+                    class="section-name selfRef">정보 참고문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="OASIS.saml-core-1.1">[OASIS.saml-core-1.1]</dt>
+                <dd>
+                    <span class="refAuthor">Maler, E.</span><span class="refAuthor">, Mishra, P.</span><span
+                        class="refAuthor">, and R. Philpott</span>, <span class="refTitle">"Assertions and Protocol for
+                        the OASIS Security Assertion Markup Language (SAML) V1.1"</span>, <span class="seriesInfo">OASIS
+                        Standard oasis-sstc-saml-core-1.1</span>, <time datetime="2003-09">2003년 9월</time>,
+                    <span>&lt;<a
+                            href="https://www.oasis-open.org/committees/download.php/3406/oasis-sstc-saml-core-1.1.pdf">https://www.oasis-open.org/committees/download.php/3406/oasis-sstc-saml-core-1.1.pdf</a>&gt;</span>.
+                </dd>
+                <dt id="OASIS.saml-core-2.0-os">[OASIS.saml-core-2.0-os]</dt>
+                <dd>
+                    <span class="refAuthor">Cantor, S.</span><span class="refAuthor">, Kemp, J.</span><span
+                        class="refAuthor">, Philpott, R.</span><span class="refAuthor">, and E. Maler</span>, <span
+                        class="refTitle">"Assertions and Protocol for the OASIS Security Assertion Markup Language
+                        (SAML) V2.0"</span>, <span class="seriesInfo">OASIS Standard saml-core-2.0-os</span>, <time
+                        datetime="2005-03">2005년 3월</time>, <span>&lt;<a
+                            href="http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf</a>&gt;</span>.
+                </dd>
+                <dt id="I-D.ietf-oauth-resource-indicators">[OAUTH-RESOURCE]</dt>
+                <dd>
+                    <span class="refAuthor">Campbell, B.</span><span class="refAuthor">, Bradley, J.</span><span
+                        class="refAuthor">, and H. Tschofenig</span>, <span class="refTitle">"Resource Indicators for
+                        OAuth 2.0"</span>, <span class="refContent">진행 중 작업</span>, <span
+                        class="seriesInfo">Internet-Draft, draft-ietf-oauth-resource-indicators-08</span>, <time
+                        datetime="2019-09-11">2019년 9월 11일</time>, <span>&lt;<a
+                            href="https://tools.ietf.org/html/draft-ietf-oauth-resource-indicators-08">https://tools.ietf.org/html/draft-ietf-oauth-resource-indicators-08</a>&gt;</span>.
+                </dd>
+                <dt id="I-D.ietf-oauth-security-topics">[OAUTH-SECURITY]</dt>
+                <dd>
+                    <span class="refAuthor">Lodderstedt, T.</span><span class="refAuthor">, Bradley, J.</span><span
+                        class="refAuthor">, Labunets, A.</span><span class="refAuthor">, and D. Fett</span>, <span
+                        class="refTitle">"OAuth 2.0 Security Best Current Practice"</span>, <span class="refContent">진행
+                        중 작업</span>, <span class="seriesInfo">Internet-Draft,
+                        draft-ietf-oauth-security-topics-13</span>, <time datetime="2019-07-08">2019년 7월 8일</time>,
+                    <span>&lt;<a
+                            href="https://tools.ietf.org/html/draft-ietf-oauth-security-topics-13">https://tools.ietf.org/html/draft-ietf-oauth-security-topics-13</a>&gt;</span>.
+                </dd>
+                <dt id="OpenID.Core">[OpenID.Core]</dt>
+                <dd>
+                    <span class="refAuthor">Sakimura, N.</span><span class="refAuthor">, Bradley, J.</span><span
+                        class="refAuthor">, Jones, M.</span><span class="refAuthor">, de Medeiros, B.</span><span
+                        class="refAuthor">, and C. Mortimore</span>, <span class="refTitle">"OpenID Connect Core
+                        1.0"</span>, <time datetime="2014-11">2014년 11월</time>, <span>&lt;<a
+                            href="https://openid.net/specs/openid-connect-core-1_0.html">https://openid.net/specs/openid-connect-core-1_0.html</a>&gt;</span>.
+                </dd>
+                <dt id="RFC6750">[RFC6750]</dt>
+                <dd>
+                    <span class="refAuthor">Jones, M.</span><span class="refAuthor"> and D. Hardt</span>, <span
+                        class="refTitle">"The OAuth 2.0 Authorization Framework: Bearer Token Usage"</span>, <span
+                        class="seriesInfo">RFC 6750</span>, <span class="seriesInfo">DOI 10.17487/RFC6750</span>, <time
+                        datetime="2012-10">2012년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6750">https://www.rfc-editor.org/info/rfc6750</a>&gt;</span>.
+                </dd>
+                <dt id="RFC6755">[RFC6755]</dt>
+                <dd>
+                    <span class="refAuthor">Campbell, B.</span><span class="refAuthor"> and H. Tschofenig</span>, <span
+                        class="refTitle">"OAuth용 IETF URN 하위 네임스페이스"</span>, <span class="seriesInfo">RFC
+                        6755</span>, <span class="seriesInfo">DOI 10.17487/RFC6755</span>, <time
+                        datetime="2012-10">2012년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6755">https://www.rfc-editor.org/info/rfc6755</a>&gt;</span>.
+                </dd>
+                <dt id="RFC6819">[RFC6819]</dt>
+                <dd>
+                    <span class="refAuthor">Lodderstedt, T., Ed.</span><span class="refAuthor">, McGloin, M.</span><span
+                        class="refAuthor">, and P. Hunt</span>, <span class="refTitle">"OAuth 2.0 위협 모델 및
+                        보안 고려사항"</span>, <span class="seriesInfo">RFC 6819</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC6819</span>, <time datetime="2013-01">2013년 1월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6819">https://www.rfc-editor.org/info/rfc6819</a>&gt;</span>.
+                </dd>
+                <dt id="RFC7521">[RFC7521]</dt>
+                <dd>
+                    <span class="refAuthor">Campbell, B.</span><span class="refAuthor">, Mortimore, C.</span><span
+                        class="refAuthor">, Jones, M.</span><span class="refAuthor">, and Y. Goland</span>, <span
+                        class="refTitle">"OAuth 2.0 클라이언트 인증 및 인가
+                        grant를 위한 어서션 프레임워크"</span>, <span class="seriesInfo">RFC 7521</span>, <span
+                        class="seriesInfo">DOI
+                        10.17487/RFC7521</span>, <time datetime="2015-05">2015년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7521">https://www.rfc-editor.org/info/rfc7521</a>&gt;</span>.
+                </dd>
+                <dt id="RFC7523">[RFC7523]</dt>
+                <dd>
+                    <span class="refAuthor">Jones, M.</span><span class="refAuthor">, Campbell, B.</span><span
+                        class="refAuthor">, and C. Mortimore</span>, <span class="refTitle">"OAuth 2.0 클라이언트 인증 및 인가
+                        grant를 위한
+                        JSON Web Token (JWT)
+                        프로파일"</span>, <span class="seriesInfo">RFC 7523</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC7523</span>, <time datetime="2015-05">2015년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7523">https://www.rfc-editor.org/info/rfc7523</a>&gt;</span>.
+                </dd>
+                <dt id="WS-Trust">[WS-Trust]</dt>
+                <dd>
+                    <span class="refAuthor">Nadalin, A., Ed.</span><span class="refAuthor">, Goodner, M.,
+                        Ed.</span><span class="refAuthor">, Gudgin, M., Ed.</span><span class="refAuthor">, Barbir, A.,
+                        Ed.</span><span class="refAuthor">, and H. Granqvist, Ed.</span>, <span
+                        class="refTitle">"WS-Trust 1.4"</span>, <time datetime="2012-02">2012년 2월</time>,
+                    <span>&lt;<a
+                            href="https://docs.oasis-open.org/ws-sx/ws-trust/v1.4/ws-trust.html">https://docs.oasis-open.org/ws-sx/ws-trust/v1.4/ws-trust.html</a>&gt;</span>.
+                </dd>
+            </dl>
+        </section>
+    </section>
+    <div id="AdditionalExamples">
+        <section id="section-appendix.a">
+            <h2 id="name-additional-token-exchange-e">
+                <a href="#section-appendix.a" class="section-number selfRef">부록 A. </a><a
+                    href="#name-additional-token-exchange-e" class="section-name selfRef">추가 토큰 교환
+                    예</a>
+            </h2>
+            <p id="section-appendix.a-1">
+                다음 절에서는 각각 가장과 위임을 보여 주는
+                두 가지 토큰 교환 예가 제공된다
+                (추가 줄바꿈과 들여쓰기는 표시 목적일 뿐이다).<a href="#section-appendix.a-1" class="pilcrow">¶</a></p>
+            <div id="ImpersonationExample">
+                <section id="section-a.1">
+                    <h2 id="name-impersonation-token-exchang">
+                        <a href="#section-a.1" class="section-number selfRef">A.1. </a><a
+                            href="#name-impersonation-token-exchang" class="section-name selfRef">가장 토큰
+                            교환 예</a>
+                    </h2>
+                    <div id="ImpersonationRequest">
+                        <section id="section-a.1.1">
+                            <h3 id="name-token-exchange-request-2">
+                                <a href="#section-a.1.1" class="section-number selfRef">A.1.1. </a><a
+                                    href="#name-token-exchange-request-2" class="section-name selfRef">토큰 교환
+                                    요청</a>
+                            </h3>
+                            <p id="section-a.1.1-1">
+                                다음 토큰 교환 요청에서 클라이언트는
+                                가장 의미론을 가진 토큰을 요청한다
+                                (<code>subject_token</code>만 있고
+                                <code>actor_token</code>이 없으면 위임은 불가능하다).
+                                클라이언트는 인가 서버에 논리적 이름이
+                                <code>urn:example:cooperation-context</code>인
+                                대상 서비스에서 사용할 토큰이 필요하다고 알린다.<a href="#section-a.1.1-1" class="pilcrow">¶</a>
+                            </p>
+                            <span id="name-token-exchange-request-3"></span>
+                            <div id="ImpersonationRequestEx">
+                                <figure id="figure-10">
+                                    <div class="artwork art-text alignLeft" id="section-a.1.1-2.1">
+                                        <pre>
+ POST /as/token.oauth2 HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange
+ &amp;audience=urn%3Aexample%3Acooperation-context
+ &amp;subject_token=eyJhbGciOiJFUzI1NiIsImtpZCI6IjE2In0.eyJhdWQiOiJodHRwc
+   zovL2FzLmV4YW1wbGUuY29tIiwiaXNzIjoiaHR0cHM6Ly9vcmlnaW5hbC1pc3N1ZXI
+   uZXhhbXBsZS5uZXQiLCJleHAiOjE0NDE5MTA2MDAsIm5iZiI6MTQ0MTkwOTAwMCwic
+   3ViIjoiYmRjQGV4YW1wbGUubmV0Iiwic2NvcGUiOiJvcmRlcnMgcHJvZmlsZSBoaXN
+   0b3J5In0.PRBg-jXn4cJuj1gmYXFiGkZzRuzbXZ_sDxdE98ddW44ufsbWLKd3JJ1VZ
+   hF64pbTtfjy4VXFVBDaQpKjn5JzAw
+ &amp;subject_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Ajwt
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-10" class="selfRef">그림 10</a>:
+                                        <a href="#name-token-exchange-request-3" class="selfRef">토큰 교환
+                                            요청</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="ImpersonationSubjectClaims">
+                        <section id="section-a.1.2">
+                            <h3 id="name-subject-token-claims">
+                                <a href="#section-a.1.2" class="section-number selfRef">A.1.2. </a><a
+                                    href="#name-subject-token-claims" class="section-name selfRef">주체 토큰
+                                    클레임</a>
+                            </h3>
+                            <p id="section-a.1.2-1">
+                                이전 요청의 <code>subject_token</code>은 JWT이며,
+                                디코딩된 JWT Claims Set은 여기에 표시된다. JWT는
+                                특정 시간 창 안에서 인가 서버가 소비하도록 의도되어 있다.
+                                JWT의 주체(<code>bdc@example.net</code>)는
+                                새 토큰이 대신 요청되는 당사자이다.<a href="#section-a.1.2-1" class="pilcrow">¶</a></p>
+                            <span id="name-subject-token-claims-2"></span>
+                            <div id="ImpersonationSubjectClaimsEx">
+                                <figure id="figure-11">
+                                    <div id="section-a.1.2-2.1">
+                                        <pre class="sourcecode lang-json">
+  {
+    "aud":"https://as.example.com",
+    "iss":"https://original-issuer.example.net",
+    "exp":1441910600,
+    "nbf":1441909000,
+    "sub":"bdc@example.net",
+    "scope":"orders profile history"
+  }
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-11" class="selfRef">그림 11</a>:
+                                        <a href="#name-subject-token-claims-2" class="selfRef">주체 토큰 클레임</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="ImpersonationResponse">
+                        <section id="section-a.1.3">
+                            <h3 id="name-token-exchange-response-2">
+                                <a href="#section-a.1.3" class="section-number selfRef">A.1.3. </a><a
+                                    href="#name-token-exchange-response-2" class="section-name selfRef">토큰 교환
+                                    응답</a>
+                            </h3>
+                            <p id="section-a.1.3-1">
+                                아래에 표시된 토큰 교환 응답의 <code>access_token</code> 매개변수는
+                                클라이언트가 요청한 새 토큰을 포함한다.
+                                응답의 다른 매개변수는 그 토큰이 한 시간 후 만료되는 bearer access token임을 나타낸다.<a href="#section-a.1.3-1"
+                                    class="pilcrow">¶</a></p>
+                            <span id="name-token-exchange-response-3"></span>
+                            <div id="ImpersonationResponseEx">
+                                <figure id="figure-12">
+                                    <div class="artwork art-text alignLeft" id="section-a.1.3-2.1">
+                                        <pre>
+ HTTP/1.1 200 OK
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
+
+ {
+  "access_token":"eyJhbGciOiJFUzI1NiIsImtpZCI6IjcyIn0.eyJhdWQiOiJ1cm4
+    6ZXhhbXBsZTpjb29wZXJhdGlvbi1jb250ZXh0IiwiaXNzIjoiaHR0cHM6Ly9hcy5l
+    eGFtcGxlLmNvbSIsImV4cCI6MTQ0MTkxMzYxMCwic3ViIjoiYmRjQGV4YW1wbGUub
+    mV0Iiwic2NvcGUiOiJvcmRlcnMgcHJvZmlsZSBoaXN0b3J5In0.rMdWpSGNACTvnF
+    uOL74sYZ6MVuld2Z2WkGLmQeR9ztj6w2OXraQlkJmGjyiCq24kcB7AI2VqVxl3wSW
+    nVKh85A",
+  "issued_token_type":
+    "urn:ietf:params:oauth:token-type:access_token",
+  "token_type":"Bearer",
+  "expires_in":3600
+ }
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-12" class="selfRef">그림 12</a>:
+                                        <a href="#name-token-exchange-response-3" class="selfRef">토큰 교환
+                                            응답</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="ImpersonationIssuedClaims">
+                        <section id="section-a.1.4">
+                            <h3 id="name-issued-token-claims">
+                                <a href="#section-a.1.4" class="section-number selfRef">A.1.4. </a><a
+                                    href="#name-issued-token-claims" class="section-name selfRef">발급된 토큰
+                                    클레임</a>
+                            </h3>
+                            <p id="section-a.1.4-1">
+                                발급된 토큰의 디코딩된 JWT Claims Set은 아래에 표시된다. 새 JWT는
+                                인가 서버가 발급하며,
+                                논리적 이름 <code>urn:example:cooperation-context</code>로 알려진
+                                시스템 엔티티가 만료 전 언제든 소비하도록 의도되어 있다.
+                                JWT의 주체(<code>sub</code>)는
+                                요청을 수행하는 데 사용된 토큰의 주체와 동일하며,
+                                이는 클라이언트가 그 토큰을 사용하여
+                                <code>urn:example:cooperation-context</code>라는 논리적 이름으로 알려진
+                                시스템 엔티티에서 해당 주체를 효과적으로 가장할 수 있게 한다.<a href="#section-a.1.4-1" class="pilcrow">¶</a>
+                            </p>
+                            <span id="name-issued-token-claims-2"></span>
+                            <div id="ImpersonationIssuedClaimsEx">
+                                <figure id="figure-13">
+                                    <div id="section-a.1.4-2.1">
+                                        <pre class="sourcecode lang-json">
+  {
+    "aud":"urn:example:cooperation-context",
+    "iss":"https://as.example.com",
+    "exp":1441913610,
+    "sub":"bdc@example.net",
+    "scope":"orders profile history"
+  }
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-13" class="selfRef">그림 13</a>:
+                                        <a href="#name-issued-token-claims-2" class="selfRef">발급된 토큰 클레임</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+            </div>
+            <div id="DelegationExample">
+                <section id="section-a.2">
+                    <h2 id="name-delegation-token-exchange-e">
+                        <a href="#section-a.2" class="section-number selfRef">A.2. </a><a
+                            href="#name-delegation-token-exchange-e" class="section-name selfRef">위임 토큰
+                            교환 예</a>
+                    </h2>
+                    <div id="DelegationRequest">
+                        <section id="section-a.2.1">
+                            <h3 id="name-token-exchange-request-4">
+                                <a href="#section-a.2.1" class="section-number selfRef">A.2.1. </a><a
+                                    href="#name-token-exchange-request-4" class="section-name selfRef">토큰 교환
+                                    요청</a>
+                            </h3>
+                            <p id="section-a.2.1-1">
+                                다음 토큰 교환 요청에서 클라이언트는 토큰을 요청하면서
+                                <code>subject_token</code>과 <code>actor_token</code>을 모두 제공한다.
+                                클라이언트는 인가 서버에 논리적 이름이
+                                <code>urn:example:cooperation-context</code>인
+                                대상 서비스에서 사용할 토큰이 필요하다고 알린다.
+                                인가 서버의 정책은 발급된 토큰이 복합 토큰이어야 한다고 규정한다.<a href="#section-a.2.1-1" class="pilcrow">¶</a>
+                            </p>
+                            <span id="name-token-exchange-request-5"></span>
+                            <div id="DelegationRequestEx">
+                                <figure id="figure-14">
+                                    <div class="artwork art-text alignLeft" id="section-a.2.1-2.1">
+                                        <pre>
+ POST /as/token.oauth2 HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange
+ &amp;audience=urn%3Aexample%3Acooperation-context
+ &amp;subject_token=eyJhbGciOiJFUzI1NiIsImtpZCI6IjE2In0.eyJhdWQiOiJodHRwc
+   zovL2FzLmV4YW1wbGUuY29tIiwiaXNzIjoiaHR0cHM6Ly9vcmlnaW5hbC1pc3N1ZXI
+   uZXhhbXBsZS5uZXQiLCJleHAiOjE0NDE5MTAwNjAsInNjb3BlIjoic3RhdHVzIGZlZ
+   WQiLCJzdWIiOiJ1c2VyQGV4YW1wbGUubmV0IiwibWF5X2FjdCI6eyJzdWIiOiJhZG1
+   pbkBleGFtcGxlLm5ldCJ9fQ.4rPRSWihQbpMIgAmAoqaJojAxj-p2X8_fAtAGTXrvM
+   xU-eEZHnXqY0_AOZgLdxw5DyLzua8H_I10MCcckF-Q_g
+ &amp;subject_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Ajwt
+ &amp;actor_token=eyJhbGciOiJFUzI1NiIsImtpZCI6IjE2In0.eyJhdWQiOiJodHRwczo
+   vL2FzLmV4YW1wbGUuY29tIiwiaXNzIjoiaHR0cHM6Ly9vcmlnaW5hbC1pc3N1ZXIuZ
+   XhhbXBsZS5uZXQiLCJleHAiOjE0NDE5MTAwNjAsInN1YiI6ImFkbWluQGV4YW1wbGU
+   ubmV0In0.7YQ-3zPfhUvzje5oqw8COCvN5uP6NsKik9CVV6cAOf4QKgM-tKfiOwcgZ
+   oUuDL2tEs6tqPlcBlMjiSzEjm3yBg
+ &amp;actor_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Ajwt
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-14" class="selfRef">그림 14</a>:
+                                        <a href="#name-token-exchange-request-5" class="selfRef">토큰 교환
+                                            요청</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="DelegationSubjectClaims">
+                        <section id="section-a.2.2">
+                            <h3 id="name-subject-token-claims-3">
+                                <a href="#section-a.2.2" class="section-number selfRef">A.2.2. </a><a
+                                    href="#name-subject-token-claims-3" class="section-name selfRef">주체 토큰
+                                    클레임</a>
+                            </h3>
+                            <p id="section-a.2.2-1">
+                                이전 요청의 <code>subject_token</code>은 JWT이며,
+                                디코딩된 JWT Claims Set은 여기에 표시된다. JWT는
+                                특정 만료 시간 전에 인가 서버가
+                                소비하도록 의도되어 있다.
+                                JWT의 주체
+                                (<code>user@example.net</code>)는
+                                새 토큰이 대신 요청되는 당사자이다.<a href="#section-a.2.2-1" class="pilcrow">¶</a></p>
+                            <span id="name-subject-token-claims-4"></span>
+                            <div id="DelegationSubjectClaimsEx">
+                                <figure id="figure-15">
+                                    <div id="section-a.2.2-2.1">
+                                        <pre class="sourcecode lang-json">
+  {
+    "aud":"https://as.example.com",
+    "iss":"https://original-issuer.example.net",
+    "exp":1441910060,
+    "scope":"status feed",
+    "sub":"user@example.net",
+    "may_act":
+    {
+      "sub":"admin@example.net"
+    }
+  }
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-15" class="selfRef">그림 15</a>:
+                                        <a href="#name-subject-token-claims-4" class="selfRef">주체 토큰 클레임</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="DelegationActorClaims">
+                        <section id="section-a.2.3">
+                            <h3 id="name-actor-token-claims">
+                                <a href="#section-a.2.3" class="section-number selfRef">A.2.3. </a><a
+                                    href="#name-actor-token-claims" class="section-name selfRef">행위자 토큰 클레임</a>
+                            </h3>
+                            <p id="section-a.2.3-1">
+                                이전 요청의 <code>actor_token</code>은 JWT이며,
+                                디코딩된 JWT Claims Set은 여기에 표시된다. 이 JWT 역시
+                                특정 만료 시간 전에 인가 서버가
+                                소비하도록 의도되어 있다.
+                                JWT의 주체
+                                (<code>admin@example.net</code>)는
+                                요청 중인 보안 토큰을 행사할 행위자이다.<a href="#section-a.2.3-1" class="pilcrow">¶</a></p>
+                            <span id="name-actor-token-claims-2"></span>
+                            <div id="DelegationActorClaimsEx">
+                                <figure id="figure-16">
+                                    <div id="section-a.2.3-2.1">
+                                        <pre class="sourcecode lang-json">
+  {
+    "aud":"https://as.example.com",
+    "iss":"https://original-issuer.example.net",
+    "exp":1441910060,
+    "sub":"admin@example.net"
+  }
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-16" class="selfRef">그림 16</a>:
+                                        <a href="#name-actor-token-claims-2" class="selfRef">행위자 토큰 클레임</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="DelegationResponse">
+                        <section id="section-a.2.4">
+                            <h3 id="name-token-exchange-response-4">
+                                <a href="#section-a.2.4" class="section-number selfRef">A.2.4. </a><a
+                                    href="#name-token-exchange-response-4" class="section-name selfRef">토큰 교환
+                                    응답</a>
+                            </h3>
+                            <p id="section-a.2.4-1">
+                                아래에 표시된 토큰 교환 응답의 <code>access_token</code> 매개변수는
+                                클라이언트가 요청한 새 토큰을 포함한다.
+                                응답의 다른 매개변수는 토큰이 한 시간 후 만료되는 JWT이며,
+                                발급된 토큰이 액세스 토큰이 아니므로 access token type이
+                                적용되지 않음을 나타낸다.<a href="#section-a.2.4-1" class="pilcrow">¶</a></p>
+                            <span id="name-token-exchange-response-5"></span>
+                            <div id="DelegationResponseEx">
+                                <figure id="figure-17">
+                                    <div class="artwork art-text alignLeft" id="section-a.2.4-2.1">
+                                        <pre>
+ HTTP/1.1 200 OK
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
+
+ {
+  "access_token":"eyJhbGciOiJFUzI1NiIsImtpZCI6IjcyIn0.eyJhdWQiOiJ1cm4
+    6ZXhhbXBsZTpjb29wZXJhdGlvbi1jb250ZXh0IiwiaXNzIjoiaHR0cHM6Ly9hcy5l
+    eGFtcGxlLmNvbSIsImV4cCI6MTQ0MTkxMzYxMCwic2NvcGUiOiJzdGF0dXMgZmVlZ
+    CIsInN1YiI6InVzZXJAZXhhbXBsZS5uZXQiLCJhY3QiOnsic3ViIjoiYWRtaW5AZX
+    hhbXBsZS5uZXQifX0.3paKl9UySKYB5ng6_cUtQ2qlO8Rc_y7Mea7IwEXTcYbNdwG
+    9-G1EKCFe5fW3H0hwX-MSZ49Wpcb1SiAZaOQBtw",
+  "issued_token_type":"urn:ietf:params:oauth:token-type:jwt",
+  "token_type":"N_A",
+  "expires_in":3600
+ }
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-17" class="selfRef">그림 17</a>:
+                                        <a href="#name-token-exchange-response-5" class="selfRef">토큰 교환
+                                            응답</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="DelegationIssuedClaims">
+                        <section id="section-a.2.5">
+                            <h3 id="name-issued-token-claims-3">
+                                <a href="#section-a.2.5" class="section-number selfRef">A.2.5. </a><a
+                                    href="#name-issued-token-claims-3" class="section-name selfRef">발급된 토큰
+                                    클레임</a>
+                            </h3>
+                            <p id="section-a.2.5-1">
+                                발급된 토큰의 디코딩된 JWT Claims Set은 아래에 표시된다. 새 JWT는
+                                인가 서버가 발급하며,
+                                논리적 이름
+                                <code>urn:example:cooperation-context</code>로 알려진
+                                시스템 엔티티가 만료 전 언제든
+                                소비하도록 의도되어 있다.
+                                JWT의 주체(<code>sub</code>)는
+                                요청을 수행하는 데 사용된 <code>subject_token</code>의
+                                주체와 동일하다.
+                                JWT의 행위자(<code>act</code>)는 요청을 수행하는 데 사용된
+                                <code>actor_token</code>의 주체와 동일하다.
+
+                                이는 위임을 나타내며,
+                                <code>admin@example.net</code>을
+                                <code>user@example.net</code>을 대신하여 행동하도록 권한이
+                                위임된 현재 행위자로 식별한다.<a href="#section-a.2.5-1" class="pilcrow">¶</a>
+                            </p>
+                            <span id="name-issued-token-claims-4"></span>
+                            <div id="DelegationIssuedClaimsEx">
+                                <figure id="figure-18">
+                                    <div id="section-a.2.5-2.1">
+                                        <pre class="sourcecode lang-json">
+  {
+    "aud":"urn:example:cooperation-context",
+    "iss":"https://as.example.com",
+    "exp":1441913610,
+    "scope":"status feed",
+    "sub":"user@example.net",
+    "act":
+    {
+      "sub":"admin@example.net"
+    }
+  }
+</pre>
+                                    </div>
+                                    <figcaption><a href="#figure-18" class="selfRef">그림 18</a>:
+                                        <a href="#name-issued-token-claims-4" class="selfRef">발급된 토큰 클레임</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="Acknowledgements">
+        <section id="section-appendix.b">
+            <h2 id="name-acknowledgements">
+                <a href="#name-acknowledgements" class="section-name selfRef">감사의 말</a>
+            </h2>
+            <p id="section-appendix.b-1">
+                이 명세는 수십 명의 적극적이고 헌신적인 참여자를 포함한
+                OAuth Working Group 안에서 개발되었다.
+                이는
+                <span class="contact-name">Hannes Tschofenig</span>, <span class="contact-name">Derek Atkins</span>, 및
+                <span class="contact-name">Rifaat Shekh-Yusef</span>의 의장직 아래에서 작성되었으며,
+                <span class="contact-name">Kathleen Moriarty</span>, <span class="contact-name">Stephen
+                    Farrell</span>, <span class="contact-name">Eric Rescorla</span>, <span class="contact-name">Roman
+                    Danyliw</span>, 및 <span class="contact-name">Benjamin Kaduk</span>가
+                Security Area Directors로 활동했다.<a href="#section-appendix.b-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-appendix.b-2">
+                다음 개인들은 이 명세에 아이디어, 피드백 및 문구를
+                기여했다:
+                <span class="contact-name">Caleb Baker</span>,
+                <span class="contact-name">Vittorio Bertocci</span>,
+                <span class="contact-name">Mike Brown</span>,
+                <span class="contact-name">Thomas Broyer</span>,
+                <span class="contact-name">Roman Danyliw</span>,
+                <span class="contact-name">William Denniss</span>,
+                <span class="contact-name">Vladimir Dzhuvinov</span>,
+                <span class="contact-name">Eric Fazendin</span>,
+                <span class="contact-name">Phil Hunt</span>,
+                <span class="contact-name">Benjamin Kaduk</span>,
+                <span class="contact-name">Jason Keglovitz</span>,
+                <span class="contact-name">Torsten Lodderstedt</span>,
+                <span class="contact-name">Barry Leiba</span>,
+                <span class="contact-name">Adam Lewis</span>,
+                <span class="contact-name">James Manger</span>,
+                <span class="contact-name">Nov Matake</span>,
+                <span class="contact-name">Matt Miller</span>,
+                <span class="contact-name">Hilarie Orman</span>,
+                <span class="contact-name">Matthew Perry</span>,
+                <span class="contact-name">Eric Rescorla</span>,
+                <span class="contact-name">Justin Richer</span>,
+                <span class="contact-name">Adam Roach</span>,
+                <span class="contact-name">Rifaat Shekh-Yusef</span>,
+                <span class="contact-name">Scott Tomilson</span>,
+                그리고
+                <span class="contact-name">Hannes Tschofenig</span>.<a href="#section-appendix.b-2"
+                    class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="authors-addresses">
+        <section id="section-appendix.c">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Michael B. Jones</span></div>
+                <div dir="auto" class="left"><span class="org">Microsoft</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:mbj@microsoft.com" class="email">mbj@microsoft.com</a>
+                </div>
+                <div class="url">
+                    <span>URI:</span>
+                    <a href="https://self-issued.info/" class="url">https://self-issued.info/</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Anthony Nadalin</span></div>
+                <div dir="auto" class="left"><span class="org">Microsoft</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:tonynad@microsoft.com" class="email">tonynad@microsoft.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Brian Campbell (<span
+                            class="role">편집자</span>)</span></div>
+                <div dir="auto" class="left"><span class="org">Ping Identity</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:brian.d.campbell@gmail.com" class="email">brian.d.campbell@gmail.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">John Bradley</span></div>
+                <div dir="auto" class="left"><span class="org">Yubico</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:ve7jtb@ve7jtb.com" class="email">ve7jtb@ve7jtb.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Chuck Mortimore</span></div>
+                <div dir="auto" class="left"><span class="org">Visa</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:chuck.mortimore@visa.com" class="email">chuck.mortimore@visa.com</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script>var toc = document.getElementById("toc");
+        var tocToggle = toc.querySelector("h2");
+        var tocNav = toc.querySelector("nav");
+
+        // mobile menu toggle
+        tocToggle.onclick = function (event) {
+            if (window.innerWidth < 1024) {
+                var tocNavDisplay = tocNav.currentStyle ? tocNav.currentStyle.display : getComputedStyle(tocNav, null).display;
+                if (tocNavDisplay == "none") {
+                    tocNav.style.display = "block";
+                } else {
+                    tocNav.style.display = "none";
+                }
+            }
+        }
+
+        // toc anchor scroll to anchor
+        tocNav.addEventListener("click", function (event) {
+            event.preventDefault();
+            if (event.target.nodeName == 'A') {
+                if (window.innerWidth < 1024) {
+                    tocNav.style.display = "none";
+                }
+                var href = event.target.getAttribute("href");
+                var anchorId = href.substr(1);
+                var anchor = document.getElementById(anchorId);
+                anchor.scrollIntoView(true);
+                window.history.pushState("", "", href);
+            }
+        });
+
+        // switch toc mode when window resized
+        window.onresize = function () {
+            if (window.innerWidth < 1024) {
+                tocNav.style.display = "none";
+            } else {
+                tocNav.style.display = "block";
+            }
+        }
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
