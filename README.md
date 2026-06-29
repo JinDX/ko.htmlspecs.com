@@ -197,6 +197,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web of Things (WoT) Scripting API](https://ko.htmlspecs.com/wot-scripting-api/)（[Source](https://www.w3.org/TR/2023/NOTE-wot-scripting-api-20231003/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Web of Things (WoT) Architecture 1.1](https://ko.htmlspecs.com/wot-architecture11/)（[Source](https://www.w3.org/TR/2023/REC-wot-architecture11-20231205/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web of Things (WoT) Discovery](https://ko.htmlspecs.com/wot-discovery/)（[Source](https://www.w3.org/TR/2023/REC-wot-discovery-20231205/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Web of Things (WoT) Profile](https://ko.htmlspecs.com/wot-profile/)（[Source](https://www.w3.org/TR/2025/WD-wot-profile-20251104/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 
 ### 창, 화면 및 시스템 통합
 - [Screen Orientation](https://ko.htmlspecs.com/screen-orientation/)（[Source](https://www.w3.org/TR/2025/WD-screen-orientation-20251021/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
@@ -244,6 +245,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Encrypted Media Extensions](https://ko.htmlspecs.com/encrypted-media-2/)（[Source](https://www.w3.org/TR/2026/WD-encrypted-media-2-20260624/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Remote Playback](https://ko.htmlspecs.com/remote-playback/)（[Source](https://www.w3.org/TR/2024/CRD-remote-playback-20240430/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Open Screen Application Protocol](https://ko.htmlspecs.com/openscreen-application/)（[Source](https://www.w3.org/TR/2026/WD-openscreen-application-20260210/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Open Screen Network Protocol](https://ko.htmlspecs.com/openscreen-network/)（[Source](https://www.w3.org/TR/2026/WD-openscreen-network-20260210/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 미디어 형식, 자막 및 코덱
 - [WebVTT: The Web Video Text Tracks Format](https://ko.htmlspecs.com/webvtt1/)（[Source](https://www.w3.org/TR/2026/CRD-webvtt1-20260520/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
