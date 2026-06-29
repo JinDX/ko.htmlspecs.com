@@ -1,0 +1,3538 @@
+<!DOCTYPE html>
+<html lang="ko" class="RFC">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>RFC 9116: 보안 취약점 공개를 돕기 위한 파일 형식</title>
+    <meta content="Edwin Foudil" name="author">
+    <meta content="Yakov Shafranovich" name="author">
+    <meta content='
+       연구자들이 보안 취약점을 발견했을 때,
+적절한 보고 채널이 부족한 경우가 많습니다. 그 결과,
+취약점이 보고되지 않은 채 남을 수 있습니다. 이 문서는 기계 판독 가능 형식
+("security.txt")을 정의하여 조직이 취약점 공개 관행을 설명하도록 돕고,
+연구자가 취약점을 더 쉽게 보고할 수 있게 합니다. 
+    ' name="description">
+    <meta content="xml2rfc 3.12.2" name="generator">
+    <meta content="9116" name="rfc.number">
+    <!-- Generator version information:
+  xml2rfc 3.12.2
+    Python 3.6.15
+    appdirs 1.4.4
+    ConfigArgParse 1.4.1
+    google-i18n-address 2.4.0
+    html5lib 1.0.1
+    intervaltree 3.0.2
+    Jinja2 2.11.3
+    kitchen 1.2.6
+    lxml 4.4.2
+    pycairo 1.15.1
+    pycountry 19.8.18
+    pyflakes 2.1.1
+    PyYAML 5.4.1
+    requests 2.24.0
+    setuptools 40.5.0
+    six 1.14.0
+    WeasyPrint 52.5
+-->
+    <link href="rfc9116.xml" rel="alternate" type="application/rfc+xml">
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        /*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necssary during the development of the v3
+  formatters.
+
+*/
+
+        /* fonts */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+        /* Sans-serif */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Serif');
+        /* Serif (print) */
+        @import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+        /* Monospace */
+
+        @viewport {
+            zoom: 1.0;
+            width: extend-to-zoom;
+        }
+
+        @-ms-viewport {
+            width: extend-to-zoom;
+            zoom: 1.0;
+        }
+
+        /* general and mobile first */
+        html {}
+
+        body {
+            max-width: 90%;
+            margin: 1.5em auto;
+            color: #222;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        #title,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1em 0 0.5em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        #title {
+            clear: both;
+            border-bottom: 1px solid #ddd;
+            margin: 0 0 0.5em 0;
+            padding: 1em 0 0.5em;
+        }
+
+        .author {
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 1em 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: -20px;
+            /* provide offset for in-page anchors */
+            padding-top: 33px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h5,
+        h6 {
+            font-size: 14px;
+        }
+
+        #n-copyright-notice {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
+        }
+
+        /* general structure */
+        p {
+            padding: 0;
+            margin: 0 0 1em 0;
+            text-align: left;
+        }
+
+        div,
+        span {
+            position: relative;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignRight.art-text pre {
+            padding: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+        }
+
+        .alignRight>*:first-child {
+            border: none;
+            margin: 0;
+            float: right;
+            clear: both;
+        }
+
+        .alignRight>*:nth-child(2) {
+            clear: both;
+            display: block;
+            border: none;
+        }
+
+        svg {
+            display: block;
+        }
+
+        .alignCenter.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignCenter.art-text pre {
+            padding: 0;
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+        }
+
+        .alignCenter>*:first-child {
+            border: none;
+            /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+            display: table;
+            margin: 0 auto;
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 1em 2em;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-left: 1em;
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        .ulCompact li {
+            margin: 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+        }
+
+        ul.empty li,
+        .ulEmpty li {
+            margin-top: 0.5em;
+        }
+
+        ul.ulBare,
+        li.ulBare {
+            margin-left: 0em !important;
+        }
+
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact {
+            line-height: 100%;
+            margin: 0 0 0 2em;
+        }
+
+        /* definition lists */
+        dl {}
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        /* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+        dl>dd {
+            margin-bottom: .8em;
+            min-height: 1.3em;
+        }
+
+        dl.compact>dd,
+        .dlCompact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+        }
+
+        a[href] {
+            color: #22e;
+            /* Arlen: WCAG 2019 */
+        }
+
+        a[href]:hover {
+            background-color: #f2f2f2;
+        }
+
+        figcaption a[href],
+        a[href].selfRef {
+            color: #222;
+        }
+
+        /* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+        /* Figures */
+        tt,
+        code,
+        pre,
+        code {
+            background-color: #f9f9f9;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        pre {
+            border: 1px solid #eee;
+            margin: 0;
+            padding: 1em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        figure blockquote {
+            margin: 0.8em 0.4em 0.4em;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0 0 1em 0;
+        }
+
+        @media screen {
+            pre {
+                overflow-x: auto;
+                max-width: 100%;
+                max-width: calc(100% - 22px);
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 1.2em 2em;
+        }
+
+        blockquote {
+            background-color: #f9f9f9;
+            color: #111;
+            /* Arlen: WCAG 2019 */
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 1em 0;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.5em 0.75em;
+        }
+
+        th {
+            text-align: left;
+            background-color: #e9e9e9;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f5f5f5;
+        }
+
+        table caption {
+            font-style: italic;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        table p {
+            /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+            margin: 0;
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            color: #666;
+            /* Arlen: AHDJ 2019 */
+            text-decoration: none;
+            visibility: hidden;
+            user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        @media screen {
+
+            aside:hover>a.pilcrow,
+            p:hover>a.pilcrow,
+            blockquote:hover>a.pilcrow,
+            div:hover>a.pilcrow,
+            li:hover>a.pilcrow,
+            pre:hover>a.pilcrow {
+                visibility: visible;
+            }
+
+            a.pilcrow:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        #identifiers dt {
+            width: 3em;
+            clear: left;
+        }
+
+        #identifiers dd {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        /* Fix PDF info block run off issue */
+        @media print {
+            #identifiers dd {
+                float: none;
+            }
+        }
+
+        #identifiers .authors .author {
+            display: inline-block;
+            margin-right: 1.5em;
+        }
+
+        #identifiers .authors .org {
+            font-style: italic;
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #666;
+            /* Arlen: WCAG 2019 */
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+        }
+
+        .docInfo .prepared {
+            float: left;
+        }
+
+        .docInfo .prepared {
+            float: right;
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+        }
+
+        nav.toc ul {
+            margin: 0 0.5em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav.toc li {
+            line-height: 1.3em;
+            margin: 0.75em 0;
+            padding-left: 1.2em;
+            text-indent: -1.2em;
+        }
+
+        /* references */
+        .references dt {
+            text-align: right;
+            font-weight: bold;
+            min-width: 7em;
+        }
+
+        .references dd {
+            margin-left: 8em;
+            overflow: auto;
+        }
+
+        .refInstance {
+            margin-bottom: 1.25em;
+        }
+
+        .references .ascii {
+            margin-bottom: 0.25em;
+        }
+
+        /* index */
+        .index ul {
+            margin: 0 0 0 1em;
+            padding: 0;
+            list-style: none;
+        }
+
+        .index ul ul {
+            margin: 0;
+        }
+
+        .index li {
+            margin: 0;
+            text-indent: -2em;
+            padding-left: 2em;
+            padding-bottom: 5px;
+        }
+
+        .indexIndex {
+            margin: 0.5em 0 1em;
+        }
+
+        .index a {
+            font-weight: 700;
+        }
+
+        /* make the index two-column on all but the smallest screens */
+        @media (min-width: 600px) {
+            .index ul {
+                -moz-column-count: 2;
+                -moz-column-gap: 20px;
+            }
+
+            .index ul ul {
+                -moz-column-count: 1;
+                -moz-column-gap: 0;
+            }
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            margin: 1em 0;
+        }
+
+        address.vcard .nameRole {
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        address.vcard .label {
+            font-family: "Noto Sans", Arial, Helvetica, sans-serif;
+            margin: 0.5em 0;
+        }
+
+        address.vcard .type {
+            display: none;
+        }
+
+        .alternative-contact {
+            margin: 1.5em 0 1em;
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        /* temporary notes */
+        .rfcEditorRemove::before {
+            position: absolute;
+            top: 0.2em;
+            right: 0.2em;
+            padding: 0.2em;
+            content: "The RFC Editor will remove this note";
+            color: #9e2a00;
+            /* Arlen: WCAG 2019 */
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+        }
+
+        .rfcEditorRemove {
+            position: relative;
+            padding-top: 1.8em;
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            border-radius: 3px;
+        }
+
+        .cref {
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        /* alternative layout for smaller screens */
+        @media screen and (max-width: 1023px) {
+            body {
+                padding-top: 2em;
+            }
+
+            #title {
+                padding: 1em 0;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: -18px;
+                /* provide offset for in-page anchors */
+                padding-top: 38px;
+            }
+
+            #identifiers dd {
+                max-width: 60%;
+            }
+
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 0;
+                margin: 0;
+                background-color: inherit;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #toc h2 {
+                margin: -1px 0 0 0;
+                padding: 4px 0 4px 6px;
+                padding-right: 1em;
+                min-width: 190px;
+                font-size: 1.1em;
+                text-align: right;
+                background-color: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            #toc h2::before {
+                /* css hamburger */
+                float: right;
+                position: relative;
+                width: 1em;
+                height: 1px;
+                left: -164px;
+                margin: 6px 0 0 0;
+                background: white none repeat scroll 0 0;
+                box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                content: "";
+            }
+
+            #toc nav {
+                display: none;
+                padding: 0.5em 1em 1em;
+                overflow: auto;
+                height: calc(100vh - 48px);
+                border-left: 1px solid #ddd;
+            }
+        }
+
+        /* alternative layout for wide screens */
+        @media screen and (min-width: 1024px) {
+            body {
+                max-width: 724px;
+                margin: 42px auto;
+                padding-left: 1.5em;
+                padding-right: 29em;
+            }
+
+            #toc {
+                position: fixed;
+                top: 42px;
+                right: 42px;
+                width: 25%;
+                margin: 0;
+                padding: 0 1em;
+                z-index: 1;
+            }
+
+            #toc h2 {
+                border-top: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 1em;
+                font-weight: normal;
+                margin: 0;
+                padding: 0.25em 1em 1em 0;
+            }
+
+            #toc nav {
+                display: block;
+                height: calc(90vh - 84px);
+                bottom: 0;
+                padding: 0.5em 0 0;
+                overflow: auto;
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc,
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            #toc {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            figure,
+            pre {
+                page-break-inside: avoid;
+            }
+
+            figure {
+                overflow: scroll;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            h2+*,
+            h3+*,
+            h4+*,
+            h5+*,
+            h6+* {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        /* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+        /*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+            /* The follwing is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+            /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+        }
+
+        /* Changes introduced to fix issues found during implementation */
+        /* Make sure links are clickable even if overlapped by following H* */
+        a {
+            z-index: 2;
+        }
+
+        /* Separate body from document info even without intervening H1 */
+        section {
+            clear: both;
+        }
+
+
+        /* Top align author divs, to avoid names without organization dropping level with org names */
+        .author {
+            vertical-align: top;
+        }
+
+        /* Leave room in document info to show Internet-Draft on one line */
+        #identifiers dt {
+            width: 8em;
+        }
+
+        /* Don't waste quite as much whitespace between label and value in doc info */
+        #identifiers dd {
+            margin-left: 1em;
+        }
+
+        /* Give floating toc a background color (needed when it's a div inside section */
+        #toc {
+            background-color: white;
+        }
+
+        /* Make the collapsed ToC header render white on gray also when it's a link */
+        @media screen and (max-width: 1023px) {
+
+            #toc h2 a,
+            #toc h2 a:link,
+            #toc h2 a:focus,
+            #toc h2 a:hover,
+            #toc a.toplink,
+            #toc a.toplink:hover {
+                color: white;
+                background-color: #444;
+                text-decoration: none;
+            }
+        }
+
+        /* Give the bottom of the ToC some whitespace */
+        @media screen and (min-width: 1024px) {
+            #toc {
+                padding: 0 0 1em 1em;
+            }
+        }
+
+        /* Style section numbers with more space between number and title */
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        /* prevent monospace from becoming overly large */
+        tt,
+        code,
+        pre,
+        code {
+            font-size: 95%;
+        }
+
+        /* Fix the height/width aspect for ascii art*/
+        pre.sourcecode,
+        .art-text pre {
+            line-height: 1.12;
+        }
+
+
+        /* Add styling for a link in the ToC that points to the top of the document */
+        a.toplink {
+            float: right;
+            margin-right: 0.5em;
+        }
+
+        /* Fix the dl styling to match the RFC 7992 attributes */
+        dl>dt,
+        dl.dlParallel>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.dlNewline>dt {
+            float: none;
+        }
+
+        /* Provide styling for table cell text alignment */
+        table td.text-left,
+        table th.text-left {
+            text-align: left;
+        }
+
+        table td.text-center,
+        table th.text-center {
+            text-align: center;
+        }
+
+        table td.text-right,
+        table th.text-right {
+            text-align: right;
+        }
+
+        /* Make the alternative author contact informatio look less like just another
+   author, and group it closer with the primary author contact information */
+        .alternative-contact {
+            margin: 0.5em 0 0.25em 0;
+        }
+
+        address .non-ascii {
+            margin: 0 0 0 2em;
+        }
+
+        /* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+        table {
+            width: auto;
+        }
+
+        /* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+        .references dd {
+            overflow: visible;
+        }
+
+        /* Control caption placement */
+        caption {
+            caption-side: bottom;
+        }
+
+        /* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+        address.vcard {
+            max-width: 30em;
+            margin-right: auto;
+        }
+
+        /* For address alignment dependent on LTR or RTL scripts */
+        address div.left {
+            text-align: left;
+        }
+
+        address div.right {
+            text-align: right;
+        }
+
+        /* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+        table.right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Give the table caption label the same styling as the figcaption */
+        caption a[href] {
+            color: #222;
+        }
+
+        @media print {
+            .toplink {
+                display: none;
+            }
+
+            /* avoid overwriting the top border line with the ToC header */
+            #toc {
+                padding-top: 1px;
+            }
+
+            /* Avoid page breaks inside dl and author address entries */
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+        }
+
+        /* Tweak the bcp14 keyword presentation */
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Tweak the invisible space above H* in order not to overlay links in text above */
+        h2 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 31px;
+        }
+
+        h3 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        h4 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        /* Float artwork pilcrow to the right */
+        @media screen {
+            .artwork a.pilcrow {
+                display: block;
+                line-height: 0.7;
+                margin-top: 0.15em;
+            }
+        }
+
+        /* Make pilcrows on dd visible */
+        @media screen {
+            dd:hover>a.pilcrow {
+                visibility: visible;
+            }
+        }
+
+        /* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+        .alignLeft.art-text,
+        .alignCenter.art-text,
+        .alignRight.art-text {
+            margin-bottom: 0;
+        }
+
+        .alignLeft,
+        .alignCenter,
+        .alignRight {
+            margin: 1em 0 0 0;
+        }
+
+        /* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+        @media print {
+            a.pilcrow {
+                display: none;
+            }
+        }
+
+        /* Styling for the external metadata */
+        div#external-metadata {
+            background-color: #eee;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            display: none;
+        }
+
+        div#internal-metadata {
+            padding: 0.5em;
+            /* to match the external-metadata padding */
+        }
+
+        /* Styling for title RFC Number */
+        h1#rfcnum {
+            clear: both;
+            margin: 0 0 -1em;
+            padding: 1em 0 0 0;
+        }
+
+        /* Make .olPercent look the same as <ol><li> */
+        dl.olPercent>dd {
+            margin-bottom: 0.25em;
+            min-height: initial;
+        }
+
+        /* Give aside some styling to set it apart */
+        aside {
+            border-left: 1px solid #ddd;
+            margin: 1em 0 1em 2em;
+            padding: 0.2em 2em;
+        }
+
+        aside>dl,
+        aside>ol,
+        aside>ul,
+        aside>table,
+        aside>p {
+            margin-bottom: 0.5em;
+        }
+
+        /* Additional page break settings */
+        @media print {
+
+            figcaption,
+            table caption {
+                page-break-before: avoid;
+            }
+        }
+
+        /* Font size adjustments for print */
+        @media print {
+            body {
+                font-size: 10pt;
+                line-height: normal;
+                max-width: 96%;
+            }
+
+            h1 {
+                font-size: 1.72em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2*1.2 */
+            h2 {
+                font-size: 1.44em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2 */
+            h3 {
+                font-size: 1.2em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2 */
+            h4 {
+                font-size: 1em;
+                padding-top: 1.5em;
+            }
+
+            h5,
+            h6 {
+                font-size: 1em;
+                margin: initial;
+                padding: 0.5em 0 0.3em;
+            }
+        }
+
+        /* Sourcecode margin in print, when there's no pilcrow */
+        @media print {
+
+            .artwork,
+            .sourcecode {
+                margin-bottom: 1em;
+            }
+        }
+
+        /* Avoid narrow tables forcing too narrow table captions, which may render badly */
+        table {
+            min-width: 20em;
+        }
+
+        /* ol type a */
+        ol.type-a {
+            list-style-type: lower-alpha;
+        }
+
+        ol.type-A {
+            list-style-type: upper-alpha;
+        }
+
+        ol.type-i {
+            list-style-type: lower-roman;
+        }
+
+        ol.type-I {
+            list-style-type: lower-roman;
+        }
+
+        /* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background sligthtly */
+        table {
+            border: 1px solid #ddd;
+        }
+
+        td {
+            border-top: 1px solid #ddd;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f8f8f8;
+        }
+
+        /* Use style rules to govern display of the TOC. */
+        @media screen and (max-width: 1023px) {
+            #toc nav {
+                display: none;
+            }
+
+            #toc.active nav {
+                display: block;
+            }
+        }
+
+        /* Add support for keepWithNext */
+        .keepWithNext {
+            break-after: avoid-page;
+            break-after: avoid-page;
+        }
+
+        /* Add support for keepWithPrevious */
+        .keepWithPrevious {
+            break-before: avoid-page;
+        }
+
+        /* Change the approach to avoiding breaks inside artwork etc. */
+        figure,
+        pre,
+        table,
+        .artwork,
+        .sourcecode {
+            break-before: auto;
+            break-after: auto;
+        }
+
+        /* Avoid breaks between <dt> and <dd> */
+        dl {
+            break-before: auto;
+            break-inside: auto;
+        }
+
+        dt {
+            break-before: auto;
+            break-after: avoid-page;
+        }
+
+        dd {
+            break-before: avoid-page;
+            break-after: auto;
+            orphans: 3;
+            widows: 3
+        }
+
+        span.break,
+        dd.break {
+            margin-bottom: 0;
+            min-height: 0;
+            break-before: auto;
+            break-inside: auto;
+            break-after: auto;
+        }
+
+        /* Undo break-before ToC */
+        @media print {
+            #toc {
+                break-before: auto;
+            }
+        }
+
+        /* Text in compact lists should not get extra bottim margin space,
+   since that would makes the list not compact */
+        ul.compact p,
+        .ulCompact p,
+        ol.compact p,
+        .olCompact p {
+            margin: 0;
+        }
+
+        /* But the list as a whole needs the extra space at the end */
+        section ul.compact,
+        section .ulCompact,
+        section ol.compact,
+        section .olCompact {
+            margin-bottom: 1em;
+            /* same as p not within ul.compact etc. */
+        }
+
+        /* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+        tt,
+        code {
+            background-color: transparent;
+        }
+
+        p tt,
+        p code,
+        li tt,
+        li code {
+            background-color: #f8f8f8;
+        }
+
+        /* Tweak the pre margin -- 0px doesn't come out well */
+        pre {
+            margin-top: 0.5px;
+        }
+
+        /* Tweak the comact list text */
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact,
+        dl.compact,
+        .dlCompact {
+            line-height: normal;
+        }
+
+        /* Don't add top margin for nested lists */
+        li>ul,
+        li>ol,
+        li>dl,
+        dd>ul,
+        dd>ol,
+        dd>dl,
+        dl>dd>dl {
+            margin-top: initial;
+        }
+
+        /* Elements that should not be rendered on the same line as a <dt> */
+        /* This should match the element list in writer.text.TextWriter.render_dl() */
+        dd>div.artwork:first-child,
+        dd>aside:first-child,
+        dd>figure:first-child,
+        dd>ol:first-child,
+        dd>div:first-child>pre.sourcecode,
+        dd>table:first-child,
+        dd>ul:first-child {
+            clear: left;
+        }
+
+        /* fix for weird browser behaviour when <dd/> is empty */
+        dt+dd:empty::before {
+            content: "\00a0";
+        }
+
+        /* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+        li>p {
+            margin-bottom: 0.5em
+        }
+
+        /* Don't let p margin spill out from inside list items */
+        li>p:last-of-type {
+            margin-bottom: 0;
+        }
+    </style>
+    <link href="https://www.rfc-editor.org/rfc/rfc-local.css" rel="stylesheet" type="text/css">
+    <link href="https://dx.doi.org/10.17487/rfc9116" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link href="https://datatracker.ietf.org/doc/draft-foudil-securitytxt-12" rel="prev">
+</head>
+
+<body>
+    <script src="https://www.rfc-editor.org/js/metadata.min.js"></script>
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">RFC 9116</td>
+                <td class="center">security.txt</td>
+                <td class="right">2022년 4월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Foudil &amp; Shafranovich</td>
+                <td class="center">정보 제공용</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-stream">스트림:</dt>
+            <dd class="stream">인터넷 엔지니어링 태스크 포스(IETF)</dd>
+            <dt class="label-rfc">RFC:</dt>
+            <dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc9116" class="eref">9116</a></dd>
+            <dt class="label-category">분류:</dt>
+            <dd class="category">정보 제공용</dd>
+            <dt class="label-published">게시됨:</dt>
+            <dd class="published">
+                <time datetime="2022-04" class="published">2022년 4월</time>
+            </dd>
+            <dt class="label-issn">ISSN:</dt>
+            <dd class="issn">2070-1721</dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">E. Foudil</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">Y. Shafranovich</div>
+                    <div class="org">Nightwatch Cybersecurity</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="rfcnum">RFC 9116</h1>
+    <h1 id="title">보안 취약점 공개를 돕기 위한 파일 형식</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">연구자들이 보안 취약점을 발견했을 때,
+            적절한 보고 채널이 부족한 경우가 많습니다. 그 결과,
+            취약점이 보고되지 않은 채 남을 수 있습니다. 이 문서는 기계 판독 가능 형식
+            ("security.txt")을 정의하여 조직이 취약점 공개 관행을 설명하도록 돕고,
+            연구자가 취약점을 더 쉽게 보고할 수 있게 합니다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 문서는 인터넷 표준 트랙 명세가 아니며,
+                정보 제공 목적으로 게시되었습니다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-2">
+                이 문서는 인터넷 엔지니어링 태스크 포스
+                (IETF)의 산물입니다. 이는 IETF 커뮤니티의 합의를 나타냅니다. 이 문서는
+                공개 검토를 받았으며 인터넷 엔지니어링 운영 그룹
+                (IESG)에 의해 게시 승인을 받았습니다. IESG가 승인한 모든 문서가
+                인터넷 표준의 어떤 수준에 대한 후보가 되는 것은 아닙니다.
+                RFC 7841의 2절을 참조하십시오.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-3">
+                이 문서의 현재 상태, 모든 정오표 및 이에 대한
+                피드백 제공 방법에 관한 정보는
+                <span><a
+                        href="https://www.rfc-editor.org/info/rfc9116">https://www.rfc-editor.org/info/rfc9116</a></span>에서
+                확인할 수 있습니다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2022 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Revised BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="compact toc ulBare ulEmpty">
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>. <a
+                                href="#name-introduction" class="xref">소개</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1"
+                                        class="xref">1.1</a>. <a href="#name-motivation-prior-work-and-s"
+                                        class="xref">동기, 선행 작업 및 범위</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2"
+                                        class="xref">1.2</a>. <a href="#name-terminology" class="xref">용어</a>
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>. <a
+                                href="#name-the-specification" class="xref">명세</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>. <a
+                                        href="#name-comments" class="xref">주석</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>. <a
+                                        href="#name-line-separator" class="xref">줄 구분자</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>. <a
+                                        href="#name-digital-signature" class="xref">디지털 서명</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="xref">2.4</a>. <a
+                                        href="#name-extensibility" class="xref">확장성</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5">
+                                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5" class="xref">2.5</a>. <a
+                                        href="#name-field-definitions" class="xref">필드 정의</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.1">
+                                        <p id="section-toc.1-1.2.2.5.2.1.1"><a href="#section-2.5.1"
+                                                class="xref">2.5.1</a>. <a href="#name-acknowledgments"
+                                                class="xref">Acknowledgments</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.2">
+                                        <p id="section-toc.1-1.2.2.5.2.2.1"><a href="#section-2.5.2"
+                                                class="xref">2.5.2</a>. <a href="#name-canonical"
+                                                class="xref">Canonical</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.3">
+                                        <p id="section-toc.1-1.2.2.5.2.3.1"><a href="#section-2.5.3"
+                                                class="xref">2.5.3</a>. <a href="#name-contact" class="xref">Contact</a>
+                                        </p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.4">
+                                        <p id="section-toc.1-1.2.2.5.2.4.1"><a href="#section-2.5.4"
+                                                class="xref">2.5.4</a>. <a href="#name-encryption"
+                                                class="xref">Encryption</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.5">
+                                        <p id="section-toc.1-1.2.2.5.2.5.1"><a href="#section-2.5.5"
+                                                class="xref">2.5.5</a>. <a href="#name-expires" class="xref">Expires</a>
+                                        </p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.6">
+                                        <p id="section-toc.1-1.2.2.5.2.6.1"><a href="#section-2.5.6"
+                                                class="xref">2.5.6</a>. <a href="#name-hiring" class="xref">Hiring</a>
+                                        </p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.7">
+                                        <p id="section-toc.1-1.2.2.5.2.7.1"><a href="#section-2.5.7"
+                                                class="xref">2.5.7</a>. <a href="#name-policy" class="xref">Policy</a>
+                                        </p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5.2.8">
+                                        <p id="section-toc.1-1.2.2.5.2.8.1"><a href="#section-2.5.8"
+                                                class="xref">2.5.8</a>. <a href="#name-preferred-languages"
+                                                class="xref">Preferred-Languages</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6">
+                                <p id="section-toc.1-1.2.2.6.1"><a href="#section-2.6" class="xref">2.6</a>. <a
+                                        href="#name-example-of-an-unsigned-secu" class="xref">서명되지 않은
+                                        "security.txt" 파일의 예</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7">
+                                <p id="section-toc.1-1.2.2.7.1"><a href="#section-2.7" class="xref">2.7</a>. <a
+                                        href="#name-example-of-a-signed-securit" class="xref">서명된
+                                        "security.txt" 파일의 예</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>. <a
+                                href="#name-location-of-the-securitytxt" class="xref">security.txt
+                                파일의 위치</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>. <a
+                                        href="#name-scope-of-the-file" class="xref">파일의 범위</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>. <a
+                                href="#name-file-format-description-and" class="xref">파일 형식 설명 및 ABNF
+                                문법</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>. <a
+                                href="#name-security-considerations" class="xref">보안 고려 사항</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>. <a
+                                        href="#name-compromised-files-and-incid" class="xref">침해된 파일 및
+                                        사고 대응</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>. <a
+                                        href="#name-redirects" class="xref">리디렉션</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="xref">5.3</a>. <a
+                                        href="#name-incorrect-or-stale-informat" class="xref">부정확하거나 오래된
+                                        정보</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="xref">5.4</a>. <a
+                                        href="#name-intentionally-malformed-fil" class="xref">의도적으로 잘못 구성된
+                                        파일, 리소스 및 보고서</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="xref">5.5</a>. <a
+                                        href="#name-no-implied-permission-for-t" class="xref">테스트에 대한 묵시적 권한
+                                        없음</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="xref">5.6</a>. <a
+                                        href="#name-multi-user-environments" class="xref">다중 사용자 환경</a>
+                                </p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.7">
+                                <p id="section-toc.1-1.5.2.7.1"><a href="#section-5.7" class="xref">5.7</a>. <a
+                                        href="#name-protecting-data-in-transit" class="xref">전송 중 데이터
+                                        보호</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.8">
+                                <p id="section-toc.1-1.5.2.8.1"><a href="#section-5.8" class="xref">5.8</a>. <a
+                                        href="#name-spam-and-spurious-reports" class="xref">스팸 및 허위
+                                        보고서</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>. <a
+                                href="#name-iana-considerations" class="xref">IANA 고려 사항</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="xref">6.1</a>. <a
+                                        href="#name-well-known-uris-registry" class="xref">잘 알려진 URI 레지스트리</a>
+                                </p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="xref">6.2</a>. <a
+                                        href="#name-registry-for-securitytxt-fi" class="xref">security.txt
+                                        필드 레지스트리</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>. <a href="#name-references"
+                                class="xref">참고 문헌</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>. <a
+                                        href="#name-normative-references" class="xref">규범 참고 문헌</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>. <a
+                                        href="#name-informative-references" class="xref">정보 참고 문헌</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="xref"></a><a
+                                href="#name-acknowledgments-2" class="xref">감사의 말</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+                        <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="xref"></a><a
+                                href="#name-authors-addresses" class="xref">저자 주소</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <div id="introduction">
+        <section id="section-1">
+            <h2 id="name-introduction">
+                <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                    class="section-name selfRef">소개</a>
+            </h2>
+            <div id="motivation">
+                <section id="section-1.1">
+                    <h3 id="name-motivation-prior-work-and-s">
+                        <a href="#section-1.1" class="section-number selfRef">1.1. </a><a
+                            href="#name-motivation-prior-work-and-s" class="section-name selfRef">동기, 선행
+                            작업 및 범위</a>
+                    </h3>
+                    <p id="section-1.1-1">많은 보안 연구자는 특정
+                        리소스의 소유자에게 연락할 보고 채널이 없고, 해당 소유자의
+                        취약점 공개 관행에 관한 정보도 제공되지 않기 때문에, 조직에
+                        보안 취약점을 보고할 수 없는 상황을 마주합니다.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-2">[<a href="#RFC2142" class="xref">RFC2142</a>]의 <span><a
+                                href="https://www.rfc-editor.org/rfc/rfc2142#section-4" class="relref">4절</a></span>에
+                        따르면,
+                        보안 문제에 관한 통신을 위해 &lt;SECURITY@domain&gt; 이메일 주소를 사용하는 기존 관례가
+                        있습니다. 이 관례는 도메인당 하나의 이메일 기반 통신 채널만
+                        제공하며, 도메인 소유자가 보안 공개 관행에 관한 정보를 게시할
+                        방법을 제공하지 않습니다.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-3">또한 [<a href="#RFC3013" class="xref">RFC3013</a>]의 <span><a
+                                href="https://www.rfc-editor.org/rfc/rfc3013#section-2" class="relref">2절</a></span>에는
+                        인터넷 서비스 제공자
+                        (ISP)를 위한 연락 관례가,
+                        [<a href="#RFC2350" class="xref">RFC2350</a>]의 <span><a
+                                href="https://www.rfc-editor.org/rfc/rfc2350#section-3.2"
+                                class="relref">3.2절</a></span>에는 컴퓨터 보안 사고
+                        대응 팀(CSIRT)을 위한 연락 관례가, [<a href="#RFC2196" class="xref">RFC2196</a>]의 <span><a
+                                href="https://www.rfc-editor.org/rfc/rfc2196#section-5.2"
+                                class="relref">5.2절</a></span>에는 사이트 운영자를 위한
+                        연락 관례가 규정되어 있습니다. [<a href="#RFC7485" class="xref">RFC7485</a>]에 따르면, IP 주소, 자율 시스템 번호(ASN) 및
+                        도메인 이름의
+                        소유자에 대해 지역 인터넷 레지스트리(RIR)와 도메인 레지스트리가
+                        제공하는 연락 정보도 있습니다. 그러나 이들 중 어느 것도 보안 연구자가
+                        취약점을 보고하기 위해 조직의 연락 정보와 취약점 공개 관행을
+                        찾는 방법이라는 문제를 다루지 않습니다.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-4">이 문서에서는 조직이 보안 공개 관행과 연락 방법에 관한 정보를
+                        전달하기 위한, 더 풍부하고 기계가 구문 분석할 수 있으며 더 확장 가능한 방법을
+                        정의합니다. 취약점 공개의 다른 세부 사항은 이 문서의 범위를 벗어납니다.
+                        독자는 <span>[<a href="#ISO.29147.2018" class="xref">ISO.29147.2018</a>]</span> 또는
+                        <span>[<a href="#CERT.CVD" class="xref">CERT.CVD</a>]</span> 같은 다른 문서를
+                        참고하는 것이 좋습니다.<a href="#section-1.1-4" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-1.1-5"><span>[<a href="#CERT.CVD" class="xref">CERT.CVD</a>]</span>에 따르면,
+                        "vulnerability response"는 제품 취약점 보고를 의미하며,
+                        이는 네트워크 침입 및 침해된 웹사이트에 대한 보고("incident response")와
+                        관련은 있지만 구별됩니다. 이 문서에서 정의한 메커니즘은 전자
+                        ("vulnerability response")에 사용되도록 의도되었습니다. 구현자가
+                        이 메커니즘을 사고 대응에 활용하려는 경우, <a href="#compromise" class="xref">5.1절</a>에서
+                        논의하는 추가 보안 고려 사항을 알고 있어야 합니다.<a href="#section-1.1-5" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-6">"security.txt" 파일은 조직이 보안 공개 관행과 관련하여
+                        유지하는 다른 공개 리소스를 보완하기 위한 것이며, 이를 대체하거나
+                        대신하기 위한 것이 아닙니다.<a href="#section-1.1-6" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="terminology">
+                <section id="section-1.2">
+                    <h3 id="name-terminology">
+                        <a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-terminology"
+                            class="section-name selfRef">용어</a>
+                    </h3>
+                    <p id="section-1.2-1">이 문서에서 핵심 단어 "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST
+                            NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>",
+                        "<span class="bcp14">SHALL NOT</span>",
+                        "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span
+                            class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>", "<span
+                            class="bcp14">MAY</span>", 및
+                        "<span class="bcp14">OPTIONAL</span>"은 여기에 표시된 것처럼 모두 대문자로 나타나는 경우에만
+                        BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174"
+                                class="xref">RFC8174</a>]</span>에 설명된 대로 해석됩니다.<a href="#section-1.2-1"
+                            class="pilcrow">¶</a></p>
+                    <p id="section-1.2-2">"researcher"라는 용어는
+                        <span>[<a href="#ISO.29147.2018" class="xref">ISO.29147.2018</a>]</span> 및 <span>[<a
+                                href="#CERT.CVD" class="xref">CERT.CVD</a>]</span>의 "finder" 및 "reporter"라는 용어에
+                        해당합니다.
+                        "organization"이라는 용어는
+                        <span>[<a href="#ISO.29147.2018" class="xref">ISO.29147.2018</a>]</span> 및 <span>[<a
+                                href="#CERT.CVD" class="xref">CERT.CVD</a>]</span>의 "vendor"라는 용어에
+                        해당합니다.<a href="#section-1.2-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-1.2-3">"implementors"라는 용어에는
+                        취약점 공개 프로세스에 관여하는 모든 당사자가 포함됩니다.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="the-specification">
+        <section id="section-2">
+            <h2 id="name-the-specification">
+                <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-the-specification"
+                    class="section-name selfRef">명세</a>
+            </h2>
+            <p id="section-2-1">이 문서는 알려진 위치에 배치되는 텍스트 파일을 정의하며,
+                이 파일은 특정 조직의 취약점 공개 관행에 관한 정보를 제공합니다.
+                이 파일의 형식은 기계가 구문 분석할 수 있으며, <a href="#abnf" class="xref">4절</a>에 정의된
+                ABNF 문법을 <span class="bcp14">MUST</span> 따라야 합니다. 이 파일은 보안 연구자가
+                보안 취약점을 공개할 때 도움을 주기 위한 것입니다.<a href="#section-2-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-2">관례상 이 파일의 이름은 "security.txt"입니다. 위치와 범위는
+                <a href="#location" class="xref">3절</a>에 설명되어 있습니다.<a href="#section-2-2" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-3">이 텍스트 파일에는 서로 다른 값을 가진 여러 필드가 포함됩니다. 필드에는
+                콜론까지의 필드 첫 부분인 "name"(예: "Contact:")이 포함되며,
+                이는 [<a href="#RFC5322" class="xref">RFC5322</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc5322#section-3.6.8" class="relref">3.6.8절</a></span>에서
+                "field-name"에 대해 정의한 구문을 따릅니다. 필드 이름은
+                [<a href="#RFC5234" class="xref">RFC5234</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc5234#section-2.3" class="relref">2.3절</a></span>에 따라
+                대소문자를 구분하지 않습니다.
+                "value"는 필드 이름 뒤에 오며(예: "mailto:security@example.com"),
+                [<a href="#RFC5322" class="xref">RFC5322</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc5322#section-3.2.5" class="relref">3.2.5절</a></span>에서
+                "unstructured"에 대해 정의한 구문을 따릅니다.
+                파일은 빈 줄을 포함할 수도 <span class="bcp14">MAY</span> 있습니다.<a href="#section-2-3" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-4">필드는 항상 이름과 값으로 구성되어야 <span class="bcp14">MUST</span> 합니다
+                (예: "Contact: mailto:security@example.com"). "security.txt" 파일은
+                필드를 무제한으로 가질 수 있습니다. 각 필드는 자체 줄에 나타나야
+                <span class="bcp14">MUST</span> 합니다. 필드 정의에서 달리 지정하지 않는 한,
+                단일 필드에 대해 여러 값을 함께 연결해서는 <span class="bcp14">MUST NOT</span> 안 됩니다.
+                특정 필드의 정의에서 달리 표시하지 않는 한, 필드는 여러 번 나타날 수도
+                <span class="bcp14">MAY</span> 있습니다.<a href="#section-2-4" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-5">구현자는 일부 필드가
+                [<a href="#RFC3986" class="xref">RFC3986</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc3986#section-2.1" class="relref">2.1절</a></span>에 따른
+                퍼센트 인코딩을 사용하는 URI를 포함할 수 있음을 알고 있어야 합니다.<a href="#section-2-5" class="pilcrow">¶</a>
+            </p>
+            <div id="comments">
+                <section id="section-2.1">
+                    <h3 id="name-comments">
+                        <a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-comments"
+                            class="section-name selfRef">주석</a>
+                    </h3>
+                    <p id="section-2.1-1">"#"(%x23) 기호로 시작하는 모든 줄은 주석으로 해석되어야
+                        <span class="bcp14">MUST</span> 합니다. 주석의 내용에는
+                        %x21-7E 및 %x80-FFFFF 범위의 ASCII 또는 Unicode 문자와 탭(%x09) 및
+                        공백(%x20) 문자가 포함될 수 있습니다.<a href="#section-2.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.1-2">예:<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+                    <div class="alignLeft art-text artwork" id="section-2.1-3">
+                        <pre>
+# This is a comment.
+</pre><a href="#section-2.1-3" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+            <div id="line-separator">
+                <section id="section-2.2">
+                    <h3 id="name-line-separator">
+                        <a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-line-separator"
+                            class="section-name selfRef">줄 구분자</a>
+                    </h3>
+                    <p id="section-2.2-1">모든 줄은 캐리지 리턴 및 줄 바꿈
+                        문자(CRLF / %x0D %x0A) 또는 줄 바꿈 문자(LF / %x0A)만으로 끝나야
+                        <span class="bcp14">MUST</span> 합니다.<a href="#section-2.2-1" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="signature">
+                <section id="section-2.3">
+                    <h3 id="name-digital-signature">
+                        <a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-digital-signature"
+                            class="section-name selfRef">디지털 서명</a>
+                    </h3>
+                    <p id="section-2.3-1">"security.txt" 파일은
+                        [<a href="#RFC4880" class="xref">RFC4880</a>]의 <span><a
+                                href="https://www.rfc-editor.org/rfc/rfc4880#section-7" class="relref">7절</a></span>에
+                        설명된 OpenPGP 클리어텍스트 서명을 사용하여 디지털 서명하는 것이
+                        <span class="bcp14">RECOMMENDED</span>됩니다. 디지털 서명이 사용되는 경우, 조직이
+                        <a href="#canonical" class="xref">2.5.2절</a>에 따른 "Canonical" 필드를 사용하여
+                        디지털 서명이 파일의 위치를 인증할 수 있게 하는 것도
+                        <span class="bcp14">RECOMMENDED</span>됩니다.<a href="#section-2.3-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.3-2">서명을 생성하는 데 사용된 키를 검증하는 경우,
+                        사용 중인 키가 자신이 신뢰하는 키인지 확인하는 것은 항상
+                        보안 연구자의 책임입니다.<a href="#section-2.3-2" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="extensibility">
+                <section id="section-2.4">
+                    <h3 id="name-extensibility">
+                        <a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-extensibility"
+                            class="section-name selfRef">확장성</a>
+                    </h3>
+                    <p id="section-2.4-1">다른 많은 형식과 프로토콜처럼, 이 형식은 시간이 지나며
+                        계속 변화하는 인터넷 환경에 맞도록 변경될 필요가 있을 수 있습니다. 따라서
+                        <a href="#registry" class="xref">6.2절</a>에 정의된 필드용 IANA 레지스트리를 통해
+                        확장성이 제공됩니다. 해당 프로세스를 통해 등록된 모든 필드는
+                        선택 사항으로 간주되어야 <span class="bcp14">MUST</span> 합니다. 확장성과 상호 운용성을
+                        장려하기 위해, 연구자는 명시적으로 지원하지 않는 모든 필드를
+                        무시해야 <span class="bcp14">MUST</span> 합니다.<a href="#section-2.4-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.4-2">일반적으로, 구현자는 "자신이 하는 일에는 보수적이고,
+                        다른 이에게서 받아들이는 것에는 관대하라"([<a href="#RFC0793" class="xref">RFC0793</a>]에 따름)는 원칙을 따라야 합니다.<a
+                            href="#section-2.4-2" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="field-definitions">
+                <section id="section-2.5">
+                    <h3 id="name-field-definitions">
+                        <a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-field-definitions"
+                            class="section-name selfRef">필드 정의</a>
+                    </h3>
+                    <p id="section-2.5-1">달리 명시되지 않는 한, 모든 필드는
+                        선택 사항으로 간주되어야 <span class="bcp14">MUST</span> 합니다.<a href="#section-2.5-1" class="pilcrow">¶</a>
+                    </p>
+                    <div id="acknowledgments">
+                        <section id="section-2.5.1">
+                            <h4 id="name-acknowledgments">
+                                <a href="#section-2.5.1" class="section-number selfRef">2.5.1. </a><a
+                                    href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+                            </h4>
+                            <p id="section-2.5.1-1">"Acknowledgments" 필드는
+                                보안 연구자가 자신의 보고에 대해 인정받는 페이지에 대한 링크를 나타냅니다.
+                                참조된 페이지는 보안 취약점을 보고하고 이를 해결하기 위해 협력한
+                                보안 연구자를 나열해야 합니다. 조직은 향후 공격을 방지하기 위해
+                                게시되는 취약점 정보를 제한하는 데 주의해야 합니다.<a href="#section-2.5.1-1" class="pilcrow">¶</a></p>
+                            <p id="section-2.5.1-2">이 필드가 웹 URI를 나타내는 경우, [<a href="#RFC7230" class="xref">RFC7230</a>]의
+                                <span><a href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2"
+                                        class="relref">2.7.2절</a></span>에 따라 "https://"로 시작해야
+                                <span class="bcp14">MUST</span> 합니다.<a href="#section-2.5.1-2" class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.1-3">예:<a href="#section-2.5.1-3" class="pilcrow">¶</a></p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.1-4">
+                                <pre>
+Acknowledgments: https://example.com/hall-of-fame.html
+</pre><a href="#section-2.5.1-4" class="pilcrow">¶</a>
+                            </div>
+                            <p id="section-2.5.1-5">보안 감사 페이지의 예:<a href="#section-2.5.1-5" class="pilcrow">¶</a></p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.1-6">
+                                <pre>
+We would like to thank the following researchers:
+
+(2017-04-15) Frank Denis - Reflected cross-site scripting
+(2017-01-02) Alice Quinn  - SQL injection
+(2016-12-24) John Buchner - Stored cross-site scripting
+(2016-06-10) Anna Richmond - A server configuration issue
+</pre><a href="#section-2.5.1-6" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="canonical">
+                        <section id="section-2.5.2">
+                            <h4 id="name-canonical">
+                                <a href="#section-2.5.2" class="section-number selfRef">2.5.2. </a><a
+                                    href="#name-canonical" class="section-name selfRef">Canonical</a>
+                            </h4>
+                            <p id="section-2.5.2-1">"Canonical" 필드는
+                                "security.txt" 파일이 위치한 표준 URI를 나타내며,
+                                이는 일반적으로 "https://example.com/.well-known/security.txt"와 같은 형식입니다.
+                                이 필드가 웹 URI를 나타내는 경우, [<a href="#RFC7230" class="xref">RFC7230</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2"
+                                        class="relref">2.7.2절</a></span>에 따라
+                                "https://"로 시작해야 <span class="bcp14">MUST</span> 합니다.<a href="#section-2.5.2-1"
+                                    class="pilcrow">¶</a></p>
+                            <p id="section-2.5.2-2">이 필드는 주어진 URI에서 가져온 "security.txt"가
+                                해당 URI에 적용되도록 의도되었음을 나타내지만, 파일 안에 나열된
+                                모든 표준 URI에 적용되는 것으로 해석되어서는 <span class="bcp14">MUST NOT</span> 안 됩니다.
+                                연구자는 특정 표준 URI가 적용 가능한지 판단하기 위해
+                                <a href="#signature" class="xref">2.3절</a>에 따른 디지털 서명 같은 추가 신뢰 메커니즘을
+                                사용해야 <span class="bcp14">SHOULD</span> 합니다.<a href="#section-2.5.2-2"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.2-3">이 필드가 "security.txt" 파일 안에 나타나고,
+                                해당 파일을 가져오는 데 사용된 URI가 어떤 canonical 필드에도
+                                나열되어 있지 않다면, 파일 내용은 신뢰해서는
+                                <span class="bcp14">SHOULD NOT</span> 안 됩니다.<a href="#section-2.5.2-3"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.2-4">
+                                <pre>
+Canonical: https://www.example.com/.well-known/security.txt
+Canonical: https://someserver.example.com/.well-known/security.txt
+</pre><a href="#section-2.5.2-4" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="contact">
+                        <section id="section-2.5.3">
+                            <h4 id="name-contact">
+                                <a href="#section-2.5.3" class="section-number selfRef">2.5.3. </a><a
+                                    href="#name-contact" class="section-name selfRef">Contact</a>
+                            </h4>
+                            <p id="section-2.5.3-1">"Contact" 필드는 보안 취약점을 보고하기 위해
+                                연구자가 사용해야 하는 방법을 나타내며, 여기에는 이메일 주소, 전화번호 및/또는
+                                연락 정보가 있는 웹 페이지가 포함될 수 있습니다. 이 필드는
+                                "security.txt" 파일에 항상 있어야 <span class="bcp14">MUST</span> 합니다.
+                                이 필드가 웹 URI를 나타내는 경우, [<a href="#RFC7230" class="xref">RFC7230</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2"
+                                        class="relref">2.7.2절</a></span>에 따라 "https://"로 시작해야
+                                <span class="bcp14">MUST</span> 합니다.
+                                보안 이메일 주소는 [<a href="#RFC2142" class="xref">RFC2142</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc2142#section-4"
+                                        class="relref">4절</a></span>에
+                                정의된 관례를 사용해야 합니다.<a href="#section-2.5.3-1" class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.3-2">값은 [<a href="#RFC3986" class="xref">RFC3986</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc3986#section-3"
+                                        class="relref">3절</a></span>에
+                                설명된 URI 구문을 따라야 <span class="bcp14">MUST</span> 합니다.
+                                이는 이메일 주소와 전화번호를 지정할 때
+                                <span>[<a href="#RFC6068" class="xref">RFC6068</a>]</span> 및
+                                <span>[<a href="#RFC3966" class="xref">RFC3966</a>]</span>에 정의된
+                                "mailto" 및 "tel" URI 스킴을 사용해야 함을 의미합니다. 이 필드의 값이
+                                이메일 주소인 경우, <a href="#encryption" class="xref">2.5.4절</a>에 따라 암호화를 사용하는 것이
+                                <span class="bcp14">RECOMMENDED</span>됩니다.<a href="#section-2.5.3-2"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.3-3">이들은 선호도 순으로 나열되어야
+                                <span class="bcp14">SHOULD</span> 하며, 첫 번째 항목이 선호되는 연락 방법,
+                                두 번째 항목이 두 번째로 선호되는 연락 방법 등이 됩니다. 아래 예에서 첫 번째 이메일 주소
+                                ("security@example.com")가 선호되는 연락 방법입니다.<a href="#section-2.5.3-3" class="pilcrow">¶</a>
+                            </p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.3-4">
+                                <pre>
+Contact: mailto:security@example.com
+Contact: mailto:security%2Buri%2Bencoded@example.com
+Contact: tel:+1-201-555-0123
+Contact: https://example.com/security-contact.html
+</pre><a href="#section-2.5.3-4" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="encryption">
+                        <section id="section-2.5.4">
+                            <h4 id="name-encryption">
+                                <a href="#section-2.5.4" class="section-number selfRef">2.5.4. </a><a
+                                    href="#name-encryption" class="section-name selfRef">Encryption</a>
+                            </h4>
+                            <p id="section-2.5.4-1">"Encryption" 필드는
+                                보안 연구자가 암호화된 통신에 사용해야 하는 암호화 키를 나타냅니다.
+                                키는 이 필드에 나타나서는 <span class="bcp14">MUST NOT</span> 안 됩니다. 대신 이 필드의 값은
+                                키를 가져올 수 있는 위치를 가리키는 URI여야
+                                <span class="bcp14">MUST</span> 합니다.
+                                이 필드가 웹 URI를 나타내는 경우, [<a href="#RFC7230" class="xref">RFC7230</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2"
+                                        class="relref">2.7.2절</a></span>에 따라
+                                "https://"로 시작해야 <span class="bcp14">MUST</span> 합니다.<a href="#section-2.5.4-1"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.4-2">키의 진위성을 검증하는 경우, 지정된 키가
+                                자신이 신뢰하는 키인지 확인하는 것은 항상 보안 연구자의 책임입니다.
+                                연구자는 이 키가 <a href="#signature" class="xref">2.3절</a>에서 참조된 디지털 서명을 생성하는 데
+                                사용되었다고 가정해서는 안 됩니다.<a href="#section-2.5.4-2" class="pilcrow">¶</a></p>
+                            <p id="section-2.5.4-3">웹 서버에서 제공되는 OpenPGP 키의 예:<a href="#section-2.5.4-3"
+                                    class="pilcrow">¶</a></p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.4-4">
+                                <pre>
+Encryption: https://example.com/pgp-key.txt
+</pre><a href="#section-2.5.4-4" class="pilcrow">¶</a>
+                            </div>
+                            <p id="section-2.5.4-5">OPENPGPKEY DNS 레코드에서 제공되는 OpenPGP 키의 예:<a href="#section-2.5.4-5"
+                                    class="pilcrow">¶</a></p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.4-6">
+                                <pre>
+Encryption: dns:5d2d37ab76d47d36._openpgpkey.example.com?type=OPENPGPKEY
+</pre><a href="#section-2.5.4-6" class="pilcrow">¶</a>
+                            </div>
+                            <p id="section-2.5.4-7">지문으로 참조되는 OpenPGP 키의 예:<a href="#section-2.5.4-7"
+                                    class="pilcrow">¶</a></p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.4-8">
+                                <pre>
+Encryption: openpgp4fpr:5f2de5521c63a801ab59ccb603d49de44b29100f
+</pre><a href="#section-2.5.4-8" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="expires">
+                        <section id="section-2.5.5">
+                            <h4 id="name-expires">
+                                <a href="#section-2.5.5" class="section-number selfRef">2.5.5. </a><a
+                                    href="#name-expires" class="section-name selfRef">Expires</a>
+                            </h4>
+                            <p id="section-2.5.5-1">"Expires" 필드는
+                                "security.txt" 파일에 포함된 데이터가 오래되어 더 이상 사용해서는 안 되는
+                                날짜와 시간을 나타냅니다(<a href="#stale" class="xref">5.3절</a>에 따름). 이 필드의 값은
+                                <span>[<a href="#RFC3339" class="xref">RFC3339</a>]</span>에 정의된 대로
+                                <span>[<a href="#ISO.8601-1" class="xref">ISO.8601-1</a>]</span> 및 <span>[<a
+                                        href="#ISO.8601-2" class="xref">ISO.8601-2</a>]</span>의 인터넷 프로파일에 따라 형식화됩니다.
+                                오래된 정보가 되는 것을 피하기 위해, 이 필드의 값은
+                                미래 1년 미만으로 설정하는 것이 <span class="bcp14">RECOMMENDED</span>됩니다.<a href="#section-2.5.5-1"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.5-2">이 필드는 항상 있어야 <span class="bcp14">MUST</span> 하며
+                                한 번을 초과하여 나타나서는 <span class="bcp14">MUST NOT</span> 안 됩니다.<a href="#section-2.5.5-2"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.5-3">
+                                <pre>
+Expires: 2021-12-31T18:37:07z
+</pre><a href="#section-2.5.5-3" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="hiring">
+                        <section id="section-2.5.6">
+                            <h4 id="name-hiring">
+                                <a href="#section-2.5.6" class="section-number selfRef">2.5.6. </a><a
+                                    href="#name-hiring" class="section-name selfRef">Hiring</a>
+                            </h4>
+                            <p id="section-2.5.6-1">"Hiring" 필드는 벤더의
+                                보안 관련 채용 직무에 연결하는 데 사용됩니다.
+                                이 필드가 웹 URI를 나타내는 경우, [<a href="#RFC7230" class="xref">RFC7230</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2"
+                                        class="relref">2.7.2절</a></span>에 따라
+                                "https://"로 시작해야 <span class="bcp14">MUST</span> 합니다.<a href="#section-2.5.6-1"
+                                    class="pilcrow">¶</a></p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.6-2">
+                                <pre>
+Hiring: https://example.com/jobs.html
+</pre><a href="#section-2.5.6-2" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="policy">
+                        <section id="section-2.5.7">
+                            <h4 id="name-policy">
+                                <a href="#section-2.5.7" class="section-number selfRef">2.5.7. </a><a
+                                    href="#name-policy" class="section-name selfRef">Policy</a>
+                            </h4>
+                            <p id="section-2.5.7-1">"Policy" 필드는 취약점 공개 정책이 위치한 곳에 대한
+                                링크를 나타냅니다.
+                                이는 보안 연구자가 조직의 취약점 보고 관행을
+                                이해하는 데 도움을 줄 수 있습니다.
+                                이 필드가 웹 URI를 나타내는 경우, [<a href="#RFC7230" class="xref">RFC7230</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2"
+                                        class="relref">2.7.2절</a></span>에 따라
+                                "https://"로 시작해야 <span class="bcp14">MUST</span> 합니다.<a href="#section-2.5.7-1"
+                                    class="pilcrow">¶</a></p>
+                            <p id="section-2.5.7-2">예:<a href="#section-2.5.7-2" class="pilcrow">¶</a></p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.7-3">
+                                <pre>
+Policy: https://example.com/disclosure-policy.html
+</pre><a href="#section-2.5.7-3" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="preflang">
+                        <section id="section-2.5.8">
+                            <h4 id="name-preferred-languages">
+                                <a href="#section-2.5.8" class="section-number selfRef">2.5.8. </a><a
+                                    href="#name-preferred-languages"
+                                    class="section-name selfRef">Preferred-Languages</a>
+                            </h4>
+                            <p id="section-2.5.8-1">"Preferred-Languages" 필드는
+                                보안 보고서를 제출할 때 선호되는 자연어 집합을 나타내는 데
+                                사용할 수 있습니다. 이 집합은 쉼표로 구분된 여러 값을 나열할 수도
+                                <span class="bcp14">MAY</span> 있습니다. 이 필드가 포함되는 경우, 최소 하나의 값이
+                                나열되어야 <span class="bcp14">MUST</span> 합니다. 이 집합 안의 값은
+                                <span>[<a href="#RFC5646" class="xref">RFC5646</a>]</span>에 정의된 언어 태그입니다.
+                                이 필드가 없으면, 보안 연구자는 [<a href="#RFC2277" class="xref">RFC2277</a>]의 <span><a
+                                        href="https://www.rfc-editor.org/rfc/rfc2277#section-4.5"
+                                        class="relref">4.5절</a></span>에 따라
+                                영어가 사용될 언어라고 가정할 수 있습니다.<a href="#section-2.5.8-1" class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.8-2">이들이 나타나는 순서는 우선순위를 나타내지 않습니다.
+                                나열된 언어는 동등한 우선순위를 갖도록 의도됩니다.<a href="#section-2.5.8-2" class="pilcrow">¶</a></p>
+                            <p id="section-2.5.8-3">이 필드는 한 번을 초과하여 나타나서는
+                                <span class="bcp14">MUST NOT</span> 안 됩니다.<a href="#section-2.5.8-3"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <p id="section-2.5.8-4">예(영어, 스페인어 및 프랑스어):<a href="#section-2.5.8-4" class="pilcrow">¶</a>
+                            </p>
+                            <div class="alignLeft art-text artwork" id="section-2.5.8-5">
+                                <pre>
+Preferred-Languages: en, es, fr
+</pre><a href="#section-2.5.8-5" class="pilcrow">¶</a>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+            </div>
+            <div id="example-of-an-unsigned-securitytxt-file">
+                <section id="section-2.6">
+                    <h3 id="name-example-of-an-unsigned-secu">
+                        <a href="#section-2.6" class="section-number selfRef">2.6. </a><a
+                            href="#name-example-of-an-unsigned-secu" class="section-name selfRef">서명되지 않은
+                            "security.txt" 파일의 예</a>
+                    </h3>
+                    <div class="alignLeft art-text artwork" id="section-2.6-1">
+                        <pre>
+# Our security address
+Contact: mailto:security@example.com
+
+# Our OpenPGP key
+Encryption: https://example.com/pgp-key.txt
+
+# Our security policy
+Policy: https://example.com/security-policy.html
+
+# Our security acknowledgments page
+Acknowledgments: https://example.com/hall-of-fame.html
+
+Expires: 2021-12-31T18:37:07z
+</pre><a href="#section-2.6-1" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+            <div id="example-of-a-signed-securitytxt-file">
+                <section id="section-2.7">
+                    <h3 id="name-example-of-a-signed-securit">
+                        <a href="#section-2.7" class="section-number selfRef">2.7. </a><a
+                            href="#name-example-of-a-signed-securit" class="section-name selfRef">서명된
+                            "security.txt" 파일의 예</a>
+                    </h3>
+                    <div class="alignLeft art-text artwork" id="section-2.7-1">
+                        <pre>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+# Canonical URI
+Canonical: https://example.com/.well-known/security.txt
+
+# Our security address
+Contact: mailto:security@example.com
+
+# Our OpenPGP key
+Encryption: https://example.com/pgp-key.txt
+
+# Our security policy
+Policy: https://example.com/security-policy.html
+
+# Our security acknowledgments page
+Acknowledgments: https://example.com/hall-of-fame.html
+
+Expires: 2021-12-31T18:37:07z
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.2
+
+[signature]
+-----END PGP SIGNATURE-----
+</pre><a href="#section-2.7-1" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="location">
+        <section id="section-3">
+            <h2 id="name-location-of-the-securitytxt">
+                <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-location-of-the-securitytxt"
+                    class="section-name selfRef">security.txt 파일의 위치</a>
+            </h2>
+            <p id="section-3-1">웹 기반 서비스의 경우, 조직은
+                도메인 이름 또는 IP 주소에 대해 <span>[<a href="#RFC8615" class="xref">RFC8615</a>]</span>에 따라
+                "security.txt" 파일을 "/.well-known/" 경로 아래에 배치해야 <span class="bcp14">MUST</span> 합니다.
+                예: https://example.com/.well-known/security.txt.
+                레거시 호환성을 위해 "security.txt" 파일은 최상위 경로에 배치되거나,
+                "/.well-known/" 경로 아래의 "security.txt" 파일로
+                리디렉션될 수도 있습니다([<a href="#RFC7231" class="xref">RFC7231</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc7231#section-6.4" class="relref">6.4절</a></span>에 따름).
+                "security.txt" 파일이
+                두 위치 모두에 존재하는 경우, "/.well-known/" 경로에 있는 파일을
+                사용해야 <span class="bcp14">MUST</span> 합니다.<a href="#section-3-1" class="pilcrow">¶</a></p>
+            <p id="section-3-2">파일은 HTTP 1.0 또는 그 이상의 버전을 통해 접근되어야
+                <span class="bcp14">MUST</span> 하며, 파일 접근은 [<a href="#RFC7230" class="xref">RFC7230</a>]의
+                <span><a href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2" class="relref">2.7.2절</a></span>에
+                따라
+                "https" 스킴을 사용해야 <span class="bcp14">MUST</span> 합니다.
+                이 파일은 [<a href="#RFC2046" class="xref">RFC2046</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc2046#section-4.1.3" class="relref">4.1.3절</a></span>에 따라
+                기본 charset 매개변수가 "utf-8"로 설정된 "text/plain" Content-Type을
+                가져야 <span class="bcp14">MUST</span> 합니다.<a href="#section-3-2" class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-3">"security.txt" 파일과 그러한 파일 안에 표시된 리소스를 가져오는 과정에서
+                리디렉션이 발생할 수 있습니다([<a href="#RFC7231" class="xref">RFC7231</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc7231#section-6.4" class="relref">6.4절</a></span>에 따름).
+                연구자는 이러한 리디렉션이 악의적이지 않거나 공격자가 제어하는 리소스를
+                가리키지 않는지 확인하기 위해 추가 분석(<a href="#redirects" class="xref">5.2절</a>에 따름)을
+                수행해야 합니다.<a href="#section-3-3" class="pilcrow">¶</a></p>
+            <div id="scope-of-the-file">
+                <section id="section-3.1">
+                    <h3 id="name-scope-of-the-file">
+                        <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-scope-of-the-file"
+                            class="section-name selfRef">파일의 범위</a>
+                    </h3>
+                    <p id="section-3.1-1">"security.txt" 파일은 이를 가져오는 데 사용된 URI의
+                        도메인 또는 IP 주소에만 적용되어야 <span class="bcp14">MUST</span> 하며, 그 하위 도메인이나
+                        상위 도메인에는 적용되지 않습니다.
+                        "security.txt" 파일은 해당 파일을 게시한 조직이 제공하는 제품과 서비스에도
+                        적용될 수 <span class="bcp14">MAY</span> 있습니다.<a href="#section-3.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-3.1-2"><a href="#motivation" class="xref">1.1절</a>에 따라, 이 명세는
+                        취약점 대응을 위한 것입니다.
+                        구현자가 이를 사고 대응에 사용하려는 경우, <a href="#compromise" class="xref">5.1절</a>에서
+                        논의하는 추가 보안 고려 사항을 알고 있어야 합니다.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+                    <p id="section-3.1-3">조직은 취약점 공개 프로세스의 범위와 세부 사항에 대한
+                        추가 세부 정보를 제공하기 위해
+                        <a href="#policy" class="xref">2.5.7절</a>에 따른 policy 지시자를 사용해야
+                        <span class="bcp14">SHOULD</span> 합니다.<a href="#section-3.1-3" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-3.1-4">아래에 몇 가지 예가 나옵니다:<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+                    <div class="alignLeft art-text artwork" id="section-3.1-5">
+                        <pre>
+# The following only applies to example.com.
+https://example.com/.well-known/security.txt
+
+# This only applies to subdomain.example.com.
+https://subdomain.example.com/.well-known/security.txt
+
+# This security.txt file applies to IPv4 address of 192.0.2.0.
+https://192.0.2.0/.well-known/security.txt
+
+# This security.txt file applies to IPv6 address of 2001:db8:8:4::2.
+https://[2001:db8:8:4::2]/.well-known/security.txt
+</pre><a href="#section-3.1-5" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="abnf">
+        <section id="section-4">
+            <h2 id="name-file-format-description-and">
+                <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-file-format-description-and"
+                    class="section-name selfRef">파일 형식 설명 및 ABNF 문법</a>
+            </h2>
+            <p id="section-4-1" class="keepWithNext">"security.txt" 파일의 파일 형식은
+                [<a href="#RFC2046" class="xref">RFC2046</a>]의 <span><a
+                        href="https://www.rfc-editor.org/rfc/rfc2046#section-4.1.3" class="relref">4.1.3절</a></span>에
+                정의된 일반 텍스트(MIME 유형 "text/plain")여야 <span class="bcp14">MUST</span> 하며, Net-Unicode 형식
+                <span>[<a href="#RFC5198" class="xref">RFC5198</a>]</span>의 UTF-8 <span>[<a href="#RFC3629"
+                        class="xref">RFC3629</a>]</span>을
+                사용하여 인코딩되어야 <span class="bcp14">MUST</span> 합니다.<a href="#section-4-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-4-2">이 파일의 형식은 아래 ABNF 정의를 따라야
+                <span class="bcp14">MUST</span> 합니다(이는
+                <span>[<a href="#RFC5234" class="xref">RFC5234</a>]</span>의 핵심 ABNF 규칙을 통합하고
+                <span>[<a href="#RFC7405" class="xref">RFC7405</a>]</span>의 대소문자 구분 문자열 지원을 사용합니다).<a
+                    href="#section-4-2" class="pilcrow">¶</a>
+            </p>
+            <div id="section-4-3">
+                <pre class="lang-abnf sourcecode">
+body             =  signed / unsigned
+
+unsigned       =  *line (contact-field eol) ; one or more required
+                  *line (expires-field eol) ; exactly one required
+                  *line [lang-field eol] *line ; exactly one optional
+                  ; order of fields within the file is not important
+                  ; except that if contact-field appears more
+                  ; than once, the order of those indicates
+                  ; priority (see Section 3.5.3)
+
+; signed is the production that should match the OpenPGP clearsigned
+; document
+signed           =  cleartext-header
+                    1*(hash-header)
+                    CRLF
+                    cleartext
+                    signature
+
+cleartext-header =  %s"-----BEGIN PGP SIGNED MESSAGE-----" CRLF
+
+hash-header      =  %s"Hash: " hash-alg *("," hash-alg) CRLF
+
+hash-alg         =  token
+                      ; imported from RFC 2045; see RFC 4880 Section
+                      ; 10.3.3 for a pointer to the registry of
+                      ; valid values
+
+;cleartext       =  1*( UTF8-octets [CR] LF)
+                      ; dash-escaped per RFC 4880 Section 7.1
+
+cleartext        =  *((line-dash / line-from / line-nodash) [CR] LF)
+
+line-dash        =  ("- ") "-" *UTF8-char-not-cr
+                       ; MUST include initial "- "
+
+line-from        =  ["- "] "From " *UTF8-char-not-cr
+                      ; SHOULD include initial "- "
+
+line-nodash      =  ["- "] *UTF8-char-not-cr
+                      ; MAY include initial "- "
+
+UTF8-char-not-dash =  UTF8-1-not-dash / UTF8-2 / UTF8-3 / UTF8-4
+UTF8-1-not-dash  =  %x00-2C / %x2E-7F
+UTF8-char-not-cr =  UTF8-1-not-cr / UTF8-2 / UTF8-3 / UTF8-4
+UTF8-1-not-cr    =  %x00-0C / %x0E-7F
+
+; UTF8 rules from RFC 3629
+UTF8-octets      =  *( UTF8-char )
+UTF8-char        =  UTF8-1 / UTF8-2 / UTF8-3 / UTF8-4
+UTF8-1           =  %x00-7F
+UTF8-2           =  %xC2-DF UTF8-tail
+UTF8-3           =  %xE0 %xA0-BF UTF8-tail / %xE1-EC 2( UTF8-tail ) /
+                    %xED %x80-9F UTF8-tail / %xEE-EF 2( UTF8-tail )
+UTF8-4           =  %xF0 %x90-BF 2( UTF8-tail ) /
+                    %xF1-F3 3( UTF8-tail ) /
+                    %xF4 %x80-8F 2( UTF8-tail )
+UTF8-tail        =  %x80-BF
+
+signature        =  armor-header
+                    armor-keys
+                    CRLF
+                    signature-data
+                    armor-tail
+
+armor-header     =  %s"-----BEGIN PGP SIGNATURE-----" CRLF
+
+armor-keys       =  *(token ": " *( VCHAR / WSP ) CRLF)
+                      ; Armor Header Keys from RFC 4880
+
+armor-tail       =  %s"-----END PGP SIGNATURE-----" CRLF
+
+signature-data   =  1*(1*(ALPHA / DIGIT / "=" / "+" / "/") CRLF)
+                      ; base64; see RFC 4648
+                      ; includes RFC 4880 checksum
+
+line             =  [ (field / comment) ] eol
+
+eol              =  *WSP [CR] LF
+
+field            =  ; optional fields
+                    ack-field /
+                    can-field /
+                    contact-field / ; optional repeated instances
+                    encryption-field /
+                    hiring-field /
+                    policy-field /
+                    ext-field
+
+fs               =  ":"
+
+comment          =  "#" *(WSP / VCHAR / %x80-FFFFF)
+
+ack-field        =  "Acknowledgments" fs SP uri
+
+can-field        =  "Canonical" fs SP uri
+
+contact-field    =  "Contact" fs SP uri
+
+expires-field    =  "Expires" fs SP date-time
+
+encryption-field =  "Encryption" fs SP uri
+
+hiring-field     =  "Hiring" fs SP uri
+
+lang-field       =  "Preferred-Languages" fs SP lang-values
+
+policy-field     =  "Policy" fs SP uri
+
+date-time        =  &lt; imported from Section 5.6 of [RFC3339] &gt;
+
+lang-tag         =  &lt; Language-Tag from Section 2.1 of [RFC5646] &gt;
+
+lang-values      =  lang-tag *(*WSP "," *WSP lang-tag)
+
+uri              =  &lt; URI as per Section 3 of [RFC3986] &gt;
+
+ext-field        =  field-name fs SP unstructured
+
+field-name       =  &lt; imported from Section 3.6.8 of [RFC5322] &gt;
+
+unstructured     =  &lt; imported from Section 3.2.5 of [RFC5322] &gt;
+
+token            =  &lt; imported from Section 5.1 of [RFC2045] &gt;
+
+ALPHA            =  %x41-5A / %x61-7A   ; A-Z / a-z
+
+BIT              =  "0" / "1"
+
+CHAR             =  %x01-7F
+                      ; any 7-bit US-ASCII character,
+                      ;  excluding NUL
+
+CR               =  %x0D
+                      ; carriage return
+
+CRLF             =  CR LF
+                      ; Internet standard newline
+
+CTL              =  %x00-1F / %x7F
+                      ; controls
+
+DIGIT            =  %x30-39
+                      ; 0-9
+
+DQUOTE           =  %x22
+                      ; " (Double Quote)
+
+HEXDIG           =  DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+
+HTAB             =  %x09
+                      ; horizontal tab
+
+LF               =  %x0A
+                      ; linefeed
+
+LWSP             =  *(WSP / CRLF WSP)
+                      ; Use of this linear-white-space rule
+                      ;  permits lines containing only white
+                      ;  space that are no longer legal in
+                      ;  mail headers and have caused
+                      ;  interoperability problems in other
+                      ;  contexts.
+                      ; Do not use when defining mail
+                      ;  headers and use with caution in
+                      ;  other contexts.
+
+OCTET            =  %x00-FF
+                      ; 8 bits of data
+
+SP               =  %x20
+
+VCHAR            =  %x21-7E
+                      ; visible (printing) characters
+
+WSP              =  SP / HTAB
+                      ; white space
+</pre><a href="#section-4-3" class="pilcrow">¶</a>
+            </div>
+            <p id="section-4-4">"ext-field"는 확장 필드를 의미하며, 이는 <a href="#extensibility" class="xref">2.4절</a>에서 논의됩니다.<a
+                    href="#section-4-4" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="security-considerations">
+        <section id="section-5">
+            <h2 id="name-security-considerations">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations"
+                    class="section-name selfRef">보안 고려 사항</a>
+            </h2>
+            <p id="section-5-1">URI와 well-known 리소스의 사용으로 인해,
+                아래에 요약된 고려 사항에 더해
+                <span>[<a href="#RFC3986" class="xref">RFC3986</a>]</span> 및 <span>[<a href="#RFC8615"
+                        class="xref">RFC8615</a>]</span>의 보안 고려 사항이 여기에 적용됩니다.<a href="#section-5-1"
+                    class="pilcrow">¶</a>
+            </p>
+            <div id="compromise">
+                <section id="section-5.1">
+                    <h3 id="name-compromised-files-and-incid">
+                        <a href="#section-5.1" class="section-number selfRef">5.1. </a><a
+                            href="#name-compromised-files-and-incid" class="section-name selfRef">침해된 파일 및
+                            사고 대응</a>
+                    </h3>
+                    <p id="section-5.1-1">웹사이트를 침해한 공격자는
+                        "security.txt" 파일도 침해하거나 자신의 사이트로 리디렉션을 설정할 수 있습니다.
+                        이로 인해 보안 보고서가 조직에 수신되지 않거나
+                        공격자에게 전송될 수 있습니다.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-5.1-2">이를 방지하기 위해, 조직은 "Canonical" 필드를 사용하여
+                        파일의 위치를 나타내고(<a href="#canonical" class="xref">2.5.2절</a>에 따름),
+                        "security.txt" 파일에 디지털 서명하며(<a href="#signature" class="xref">2.3절</a>에 따름),
+                        변조를 탐지하기 위해 파일과 참조된 리소스를 정기적으로 모니터링해야 합니다.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+                    <p id="section-5.1-3">보안 연구자는 "security.txt" 파일을 사용하기 전에
+                        디지털 서명을 검증하고 이용 가능한 과거 기록을 확인하는 것을 포함하여
+                        이를 검증해야 합니다. "security.txt" 파일이 의심스럽거나 침해된 것으로 보이면,
+                        사용해서는 안 됩니다.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+                    <p id="section-5.1-4">권장되지는 않지만, 구현자는 "security.txt" 파일에 게시된 정보를
+                        사고 대응에 사용하도록 선택할 수 있습니다. 그러한 경우,
+                        해당 정보가 공격자에 의해 침해되었을 수 있으므로 이를 신뢰하기 전에
+                        극도의 주의를 기울여야 합니다. 연구자는 Pretty Good Privacy(PGP)
+                        서명의 대역 외 검증, DNSSEC 기반 접근 방식 등을 포함하여
+                        그러한 데이터를 검증하기 위한 추가 방법을 사용해야 합니다.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="redirects">
+                <section id="section-5.2">
+                    <h3 id="name-redirects">
+                        <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-redirects"
+                            class="section-name selfRef">리디렉션</a>
+                    </h3>
+                    <p id="section-5.2-1">파일과 파일 안에서 참조된 리소스를 가져올 때, 연구자는
+                        모든 리디렉션을 기록해야 합니다. 리디렉션은 공격자가 제어하는 다른 도메인 또는 IP 주소로
+                        이어질 수 있기 때문입니다.
+                        파일 안에 포함된 정보를 사용하기 전에 그러한 리디렉션을 추가로
+                        검사하는 것이 권장됩니다.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="stale">
+                <section id="section-5.3">
+                    <h3 id="name-incorrect-or-stale-informat">
+                        <a href="#section-5.3" class="section-number selfRef">5.3. </a><a
+                            href="#name-incorrect-or-stale-informat" class="section-name selfRef">부정확하거나 오래된
+                            정보</a>
+                    </h3>
+                    <p id="section-5.3-1">"security.txt" 파일에서 참조된 정보와 리소스가 부정확하거나
+                        최신 상태로 유지되지 않으면, 보안 보고서가 조직에 수신되지 않거나
+                        잘못된 연락처로 전송되어, 가능한 보안 문제가 제3자에게 노출될 수 있습니다.
+                        오래된 정보를 포함한 "security.txt" 파일을 갖는 것보다
+                        "security.txt" 파일이 없는 것이 더 나을 수 있습니다. 조직은
+                        <a href="#expires" class="xref">2.5.5절</a>을 참조하여 "Expires" 필드를 사용해
+                        파일의 데이터가 더 이상 유효하지 않은 시점을 연구자에게 알려야 합니다.<a href="#section-5.3-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-5.3-2">조직은 이 파일과 웹 페이지, 이메일 주소, 전화번호 같은 참조된
+                        모든 리소스의 정보가 최신 상태로 유지되고, 접근 가능하며, 조직이 제어하고,
+                        안전하게 유지되도록 해야 합니다.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="intentionally-malformed-files-resources-and-reports">
+                <section id="section-5.4">
+                    <h3 id="name-intentionally-malformed-fil">
+                        <a href="#section-5.4" class="section-number selfRef">5.4. </a><a
+                            href="#name-intentionally-malformed-fil" class="section-name selfRef">의도적으로 잘못 구성된
+                            파일, 리소스 및 보고서</a>
+                    </h3>
+                    <p id="section-5.4-1">침해되었거나 악의적인 사이트가 구문 분석 코드의 약점을 발견하거나
+                        악용하려는 시도로 비정상적으로 큰 파일 또는 그 밖에 잘못 구성된 파일을
+                        만들 수 있습니다.
+
+                        연구자는 그러한 코드가
+                        크거나 잘못 구성된 파일과 필드에 대해 견고한지 확인해야 하며,
+                        32KB보다 큰 파일, 2,048자보다 긴 필드를 가진 파일 또는 1,000줄을 초과하는 파일을
+                        구문 분석하지 않도록 선택할 수 있습니다. <a href="#abnf" class="xref">4절</a>에 정의된 ABNF 문법도 이러한 파일을 검증하는
+                        방법으로 사용할 수 있습니다.<a href="#section-5.4-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-5.4-2">동일한 우려 사항은 "security.txt" 파일 안에서 참조된
+                        다른 모든 리소스와, 이 파일의 게시 결과로 수신되는 모든 보안 보고서에도 적용됩니다.
+                        이러한 리소스와 보고서는 적대적이거나, 잘못 구성되었거나, 악의적일 수 있습니다.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="no-implied-permission-for-testing">
+                <section id="section-5.5">
+                    <h3 id="name-no-implied-permission-for-t">
+                        <a href="#section-5.5" class="section-number selfRef">5.5. </a><a
+                            href="#name-no-implied-permission-for-t" class="section-name selfRef">테스트에 대한 묵시적 권한
+                            없음</a>
+                    </h3>
+                    <p id="section-5.5-1">"security.txt" 파일의 존재는 연구자에게
+                        해당 파일이 게시된 도메인 또는 IP 주소, 또는 파일을 게시한 조직이 제공하는
+                        제품 및 서비스에 대해 보안 테스트를 수행할 권한을 제공하는 것으로
+                        해석될 수 있습니다.
+                        이로 인해 연구자에 의한 조직 대상 테스트가 증가할 수 있습니다. 반대로
+                        "security.txt" 파일을 게시하지 않기로 한 결정은
+                        해당 웹사이트를 운영하는 조직이 연구자에게
+                        특정 사이트 또는 프로젝트에 대한 테스트 권한이 거부되었음을 알리는 방법으로
+                        해석될 수 있습니다. 이로 인해 해당 조직에 보안 문제를 보고하는
+                        연구자에게 반발이 발생할 수 있습니다.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+                    <p id="section-5.5-2">따라서 연구자는 "security.txt" 파일의 존재 또는 부재가
+                        보안 테스트 권한을 부여하거나 거부한다고 가정해서는 안 됩니다.
+                        그러한 권한은 회사의 취약점 공개 정책(<a href="#policy" class="xref">2.5.7절</a>에 따름) 또는
+                        새 필드(<a href="#extensibility" class="xref">2.4절</a>에 따름)에 표시될 수 있습니다.<a href="#section-5.5-2"
+                            class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="multi-user-environments">
+                <section id="section-5.6">
+                    <h3 id="name-multi-user-environments">
+                        <a href="#section-5.6" class="section-number selfRef">5.6. </a><a
+                            href="#name-multi-user-environments" class="section-name selfRef">다중 사용자
+                            환경</a>
+                    </h3>
+                    <p id="section-5.6-1">다중 사용자/다중 테넌트 환경에서는 사용자가
+                        "security.txt" 파일의 위치를 장악할 수 있을 수 있습니다. 조직은
+                        제3자가 "security.txt" 및 "/.well-known/security.txt" 이름으로 페이지를 만들 수 없도록
+                        루트에서 "security.txt" 네임스페이스를 예약해야 합니다.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="protecting-data-in-transit">
+                <section id="section-5.7">
+                    <h3 id="name-protecting-data-in-transit">
+                        <a href="#section-5.7" class="section-number selfRef">5.7. </a><a
+                            href="#name-protecting-data-in-transit" class="section-name selfRef">전송 중 데이터
+                            보호</a>
+                    </h3>
+                    <p id="section-5.7-1">"security.txt" 파일이 전송 중 변조되는 것을 막기 위해,
+                        구현자는 파일 자체를 제공할 때와 그 안에서 참조된 모든 웹 URI를 가져올 때
+                        [<a href="#RFC7230" class="xref">RFC7230</a>]의 <span><a
+                                href="https://www.rfc-editor.org/rfc/rfc7230#section-2.7.2"
+                                class="relref">2.7.2절</a></span>에 따라
+                        HTTPS를 사용해야 <span class="bcp14">MUST</span> 합니다(이 명세에서 달리 명시된 경우 제외).
+                        TLS 핸드셰이크의 일부로, 연구자는 <span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span> 및
+                        다음 고려 사항에 따라 제공된 X.509 인증서를 검증해야 합니다:<a href="#section-5.7-1" class="pilcrow">¶</a></p>
+                    <ul class="normal">
+                        <li class="normal" id="section-5.7-2.1">일치는 DNS-ID 식별자에 대해서만
+                            수행됩니다.<a href="#section-5.7-2.1" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal" id="section-5.7-2.2">서버 인증서의 DNS 도메인 이름은
+                            식별자 안에서 가장 왼쪽 레이블 전체로 와일드카드 문자 '*'를
+                            포함할 수 <span class="bcp14">MAY</span> 있습니다.<a href="#section-5.7-2.2" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <p id="section-5.7-3">인증서는 온라인 인증서 상태 프로토콜(OCSP)
+                        <span>[<a href="#RFC6960" class="xref">RFC6960</a>]</span>, 인증서 해지 목록(CRL) 또는
+                        유사한 메커니즘을 통해 해지 여부도 확인될 수 있습니다.<a href="#section-5.7-3" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-5.7-4">"security.txt" 파일이 HTTPS를 통해 제공될 수 없는 경우(예: localhost) 또는
+                        유효하지 않은 인증서로 제공되는 경우, 내용이 전송 중 수정되었을 수 있으므로
+                        추가적인 사람의 검증이 권장됩니다.<a href="#section-5.7-4" class="pilcrow">¶</a></p>
+                    <p id="section-5.7-5">추가 보호 계층으로, 조직이
+                        OpenPGP로 "security.txt" 파일에 디지털 서명하는 것도 권장됩니다(<a href="#signature" class="xref">2.3절</a>에 따름).
+                        또한 보안 보고서가 전송 중 변조되거나 관찰되는 것을 막기 위해,
+                        HTTPS가 보고서 제출에 사용되지 않는 한, 조직은 암호화 키를 지정해야 합니다(<a href="#encryption" class="xref">2.5.4절</a>에
+                        따름).<a href="#section-5.7-5" class="pilcrow">¶</a></p>
+                    <p id="section-5.7-6">그러나 그러한 키의 유효성을 판단하는 것은
+                        이 명세의 범위를 벗어납니다. 보안 연구자는 이를 검증하기 위한
+                        다른 안전한 수단을 마련해야 합니다.<a href="#section-5.7-6" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="spam-and-spurious-reports">
+                <section id="section-5.8">
+                    <h3 id="name-spam-and-spurious-reports">
+                        <a href="#section-5.8" class="section-number selfRef">5.8. </a><a
+                            href="#name-spam-and-spurious-reports" class="section-name selfRef">스팸 및 허위
+                            보고서</a>
+                    </h3>
+                    <p id="section-5.8-1"><span>[<a href="#RFC2142" class="xref">RFC2142</a>]</span>의 우려 사항과 유사하게,
+                        조직이 "security.txt" 파일을 게시하면 스팸 보고서를 통한
+                        서비스 거부 공격이 더 쉬워질 수 있습니다. 또한 자동화된 방식으로
+                        보고서가 전송되거나, 사람의 분석 없이 자동 스캔의 결과로 보고서가
+                        전송될 가능성이 높아집니다. 공격자는 이 파일을 사용하여 관련 없는
+                        제3자의 리소스 및/또는 연락 정보를 나열함으로써 이들을 스팸 대상으로
+                        삼을 수도 있습니다.<a href="#section-5.8-1" class="pilcrow">¶</a></p>
+                    <p id="section-5.8-2">조직은 이 파일을 게시할 때의 장점과,
+                        보안 보고서를 분석하는 데 필요한 리소스 증가 및 가능한 단점을
+                        비교 검토해야 합니다.<a href="#section-5.8-2" class="pilcrow">¶</a></p>
+                    <p id="section-5.8-3">보안 연구자는 자동화된 방식으로 보고서를 제출하거나 자동 스캔으로 인한
+                        보고서를 제출하기 전에 "security.txt" 파일 안의 모든 정보를 검토해야 합니다.<a href="#section-5.8-3" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="iana-considerations">
+        <section id="section-6">
+            <h2 id="name-iana-considerations">
+                <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-considerations"
+                    class="section-name selfRef">IANA 고려 사항</a>
+            </h2>
+            <p id="section-6-1">구현자는 "security.txt" 파일 안에서 참조된 모든 리소스가
+                IANA에 등록되어 있지 않는 한([<a href="#RFC8615" class="xref">RFC8615</a>]에 따름)
+                Well-Known URI 네임스페이스를 가리켜서는 <span class="bcp14">MUST NOT</span> 안 됨을
+                알고 있어야 합니다.<a href="#section-6-1" class="pilcrow">¶</a></p>
+            <div id="well-known-uris-registry">
+                <section id="section-6.1">
+                    <h3 id="name-well-known-uris-registry">
+                        <a href="#section-6.1" class="section-number selfRef">6.1. </a><a
+                            href="#name-well-known-uris-registry" class="section-name selfRef">Well-Known URI
+                            레지스트리</a>
+                    </h3>
+                    <p id="section-6.1-1">IANA는 <span>[<a href="#RFC8615" class="xref">RFC8615</a>]</span>의
+                        템플릿을 사용하여 다음 추가 값으로 "Well-Known URIs" 레지스트리를 업데이트했습니다:<a href="#section-6.1-1"
+                            class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.1-2">
+                        <dt id="section-6.1-2.1">URI 접미사:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.1-2.2">security.txt<a href="#section-6.1-2.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.1-2.3">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.1-2.4">IETF<a href="#section-6.1-2.4"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.1-2.5">명세 문서:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.1-2.6">RFC 9116<a href="#section-6.1-2.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.1-2.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.1-2.8">영구<a href="#section-6.1-2.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+            <div id="registry">
+                <section id="section-6.2">
+                    <h3 id="name-registry-for-securitytxt-fi">
+                        <a href="#section-6.2" class="section-number selfRef">6.2. </a><a
+                            href="#name-registry-for-securitytxt-fi" class="section-name selfRef">security.txt
+                            필드 레지스트리</a>
+                    </h3>
+                    <p id="section-6.2-1">IANA는 <span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>에 따라
+                        "security.txt Fields" 레지스트리를 만들었습니다. 이 레지스트리는
+                        이 명세에서 정의한 "security.txt" 파일에서 사용할 필드를 포함합니다.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.2-2">새 등록 또는 업데이트는
+                        <span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>의
+                        <a href="https://www.rfc-editor.org/rfc/rfc8126#section-4.5" class="relref">4.5절</a> 및 <a
+                            href="https://www.rfc-editor.org/rfc/rfc8126#section-5" class="relref">5절</a>에 설명된
+                        "Expert Review" 지침에 따라 게시되어야
+                        <span class="bcp14">MUST</span> 합니다. 이렇게 등록된 모든 새 필드는
+                        이 명세의 새 버전이 게시되지 않는 한 이 명세에서 선택 사항으로
+                        간주됩니다.<a href="#section-6.2-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-6.2-3">지정 전문가들은 제안된 등록 또는 업데이트가
+                        이 형식을 사용하는 조직과 연구자에게 가치를 제공하는지, 그리고
+                        <span>[<a href="#ISO.29147.2018" class="xref">ISO.29147.2018</a>]</span> 및 <span>[<a
+                                href="#CERT.CVD" class="xref">CERT.CVD</a>]</span> 같은 업계에서 받아들여진 취약점 공개 프로세스의
+                        맥락에서 타당한지 판단해야 합니다.<a href="#section-6.2-3" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-6.2-4">새 등록 및 업데이트는 다음 정보를 포함해야
+                        <span class="bcp14">MUST</span> 합니다:<a href="#section-6.2-4" class="pilcrow">¶</a>
+                    </p>
+                    <ol start="1" type="1" class="normal type-1" id="section-6.2-5">
+                        <li id="section-6.2-5.1">등록 또는 업데이트되는 필드의 이름<a href="#section-6.2-5.1" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-6.2-5.2">필드에 대한 짧은 설명<a href="#section-6.2-5.2" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-6.2-5.3">필드가 한 번을 초과하여 나타날 수 있는지 여부<a href="#section-6.2-5.3"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-6.2-5.4">
+                            <p id="section-6.2-5.4.1"> 새 또는 업데이트된 상태. 이는 다음 중 하나여야
+                                <span class="bcp14">MUST</span> 합니다:<a href="#section-6.2-5.4.1" class="pilcrow">¶</a>
+                            </p>
+                            <span class="break"></span>
+                            <dl class="dlCompact dlParallel" id="section-6.2-5.4.2">
+                                <dt id="section-6.2-5.4.2.1">current:</dt>
+                                <dd style="margin-left: 1.5em" id="section-6.2-5.4.2.2">필드가 현재 사용 중입니다.<a
+                                        href="#section-6.2-5.4.2.2" class="pilcrow">¶</a>
+                                </dd>
+                                <dd class="break"></dd>
+                                <dt id="section-6.2-5.4.2.3">deprecated:</dt>
+                                <dd style="margin-left: 1.5em" id="section-6.2-5.4.2.4">필드가 사용된 적은 있지만,
+                                    새 사용은 권장되지 않습니다.<a href="#section-6.2-5.4.2.4" class="pilcrow">¶</a>
+                                </dd>
+                                <dd class="break"></dd>
+                                <dt id="section-6.2-5.4.2.5">historic:</dt>
+                                <dd style="margin-left: 1.5em" id="section-6.2-5.4.2.6">필드가 더 이상 현재
+                                    사용되지 않습니다.<a href="#section-6.2-5.4.2.6" class="pilcrow">¶</a>
+                                </dd>
+                                <dd class="break"></dd>
+                            </dl>
+                        </li>
+                        <li id="section-6.2-5.5">변경 관리자<a href="#section-6.2-5.5" class="pilcrow">¶</a>
+                        </li>
+                        <li id="section-6.2-5.6">필드의 명세가 게시된 문서(사용 가능한 경우)<a href="#section-6.2-5.6"
+                                class="pilcrow">¶</a>
+                        </li>
+                    </ol>
+                    <p id="section-6.2-6">기존 등록은 이 문서의 향후 업데이트에 의해 적절하게
+                        historic 또는 deprecated로 표시될 수 있습니다.<a href="#section-6.2-6" class="pilcrow">¶</a></p>
+                    <p id="section-6.2-7">초기 레지스트리에는 다음 값이 포함됩니다:<a href="#section-6.2-7" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-8">
+                        <dt id="section-6.2-8.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-8.2">Acknowledgments<a href="#section-6.2-8.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-8.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-8.4">보안 연구자가 인정받는 페이지로 연결되는 링크<a
+                                href="#section-6.2-8.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-8.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-8.6">예<a href="#section-6.2-8.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-8.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-8.8">current<a href="#section-6.2-8.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-8.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-8.10">IETF<a href="#section-6.2-8.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-8.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-8.12">RFC 9116<a href="#section-6.2-8.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-9">
+                        <dt id="section-6.2-9.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-9.2">Canonical<a href="#section-6.2-9.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-9.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-9.4">이 파일의 표준 URI<a href="#section-6.2-9.4"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-9.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-9.6">예<a href="#section-6.2-9.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-9.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-9.8">current<a href="#section-6.2-9.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-9.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-9.10">IETF<a href="#section-6.2-9.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-9.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-9.12">RFC 9116<a href="#section-6.2-9.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-10">
+                        <dt id="section-6.2-10.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-10.2">Contact<a href="#section-6.2-10.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-10.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-10.4">취약점 보고에 사용할 연락 정보<a
+                                href="#section-6.2-10.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-10.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-10.6">예<a href="#section-6.2-10.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-10.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-10.8">current<a href="#section-6.2-10.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-10.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-10.10">IETF<a href="#section-6.2-10.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-10.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-10.12">RFC 9116<a href="#section-6.2-10.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-11">
+                        <dt id="section-6.2-11.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-11.2">Expires<a href="#section-6.2-11.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-11.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-11.4">이 파일이 오래된 것으로 간주되는 날짜와 시간<a
+                                href="#section-6.2-11.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-11.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-11.6">아니요<a href="#section-6.2-11.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-11.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-11.8">current<a href="#section-6.2-11.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-11.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-11.10">IETF<a href="#section-6.2-11.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-11.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-11.12">RFC 9116<a href="#section-6.2-11.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-12">
+                        <dt id="section-6.2-12.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-12.2">Encryption<a href="#section-6.2-12.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-12.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-12.4">암호화된 통신에 사용할 키로 연결되는 링크<a
+                                href="#section-6.2-12.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-12.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-12.6">예<a href="#section-6.2-12.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-12.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-12.8">current<a href="#section-6.2-12.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-12.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-12.10">IETF<a href="#section-6.2-12.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-12.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-12.12">RFC 9116<a href="#section-6.2-12.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-13">
+                        <dt id="section-6.2-13.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-13.2">Hiring<a href="#section-6.2-13.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-13.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-13.4">벤더의 보안 관련 채용 직무로 연결되는 링크<a
+                                href="#section-6.2-13.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-13.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-13.6">예<a href="#section-6.2-13.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-13.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-13.8">current<a href="#section-6.2-13.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-13.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-13.10">IETF<a href="#section-6.2-13.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-13.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-13.12">RFC 9116<a href="#section-6.2-13.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-14">
+                        <dt id="section-6.2-14.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-14.2">Policy<a href="#section-6.2-14.2"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-14.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-14.4">보안 정책 페이지로 연결되는 링크<a
+                                href="#section-6.2-14.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-14.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-14.6">예<a href="#section-6.2-14.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-14.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-14.8">current<a href="#section-6.2-14.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-14.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-14.10">IETF<a href="#section-6.2-14.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-14.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-14.12">RFC 9116<a href="#section-6.2-14.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <span class="break"></span>
+                    <dl class="dlCompact dlParallel" id="section-6.2-15">
+                        <dt id="section-6.2-15.1">필드 이름:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-15.2">Preferred-Languages<a
+                                href="#section-6.2-15.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-15.3">설명:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-15.4">보안 보고서에 선호되는 언어 목록<a
+                                href="#section-6.2-15.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-15.5">여러 번 나타남:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-15.6">아니요<a href="#section-6.2-15.6"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-15.7">상태:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-15.8">current<a href="#section-6.2-15.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-15.9">변경 관리자:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-15.10">IETF<a href="#section-6.2-15.10"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-6.2-15.11">참조:</dt>
+                        <dd style="margin-left: 1.5em" id="section-6.2-15.12">RFC 9116<a href="#section-6.2-15.12"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+        </section>
+    </div>
+    <section id="section-7">
+        <h2 id="name-references">
+            <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-references"
+                class="section-name selfRef">참고 문헌</a>
+        </h2>
+        <section id="section-7.1">
+            <h3 id="name-normative-references">
+                <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-normative-references"
+                    class="section-name selfRef">규범 참고 문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="RFC2046">[RFC2046]</dt>
+                <dd>
+                    <span class="refAuthor">Freed, N.</span> and <span class="refAuthor">N. Borenstein</span>, <span
+                        class="refTitle">"Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types"</span>,
+                    <span class="seriesInfo">RFC 2046</span>, <span class="seriesInfo">DOI 10.17487/RFC2046</span>,
+                    <time datetime="1996-11" class="refDate">1996년 11월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2046">https://www.rfc-editor.org/info/rfc2046</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2119">[RFC2119]</dt>
+                <dd>
+                    <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to
+                        Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span
+                        class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time
+                        datetime="1997-03" class="refDate">1997년 3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2142">[RFC2142]</dt>
+                <dd>
+                    <span class="refAuthor">Crocker, D.</span>, <span class="refTitle">"Mailbox Names for Common
+                        Services, Roles and Functions"</span>, <span class="seriesInfo">RFC 2142</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC2142</span>, <time datetime="1997-05" class="refDate">1997년
+                        5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2142">https://www.rfc-editor.org/info/rfc2142</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2277">[RFC2277]</dt>
+                <dd>
+                    <span class="refAuthor">Alvestrand, H.</span>, <span class="refTitle">"IETF Policy on Character Sets
+                        and Languages"</span>, <span class="seriesInfo">BCP 18</span>, <span class="seriesInfo">RFC
+                        2277</span>, <span class="seriesInfo">DOI 10.17487/RFC2277</span>, <time datetime="1998-01"
+                        class="refDate">1998년 1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2277">https://www.rfc-editor.org/info/rfc2277</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3339">[RFC3339]</dt>
+                <dd>
+                    <span class="refAuthor">Klyne, G.</span> and <span class="refAuthor">C. Newman</span>, <span
+                        class="refTitle">"Date and Time on the Internet: Timestamps"</span>, <span
+                        class="seriesInfo">RFC 3339</span>, <span class="seriesInfo">DOI 10.17487/RFC3339</span>, <time
+                        datetime="2002-07" class="refDate">2002년 7월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3339">https://www.rfc-editor.org/info/rfc3339</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3629">[RFC3629]</dt>
+                <dd>
+                    <span class="refAuthor">Yergeau, F.</span>, <span class="refTitle">"UTF-8, a transformation format
+                        of ISO 10646"</span>, <span class="seriesInfo">STD 63</span>, <span class="seriesInfo">RFC
+                        3629</span>, <span class="seriesInfo">DOI 10.17487/RFC3629</span>, <time datetime="2003-11"
+                        class="refDate">2003년 11월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3629">https://www.rfc-editor.org/info/rfc3629</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3966">[RFC3966]</dt>
+                <dd>
+                    <span class="refAuthor">Schulzrinne, H.</span>, <span class="refTitle">"The tel URI for Telephone
+                        Numbers"</span>, <span class="seriesInfo">RFC 3966</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC3966</span>, <time datetime="2004-12" class="refDate">2004년 12월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3966">https://www.rfc-editor.org/info/rfc3966</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3986">[RFC3986]</dt>
+                <dd>
+                    <span class="refAuthor">Berners-Lee, T.</span>, <span class="refAuthor">Fielding, R.</span>, and
+                    <span class="refAuthor">L. Masinter</span>, <span class="refTitle">"Uniform Resource Identifier
+                        (URI): Generic Syntax"</span>, <span class="seriesInfo">STD 66</span>, <span
+                        class="seriesInfo">RFC 3986</span>, <span class="seriesInfo">DOI 10.17487/RFC3986</span>, <time
+                        datetime="2005-01" class="refDate">2005년 1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC4880">[RFC4880]</dt>
+                <dd>
+                    <span class="refAuthor">Callas, J.</span>, <span class="refAuthor">Donnerhacke, L.</span>, <span
+                        class="refAuthor">Finney, H.</span>, <span class="refAuthor">Shaw, D.</span>, and <span
+                        class="refAuthor">R. Thayer</span>, <span class="refTitle">"OpenPGP Message Format"</span>,
+                    <span class="seriesInfo">RFC 4880</span>, <span class="seriesInfo">DOI 10.17487/RFC4880</span>,
+                    <time datetime="2007-11" class="refDate">2007년 11월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc4880">https://www.rfc-editor.org/info/rfc4880</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5198">[RFC5198]</dt>
+                <dd>
+                    <span class="refAuthor">Klensin, J.</span> and <span class="refAuthor">M. Padlipsky</span>, <span
+                        class="refTitle">"Unicode Format for Network Interchange"</span>, <span class="seriesInfo">RFC
+                        5198</span>, <span class="seriesInfo">DOI 10.17487/RFC5198</span>, <time datetime="2008-03"
+                        class="refDate">2008년 3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5198">https://www.rfc-editor.org/info/rfc5198</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5234">[RFC5234]</dt>
+                <dd>
+                    <span class="refAuthor">Crocker, D., Ed.</span> and <span class="refAuthor">P. Overell</span>, <span
+                        class="refTitle">"Augmented BNF for Syntax Specifications: ABNF"</span>, <span
+                        class="seriesInfo">STD 68</span>, <span class="seriesInfo">RFC 5234</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC5234</span>, <time datetime="2008-01" class="refDate">2008년
+                        1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5234">https://www.rfc-editor.org/info/rfc5234</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5322">[RFC5322]</dt>
+                <dd>
+                    <span class="refAuthor">Resnick, P., Ed.</span>, <span class="refTitle">"Internet Message
+                        Format"</span>, <span class="seriesInfo">RFC 5322</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC5322</span>, <time datetime="2008-10" class="refDate">2008년 10월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5322">https://www.rfc-editor.org/info/rfc5322</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5646">[RFC5646]</dt>
+                <dd>
+                    <span class="refAuthor">Phillips, A., Ed.</span> and <span class="refAuthor">M. Davis, Ed.</span>,
+                    <span class="refTitle">"Tags for Identifying Languages"</span>, <span class="seriesInfo">BCP
+                        47</span>, <span class="seriesInfo">RFC 5646</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC5646</span>, <time datetime="2009-09" class="refDate">2009년 9월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5646">https://www.rfc-editor.org/info/rfc5646</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6068">[RFC6068]</dt>
+                <dd>
+                    <span class="refAuthor">Duerst, M.</span>, <span class="refAuthor">Masinter, L.</span>, and <span
+                        class="refAuthor">J. Zawinski</span>, <span class="refTitle">"The 'mailto' URI Scheme"</span>,
+                    <span class="seriesInfo">RFC 6068</span>, <span class="seriesInfo">DOI 10.17487/RFC6068</span>,
+                    <time datetime="2010-10" class="refDate">2010년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6068">https://www.rfc-editor.org/info/rfc6068</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6125">[RFC6125]</dt>
+                <dd>
+                    <span class="refAuthor">Saint-Andre, P.</span> and <span class="refAuthor">J. Hodges</span>, <span
+                        class="refTitle">"Representation and Verification of Domain-Based Application Service Identity
+                        within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of
+                        Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 6125</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC6125</span>, <time datetime="2011-03" class="refDate">2011년
+                        3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6125">https://www.rfc-editor.org/info/rfc6125</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6960">[RFC6960]</dt>
+                <dd>
+                    <span class="refAuthor">Santesson, S.</span>, <span class="refAuthor">Myers, M.</span>, <span
+                        class="refAuthor">Ankney, R.</span>, <span class="refAuthor">Malpani, A.</span>, <span
+                        class="refAuthor">Galperin, S.</span>, and <span class="refAuthor">C. Adams</span>, <span
+                        class="refTitle">"X.509 Internet Public Key Infrastructure Online Certificate Status Protocol -
+                        OCSP"</span>, <span class="seriesInfo">RFC 6960</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC6960</span>, <time datetime="2013-06" class="refDate">2013년 6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6960">https://www.rfc-editor.org/info/rfc6960</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7230">[RFC7230]</dt>
+                <dd>
+                    <span class="refAuthor">Fielding, R., Ed.</span> and <span class="refAuthor">J. Reschke, Ed.</span>,
+                    <span class="refTitle">"Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing"</span>,
+                    <span class="seriesInfo">RFC 7230</span>, <span class="seriesInfo">DOI 10.17487/RFC7230</span>,
+                    <time datetime="2014-06" class="refDate">2014년 6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7230">https://www.rfc-editor.org/info/rfc7230</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7231">[RFC7231]</dt>
+                <dd>
+                    <span class="refAuthor">Fielding, R., Ed.</span> and <span class="refAuthor">J. Reschke, Ed.</span>,
+                    <span class="refTitle">"Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content"</span>, <span
+                        class="seriesInfo">RFC 7231</span>, <span class="seriesInfo">DOI 10.17487/RFC7231</span>, <time
+                        datetime="2014-06" class="refDate">2014년 6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7231">https://www.rfc-editor.org/info/rfc7231</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7405">[RFC7405]</dt>
+                <dd>
+                    <span class="refAuthor">Kyzivat, P.</span>, <span class="refTitle">"Case-Sensitive String Support in
+                        ABNF"</span>, <span class="seriesInfo">RFC 7405</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC7405</span>, <time datetime="2014-12" class="refDate">2014년 12월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7405">https://www.rfc-editor.org/info/rfc7405</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8174">[RFC8174]</dt>
+                <dd>
+                    <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs
+                        Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span
+                        class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time
+                        datetime="2017-05" class="refDate">2017년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8615">[RFC8615]</dt>
+                <dd>
+                    <span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Well-Known Uniform Resource
+                        Identifiers (URIs)"</span>, <span class="seriesInfo">RFC 8615</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC8615</span>, <time datetime="2019-05" class="refDate">2019년
+                        5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8615">https://www.rfc-editor.org/info/rfc8615</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+        <section id="section-7.2">
+            <h3 id="name-informative-references">
+                <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references"
+                    class="section-name selfRef">정보 참고 문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="CERT.CVD">[CERT.CVD]</dt>
+                <dd>
+                    <span class="refAuthor">Software Engineering Institute</span>, <span class="refTitle">"The CERT
+                        Guide to Coordinated Vulnerability Disclosure"</span>, <span class="refContent">Carnegie Mellon
+                        University, CMU/SEI-2017-SR-022</span>, <time datetime="2017-08" class="refDate">2017년
+                        8월</time>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="ISO.29147.2018">[ISO.29147.2018]</dt>
+                <dd>
+                    <span class="refAuthor">ISO</span>, <span class="refTitle">"Information technology - Security
+                        techniques - Vulnerability disclosure"</span>, <span class="seriesInfo">ISO/IEC
+                        29147:2018</span>, <time datetime="2018-10" class="refDate">2018년 10월</time>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="ISO.8601-1">[ISO.8601-1]</dt>
+                <dd>
+                    <span class="refAuthor">ISO</span>, <span class="refTitle">"Date and time - Representations for
+                        information interchange - Part 1: Basic rules"</span>, <span class="seriesInfo">ISO
+                        8601-1:2019</span>, <time datetime="2019-02" class="refDate">2019년 2월</time>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="ISO.8601-2">[ISO.8601-2]</dt>
+                <dd>
+                    <span class="refAuthor">ISO</span>, <span class="refTitle">"Date and time - Representations for
+                        information interchange - Part 2: Extensions"</span>, <span class="seriesInfo">ISO
+                        8601-2:2019</span>, <time datetime="2019-02" class="refDate">2019년 2월</time>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC0793">[RFC0793]</dt>
+                <dd>
+                    <span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Transmission Control
+                        Protocol"</span>, <span class="seriesInfo">STD 7</span>, <span class="seriesInfo">RFC
+                        793</span>, <span class="seriesInfo">DOI 10.17487/RFC0793</span>, <time datetime="1981-09"
+                        class="refDate">1981년 9월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc793">https://www.rfc-editor.org/info/rfc793</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2196">[RFC2196]</dt>
+                <dd>
+                    <span class="refAuthor">Fraser, B.</span>, <span class="refTitle">"Site Security Handbook"</span>,
+                    <span class="seriesInfo">FYI 8</span>, <span class="seriesInfo">RFC 2196</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC2196</span>, <time datetime="1997-09" class="refDate">1997년
+                        9월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2196">https://www.rfc-editor.org/info/rfc2196</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2350">[RFC2350]</dt>
+                <dd>
+                    <span class="refAuthor">Brownlee, N.</span> and <span class="refAuthor">E. Guttman</span>, <span
+                        class="refTitle">"Expectations for Computer Security Incident Response"</span>, <span
+                        class="seriesInfo">BCP 21</span>, <span class="seriesInfo">RFC 2350</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC2350</span>, <time datetime="1998-06" class="refDate">1998년
+                        6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2350">https://www.rfc-editor.org/info/rfc2350</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3013">[RFC3013]</dt>
+                <dd>
+                    <span class="refAuthor">Killalea, T.</span>, <span class="refTitle">"Recommended Internet Service
+                        Provider Security Services and Procedures"</span>, <span class="seriesInfo">BCP 46</span>, <span
+                        class="seriesInfo">RFC 3013</span>, <span class="seriesInfo">DOI 10.17487/RFC3013</span>, <time
+                        datetime="2000-11" class="refDate">2000년 11월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3013">https://www.rfc-editor.org/info/rfc3013</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC7485">[RFC7485]</dt>
+                <dd>
+                    <span class="refAuthor">Zhou, L.</span>, <span class="refAuthor">Kong, N.</span>, <span
+                        class="refAuthor">Shen, S.</span>, <span class="refAuthor">Sheng, S.</span>, and <span
+                        class="refAuthor">A. Servin</span>, <span class="refTitle">"Inventory and Analysis of WHOIS
+                        Registration Objects"</span>, <span class="seriesInfo">RFC 7485</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC7485</span>, <time datetime="2015-03" class="refDate">2015년
+                        3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc7485">https://www.rfc-editor.org/info/rfc7485</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8126">[RFC8126]</dt>
+                <dd>
+                    <span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span
+                        class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA
+                        Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span
+                        class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time
+                        datetime="2017-06" class="refDate">2017년 6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+    </section>
+    <div id="contributors">
+        <section id="appendix-A">
+            <h2 id="name-acknowledgments-2">
+                <a href="#name-acknowledgments-2" class="section-name selfRef">감사의 말</a>
+            </h2>
+            <p id="appendix-A-1">저자들은 이 문서의 개발 과정에서
+                <span class="contact-name">Tom Hudson</span>, <span class="contact-name">Jobert Abma</span>,
+                <span class="contact-name">Gerben Janssen van Doorn</span>, <span class="contact-name">Austin
+                    Heap</span>, <span class="contact-name">Stephane Bortzmeyer</span>, <span class="contact-name">Max
+                    Smith</span>, <span class="contact-name">Eduardo Vela</span>, 및 <span class="contact-name">Krzysztof
+                    Kotowicz</span>가 제공한 도움에 감사를 표합니다.<a href="#appendix-A-1" class="pilcrow">¶</a>
+            </p>
+            <p id="appendix-A-2">저자들은 또한 IETF의
+                LAST CALL, SAAG 및 SECDISPATCH 목록의 여러 구성원이 제공한
+                피드백에 감사를 표합니다.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+            <p id="appendix-A-3"><span class="contact-name">Yakov Shafranovich</span>는 L.T.S.에게도
+                감사드립니다(모든 것에 대해).<a href="#appendix-A-3" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="authors-addresses">
+        <section id="appendix-B">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Edwin Foudil</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:contact@edoverflow.com" class="email">contact@edoverflow.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Yakov Shafranovich</span></div>
+                <div dir="auto" class="left"><span class="org">Nightwatch Cybersecurity</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:yakov+ietf@nightwatchcybersecurity.com"
+                        class="email">yakov+ietf@nightwatchcybersecurity.com</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script>const toc = document.getElementById("toc");
+        toc.querySelector("h2").addEventListener("click", e => {
+            toc.classList.toggle("active");
+        });
+        toc.querySelector("nav").addEventListener("click", e => {
+            toc.classList.remove("active");
+        });
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
