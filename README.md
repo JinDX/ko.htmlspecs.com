@@ -197,7 +197,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web of Things (WoT) Scripting API](https://ko.htmlspecs.com/wot-scripting-api/)（[Source](https://www.w3.org/TR/2023/NOTE-wot-scripting-api-20231003/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Web of Things (WoT) Architecture 1.1](https://ko.htmlspecs.com/wot-architecture11/)（[Source](https://www.w3.org/TR/2023/REC-wot-architecture11-20231205/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web of Things (WoT) Discovery](https://ko.htmlspecs.com/wot-discovery/)（[Source](https://www.w3.org/TR/2023/REC-wot-discovery-20231205/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
-- [Web of Things (WoT) Profile](https://ko.htmlspecs.com/wot-profile/)（[Source](https://www.w3.org/TR/2025/WD-wot-profile-20251104/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Web of Things (WoT) Profile](https://ko.htmlspecs.com/wot-profile/)（[Source](https://www.w3.org/TR/2025/WD-wot-profile-20251104/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 창, 화면 및 시스템 통합
 - [Screen Orientation](https://ko.htmlspecs.com/screen-orientation/)（[Source](https://www.w3.org/TR/2025/WD-screen-orientation-20251021/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
