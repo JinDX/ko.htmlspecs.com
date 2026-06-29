@@ -346,6 +346,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Mixed Content](https://ko.htmlspecs.com/mixed-content/)（[Source](https://www.w3.org/TR/2023/CRD-mixed-content-20230223/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Trusted Types](https://ko.htmlspecs.com/trusted-types/)（[Source](https://www.w3.org/TR/2026/WD-trusted-types-20260623/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Clear Site Data](https://ko.htmlspecs.com/clear-site-data/)（[Source](https://www.w3.org/TR/2017/WD-clear-site-data-20171130/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [A File Format to Aid in Security Vulnerability Disclosure](https://ko.htmlspecs.com/rfc9116/)（[Source](https://www.rfc-editor.org/rfc/rfc9116.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON Web Token (JWT)](https://ko.htmlspecs.com/jwt/)（[Source](https://www.rfc-editor.org/rfc/rfc7519.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON Web Signature (JWS)](https://ko.htmlspecs.com/jws/)（[Source](https://www.rfc-editor.org/rfc/rfc7515.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON Web Encryption (JWE)](https://ko.htmlspecs.com/jwe/)（[Source](https://www.rfc-editor.org/rfc/rfc7516.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
