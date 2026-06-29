@@ -416,6 +416,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WAI-Adapt Explainer](https://ko.htmlspecs.com/adapt/)（[Source](https://www.w3.org/TR/2023/DNOTE-adapt-20230103/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [WAI-Adapt: Symbols Module](https://ko.htmlspecs.com/adapt-symbols/)（[Source](https://www.w3.org/TR/2023/CR-adapt-symbols-20230105/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [WAI-Adapt: Tools Module](https://ko.htmlspecs.com/adapt-tools/)（[Source](https://www.w3.org/TR/2022/WD-adapt-tools-20220609/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Specification for Spoken Presentation in HTML](https://ko.htmlspecs.com/spoken-html/)（[Source](https://www.w3.org/TR/2021/WD-spoken-html-20210923/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.2](https://ko.htmlspecs.com/wai-aria-1.2/)（[Source](https://www.w3.org/TR/2023/REC-wai-aria-1.2-20230606/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.3](https://ko.htmlspecs.com/wai-aria-1.3/)（[Source](https://www.w3.org/TR/2026/WD-wai-aria-1.3-20260604/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Publishing WAI-ARIA Module 1.1](https://ko.htmlspecs.com/dpub-aria-1.1/)（[Source](https://www.w3.org/TR/2025/REC-dpub-aria-1.1-20250612/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
