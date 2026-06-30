@@ -154,7 +154,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 입력, 편집 및 클립보드
 - [EditContext API](https://ko.htmlspecs.com/edit-context/)（[Source](https://www.w3.org/TR/2026/WD-edit-context-20260616/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Scroll To Text Fragment](https://ko.htmlspecs.com/scroll-to-text-fragment/)（[Source](https://wicg.github.io/scroll-to-text-fragment/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [Pointer Events Level 2](https://ko.htmlspecs.com/pointerevents2/)（[Source](https://www.w3.org/TR/2019/REC-pointerevents2-20190404/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Pointer Events Level 2](https://ko.htmlspecs.com/pointerevents2/)（[Source](https://www.w3.org/TR/2026/SPSD-pointerevents2-20260630/) ![Superseded Recommendation](https://img.shields.io/badge/SPSD-6c757d)）
 - [Pointer Events Level 3](https://ko.htmlspecs.com/pointerevents3/)（[Source](https://www.w3.org/TR/2026/REC-pointerevents3-20260630/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Pointer Events Level 4](https://ko.htmlspecs.com/pointerevents4/)（[Source](https://www.w3.org/TR/2026/WD-pointerevents4-20260616/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Ink API](https://ko.htmlspecs.com/ink-api/)（[Source](https://wicg.github.io/ink-enhancement/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
