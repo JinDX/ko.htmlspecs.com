@@ -1,0 +1,3938 @@
+<!DOCTYPE html>
+<html lang="ko" class="Internet-Draft">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>JSON 스키마 검증: JSON의 구조적 검증을 위한 어휘</title>
+    <meta content="Austin Wright" name="author">
+    <meta content="Henry Andrews" name="author">
+    <meta content="Ben Hutton" name="author">
+    <meta content="
+       
+                JSON Schema(application/schema+json)에는 여러 목적이 있으며, 그중 하나는 JSON
+                인스턴스 검증입니다.
+                이 문서는 JSON Schema가 JSON 문서의 의미를 설명하고, JSON 데이터로 작업하는
+                사용자 인터페이스에 힌트를 제공하며, 유효한 문서가 어떤 모습이어야 하는지에
+                대한 단언을 만들기 위한 어휘를 명세합니다.
+       
+    " name="description">
+    <!-- <meta content="xml2rfc 3.12.2" name="generator"> -->
+    <meta content="JSON" name="keyword">
+    <meta content="Schema" name="keyword">
+    <meta content="validation" name="keyword">
+    <meta content="draft-bhutton-json-schema-validation-01" name="ietf.draft">
+    <!-- Generator version information:
+  xml2rfc 3.12.2
+    Python 3.9.4
+    appdirs 1.4.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 2.5.0
+    html5lib 1.1
+    intervaltree 3.1.0
+    Jinja2 2.11.3
+    kitchen 1.2.6
+    lxml 4.8.0
+    pycountry 22.1.10
+    pyflakes 2.4.0
+    PyYAML 6.0
+    requests 2.25.1
+    setuptools 49.2.1
+    six 1.15.0
+-->
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        /*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necssary during the development of the v3
+  formatters.
+
+*/
+
+        /* fonts */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+        /* Sans-serif */
+        @import url('https://fonts.googleapis.com/css?family=Noto+Serif');
+        /* Serif (print) */
+        @import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+        /* Monospace */
+
+        @viewport {
+            zoom: 1.0;
+            width: extend-to-zoom;
+        }
+
+        @-ms-viewport {
+            width: extend-to-zoom;
+            zoom: 1.0;
+        }
+
+        /* general and mobile first */
+        html {}
+
+        body {
+            max-width: 90%;
+            margin: 1.5em auto;
+            color: #222;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        #title,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1em 0 0.5em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        #title {
+            clear: both;
+            border-bottom: 1px solid #ddd;
+            margin: 0 0 0.5em 0;
+            padding: 1em 0 0.5em;
+        }
+
+        .author {
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 1em 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: -20px;
+            /* provide offset for in-page anchors */
+            padding-top: 33px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h5,
+        h6 {
+            font-size: 14px;
+        }
+
+        #n-copyright-notice {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
+        }
+
+        /* general structure */
+        p {
+            padding: 0;
+            margin: 0 0 1em 0;
+            text-align: left;
+        }
+
+        div,
+        span {
+            position: relative;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignRight.art-text pre {
+            padding: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+        }
+
+        .alignRight>*:first-child {
+            border: none;
+            margin: 0;
+            float: right;
+            clear: both;
+        }
+
+        .alignRight>*:nth-child(2) {
+            clear: both;
+            display: block;
+            border: none;
+        }
+
+        svg {
+            display: block;
+        }
+
+        .alignCenter.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignCenter.art-text pre {
+            padding: 0;
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+        }
+
+        .alignCenter>*:first-child {
+            border: none;
+            /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+            display: table;
+            margin: 0 auto;
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 1em 2em;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-left: 1em;
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        .ulCompact li {
+            margin: 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+        }
+
+        ul.empty li,
+        .ulEmpty li {
+            margin-top: 0.5em;
+        }
+
+        ul.ulBare,
+        li.ulBare {
+            margin-left: 0em !important;
+        }
+
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact {
+            line-height: 100%;
+            margin: 0 0 0 2em;
+        }
+
+        /* definition lists */
+        dl {}
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        /* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+        dl>dd {
+            margin-bottom: .8em;
+            min-height: 1.3em;
+        }
+
+        dl.compact>dd,
+        .dlCompact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+        }
+
+        a[href] {
+            color: #22e;
+            /* Arlen: WCAG 2019 */
+        }
+
+        a[href]:hover {
+            background-color: #f2f2f2;
+        }
+
+        figcaption a[href],
+        a[href].selfRef {
+            color: #222;
+        }
+
+        /* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+        /* Figures */
+        tt,
+        code,
+        pre,
+        code {
+            background-color: #f9f9f9;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        pre {
+            border: 1px solid #eee;
+            margin: 0;
+            padding: 1em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        figure blockquote {
+            margin: 0.8em 0.4em 0.4em;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0 0 1em 0;
+        }
+
+        @media screen {
+            pre {
+                overflow-x: auto;
+                max-width: 100%;
+                max-width: calc(100% - 22px);
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 1.2em 2em;
+        }
+
+        blockquote {
+            background-color: #f9f9f9;
+            color: #111;
+            /* Arlen: WCAG 2019 */
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 1em 0;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.5em 0.75em;
+        }
+
+        th {
+            text-align: left;
+            background-color: #e9e9e9;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f5f5f5;
+        }
+
+        table caption {
+            font-style: italic;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        table p {
+            /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+            margin: 0;
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            color: #666;
+            /* Arlen: AHDJ 2019 */
+            text-decoration: none;
+            visibility: hidden;
+            user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        @media screen {
+
+            aside:hover>a.pilcrow,
+            p:hover>a.pilcrow,
+            blockquote:hover>a.pilcrow,
+            div:hover>a.pilcrow,
+            li:hover>a.pilcrow,
+            pre:hover>a.pilcrow {
+                visibility: visible;
+            }
+
+            a.pilcrow:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        #identifiers dt {
+            width: 3em;
+            clear: left;
+        }
+
+        #identifiers dd {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        /* Fix PDF info block run off issue */
+        @media print {
+            #identifiers dd {
+                float: none;
+            }
+        }
+
+        #identifiers .authors .author {
+            display: inline-block;
+            margin-right: 1.5em;
+        }
+
+        #identifiers .authors .org {
+            font-style: italic;
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #666;
+            /* Arlen: WCAG 2019 */
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+        }
+
+        .docInfo .prepared {
+            float: left;
+        }
+
+        .docInfo .prepared {
+            float: right;
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+        }
+
+        nav.toc ul {
+            margin: 0 0.5em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav.toc li {
+            line-height: 1.3em;
+            margin: 0.75em 0;
+            padding-left: 1.2em;
+            text-indent: -1.2em;
+        }
+
+        /* references */
+        .references dt {
+            text-align: right;
+            font-weight: bold;
+            min-width: 7em;
+        }
+
+        .references dd {
+            margin-left: 8em;
+            overflow: auto;
+        }
+
+        .refInstance {
+            margin-bottom: 1.25em;
+        }
+
+        .references .ascii {
+            margin-bottom: 0.25em;
+        }
+
+        /* index */
+        .index ul {
+            margin: 0 0 0 1em;
+            padding: 0;
+            list-style: none;
+        }
+
+        .index ul ul {
+            margin: 0;
+        }
+
+        .index li {
+            margin: 0;
+            text-indent: -2em;
+            padding-left: 2em;
+            padding-bottom: 5px;
+        }
+
+        .indexIndex {
+            margin: 0.5em 0 1em;
+        }
+
+        .index a {
+            font-weight: 700;
+        }
+
+        /* make the index two-column on all but the smallest screens */
+        @media (min-width: 600px) {
+            .index ul {
+                -moz-column-count: 2;
+                -moz-column-gap: 20px;
+            }
+
+            .index ul ul {
+                -moz-column-count: 1;
+                -moz-column-gap: 0;
+            }
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            margin: 1em 0;
+        }
+
+        address.vcard .nameRole {
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        address.vcard .label {
+            font-family: "Noto Sans", Arial, Helvetica, sans-serif;
+            margin: 0.5em 0;
+        }
+
+        address.vcard .type {
+            display: none;
+        }
+
+        .alternative-contact {
+            margin: 1.5em 0 1em;
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        /* temporary notes */
+        .rfcEditorRemove::before {
+            position: absolute;
+            top: 0.2em;
+            right: 0.2em;
+            padding: 0.2em;
+            content: "The RFC Editor will remove this note";
+            color: #9e2a00;
+            /* Arlen: WCAG 2019 */
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+        }
+
+        .rfcEditorRemove {
+            position: relative;
+            padding-top: 1.8em;
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            border-radius: 3px;
+        }
+
+        .cref {
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        /* alternative layout for smaller screens */
+        @media screen and (max-width: 1023px) {
+            body {
+                padding-top: 2em;
+            }
+
+            #title {
+                padding: 1em 0;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: -18px;
+                /* provide offset for in-page anchors */
+                padding-top: 38px;
+            }
+
+            #identifiers dd {
+                max-width: 60%;
+            }
+
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 0;
+                margin: 0;
+                background-color: inherit;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #toc h2 {
+                margin: -1px 0 0 0;
+                padding: 4px 0 4px 6px;
+                padding-right: 1em;
+                min-width: 190px;
+                font-size: 1.1em;
+                text-align: right;
+                background-color: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            #toc h2::before {
+                /* css hamburger */
+                float: right;
+                position: relative;
+                width: 1em;
+                height: 1px;
+                left: -164px;
+                margin: 6px 0 0 0;
+                background: white none repeat scroll 0 0;
+                box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                content: "";
+            }
+
+            #toc nav {
+                display: none;
+                padding: 0.5em 1em 1em;
+                overflow: auto;
+                height: calc(100vh - 48px);
+                border-left: 1px solid #ddd;
+            }
+        }
+
+        /* alternative layout for wide screens */
+        @media screen and (min-width: 1024px) {
+            body {
+                max-width: 724px;
+                margin: 42px auto;
+                padding-left: 1.5em;
+                padding-right: 29em;
+            }
+
+            #toc {
+                position: fixed;
+                top: 42px;
+                right: 42px;
+                width: 25%;
+                margin: 0;
+                padding: 0 1em;
+                z-index: 1;
+            }
+
+            #toc h2 {
+                border-top: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 1em;
+                font-weight: normal;
+                margin: 0;
+                padding: 0.25em 1em 1em 0;
+            }
+
+            #toc nav {
+                display: block;
+                height: calc(90vh - 84px);
+                bottom: 0;
+                padding: 0.5em 0 0;
+                overflow: auto;
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc,
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            #toc {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            figure,
+            pre {
+                page-break-inside: avoid;
+            }
+
+            figure {
+                overflow: scroll;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            h2+*,
+            h3+*,
+            h4+*,
+            h5+*,
+            h6+* {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        /* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+        /*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+            /* The follwing is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+            /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+        }
+
+        /* Changes introduced to fix issues found during implementation */
+        /* Make sure links are clickable even if overlapped by following H* */
+        a {
+            z-index: 2;
+        }
+
+        /* Separate body from document info even without intervening H1 */
+        section {
+            clear: both;
+        }
+
+
+        /* Top align author divs, to avoid names without organization dropping level with org names */
+        .author {
+            vertical-align: top;
+        }
+
+        /* Leave room in document info to show Internet-Draft on one line */
+        #identifiers dt {
+            width: 8em;
+        }
+
+        /* Don't waste quite as much whitespace between label and value in doc info */
+        #identifiers dd {
+            margin-left: 1em;
+        }
+
+        /* Give floating toc a background color (needed when it's a div inside section */
+        #toc {
+            background-color: white;
+        }
+
+        /* Make the collapsed ToC header render white on gray also when it's a link */
+        @media screen and (max-width: 1023px) {
+
+            #toc h2 a,
+            #toc h2 a:link,
+            #toc h2 a:focus,
+            #toc h2 a:hover,
+            #toc a.toplink,
+            #toc a.toplink:hover {
+                color: white;
+                background-color: #444;
+                text-decoration: none;
+            }
+        }
+
+        /* Give the bottom of the ToC some whitespace */
+        @media screen and (min-width: 1024px) {
+            #toc {
+                padding: 0 0 1em 1em;
+            }
+        }
+
+        /* Style section numbers with more space between number and title */
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        /* prevent monospace from becoming overly large */
+        tt,
+        code,
+        pre,
+        code {
+            font-size: 95%;
+        }
+
+        /* Fix the height/width aspect for ascii art*/
+        pre.sourcecode,
+        .art-text pre {
+            line-height: 1.12;
+        }
+
+
+        /* Add styling for a link in the ToC that points to the top of the document */
+        a.toplink {
+            float: right;
+            margin-right: 0.5em;
+        }
+
+        /* Fix the dl styling to match the RFC 7992 attributes */
+        dl>dt,
+        dl.dlParallel>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.dlNewline>dt {
+            float: none;
+        }
+
+        /* Provide styling for table cell text alignment */
+        table td.text-left,
+        table th.text-left {
+            text-align: left;
+        }
+
+        table td.text-center,
+        table th.text-center {
+            text-align: center;
+        }
+
+        table td.text-right,
+        table th.text-right {
+            text-align: right;
+        }
+
+        /* Make the alternative author contact informatio look less like just another
+   author, and group it closer with the primary author contact information */
+        .alternative-contact {
+            margin: 0.5em 0 0.25em 0;
+        }
+
+        address .non-ascii {
+            margin: 0 0 0 2em;
+        }
+
+        /* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+        table {
+            width: auto;
+        }
+
+        /* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+        .references dd {
+            overflow: visible;
+        }
+
+        /* Control caption placement */
+        caption {
+            caption-side: bottom;
+        }
+
+        /* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+        address.vcard {
+            max-width: 30em;
+            margin-right: auto;
+        }
+
+        /* For address alignment dependent on LTR or RTL scripts */
+        address div.left {
+            text-align: left;
+        }
+
+        address div.right {
+            text-align: right;
+        }
+
+        /* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+        table.right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Give the table caption label the same styling as the figcaption */
+        caption a[href] {
+            color: #222;
+        }
+
+        @media print {
+            .toplink {
+                display: none;
+            }
+
+            /* avoid overwriting the top border line with the ToC header */
+            #toc {
+                padding-top: 1px;
+            }
+
+            /* Avoid page breaks inside dl and author address entries */
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+        }
+
+        /* Tweak the bcp14 keyword presentation */
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Tweak the invisible space above H* in order not to overlay links in text above */
+        h2 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 31px;
+        }
+
+        h3 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        h4 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        /* Float artwork pilcrow to the right */
+        @media screen {
+            .artwork a.pilcrow {
+                display: block;
+                line-height: 0.7;
+                margin-top: 0.15em;
+            }
+        }
+
+        /* Make pilcrows on dd visible */
+        @media screen {
+            dd:hover>a.pilcrow {
+                visibility: visible;
+            }
+        }
+
+        /* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+        .alignLeft.art-text,
+        .alignCenter.art-text,
+        .alignRight.art-text {
+            margin-bottom: 0;
+        }
+
+        .alignLeft,
+        .alignCenter,
+        .alignRight {
+            margin: 1em 0 0 0;
+        }
+
+        /* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+        @media print {
+            a.pilcrow {
+                display: none;
+            }
+        }
+
+        /* Styling for the external metadata */
+        div#external-metadata {
+            background-color: #eee;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            display: none;
+        }
+
+        div#internal-metadata {
+            padding: 0.5em;
+            /* to match the external-metadata padding */
+        }
+
+        /* Styling for title RFC Number */
+        h1#rfcnum {
+            clear: both;
+            margin: 0 0 -1em;
+            padding: 1em 0 0 0;
+        }
+
+        /* Make .olPercent look the same as <ol><li> */
+        dl.olPercent>dd {
+            margin-bottom: 0.25em;
+            min-height: initial;
+        }
+
+        /* Give aside some styling to set it apart */
+        aside {
+            border-left: 1px solid #ddd;
+            margin: 1em 0 1em 2em;
+            padding: 0.2em 2em;
+        }
+
+        aside>dl,
+        aside>ol,
+        aside>ul,
+        aside>table,
+        aside>p {
+            margin-bottom: 0.5em;
+        }
+
+        /* Additional page break settings */
+        @media print {
+
+            figcaption,
+            table caption {
+                page-break-before: avoid;
+            }
+        }
+
+        /* Font size adjustments for print */
+        @media print {
+            body {
+                font-size: 10pt;
+                line-height: normal;
+                max-width: 96%;
+            }
+
+            h1 {
+                font-size: 1.72em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2*1.2 */
+            h2 {
+                font-size: 1.44em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2 */
+            h3 {
+                font-size: 1.2em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2 */
+            h4 {
+                font-size: 1em;
+                padding-top: 1.5em;
+            }
+
+            h5,
+            h6 {
+                font-size: 1em;
+                margin: initial;
+                padding: 0.5em 0 0.3em;
+            }
+        }
+
+        /* Sourcecode margin in print, when there's no pilcrow */
+        @media print {
+
+            .artwork,
+            .sourcecode {
+                margin-bottom: 1em;
+            }
+        }
+
+        /* Avoid narrow tables forcing too narrow table captions, which may render badly */
+        table {
+            min-width: 20em;
+        }
+
+        /* ol type a */
+        ol.type-a {
+            list-style-type: lower-alpha;
+        }
+
+        ol.type-A {
+            list-style-type: upper-alpha;
+        }
+
+        ol.type-i {
+            list-style-type: lower-roman;
+        }
+
+        ol.type-I {
+            list-style-type: lower-roman;
+        }
+
+        /* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background sligthtly */
+        table {
+            border: 1px solid #ddd;
+        }
+
+        td {
+            border-top: 1px solid #ddd;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f8f8f8;
+        }
+
+        /* Use style rules to govern display of the TOC. */
+        @media screen and (max-width: 1023px) {
+            #toc nav {
+                display: none;
+            }
+
+            #toc.active nav {
+                display: block;
+            }
+        }
+
+        /* Add support for keepWithNext */
+        .keepWithNext {
+            break-after: avoid-page;
+            break-after: avoid-page;
+        }
+
+        /* Add support for keepWithPrevious */
+        .keepWithPrevious {
+            break-before: avoid-page;
+        }
+
+        /* Change the approach to avoiding breaks inside artwork etc. */
+        figure,
+        pre,
+        table,
+        .artwork,
+        .sourcecode {
+            break-before: auto;
+            break-after: auto;
+        }
+
+        /* Avoid breaks between <dt> and <dd> */
+        dl {
+            break-before: auto;
+            break-inside: auto;
+        }
+
+        dt {
+            break-before: auto;
+            break-after: avoid-page;
+        }
+
+        dd {
+            break-before: avoid-page;
+            break-after: auto;
+            orphans: 3;
+            widows: 3
+        }
+
+        span.break,
+        dd.break {
+            margin-bottom: 0;
+            min-height: 0;
+            break-before: auto;
+            break-inside: auto;
+            break-after: auto;
+        }
+
+        /* Undo break-before ToC */
+        @media print {
+            #toc {
+                break-before: auto;
+            }
+        }
+
+        /* Text in compact lists should not get extra bottim margin space,
+   since that would makes the list not compact */
+        ul.compact p,
+        .ulCompact p,
+        ol.compact p,
+        .olCompact p {
+            margin: 0;
+        }
+
+        /* But the list as a whole needs the extra space at the end */
+        section ul.compact,
+        section .ulCompact,
+        section ol.compact,
+        section .olCompact {
+            margin-bottom: 1em;
+            /* same as p not within ul.compact etc. */
+        }
+
+        /* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+        tt,
+        code {
+            background-color: transparent;
+        }
+
+        p tt,
+        p code,
+        li tt,
+        li code {
+            background-color: #f8f8f8;
+        }
+
+        /* Tweak the pre margin -- 0px doesn't come out well */
+        pre {
+            margin-top: 0.5px;
+        }
+
+        /* Tweak the comact list text */
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact,
+        dl.compact,
+        .dlCompact {
+            line-height: normal;
+        }
+
+        /* Don't add top margin for nested lists */
+        li>ul,
+        li>ol,
+        li>dl,
+        dd>ul,
+        dd>ol,
+        dd>dl,
+        dl>dd>dl {
+            margin-top: initial;
+        }
+
+        /* Elements that should not be rendered on the same line as a <dt> */
+        /* This should match the element list in writer.text.TextWriter.render_dl() */
+        dd>div.artwork:first-child,
+        dd>aside:first-child,
+        dd>figure:first-child,
+        dd>ol:first-child,
+        dd>div:first-child>pre.sourcecode,
+        dd>table:first-child,
+        dd>ul:first-child {
+            clear: left;
+        }
+
+        /* fix for weird browser behaviour when <dd/> is empty */
+        dt+dd:empty::before {
+            content: "\00a0";
+        }
+
+        /* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+        li>p {
+            margin-bottom: 0.5em
+        }
+
+        /* Don't let p margin spill out from inside list items */
+        li>p:last-of-type {
+            margin-bottom: 0;
+        }
+    </style>
+    <link href="https://json-schema.org/draft/2020-12/rfc-local.css" rel="stylesheet" type="text/css">
+    <script
+        type="application/javascript">async function addMetadata() { try { const e = document.styleSheets[0].cssRules; for (let t = 0; t < e.length; t++)if (/#identifiers/.exec(e[t].selectorText)) { const a = e[t].cssText.replace("#identifiers", "#external-updates"); document.styleSheets[0].insertRule(a, document.styleSheets[0].cssRules.length) } } catch (e) { console.log(e) } const e = document.getElementById("external-metadata"); if (e) try { var t, a = "", o = function (e) { const t = document.getElementsByTagName("meta"); for (let a = 0; a < t.length; a++)if (t[a].getAttribute("name") === e) return t[a].getAttribute("content"); return "" }("rfc.number"); if (o) { t = "https://www.rfc-editor.org/rfc/rfc" + o + ".json"; try { const e = await fetch(t); a = await e.json() } catch (e) { t = document.URL.indexOf("html") >= 0 ? document.URL.replace(/html$/, "json") : document.URL + ".json"; const o = await fetch(t); a = await o.json() } } if (!a) return; e.style.display = "block"; const s = "", d = "https://datatracker.ietf.org/doc", n = "https://datatracker.ietf.org/ipr/search", c = "https://www.rfc-editor.org/info", l = a.doc_id.toLowerCase(), i = a.doc_id.slice(0, 3).toLowerCase(), f = a.doc_id.slice(3).replace(/^0+/, ""), u = { status: "Status", obsoletes: "Obsoletes", obsoleted_by: "Obsoleted By", updates: "Updates", updated_by: "Updated By", see_also: "See Also", errata_url: "Errata" }; let h = "<dl style='overflow:hidden' id='external-updates'>";["status", "obsoletes", "obsoleted_by", "updates", "updated_by", "see_also", "errata_url"].forEach(e => { if ("status" == e) { a[e] = a[e].toLowerCase(); var t = a[e].split(" "), o = t.length, w = "", p = 1; for (let e = 0; e < o; e++)p < o ? w = w + r(t[e]) + " " : w += r(t[e]), p++; a[e] = w } else if ("obsoletes" == e || "obsoleted_by" == e || "updates" == e || "updated_by" == e) { var g, m = "", b = 1; g = a[e].length; for (let t = 0; t < g; t++)a[e][t] && (a[e][t] = String(a[e][t]).toLowerCase(), m = b < g ? m + "<a href='" + s + "/rfc/".concat(a[e][t]) + "'>" + a[e][t].slice(3) + "</a>, " : m + "<a href='" + s + "/rfc/".concat(a[e][t]) + "'>" + a[e][t].slice(3) + "</a>", b++); a[e] = m } else if ("see_also" == e) { var y, L = "", C = 1; y = a[e].length; for (let t = 0; t < y; t++)if (a[e][t]) { a[e][t] = String(a[e][t]); var _ = a[e][t].slice(0, 3), v = a[e][t].slice(3).replace(/^0+/, ""); L = C < y ? "RFC" != _ ? L + "<a href='" + s + "/info/" + _.toLowerCase().concat(v.toLowerCase()) + "'>" + _ + " " + v + "</a>, " : L + "<a href='" + s + "/info/" + _.toLowerCase().concat(v.toLowerCase()) + "'>" + v + "</a>, " : "RFC" != _ ? L + "<a href='" + s + "/info/" + _.toLowerCase().concat(v.toLowerCase()) + "'>" + _ + " " + v + "</a>" : L + "<a href='" + s + "/info/" + _.toLowerCase().concat(v.toLowerCase()) + "'>" + v + "</a>", C++ } a[e] = L } else if ("errata_url" == e) { var R = ""; R = a[e] ? R + "<a href='" + a[e] + "'>Errata exist</a> | <a href='" + d + "/" + l + "'>Datatracker</a>| <a href='" + n + "/?" + i + "=" + f + "&submit=" + i + "'>IPR</a> | <a href='" + c + "/" + l + "'>Info page</a>" : "<a href='" + d + "/" + l + "'>Datatracker</a> | <a href='" + n + "/?" + i + "=" + f + "&submit=" + i + "'>IPR</a> | <a href='" + c + "/" + l + "'>Info page</a>", a[e] = R } "" != a[e] ? "Errata" == u[e] ? h += `<dt>More info:</dt><dd>${a[e]}</dd>` : h += `<dt>${u[e]}:</dt><dd>${a[e]}</dd>` : "Errata" == u[e] && (h += `<dt>More info:</dt><dd>${a[e]}</dd>`) }), h += "</dl>", e.innerHTML = h } catch (e) { console.log(e) } else console.log("Could not locate metadata <div> element"); function r(e) { return e.charAt(0).toUpperCase() + e.slice(1) } } window.removeEventListener("load", addMetadata), window.addEventListener("load", addMetadata);</script>
+</head>
+
+<body>
+    <script src="https://json-schema.org/draft/2020-12/metadata.min.js"></script>
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">Internet-Draft</td>
+                <td class="center">JSON 스키마 검증</td>
+                <td class="right">2022년 6월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Wright 외</td>
+                <td class="center">2022년 12월 18일 만료</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-workgroup">작업 그룹:</dt>
+            <dd class="workgroup">인터넷 엔지니어링 태스크 포스</dd>
+            <dt class="label-internet-draft">Internet-Draft:</dt>
+            <dd class="internet-draft">draft-bhutton-json-schema-validation-01</dd>
+            <dt class="label-published">발행일:</dt>
+            <dd class="published">
+                <time datetime="2022-06-16" class="published">2022년 6월 16일</time>
+            </dd>
+            <dt class="label-intended-status">의도된 상태:</dt>
+            <dd class="intended-status">정보 제공</dd>
+            <dt class="label-expires">만료일:</dt>
+            <dd class="expires"><time datetime="2022-12-18">2022년 12월 18일</time></dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">A. Wright, <span class="editor">편집자</span>
+                    </div>
+                </div>
+                <div class="author">
+                    <div class="author-name">H. Andrews, <span class="editor">편집자</span>
+                    </div>
+                </div>
+                <div class="author">
+                    <div class="author-name">B. Hutton, <span class="editor">편집자</span>
+                    </div>
+                    <div class="org">Postman</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="title">JSON 스키마 검증: JSON의 구조적 검증을 위한 어휘</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">
+            JSON Schema(application/schema+json)에는 여러 목적이 있으며, 그중 하나는 JSON
+            인스턴스 검증입니다.
+            이 문서는 JSON Schema가 JSON 문서의 의미를 설명하고, JSON 데이터로 작업하는
+            사용자 인터페이스에 힌트를 제공하며, 유효한 문서가 어떤 모습이어야 하는지에
+            대한 단언을 하기 위한 어휘를 명세합니다.<a href="#section-abstract-1" class="pilcrow">¶</a>
+        </p>
+    </section>
+    <section class="note" id="section-note.1">
+        <h2 id="name-note-to-readers">
+            <a href="#name-note-to-readers" class="section-name selfRef">독자에게 드리는 참고 사항</a>
+        </h2>
+        <p id="section-note.1-1">
+            이 초안의 이슈 목록은 다음에서 찾을 수 있습니다.
+            <span><a
+                    href="https://github.com/json-schema-org/json-schema-spec/issues">https://github.com/json-schema-org/json-schema-spec/issues</a></span>.<a
+                href="#section-note.1-1" class="pilcrow">¶</a>
+        </p>
+        <p id="section-note.1-2">
+            추가 정보는 <span><a href="https://json-schema.org/">https://json-schema.org/</a></span>를 참조하십시오.<a
+                href="#section-note.1-2" class="pilcrow">¶</a></p>
+        <p id="section-note.1-3">
+            피드백을 제공하려면 이 이슈 트래커, 홈페이지에 나열된 커뮤니케이션 방법,
+            또는 문서 편집자에게 보내는 이메일을 사용하십시오.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 Internet-Draft는 BCP 78 및 BCP 79의 조항을 완전히 준수하여
+                제출되었습니다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-2">
+                Internet-Draft는 인터넷 엔지니어링 태스크 포스(IETF)의 작업 문서입니다.
+                다른 그룹도 작업 문서를 Internet-Draft로 배포할 수 있음에 유의하십시오.
+                현재 Internet-Draft 목록은
+                <span><a
+                        href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>에
+                있습니다.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a>
+            </p>
+            <p id="section-boilerplate.1-3">
+                Internet-Draft는 최대 6개월 동안 유효한 초안 문서이며,
+                언제든지 다른 문서에 의해 갱신, 대체 또는 폐기될 수 있습니다.
+                Internet-Draft를 참고 자료로 사용하거나 "진행 중인 작업" 이외의 방식으로
+                인용하는 것은 적절하지 않습니다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-4">
+                이 Internet-Draft는 2022년 12월 18일에 만료됩니다.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2022 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Revised BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="compact toc ulBare ulEmpty">
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>. <a
+                                href="#name-introduction" class="xref">소개</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>. <a
+                                href="#name-conventions-and-terminology" class="xref">규약 및 용어</a>
+                        </p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>. <a
+                                href="#name-overview" class="xref">개요</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>. <a
+                                href="#name-interoperability-considerat" class="xref">상호 운용성
+                                고려사항</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>. <a
+                                        href="#name-validation-of-string-instan" class="xref">문자열
+                                        인스턴스의 검증</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>. <a
+                                        href="#name-validation-of-numeric-insta" class="xref">숫자
+                                        인스턴스의 검증</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="xref">4.3</a>. <a
+                                        href="#name-regular-expressions" class="xref">정규 표현식</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>. <a href="#name-meta-schema"
+                                class="xref">메타 스키마</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>. <a
+                                href="#name-a-vocabulary-for-structural" class="xref">구조적
+                                검증을 위한 어휘</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="xref">6.1</a>. <a
+                                        href="#name-validation-keywords-for-any" class="xref">모든 인스턴스 타입을 위한
+                                        검증 키워드</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.1">
+                                        <p id="section-toc.1-1.6.2.1.2.1.1"><a href="#section-6.1.1"
+                                                class="xref">6.1.1</a>. <a href="#name-type" class="xref">type</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.2">
+                                        <p id="section-toc.1-1.6.2.1.2.2.1"><a href="#section-6.1.2"
+                                                class="xref">6.1.2</a>. <a href="#name-enum" class="xref">enum</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.3">
+                                        <p id="section-toc.1-1.6.2.1.2.3.1"><a href="#section-6.1.3"
+                                                class="xref">6.1.3</a>. <a href="#name-const" class="xref">const</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="xref">6.2</a>. <a
+                                        href="#name-validation-keywords-for-num" class="xref">숫자 인스턴스(number 및 integer)를
+                                        위한
+                                        검증 키워드</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.1">
+                                        <p id="section-toc.1-1.6.2.2.2.1.1"><a href="#section-6.2.1"
+                                                class="xref">6.2.1</a>. <a href="#name-multipleof"
+                                                class="xref">multipleOf</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.2">
+                                        <p id="section-toc.1-1.6.2.2.2.2.1"><a href="#section-6.2.2"
+                                                class="xref">6.2.2</a>. <a href="#name-maximum" class="xref">maximum</a>
+                                        </p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.3">
+                                        <p id="section-toc.1-1.6.2.2.2.3.1"><a href="#section-6.2.3"
+                                                class="xref">6.2.3</a>. <a href="#name-exclusivemaximum"
+                                                class="xref">exclusiveMaximum</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.4">
+                                        <p id="section-toc.1-1.6.2.2.2.4.1"><a href="#section-6.2.4"
+                                                class="xref">6.2.4</a>. <a href="#name-minimum" class="xref">minimum</a>
+                                        </p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.5">
+                                        <p id="section-toc.1-1.6.2.2.2.5.1"><a href="#section-6.2.5"
+                                                class="xref">6.2.5</a>. <a href="#name-exclusiveminimum"
+                                                class="xref">exclusiveMinimum</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="xref">6.3</a>. <a
+                                        href="#name-validation-keywords-for-str" class="xref">문자열을 위한
+                                        검증 키워드</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
+                                        <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1"
+                                                class="xref">6.3.1</a>. <a href="#name-maxlength"
+                                                class="xref">maxLength</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
+                                        <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2"
+                                                class="xref">6.3.2</a>. <a href="#name-minlength"
+                                                class="xref">minLength</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.3">
+                                        <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3"
+                                                class="xref">6.3.3</a>. <a href="#name-pattern" class="xref">pattern</a>
+                                        </p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
+                                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="xref">6.4</a>. <a
+                                        href="#name-validation-keywords-for-arr" class="xref">배열을 위한
+                                        검증 키워드</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4.2.1">
+                                        <p id="section-toc.1-1.6.2.4.2.1.1"><a href="#section-6.4.1"
+                                                class="xref">6.4.1</a>. <a href="#name-maxitems"
+                                                class="xref">maxItems</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4.2.2">
+                                        <p id="section-toc.1-1.6.2.4.2.2.1"><a href="#section-6.4.2"
+                                                class="xref">6.4.2</a>. <a href="#name-minitems"
+                                                class="xref">minItems</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4.2.3">
+                                        <p id="section-toc.1-1.6.2.4.2.3.1"><a href="#section-6.4.3"
+                                                class="xref">6.4.3</a>. <a href="#name-uniqueitems"
+                                                class="xref">uniqueItems</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4.2.4">
+                                        <p id="section-toc.1-1.6.2.4.2.4.1"><a href="#section-6.4.4"
+                                                class="xref">6.4.4</a>. <a href="#name-maxcontains"
+                                                class="xref">maxContains</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4.2.5">
+                                        <p id="section-toc.1-1.6.2.4.2.5.1"><a href="#section-6.4.5"
+                                                class="xref">6.4.5</a>. <a href="#name-mincontains"
+                                                class="xref">minContains</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
+                                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="xref">6.5</a>. <a
+                                        href="#name-validation-keywords-for-obj" class="xref">객체를 위한
+                                        검증 키워드</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5.2.1">
+                                        <p id="section-toc.1-1.6.2.5.2.1.1"><a href="#section-6.5.1"
+                                                class="xref">6.5.1</a>. <a href="#name-maxproperties"
+                                                class="xref">maxProperties</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5.2.2">
+                                        <p id="section-toc.1-1.6.2.5.2.2.1"><a href="#section-6.5.2"
+                                                class="xref">6.5.2</a>. <a href="#name-minproperties"
+                                                class="xref">minProperties</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5.2.3">
+                                        <p id="section-toc.1-1.6.2.5.2.3.1"><a href="#section-6.5.3"
+                                                class="xref">6.5.3</a>. <a href="#name-required"
+                                                class="xref">required</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5.2.4">
+                                        <p id="section-toc.1-1.6.2.5.2.4.1"><a href="#section-6.5.4"
+                                                class="xref">6.5.4</a>. <a href="#name-dependentrequired"
+                                                class="xref">dependentRequired</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>. <a
+                                href="#name-vocabularies-for-semantic-c" class="xref">"format"을 사용하는 의미 콘텐츠를 위한
+                                어휘들</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>. <a
+                                        href="#name-foreword" class="xref">머리말</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>. <a
+                                        href="#name-implementation-requirements" class="xref">구현
+                                        요구사항</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.1">
+                                        <p id="section-toc.1-1.7.2.2.2.1.1"><a href="#section-7.2.1"
+                                                class="xref">7.2.1</a>. <a href="#name-format-annotation-vocabular"
+                                                class="xref">Format-Annotation 어휘</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.2">
+                                        <p id="section-toc.1-1.7.2.2.2.2.1"><a href="#section-7.2.2"
+                                                class="xref">7.2.2</a>. <a href="#name-format-assertion-vocabulary"
+                                                class="xref">Format-Assertion 어휘</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.3">
+                                        <p id="section-toc.1-1.7.2.2.2.3.1"><a href="#section-7.2.3"
+                                                class="xref">7.2.3</a>. <a href="#name-custom-format-attributes"
+                                                class="xref">사용자 정의 format 속성</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="xref">7.3</a>. <a
+                                        href="#name-defined-formats" class="xref">정의된 형식</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.1">
+                                        <p id="section-toc.1-1.7.2.3.2.1.1"><a href="#section-7.3.1"
+                                                class="xref">7.3.1</a>. <a href="#name-dates-times-and-duration"
+                                                class="xref">날짜, 시간 및 기간</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.2">
+                                        <p id="section-toc.1-1.7.2.3.2.2.1"><a href="#section-7.3.2"
+                                                class="xref">7.3.2</a>. <a href="#name-email-addresses" class="xref">이메일
+                                                주소</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.3">
+                                        <p id="section-toc.1-1.7.2.3.2.3.1"><a href="#section-7.3.3"
+                                                class="xref">7.3.3</a>. <a href="#name-hostnames" class="xref">호스트명</a>
+                                        </p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.4">
+                                        <p id="section-toc.1-1.7.2.3.2.4.1"><a href="#section-7.3.4"
+                                                class="xref">7.3.4</a>. <a href="#name-ip-addresses" class="xref">IP
+                                                주소</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.5">
+                                        <p id="section-toc.1-1.7.2.3.2.5.1"><a href="#section-7.3.5"
+                                                class="xref">7.3.5</a>. <a href="#name-resource-identifiers"
+                                                class="xref">리소스 식별자</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.6">
+                                        <p id="section-toc.1-1.7.2.3.2.6.1"><a href="#section-7.3.6"
+                                                class="xref">7.3.6</a>. <a href="#name-uri-template"
+                                                class="xref">uri-template</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.7">
+                                        <p id="section-toc.1-1.7.2.3.2.7.1"><a href="#section-7.3.7"
+                                                class="xref">7.3.7</a>. <a href="#name-json-pointers" class="xref">JSON
+                                                포인터</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.8">
+                                        <p id="section-toc.1-1.7.2.3.2.8.1"><a href="#section-7.3.8"
+                                                class="xref">7.3.8</a>. <a href="#name-regex" class="xref">regex</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>. <a
+                                href="#name-a-vocabulary-for-the-conten" class="xref">문자열로 인코딩된 데이터의 내용을 위한
+                                어휘</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="xref">8.1</a>. <a
+                                        href="#name-foreword-2" class="xref">머리말</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="xref">8.2</a>. <a
+                                        href="#name-implementation-requirements-2" class="xref">구현
+                                        요구사항</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="xref">8.3</a>. <a
+                                        href="#name-contentencoding" class="xref">contentEncoding</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
+                                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="xref">8.4</a>. <a
+                                        href="#name-contentmediatype" class="xref">contentMediaType</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
+                                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="xref">8.5</a>. <a
+                                        href="#name-contentschema" class="xref">contentSchema</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
+                                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="xref">8.6</a>. <a
+                                        href="#name-example" class="xref">예시</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+                        <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>. <a
+                                href="#name-a-vocabulary-for-basic-meta" class="xref">기본 메타데이터
+                                주석을 위한 어휘</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="xref">9.1</a>. <a
+                                        href="#name-title-and-description" class="xref">"title" 및 "description"</a>
+                                </p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="xref">9.2</a>. <a
+                                        href="#name-default" class="xref">"default"</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="xref">9.3</a>. <a
+                                        href="#name-deprecated" class="xref">"deprecated"</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.4">
+                                <p id="section-toc.1-1.9.2.4.1"><a href="#section-9.4" class="xref">9.4</a>. <a
+                                        href="#name-readonly-and-writeonly" class="xref">"readOnly" 및 "writeOnly"</a>
+                                </p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.5">
+                                <p id="section-toc.1-1.9.2.5.1"><a href="#section-9.5" class="xref">9.5</a>. <a
+                                        href="#name-examples" class="xref">"examples"</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+                        <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a
+                                href="#name-security-considerations" class="xref">보안 고려사항</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+                        <p id="section-toc.1-1.11.1"><a href="#section-11" class="xref">11</a>. <a
+                                href="#name-references" class="xref">참고문헌</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="xref">11.1</a>. <a
+                                        href="#name-normative-references" class="xref">규범적 참고문헌</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="xref">11.2</a>. <a
+                                        href="#name-informative-references" class="xref">정보성 참고문헌</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+                        <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="xref">부록 A</a>. <a
+                                href="#name-keywords-moved-from-validat" class="xref">Validation에서 Core로
+                                이동된 키워드</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+                        <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="xref">부록 B</a>. <a
+                                href="#name-acknowledgments" class="xref">감사의 말</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+                        <p id="section-toc.1-1.14.1"><a href="#appendix-C" class="xref">부록 C</a>. <a
+                                href="#name-changelog" class="xref">변경 로그</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+                        <p id="section-toc.1-1.15.1"><a href="#appendix-D" class="xref"></a><a
+                                href="#name-authors-addresses" class="xref">저자 주소</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <section id="section-1">
+        <h2 id="name-introduction">
+            <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                class="section-name selfRef">소개</a>
+        </h2>
+        <p id="section-1-1">
+            JSON Schema는 주어진 JSON 문서(인스턴스)가 일정 수의 기준을
+            만족하도록 요구하는 데 사용할 수 있습니다. 이러한 기준은 이 명세에서
+            설명하는 키워드를 사용하여 단언됩니다. 또한 대화형 사용자 인터페이스의
+            인스턴스 생성을 지원하기 위한 키워드 집합도 정의됩니다.<a href="#section-1-1" class="pilcrow">¶</a></p>
+        <p id="section-1-2">
+            이 명세는 <span><a href="#json-schema" class="xref">JSON Schema Core</a> [<a href="#json-schema"
+                    class="xref">json-schema</a>]</span> 명세에서 정의한 개념, 구문 및 용어를 사용합니다.<a href="#section-1-2"
+                class="pilcrow">¶</a></p>
+    </section>
+    <section id="section-2">
+        <h2 id="name-conventions-and-terminology">
+            <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-terminology"
+                class="section-name selfRef">규약 및 용어</a>
+        </h2>
+        <p id="section-2-1">
+
+
+            이 문서에서 핵심 단어 "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+            "SHOULD NOT", "RECOMMENDED", "MAY", "OPTIONAL"은
+            <span><a href="#RFC2119" class="xref">RFC 2119</a> [<a href="#RFC2119" class="xref">RFC2119</a>]</span>에 설명된
+            대로 해석됩니다.<a href="#section-2-1" class="pilcrow">¶</a>
+        </p>
+        <p id="section-2-2">
+            이 명세는 배열과 객체 인스턴스 모두를 가리키기 위해 "컨테이너 인스턴스"라는
+            용어를 사용합니다. 배열 요소 또는 객체 멤버 값을 가리키기 위해
+            "자식 인스턴스"라는 용어를 사용합니다.<a href="#section-2-2" class="pilcrow">¶</a></p>
+        <p id="section-2-3">
+            배열 값의 요소들은 이 배열의 서로 다른 두 요소가
+            <span><a href="#json-schema" class="xref">동등하지</a> [<a href="#json-schema"
+                    class="xref">json-schema</a>]</span> 않다면 고유하다고 합니다.<a href="#section-2-3" class="pilcrow">¶</a>
+        </p>
+    </section>
+    <section id="section-3">
+        <h2 id="name-overview">
+            <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-overview"
+                class="section-name selfRef">개요</a>
+        </h2>
+        <p id="section-3-1">
+            JSON Schema 검증은 인스턴스 데이터의 구조에 제약을 단언합니다.
+            단언된 모든 제약을 만족하는 인스턴스 위치에는 그 다음
+            설명 메타데이터 및 사용 힌트와 같은 비단언 정보를 포함하는
+            모든 키워드가 주석으로 추가됩니다. 인스턴스 내의 모든 위치가
+            단언된 모든 제약을 만족하면, 해당 인스턴스는 스키마에 대해
+            유효하다고 합니다.<a href="#section-3-1" class="pilcrow">¶</a></p>
+        <p id="section-3-2">
+            각 스키마 객체는 적용되는 각 인스턴스 위치에 대해 독립적으로 평가됩니다.
+            이는 검증기가 문서 전체 검증 프로세스에서 상태를 유지할 필요가 없도록
+            보장하여 구현 요구사항을 크게 단순화합니다.<a href="#section-3-2" class="pilcrow">¶</a></p>
+        <p id="section-3-3">
+            이 명세는 단언 키워드 집합과 함께, JSON 인스턴스에 유용한 정보를
+            주석으로 달기 위해 사용할 수 있는 작은 메타데이터 키워드 어휘를
+            정의합니다. <a href="#format" class="xref">7절</a> 키워드는 주로
+            주석으로 사용되도록 의도되었지만, 선택적으로 단언으로도 사용할 수 있습니다.
+            <a href="#content" class="xref">8절</a> 키워드는 JSON 문자열로 포함된 문서와
+            함께 작업하기 위한 주석입니다.<a href="#section-3-3" class="pilcrow">¶</a>
+        </p>
+    </section>
+    <section id="section-4">
+        <h2 id="name-interoperability-considerat">
+            <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-interoperability-considerat"
+                class="section-name selfRef">상호 운용성 고려사항</a>
+        </h2>
+        <section id="section-4.1">
+            <h3 id="name-validation-of-string-instan">
+                <a href="#section-4.1" class="section-number selfRef">4.1. </a><a
+                    href="#name-validation-of-string-instan" class="section-name selfRef">문자열
+                    인스턴스의 검증</a>
+            </h3>
+            <p id="section-4.1-1">
+                nul 문자(\u0000)는 JSON 문자열에서 유효하다는 점에 유의해야 합니다.
+                검증할 인스턴스는 기본 프로그래밍 언어가 이러한 데이터를 처리할 수
+                있는지와 관계없이 이 문자를 포함하는 문자열 값을 가질 수 있습니다.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+        </section>
+        <section id="section-4.2">
+            <h3 id="name-validation-of-numeric-insta">
+                <a href="#section-4.2" class="section-number selfRef">4.2. </a><a
+                    href="#name-validation-of-numeric-insta" class="section-name selfRef">숫자
+                    인스턴스의 검증</a>
+            </h3>
+            <p id="section-4.2-1">
+                JSON 명세는 임의 정밀도의 숫자를 허용하며, JSON Schema는
+                그러한 경계를 추가하지 않습니다.
+                이는 JSON Schema가 처리하는 숫자 인스턴스가 기본 프로그래밍 언어가
+                이러한 데이터를 처리할 수 있는지와 관계없이 임의로 크거나
+                그리고/또는 임의로 긴 소수 부분을 가질 수 있음을 의미합니다.<a href="#section-4.2-1" class="pilcrow">¶</a>
+            </p>
+        </section>
+        <div id="regexInterop">
+            <section id="section-4.3">
+                <h3 id="name-regular-expressions">
+                    <a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-regular-expressions"
+                        class="section-name selfRef">정규 표현식</a>
+                </h3>
+                <p id="section-4.3-1">
+                    정규 표현식을 사용하거나 인스턴스 값을 정규 표현식으로
+                    제한하는 키워드는
+                    <span><a href="#json-schema" class="xref">JSON Schema Core</a> [<a href="#json-schema"
+                            class="xref">json-schema</a>]</span> 명세의 정규 표현식에 대한
+                    상호 운용성 고려사항의 적용을 받습니다.<a href="#section-4.3-1" class="pilcrow">¶</a>
+                </p>
+            </section>
+        </div>
+    </section>
+    <div id="meta-schema">
+        <section id="section-5">
+            <h2 id="name-meta-schema">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-meta-schema"
+                    class="section-name selfRef">메타 스키마</a>
+            </h2>
+            <p id="section-5-1">
+                기본 JSON Schema 방언 메타 스키마의 현재 URI는
+                <span><a
+                        href="https://json-schema.org/draft/2020-12/schema">https://json-schema.org/draft/2020-12/schema</a></span>입니다.
+                스키마 작성자의 편의를 위해 이 메타 스키마는
+                이 명세와 JSON Schema Core 명세에 정의된 모든 어휘와,
+                전환 기간 동안 예약된 두 개의 이전 키워드로 구성된 방언을
+                설명합니다.
+                개별 어휘 및 어휘 메타 스키마 URI는 아래 각 절에 제시됩니다.
+                특정 어휘는 지원이 선택 사항이며, 이는 관련 절에서 자세히
+                설명됩니다.<a href="#section-5-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-5-2">
+                오류를 수정하기 위해 명세 초안 사이에 갱신된 어휘 및 메타 스키마
+                URI가 게시될 수 있습니다(MAY). 구현은 이 명세 초안 이후 및 다음
+                명세 초안 이전 날짜의 URI를 여기 나열된 것과 동일한 구문 및 의미를
+                나타내는 것으로 간주하는 것이 좋습니다(SHOULD).<a href="#section-5-2" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <section id="section-6">
+        <h2 id="name-a-vocabulary-for-structural">
+            <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-a-vocabulary-for-structural"
+                class="section-name selfRef">구조적 검증을 위한 어휘</a>
+        </h2>
+        <p id="section-6-1">
+            스키마의 검증 키워드는 인스턴스의 성공적인 검증을 위한 요구사항을 부과합니다.
+            이러한 키워드는 모두 주석 동작이 없는 단언입니다.<a href="#section-6-1" class="pilcrow">¶</a></p>
+        <p id="section-6-2">
+            "$vocabulary"를 사용하지 않는 메타 스키마는 이 어휘의 URI가 true 값으로
+            존재하는 것처럼 이 어휘를 요구하는 것으로 간주하는 것이 좋습니다(SHOULD).<a href="#section-6-2" class="pilcrow">¶</a></p>
+        <p id="section-6-3">
+            Validation 어휘로 알려진 이 어휘의 현재 URI는 다음과 같습니다.
+            &lt;https://json-schema.org/draft/2020-12/vocab/validation&gt;.<a href="#section-6-3" class="pilcrow">¶</a>
+        </p>
+        <p id="section-6-4">
+            대응하는 메타 스키마의 현재 URI는 다음과 같습니다.
+            <span><a
+                    href="https://json-schema.org/draft/2020-12/meta/validation">https://json-schema.org/draft/2020-12/meta/validation</a></span>.<a
+                href="#section-6-4" class="pilcrow">¶</a>
+        </p>
+        <div id="general">
+            <section id="section-6.1">
+                <h3 id="name-validation-keywords-for-any">
+                    <a href="#section-6.1" class="section-number selfRef">6.1. </a><a
+                        href="#name-validation-keywords-for-any" class="section-name selfRef">모든 인스턴스 타입을 위한
+                        검증 키워드</a>
+                </h3>
+                <section id="section-6.1.1">
+                    <h4 id="name-type">
+                        <a href="#section-6.1.1" class="section-number selfRef">6.1.1. </a><a href="#name-type"
+                            class="section-name selfRef">type</a>
+                    </h4>
+                    <p id="section-6.1.1-1">
+                        이 키워드의 값은 문자열 또는 배열이어야 합니다(MUST). 배열인 경우
+                        배열의 요소는 문자열이어야 하며(MUST), 고유해야 합니다(MUST).<a href="#section-6.1.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.1.1-2">
+                        문자열 값은 여섯 가지 원시 타입
+                        ("null", "boolean", "object", "array", "number", "string") 중 하나이거나,
+                        소수 부분이 0인 모든 숫자와 일치하는 "integer"여야 합니다(MUST).<a href="#section-6.1.1-2" class="pilcrow">¶</a></p>
+                    <p id="section-6.1.1-3">
+                        "type"의 값이 문자열이면, 인스턴스의 타입이 해당 문자열 값이
+                        나타내는 타입과 일치할 때 인스턴스는 성공적으로 검증됩니다.
+
+                        "type"의 값이 배열이면, 인스턴스의 타입이 배열 내 문자열들이
+                        나타내는 타입 중 하나와 일치할 때 인스턴스는 성공적으로 검증됩니다.<a href="#section-6.1.1-3" class="pilcrow">¶</a></p>
+                </section>
+                <div id="enum">
+                    <section id="section-6.1.2">
+                        <h4 id="name-enum">
+                            <a href="#section-6.1.2" class="section-number selfRef">6.1.2. </a><a href="#name-enum"
+                                class="section-name selfRef">enum</a>
+                        </h4>
+                        <p id="section-6.1.2-1">
+                            이 키워드의 값은 배열이어야 합니다(MUST). 이 배열은
+                            적어도 하나의 요소를 가지는 것이 좋습니다(SHOULD).
+                            배열의 요소는 고유한 것이 좋습니다(SHOULD).<a href="#section-6.1.2-1" class="pilcrow">¶</a></p>
+                        <p id="section-6.1.2-2">
+                            인스턴스의 값이 이 키워드의 배열 값에 있는 요소 중 하나와
+                            같다면, 인스턴스는 이 키워드에 대해 성공적으로 검증됩니다.<a href="#section-6.1.2-2" class="pilcrow">¶</a></p>
+                        <p id="section-6.1.2-3">
+                            배열의 요소는 null을 포함하여 어떤 타입일 수도 있습니다.<a href="#section-6.1.2-3" class="pilcrow">¶</a></p>
+                    </section>
+                </div>
+                <section id="section-6.1.3">
+                    <h4 id="name-const">
+                        <a href="#section-6.1.3" class="section-number selfRef">6.1.3. </a><a href="#name-const"
+                            class="section-name selfRef">const</a>
+                    </h4>
+                    <p id="section-6.1.3-1">
+                        이 키워드의 값은 null을 포함하여 어떤 타입일 수도 있습니다(MAY).<a href="#section-6.1.3-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.1.3-2">
+                        이 키워드의 사용은 단일 값을 갖는
+                        <span><a href="#enum" class="xref">"enum"</a> (<a href="#enum" class="xref">6.1.2절</a>)</span>과
+                        기능적으로 동등합니다.<a href="#section-6.1.3-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-6.1.3-3">
+                        인스턴스의 값이 키워드의 값과 같다면, 인스턴스는 이 키워드에 대해
+                        성공적으로 검증됩니다.<a href="#section-6.1.3-3" class="pilcrow">¶</a></p>
+                </section>
+            </section>
+        </div>
+        <div id="numeric">
+            <section id="section-6.2">
+                <h3 id="name-validation-keywords-for-num">
+                    <a href="#section-6.2" class="section-number selfRef">6.2. </a><a
+                        href="#name-validation-keywords-for-num" class="section-name selfRef">숫자 인스턴스(number 및 integer)를
+                        위한
+                        검증 키워드</a>
+                </h3>
+                <section id="section-6.2.1">
+                    <h4 id="name-multipleof">
+                        <a href="#section-6.2.1" class="section-number selfRef">6.2.1. </a><a href="#name-multipleof"
+                            class="section-name selfRef">multipleOf</a>
+                    </h4>
+                    <p id="section-6.2.1-1">
+                        "multipleOf"의 값은 숫자여야 하며(MUST), 0보다 엄격하게 커야 합니다.<a href="#section-6.2.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-6.2.1-2">
+                        숫자 인스턴스는 이 키워드의 값으로 나누었을 때 결과가 정수인 경우에만
+                        유효합니다.<a href="#section-6.2.1-2" class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-6.2.2">
+                    <h4 id="name-maximum">
+                        <a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-maximum"
+                            class="section-name selfRef">maximum</a>
+                    </h4>
+                    <p id="section-6.2.2-1">
+                        "maximum"의 값은 숫자여야 하며(MUST), 숫자 인스턴스에 대한 포함 상한을
+                        나타냅니다.<a href="#section-6.2.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.2.2-2">
+                        인스턴스가 숫자인 경우, 이 키워드는 인스턴스가 "maximum"보다 작거나
+                        정확히 같을 때만 검증됩니다.<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-6.2.3">
+                    <h4 id="name-exclusivemaximum">
+                        <a href="#section-6.2.3" class="section-number selfRef">6.2.3. </a><a
+                            href="#name-exclusivemaximum" class="section-name selfRef">exclusiveMaximum</a>
+                    </h4>
+                    <p id="section-6.2.3-1">
+                        "exclusiveMaximum"의 값은 숫자여야 하며(MUST), 숫자 인스턴스에 대한 배타적 상한을
+                        나타냅니다.<a href="#section-6.2.3-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.2.3-2">
+                        인스턴스가 숫자인 경우, 인스턴스는 "exclusiveMaximum"보다
+                        엄격하게 작은(같지 않은) 값을 가질 때만 유효합니다.<a href="#section-6.2.3-2" class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-6.2.4">
+                    <h4 id="name-minimum">
+                        <a href="#section-6.2.4" class="section-number selfRef">6.2.4. </a><a href="#name-minimum"
+                            class="section-name selfRef">minimum</a>
+                    </h4>
+                    <p id="section-6.2.4-1">
+                        "minimum"의 값은 숫자여야 하며(MUST), 숫자 인스턴스에 대한 포함 하한을
+                        나타냅니다.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.2.4-2">
+                        인스턴스가 숫자인 경우, 이 키워드는 인스턴스가 "minimum"보다 크거나
+                        정확히 같을 때만 검증됩니다.<a href="#section-6.2.4-2" class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-6.2.5">
+                    <h4 id="name-exclusiveminimum">
+                        <a href="#section-6.2.5" class="section-number selfRef">6.2.5. </a><a
+                            href="#name-exclusiveminimum" class="section-name selfRef">exclusiveMinimum</a>
+                    </h4>
+                    <p id="section-6.2.5-1">
+                        "exclusiveMinimum"의 값은 숫자여야 하며(MUST), 숫자 인스턴스에 대한 배타적 하한을
+                        나타냅니다.<a href="#section-6.2.5-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.2.5-2">
+                        인스턴스가 숫자인 경우, 인스턴스는 "exclusiveMinimum"보다
+                        엄격하게 큰(같지 않은) 값을 가질 때만 유효합니다.<a href="#section-6.2.5-2" class="pilcrow">¶</a></p>
+                </section>
+            </section>
+        </div>
+        <div id="string">
+            <section id="section-6.3">
+                <h3 id="name-validation-keywords-for-str">
+                    <a href="#section-6.3" class="section-number selfRef">6.3. </a><a
+                        href="#name-validation-keywords-for-str" class="section-name selfRef">문자열을 위한
+                        검증 키워드</a>
+                </h3>
+                <section id="section-6.3.1">
+                    <h4 id="name-maxlength">
+                        <a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-maxlength"
+                            class="section-name selfRef">maxLength</a>
+                    </h4>
+                    <p id="section-6.3.1-1">
+                        이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.3.1-2">
+                        문자열 인스턴스의 길이가 이 키워드의 값보다 작거나 같다면,
+                        해당 인스턴스는 이 키워드에 대해 유효합니다.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+                    <p id="section-6.3.1-3">
+                        문자열 인스턴스의 길이는 <span><a href="#RFC8259" class="xref">RFC 8259</a> [<a href="#RFC8259"
+                                class="xref">RFC8259</a>]</span>에서 정의한 문자 수로 정의됩니다.<a href="#section-6.3.1-3"
+                            class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-6.3.2">
+                    <h4 id="name-minlength">
+                        <a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-minlength"
+                            class="section-name selfRef">minLength</a>
+                    </h4>
+                    <p id="section-6.3.2-1">
+                        이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-6.3.2-2">
+                        문자열 인스턴스의 길이가 이 키워드의 값보다 크거나 같다면,
+                        해당 인스턴스는 이 키워드에 대해 유효합니다.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
+                    <p id="section-6.3.2-3">
+                        문자열 인스턴스의 길이는 <span><a href="#RFC8259" class="xref">RFC 8259</a> [<a href="#RFC8259"
+                                class="xref">RFC8259</a>]</span>에서 정의한 문자 수로 정의됩니다.<a href="#section-6.3.2-3"
+                            class="pilcrow">¶</a></p>
+                    <p id="section-6.3.2-4">
+                        이 키워드를 생략하면 값이 0인 것과 동일하게 동작합니다.<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
+                </section>
+                <div id="pattern">
+                    <section id="section-6.3.3">
+                        <h4 id="name-pattern">
+                            <a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-pattern"
+                                class="section-name selfRef">pattern</a>
+                        </h4>
+                        <p id="section-6.3.3-1">
+                            이 키워드의 값은 문자열이어야 합니다(MUST). 이 문자열은 ECMA-262 정규 표현식
+                            방언에 따라 유효한 정규 표현식인 것이 좋습니다(SHOULD).<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
+                        <p id="section-6.3.3-2">
+                            정규 표현식이 인스턴스와 성공적으로 일치하면 문자열 인스턴스는
+                            유효한 것으로 간주됩니다. 기억하십시오: 정규 표현식은 암묵적으로
+                            고정(anchor)되지 않습니다.<a href="#section-6.3.3-2" class="pilcrow">¶</a></p>
+                    </section>
+                </div>
+            </section>
+        </div>
+        <section id="section-6.4">
+            <h3 id="name-validation-keywords-for-arr">
+                <a href="#section-6.4" class="section-number selfRef">6.4. </a><a
+                    href="#name-validation-keywords-for-arr" class="section-name selfRef">배열을 위한
+                    검증 키워드</a>
+            </h3>
+            <section id="section-6.4.1">
+                <h4 id="name-maxitems">
+                    <a href="#section-6.4.1" class="section-number selfRef">6.4.1. </a><a href="#name-maxitems"
+                        class="section-name selfRef">maxItems</a>
+                </h4>
+                <p id="section-6.4.1-1">
+                    이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
+                <p id="section-6.4.1-2">
+                    배열 인스턴스의 크기가 이 키워드의 값보다 작거나 같다면,
+                    해당 인스턴스는 "maxItems"에 대해 유효합니다.<a href="#section-6.4.1-2" class="pilcrow">¶</a>
+                </p>
+            </section>
+            <section id="section-6.4.2">
+                <h4 id="name-minitems">
+                    <a href="#section-6.4.2" class="section-number selfRef">6.4.2. </a><a href="#name-minitems"
+                        class="section-name selfRef">minItems</a>
+                </h4>
+                <p id="section-6.4.2-1">
+                    이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.4.2-1" class="pilcrow">¶</a></p>
+                <p id="section-6.4.2-2">
+                    배열 인스턴스의 크기가 이 키워드의 값보다 크거나 같다면,
+                    해당 인스턴스는 "minItems"에 대해 유효합니다.<a href="#section-6.4.2-2" class="pilcrow">¶</a></p>
+                <p id="section-6.4.2-3">
+                    이 키워드를 생략하면 값이 0인 것과 동일하게 동작합니다.<a href="#section-6.4.2-3" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-6.4.3">
+                <h4 id="name-uniqueitems">
+                    <a href="#section-6.4.3" class="section-number selfRef">6.4.3. </a><a href="#name-uniqueitems"
+                        class="section-name selfRef">uniqueItems</a>
+                </h4>
+                <p id="section-6.4.3-1">
+                    이 키워드의 값은 불리언이어야 합니다(MUST).<a href="#section-6.4.3-1" class="pilcrow">¶</a></p>
+                <p id="section-6.4.3-2">
+                    이 키워드가 불리언 값 false를 가지면 인스턴스는 성공적으로 검증됩니다.
+                    불리언 값 true를 가지면, 모든 요소가 고유한 경우 인스턴스는
+                    성공적으로 검증됩니다.<a href="#section-6.4.3-2" class="pilcrow">¶</a></p>
+                <p id="section-6.4.3-3">
+                    이 키워드를 생략하면 값이 false인 것과 동일하게 동작합니다.<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-6.4.4">
+                <h4 id="name-maxcontains">
+                    <a href="#section-6.4.4" class="section-number selfRef">6.4.4. </a><a href="#name-maxcontains"
+                        class="section-name selfRef">maxContains</a>
+                </h4>
+                <p id="section-6.4.4-1">
+                    이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.4.4-1" class="pilcrow">¶</a></p>
+                <p id="section-6.4.4-2">
+                    "contains"가 같은 스키마 객체 안에 존재하지 않으면,
+                    이 키워드는 효과가 없습니다.<a href="#section-6.4.4-2" class="pilcrow">¶</a></p>
+                <p id="section-6.4.4-3">
+                    인스턴스 배열은 인접한
+                    <span><a href="#json-schema" class="xref">"contains"</a> [<a href="#json-schema"
+                            class="xref">json-schema</a>]</span> 키워드의 주석 결과 형태에 따라
+                    두 가지 방식으로 "maxContains"에 대해 유효합니다. 첫 번째 방식은
+                    주석 결과가 배열이고 그 배열의 길이가 "maxContains" 값보다 작거나
+                    같은 경우입니다. 두 번째 방식은 주석 결과가 불리언 "true"이고
+                    인스턴스 배열 길이가 "maxContains" 값보다 작거나 같은 경우입니다.<a href="#section-6.4.4-3" class="pilcrow">¶</a>
+                </p>
+            </section>
+            <section id="section-6.4.5">
+                <h4 id="name-mincontains">
+                    <a href="#section-6.4.5" class="section-number selfRef">6.4.5. </a><a href="#name-mincontains"
+                        class="section-name selfRef">minContains</a>
+                </h4>
+                <p id="section-6.4.5-1">
+                    이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.4.5-1" class="pilcrow">¶</a></p>
+                <p id="section-6.4.5-2">
+                    "contains"가 같은 스키마 객체 안에 존재하지 않으면,
+                    이 키워드는 효과가 없습니다.<a href="#section-6.4.5-2" class="pilcrow">¶</a></p>
+                <p id="section-6.4.5-3">
+                    인스턴스 배열은 인접한
+                    <span><a href="#json-schema" class="xref">"contains"</a> [<a href="#json-schema"
+                            class="xref">json-schema</a>]</span> 키워드의 주석 결과 형태에 따라
+                    두 가지 방식으로 "minContains"에 대해 유효합니다. 첫 번째 방식은
+                    주석 결과가 배열이고 그 배열의 길이가 "minContains" 값보다 크거나
+                    같은 경우입니다. 두 번째 방식은 주석 결과가 불리언 "true"이고
+                    인스턴스 배열 길이가 "minContains" 값보다 크거나 같은 경우입니다.<a href="#section-6.4.5-3" class="pilcrow">¶</a>
+                </p>
+                <p id="section-6.4.5-4">
+                    값 0은 허용되지만, 발생 횟수의 범위를 0부터 "maxContains" 값까지로
+                    설정하는 데만 유용합니다. 값 0은 "minContains"와 "contains"가 항상
+                    검증을 통과하게 합니다(하지만 "maxContains" 키워드에 대해서는
+                    여전히 검증에 실패할 수 있습니다).<a href="#section-6.4.5-4" class="pilcrow">¶</a></p>
+                <p id="section-6.4.5-5">
+                    이 키워드를 생략하면 값이 1인 것과 동일하게 동작합니다.<a href="#section-6.4.5-5" class="pilcrow">¶</a></p>
+            </section>
+        </section>
+        <section id="section-6.5">
+            <h3 id="name-validation-keywords-for-obj">
+                <a href="#section-6.5" class="section-number selfRef">6.5. </a><a
+                    href="#name-validation-keywords-for-obj" class="section-name selfRef">객체를 위한
+                    검증 키워드</a>
+            </h3>
+            <section id="section-6.5.1">
+                <h4 id="name-maxproperties">
+                    <a href="#section-6.5.1" class="section-number selfRef">6.5.1. </a><a href="#name-maxproperties"
+                        class="section-name selfRef">maxProperties</a>
+                </h4>
+                <p id="section-6.5.1-1">
+                    이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.5.1-1" class="pilcrow">¶</a></p>
+                <p id="section-6.5.1-2">
+                    객체 인스턴스의 프로퍼티 수가 이 키워드의 값보다 작거나 같다면,
+                    해당 인스턴스는 "maxProperties"에 대해 유효합니다.<a href="#section-6.5.1-2" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-6.5.2">
+                <h4 id="name-minproperties">
+                    <a href="#section-6.5.2" class="section-number selfRef">6.5.2. </a><a href="#name-minproperties"
+                        class="section-name selfRef">minProperties</a>
+                </h4>
+                <p id="section-6.5.2-1">
+                    이 키워드의 값은 음이 아닌 정수여야 합니다(MUST).<a href="#section-6.5.2-1" class="pilcrow">¶</a></p>
+                <p id="section-6.5.2-2">
+                    객체 인스턴스의 프로퍼티 수가 이 키워드의 값보다 크거나 같다면,
+                    해당 인스턴스는 "minProperties"에 대해 유효합니다.<a href="#section-6.5.2-2" class="pilcrow">¶</a></p>
+                <p id="section-6.5.2-3">
+                    이 키워드를 생략하면 값이 0인 것과 동일하게 동작합니다.<a href="#section-6.5.2-3" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-6.5.3">
+                <h4 id="name-required">
+                    <a href="#section-6.5.3" class="section-number selfRef">6.5.3. </a><a href="#name-required"
+                        class="section-name selfRef">required</a>
+                </h4>
+                <p id="section-6.5.3-1">
+                    이 키워드의 값은 배열이어야 합니다(MUST).
+                    이 배열의 요소가 있다면 문자열이어야 하며(MUST), 고유해야 합니다(MUST).<a href="#section-6.5.3-1" class="pilcrow">¶</a></p>
+                <p id="section-6.5.3-2">
+                    배열의 모든 항목이 인스턴스 내 프로퍼티의 이름이라면,
+                    객체 인스턴스는 이 키워드에 대해 유효합니다.<a href="#section-6.5.3-2" class="pilcrow">¶</a></p>
+                <p id="section-6.5.3-3">
+                    이 키워드를 생략하면 빈 배열과 동일하게 동작합니다.<a href="#section-6.5.3-3" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-6.5.4">
+                <h4 id="name-dependentrequired">
+                    <a href="#section-6.5.4" class="section-number selfRef">6.5.4. </a><a href="#name-dependentrequired"
+                        class="section-name selfRef">dependentRequired</a>
+                </h4>
+                <p id="section-6.5.4-1">
+                    이 키워드의 값은 객체여야 합니다(MUST). 이 객체 안의 프로퍼티가 있다면
+                    배열이어야 합니다(MUST). 각 배열의 요소가 있다면 문자열이어야 하며(MUST),
+                    고유해야 합니다(MUST).<a href="#section-6.5.4-1" class="pilcrow">¶</a></p>
+                <p id="section-6.5.4-2">
+                    이 키워드는 특정 다른 프로퍼티가 존재하는 경우 요구되는 프로퍼티를
+                    지정합니다. 이들의 요구사항은 다른 프로퍼티의 존재 여부에 의존합니다.<a href="#section-6.5.4-2" class="pilcrow">¶</a></p>
+                <p id="section-6.5.4-3">
+                    인스턴스와 이 키워드의 값 안에 이름으로 모두 나타나는 각 이름에 대해,
+                    대응하는 배열의 모든 항목도 인스턴스 내 프로퍼티의 이름이면
+                    검증은 성공합니다.<a href="#section-6.5.4-3" class="pilcrow">¶</a></p>
+                <p id="section-6.5.4-4">
+                    이 키워드를 생략하면 빈 객체와 동일하게 동작합니다.<a href="#section-6.5.4-4" class="pilcrow">¶</a></p>
+            </section>
+        </section>
+    </section>
+    <div id="format">
+        <section id="section-7">
+            <h2 id="name-vocabularies-for-semantic-c">
+                <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-vocabularies-for-semantic-c"
+                    class="section-name selfRef">"format"을 사용하는 의미 콘텐츠를 위한 어휘</a>
+            </h2>
+            <section id="section-7.1">
+                <h3 id="name-foreword">
+                    <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-foreword"
+                        class="section-name selfRef">머리말</a>
+                </h3>
+                <p id="section-7.1-1">
+                    구조적 검증만으로는 애플리케이션이 특정 값을 올바르게 활용하기에
+                    충분하지 않을 수 있습니다. "format" 주석 키워드는 스키마 작성자가
+                    RFC이든 다른 외부 명세이든 권위 있는 리소스에 의해 정확하게
+                    설명되는 고정된 값 부분집합에 대한 의미 정보를 전달할 수 있도록
+                    정의됩니다.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+                <p id="section-7.1-2">
+                    이 키워드의 값은 format 속성이라고 합니다. 이는 문자열이어야 합니다(MUST).
+                    format 속성은 일반적으로 주어진 인스턴스 타입 집합만 검증할 수 있습니다.
+                    검증할 인스턴스의 타입이 이 집합에 없으면, 이 format 속성과 인스턴스에
+                    대한 검증은 성공하는 것이 좋습니다(SHOULD). 이 절에 정의된 모든 format
+                    속성은 문자열에 적용되지만, format 속성은
+                    <span><a href="#json-schema" class="xref">Core JSON Schema</a> [<a href="#json-schema"
+                            class="xref">json-schema</a>]</span>에 정의된 데이터 모델의
+                    모든 인스턴스 타입에 적용되도록 지정할 수 있습니다.
+                    <span class="cref">
+                        이 명세의 "type" 키워드는 데이터 모델의 일부가 아닌 "integer" 타입을
+                        정의한다는 점에 유의하십시오. 따라서 format 속성은 숫자로 제한될 수는
+                        있지만, 특별히 정수로 제한될 수는 없습니다. 그러나 숫자 format은
+                        값이 "integer"인 "type" 키워드와 함께 사용할 수 있거나, 숫자가 정수가
+                        아니면 항상 통과하도록 명시적으로 정의할 수 있으며, 이는 본질적으로
+                        정수에만 적용하는 것과 동일한 동작을 생성합니다.
+                    </span><a href="#section-7.1-2" class="pilcrow">¶</a>
+                </p>
+                <p id="section-7.1-3">
+                    Format-Annotation 어휘로 알려진 이 어휘의 현재 URI는 다음과 같습니다.
+                    &lt;https://json-schema.org/draft/2020-12/vocab/format-annotation&gt;. 대응하는
+                    메타 스키마의 현재 URI는 다음과 같습니다.
+                    <span><a
+                            href="https://json-schema.org/draft/2020-12/meta/format-annotation">https://json-schema.org/draft/2020-12/meta/format-annotation</a></span>.
+                    이 어휘에 대한 지원 구현은 필수입니다(REQUIRED).<a href="#section-7.1-3" class="pilcrow">¶</a>
+                </p>
+                <p id="section-7.1-4">
+                    Format-Annotation 어휘 외에도, "format"을 단언으로 정의하는 사용자 정의
+                    메타 스키마를 위한 보조 어휘를 사용할 수 있습니다. Format-Assertion
+                    어휘의 URI는 다음과 같습니다.
+                    &lt;https://json-schema.org/draft/2020-12/vocab/format-assertion&gt;. 대응하는
+                    메타 스키마의 현재 URI는 다음과 같습니다.
+                    <span><a
+                            href="https://json-schema.org/draft/2020-12/meta/format-assertion">https://json-schema.org/draft/2020-12/meta/format-assertion</a></span>.
+                    Format-Assertion 어휘에 대한 지원 구현은 선택 사항입니다(OPTIONAL).<a href="#section-7.1-4" class="pilcrow">¶</a>
+                </p>
+                <p id="section-7.1-5">
+                    Format-Annotation 어휘와 Format-Assertion 어휘를 모두 지정하는 것은,
+                    그 요구사항이 Format-Annotation 어휘의 상위 집합이므로 Format-Assertion
+                    어휘만 지정하는 것과 기능적으로 동등합니다.<a href="#section-7.1-5" class="pilcrow">¶</a>
+                </p>
+            </section>
+            <section id="section-7.2">
+                <h3 id="name-implementation-requirements">
+                    <a href="#section-7.2" class="section-number selfRef">7.2. </a><a
+                        href="#name-implementation-requirements" class="section-name selfRef">구현
+                        요구사항</a>
+                </h3>
+                <p id="section-7.2-1">
+                    "format" 키워드는 참조되는 어휘가 정의한 대로 동작합니다.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+                <section id="section-7.2.1">
+                    <h4 id="name-format-annotation-vocabular">
+                        <a href="#section-7.2.1" class="section-number selfRef">7.2.1. </a><a
+                            href="#name-format-annotation-vocabular" class="section-name selfRef">Format-Annotation
+                            어휘</a>
+                    </h4>
+                    <p id="section-7.2.1-1">
+                        구현이 주석 수집을 지원한다면 format의 값은 주석으로 수집되어야 합니다(MUST).
+                        이는 스키마 검증이 불가능하거나 불충분할 때 애플리케이션 수준 검증을
+                        가능하게 합니다.<a href="#section-7.2.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-7.2.1-2">
+                        구현은 여전히 "format"을 주석에 더해 단언으로 취급하고, 지정된 의미에
+                        대한 값의 부합성을 검증하려고 시도할 수 있습니다(MAY). 구현은 그러한
+                        평가를 활성화 및 비활성화하는 옵션을 제공해야 하며(MUST), 기본적으로
+                        비활성화되어야 합니다(MUST). 구현은 그러한 검증에 대한 지원 수준을
+                        문서화하는 것이 좋습니다(SHOULD).
+                        <span class="cref">
+                            Format-Annotation 어휘를 지정하고 구현에서 검증을 활성화하는 것은
+                            Format-Assertion 어휘를 지정하는 것과 동등한 것으로 보아서는 안 됩니다.
+                            Format-Assertion 어휘가 지정되지 않았을 때 구현은 전체 검증 지원을
+                            제공할 필요가 없기 때문입니다.
+                        </span><a href="#section-7.2.1-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-7.2.1-3">
+                        구현이 단언 동작으로 구성된 경우, 구현은 다음을 수행합니다.<a href="#section-7.2.1-3" class="pilcrow">¶</a></p>
+                    <ul class="normal ulEmpty">
+                        <li class="normal ulEmpty" id="section-7.2.1-4.1">
+                            아래에 정의된 각 format 속성에 대해 구현별 최선 노력 검증을
+                            제공하는 것이 좋습니다(SHOULD).<a href="#section-7.2.1-4.1" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal ulEmpty" id="section-7.2.1-4.2">
+                            일부 또는 모든 format 속성의 검증을 항상 true라는 검증 결과를
+                            생성하는 no-op으로 구현하도록 선택할 수 있습니다(MAY).<a href="#section-7.2.1-4.2" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <p id="section-7.2.1-5">
+                        <span class="cref">
+                            이는 일부 또는 모든 format 속성에 대해 검증을 전혀 제공하지 않는
+                            경우를 포함하여 검증 수준이 매우 다양한 현재 구현 현실과 일치합니다.
+                            또한 주석 동작에만 의존하고 애플리케이션에서 의미 검증을 수행하도록
+                            장려하기 위해 설계되었으며, 이것이 권장되는 모범 사례입니다.
+                        </span><a href="#section-7.2.1-5" class="pilcrow">¶</a>
+                    </p>
+                </section>
+                <section id="section-7.2.2">
+                    <h4 id="name-format-assertion-vocabulary">
+                        <a href="#section-7.2.2" class="section-number selfRef">7.2.2. </a><a
+                            href="#name-format-assertion-vocabulary" class="section-name selfRef">Format-Assertion
+                            어휘</a>
+                    </h4>
+                    <p id="section-7.2.2-1">
+                        Format-Assertion 어휘가 true 값으로 선언되면, 구현은 이 명세에서 정의한
+                        모든 format에 대해 전체 검증 지원을 제공해야 합니다(MUST). 전체 검증
+                        지원을 제공할 수 없는 구현은 스키마 처리를 거부해야 합니다(MUST).<a href="#section-7.2.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-7.2.2-2">
+                        Format-Assertion 어휘를 지원하는 구현은 다음을 수행합니다.<a href="#section-7.2.2-2" class="pilcrow">¶</a></p>
+                    <ul class="normal ulEmpty">
+                        <li class="normal ulEmpty" id="section-7.2.2-3.1">
+                            구현이 주석 수집을 지원한다면 "format"을 여전히 주석으로 수집해야 합니다(MUST).<a href="#section-7.2.2-3.1"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal ulEmpty" id="section-7.2.2-3.2">
+                            "format"을 단언으로 평가해야 합니다(MUST).<a href="#section-7.2.2-3.2" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal ulEmpty" id="section-7.2.2-3.3">
+                            이 명세에 정의된 모든 format 속성과, 인식하는 모든 추가 format
+                            속성에 대해 구문적 검증을 구현해야 합니다(MUST). 이때 올바른 타입의
+                            가능한 인스턴스 값 중 검증에 실패할 값이 존재해야 합니다.<a href="#section-7.2.2-3.3" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <p id="section-7.2.2-4">
+                        format 속성의 최소 검증 요구사항은 많은 속성에 관련된 복잡성 때문에
+                        의도적으로 모호하고 허용적으로 되어 있습니다. 특히 이 요구사항은
+                        구문 검사로 제한된다는 점에 유의하십시오. 구현이 이메일을 보내거나,
+                        URL에 연결을 시도하거나, format 인스턴스가 식별하는 엔티티의 존재를
+                        확인할 것으로 기대해서는 안 됩니다.
+                        <span class="cref">
+                            date-time과 같은 단순한 format의 경우 구문 검증이 철저할 것으로
+                            기대됩니다. 이메일 주소와 같은 복잡한 format은 다양한 표준과
+                            시간이 지나며 이루어진 수많은 조정이 뒤섞인 것이며, 값을 사용하는
+                            다른 애플리케이션에 의해 제한될 수도 있고 아닐 수도 있는 모호하거나
+                            오래된 규칙이 있으므로 최소 검증으로 충분합니다. 예를 들어, "@"를
+                            포함하지 않는 인스턴스 문자열은 명백히 유효한 이메일 주소가 아니며,
+                            7비트 ASCII 범위를 벗어난 문자를 포함하는 "email" 또는 "hostname"도
+                            마찬가지로 명백히 유효하지 않습니다.
+                        </span><a href="#section-7.2.2-4" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-7.2.2-5">
+                        구현은 각 format에 대해 공통 파싱 라이브러리 또는 잘 알려진 정규 표현식을
+                        사용하는 것이 권장됩니다(RECOMMENDED). 구현은 각 format 속성이 어떻게,
+                        어느 정도까지 검증되는지 명확히 문서화하는 것이 좋습니다(SHOULD).<a href="#section-7.2.2-5" class="pilcrow">¶</a></p>
+                    <p id="section-7.2.2-6">
+                        <span><a href="#meta-schema" class="xref">표준 Core 및 Validation 메타 스키마</a> (<a
+                                href="#meta-schema" class="xref">5절</a>)</span>는 "$vocabulary" 키워드에
+                        이 어휘를 false 값으로 포함합니다. 기본적으로 구현은 이 키워드를
+                        단언으로 지원할 필요가 없기 때문입니다. format 어휘를 true 값으로
+                        지원하면 코드 크기와 경우에 따라 실행 시간이 크게 증가하는 것으로
+                        이해되며, 모든 구현에 적합하지는 않습니다.<a href="#section-7.2.2-6" class="pilcrow">¶</a>
+                    </p>
+                </section>
+                <section id="section-7.2.3">
+                    <h4 id="name-custom-format-attributes">
+                        <a href="#section-7.2.3" class="section-number selfRef">7.2.3. </a><a
+                            href="#name-custom-format-attributes" class="section-name selfRef">사용자 정의 format
+                            속성</a>
+                    </h4>
+                    <p id="section-7.2.3-1">
+                        구현은 사용자 정의 format 속성을 지원할 수 있습니다(MAY). 당사자 간의 합의가
+                        없는 한, 스키마 작성자는 피어 구현이 그러한 사용자 정의 format 속성을
+                        지원할 것으로 기대해서는 안 됩니다(SHALL NOT). 구현은 알 수 없는 format을
+                        주석으로 수집하는 데 실패해서는 안 됩니다(MUST NOT). Format-Assertion 어휘가
+                        지정된 경우, 구현은 알 수 없는 format을 만나면 실패해야 합니다(MUST).<a href="#section-7.2.3-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-7.2.3-2">
+                        어휘는 키워드에 대해 서로 다른 값 집합을 구체적으로 선언하는 것을 지원하지
+                        않습니다. 이러한 한계와 이 키워드의 역사적으로 고르지 못한 구현으로 인해,
+                        상호 운용성이 필요하다면 추가 format 속성보다 사용자 정의 어휘에 추가
+                        키워드를 정의하는 것이 권장됩니다(RECOMMENDED).<a href="#section-7.2.3-2" class="pilcrow">¶</a></p>
+                </section>
+            </section>
+            <section id="section-7.3">
+                <h3 id="name-defined-formats">
+                    <a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-defined-formats"
+                        class="section-name selfRef">정의된 형식</a>
+                </h3>
+                <section id="section-7.3.1">
+                    <h4 id="name-dates-times-and-duration">
+                        <a href="#section-7.3.1" class="section-number selfRef">7.3.1. </a><a
+                            href="#name-dates-times-and-duration" class="section-name selfRef">날짜, 시간 및
+                            기간</a>
+                    </h4>
+                    <p id="section-7.3.1-1">
+                        이러한 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.1-2">
+                        날짜 및 시간 format 이름은
+                        <span><a href="#RFC3339" class="xref">RFC 3339, 5.6절</a> [<a href="#RFC3339"
+                                class="xref">RFC3339</a>]</span>에서 파생됩니다.
+                        duration format은 RFC 3339의 부록 A에 제시된 ISO 8601 ABNF에서 가져옵니다.<a href="#section-7.3.1-2"
+                            class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-7.3.1-3">
+                        format을 지원하는 구현은 다음 속성에 대한 지원을 구현하는 것이 좋습니다(SHOULD).<a href="#section-7.3.1-3"
+                            class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-7.3.1-4">
+                        <dt id="section-7.3.1-4.1">date-time:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.1-4.2">
+                            문자열 인스턴스가 위에서 참조한 "date-time" ABNF 규칙에 따른
+                            유효한 표현이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.1-4.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.1-4.3">date:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.1-4.4">
+                            문자열 인스턴스가 위에서 참조한 "full-date" ABNF 규칙에 따른
+                            유효한 표현이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.1-4.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.1-4.5">time:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.1-4.6">
+                            문자열 인스턴스가 위에서 참조한 "full-time" ABNF 규칙에 따른
+                            유효한 표현이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.1-4.6" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.1-4.7">duration:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.1-4.8">
+                            문자열 인스턴스가 위에서 참조한 "duration" ABNF 규칙에 따른
+                            유효한 표현이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.1-4.8" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <p id="section-7.3.1-5">
+                        구현은 해당 RFC의 어디에서든 정의된 다른 format 이름을 사용하여
+                        추가 속성을 지원할 수 있습니다(MAY). "full-date" 또는 "full-time"이
+                        구현되면, 대응하는 축약 형식("date" 또는 "time")도 각각 구현되어야 하며(MUST),
+                        동일하게 동작해야 합니다(MUST).
+                        구현은 해당 format의 규칙에 따라 검증하지 않는 한 RFC 3339 format과
+                        일치하는 이름의 확장 속성을 정의해서는 안 됩니다(SHOULD NOT).
+                        <span class="cref">
+                            현재 모든 RFC 3339 format을 지원할 필요성에 대한 합의는 없습니다.
+                            따라서 네임스페이스를 예약하는 이러한 접근 방식은 전체 집합에
+                            전념하지 않고도 실험을 장려할 것입니다. format 구현 요구사항이
+                            전반적으로 더 유연해지거나, 이러한 것들이 완전히 지정된 속성으로
+                            승격되거나 제거될 가능성이 있습니다.
+                        </span><a href="#section-7.3.1-5" class="pilcrow">¶</a>
+                    </p>
+                </section>
+                <section id="section-7.3.2">
+                    <h4 id="name-email-addresses">
+                        <a href="#section-7.3.2" class="section-number selfRef">7.3.2. </a><a
+                            href="#name-email-addresses" class="section-name selfRef">이메일 주소</a>
+                    </h4>
+                    <p id="section-7.3.2-1">
+                        이러한 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.2-2">
+                        문자열 인스턴스가 다음과 같이 유효한 인터넷 이메일 주소라면,
+                        이 속성들에 대해 유효합니다.<a href="#section-7.3.2-2" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-7.3.2-3">
+                        <dt id="section-7.3.2-3.1">email:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.2-3.2">
+                            <span><a href="#RFC5321" class="xref">RFC 5321, 4.1.2절</a> [<a href="#RFC5321"
+                                    class="xref">RFC5321</a>]</span>의 "Mailbox" ABNF 규칙에 정의된 대로입니다.<a
+                                href="#section-7.3.2-3.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.2-3.3">idn-email:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.2-3.4">
+                            <span><a href="#RFC6531" class="xref">RFC 6531, 3.3절</a> [<a href="#RFC6531"
+                                    class="xref">RFC6531</a>]</span>의 확장 "Mailbox" ABNF 규칙에 정의된 대로입니다.<a
+                                href="#section-7.3.2-3.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <p id="section-7.3.2-4">
+                        "email" 속성에 대해 유효한 모든 문자열은 "idn-email" 속성에 대해서도
+                        유효하다는 점에 유의하십시오.<a href="#section-7.3.2-4" class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-7.3.3">
+                    <h4 id="name-hostnames">
+                        <a href="#section-7.3.3" class="section-number selfRef">7.3.3. </a><a href="#name-hostnames"
+                            class="section-name selfRef">호스트명</a>
+                    </h4>
+                    <p id="section-7.3.3-1">
+                        이러한 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.3-1" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.3-2">
+                        문자열 인스턴스가 다음과 같이 인터넷 호스트명에 대한 유효한 표현이면,
+                        이 속성들에 대해 유효합니다.<a href="#section-7.3.3-2" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-7.3.3-3">
+                        <dt id="section-7.3.3-3.1">hostname:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.3-3.2">
+                            <span><a href="#RFC1123" class="xref">RFC 1123, 2.1절</a> [<a href="#RFC1123"
+                                    class="xref">RFC1123</a>]</span>에 정의된 대로이며,
+                            <span><a href="#RFC5891" class="xref">RFC 5891, 4.4절</a> [<a href="#RFC5891"
+                                    class="xref">RFC5891</a>]</span>에 지정된 Punycode 알고리즘을
+                            사용하여 생성된 호스트 이름을 포함합니다.<a href="#section-7.3.3-3.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.3-3.3">idn-hostname:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.3-3.4">
+                            hostname의 경우처럼 RFC 1123에 정의된 것이거나,
+                            <span><a href="#RFC5890" class="xref">RFC 5890, 2.3.2.3절</a> [<a href="#RFC5890"
+                                    class="xref">RFC5890</a>]</span>에 정의된 국제화 호스트명입니다.<a href="#section-7.3.3-3.4"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <p id="section-7.3.3-4">
+                        "hostname" 속성에 대해 유효한 모든 문자열은 "idn-hostname" 속성에 대해서도
+                        유효하다는 점에 유의하십시오.<a href="#section-7.3.3-4" class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-7.3.4">
+                    <h4 id="name-ip-addresses">
+                        <a href="#section-7.3.4" class="section-number selfRef">7.3.4. </a><a href="#name-ip-addresses"
+                            class="section-name selfRef">IP 주소</a>
+                    </h4>
+                    <p id="section-7.3.4-1">
+                        이러한 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.4-1" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.4-2">
+                        문자열 인스턴스가 다음과 같이 IP 주소의 유효한 표현이면,
+                        이 속성들에 대해 유효합니다.<a href="#section-7.3.4-2" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-7.3.4-3">
+                        <dt id="section-7.3.4-3.1">ipv4:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.4-3.2">
+                            <span><a href="#RFC2673" class="xref">RFC 2673, 3.2절</a> [<a href="#RFC2673"
+                                    class="xref">RFC2673</a>]</span>에 정의된 "dotted-quad" ABNF
+                            구문에 따른 IPv4 주소입니다.<a href="#section-7.3.4-3.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.4-3.3">ipv6:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.4-3.4">
+                            <span><a href="#RFC4291" class="xref">RFC 4291, 2.2절</a> [<a href="#RFC4291"
+                                    class="xref">RFC4291</a>]</span>에 정의된 IPv6 주소입니다.<a href="#section-7.3.4-3.4"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+                <section id="section-7.3.5">
+                    <h4 id="name-resource-identifiers">
+                        <a href="#section-7.3.5" class="section-number selfRef">7.3.5. </a><a
+                            href="#name-resource-identifiers" class="section-name selfRef">리소스 식별자</a>
+                    </h4>
+                    <p id="section-7.3.5-1">
+                        이러한 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.5-1" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-7.3.5-2">
+                        <dt id="section-7.3.5-2.1">uri:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.5-2.2">
+                            문자열 인스턴스가 <span>[<a href="#RFC3986" class="xref">RFC3986</a>]</span>에 따른
+                            유효한 URI이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.5-2.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.5-2.3">uri-reference:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.5-2.4">
+                            문자열 인스턴스가 <span>[<a href="#RFC3986" class="xref">RFC3986</a>]</span>에 따른
+                            유효한 URI Reference(URI 또는 relative-reference)이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.5-2.4"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.5-2.5">iri:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.5-2.6">
+                            문자열 인스턴스가 <span>[<a href="#RFC3987" class="xref">RFC3987</a>]</span>에 따른
+                            유효한 IRI이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.5-2.6" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.5-2.7">iri-reference:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.5-2.8">
+                            문자열 인스턴스가 <span>[<a href="#RFC3987" class="xref">RFC3987</a>]</span>에 따른
+                            유효한 IRI Reference(IRI 또는 relative-reference)이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.5-2.8"
+                                class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.5-2.9">uuid:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.5-2.10">
+                            문자열 인스턴스가 <span>[<a href="#RFC4122" class="xref">RFC4122</a>]</span>에 따른 UUID의 유효한
+                            문자열 표현이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.5-2.10" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <p id="section-7.3.5-3">
+                        모든 유효한 URI는 유효한 IRI이며, 모든 유효한 URI Reference도
+                        유효한 IRI Reference라는 점에 유의하십시오.<a href="#section-7.3.5-3" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.5-4">
+                        또한 "uuid" format은 URN의 UUID가 아니라 일반 UUID를 위한 것임에
+                        유의하십시오. 예시는 "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"입니다.
+                        URN으로서의 UUID에는 "uri" format을 사용하고, URI 스킴과 URN 네임스페이스를
+                        나타내기 위해 "^urn:uuid:"의 "pattern" 정규 표현식을 사용하십시오.<a href="#section-7.3.5-4" class="pilcrow">¶</a>
+                    </p>
+                </section>
+                <section id="section-7.3.6">
+                    <h4 id="name-uri-template">
+                        <a href="#section-7.3.6" class="section-number selfRef">7.3.6. </a><a href="#name-uri-template"
+                            class="section-name selfRef">uri-template</a>
+                    </h4>
+                    <p id="section-7.3.6-1">
+                        이 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.6-1" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.6-2">
+                        문자열 인스턴스가 <span>[<a href="#RFC6570" class="xref">RFC6570</a>]</span>에 따른
+                        유효한 URI Template(어느 수준이든)이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.6-2" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.6-3">
+                        URI Template은 IRI에 사용될 수 있으며, 별도의 IRI Template 명세는 없다는
+                        점에 유의하십시오.<a href="#section-7.3.6-3" class="pilcrow">¶</a></p>
+                </section>
+                <section id="section-7.3.7">
+                    <h4 id="name-json-pointers">
+                        <a href="#section-7.3.7" class="section-number selfRef">7.3.7. </a><a href="#name-json-pointers"
+                            class="section-name selfRef">JSON 포인터</a>
+                    </h4>
+                    <p id="section-7.3.7-1">
+                        이러한 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.7-1" class="pilcrow">¶</a></p>
+                    <span class="break"></span>
+                    <dl class="dlParallel" id="section-7.3.7-2">
+                        <dt id="section-7.3.7-2.1">json-pointer:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.7-2.2">
+                            문자열 인스턴스가
+                            <span><a href="#RFC6901" class="xref">RFC 6901, 5절</a> [<a href="#RFC6901"
+                                    class="xref">RFC6901</a>]</span>에 따른 JSON Pointer의
+                            유효한 JSON 문자열 표현이면, 이 속성에 대해 유효합니다.<a href="#section-7.3.7-2.2" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="section-7.3.7-2.3">relative-json-pointer:</dt>
+                        <dd style="margin-left: 1.5em" id="section-7.3.7-2.4">
+                            문자열 인스턴스가 유효한
+                            <span><a href="#relative-json-pointer" class="xref">Relative JSON Pointer</a> [<a
+                                    href="#relative-json-pointer" class="xref">relative-json-pointer</a>]</span>이면,
+                            이 속성에 대해 유효합니다.<a href="#section-7.3.7-2.4" class="pilcrow">¶</a>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                    <p id="section-7.3.7-3">
+                        절대 및 상대 JSON Pointer를 모두 허용하려면 "anyOf" 또는
+                        "oneOf"를 사용하여 어느 format이든 지원함을 나타내십시오.<a href="#section-7.3.7-3" class="pilcrow">¶</a>
+                    </p>
+                </section>
+                <section id="section-7.3.8">
+                    <h4 id="name-regex">
+                        <a href="#section-7.3.8" class="section-number selfRef">7.3.8. </a><a href="#name-regex"
+                            class="section-name selfRef">regex</a>
+                    </h4>
+                    <p id="section-7.3.8-1">
+                        이 속성은 문자열 인스턴스에 적용됩니다.<a href="#section-7.3.8-1" class="pilcrow">¶</a></p>
+                    <p id="section-7.3.8-2">
+                        <span><a href="#ecma262" class="xref">ECMA-262</a> [<a href="#ecma262"
+                                class="xref">ecma262</a>]</span> 정규 표현식 방언에 따라
+                        유효한 것이 좋은(SHOULD) 정규 표현식입니다.<a href="#section-7.3.8-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-7.3.8-3">
+                        format을 검증하는 구현은 이 명세의
+                        <span><a href="#regexInterop" class="xref">정규 표현식</a> (<a href="#regexInterop"
+                                class="xref">4.3절</a>)</span>
+                        절에 정의된 ECMA-262의 부분집합을 적어도 수용해야 하며(MUST),
+                        모든 유효한 ECMA-262 표현식을 수용하는 것이 좋습니다(SHOULD).<a href="#section-7.3.8-3" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </section>
+        </section>
+    </div>
+    <div id="content">
+        <section id="section-8">
+            <h2 id="name-a-vocabulary-for-the-conten">
+                <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-a-vocabulary-for-the-conten"
+                    class="section-name selfRef">문자열로 인코딩된 데이터의 내용을 위한 어휘</a>
+            </h2>
+            <section id="section-8.1">
+                <h3 id="name-foreword-2">
+                    <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-foreword-2"
+                        class="section-name selfRef">머리말</a>
+                </h3>
+                <p id="section-8.1-1">
+                    이 절에 정의된 주석은 인스턴스가 JSON 문자열로 인코딩된
+                    비 JSON 데이터를 포함함을 나타냅니다.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+                <p id="section-8.1-2">
+                    이러한 프로퍼티는 JSON 데이터를 풍부한 멀티미디어 문서로 해석하는 데
+                    필요한 추가 정보를 제공합니다. 콘텐츠의 타입, 인코딩 방식,
+                    그리고/또는 검증될 수 있는 방식을 설명합니다. 이들은 검증 단언으로
+                    동작하지 않습니다. 잘못 형성된 문자열 인코딩 문서가 포함하는 인스턴스를
+                    유효하지 않은 것으로 간주하게 해서는 안 됩니다(MUST NOT).<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+                <p id="section-8.1-3">
+                    "$vocabulary"를 사용하지 않는 메타 스키마는 이 어휘의 URI가 true 값으로
+                    존재하는 것처럼 이 어휘를 요구하는 것으로 간주하는 것이 좋습니다(SHOULD).<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+                <p id="section-8.1-4">
+                    Content 어휘로 알려진 이 어휘의 현재 URI는 다음과 같습니다.
+                    &lt;https://json-schema.org/draft/2020-12/vocab/content&gt;.<a href="#section-8.1-4"
+                        class="pilcrow">¶</a></p>
+                <p id="section-8.1-5">
+                    대응하는 메타 스키마의 현재 URI는 다음과 같습니다.
+                    <span><a
+                            href="https://json-schema.org/draft/2020-12/meta/content">https://json-schema.org/draft/2020-12/meta/content</a></span>.<a
+                        href="#section-8.1-5" class="pilcrow">¶</a>
+                </p>
+            </section>
+            <section id="section-8.2">
+                <h3 id="name-implementation-requirements-2">
+                    <a href="#section-8.2" class="section-number selfRef">8.2. </a><a
+                        href="#name-implementation-requirements-2" class="section-name selfRef">구현
+                        요구사항</a>
+                </h3>
+                <p id="section-8.2-1">
+                    보안 및 성능 문제와 가능한 콘텐츠 타입의 개방적인 특성 때문에,
+                    구현은 기본적으로 문자열 내용을 자동으로 디코딩, 파싱,
+                    그리고/또는 검증해서는 안 됩니다(MUST NOT). 이는 포함하는 문서를
+                    처리한 소비자와 다른 소비자가 처리하도록 의도된 임베디드 문서의
+                    사용 사례도 추가로 지원합니다.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+                <p id="section-8.2-2">
+                    이 절의 모든 키워드는 문자열에만 적용되며, 다른 데이터 타입에는
+                    효과가 없습니다.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+                <p id="section-8.2-3">
+                    구현은 문자열 내용을 자동으로 디코딩, 파싱, 그리고/또는 검증하는
+                    기능을 제공할 수 있습니다(MAY). 그러나 이러한 작업을 기본적으로
+                    수행해서는 안 되며(MUST NOT), 각 문자열 인코딩 문서의 검증 결과를
+                    둘러싼 문서와 별도로 제공해야 합니다(MUST). 이 프로세스는 원래
+                    스키마에 대해 인스턴스를 완전히 평가한 뒤, 주석을 사용하여 각
+                    문자열 인코딩 문서를 디코딩, 파싱, 그리고/또는 검증하는 것과
+                    동등한 것이 좋습니다(SHOULD).
+                    <span class="cref">
+                        현재로서는 이러한 자동 디코딩, 파싱 및 검증 기능에서 파싱된
+                        데이터 및/또는 검증 결과를 수행하고 반환하는 정확한 메커니즘은
+                        명세하지 않습니다. 그러한 기능이 널리 사용되는 것으로 입증되면,
+                        향후 초안에서 더 철저히 명세될 수 있습니다.
+                    </span><a href="#section-8.2-3" class="pilcrow">¶</a>
+                </p>
+                <p id="section-8.2-4">
+                    이러한 키워드에 따라 인스턴스 문자열을 자동으로 처리함으로써
+                    도입될 수 있는 취약점에 대해서는 <span><a href="#security" class="xref">보안 고려사항</a> (<a href="#security"
+                            class="xref">10절</a>)</span>
+                    절도 참조하십시오.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-8.3">
+                <h3 id="name-contentencoding">
+                    <a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-contentencoding"
+                        class="section-name selfRef">contentEncoding</a>
+                </h3>
+                <p id="section-8.3-1">
+                    인스턴스 값이 문자열이면, 이 프로퍼티는 해당 문자열이 인코딩된
+                    바이너리 데이터로 해석되고 이 프로퍼티가 이름으로 지정한 인코딩을
+                    사용하여 디코딩되는 것이 좋음을 정의합니다(SHOULD).<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+                <p id="section-8.3-2">
+                    여러 변형을 포함한 base 16, 32 및 64 인코딩을 나타내는 가능한 값은
+                    <span><a href="#RFC4648" class="xref">RFC 4648</a> [<a href="#RFC4648"
+                            class="xref">RFC4648</a>]</span>에 나열되어 있습니다. 또한
+                    <span><a href="#RFC2045" class="xref">RFC 2045</a> [<a href="#RFC2045"
+                            class="xref">RFC2045</a>]</span>의 6.7절 및 6.8절은
+                    MIME에서 사용되는 인코딩을 제공합니다. 이 키워드는 바이너리 데이터를
+                    ASCII 문자로 매핑하도록 설계된 MIME의 Content-Transfer-Encoding 헤더에서
+                    파생되었습니다. 이는 HTTP 요청 및 응답의 콘텐츠를 인코딩(예: 압축 또는 암호화)하는 데
+                    사용되는 HTTP의 Content-Encoding 헤더와 관련이 없습니다.<a href="#section-8.3-2" class="pilcrow">¶</a>
+                </p>
+                <p id="section-8.3-3">
+                    "base64"는 두 RFC 모두에 정의되어 있으므로, 문자열이 MIME 컨텍스트에서
+                    사용되도록 특별히 의도되지 않은 한 RFC 4648의 정의를 가정하는 것이
+                    좋습니다(SHOULD). 이러한 모든 인코딩은 7비트 ASCII 문자만으로 구성된
+                    문자열을 생성한다는 점에 유의하십시오. 따라서 이 키워드는 그 범위를
+                    벗어난 문자를 포함하는 문자열에는 의미가 없습니다.<a href="#section-8.3-3" class="pilcrow">¶</a></p>
+                <p id="section-8.3-4">
+                    이 키워드가 없지만 "contentMediaType"이 존재하는 경우, 이는 인코딩이
+                    identity 인코딩임을 나타냅니다. 즉, 콘텐츠를 UTF-8 문자열로 표현하기 위해
+                    변환이 필요하지 않았다는 뜻입니다.<a href="#section-8.3-4" class="pilcrow">¶</a></p>
+                <p id="section-8.3-5">
+                    이 프로퍼티의 값은 문자열이어야 합니다(MUST).<a href="#section-8.3-5" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-8.4">
+                <h3 id="name-contentmediatype">
+                    <a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-contentmediatype"
+                        class="section-name selfRef">contentMediaType</a>
+                </h3>
+                <p id="section-8.4-1">
+                    인스턴스가 문자열이면, 이 프로퍼티는 문자열 내용의 미디어 타입을
+                    나타냅니다. "contentEncoding"이 존재하면, 이 프로퍼티는 디코딩된
+                    문자열을 설명합니다.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
+                <p id="section-8.4-2">
+                    이 프로퍼티의 값은 문자열이어야 하며(MUST), <span><a href="#RFC2046" class="xref">RFC 2046</a> [<a href="#RFC2046"
+                            class="xref">RFC2046</a>]</span>에 정의된 미디어 타입이어야 합니다(MUST).<a href="#section-8.4-2"
+                        class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-8.5">
+                <h3 id="name-contentschema">
+                    <a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-contentschema"
+                        class="section-name selfRef">contentSchema</a>
+                </h3>
+                <p id="section-8.5-1">
+                    인스턴스가 문자열이고 "contentMediaType"이 존재하면, 이 프로퍼티는
+                    문자열의 구조를 설명하는 스키마를 포함합니다.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+                <p id="section-8.5-2">
+                    이 키워드는 JSON Schema의 데이터 모델로 매핑될 수 있는 모든 미디어 타입과
+                    함께 사용할 수 있습니다(MAY).<a href="#section-8.5-2" class="pilcrow">¶</a></p>
+                <p id="section-8.5-3">
+                    이 프로퍼티의 값은 유효한 JSON Schema여야 합니다(MUST). "contentMediaType"이
+                    존재하지 않으면 무시되는 것이 좋습니다(SHOULD).<a href="#section-8.5-3" class="pilcrow">¶</a></p>
+            </section>
+            <section id="section-8.6">
+                <h3 id="name-example">
+                    <a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-example"
+                        class="section-name selfRef">예시</a>
+                </h3>
+                <p id="section-8.6-1" class="keepWithNext">
+                    다음은 "contentEncoding"과 "contentMediaType"의 사용을 보여주는 예시 스키마입니다.<a href="#section-8.6-1"
+                        class="pilcrow">¶</a></p>
+                <div class="alignLeft art-text artwork" id="section-8.6-2">
+                    <pre>
+
+{
+    "type": "string",
+    "contentEncoding": "base64",
+    "contentMediaType": "image/png"
+}
+
+</pre><a href="#section-8.6-2" class="pilcrow">¶</a>
+                </div>
+                <p id="section-8.6-3" class="keepWithPrevious">
+                    이 스키마가 설명하는 인스턴스는 문자열일 것으로 예상되며,
+                    그 값은 base64로 인코딩된 PNG 이미지로 해석될 수 있어야 합니다.<a href="#section-8.6-3" class="pilcrow">¶</a></p>
+                <p id="section-8.6-4" class="keepWithNext">
+                    또 다른 예시입니다.<a href="#section-8.6-4" class="pilcrow">¶</a></p>
+                <div class="alignLeft art-text artwork" id="section-8.6-5">
+                    <pre>
+
+{
+    "type": "string",
+    "contentMediaType": "text/html"
+}
+
+</pre><a href="#section-8.6-5" class="pilcrow">¶</a>
+                </div>
+                <p id="section-8.6-6" class="keepWithPrevious">
+                    이 스키마가 설명하는 인스턴스는 JSON 문자열이 디코딩된 문자 집합을 사용하여
+                    HTML을 포함하는 문자열일 것으로 예상됩니다.
+                    <span><a href="#RFC8259" class="xref">RFC 8259</a> [<a href="#RFC8259"
+                            class="xref">RFC8259</a>]</span>의 8.1절에 따르면, 완전히 닫힌
+                    시스템 외부에서는 이는 UTF-8이어야 합니다(MUST).<a href="#section-8.6-6" class="pilcrow">¶</a>
+                </p>
+                <p id="section-8.6-7" class="keepWithNext">
+                    이 예시는 HMAC SHA-256 알고리즘을 사용하여 MAC 처리된 JWT를 설명하며,
+                    claim set 안에 "iss" 및 "exp" 필드를 요구합니다.<a href="#section-8.6-7" class="pilcrow">¶</a></p>
+                <div class="alignLeft art-text artwork" id="section-8.6-8">
+                    <pre>
+
+{
+    "type": "string",
+    "contentMediaType": "application/jwt",
+    "contentSchema": {
+        "type": "array",
+        "minItems": 2,
+        "prefixItems": [
+            {
+                "const": {
+                    "typ": "JWT",
+                    "alg": "HS256"
+                }
+            },
+            {
+                "type": "object",
+                "required": ["iss", "exp"],
+                "properties": {
+                    "iss": {"type": "string"},
+                    "exp": {"type": "integer"}
+                }
+            }
+        ]
+    }
+}
+</pre><a href="#section-8.6-8" class="pilcrow">¶</a>
+                </div>
+                <p id="section-8.6-9" class="keepWithPrevious">
+                    "contentEncoding"이 나타나지 않는다는 점에 유의하십시오. "application/jwt"
+                    미디어 타입은 base64url 인코딩을 사용하지만, 이는 미디어 타입에 의해
+                    정의되며, JWT 문자열이 두 개의 JSON 데이터 구조 목록으로 디코딩되는 방식을
+                    결정합니다. 첫 번째는 헤더이고, 그 다음은 페이로드입니다. JWT 미디어 타입은
+                    JWT가 JSON 문자열로 표현될 수 있음을 보장하므로, 추가 인코딩 또는 디코딩이
+                    필요하지 않습니다.<a href="#section-8.6-9" class="pilcrow">¶</a></p>
+            </section>
+        </section>
+    </div>
+    <section id="section-9">
+        <h2 id="name-a-vocabulary-for-basic-meta">
+            <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-a-vocabulary-for-basic-meta"
+                class="section-name selfRef">기본 메타데이터 주석을 위한 어휘</a>
+        </h2>
+        <p id="section-9-1">
+            이러한 범용 주석 키워드는 문서화 및 사용자 인터페이스 표시 목적에
+            흔히 사용되는 정보를 제공합니다. 이는 포괄적인 기능 집합을 형성하도록
+            의도된 것이 아닙니다. 오히려 더 복잡한 주석 기반 애플리케이션을 위해
+            추가 어휘를 정의할 수 있습니다.<a href="#section-9-1" class="pilcrow">¶</a>
+        </p>
+        <p id="section-9-2">
+            "$vocabulary"를 사용하지 않는 메타 스키마는 이 어휘의 URI가 true 값으로
+            존재하는 것처럼 이 어휘를 요구하는 것으로 간주하는 것이 좋습니다(SHOULD).<a href="#section-9-2" class="pilcrow">¶</a></p>
+        <p id="section-9-3">
+            Meta-Data 어휘로 알려진 이 어휘의 현재 URI는 다음과 같습니다.
+            &lt;https://json-schema.org/draft/2020-12/vocab/meta-data&gt;.<a href="#section-9-3" class="pilcrow">¶</a>
+        </p>
+        <p id="section-9-4">
+            대응하는 메타 스키마의 현재 URI는 다음과 같습니다.
+            <span><a
+                    href="https://json-schema.org/draft/2020-12/meta/meta-data">https://json-schema.org/draft/2020-12/meta/meta-data</a></span>.<a
+                href="#section-9-4" class="pilcrow">¶</a>
+        </p>
+        <section id="section-9.1">
+            <h3 id="name-title-and-description">
+                <a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-title-and-description"
+                    class="section-name selfRef">"title" 및 "description"</a>
+            </h3>
+            <p id="section-9.1-1">
+                이 두 키워드의 값은 모두 문자열이어야 합니다(MUST).<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+            <p id="section-9.1-2">
+                이 두 키워드는 이 사용자 인터페이스가 생성한 데이터에 대한 정보로
+                사용자 인터페이스를 꾸미는 데 사용할 수 있습니다. title은 되도록 짧고,
+                description은 이 스키마가 설명하는 인스턴스의 목적에 대한 설명을
+                제공합니다.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
+        </section>
+        <section id="section-9.2">
+            <h3 id="name-default">
+                <a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-default"
+                    class="section-name selfRef">"default"</a>
+            </h3>
+            <p id="section-9.2-1">
+                이 키워드의 값에는 제한이 없습니다. 이 키워드의 여러 발생이 단일
+                하위 인스턴스에 적용될 수 있는 경우, 구현은 중복을 제거하는 것이
+                좋습니다(SHOULD).<a href="#section-9.2-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-9.2-2">
+                이 키워드는 특정 스키마와 연결된 기본 JSON 값을 제공하는 데 사용할 수 있습니다.
+                기본값은 관련 스키마에 대해 유효한 것이 권장됩니다(RECOMMENDED).<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+        </section>
+        <section id="section-9.3">
+            <h3 id="name-deprecated">
+                <a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-deprecated"
+                    class="section-name selfRef">"deprecated"</a>
+            </h3>
+            <p id="section-9.3-1">
+                이 키워드의 값은 불리언이어야 합니다(MUST). 이 키워드의 여러 발생이
+                단일 하위 인스턴스에 적용될 수 있는 경우, 애플리케이션은 어떤 발생이든
+                true 값을 지정하면 인스턴스 위치를 deprecated로 간주하는 것이 좋습니다(SHOULD).<a href="#section-9.3-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-9.3-2">
+                "deprecated"가 불리언 true 값을 가지면, 애플리케이션이 선언된 프로퍼티의
+                사용을 삼가는 것이 좋음을 나타냅니다(SHOULD). 이는 해당 프로퍼티가
+                향후 제거될 수 있음을 의미할 수 있습니다(MAY).<a href="#section-9.3-2" class="pilcrow">¶</a></p>
+            <p id="section-9.3-3">
+                true 값의 "deprecated"를 포함하는 루트 스키마는 설명되는 전체 리소스가
+                향후 제거될 수 있음을 나타냅니다(MAY).<a href="#section-9.3-3" class="pilcrow">¶</a></p>
+            <p id="section-9.3-4">
+                "deprecated" 키워드는 해당 키워드를 포함하는 스키마 객체가 성공적으로
+                적용되는 각 인스턴스 위치에 적용됩니다. 이로 인해 포함하는 배열 또는 객체는
+                deprecated가 아니더라도 모든 배열 항목 또는 객체 프로퍼티가 deprecated가 되는
+                시나리오가 발생할 수 있습니다.<a href="#section-9.3-4" class="pilcrow">¶</a></p>
+            <p id="section-9.3-5">
+                이 키워드를 생략하면 값이 false인 것과 동일하게 동작합니다.<a href="#section-9.3-5" class="pilcrow">¶</a></p>
+        </section>
+        <section id="section-9.4">
+            <h3 id="name-readonly-and-writeonly">
+                <a href="#section-9.4" class="section-number selfRef">9.4. </a><a href="#name-readonly-and-writeonly"
+                    class="section-name selfRef">"readOnly" 및 "writeOnly"</a>
+            </h3>
+            <p id="section-9.4-1">
+                이러한 키워드의 값은 불리언이어야 합니다(MUST). 이러한 키워드의 여러 발생이
+                단일 하위 인스턴스에 적용될 수 있는 경우, 어떤 발생이든 true 값을 지정하면
+                결과 동작은 true 값의 경우와 같은 것이 좋고(SHOULD), 그렇지 않으면 false 값의
+                경우와 같은 것이 좋습니다(SHOULD).<a href="#section-9.4-1" class="pilcrow">¶</a></p>
+            <p id="section-9.4-2">
+                "readOnly"가 불리언 true 값을 가지면, 인스턴스의 값이 소유 권한자에 의해서만
+                관리되며, 애플리케이션이 이 프로퍼티의 값을 수정하려는 시도는 해당 소유
+                권한자에 의해 무시되거나 거부될 것으로 예상됨을 나타냅니다.<a href="#section-9.4-2" class="pilcrow">¶</a></p>
+            <p id="section-9.4-3">
+                전체 문서에 대해 "readOnly"로 표시된 인스턴스 문서가 소유 권한자에게
+                전송되면, 권한자의 재량에 따라 무시될 수 있거나(MAY) 오류가 발생할 수 있습니다(MAY).<a href="#section-9.4-3" class="pilcrow">¶</a></p>
+            <p id="section-9.4-4">
+                "writeOnly"가 불리언 true 값을 가지면, 인스턴스가 소유 권한자로부터 검색될 때
+                해당 값이 절대 존재하지 않음을 나타냅니다. 문서(또는 그것이 나타내는 리소스)를
+                갱신하거나 생성하기 위해 소유 권한자에게 전송될 때는 존재할 수 있지만,
+                인스턴스의 어떤 갱신된 버전이나 새로 생성된 버전에도 포함되지 않습니다.<a href="#section-9.4-4" class="pilcrow">¶</a>
+            </p>
+            <p id="section-9.4-5">
+                전체 문서에 대해 "writeOnly"로 표시된 인스턴스 문서는 어떤 종류의 빈 문서로
+                반환될 수 있거나(MAY), 검색 시 오류를 발생시킬 수 있거나(MAY), 권한자의 재량에
+                따라 검색 요청이 무시될 수 있습니다.<a href="#section-9.4-5" class="pilcrow">¶</a></p>
+            <p id="section-9.4-6">
+                예를 들어, "readOnly"는 데이터베이스가 생성한 일련번호를 읽기 전용으로
+                표시하는 데 사용되고, "writeOnly"는 비밀번호 입력 필드를 표시하는 데 사용됩니다.<a href="#section-9.4-6" class="pilcrow">¶</a></p>
+            <p id="section-9.4-7">
+                이러한 키워드는 사용자 인터페이스 인스턴스 생성을 지원하는 데 사용할 수 있습니다.
+                특히 애플리케이션은 write-only 필드에 대해 사용자가 입력하는 동안 입력 값을
+                숨기는 위젯을 사용하도록 선택할 수 있습니다(MAY).<a href="#section-9.4-7" class="pilcrow">¶</a></p>
+            <p id="section-9.4-8">
+                이러한 키워드를 생략하면 값이 false인 것과 동일하게 동작합니다.<a href="#section-9.4-8" class="pilcrow">¶</a></p>
+        </section>
+        <section id="section-9.5">
+            <h3 id="name-examples">
+                <a href="#section-9.5" class="section-number selfRef">9.5. </a><a href="#name-examples"
+                    class="section-name selfRef">"examples"</a>
+            </h3>
+            <p id="section-9.5-1">
+                이 키워드의 값은 배열이어야 합니다(MUST).
+                배열 안의 값에는 제한이 없습니다.
+                이 키워드의 여러 발생이 단일 하위 인스턴스에 적용될 수 있는 경우,
+                구현은 배열의 배열이 아니라 모든 값의 평탄한 배열을 제공해야 합니다(MUST).<a href="#section-9.5-1" class="pilcrow">¶</a></p>
+            <p id="section-9.5-2">
+                이 키워드는 사용법을 설명하기 위한 목적으로 특정 스키마와 연결된
+                샘플 JSON 값을 제공하는 데 사용할 수 있습니다. 이러한 값은 관련 스키마에
+                대해 유효한 것이 권장됩니다(RECOMMENDED).<a href="#section-9.5-2" class="pilcrow">¶</a></p>
+            <p id="section-9.5-3">
+                구현은 "default"가 존재하는 경우 그 값을 추가 예시로 사용할 수 있습니다(MAY).
+                "examples"가 없더라도 "default"는 여전히 이러한 방식으로 사용될 수 있습니다(MAY).<a href="#section-9.5-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </section>
+    <div id="security">
+        <section id="section-10">
+            <h2 id="name-security-considerations">
+                <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations"
+                    class="section-name selfRef">보안 고려사항</a>
+            </h2>
+            <p id="section-10-1">
+                JSON Schema 검증은 JSON Schema Core를 위한 어휘를 정의하며, 거기에 나열된
+                모든 보안 고려사항과 관련됩니다.<a href="#section-10-1" class="pilcrow">¶</a></p>
+            <p id="section-10-2">
+                JSON Schema 검증은 정규 표현식의 사용을 허용하며, 정규 표현식에는 수많은
+                서로 다른(종종 호환되지 않는) 구현이 있습니다.
+                일부 구현은 임의 코드의 삽입을 허용하는데, 이는 JSON Schema의 범위를
+                벗어나며 허용되어서는 안 됩니다(MUST NOT).
+                정규 표현식은 계산 비용이 매우 높도록(이른바 "catastrophic backtracking")
+                작성될 수도 있으며, 이로 인해 서비스 거부 공격이 발생할 수 있습니다.<a href="#section-10-2" class="pilcrow">¶</a></p>
+            <p id="section-10-3">
+                "contentEncoding" 및/또는 "contentMediaType"에 기반하여 인스턴스 문자열 데이터를
+                검증하거나 달리 평가하는 것을 지원하는 구현은 오해의 소지가 있는 정보에
+                기반해 안전하지 않은 방식으로 데이터를 평가할 위험이 있습니다. 애플리케이션은
+                스키마와 인스턴스 사이의 관계가 확립된 경우(예: 동일한 권한자를 공유하는 경우)에만
+                그러한 처리를 수행함으로써 이 위험을 완화할 수 있습니다.<a href="#section-10-3" class="pilcrow">¶</a></p>
+            <p id="section-10-4">
+                미디어 타입 또는 인코딩을 처리하는 것은 해당 미디어 타입 또는 인코딩의
+                보안 고려사항의 적용을 받습니다. 예를 들어, JSON 문자열 안에 인코딩된
+                JavaScript 또는 ECMAScript를 처리할 때는 <span><a href="#RFC4329" class="xref">RFC 4329 Scripting Media
+                        Types</a> [<a href="#RFC4329" class="xref">RFC4329</a>]</span>의 보안 고려사항이 적용됩니다.<a
+                    href="#section-10-4" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <section id="section-11">
+        <h2 id="name-references">
+            <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references"
+                class="section-name selfRef">참고문헌</a>
+        </h2>
+        <section id="section-11.1">
+            <h3 id="name-normative-references">
+                <a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references"
+                    class="section-name selfRef">규범적 참고문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="RFC2119">[RFC2119]</dt>
+                <dd>
+                    <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"요구 수준을 나타내기 위해 RFC에서
+                        사용하는 핵심 단어"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC
+                        2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03"
+                        class="refDate">1997년 3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC1123">[RFC1123]</dt>
+                <dd>
+                    <span class="refAuthor">Braden, R., Ed.</span>, <span class="refTitle">"인터넷
+                        호스트 요구사항 - 애플리케이션 및 지원"</span>, <span class="seriesInfo">STD 3</span>, <span
+                        class="seriesInfo">RFC 1123</span>, <span class="seriesInfo">DOI 10.17487/RFC1123</span>, <time
+                        datetime="1989-10" class="refDate">1989년 10월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc1123">https://www.rfc-editor.org/info/rfc1123</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2045">[RFC2045]</dt>
+                <dd>
+                    <span class="refAuthor">Freed, N.</span> and <span class="refAuthor">N. Borenstein</span>, <span
+                        class="refTitle">"Multipurpose Internet Mail Extensions (MIME) 제1부: 인터넷
+                        메시지 본문의 형식"</span>, <span class="seriesInfo">RFC 2045</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC2045</span>, <time datetime="1996-11" class="refDate">1996년 11월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2045">https://www.rfc-editor.org/info/rfc2045</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2046">[RFC2046]</dt>
+                <dd>
+                    <span class="refAuthor">Freed, N.</span> and <span class="refAuthor">N. Borenstein</span>, <span
+                        class="refTitle">"Multipurpose Internet Mail Extensions (MIME) 제2부: 미디어 타입"</span>,
+                    <span class="seriesInfo">RFC 2046</span>, <span class="seriesInfo">DOI 10.17487/RFC2046</span>,
+                    <time datetime="1996-11" class="refDate">1996년 11월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2046">https://www.rfc-editor.org/info/rfc2046</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2673">[RFC2673]</dt>
+                <dd>
+                    <span class="refAuthor">Crawford, M.</span>, <span class="refTitle">"도메인
+                        이름 시스템의 바이너리 레이블"</span>, <span class="seriesInfo">RFC 2673</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC2673</span>, <time datetime="1999-08" class="refDate">1999년 8월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2673">https://www.rfc-editor.org/info/rfc2673</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3339">[RFC3339]</dt>
+                <dd>
+                    <span class="refAuthor">Klyne, G.</span> and <span class="refAuthor">C. Newman</span>, <span
+                        class="refTitle">"인터넷의 날짜와 시간: 타임스탬프"</span>, <span class="seriesInfo">RFC 3339</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC3339</span>, <time datetime="2002-07" class="refDate">2002년
+                        7월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3339">https://www.rfc-editor.org/info/rfc3339</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3986">[RFC3986]</dt>
+                <dd>
+                    <span class="refAuthor">Berners-Lee, T.</span>, <span class="refAuthor">Fielding, R.</span>, and
+                    <span class="refAuthor">L. Masinter</span>, <span class="refTitle">"Uniform Resource Identifier
+                        (URI): 일반 구문"</span>, <span class="seriesInfo">STD 66</span>, <span class="seriesInfo">RFC
+                        3986</span>, <span class="seriesInfo">DOI 10.17487/RFC3986</span>, <time datetime="2005-01"
+                        class="refDate">2005년 1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3987">[RFC3987]</dt>
+                <dd>
+                    <span class="refAuthor">Duerst, M.</span> and <span class="refAuthor">M. Suignard</span>, <span
+                        class="refTitle">"Internationalized Resource Identifiers (IRIs)"</span>, <span
+                        class="seriesInfo">RFC 3987</span>, <span class="seriesInfo">DOI 10.17487/RFC3987</span>, <time
+                        datetime="2005-01" class="refDate">2005년 1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3987">https://www.rfc-editor.org/info/rfc3987</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC4122">[RFC4122]</dt>
+                <dd>
+                    <span class="refAuthor">Leach, P.</span>, <span class="refAuthor">Mealling, M.</span>, and <span
+                        class="refAuthor">R. Salz</span>, <span class="refTitle">"Universally Unique IDentifier (UUID)
+                        URN 네임스페이스"</span>, <span class="seriesInfo">RFC 4122</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC4122</span>, <time datetime="2005-07" class="refDate">2005년 7월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc4122">https://www.rfc-editor.org/info/rfc4122</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC4291">[RFC4291]</dt>
+                <dd>
+                    <span class="refAuthor">Hinden, R.</span> and <span class="refAuthor">S. Deering</span>, <span
+                        class="refTitle">"IP 버전 6 주소 지정 아키텍처"</span>, <span class="seriesInfo">RFC
+                        4291</span>, <span class="seriesInfo">DOI 10.17487/RFC4291</span>, <time datetime="2006-02"
+                        class="refDate">2006년 2월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc4291">https://www.rfc-editor.org/info/rfc4291</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC4648">[RFC4648]</dt>
+                <dd>
+                    <span class="refAuthor">Josefsson, S.</span>, <span class="refTitle">"Base16, Base32 및 Base64
+                        데이터 인코딩"</span>, <span class="seriesInfo">RFC 4648</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC4648</span>, <time datetime="2006-10" class="refDate">2006년 10월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc4648">https://www.rfc-editor.org/info/rfc4648</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5321">[RFC5321]</dt>
+                <dd>
+                    <span class="refAuthor">Klensin, J.</span>, <span class="refTitle">"Simple Mail Transfer
+                        Protocol"</span>, <span class="seriesInfo">RFC 5321</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC5321</span>, <time datetime="2008-10" class="refDate">2008년 10월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5321">https://www.rfc-editor.org/info/rfc5321</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5890">[RFC5890]</dt>
+                <dd>
+                    <span class="refAuthor">Klensin, J.</span>, <span class="refTitle">"애플리케이션을 위한 국제화 도메인 이름
+                        (IDNA): 정의 및 문서 프레임워크"</span>, <span class="seriesInfo">RFC 5890</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC5890</span>, <time datetime="2010-08" class="refDate">2010년
+                        8월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5890">https://www.rfc-editor.org/info/rfc5890</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5891">[RFC5891]</dt>
+                <dd>
+                    <span class="refAuthor">Klensin, J.</span>, <span class="refTitle">"애플리케이션의 국제화 도메인 이름
+                        (IDNA): 프로토콜"</span>, <span class="seriesInfo">RFC 5891</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC5891</span>, <time datetime="2010-08" class="refDate">2010년 8월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5891">https://www.rfc-editor.org/info/rfc5891</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6570">[RFC6570]</dt>
+                <dd>
+                    <span class="refAuthor">Gregorio, J.</span>, <span class="refAuthor">Fielding, R.</span>, <span
+                        class="refAuthor">Hadley, M.</span>, <span class="refAuthor">Nottingham, M.</span>, and <span
+                        class="refAuthor">D. Orchard</span>, <span class="refTitle">"URI Template"</span>, <span
+                        class="seriesInfo">RFC 6570</span>, <span class="seriesInfo">DOI 10.17487/RFC6570</span>, <time
+                        datetime="2012-03" class="refDate">2012년 3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6570">https://www.rfc-editor.org/info/rfc6570</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6531">[RFC6531]</dt>
+                <dd>
+                    <span class="refAuthor">Yao, J.</span> and <span class="refAuthor">W. Mao</span>, <span
+                        class="refTitle">"국제화 이메일을 위한 SMTP 확장"</span>, <span class="seriesInfo">RFC 6531</span>, <span
+                        class="seriesInfo">DOI 10.17487/RFC6531</span>, <time datetime="2012-02" class="refDate">2012년
+                        2월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6531">https://www.rfc-editor.org/info/rfc6531</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6901">[RFC6901]</dt>
+                <dd>
+                    <span class="refAuthor">Bryan, P., Ed.</span>, <span class="refAuthor">Zyp, K.</span>, and <span
+                        class="refAuthor">M. Nottingham, Ed.</span>, <span class="refTitle">"JavaScript Object Notation
+                        (JSON) Pointer"</span>, <span class="seriesInfo">RFC 6901</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC6901</span>, <time datetime="2013-04" class="refDate">2013년 4월</time>,
+                    <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6901">https://www.rfc-editor.org/info/rfc6901</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8259">[RFC8259]</dt>
+                <dd>
+                    <span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"JavaScript Object Notation
+                        (JSON) 데이터 교환 형식"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC
+                        8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12"
+                        class="refDate">2017년 12월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8259">https://www.rfc-editor.org/info/rfc8259</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="ecma262">[ecma262]</dt>
+                <dd>
+                    <span class="refTitle">"ECMA-262, 제11판 명세"</span>, <time datetime="2020-06" class="refDate">2020년
+                        6월</time>, <span>&lt;<a
+                            href="https://262.ecma-international.org/5.1/">https://262.ecma-international.org/5.1/</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="relative-json-pointer">[relative-json-pointer]</dt>
+                <dd>
+                    <span class="refAuthor">Luff, G.</span>, <span class="refAuthor">Andrews, H.</span>, and <span
+                        class="refAuthor">B. Hutton, Ed.</span>, <span class="refTitle">"Relative JSON Pointers"</span>,
+                    <span class="refContent">진행 중인 작업</span>, <span class="seriesInfo">Internet-Draft,
+                        draft-handrews-relative-json-pointer-01</span>, <time datetime="2020-12" class="refDate">2020년
+                        12월</time>, <span>&lt;<a
+                            href="https://datatracker.ietf.org/doc/html/draft-handrews-relative-json-pointer-01">https://datatracker.ietf.org/doc/html/draft-handrews-relative-json-pointer-01</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="json-schema">[json-schema]</dt>
+                <dd>
+                    <span class="refAuthor">Wright, A.</span>, <span class="refAuthor">Andrews, H.</span>, <span
+                        class="refAuthor">Hutton, B.</span>, and <span class="refAuthor">G. Dennis</span>, <span
+                        class="refTitle">"JSON Schema: JSON 문서를 설명하기 위한 미디어 타입"</span>, <span class="refContent">진행 중인
+                        작업</span>, <span class="seriesInfo">Internet-Draft,
+                        draft-bhutton-json-schema-01</span>, <time datetime="2022-06" class="refDate">2022년 6월</time>,
+                    <span>&lt;<a
+                            href="https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-01">https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-01</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+        <section id="section-11.2">
+            <h3 id="name-informative-references">
+                <a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references"
+                    class="section-name selfRef">정보성 참고문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="RFC4329">[RFC4329]</dt>
+                <dd>
+                    <span class="refAuthor">Hoehrmann, B.</span>, <span class="refTitle">"스크립팅 미디어 타입"</span>,
+                    <span class="seriesInfo">RFC 4329</span>, <span class="seriesInfo">DOI 10.17487/RFC4329</span>,
+                    <time datetime="2006-04" class="refDate">2006년 4월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc4329">https://www.rfc-editor.org/info/rfc4329</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+    </section>
+    <section id="appendix-A">
+        <h2 id="name-keywords-moved-from-validat">
+            <a href="#appendix-A" class="section-number selfRef">부록 A. </a><a href="#name-keywords-moved-from-validat"
+                class="section-name selfRef">Validation에서
+                Core로 이동된 키워드</a>
+        </h2>
+        <p id="appendix-A-1">
+            이 초안부터 여러 키워드가 이 문서에서
+            <span><a href="#json-schema" class="xref">Core 명세</a> [<a href="#json-schema"
+                    class="xref">json-schema</a>]</span>로 이동되었으며, 일부
+            경우에는 이름 변경 또는 다른 변경이 있었습니다. 이는 다음의 이전
+            검증 키워드에 영향을 줍니다.<a href="#appendix-A-1" class="pilcrow">¶</a>
+        </p>
+        <span class="break"></span>
+        <dl class="dlParallel" id="appendix-A-2">
+            <dt id="appendix-A-2.1">"definitions"</dt>
+            <dd style="margin-left: 1.5em" id="appendix-A-2.2">
+                "$ref"와 맞추고 입력하기 더 짧게 하기 위해 "$defs"로 이름이 변경되었습니다.
+                스키마 어휘 작성자는 여전히 이전 이름을 사용하는 스키마를 무효화하지 않기 위해
+                다른 동작을 가진 "definitions" 키워드를 정의해서는 안 됩니다(SHOULD NOT).
+                "definitions"는 이 문서가 참조하는 단일 어휘 메타 스키마에는 없지만,
+                기본 메타 스키마에는 계속 존재하며, 구현은 해당 메타 스키마가 사용될 때
+                "$defs"와 "definitions"가 동일한 동작을 가진다고 가정하는 것이 좋습니다(SHOULD).<a href="#appendix-A-2.2"
+                    class="pilcrow">¶</a>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-A-2.3">"allOf", "anyOf", "oneOf", "not", "if", "then", "else", "items", "additionalItems",
+                "contains", "propertyNames", "properties", "patternProperties", "additionalProperties"</dt>
+            <dd style="margin-left: 1.5em" id="appendix-A-2.4">
+                이 모든 키워드는 인스턴스에 하위 스키마를 적용하고 그 결과를 결합하며,
+                자체적으로 어떤 조건도 단언하지 않습니다.
+                단언 키워드가 없으면, 이러한 applicator는 false 불리언 스키마를 사용하거나
+                true 불리언 스키마(또는 동등한 스키마 객체)의 결과를 반전함으로써만
+                단언 실패를 일으킬 수 있습니다.
+                이러한 이유로, validation, hyper-schema 및 확장 어휘가 모두 기반으로 삼을 수 있는
+                일반 메커니즘으로 정의하는 것이 더 적절합니다.<a href="#appendix-A-2.4" class="pilcrow">¶</a>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-A-2.5">"dependencies"</dt>
+            <dd style="margin-left: 1.5em" id="appendix-A-2.6">
+                이 키워드는 두 가지 서로 다른 동작 모드를 가지고 있었기 때문에
+                구현하고 추론하기가 비교적 어려웠습니다.
+                스키마 형태는 Core로 이동되었고 applicator 어휘의 일부로
+                "dependentSchemas"로 이름이 변경되었습니다.
+                이는 "properties"와 유사하지만, 프로퍼티 값에 하위 스키마를 적용하는 대신
+                해당 프로퍼티를 포함하는 객체에 적용합니다.
+                프로퍼티 이름 배열 형태는 여기 유지되며 "dependentRequired"로 이름이 변경되었습니다.
+                이는 "required" 단언 키워드의 조건부 사용을 위한 단축 표현인 단언이기 때문입니다.<a href="#appendix-A-2.6" class="pilcrow">¶</a>
+            </dd>
+            <dd class="break"></dd>
+        </dl>
+    </section>
+    <section id="appendix-B">
+        <h2 id="name-acknowledgments">
+            <a href="#appendix-B" class="section-number selfRef">부록 B. </a><a href="#name-acknowledgments"
+                class="section-name selfRef">감사의 말</a>
+        </h2>
+        <p id="appendix-B-1">
+            JSON Schema의 초기 초안 작업에 대해
+            Gary Court,
+            Francis Galiegue,
+            Kris Zyp,
+            Geraint Luff에게 감사드립니다.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2">
+            문서에 제출 및 패치를 해 준
+            Jason Desrosiers,
+            Daniel Perrett,
+            Erik Wilde,
+            Evgeny Poberezkin,
+            Brad Bowman,
+            Gowry Sankar,
+            Donald Pipowitch,
+            Dave Finlay,
+            Denis Laxalde,
+            Phil Sturgeon,
+            Shawn Silverman,
+            Karen Etheridge에게 감사드립니다.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+    </section>
+    <section id="appendix-C">
+        <h2 id="name-changelog">
+            <a href="#appendix-C" class="section-number selfRef">부록 C. </a><a href="#name-changelog"
+                class="section-name selfRef">변경 로그</a>
+        </h2>
+        <p id="appendix-C-1">
+            <span class="cref">이 절은 Internet-Draft 상태를 벗어나기 전에 제거될 예정입니다.</span><a href="#appendix-C-1"
+                class="pilcrow">¶</a>
+        </p>
+        <span class="break"></span>
+        <dl class="dlParallel" id="appendix-C-2">
+            <dt id="appendix-C-2.1">draft-bhutton-json-schema-validation-01</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.2">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.2.1.1">"minContains" 키워드 설명을 개선하고 명확히 함<a
+                            href="#appendix-C-2.2.1.1" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.2.1.2">"production" 사용을 제거하고 "ABNF rule"을 사용하도록 함<a
+                            href="#appendix-C-2.2.1.2" class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-C-2.3">draft-bhutton-json-schema-validation-00</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.4">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.4.1.1">email format RFC 참조를 5322가 아니라 5321로 수정<a
+                            href="#appendix-C-2.4.1.1" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.4.1.2">"contentEncoding" 값의 집합과 의미를 명확히 함<a
+                            href="#appendix-C-2.4.1.2" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.4.1.3">정규 표현식 지원에 대해 ECMA-262 제11판을 참조<a
+                            href="#appendix-C-2.4.1.3" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.4.1.4">"format"을 주석 전용 어휘와
+                        단언 어휘로 분리<a href="#appendix-C-2.4.1.4" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.4.1.5">배열에 적용될 때의 "deprecated"를 명확히 함<a
+                            href="#appendix-C-2.4.1.5" class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-C-2.5">draft-handrews-json-schema-validation-02</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.6">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.6.1.1">키워드를 공식 어휘로 그룹화<a href="#appendix-C-2.6.1.1"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.2">"format" 구현 요구사항을 어휘 관점에서 갱신<a href="#appendix-C-2.6.1.2"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.3">기본적으로 "format"은 검증되어서는 안 되지만,
+                        검증은 활성화될 수 있음<a href="#appendix-C-2.6.1.3" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.4">어휘 선언을 사용하여 "format"
+                        검증을 요구할 수 있음<a href="#appendix-C-2.6.1.4" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.5">"definitions"를 "$defs"로 Core 명세로 이동<a
+                            href="#appendix-C-2.6.1.5" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.6">applicator 키워드를 Core 명세로 이동<a href="#appendix-C-2.6.1.6"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.7">"dependencies"의 배열 형태를
+                        "dependentRequired"로 이름 변경하고, 스키마 형태를 Core 명세로 이동<a href="#appendix-C-2.6.1.7"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.8">모든 "content*" 키워드를 단언이 아니라 주석으로 명세<a
+                            href="#appendix-C-2.6.1.8" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.9">문자열 인코딩 문서에 스키마를 적용할 수 있도록 "contentSchema" 추가<a
+                            href="#appendix-C-2.6.1.9" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.10">"contentEncoding"에서 RFC 4648 인코딩도 허용<a
+                            href="#appendix-C-2.6.1.10" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.11">"minContains" 및 "maxContains" 추가<a
+                            href="#appendix-C-2.6.1.11" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.12">"hostname" 및 "idn-hostname"에 대한 RFC 참조 갱신<a
+                            href="#appendix-C-2.6.1.12" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.6.1.13">"uuid" 및 "duration" format 추가<a
+                            href="#appendix-C-2.6.1.13" class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-C-2.7">draft-handrews-json-schema-validation-01</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.8">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.8.1.1">이 초안은 기능 변경 없이 순수하게 명확화만 수행<a href="#appendix-C-2.8.1.1"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.8.1.2">"not" 및 유사한 경우 아래에서 주석을 무시하는
+                        일반 원칙을 제공<a href="#appendix-C-2.8.1.2" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.8.1.3">"if"/"then"/"else" 검증 상호작용을 명확히 함<a
+                            href="#appendix-C-2.8.1.3" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.8.1.4">주석에 대한 "if"/"then"/"else" 동작을 명확히 함<a
+                            href="#appendix-C-2.8.1.4" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.8.1.5">사소한 형식 지정 및 상호 참조 개선<a href="#appendix-C-2.8.1.5"
+                            class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-C-2.9">draft-handrews-json-schema-validation-00</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.10">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.10.1.1">"if"/"then"/"else" 추가<a href="#appendix-C-2.10.1.1"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.2">Core 명세에 따라 키워드를 단언 또는 주석으로 분류<a
+                            href="#appendix-C-2.10.1.2" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.3">향후 "dependencies"를 제거할 가능성을 경고<a
+                            href="#appendix-C-2.10.1.3" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.4">가독성을 위해 검증 키워드를 하위 절로 그룹화<a href="#appendix-C-2.10.1.4"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.5">"readOnly"를 hyper-schema에서 validation
+                        meta-data로 이동<a href="#appendix-C-2.10.1.5" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.6">"writeOnly" 추가<a href="#appendix-C-2.10.1.6"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.7">이전 hyper-schema "media" 키워드를 포함한
+                        문자열 인코딩 미디어 절 추가<a href="#appendix-C-2.10.1.7" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.8">"regex" format 복원(제거는 의도하지 않은 것이었음)<a
+                            href="#appendix-C-2.10.1.8" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.9">"date" 및 "time" format 추가, 추가
+                        RFC 3339 format 이름 예약<a href="#appendix-C-2.10.1.9" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.10">I18N format: "iri", "iri-reference", "idn-hostname",
+                        "idn-email"<a href="#appendix-C-2.10.1.10" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.11">"json-pointer" format이 URI fragment가 아니라 문자열
+                        인코딩을 의미함을 명확히 함<a href="#appendix-C-2.10.1.11" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.12">"minimum" 및
+                        "exclusiveMinimum"의 의미를 뒤집던 오타 수정<a href="#appendix-C-2.10.1.12" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.13">format 구문 참조를 규범적
+                        참고문헌으로 이동<a href="#appendix-C-2.10.1.13" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.10.1.14">JSON은 규범적 요구사항임<a href="#appendix-C-2.10.1.14"
+                            class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-C-2.11">draft-wright-json-schema-validation-01</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.12">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.12.1.1">전체 단어를 사용하는 하이픈 연결 format 이름으로 표준화
+                        ("uriref"가 "uri-reference"가 됨)<a href="#appendix-C-2.12.1.1" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.2">"uri-template" 및 "json-pointer" format 추가<a
+                            href="#appendix-C-2.12.1.2" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.3">"exclusiveMaximum"/"exclusiveMinimum"을
+                        "maximum"/"minimum"의 불리언 수정자에서 독립적인 숫자 필드로 변경<a href="#appendix-C-2.12.1.3"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.4">additionalItems/items를 두 절로 분리<a
+                            href="#appendix-C-2.12.1.4" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.5">properties/patternProperties/additionalProperties 정의를
+                        재작업<a href="#appendix-C-2.12.1.5" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.6">"examples" 키워드 추가<a href="#appendix-C-2.12.1.6"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.7">"contains" 키워드 추가<a href="#appendix-C-2.12.1.7"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.8">빈 "required" 및 "dependencies" 배열 허용<a
+                            href="#appendix-C-2.12.1.8" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.9">"type"의 원시 타입 참조 수정<a href="#appendix-C-2.12.1.9"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.10">"const" 키워드 추가<a href="#appendix-C-2.12.1.10"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.12.1.11">"propertyNames" 키워드 추가<a href="#appendix-C-2.12.1.11"
+                            class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-C-2.13">draft-wright-json-schema-validation-00</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.14">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.14.1.1">추가 보안 고려사항 추가<a href="#appendix-C-2.14.1.1"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.14.1.2">"latest version" 메타 스키마에 대한 참조를 제거하고,
+                        번호가 매겨진 버전을 사용<a href="#appendix-C-2.14.1.2" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.14.1.3">간결성을 위해 많은 키워드 정의를 다시 표현<a href="#appendix-C-2.14.1.3"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.14.1.4">상대 URI 참조도 허용하는 "uriref" format 추가<a
+                            href="#appendix-C-2.14.1.4" class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+            <dt id="appendix-C-2.15">draft-fge-json-schema-validation-00</dt>
+            <dd style="margin-left: 1.5em" id="appendix-C-2.16">
+                <ul class="normal">
+                    <li class="normal" id="appendix-C-2.16.1.1">초기 초안.<a href="#appendix-C-2.16.1.1"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.2">draft v3에서 복구.<a href="#appendix-C-2.16.1.2"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.3">"required" 키워드를 재정의.<a href="#appendix-C-2.16.1.3"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.4">"extends", "disallow" 제거<a href="#appendix-C-2.16.1.4"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.5">"anyOf", "allOf", "oneOf", "not", "definitions",
+                        "minProperties",
+                        "maxProperties" 추가.<a href="#appendix-C-2.16.1.5" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.6">"dependencies" 멤버 값은 더 이상 단일
+                        문자열일 수 없으며,
+                        프로퍼티 의존성 배열에는 적어도 하나의 요소가 필요함.<a href="#appendix-C-2.16.1.6" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.7">"divisibleBy"를 "multipleOf"로 이름 변경.<a
+                            href="#appendix-C-2.16.1.7" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.8">"type" 배열은 더 이상 스키마를 가질 수 없으며,
+                        가능한 값에서 "any" 제거.<a href="#appendix-C-2.16.1.8" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.9">"format" 절을 재작업하고 지원을 선택 사항으로 함.<a
+                            href="#appendix-C-2.16.1.9" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.10">"format": "phone", "style", "color" 속성을 제거하고,
+                        "ip-address"를 "ipv4"로 이름 변경하며, 모든 속성에 대한 참조 추가.<a href="#appendix-C-2.16.1.10"
+                            class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.11">배열/객체 인스턴스에 대한 스키마를 계산하는
+                        알고리즘 제공.<a href="#appendix-C-2.16.1.11" class="pilcrow">¶</a>
+                    </li>
+                    <li class="normal" id="appendix-C-2.16.1.12">상호 운용성 고려사항 추가.<a href="#appendix-C-2.16.1.12"
+                            class="pilcrow">¶</a>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="break"></dd>
+        </dl>
+    </section>
+    <div id="authors-addresses">
+        <section id="appendix-D">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Austin Wright (<span
+                            class="role">편집자</span>)</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="/cdn-cgi/l/email-protection#a3c2c2c2e3c1d9c5db8dcdc6d7" class="email"><span
+                            class="__cf_email__"
+                            data-cfemail="9dfcfcfcddffe7fbe5b3f3f8e9">[email&#160;protected]</span></a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Henry Andrews (<span
+                            class="role">편집자</span>)</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="/cdn-cgi/l/email-protection#d7b6b9b3a5b2a0a488bfb2b9a5ae97aeb6bfb8b8f9b4b8ba"
+                        class="email"><span class="__cf_email__"
+                            data-cfemail="ef8e818b9d8a989cb0878a819d96af968e878080c18c8082">[email&#160;protected]</span></a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Ben Hutton (<span class="role">편집자</span>)</span>
+                </div>
+                <div dir="auto" class="left"><span class="org">Postman</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="/cdn-cgi/l/email-protection#94f6f1fad4fee7fbfae7f7fcf1f5baf0f1e2" class="email"><span
+                            class="__cf_email__"
+                            data-cfemail="56343338163c25393825353e333b3778323320">[email&#160;protected]</span></a>
+                </div>
+                <div class="url">
+                    <span>URI:</span>
+                    <a href="https://jsonschema.dev" class="url">https://jsonschema.dev</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script data-cfasync="false"
+        src="https://json-schema.org/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>const toc = document.getElementById("toc");
+        toc.querySelector("h2").addEventListener("click", e => {
+            toc.classList.toggle("active");
+        });
+        toc.querySelector("nav").addEventListener("click", e => {
+            toc.classList.remove("active");
+        });
+    </script>
+    <script defer
+        src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496"
+        integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ=="
+        data-cf-beacon='{"version":"2024.11.0","token":"630290c3cc5644fd8a7c2cb7de3b7eff","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+        crossorigin="anonymous"></script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
