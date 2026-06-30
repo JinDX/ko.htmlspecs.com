@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>Save Data API</title>
+<script class='remove' src='https://www.w3.org/Tools/respec/respec-w3c-common'></script>
+<script>
+
+    var respecConfig = {
+        specStatus: "CG-DRAFT",
+        shortName: "savedata-api",
+        format: "markdown",
+        subtitle: "Living Document",
+        github: "https://github.com/WICG/savedata/",
+        editors: [
+            {
+                name: "Yoav Weiss",
+                company: "Google",
+                companyURL: "http://google.com",
+            },
+            {
+                name: "Ilya Grigorik",
+                company: "Google",
+                companyURL: "http://google.com",
+            },
+        ],
+        wg: "Web Incubator Community Group",
+        wgURI: "https://wicg.io",
+        caniuse: "",
+        localBiblio: {
+            "CLIENT-HINTS": {
+                title: "HTTP Client Hints",
+                href: "https://tools.ietf.org/html/draft-ietf-httpbis-client-hints-07",
+                status: "Internet-Draft",
+                publisher: "IETF",
+            },
+            "STRUCTURED-HEADERS": {
+                title: "Structured Headers for HTTP",
+                href: "https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-11",
+                status: "Internet-Draft",
+                publisher: "IETF",
+            }
+        },
+    };
+</script>
+
+<section id='abstract'>
+    <cite>Save Data API</cite>는 웹 애플리케이션이 데이터 절약에 관한 사용자의 선호 정보에 접근할 수 있게 한다.
+</section>
+
+<section id='sotd'></section>
+
+## 요구사항과 사용 사례
+
+이 문서는 특정 요구사항을 다루는 API를 설명한다. 즉, JS API와 Client Hint 양쪽을 통해 데이터 절약에 관한
+사용자의 선호를 전달하는 것이다.
+
+**사용 사례 예시:**
+
+* 주된 목적이 미디어 스트리밍인 웹 애플리케이션은 사용자가 데이터 비용을 줄이는 데 관심이 있다면
+고도로 압축된 미디어 콘텐츠를 제공할 수 있다.
+* 사용자에게 배경 동영상을 표시하는 웹 애플리케이션은 사용자의 선호에 따라 배경 이미지 사용을 선택할 수 있다.
+
+
+## <dfn>NavigatorNetworkInformation</dfn> 인터페이스
+
+<code><dfn data-cite="netinfo#networkinformation-interface">NetworkInformation</dfn></code> 인터페이스는
+<a>NetworkInformationSaveData</a>를 믹스인하여 <a>saveData</a>에 대한 접근을 노출한다.
+
+<pre class="idl">
+  interface mixin NetworkInformationSaveData {
+    [SameObject] readonly attribute boolean saveData;
+  };
+
+  NetworkInformation includes NetworkInformationSaveData;
+</pre>
+
+### <dfn>saveData</dfn> 속성
+
+<a>saveData</a> 속성은 가져올 때, 사용자가 사용자 에이전트에 데이터 사용량 감소 모드를 요청한 경우 `true`를
+반환하고, 그렇지 않으면 `false`를 반환한다.
+
+<p class="note">사용자는 사용자 에이전트가 이러한 선호를 제공하는 경우, 높은 데이터 전송 비용,
+    느린 연결 속도 또는 기타 이유로 이를 활성화할 수 있다.</p>
+
+#### <code><dfn>Save-Data</dfn></code> 요청 헤더 필드
+
+<a>SaveData</a> 요청 헤더는 Client Hint [[CLIENT-HINTS]]이다. 이 헤더의 값은 `token`들을 포함하는
+`sh-list` [[STRUCTURED-HEADERS]]이며, 이는 데이터 사용량 감소에 대한 사용자 에이전트의 선호를 나타낸다.
+
+<pre class="nohighlight">
+    Save-Data = sh-list
+  </pre>
+
+이 명세는 "`on`" `token` 값을 정의한다. 이 값은 데이터 사용량 감소 모드에 대한 명시적 사용자 옵트인을
+나타내는 신호로 사용되며(즉, <a>saveData</a>의 값이 `true`일 때), 이를 오리진에 전달하면 오리진은
+더 작은 이미지와 동영상 리소스, 대체 마크업 등과 같이 이러한 선호를 존중하는 대체 콘텐츠를 제공할 수 있다.
+
+목록에 여러 개의 충돌하는 토큰이 있는 경우, 가장 마지막 토큰이 우선한다.
+
+<div class="issue">
+    TODO: <a href="https://fetch.spec.whatwg.org/#fetching">Fetch#fetching 알고리즘</a>을 업데이트하여
+    `connection.saveData`를 Save-Data 헤더를 추가하기 위한 신호로 사용하게 한다.
+</div>
+</section>
+
+
+<section data-link-for="NetworkInformation">
+    ### 사용자 선호 변경 처리
+
+    사용자의 <a>saveData</a> 선호가 변경되면, 사용자 에이전트는 <dfn>사용자 선호를 업데이트하는 단계</dfn>를
+    실행해야 한다:
+
+    1. <var>new-saveData</var>를 현재 <a>saveData</a> 선호로 둔다.
+    1. <var>new-saveData</var>가 `connection.saveData`의 값과 같지 않다면:
+    1. <a data-cite="HTML#networking-task-source">네트워킹 태스크 소스</a>를 사용하여, 다음을 수행하도록 <a data-cite="HTML#queue-a-task">태스크를
+        큐에 넣는다</a>:
+    1. `connection.saveData`를 <var>new-saveData</var>로 설정한다.
+    1. `NetworkInformation` 객체에서 `change`라는 이름의 <a data-cite="DOM#concept-event-fire">이벤트를 발생시킨다</a>.
+</section>
+
+<section>
+    ## 개인정보 보호 고려사항
+
+    이 명세는 사용자의 선호에 관한 정보를 노출하며, 이는 사용자에 관한 약간의 정보이고
+    능동적 핑거프린팅 벡터로 사용될 수 있다.
+    이 명세를 구현하는 사용자 에이전트는 이를 인식해야 하며, 특정 상황에서
+    이 기능을 활성화할지 결정할 때 이를 고려해야 한다.
+
+    예를 들어, 사용자 에이전트는 사용자가 비공개 브라우징 모드에 있을 때 사용자의 선호를 생략하거나
+    거짓으로 보고하기로 결정할 수 있다.
+
+</section>
+
+<section id="iana-considerations">
+    ## IANA 고려사항
+
+    다음 세 개의 HTTP 요청 헤더 필드는 HTTP/1.1 [[RFC7231]]에서 제공하는 지침을 고려하여
+    메시지 헤더 필드 영구 레지스트리(see [[RFC3864]])에 추가되어야 한다.
+
+    <section id="registration-save-data">
+        ### `Save-Data` 요청 헤더 필드 등록
+
+        * 헤더 필드 이름: Save-Data
+        * 적용 가능한 프로토콜: 하이퍼텍스트 전송 프로토콜(HTTP)
+        * 상태: 표준
+        * 작성자/변경 관리자: W3C
+        * 명세 문서: W3C TR https://www.w3.org/TR/netinfo/
+
+    </section>
+
+</section>
+
+<section id="policy-controlled-features">
+    ## 정책 제어 기능
+
+    이 문서는 [=policy-controlled client hints features=]를 다음 [=policy-controlled
+    features=]로 확장한다:
+    * `ch-save-data`, 기본 허용 목록은 `*`이다
+
+</section>
+
+<section id="conformance">
+    이 명세에 적합성을 주장할 수 있는 제품 클래스는 단 하나뿐이다:
+    <dfn>사용자 에이전트</dfn>.
+</section>
+
+<section class="appendix">
+    ## 감사의 말
+    이 문서는 해당 명세의 라이선스가 허용하는 바에 따라 [[HTML]] 명세의 텍스트를
+    재사용한다.
+</section>
+<script src="https://htmlspecs.com/dropdown.js"></script>
