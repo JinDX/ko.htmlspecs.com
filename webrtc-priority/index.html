@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <title>WebRTC 우선순위 제어 API</title>
+    <meta content="CR" name="w3c-status">
+    <!-- <meta content="Bikeshed version b94c7e755, updated Fri Feb 19 16:28:59 2021 -0800" name="generator"> -->
+    <link href="https://www.w3.org/TR/webrtc-priority/" rel="canonical">
+    <style>
+        /* style-autolinks */
+
+        .css.css,
+        .property.property,
+        .descriptor.descriptor {
+            color: var(--a-normal-text);
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+        .css::before,
+        .property::before,
+        .descriptor::before {
+            content: "‘";
+        }
+
+        .css::after,
+        .property::after,
+        .descriptor::after {
+            content: "’";
+        }
+
+        .property,
+        .descriptor {
+            /* Don't wrap property and descriptor names */
+            white-space: nowrap;
+        }
+
+        .type {
+            /* CSS value <type> */
+            font-style: italic;
+        }
+
+        pre .property::before,
+        pre .property::after {
+            content: "";
+        }
+
+        [data-link-type="property"]::before,
+        [data-link-type="propdesc"]::before,
+        [data-link-type="descriptor"]::before,
+        [data-link-type="value"]::before,
+        [data-link-type="function"]::before,
+        [data-link-type="at-rule"]::before,
+        [data-link-type="selector"]::before,
+        [data-link-type="maybe"]::before {
+            content: "‘";
+        }
+
+        [data-link-type="property"]::after,
+        [data-link-type="propdesc"]::after,
+        [data-link-type="descriptor"]::after,
+        [data-link-type="value"]::after,
+        [data-link-type="function"]::after,
+        [data-link-type="at-rule"]::after,
+        [data-link-type="selector"]::after,
+        [data-link-type="maybe"]::after {
+            content: "’";
+        }
+
+        [data-link-type].production::before,
+        [data-link-type].production::after,
+        .prod [data-link-type]::before,
+        .prod [data-link-type]::after {
+            content: "";
+        }
+
+        [data-link-type=element],
+        [data-link-type=element-attr] {
+            font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace;
+            font-size: .9em;
+        }
+
+        [data-link-type=element]::before {
+            content: "<"
+        }
+
+        [data-link-type=element]::after {
+            content: ">"
+        }
+
+        [data-link-type=biblio] {
+            white-space: pre;
+        }
+    </style>
+    <style>
+        /* style-counters */
+
+        body {
+            counter-reset: example figure issue;
+        }
+
+        .issue {
+            counter-increment: issue;
+        }
+
+        .issue:not(.no-marker)::before {
+            content: "Issue " counter(issue);
+        }
+
+        .example {
+            counter-increment: example;
+        }
+
+        .example:not(.no-marker)::before {
+            content: "Example " counter(example);
+        }
+
+        .invalid.example:not(.no-marker)::before,
+        .illegal.example:not(.no-marker)::before {
+            content: "Invalid Example" counter(example);
+        }
+
+        figcaption {
+            counter-increment: figure;
+        }
+
+        figcaption:not(.no-marker)::before {
+            content: "Figure " counter(figure) " ";
+        }
+    </style>
+    <style>
+        /* style-dfn-panel */
+
+        :root {
+            --dfnpanel-bg: #ddd;
+            --dfnpanel-text: var(--text);
+        }
+
+        .dfn-panel {
+            position: absolute;
+            z-index: 35;
+            height: auto;
+            width: -webkit-fit-content;
+            width: fit-content;
+            max-width: 300px;
+            max-height: 500px;
+            overflow: auto;
+            padding: 0.5em 0.75em;
+            font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+            background: var(--dfnpanel-bg);
+            color: var(--dfnpanel-text);
+            border: outset 0.2em;
+        }
+
+        .dfn-panel:not(.on) {
+            display: none;
+        }
+
+        .dfn-panel * {
+            margin: 0;
+            padding: 0;
+            text-indent: 0;
+        }
+
+        .dfn-panel>b {
+            display: block;
+        }
+
+        .dfn-panel a {
+            color: var(--dfnpanel-text);
+        }
+
+        .dfn-panel a:not(:hover) {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+
+        .dfn-panel>b+b {
+            margin-top: 0.25em;
+        }
+
+        .dfn-panel ul {
+            padding: 0;
+        }
+
+        .dfn-panel li {
+            list-style: inside;
+        }
+
+        .dfn-panel.activated {
+            display: inline-block;
+            position: fixed;
+            left: .5em;
+            bottom: 2em;
+            margin: 0 auto;
+            max-width: calc(100vw - 1.5em - .4em - .5em);
+            max-height: 30vh;
+        }
+
+        .dfn-paneled {
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        /* style-md-lists */
+
+        /* This is a weird hack for me not yet following the commonmark spec
+   regarding paragraph and lists. */
+        [data-md]> :first-child {
+            margin-top: 0;
+        }
+
+        [data-md]> :last-child {
+            margin-bottom: 0;
+        }
+    </style>
+    <style>
+        /* style-selflinks */
+
+        :root {
+            --selflink-text: white;
+            --selflink-bg: gray;
+            --selflink-hover-text: black;
+        }
+
+        .heading,
+        .issue,
+        .note,
+        .example,
+        li,
+        dt {
+            position: relative;
+        }
+
+        a.self-link {
+            position: absolute;
+            top: 0;
+            left: calc(-1 * (3.5rem - 26px));
+            width: calc(3.5rem - 26px);
+            height: 2em;
+            text-align: center;
+            border: none;
+            transition: opacity .2s;
+            opacity: .5;
+        }
+
+        a.self-link:hover {
+            opacity: 1;
+        }
+
+        .heading>a.self-link {
+            font-size: 83%;
+        }
+
+        li>a.self-link {
+            left: calc(-1 * (3.5rem - 26px) - 2em);
+        }
+
+        dfn>a.self-link {
+            top: auto;
+            left: auto;
+            opacity: 0;
+            width: 1.5em;
+            height: 1.5em;
+            background: var(--selflink-bg);
+            color: var(--selflink-text);
+            font-style: normal;
+            transition: opacity .2s, background-color .2s, color .2s;
+        }
+
+        dfn:hover>a.self-link {
+            opacity: 1;
+        }
+
+        dfn>a.self-link:hover {
+            color: var(--selflink-hover-text);
+        }
+
+        a.self-link::before {
+            content: "¶";
+        }
+
+        .heading>a.self-link::before {
+            content: "§";
+        }
+
+        dfn>a.self-link::before {
+            content: "#";
+        }
+    </style>
+    <style>
+        /* style-syntax-highlighting */
+
+        pre.idl.highlight {
+            background: var(--borderedblock-bg, var(--def-bg));
+        }
+
+        code.highlight {
+            padding: .1em;
+            border-radius: .3em;
+        }
+
+        pre.highlight,
+        pre>code.highlight {
+            display: block;
+            padding: 1em;
+            margin: .5em 0;
+            overflow: auto;
+            border-radius: 0;
+        }
+
+        .highlight:not(.idl) {
+            background: rgba(0, 0, 0, .03);
+        }
+
+        c-[a] {
+            color: #990055
+        }
+
+        /* Keyword.Declaration */
+        c-[b] {
+            color: #990055
+        }
+
+        /* Keyword.Type */
+        c-[c] {
+            color: #708090
+        }
+
+        /* Comment */
+        c-[d] {
+            color: #708090
+        }
+
+        /* Comment.Multiline */
+        c-[e] {
+            color: #0077aa
+        }
+
+        /* Name.Attribute */
+        c-[f] {
+            color: #669900
+        }
+
+        /* Name.Tag */
+        c-[g] {
+            color: #222222
+        }
+
+        /* Name.Variable */
+        c-[k] {
+            color: #990055
+        }
+
+        /* Keyword */
+        c-[l] {
+            color: #000000
+        }
+
+        /* Literal */
+        c-[m] {
+            color: #000000
+        }
+
+        /* Literal.Number */
+        c-[n] {
+            color: #0077aa
+        }
+
+        /* Name */
+        c-[o] {
+            color: #999999
+        }
+
+        /* Operator */
+        c-[p] {
+            color: #999999
+        }
+
+        /* Punctuation */
+        c-[s] {
+            color: #a67f59
+        }
+
+        /* Literal.String */
+        c-[t] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Single */
+        c-[u] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Double */
+        c-[cp] {
+            color: #708090
+        }
+
+        /* Comment.Preproc */
+        c-[c1] {
+            color: #708090
+        }
+
+        /* Comment.Single */
+        c-[cs] {
+            color: #708090
+        }
+
+        /* Comment.Special */
+        c-[kc] {
+            color: #990055
+        }
+
+        /* Keyword.Constant */
+        c-[kn] {
+            color: #990055
+        }
+
+        /* Keyword.Namespace */
+        c-[kp] {
+            color: #990055
+        }
+
+        /* Keyword.Pseudo */
+        c-[kr] {
+            color: #990055
+        }
+
+        /* Keyword.Reserved */
+        c-[ld] {
+            color: #000000
+        }
+
+        /* Literal.Date */
+        c-[nc] {
+            color: #0077aa
+        }
+
+        /* Name.Class */
+        c-[no] {
+            color: #0077aa
+        }
+
+        /* Name.Constant */
+        c-[nd] {
+            color: #0077aa
+        }
+
+        /* Name.Decorator */
+        c-[ni] {
+            color: #0077aa
+        }
+
+        /* Name.Entity */
+        c-[ne] {
+            color: #0077aa
+        }
+
+        /* Name.Exception */
+        c-[nf] {
+            color: #0077aa
+        }
+
+        /* Name.Function */
+        c-[nl] {
+            color: #0077aa
+        }
+
+        /* Name.Label */
+        c-[nn] {
+            color: #0077aa
+        }
+
+        /* Name.Namespace */
+        c-[py] {
+            color: #0077aa
+        }
+
+        /* Name.Property */
+        c-[ow] {
+            color: #999999
+        }
+
+        /* Operator.Word */
+        c-[mb] {
+            color: #000000
+        }
+
+        /* Literal.Number.Bin */
+        c-[mf] {
+            color: #000000
+        }
+
+        /* Literal.Number.Float */
+        c-[mh] {
+            color: #000000
+        }
+
+        /* Literal.Number.Hex */
+        c-[mi] {
+            color: #000000
+        }
+
+        /* Literal.Number.Integer */
+        c-[mo] {
+            color: #000000
+        }
+
+        /* Literal.Number.Oct */
+        c-[sb] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Backtick */
+        c-[sc] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Char */
+        c-[sd] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Doc */
+        c-[se] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Escape */
+        c-[sh] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Heredoc */
+        c-[si] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Interpol */
+        c-[sx] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Other */
+        c-[sr] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Regex */
+        c-[ss] {
+            color: #a67f59
+        }
+
+        /* Literal.String.Symbol */
+        c-[vc] {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Class */
+        c-[vg] {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Global */
+        c-[vi] {
+            color: #0077aa
+        }
+
+        /* Name.Variable.Instance */
+        c-[il] {
+            color: #000000
+        }
+
+        /* Literal.Number.Integer.Long */
+    </style>
+    <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-CR" rel="stylesheet">
+
+<body class="h-entry">
+    <div class="head">
+        <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48"
+                    src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
+        <h1 class="p-name no-ref" id="title">WebRTC 우선순위 제어 API</h1>
+        <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">W3C 후보
+                권고안 스냅샷, <time class="dt-updated" datetime="2021-03-18">2021년 3월 18일</time></span></h2>
+        <div data-fill-with="spec-metadata">
+            <dl>
+                <dt>현재 버전:
+                <dd><a class="u-url"
+                        href="https://www.w3.org/TR/2021/CR-webrtc-priority-20210318/">https://www.w3.org/TR/2021/CR-webrtc-priority-20210318/</a>
+                <dt>최신 공개 버전:
+                <dd><a href="https://www.w3.org/TR/webrtc-priority/">https://www.w3.org/TR/webrtc-priority/</a>
+                <dt>편집자 초안:
+                <dd><a href="https://w3c.github.io/webrtc-priority/">https://w3c.github.io/webrtc-priority/</a>
+                <dt>이전 버전:
+                <dd><a href="https://www.w3.org/TR/2020/WD-webrtc-priority-20200922/"
+                        rel="prev">https://www.w3.org/TR/2020/WD-webrtc-priority-20200922/</a>
+                <dt>구현 보고서:
+                <dd><a
+                        href="https://wpt.fyi/results/webrtc-priority?label=experimental&label=master&aligned">https://wpt.fyi/results/webrtc-priority?label=experimental&label=master&aligned</a>
+                <dt>테스트 스위트:
+                <dd><a
+                        href="https://github.com/web-platform-tests/wpt/tree/master/webrtc-priority">https://github.com/web-platform-tests/wpt/tree/master/webrtc-priority</a>
+                <dt>이슈 추적:
+                <dd><a href="https://github.com/w3c/webrtc-priority/issues/">GitHub</a>
+                <dt class="editor">편집자:
+                <dd class="editor p-author h-card vcard" data-editor-id="24610"><a class="p-name fn u-email email"
+                        href="mailto:hta@google.com">Harald Alvestrand</a> (<a class="p-org org"
+                        href="https://google.com">Google</a>)
+                </dd>
+            </dl>
+        </div>
+        <div data-fill-with="warning"></div>
+        <p class="copyright" data-fill-with="copyright"><a
+                href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2021 <a
+                href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a
+                href="https://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a
+                href="https://www.ercim.eu/"><abbr
+                    title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a
+                href="https://www.keio.ac.jp/">Keio</a>, <a href="https://ev.buaa.edu.cn/">Beihang</a>). W3C <a
+                href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a
+                href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a
+                href="https://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply. </p>
+        <hr title="Separator for header">
+    </div>
+    <div class="p-summary" data-fill-with="abstract">
+        <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">초록</span></h2>
+        <p>이 API는 나가는 WebRTC 패킷의 네트워크
+
+            제어 비트(DSCP 비트)와, 혼잡 상황에서 나가는 WebRTC 패킷의
+            큐잉 우선순위를 조작하기 위한 제어 표면을 정의한다.</p>
+    </div>
+    <h2 class="no-num no-toc no-ref heading settled" id="sotd"><span class="content">이 문서의 상태</span></h2>
+    <div data-fill-with="status">
+        <p> <em>이 절은
+                발행 시점의 이 문서 상태를 설명한다. 다른 문서가 이 문서를 대체할 수 있다.
+                현재 W3C 발행물 목록과 이 기술 보고서의 최신 개정판은
+                <a href="https://www.w3.org/TR/">https://www.w3.org/TR/의 W3C 기술 보고서
+                    색인</a>에서 찾을 수 있다.</em> </p>
+        <p> 이 문서는 <a href="https://www.w3.org/groups/wg/webrtc">Web Real-Time
+                Communications Working Group</a>에서 후보 권고안 스냅샷으로 발행했다. 이 문서는
+            W3C 권고안이 되는 것을 목적으로 한다.
+            이 문서는 폭넓은 검토 기회를 보장하기 위해 적어도 <time class="status-deadline" datetime="2021-04-30">2021년 4월 30일</time>까지
+            후보 권고안으로 유지된다. </p>
+        <p> 이 문서에 관해 의견을 제출하려면 <a href="https://github.com/w3c/webrtc-priority/issues/">이슈를 등록</a>하거나 <a
+                href="mailto:public-webrtc@w3.org?Subject=%5Bwebrtc-priority%5D%20PUT%20SUBJECT%20HERE">public-webrtc@w3.org</a>로
+            보내라
+            (<a href="mailto:public-webrtc-request@w3.org?subject=subscribe">구독</a>, <a
+                href="https://lists.w3.org/Archives/Public/public-webrtc/">아카이브</a>).
+            전자우편을 보낼 때는
+            제목에 “webrtc-priority”라는 텍스트를 넣어야 하며,
+            가능하면 다음과 같이 작성하는 것이 좋다:
+            “[webrtc-priority] <em>…의견 요약…</em>”.
+            모든 의견을 환영한다. </p>
+        <p>후보 권고안으로 발행되었다고 해서 W3C 회원의 승인을 의미하지는 않는다. 후보
+            권고안 스냅샷은 <a href="https://www.w3.org/2020/Process-20200915/#dfn-wide-review">폭넓은 검토</a>를 받았으며,
+            구현 경험을 수집하기 위한 것이다.</p>
+        <p> 이 문서가 제안 권고안 단계로 진입하기 위한 진입 기준은
+            이 명세의 모든 기능에 대해 최소 두 개의 독립적이고 상호운용 가능한 구현을 갖추는 것이며,
+            이는 작업 그룹이 개발한 테스트 스위트에 정의된 테스트를
+            통과함으로써 판단된다. 작업 그룹은 진행 상황을 추적하기 위해 구현 보고서를 준비할 것이다. </p>
+        <p> 이 문서는
+            <a href="https://www.w3.org/Consortium/Patent-Policy/">W3C 특허 정책</a>에 따라 운영되는 그룹에서 작성했다.
+            W3C는 해당 그룹의 산출물과 관련해 이루어진 <a href="https://www.w3.org/2004/01/pp-impl/47318/status" rel="disclosure">모든 특허
+                공개의
+                공개 목록</a>을 유지한다.
+            그 페이지에는 특허를 공개하기 위한 지침도 포함되어 있다.
+            개인이 필수 청구항을 포함한다고 믿는 특허를 실제로 알고 있는 경우,
+            그 개인은 <a href="https://www.w3.org/Consortium/Patent-Policy/#def-essential">Essential Claim(s)</a>에 해당하는 정보를
+            <a href="https://www.w3.org/Consortium/Patent-Policy/#sec-Disclosure">W3C 특허 정책
+                제6절</a>에 따라 공개해야 한다.
+        </p>
+        <p> 이 문서는 <a href="https://www.w3.org/2020/Process-20200915/" id="w3c_process_revision">2020년 9월 15일 W3C 프로세스
+                문서</a>의 적용을 받는다. </p>
+        <p></p>
+    </div>
+    <div data-fill-with="at-risk"></div>
+    <nav data-fill-with="table-of-contents" id="toc">
+        <h2 class="no-num no-toc no-ref" id="contents">목차</h2>
+        <ol class="toc" role="directory">
+            <li><a href="#intro"><span class="secno">1</span> <span class="content">소개</span></a>
+            <li><a href="#model"><span class="secno">2</span> <span class="content">우선순위 및 QoS 모델</span></a>
+            <li>
+                <a href="#media-priority"><span class="secno">3</span> <span class="content">미디어
+                        우선순위를 위한 확장</span></a>
+                <ol class="toc">
+                    <li><a href="#rtc-priority-type"><span class="secno">3.1</span> <span
+                                class="content">RTCPriorityType 열거형</span></a>
+                    <li><a href="#encoding-parameters"><span class="secno">3.2</span> <span class="content">
+                                RTCRtpEncodingParameters에 대한 확장</span></a>
+                </ol>
+            <li>
+                <a href="#datachannel"><span class="secno">4</span> <span class="content">
+                        RTCDataChannel을 위한 확장</span></a>
+                <ol class="toc">
+                    <li><a href="#new-rtcdatachannel-attribute"><span class="secno">4.1</span> <span class="content">새
+                                RTCDataChannel 속성</span></a>
+                    <li><a href="#new-rtcdatachannelinit-member"><span class="secno">4.2</span> <span class="content">새
+                                RTCDataChannelInit 멤버</span></a>
+                    <li><a href="#rtcdatachannel-processing-steps"><span class="secno">4.3</span> <span
+                                class="content">RTCDataChannel 처리 단계</span></a>
+                </ol>
+            <li><a href="#security"><span class="secno">5</span> <span class="content">보안 및 개인정보 보호
+                        고려사항</span></a>
+            <li>
+                <a href="#w3c-conformance"><span class="secno"></span> <span class="content">적합성</span></a>
+                <ol class="toc">
+                    <li><a href="#w3c-conventions"><span class="secno"></span> <span class="content">문서
+                                규약</span></a>
+                    <li><a href="#w3c-conformant-algorithms"><span class="secno"></span> <span class="content">적합한
+                                알고리즘</span></a>
+                </ol>
+            <li>
+                <a href="#index"><span class="secno"></span> <span class="content">색인</span></a>
+                <ol class="toc">
+                    <li><a href="#index-defined-here"><span class="secno"></span> <span class="content">이 명세에서
+                                정의하는 용어</span></a>
+                    <li><a href="#index-defined-elsewhere"><span class="secno"></span> <span class="content">참조로
+                                정의되는 용어</span></a>
+                </ol>
+            <li>
+                <a href="#references"><span class="secno"></span> <span class="content">참고문헌</span></a>
+                <ol class="toc">
+                    <li><a href="#normative"><span class="secno"></span> <span class="content">규범적
+                                참고문헌</span></a>
+                </ol>
+            <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL 색인</span></a>
+        </ol>
+    </nav>
+    <main>
+        <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span
+                class="content">소개</span><a class="self-link" href="#intro"></a></h2>
+        <p>이 문서는 WEBRTC <code
+                class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpencodingparameters" id="ref-for-dom-rtcrtpencodingparameters">RTCRtpEncodingParameters</a></code>
+            구조의 일부로 "priority" 필드를 정의하며, 가능한 값은 "very-low",
+            "low", "medium" 및 "high"이다.</p>
+        <p>이 기능은 원래 <a data-link-type="biblio" href="#biblio-webrtc">[WEBRTC]</a>
+            명세의 일부였지만,
+            구현 경험이 부족해 2019년 11월에
+            제거되었다. 이제 이 문서의 일부가 되었다.</p>
+        <p>또한 이 명세는 <code
+                class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpencodingparameters" id="ref-for-dom-rtcrtpencodingparameters①">RTCRtpEncodingParameters</a></code>에
+            필드를 추가하여 로컬 우선순위 지정에는 영향을 주지 않고 DSCP 마킹을
+            제어하거나, 그 반대로 제어할 수 있게 한다.</p>
+        <h2 class="heading settled" data-level="2" id="model"><span class="secno">2. </span><span class="content">우선순위 및
+                QoS 모델</span><a class="self-link" href="#model"></a></h2>
+        <p>많은 애플리케이션에는 같은 데이터 유형의 여러 미디어 흐름이 있으며,
+            종종 일부 흐름은 다른 흐름보다 더 중요하다. WebRTC는 <a data-link-type="biblio" href="#biblio-rfc8835">[rfc8835]</a> 및 <a
+                data-link-type="biblio" href="#biblio-rfc8837">[rfc8837]</a>에
+            설명된 우선순위와
+            서비스 품질(QoS) 프레임워크를 사용하여, 일부 네트워킹 환경에서 QoS 제공을
+            돕는 패킷 우선순위와 DSCP 마킹을 제공한다. 우선순위 설정은 다양한
+            흐름의 상대적 우선순위를 나타내는 데 사용할 수 있다. 우선순위 API는 JavaScript
+            애플리케이션이 <code>priority</code> 속성을 설정하여 특정 미디어 흐름이 애플리케이션에
+            얼마나 중요한지, 즉 high,
+            medium, low 또는 very low인지 브라우저에 알릴 수 있게 한다. 이 속성은
+            <code
+                class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpencodingparameters" id="ref-for-dom-rtcrtpencodingparameters②">RTCRtpEncodingParameters</a></code>
+            객체에서 아래에 정의된 값 중 하나로
+            설정된다.
+        </p>
+        <h2 class="heading settled" data-level="3" id="media-priority"><span class="secno">3. </span><span
+                class="content">미디어 우선순위를 위한 확장</span><a class="self-link" href="#media-priority"></a>
+        </h2>
+        <h3 class="heading settled" data-level="3.1" id="rtc-priority-type"><span class="secno">3.1. </span><span
+                class="content">RTCPriorityType 열거형</span><a class="self-link" href="#rtc-priority-type"></a></h3>
+        <pre class="idl highlight def"><c- b>enum</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export id="enumdef-rtcprioritytype"><code><c- g>RTCPriorityType</c-></code></dfn> {
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-very-low" id="ref-for-dom-rtcprioritytype-very-low"><c- s>"very-low"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-low" id="ref-for-dom-rtcprioritytype-low"><c- s>"low"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-medium" id="ref-for-dom-rtcprioritytype-medium"><c- s>"medium"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-high" id="ref-for-dom-rtcprioritytype-high"><c- s>"high"</c-></a>
+};
+</pre>
+        <table class="simple">
+            <tbody>
+                <tr>
+                    <th colspan="2">열거형 설명
+                <tr>
+                    <td><dfn class="dfn-paneled idl-code" data-dfn-for="RTCPriorityType" data-dfn-type="enum-value"
+                            data-export data-lt="&quot;very-low&quot;|very-low"
+                            id="dom-rtcprioritytype-very-low"><code>very-low</code></dfn>
+                    <td><a data-link-type="biblio" href="#biblio-rfc8835">[rfc8835]</a>의 4.1절과 4.2절을 참조하라.
+                        <a data-link-type="biblio" href="#biblio-rfc8831">[rfc8831]</a>에 정의된 "below
+                        normal"에 해당한다.
+                <tr>
+                    <td><dfn class="dfn-paneled idl-code" data-dfn-for="RTCPriorityType" data-dfn-type="enum-value"
+                            data-export data-lt="&quot;low&quot;|low"
+                            id="dom-rtcprioritytype-low"><code>low</code></dfn>
+                    <td><a data-link-type="biblio" href="#biblio-rfc8835">[rfc8835]</a>의 4.1절과 4.2절을 참조하라.
+                        <a data-link-type="biblio" href="#biblio-rfc8831">[rfc8831]</a>에 정의된
+                        "normal"에 해당한다.
+                <tr>
+                    <td><dfn class="dfn-paneled idl-code" data-dfn-for="RTCPriorityType" data-dfn-type="enum-value"
+                            data-export data-lt="&quot;medium&quot;|medium"
+                            id="dom-rtcprioritytype-medium"><code>medium</code></dfn>
+                    <td><a data-link-type="biblio" href="#biblio-rfc8835">[rfc8835]</a>의 4.1절과 4.2절을 참조하라.
+                        <a data-link-type="biblio" href="#biblio-rfc8831">[rfc8831]</a>에 정의된 "high"에
+                        해당한다.
+                <tr>
+                    <td><dfn class="dfn-paneled idl-code" data-dfn-for="RTCPriorityType" data-dfn-type="enum-value"
+                            data-export data-lt="&quot;high&quot;|high"
+                            id="dom-rtcprioritytype-high"><code>high</code></dfn>
+                    <td><a data-link-type="biblio" href="#biblio-rfc8835">[rfc8835]</a>의 4.1절과 4.2절을 참조하라.
+                        <a data-link-type="biblio" href="#biblio-rfc8831">[rfc8831]</a>에 정의된 "extra
+                        high"에 해당한다.
+        </table>
+        <p>이 API를 사용하는 애플리케이션은, 중요한 항목의 우선순위를 높이기보다는
+            덜 중요한 항목의 우선순위를 낮추는 편이 종종 더 나은 전체 사용자 경험을
+            제공한다는 점을 알고 있어야 한다.</p>
+        <h3 class="heading settled" data-level="3.2" id="encoding-parameters"><span class="secno">3.2. </span><span
+                class="content">RTCRtpEncodingParameters에 대한 확장</span><a class="self-link"
+                href="#encoding-parameters"></a></h3>
+        <pre class="idl highlight def"><c- b>partial</c-> <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpencodingparameters" id="ref-for-dom-rtcrtpencodingparameters③"><c- g>RTCRtpEncodingParameters</c-></a> {
+  <a data-link-type="idl-name" href="#enumdef-rtcprioritytype" id="ref-for-enumdef-rtcprioritytype"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-default="&quot;low&quot;" data-link-type="dict-member" data-type="RTCPriorityType " href="#dom-rtcrtpencodingparameters-priority" id="ref-for-dom-rtcrtpencodingparameters-priority"><c- g>priority</c-></a> = "low";
+  <a data-link-type="idl-name" href="#enumdef-rtcprioritytype" id="ref-for-enumdef-rtcprioritytype①"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="RTCPriorityType " href="#dom-rtcrtpencodingparameters-networkpriority" id="ref-for-dom-rtcrtpencodingparameters-networkpriority"><c- g>networkPriority</c-></a>;
+};
+</pre>
+        <dl>
+            <dt><dfn class="dfn-paneled idl-code" data-dfn-for="RTCRtpEncodingParameters" data-dfn-type="dict-member"
+                    data-export id="dom-rtcrtpencodingparameters-priority"><code>priority</code></dfn>, <span>
+                    <a data-link-type="idl-name" href="#enumdef-rtcprioritytype"
+                        id="ref-for-enumdef-rtcprioritytype②">RTCPriorityType</a> 유형, 기본값은
+                    <code>"low"</code></span>
+            <dd>
+                <p> <code
+                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpsender" id="ref-for-dom-rtcrtpsender">RTCRtpSender</a></code>의
+                    우선순위를 나타내며,
+                    이는 <code
+                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpsender" id="ref-for-dom-rtcrtpsender①">RTCRtpSender</a></code>
+                    객체들 사이의 대역폭 할당에
+                    영향을 준다. 이는 <a data-link-type="biblio" href="#biblio-rfc8835">[rfc8835]</a> 4절에
+                    명시되어 있다. 사용자 에이전트는 <code
+                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpsender" id="ref-for-dom-rtcrtpsender②">RTCRtpSender</a></code>의
+                    인코딩들 사이에서 대역폭을
+                    자유롭게 하위 할당할 수 있다.
+                </p>
+            <dt> <dfn class="dfn-paneled idl-code" data-dfn-for="RTCRtpEncodingParameters" data-dfn-type="dict-member"
+                    data-export id="dom-rtcrtpencodingparameters-networkpriority"><code>networkPriority</code></dfn>,
+                <span><a data-link-type="idl-name" href="#enumdef-rtcprioritytype"
+                        id="ref-for-enumdef-rtcprioritytype③">RTCPriorityType</a> 유형</span>
+            <dd>
+                이것은 <code
+                    class="idl"><a data-link-type="idl" href="#dom-rtcdatachannelinit-priority" id="ref-for-dom-rtcdatachannelinit-priority">priority</a></code>와
+                같은
+                효과를 갖지만, <a data-link-type="biblio" href="#biblio-rfc8835">[rfc8835]</a>
+                4.2절에 설명된 것처럼 생성된 패킷의 DSCP 마킹에만 영향을 준다.
+                <p><code
+                        class="idl"><a data-link-type="idl" href="#dom-rtcrtpencodingparameters-networkpriority" id="ref-for-dom-rtcrtpencodingparameters-networkpriority①">networkPriority</a></code>가
+                    설정되지 않은 경우, 생성된 패킷의 DSCP 마킹은 <code
+                        class="idl"><a data-link-type="idl" href="#dom-rtcdatachannelinit-priority" id="ref-for-dom-rtcdatachannelinit-priority①">priority</a></code>
+                    멤버에 의해 제어된다.</p>
+        </dl>
+        <h2 class="heading settled" data-level="4" id="datachannel"><span class="secno">4. </span><span
+                class="content">RTCDataChannel을 위한 확장</span><a class="self-link" href="#datachannel"></a></h2>
+        <pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webrtc/#dom-rtcdatachannel" id="ref-for-dom-rtcdatachannel"><c- g>RTCDataChannel</c-></a> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-rtcprioritytype" id="ref-for-enumdef-rtcprioritytype④"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="RTCPriorityType" href="#dom-rtcdatachannel-priority" id="ref-for-dom-rtcdatachannel-priority"><c- g>priority</c-></a>;
+};
+
+<c- b>partial</c-> <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="https://www.w3.org/TR/webrtc/#dom-rtcdatachannelinit" id="ref-for-dom-rtcdatachannelinit"><c- g>RTCDataChannelInit</c-></a> {
+  <a data-link-type="idl-name" href="#enumdef-rtcprioritytype" id="ref-for-enumdef-rtcprioritytype⑤"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-default="&quot;low&quot;" data-link-type="dict-member" data-type="RTCPriorityType " href="#dom-rtcdatachannelinit-priority" id="ref-for-dom-rtcdatachannelinit-priority②"><c- g>priority</c-></a> = "low";
+};
+
+</pre>
+        <h3 class="heading settled" data-level="4.1" id="new-rtcdatachannel-attribute"><span class="secno">4.1.
+            </span><span class="content">새 RTCDataChannel 속성</span><a class="self-link"
+                href="#new-rtcdatachannel-attribute"></a></h3>
+        <dl>
+            <dt><dfn class="dfn-paneled idl-code" data-dfn-for="RTCDataChannel" data-dfn-type="attribute" data-export
+                    id="dom-rtcdatachannel-priority"><code>priority</code></dfn>, <span><a data-link-type="idl-name"
+                        href="#enumdef-rtcprioritytype" id="ref-for-enumdef-rtcprioritytype⑥">RTCPriorityType</a> 유형,
+                    readonly</span>
+            <dd>
+                <p><code>priority</code> 속성은 이 <code
+                        class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webrtc/#dom-rtcdatachannel" id="ref-for-dom-rtcdatachannel①">RTCDataChannel</a></code>의
+                    우선순위를 반환한다.
+                    우선순위는 채널 생성 시 사용자 에이전트가
+                    할당한다. 가져올 때 이 속성은
+                    [[DataChannelPriority]] 슬롯의 값을 반드시 반환해야 한다.</p>
+        </dl>
+        <h3 class="heading settled" data-level="4.2" id="new-rtcdatachannelinit-member"><span class="secno">4.2.
+            </span><span class="content">새 RTCDataChannelInit 멤버</span><a class="self-link"
+                href="#new-rtcdatachannelinit-member"></a></h3>
+        <dl>
+            <dt><dfn class="dfn-paneled idl-code" data-dfn-for="RTCDataChannelInit" data-dfn-type="dict-member"
+                    data-export id="dom-rtcdatachannelinit-priority"><code>priority</code></dfn>, <span><a
+                        data-link-type="idl-name" href="#enumdef-rtcprioritytype"
+                        id="ref-for-enumdef-rtcprioritytype⑦">RTCPriorityType</a> 유형, 기본값은
+                    <code>"low"</code></span>
+            <dd>
+                <p>이 채널의 우선순위.</p>
+        </dl>
+        <h3 class="heading settled" data-level="4.3" id="rtcdatachannel-processing-steps"><span class="secno">4.3.
+            </span><span class="content">RTCDataChannel 처리 단계</span><a class="self-link"
+                href="#rtcdatachannel-processing-steps"></a></h3>
+        <p>다음 단계들은 DataChannel 초기화 단계에 추가된다:</p>
+        <p>DataChannel이 내부 슬롯 <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport
+                id="datachannelpriority">[[DataChannelPriority]]</dfn>을 갖도록 하라.</p>
+        <p>DataChannel을 초기화하는 처리 단계에서, <var>option</var> 인수를 처리하는 곳에 다음
+            단계를 삽입한다:</p>
+        <ul>
+            <li data-md>
+                <p><var>channel</var>.<a data-link-type="dfn" href="#datachannelpriority"
+                        id="ref-for-datachannelpriority">[[DataChannelPriority]]</a>를 <var>option</var>의
+                    <code>priority</code> 멤버로 초기화한다.
+                </p>
+            <li data-md>
+                <p>수신 DataChannel의 경우, <var>configuration</var>의 정수 우선순위 값에 기반해
+                    다음 매핑에 따라 <var>channel</var>.<a data-link-type="dfn" href="#datachannelpriority"
+                        id="ref-for-datachannelpriority①">[[DataChannelPriority]]</a>를
+                    초기화한다.</p>
+        </ul>
+        <table class="simple">
+            <tbody>
+                <tr>
+                    <th><var>configuration</var> 우선순위 값
+                    <th><code
+                            class="idl"><a data-link-type="idl" href="#enumdef-rtcprioritytype" id="ref-for-enumdef-rtcprioritytype⑧">RTCPriorityType</a></code>
+                        값
+                <tr>
+                    <td>0에서 128까지
+                    <td><code>very-low</code>
+                <tr>
+                    <td>129에서 256까지
+                    <td><code>low</code>
+                <tr>
+                    <td>257에서 512까지
+                    <td><code>medium</code>
+                <tr>
+                    <td>513 이상
+                    <td><code>high</code>
+        </table>
+        <h2 class="heading settled" data-level="5" id="security"><span class="secno">5. </span><span class="content">보안
+                및 개인정보 보호 고려사항</span><a class="self-link" href="#security"></a>
+        </h2>
+        <p>이 API 확장은 그 자체로 새로운 정보를 노출하지 않으며, 이 확장을 통해 처리되는
+            어떤 데이터도 민감한 정보나 개인 식별 정보로 간주될 수 없다.</p>
+        <p>네트워크 트래픽을 모니터링하는 기능과 함께 사용하면, 이 확장을 이용해
+            구현이 명세의 어떤 부분을 실제로 준수하는지, 특히 우선순위 설정이 생성된 패킷의
+            DSCP 마킹 변경을 유발하는지 파악할 수 있다.</p>
+        <p>이 명세는 네트워크 트래픽의 우선순위 지정에 흔히 사용되는 네트워크 헤더의 일부
+            (DSCP 마킹)에 대한 일정한 제어를 허용한다. UA가 연결된 네트워크가 잘못 구성되었거나
+            과소 프로비저닝된 경우, 구성에서 예상하지 않은 DSCP 마킹이 포함된 패킷을 내보냄으로써
+            로컬 네트워크 환경에 영향을 줄 수 있다.</p>
+        <p>이 위험에 대한 대응책에는 적절한 구성이 포함된다. 가장 단순한 구성은 DSCP
+            블리칭, 즉 DSCP 마킹을 항상 0으로 만들거나 무시하는 것이다. 혼잡 제어(WebRTC에서는
+            항상 필수)는 대부분의 경우 네트워크 과부하를 방지한다.</p>
+    </main>
+    <div data-fill-with="conformance">
+        <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">적합성</span><a
+                class="self-link" href="#w3c-conformance"></a></h2>
+        <h3 class="no-ref no-num heading settled" id="w3c-conventions"><span class="content">문서
+                규약</span><a class="self-link" href="#w3c-conventions"></a></h3>
+        <p>적합성 요구사항은
+            서술적 단언과
+            RFC 2119 용어를 함께 사용하여 표현된다.
+            이 문서의 규범적 부분에서 쓰이는 핵심 단어 “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”,
+            “RECOMMENDED”,
+            “MAY”, 및 “OPTIONAL”은
+            RFC 2119에 설명된 대로
+            해석해야 한다.
+            다만 가독성을 위해,
+            이 명세에서는 이러한 단어들이 모두 대문자로 표시되지는 않는다. </p>
+        <p>이 명세의 모든 텍스트는 규범적이다.
+            단, 명시적으로 비규범으로 표시된 절, 예제 및 참고는 제외한다. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
+        <p>이 명세의 예제는 “예를 들어”라는 말로 도입되거나
+            <code>class="example"</code>을 사용하여
+            규범적 텍스트와 구분된다.
+            다음과 같다:
+        </p>
+        <div class="example" id="w3c-example">
+            <a class="self-link" href="#w3c-example"></a>
+            <p>이것은 정보성 예제의 한 예이다. </p>
+        </div>
+        <p>정보성 참고는 “참고”라는 말로 시작하며
+            <code>class="note"</code>를 사용하여
+            규범적 텍스트와 구분된다.
+            다음과 같다:
+        </p>
+        <p class="note" role="note">참고, 이것은 정보성 참고이다. </p>
+        <h3 class="no-ref no-num heading settled" id="w3c-conformant-algorithms"><span class="content">적합한
+                알고리즘</span><a class="self-link" href="#w3c-conformant-algorithms"></a></h3>
+        <p>알고리즘의 일부로 명령형으로 표현된 요구사항
+            (예: "strip any leading space characters"
+            또는 "return false and abort these steps")은
+            해당 알고리즘을 도입할 때 사용된 핵심 단어
+            ("must", "should", "may" 등)의 의미로
+            해석해야 한다. </p>
+    </div>
+    <script src="https://www.w3.org/scripts/TR/2016/fixup.js"></script>
+    <h2 class="no-num no-ref heading settled" id="index"><span class="content">색인</span><a class="self-link"
+            href="#index"></a></h2>
+    <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">이 명세에서 정의하는
+            용어</span><a class="self-link" href="#index-defined-here"></a></h3>
+    <ul class="index">
+        <li><a href="#datachannelpriority">[[DataChannelPriority]]</a><span>, §4.3</span>
+        <li><a href="#dom-rtcprioritytype-high">"high"</a><span>, §3.1</span>
+        <li><a href="#dom-rtcprioritytype-high">high</a><span>, §3.1</span>
+        <li><a href="#dom-rtcprioritytype-low">"low"</a><span>, §3.1</span>
+        <li><a href="#dom-rtcprioritytype-low">low</a><span>, §3.1</span>
+        <li><a href="#dom-rtcprioritytype-medium">"medium"</a><span>, §3.1</span>
+        <li><a href="#dom-rtcprioritytype-medium">medium</a><span>, §3.1</span>
+        <li><a href="#dom-rtcrtpencodingparameters-networkpriority">networkPriority</a><span>, §3.2</span>
+        <li>
+            priority
+            <ul>
+                <li><a href="#dom-rtcdatachannel-priority">RTCDataChannel의 속성</a><span>, §4.1</span>
+                <li><a href="#dom-rtcdatachannelinit-priority">RTCDataChannelInit의 dict-member</a><span>,
+                        §4.2</span>
+                <li><a href="#dom-rtcrtpencodingparameters-priority">RTCRtpEncodingParameters의 dict-member</a><span>,
+                        §3.2</span>
+            </ul>
+        <li><a href="#enumdef-rtcprioritytype">RTCPriorityType</a><span>, §3.1</span>
+        <li><a href="#dom-rtcprioritytype-very-low">"very-low"</a><span>, §3.1</span>
+        <li><a href="#dom-rtcprioritytype-very-low">very-low</a><span>, §3.1</span>
+    </ul>
+    <aside class="dfn-panel" data-for="term-for-dom-rtcdatachannel">
+        <a
+            href="https://www.w3.org/TR/webrtc/#dom-rtcdatachannel">https://www.w3.org/TR/webrtc/#dom-rtcdatachannel</a><b>참조
+            위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcdatachannel">4. RTCDataChannel을 위한 확장</a>
+            <li><a href="#ref-for-dom-rtcdatachannel①">4.1. 새 RTCDataChannel 속성</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-rtcdatachannelinit">
+        <a
+            href="https://www.w3.org/TR/webrtc/#dom-rtcdatachannelinit">https://www.w3.org/TR/webrtc/#dom-rtcdatachannelinit</a><b>참조
+            위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcdatachannelinit">4. RTCDataChannel을 위한 확장</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-rtcrtpencodingparameters">
+        <a
+            href="https://www.w3.org/TR/webrtc/#dom-rtcrtpencodingparameters">https://www.w3.org/TR/webrtc/#dom-rtcrtpencodingparameters</a><b>참조
+            위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcrtpencodingparameters">1. 소개</a> <a
+                    href="#ref-for-dom-rtcrtpencodingparameters①">(2)</a>
+            <li><a href="#ref-for-dom-rtcrtpencodingparameters②">2. 우선순위 및 QoS 모델</a>
+            <li><a href="#ref-for-dom-rtcrtpencodingparameters③">3.2. RTCRtpEncodingParameters에 대한 확장</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="term-for-dom-rtcrtpsender">
+        <a href="https://www.w3.org/TR/webrtc/#dom-rtcrtpsender">https://www.w3.org/TR/webrtc/#dom-rtcrtpsender</a><b>참조
+            위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcrtpsender">3.2. RTCRtpEncodingParameters에 대한 확장</a> <a
+                    href="#ref-for-dom-rtcrtpsender①">(2)</a> <a href="#ref-for-dom-rtcrtpsender②">(3)</a>
+        </ul>
+    </aside>
+    <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">참조로 정의되는
+            용어</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
+    <ul class="index">
+        <li>
+            <a data-link-type="biblio">[WEBRTC]</a>는 다음 용어들을 정의한다:
+            <ul>
+                <li><span class="dfn-paneled" id="term-for-dom-rtcdatachannel">RTCDataChannel</span>
+                <li><span class="dfn-paneled" id="term-for-dom-rtcdatachannelinit">RTCDataChannelInit</span>
+                <li><span class="dfn-paneled" id="term-for-dom-rtcrtpencodingparameters">RTCRtpEncodingParameters</span>
+                <li><span class="dfn-paneled" id="term-for-dom-rtcrtpsender">RTCRtpSender</span>
+            </ul>
+    </ul>
+    <h2 class="no-num no-ref heading settled" id="references"><span class="content">참고문헌</span><a class="self-link"
+            href="#references"></a></h2>
+    <h3 class="no-num no-ref heading settled" id="normative"><span class="content">규범적 참고문헌</span><a class="self-link"
+            href="#normative"></a></h3>
+    <dl>
+        <dt id="biblio-rfc2119">[RFC2119]
+        <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">RFC에서 요구 수준을 나타내기 위해 사용하는 핵심 단어</a>. 1997년 3월. 현행
+            모범 사례. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
+        <dt id="biblio-rfc8831">[RFC8831]
+        <dd>R. Jesup; S. Loreto; M. Tüxen. <a href="https://datatracker.ietf.org/doc/html/rfc8831">WebRTC 데이터
+                채널</a>. 2021년 1월. 제안 표준. URL: <a
+                href="https://datatracker.ietf.org/doc/html/rfc8831">https://datatracker.ietf.org/doc/html/rfc8831</a>
+        <dt id="biblio-rfc8835">[RFC8835]
+        <dd>H. Alvestrand. <a href="https://datatracker.ietf.org/doc/html/rfc8835">WebRTC를 위한 전송</a>. 2021년 1월.
+            제안 표준. URL: <a
+                href="https://datatracker.ietf.org/doc/html/rfc8835">https://datatracker.ietf.org/doc/html/rfc8835</a>
+        <dt id="biblio-rfc8837">[RFC8837]
+        <dd>P. Jones; et al. <a href="https://datatracker.ietf.org/doc/html/rfc8837">WebRTC QoS를 위한 Differentiated
+                Services Code Point
+                (DSCP) 패킷 마킹</a>. 2021년 1월. 제안 표준. URL: <a
+                href="https://datatracker.ietf.org/doc/html/rfc8837">https://datatracker.ietf.org/doc/html/rfc8837</a>
+        <dt id="biblio-webrtc">[WEBRTC]
+        <dd>Cullen Jennings; Henrik Boström; Jan-Ivar Bruaroey. <a href="https://www.w3.org/TR/webrtc/">WebRTC 1.0:
+                브라우저 간 실시간 통신</a>. 2021년 1월 26일. REC. URL: <a
+                href="https://www.w3.org/TR/webrtc/">https://www.w3.org/TR/webrtc/</a>
+    </dl>
+    <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL 색인</span><a class="self-link"
+            href="#idl-index"></a></h2>
+    <pre class="idl highlight def"><c- b>enum</c-> <a href="#enumdef-rtcprioritytype"><code><c- g>RTCPriorityType</c-></code></a> {
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-very-low"><c- s>"very-low"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-low"><c- s>"low"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-medium"><c- s>"medium"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-rtcprioritytype-high"><c- s>"high"</c-></a>
+};
+
+<c- b>partial</c-> <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="https://www.w3.org/TR/webrtc/#dom-rtcrtpencodingparameters"><c- g>RTCRtpEncodingParameters</c-></a> {
+  <a data-link-type="idl-name" href="#enumdef-rtcprioritytype"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-default="&quot;low&quot;" data-link-type="dict-member" data-type="RTCPriorityType " href="#dom-rtcrtpencodingparameters-priority"><c- g>priority</c-></a> = "low";
+  <a data-link-type="idl-name" href="#enumdef-rtcprioritytype"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="RTCPriorityType " href="#dom-rtcrtpencodingparameters-networkpriority"><c- g>networkPriority</c-></a>;
+};
+
+<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webrtc/#dom-rtcdatachannel"><c- g>RTCDataChannel</c-></a> {
+  <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#enumdef-rtcprioritytype"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="RTCPriorityType" href="#dom-rtcdatachannel-priority"><c- g>priority</c-></a>;
+};
+
+<c- b>partial</c-> <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="https://www.w3.org/TR/webrtc/#dom-rtcdatachannelinit"><c- g>RTCDataChannelInit</c-></a> {
+  <a data-link-type="idl-name" href="#enumdef-rtcprioritytype"><c- n>RTCPriorityType</c-></a> <a class="idl-code" data-default="&quot;low&quot;" data-link-type="dict-member" data-type="RTCPriorityType " href="#dom-rtcdatachannelinit-priority"><c- g>priority</c-></a> = "low";
+};
+
+
+</pre>
+    <aside class="dfn-panel" data-for="enumdef-rtcprioritytype">
+        <b><a href="#enumdef-rtcprioritytype">#enumdef-rtcprioritytype</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-enumdef-rtcprioritytype">3.2. RTCRtpEncodingParameters에 대한 확장</a> <a
+                    href="#ref-for-enumdef-rtcprioritytype①">(2)</a> <a href="#ref-for-enumdef-rtcprioritytype②">(3)</a>
+                <a href="#ref-for-enumdef-rtcprioritytype③">(4)</a>
+            <li><a href="#ref-for-enumdef-rtcprioritytype④">4. RTCDataChannel을 위한 확장</a> <a
+                    href="#ref-for-enumdef-rtcprioritytype⑤">(2)</a>
+            <li><a href="#ref-for-enumdef-rtcprioritytype⑥">4.1. 새 RTCDataChannel 속성</a>
+            <li><a href="#ref-for-enumdef-rtcprioritytype⑦">4.2. 새 RTCDataChannelInit 멤버</a>
+            <li><a href="#ref-for-enumdef-rtcprioritytype⑧">4.3. RTCDataChannel 처리 단계</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcprioritytype-very-low">
+        <b><a href="#dom-rtcprioritytype-very-low">#dom-rtcprioritytype-very-low</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcprioritytype-very-low">3.1. RTCPriorityType 열거형</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcprioritytype-low">
+        <b><a href="#dom-rtcprioritytype-low">#dom-rtcprioritytype-low</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcprioritytype-low">3.1. RTCPriorityType 열거형</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcprioritytype-medium">
+        <b><a href="#dom-rtcprioritytype-medium">#dom-rtcprioritytype-medium</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcprioritytype-medium">3.1. RTCPriorityType 열거형</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcprioritytype-high">
+        <b><a href="#dom-rtcprioritytype-high">#dom-rtcprioritytype-high</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcprioritytype-high">3.1. RTCPriorityType 열거형</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcrtpencodingparameters-priority">
+        <b><a href="#dom-rtcrtpencodingparameters-priority">#dom-rtcrtpencodingparameters-priority</a></b><b>참조
+            위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcrtpencodingparameters-priority">3.2. RTCRtpEncodingParameters에 대한 확장</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcrtpencodingparameters-networkpriority">
+        <b><a
+                href="#dom-rtcrtpencodingparameters-networkpriority">#dom-rtcrtpencodingparameters-networkpriority</a></b><b>참조
+            위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcrtpencodingparameters-networkpriority">3.2.
+                    RTCRtpEncodingParameters에 대한 확장</a> <a
+                    href="#ref-for-dom-rtcrtpencodingparameters-networkpriority①">(2)</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcdatachannel-priority">
+        <b><a href="#dom-rtcdatachannel-priority">#dom-rtcdatachannel-priority</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcdatachannel-priority">4. RTCDataChannel을 위한 확장</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="dom-rtcdatachannelinit-priority">
+        <b><a href="#dom-rtcdatachannelinit-priority">#dom-rtcdatachannelinit-priority</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-dom-rtcdatachannelinit-priority">3.2. RTCRtpEncodingParameters에 대한 확장</a> <a
+                    href="#ref-for-dom-rtcdatachannelinit-priority①">(2)</a>
+            <li><a href="#ref-for-dom-rtcdatachannelinit-priority②">4. RTCDataChannel을 위한 확장</a>
+        </ul>
+    </aside>
+    <aside class="dfn-panel" data-for="datachannelpriority">
+        <b><a href="#datachannelpriority">#datachannelpriority</a></b><b>참조 위치:</b>
+        <ul>
+            <li><a href="#ref-for-datachannelpriority">4.3. RTCDataChannel 처리 단계</a> <a
+                    href="#ref-for-datachannelpriority①">(2)</a>
+        </ul>
+    </aside>
+    <script>/* script-dfn-panel */
+
+        document.body.addEventListener("click", function (e) {
+            var queryAll = function (sel) { return [].slice.call(document.querySelectorAll(sel)); }
+            // Find the dfn element or panel, if any, that was clicked on.
+            var el = e.target;
+            var target;
+            var hitALink = false;
+            while (el.parentElement) {
+                if (el.tagName == "A") {
+                    // Clicking on a link in a <dfn> shouldn't summon the panel
+                    hitALink = true;
+                }
+                if (el.classList.contains("dfn-paneled")) {
+                    target = "dfn";
+                    break;
+                }
+                if (el.classList.contains("dfn-panel")) {
+                    target = "dfn-panel";
+                    break;
+                }
+                el = el.parentElement;
+            }
+            if (target != "dfn-panel") {
+                // Turn off any currently "on" or "activated" panels.
+                queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function (el) {
+                    el.classList.remove("on");
+                    el.classList.remove("activated");
+                });
+            }
+            if (target == "dfn" && !hitALink) {
+                // open the panel
+                var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+                if (dfnPanel) {
+                    dfnPanel.classList.add("on");
+                    var rect = el.getBoundingClientRect();
+                    dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+                    dfnPanel.style.top = window.scrollY + rect.top + "px";
+                    var panelRect = dfnPanel.getBoundingClientRect();
+                    var panelWidth = panelRect.right - panelRect.left;
+                    if (panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                        // Reposition, because the panel is overflowing
+                        dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+                    }
+                } else {
+                    console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+                }
+            } else if (target == "dfn-panel") {
+                // Switch it to "activated" state, which pins it.
+                el.classList.add("activated");
+                el.style.left = null;
+                el.style.top = null;
+            }
+
+        });
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>

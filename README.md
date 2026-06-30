@@ -82,6 +82,8 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [GraphQL](https://ko.htmlspecs.com/graphql/)（[Source](https://spec.graphql.org/draft/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [OpenAPI Specification v3.2.0](https://ko.htmlspecs.com/openapi/)（[Source](https://spec.openapis.org/oas/latest.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [URI Template](https://ko.htmlspecs.com/uri-template/)（[Source](https://www.rfc-editor.org/rfc/rfc6570.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [JSON Schema Core](https://ko.htmlspecs.com/json-schema-core/)（[Source](https://json-schema.org/draft/2020-12/json-schema-core) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [JSON Schema Validation](https://ko.htmlspecs.com/json-schema-validation/)（[Source](https://json-schema.org/draft/2020-12/json-schema-validation) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 구문 표기법 및 시간 형식
 - [Augmented BNF for Syntax Specifications: ABNF](https://ko.htmlspecs.com/abnf/)（[Source](https://www.rfc-editor.org/rfc/rfc5234.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
@@ -212,6 +214,8 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Printing API](https://ko.htmlspecs.com/web-printing/)（[Source](https://wicg.github.io/web-printing/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Web Share API](https://ko.htmlspecs.com/web-share/)（[Source](https://www.w3.org/TR/2023/REC-web-share-20230530/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Share Target API](https://ko.htmlspecs.com/web-share-target/)（[Source](https://w3c.github.io/web-share-target/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Device Attributes API](https://ko.htmlspecs.com/device_attributes/)（[Source](https://wicg.github.io/WebApiDevice/device_attributes/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Save Data API](https://ko.htmlspecs.com/savedata/)（[Source](https://wicg.github.io/savedata/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 오디오, 음성 및 미디어 제어
 - [Web Speech API](https://ko.htmlspecs.com/web-speech-api/)（[Source](https://webaudio.github.io/web-speech-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
@@ -222,6 +226,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 오디오/비디오 캡처, WebRTC 및 재생
 - [WebRTC](https://ko.htmlspecs.com/webrtc/)（[Source](https://www.w3.org/TR/2025/REC-webrtc-20250313/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [WebRTC Priority Control API](https://ko.htmlspecs.com/webrtc-priority/)（[Source](https://www.w3.org/TR/2021/CR-webrtc-priority-20210318/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Identifiers for WebRTC&#39;s Statistics API](https://ko.htmlspecs.com/webrtc-stats/)（[Source](https://www.w3.org/TR/2025/CRD-webrtc-stats-20250925/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebRTC Encoded Transform](https://ko.htmlspecs.com/webrtc-encoded-transform/)（[Source](https://www.w3.org/TR/2026/WD-webrtc-encoded-transform-20260625/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Scalable Video Coding (SVC) Extension for WebRTC](https://ko.htmlspecs.com/webrtc-svc/)（[Source](https://www.w3.org/TR/2024/WD-webrtc-svc-20240817/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
