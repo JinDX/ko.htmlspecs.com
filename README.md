@@ -39,6 +39,8 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 데이터 형식, 시맨틱 웹 및 API 설명
 - [The JavaScript Object Notation (JSON) Data Interchange Format](https://ko.htmlspecs.com/json/)（[Source](https://www.rfc-editor.org/rfc/rfc8259.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [YAML Ain’t Markup Language (YAML™) revision 1.2.2](https://ko.htmlspecs.com/yaml/)（[Source](https://yaml.org/spec/1.2.2/)）
+- [YAML Media Type](https://ko.htmlspecs.com/yaml-media-type/)（[Source](https://www.rfc-editor.org/rfc/rfc9512.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON-LD 1.1](https://ko.htmlspecs.com/json-ld11/)（[Source](https://www.w3.org/TR/2020/REC-json-ld11-20200716/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [JSON-LD 1.1 Processing Algorithms and API](https://ko.htmlspecs.com/json-ld11-api/)（[Source](https://www.w3.org/TR/2020/REC-json-ld11-api-20200716/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [JSON-LD 1.1 Framing](https://ko.htmlspecs.com/json-ld11-framing/)（[Source](https://www.w3.org/TR/2020/REC-json-ld11-framing-20200716/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
