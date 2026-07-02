@@ -370,7 +370,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Authentication: An API for accessing Public Key Credentials Level 3](https://ko.htmlspecs.com/webauthn-3/)（[Source](https://www.w3.org/TR/2026/CR-webauthn-3-20260526/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [A Well-Known URL for Relying Party Passkey Endpoints](https://ko.htmlspecs.com/passkey-endpoints/)（[Source](https://www.w3.org/TR/2026/WD-passkey-endpoints-1-20260114/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [A Well-Known URL for Changing Passwords](https://ko.htmlspecs.com/change-password-url/)（[Source](https://www.w3.org/TR/2024/WD-change-password-url-20240603/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1/)（[Source](https://www.w3.org/TR/2026/WD-credential-management-1-20260410/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1/)（[Source](https://www.w3.org/TR/2026/WD-credential-management-1-20260702/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Federated Credential Management API (FedCM)](https://ko.htmlspecs.com/fedcm/)（[Source](https://www.w3.org/TR/2024/WD-fedcm-1-20240820/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Credentials](https://ko.htmlspecs.com/digital-credentials/)（[Source](https://www.w3.org/TR/2026/WD-digital-credentials-20260626/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Decentralized Identifiers (DIDs) v1.1](https://ko.htmlspecs.com/did-1.1/)（[Source](https://www.w3.org/TR/2026/CR-did-1.1-20260305/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
