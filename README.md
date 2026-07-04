@@ -279,7 +279,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 그래픽, 이미지, GPU 및 WebXR
 - [Accelerated Shape Detection in Images](https://ko.htmlspecs.com/shape-detection-api/)（[Source](https://wicg.github.io/shape-detection-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebGPU](https://ko.htmlspecs.com/webgpu/)（[Source](https://www.w3.org/TR/2026/CRD-webgpu-20260623/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL/)（[Source](https://www.w3.org/TR/2026/CRD-WGSL-20260702/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [WebGPU Shading Language](https://ko.htmlspecs.com/WGSL/)（[Source](https://www.w3.org/TR/2026/CRD-WGSL-20260703/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebGL Specification](https://ko.htmlspecs.com/webgl/)（[Source](https://registry.khronos.org/webgl/specs/latest/1.0/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebGL 2.0 Specification](https://ko.htmlspecs.com/webgl2/)（[Source](https://registry.khronos.org/webgl/specs/latest/2.0/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Scalable Vector Graphics (SVG) 2](https://ko.htmlspecs.com/SVG2/)（[Source](https://www.w3.org/TR/2018/CR-SVG2-20181004/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
