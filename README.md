@@ -331,6 +331,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2026/WD-paint-timing-20260324/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Largest Contentful Paint](https://ko.htmlspecs.com/largest-contentful-paint/)（[Source](https://www.w3.org/TR/2026/WD-largest-contentful-paint-20260408/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2026/WD-event-timing-20260319/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Container Timing API](https://ko.htmlspecs.com/container-timing/)（[Source](https://wicg.github.io/container-timing/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Performance measure memory](https://ko.htmlspecs.com/performance-measure-memory/)（[Source](https://wicg.github.io/performance-measure-memory/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Device Memory API](https://ko.htmlspecs.com/device-memory/)（[Source](https://www.w3.org/TR/2026/WD-device-memory-1-20260330/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Layout Instability API](https://ko.htmlspecs.com/layout-instability/)（[Source](https://wicg.github.io/layout-instability/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
@@ -341,6 +342,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [requestIdleCallback()](https://ko.htmlspecs.com/requestidlecallback/)（[Source](https://www.w3.org/TR/2025/WD-requestidlecallback-20250521/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Reporting API](https://ko.htmlspecs.com/reporting-1/)（[Source](https://www.w3.org/TR/2025/WD-reporting-1-20250611/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Deprecation Reporting](https://ko.htmlspecs.com/deprecation-reporting/)（[Source](https://wicg.github.io/deprecation-reporting/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Crash Reporting](https://ko.htmlspecs.com/crash-reporting/)（[Source](https://wicg.github.io/crash-reporting/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Page Lifecycle](https://ko.htmlspecs.com/page-lifecycle/)（[Source](https://wicg.github.io/page-lifecycle/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Prefetch](https://ko.htmlspecs.com/prefetch/)（[Source](https://wicg.github.io/nav-speculation/prefetch.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Prerendering Revamped](https://ko.htmlspecs.com/prerendering/)（[Source](https://wicg.github.io/nav-speculation/prerendering.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
@@ -352,9 +354,11 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Subresource Integrity (SRI) 2](https://ko.htmlspecs.com/sri-2/)（[Source](https://www.w3.org/TR/2026/WD-sri-2-20260320/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Content Security Policy Level 3](https://ko.htmlspecs.com/CSP3/)（[Source](https://www.w3.org/TR/2026/WD-CSP3-20260505/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Content Security Policy: Embedded Enforcement](https://ko.htmlspecs.com/csp-embedded-enforcement/)（[Source](https://www.w3.org/TR/2026/WD-csp-embedded-enforcement-20260507/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Connection Allowlists](https://ko.htmlspecs.com/connection-allowlists/)（[Source](https://wicg.github.io/connection-allowlists/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Secure Contexts](https://ko.htmlspecs.com/secure-contexts/)（[Source](https://www.w3.org/TR/2023/CRD-secure-contexts-20231110/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [The Web Origin Concept](https://ko.htmlspecs.com/web-origin/)（[Source](https://www.rfc-editor.org/rfc/rfc6454.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Threat Model for the Web](https://ko.htmlspecs.com/threat-model-web/)（[Source](https://www.w3.org/TR/2026/DNOTE-threat-model-web-20260617/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
+- [W3C Standards Vulnerability Disclosure & Handling Process and Policy](https://ko.htmlspecs.com/security-disclosure/)（[Source](https://www.w3.org/TR/2026/DNOTE-security-disclosure-20260630/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [Referrer Policy](https://ko.htmlspecs.com/referrer-policy/)（[Source](https://www.w3.org/TR/2017/CR-referrer-policy-20170126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Fetch Metadata Request Headers](https://ko.htmlspecs.com/fetch-metadata/)（[Source](https://www.w3.org/TR/2025/WD-fetch-metadata-20250401/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Mixed Content](https://ko.htmlspecs.com/mixed-content/)（[Source](https://www.w3.org/TR/2023/CRD-mixed-content-20230223/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
@@ -380,8 +384,10 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Federated Credential Management API (FedCM)](https://ko.htmlspecs.com/fedcm/)（[Source](https://www.w3.org/TR/2024/WD-fedcm-1-20240820/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Credentials](https://ko.htmlspecs.com/digital-credentials/)（[Source](https://www.w3.org/TR/2026/WD-digital-credentials-20260626/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Decentralized Identifiers (DIDs) v1.1](https://ko.htmlspecs.com/did-1.1/)（[Source](https://www.w3.org/TR/2026/CR-did-1.1-20260305/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
+- [Decentralized Identifier Resolution (DID Resolution) v0.3](https://ko.htmlspecs.com/did-resolution/)（[Source](https://www.w3.org/TR/2026/WD-did-resolution-20260611/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Verifiable Credentials Data Model v2.0](https://ko.htmlspecs.com/vc-data-model-2.0/)（[Source](https://www.w3.org/TR/2025/REC-vc-data-model-2.0-20250515/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Securing Verifiable Credentials using JOSE and COSE](https://ko.htmlspecs.com/vc-jose-cose/)（[Source](https://www.w3.org/TR/2025/REC-vc-jose-cose-20250515/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Verifiable Credential Data Integrity 1.1](https://ko.htmlspecs.com/vc-data-integrity-1.1/)（[Source](https://www.w3.org/TR/2026/WD-vc-data-integrity-1.1-20260416/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Verifiable Credential Rendering Methods v1.0](https://ko.htmlspecs.com/vc-render-method/)（[Source](https://www.w3.org/TR/2026/WD-vc-render-method-20260405/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### OAuth 및 인가 프로토콜
