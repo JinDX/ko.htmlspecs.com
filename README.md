@@ -391,6 +391,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Verifiable Credential Rendering Methods v1.0](https://ko.htmlspecs.com/vc-render-method/)（[Source](https://www.w3.org/TR/2026/WD-vc-render-method-20260405/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Bitstring Status List v1.0](https://ko.htmlspecs.com/vc-bitstring-status-list/)（[Source](https://www.w3.org/TR/2025/REC-vc-bitstring-status-list-20250515/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Verifiable Credential Barcodes v1.0](https://ko.htmlspecs.com/vc-barcodes-1.0/)（[Source](https://www.w3.org/TR/2026/WD-vc-barcodes-1.0-20260623/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Recognized Entities v1.0](https://ko.htmlspecs.com/vc-recognized-entities-1.0/)（[Source](https://www.w3.org/TR/2026/WD-vc-recognized-entities-1.0-20260512/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### OAuth 및 인가 프로토콜
 - [The OAuth 2.0 Authorization Framework](https://ko.htmlspecs.com/oauth2/)（[Source](https://www.rfc-editor.org/rfc/rfc6749.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
