@@ -645,6 +645,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [An HTTP Status Code to Report Legal Obstacles](https://ko.htmlspecs.com/http/rfc7725.html)（[Source](https://httpwg.org/specs/rfc7725.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [An HTTP Status Code for Indicating Hints](https://ko.htmlspecs.com/http/rfc8297.html)（[Source](https://httpwg.org/specs/rfc8297.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Problem Details for HTTP APIs](https://ko.htmlspecs.com/http/rfc9457.html)（[Source](https://www.rfc-editor.org/rfc/rfc9457.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [RateLimit header fields for HTTP](https://ko.htmlspecs.com/http/ratelimit-headers.html)（[Source](https://www.ietf.org/archive/id/draft-ietf-httpapi-ratelimit-headers-11.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 캐시 및 재사용
 - [HTTP Cache-Control Extensions for Stale Content](https://ko.htmlspecs.com/http/rfc5861.html)（[Source](https://httpwg.org/specs/rfc5861.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
