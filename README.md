@@ -126,7 +126,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebSub](https://ko.htmlspecs.com/websub/)（[Source](https://www.w3.org/TR/2026/REC-websub-20260602/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Private Network Access](https://ko.htmlspecs.com/private-network-access/)（[Source](https://wicg.github.io/private-network-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Local Network Access](https://ko.htmlspecs.com/local-network-access/)（[Source](https://wicg.github.io/local-network-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [WebTransport](https://ko.htmlspecs.com/webtransport/)（[Source](https://www.w3.org/TR/2026/WD-webtransport-20260618/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [WebTransport](https://ko.htmlspecs.com/webtransport/)（[Source](https://www.w3.org/TR/2026/WD-webtransport-20260706/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [User-Agent Client Hints](https://ko.htmlspecs.com/ua-client-hints/)（[Source](https://wicg.github.io/ua-client-hints/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Trace Context Level 2](https://ko.htmlspecs.com/trace-context-2/)（[Source](https://www.w3.org/TR/2024/CRD-trace-context-2-20240328/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Baggage](https://ko.htmlspecs.com/baggage/)（[Source](https://www.w3.org/TR/2024/CR-baggage-20240530/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
