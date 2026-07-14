@@ -332,7 +332,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Long Animation Frames API](https://ko.htmlspecs.com/long-animation-frames/)（[Source](https://www.w3.org/TR/2026/WD-long-animation-frames-20260428/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Server Timing](https://ko.htmlspecs.com/server-timing/)（[Source](https://www.w3.org/TR/2026/WD-server-timing-20260407/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Paint Timing](https://ko.htmlspecs.com/paint-timing/)（[Source](https://www.w3.org/TR/2026/WD-paint-timing-20260324/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Largest Contentful Paint](https://ko.htmlspecs.com/largest-contentful-paint/)（[Source](https://www.w3.org/TR/2026/WD-largest-contentful-paint-20260408/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Largest Contentful Paint](https://ko.htmlspecs.com/largest-contentful-paint/)（[Source](https://www.w3.org/TR/2026/WD-largest-contentful-paint-20260713/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Event Timing API](https://ko.htmlspecs.com/event-timing/)（[Source](https://www.w3.org/TR/2026/WD-event-timing-20260319/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Container Timing API](https://ko.htmlspecs.com/container-timing/)（[Source](https://wicg.github.io/container-timing/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Performance measure memory](https://ko.htmlspecs.com/performance-measure-memory/)（[Source](https://wicg.github.io/performance-measure-memory/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
