@@ -31,7 +31,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 국제화 및 지역화
 - [ECMAScript® 2027 Internationalization API Specification](https://ko.htmlspecs.com/ecma402/)（[Source](https://tc39.es/ecma402/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Language Tags and Locale Identifiers for the World Wide Web](https://ko.htmlspecs.com/ltli/)（[Source](https://www.w3.org/TR/2020/WD-ltli-20201007) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Strings on the Web: Language and Direction Metadata](https://ko.htmlspecs.com/string-meta/)（[Source](https://www.w3.org/TR/2024/NOTE-string-meta-20241017/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
+- [Strings on the Web: Language and Direction Metadata](https://ko.htmlspecs.com/string-meta/)（[Source](https://www.w3.org/TR/2026/WD-string-meta-20260716/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Internationalization Best Practices for Spec Developers](https://ko.htmlspecs.com/international-specs/)（[Source](https://www.w3.org/TR/2025/NOTE-international-specs-20250808/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Character Model for the World Wide Web: String Matching](https://ko.htmlspecs.com/charmod-norm/)（[Source](https://www.w3.org/TR/2021/NOTE-charmod-norm-20210811/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [String Searching](https://ko.htmlspecs.com/string-search/)（[Source](https://www.w3.org/TR/2025/DNOTE-string-search-20250107/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
