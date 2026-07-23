@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="ko" class="BCP RFC">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>RFC 9852: TLS를 사용하는 새 프로토콜은 TLS 1.3을 요구해야 한다</title>
+    <meta content="Rich Salz" name="author">
+    <meta content="Nimrod Aviram" name="author">
+    <meta content="
+       TLS 1.3은 널리 사용되고 있으며, 포괄적인 보안 증명을 거쳤고,
+TLS 1.2의 보안 및 개인정보 보호 결함을 모두 개선한다. 따라서 TLS를 사용하는 새 프로토콜은
+TLS 1.3을 요구해야 한다. DTLS 1.3은 널리 제공되거나 배포되어 있지 않으므로,
+이 지침은 DTLS(어떤 DTLS 버전에도)에는 적용되지 않으며
+TLS에만 적용된다. 
+       이 문서는 RFC 9325를 갱신한다. 이 문서는 갱신의 근거로서 포스트 양자 암호와
+TLS 1.3의 보안 및 개인정보 보호 개선 사항을 논의한다. 
+    " name="description">
+    <meta content="xml2rfc 3.34.0" name="generator">
+    <meta content="TLS" name="keyword">
+    <meta content="TLS Transition" name="keyword">
+    <meta content="TLS Support" name="keyword">
+    <meta content="Interoperability" name="keyword">
+    <meta content="features" name="keyword">
+    <meta content="9852" name="rfc.number">
+    <!-- Generator version information:
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
+    pycountry 26.2.16
+    PyYAML 6.0.3
+    requests 2.34.2
+    wcwidth 0.8.1
+    weasyprint 69.0
+-->
+    <link href="rfc9852.xml" rel="alternate" type="application/rfc+xml">
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        /*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+        /* fonts */
+        @import url('https://static.ietf.org/fonts/noto-sans/import.css');
+        /* Sans-serif */
+        @import url('https://static.ietf.org/fonts/noto-serif/import.css');
+        /* Serif (print) */
+        @import url('https://static.ietf.org/fonts/roboto-mono/import.css');
+        /* Monospace */
+
+        :root {
+            --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+            --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+            --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+        }
+
+        @viewport {
+            zoom: 1.0;
+        }
+
+        @-ms-viewport {
+            width: extend-to-zoom;
+            zoom: 1.0;
+        }
+
+        /* general and mobile first */
+        html {}
+
+        body {
+            max-width: 90%;
+            margin: 1.5em auto;
+            color: #222;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            overflow-wrap: break-word;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        #title,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1em 0 0.5em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        #title {
+            clear: both;
+            border-bottom: 1px solid #ddd;
+            margin: 0 0 0.5em 0;
+            padding: 1em 0 0.5em;
+        }
+
+        .author {
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 1em 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: -20px;
+            /* provide offset for in-page anchors */
+            padding-top: 33px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h5,
+        h6 {
+            font-size: 14px;
+        }
+
+        #n-copyright-notice {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
+        }
+
+        /* general structure */
+        p {
+            padding: 0;
+            margin: 0 0 1em 0;
+            text-align: left;
+        }
+
+        div,
+        span {
+            position: relative;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignRight.art-text pre {
+            padding: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+        }
+
+        .alignRight>*:first-child {
+            border: none;
+            margin: 0;
+            float: right;
+            clear: both;
+        }
+
+        .alignRight>*:nth-child(2) {
+            clear: both;
+            display: block;
+            border: none;
+        }
+
+        svg {
+            display: block;
+        }
+
+        @media print {
+            svg {
+                max-height: 850px;
+                max-width: 660px;
+            }
+        }
+
+        svg[font-family~="serif" i],
+        svg [font-family~="serif" i] {
+            font-family: var(--font-serif);
+        }
+
+        svg[font-family~="sans-serif" i],
+        svg [font-family~="sans-serif" i] {
+            font-family: var(--font-sans);
+        }
+
+        svg[font-family~="monospace" i],
+        svg [font-family~="monospace" i] {
+            font-family: var(--font-mono);
+        }
+
+        .alignCenter.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignCenter.art-text pre {
+            padding: 0;
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+        }
+
+        .alignCenter>*:first-child {
+            display: table;
+            border: none;
+            margin: 0 auto;
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 1em 2em;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-left: 1em;
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        .ulCompact li {
+            margin: 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+        }
+
+        ul.empty li,
+        .ulEmpty li {
+            margin-top: 0.5em;
+        }
+
+        ul.ulBare,
+        li.ulBare {
+            margin-left: 0em !important;
+        }
+
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact {
+            line-height: 100%;
+            margin: 0 0 0 2em;
+        }
+
+        /* definition lists */
+        dl {}
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        /* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+        dl>dd {
+            margin-bottom: .8em;
+            min-height: 1.3em;
+        }
+
+        dl.compact>dd,
+        .dlCompact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+        }
+
+        a[href] {
+            color: #22e;
+            /* Arlen: WCAG 2019 */
+        }
+
+        a[href]:hover {
+            background-color: #f2f2f2;
+        }
+
+        figcaption a[href],
+        a[href].selfRef {
+            color: #222;
+        }
+
+        /* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+        /* Figures */
+        tt,
+        code,
+        pre {
+            background-color: #f9f9f9;
+            font-family: var(--font-mono);
+        }
+
+        pre {
+            border: 1px solid #eee;
+            margin: 0;
+            padding: 1em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        figure blockquote {
+            margin: 0.8em 0.4em 0.4em;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0 0 1em 0;
+        }
+
+        @media screen {
+            pre {
+                overflow-x: auto;
+                max-width: 100%;
+                max-width: calc(100% - 22px);
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 1.2em 2em;
+        }
+
+        blockquote {
+            background-color: #f9f9f9;
+            color: #111;
+            /* Arlen: WCAG 2019 */
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 1em 0;
+        }
+
+        blockquote>*:last-child {
+            margin-bottom: 0;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .xref {
+            overflow-wrap: normal;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.5em 0.75em;
+        }
+
+        th {
+            text-align: left;
+            background-color: #e9e9e9;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f5f5f5;
+        }
+
+        table caption {
+            font-style: italic;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        table p {
+            /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+            margin: 0;
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            color: #666;
+            /* Arlen: AHDJ 2019 */
+            text-decoration: none;
+            visibility: hidden;
+            user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        @media screen {
+
+            aside:hover>a.pilcrow,
+            p:hover>a.pilcrow,
+            blockquote:hover>a.pilcrow,
+            div:hover>a.pilcrow,
+            li:hover>a.pilcrow,
+            pre:hover>a.pilcrow {
+                visibility: visible;
+            }
+
+            a.pilcrow:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        #identifiers dt {
+            width: 3em;
+            clear: left;
+        }
+
+        #identifiers dd {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        /* Fix PDF info block run off issue */
+        @media print {
+            #identifiers dd {
+                max-width: 100%;
+            }
+        }
+
+        #identifiers .authors .author {
+            display: inline-block;
+            margin-right: 1.5em;
+        }
+
+        #identifiers .authors .org {
+            font-style: italic;
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #666;
+            /* Arlen: WCAG 2019 */
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+        }
+
+        .docInfo .prepared {
+            float: left;
+        }
+
+        .docInfo .prepared {
+            float: right;
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+        }
+
+        nav.toc ul {
+            margin: 0 0.5em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav.toc li {
+            line-height: 1.3em;
+            margin: 0.75em 0;
+            padding-left: 1.2em;
+            text-indent: -1.2em;
+        }
+
+        /* references */
+        .references dt {
+            text-align: right;
+            font-weight: bold;
+            min-width: 7em;
+        }
+
+        .references dd {
+            margin-left: 8em;
+            overflow: auto;
+        }
+
+        .refInstance {
+            margin-bottom: 1.25em;
+        }
+
+        .refSubseries {
+            margin-bottom: 1.25em;
+        }
+
+        .references .ascii {
+            margin-bottom: 0.25em;
+        }
+
+        /* index */
+        .index ul {
+            margin: 0 0 0 1em;
+            padding: 0;
+            list-style: none;
+        }
+
+        .index ul ul {
+            margin: 0;
+        }
+
+        .index li {
+            margin: 0;
+            text-indent: -2em;
+            padding-left: 2em;
+            padding-bottom: 5px;
+        }
+
+        .indexIndex {
+            margin: 0.5em 0 1em;
+        }
+
+        .index a {
+            font-weight: 700;
+        }
+
+        /* make the index two-column on all but the smallest screens */
+        @media (min-width: 600px) {
+            .index ul {
+                -moz-column-count: 2;
+                -moz-column-gap: 20px;
+            }
+
+            .index ul ul {
+                -moz-column-count: 1;
+                -moz-column-gap: 0;
+            }
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            margin: 1em 0;
+        }
+
+        address.vcard .nameRole {
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        address.vcard .label {
+            font-family: var(--font-sans);
+            margin: 0.5em 0;
+        }
+
+        address.vcard .type {
+            display: none;
+        }
+
+        .alternative-contact {
+            margin: 1.5em 0 1em;
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        /* temporary notes */
+        .rfcEditorRemove::before {
+            position: absolute;
+            top: 0.2em;
+            right: 0.2em;
+            padding: 0.2em;
+            content: "The RFC Editor will remove this note";
+            color: #9e2a00;
+            /* Arlen: WCAG 2019 */
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+        }
+
+        .rfcEditorRemove {
+            position: relative;
+            padding-top: 1.8em;
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            border-radius: 3px;
+        }
+
+        .cref {
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        /* alternative layout for smaller screens */
+        @media screen and (max-width: 1023px) {
+            body {
+                padding-top: 2em;
+            }
+
+            #title {
+                padding: 1em 0;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: -18px;
+                /* provide offset for in-page anchors */
+                padding-top: 38px;
+            }
+
+            #identifiers dd {
+                max-width: 60%;
+            }
+
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 0;
+                margin: 0;
+                background-color: inherit;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #toc h2 {
+                margin: -1px 0 0 0;
+                padding: 4px 0 4px 6px;
+                padding-right: 1em;
+                min-width: 190px;
+                font-size: 1.1em;
+                text-align: right;
+                background-color: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            #toc h2::before {
+                /* css hamburger */
+                float: right;
+                position: relative;
+                width: 1em;
+                height: 1px;
+                left: -164px;
+                margin: 6px 0 0 0;
+                background: white none repeat scroll 0 0;
+                box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                content: "";
+            }
+
+            #toc nav {
+                display: none;
+                padding: 0.5em 1em 1em;
+                overflow: auto;
+                height: calc(100vh - 48px);
+                border-left: 1px solid #ddd;
+            }
+        }
+
+        /* alternative layout for wide screens */
+        @media screen and (min-width: 1024px) {
+            body {
+                max-width: 724px;
+                margin: 42px auto;
+                padding-left: 1.5em;
+                padding-right: 29em;
+            }
+
+            #toc {
+                position: fixed;
+                top: 42px;
+                right: 42px;
+                width: 25%;
+                margin: 0;
+                padding: 0 1em;
+                z-index: 1;
+            }
+
+            #toc h2 {
+                border-top: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 1em;
+                font-weight: normal;
+                margin: 0;
+                padding: 0.25em 1em 1em 0;
+            }
+
+            #toc nav {
+                display: block;
+                height: calc(90vh - 84px);
+                bottom: 0;
+                padding: 0.5em 0 0;
+                overflow: auto;
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc,
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            #toc {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            figure,
+            pre {
+                page-break-inside: avoid;
+            }
+
+            figure {
+                overflow: scroll;
+            }
+
+            .breakable pre {
+                break-inside: auto;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            h2+*,
+            h3+*,
+            h4+*,
+            h5+*,
+            h6+* {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        /* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+        /*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+            /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+            /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+        }
+
+        /* Changes introduced to fix issues found during implementation */
+        /* Make sure links are clickable even if overlapped by following H* */
+        a {
+            z-index: 2;
+        }
+
+        /* Separate body from document info even without intervening H1 */
+        section {
+            clear: both;
+        }
+
+
+        /* Top align author divs, to avoid names without organization dropping level with org names */
+        .author {
+            vertical-align: top;
+        }
+
+        /* Leave room in document info to show Internet-Draft on one line */
+        #identifiers dt {
+            width: 8em;
+        }
+
+        /* Don't waste quite as much whitespace between label and value in doc info */
+        #identifiers dd {
+            margin-left: 1em;
+        }
+
+        /* Give floating toc a background color (needed when it's a div inside section */
+        #toc {
+            background-color: white;
+        }
+
+        /* Make the collapsed ToC header render white on gray also when it's a link */
+        @media screen and (max-width: 1023px) {
+
+            #toc h2 a,
+            #toc h2 a:link,
+            #toc h2 a:focus,
+            #toc h2 a:hover,
+            #toc a.toplink,
+            #toc a.toplink:hover {
+                color: white;
+                background-color: #444;
+                text-decoration: none;
+            }
+        }
+
+        /* Give the bottom of the ToC some whitespace */
+        @media screen and (min-width: 1024px) {
+            #toc {
+                padding: 0 0 1em 1em;
+            }
+        }
+
+        /* Style section numbers with more space between number and title */
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        /* prevent monospace from becoming overly large */
+        tt,
+        code,
+        pre {
+            font-size: 95%;
+        }
+
+        /* Fix the height/width aspect for ascii art*/
+        .sourcecode pre,
+        .art-text pre {
+            line-height: 1.12;
+        }
+
+
+        /* Add styling for a link in the ToC that points to the top of the document */
+        a.toplink {
+            float: right;
+            margin-right: 0.5em;
+        }
+
+        /* Fix the dl styling to match the RFC 7992 attributes */
+        dl>dt,
+        dl.dlParallel>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.dlNewline>dt {
+            float: none;
+        }
+
+        /* Provide styling for table cell text alignment */
+        table td.text-left,
+        table th.text-left {
+            text-align: left;
+        }
+
+        table td.text-center,
+        table th.text-center {
+            text-align: center;
+        }
+
+        table td.text-right,
+        table th.text-right {
+            text-align: right;
+        }
+
+        /* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+        .alternative-contact {
+            margin: 0.5em 0 0.25em 0;
+        }
+
+        address .non-ascii {
+            margin: 0 0 0 2em;
+        }
+
+        /* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+        table {
+            width: auto;
+        }
+
+        /* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+        .references dd {
+            overflow: visible;
+        }
+
+        /* Control caption placement */
+        caption {
+            caption-side: bottom;
+        }
+
+        /* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+        address.vcard {
+            max-width: 30em;
+            margin-right: auto;
+        }
+
+        /* For address alignment dependent on LTR or RTL scripts */
+        address div.left {
+            text-align: left;
+        }
+
+        address div.right {
+            text-align: right;
+        }
+
+        /* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+        table.right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Give the table caption label the same styling as the figcaption */
+        caption a[href] {
+            color: #222;
+        }
+
+        @media print {
+            .toplink {
+                display: none;
+            }
+
+            /* avoid overwriting the top border line with the ToC header */
+            #toc {
+                padding-top: 1px;
+            }
+
+            /* Avoid page breaks inside dl and author address entries */
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+        }
+
+        /* Tweak the bcp14 keyword presentation */
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Tweak the invisible space above H* in order not to overlay links in text above */
+        h2 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 31px;
+        }
+
+        h3 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        h4 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        /* Float artwork pilcrow to the right */
+        @media screen {
+            .artwork a.pilcrow {
+                display: block;
+                line-height: 0.7;
+                margin-top: 0.15em;
+            }
+        }
+
+        /* Make pilcrows on dd visible */
+        @media screen {
+            dd:hover>a.pilcrow {
+                visibility: visible;
+            }
+        }
+
+        /* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+        .alignLeft.art-text,
+        .alignCenter.art-text,
+        .alignRight.art-text {
+            margin-bottom: 0;
+        }
+
+        .alignLeft,
+        .alignCenter,
+        .alignRight {
+            margin: 1em 0 0 0;
+        }
+
+        /* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+        @media print {
+            a.pilcrow {
+                display: none;
+            }
+        }
+
+        /* Styling for the external metadata */
+        div#external-metadata {
+            background-color: #eee;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            display: none;
+        }
+
+        div#internal-metadata {
+            padding: 0.5em;
+            /* to match the external-metadata padding */
+        }
+
+        /* Styling for title RFC Number */
+        h1#rfcnum {
+            clear: both;
+            margin: 0 0 -1em;
+            padding: 1em 0 0 0;
+        }
+
+        /* Make .olPercent look the same as <ol><li> */
+        dl.olPercent>dd {
+            margin-bottom: 0.25em;
+            min-height: initial;
+        }
+
+        /* Give aside some styling to set it apart */
+        aside {
+            border-left: 1px solid #ddd;
+            margin: 1em 0 1em 2em;
+            padding: 0.2em 2em;
+        }
+
+        aside>dl,
+        aside>ol,
+        aside>ul,
+        aside>table,
+        aside>p {
+            margin-bottom: 0.5em;
+        }
+
+        /* Additional page break settings */
+        @media print {
+
+            figcaption,
+            table caption {
+                page-break-before: avoid;
+            }
+        }
+
+        /* Font size adjustments for print */
+        @media print {
+            body {
+                font-size: 10pt;
+                line-height: normal;
+                max-width: 96%;
+            }
+
+            h1 {
+                font-size: 1.72em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2*1.2 */
+            h2 {
+                font-size: 1.44em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2 */
+            h3 {
+                font-size: 1.2em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2 */
+            h4 {
+                font-size: 1em;
+                padding-top: 1.5em;
+            }
+
+            h5,
+            h6 {
+                font-size: 1em;
+                margin: initial;
+                padding: 0.5em 0 0.3em;
+            }
+        }
+
+        /* Sourcecode margin in print, when there's no pilcrow */
+        @media print {
+
+            .artwork,
+            .artwork>pre,
+            .sourcecode {
+                margin-bottom: 1em;
+            }
+        }
+
+        /* Avoid narrow tables forcing too narrow table captions, which may render badly */
+        table {
+            min-width: 20em;
+        }
+
+        /* ol type a */
+        ol.type-a {
+            list-style-type: lower-alpha;
+        }
+
+        ol.type-A {
+            list-style-type: upper-alpha;
+        }
+
+        ol.type-i {
+            list-style-type: lower-roman;
+        }
+
+        ol.type-I {
+            list-style-type: upper-roman;
+        }
+
+        /* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+        table {
+            border: 1px solid #ddd;
+        }
+
+        td {
+            border-top: 1px solid #ddd;
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f8f8f8;
+        }
+
+        /* Use style rules to govern display of the TOC. */
+        @media screen and (max-width: 1023px) {
+            #toc nav {
+                display: none;
+            }
+
+            #toc.active nav {
+                display: block;
+            }
+        }
+
+        /* Add support for keepWithNext */
+        .keepWithNext {
+            break-after: avoid-page;
+            break-after: avoid-page;
+        }
+
+        /* Add support for keepWithPrevious */
+        .keepWithPrevious {
+            break-before: avoid-page;
+        }
+
+        /* Change the approach to avoiding breaks inside artwork etc. */
+        figure,
+        pre,
+        table,
+        .artwork,
+        .sourcecode {
+            break-before: auto;
+            break-after: auto;
+        }
+
+        /* Avoid breaks between <dt> and <dd> */
+        dl {
+            break-before: auto;
+            break-inside: auto;
+        }
+
+        dt {
+            break-before: auto;
+            break-after: avoid-page;
+        }
+
+        dd {
+            break-before: avoid-page;
+            break-after: auto;
+            orphans: 3;
+            widows: 3
+        }
+
+        span.break,
+        dd.break {
+            margin-bottom: 0;
+            min-height: 0;
+            break-before: auto;
+            break-inside: auto;
+            break-after: auto;
+        }
+
+        /* Undo break-before ToC */
+        @media print {
+            #toc {
+                break-before: auto;
+            }
+        }
+
+        /* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+        ul.compact p,
+        .ulCompact p,
+        ol.compact p,
+        .olCompact p {
+            margin: 0;
+        }
+
+        /* But the list as a whole needs the extra space at the end */
+        section ul.compact,
+        section .ulCompact,
+        section ol.compact,
+        section .olCompact {
+            margin-bottom: 1em;
+            /* same as p not within ul.compact etc. */
+        }
+
+        /* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+        tt,
+        code {
+            background-color: transparent;
+        }
+
+        p tt,
+        p code,
+        li tt,
+        li code,
+        dt tt,
+        dt code {
+            background-color: #f8f8f8;
+        }
+
+        /* Tweak the pre margin -- 0px doesn't come out well */
+        pre {
+            margin-top: 0.5px;
+        }
+
+        /* Tweak the compact list text */
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact,
+        dl.compact,
+        .dlCompact {
+            line-height: normal;
+        }
+
+        /* Don't add top margin for nested lists */
+        li>ul,
+        li>ol,
+        li>dl,
+        dd>ul,
+        dd>ol,
+        dd>dl,
+        dl>dd>dl {
+            margin-top: initial;
+        }
+
+        /* Elements that should not be rendered on the same line as a <dt> */
+        /* This should match the element list in writer.text.TextWriter.render_dl() */
+        dd>div.artwork:first-child,
+        dd>aside:first-child,
+        dd>blockquote:first-child,
+        dd>figure:first-child,
+        dd>ol:first-child,
+        dd>div.sourcecode:first-child,
+        dd>table:first-child,
+        dd>ul:first-child {
+            clear: left;
+        }
+
+        /* fix for weird browser behaviour when <dd/> is empty */
+        dt+dd:empty::before {
+            content: "\00a0";
+        }
+
+        /* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+        li>p {
+            margin-bottom: 0.5em
+        }
+
+        /* Don't let p margin spill out from inside list items */
+        li>p:last-of-type:only-child {
+            margin-bottom: 0;
+        }
+    </style>
+    <link href="https://www.rfc-editor.org/rfc/rfc-local.css" rel="stylesheet" type="text/css">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-uta-require-tls13-12" rel="prev">
+    <link href="https://dx.doi.org/10.17487/rfc9852" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+</head>
+
+<body class="xml2rfc">
+    <script src="https://www.rfc-editor.org/js/metadata.min.js"></script>
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">RFC 9852</td>
+                <td class="center">TLS를 사용하는 새 프로토콜은 TLS를 요구해야 한다</td>
+                <td class="right">2026년 7월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Salz &amp; Aviram</td>
+                <td class="center">최선의 현행 관행</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-stream">문서 흐름:</dt>
+            <dd class="stream">인터넷 엔지니어링 태스크 포스(IETF)</dd>
+            <dt class="label-rfc">RFC:</dt>
+            <dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc9852" class="eref">9852</a></dd>
+            <dt class="label-bcp">BCP:</dt>
+            <dd class="bcp">195</dd>
+            <dt class="label-updates">갱신:</dt>
+            <dd class="updates">
+                <a href="https://www.rfc-editor.org/rfc/rfc9325" class="eref">9325</a>
+            </dd>
+            <dt class="label-category">범주:</dt>
+            <dd class="category">최선의 현행 관행</dd>
+            <dt class="label-published">발행일:</dt>
+            <dd class="published">
+                <time datetime="2026-07" class="published">2026년 7월</time>
+            </dd>
+            <dt class="label-issn">ISSN:</dt>
+            <dd class="issn">2070-1721</dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">R. Salz</div>
+                    <div class="org">Akamai Technologies</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">N. Aviram</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="rfcnum">RFC 9852</h1>
+    <h1 id="title">TLS를 사용하는 새 프로토콜은 TLS 1.3을 요구해야 한다</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">TLS 1.3은 널리 사용되고 있으며, 포괄적인 보안 증명을 거쳤고,
+            TLS 1.2의 보안 및 개인정보 보호 결함을 모두 개선한다. 따라서 TLS를 사용하는 새 프로토콜은
+            TLS 1.3을 요구해야 한다. DTLS 1.3은 널리 제공되거나
+            배포되어 있지 않으므로, 이 지침은 DTLS(어떤 DTLS 버전에도)에는 적용되지 않으며
+            TLS에만 적용된다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+        <p id="section-abstract-2">이 문서는 RFC 9325를 갱신한다. 이 문서는 갱신의 근거로서 포스트 양자 암호와
+            TLS 1.3의 보안 및 개인정보 보호 개선 사항을 논의한다.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 메모는 인터넷 최선의 현행 관행을 문서화한다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-2">
+                이 문서는 인터넷 엔지니어링 태스크 포스
+                (IETF)의 산출물이다. 이 문서는 IETF 커뮤니티의 합의를 나타낸다. 이 문서는
+                공개 검토를 거쳤으며 인터넷 엔지니어링 운영 그룹
+                (IESG)의 발행 승인을 받았다. BCP에 관한 자세한 정보는
+                RFC 7841의 제2절에서 확인할 수 있다.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a>
+            </p>
+            <p id="section-boilerplate.1-3">
+                이 문서의 현재 상태, 정오표 및
+                이 문서에 대한 의견을 제공하는 방법에 관한 정보는
+                <span><a
+                        href="https://www.rfc-editor.org/info/rfc9852">https://www.rfc-editor.org/info/rfc9852</a></span>에서
+                확인할 수 있다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2026 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Revised BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="compact toc ulBare ulEmpty">
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1"
+                                class="auto internal xref">1</a>. <a href="#name-introduction"
+                                class="internal xref">서론</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2"
+                                class="auto internal xref">2</a>. <a href="#name-conventions"
+                                class="internal xref">규약</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3"
+                                class="auto internal xref">3</a>. <a href="#name-implications-for-post-quant"
+                                class="internal xref">포스트 양자 암호(PQC)에 미치는 영향</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>. <a
+                                href="#name-tls-use-by-other-protocols-" class="internal xref">다른 프로토콜 및
+                                애플리케이션의 TLS 사용</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>. <a
+                                href="#name-changes-to-rfc-9325" class="internal xref">RFC 9325의 변경 사항</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>. <a
+                                href="#name-security-considerations" class="internal xref">보안 고려 사항</a>
+                        </p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>. <a
+                                href="#name-iana-considerations" class="internal xref">IANA 고려 사항</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>. <a
+                                href="#name-references" class="internal xref">참고 문헌</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1"
+                                        class="auto internal xref">8.1</a>. <a href="#name-normative-references"
+                                        class="internal xref">규범적 참고 문헌</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2"
+                                        class="auto internal xref">8.2</a>. <a href="#name-informative-references"
+                                        class="internal xref">정보 제공용 참고 문헌</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+                        <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a
+                                href="#name-authors-addresses" class="internal xref">저자 주소</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <div id="sec-reasons">
+        <section id="section-1">
+            <h2 id="name-introduction">
+                <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                    class="section-name selfRef">서론</a>
+            </h2>
+            <p id="section-1-1">이 문서는 TLS를 사용하는 새 프로토콜이
+                TLS 1.3을 사용할 수 있다고 가정하고 그 사용을 요구해야 한다고 명시한다.
+                DTLS 1.3은 널리 제공되거나
+                배포되어 있지 않으므로, 이 지침은 DTLS(어떤 DTLS 버전에도)에는 적용되지 않으며
+                TLS에만 적용된다.<a href="#section-1-1" class="pilcrow">¶</a></p>
+            <p id="section-1-2">TLS 1.3 <span>[<a href="#RFC9846" class="cite xref">TLS13</a>]</span>은 널리
+                사용되고 있으며 TLS 1.2에서 알려진 대부분의 결함을
+                해결한다. 예를 들어 트래픽의 더 많은 부분을 암호화하여 외부인이
+                읽을 수 없도록 하고, 현재 취약한 것으로 간주되는 대부분의 암호학적 기본 요소를
+                제거한다. 중요한 점은 이 프로토콜이 포괄적인
+                보안 증명을 거쳤으며 추가적인
+                구성 없이도 뛰어난 보안을 제공해야 한다는 것이다.<a href="#section-1-2" class="pilcrow">¶</a></p>
+            <p id="section-1-3">TLS 1.2 <span>[<a href="#RFC5246" class="cite xref">TLS12</a>]</span>는 사용 중이며
+                우수한 보안 속성을 제공하도록
+                구성할 수 있다. 그러나 TLS 1.2에는 <a href="#sec-considerations" class="auto internal xref">제6절</a>에 설명된 것과 같은 여러
+                결함이 있다. 이러한 결함을 해결하려면
+                일반적으로 맞춤형
+                구성이 필요하다.<a href="#section-1-3" class="pilcrow">¶</a></p>
+            <p id="section-1-4">이 문서는 <span>[<a href="#RFC9325" class="cite xref">RFC9325</a>]</span>를 갱신한다.
+                이 문서는 갱신의 근거로서 포스트 양자 암호와
+                TLS 1.3의 보안 및 개인정보 보호 개선 사항을 논의한다. <a href="#rfc9325-updates" class="auto internal xref">제5절</a>을
+                참조한다.<a href="#section-1-4" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="conventions">
+        <section id="section-2">
+            <h2 id="name-conventions">
+                <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions"
+                    class="section-name selfRef">규약</a>
+            </h2>
+            <p id="section-2-1">
+                이 문서에서 핵심 단어 "<span class="bcp14">반드시</span>", "<span class="bcp14">해서는 안 된다</span>", "<span
+                    class="bcp14">요구된다</span>", "<span class="bcp14">해야 한다</span>", "<span class="bcp14">해서는
+                    안 된다</span>", "<span class="bcp14">하는 것이 좋다</span>", "<span class="bcp14">하지 않는 것이 좋다</span>",
+                "<span class="bcp14">권고된다</span>", "<span class="bcp14">권고되지 않는다</span>",
+                "<span class="bcp14">할 수 있다</span>" 및 "<span class="bcp14">선택 사항이다</span>"는
+                여기에 표시된 것처럼 모두 대문자로 나타나는 경우에만
+                BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174"
+                        class="cite xref">RFC8174</a>]</span>에
+                설명된 대로 해석해야 한다.<a href="#section-2-1" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="implications-for-post-quantum-cryptography-pqc">
+        <section id="section-3">
+            <h2 id="name-implications-for-post-quant">
+                <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-implications-for-post-quant"
+                    class="section-name selfRef">포스트 양자 암호(PQC)에 미치는 영향</a>
+            </h2>
+            <p id="section-3-1">암호학적으로 유의미한 양자 컴퓨터(CRQC)를 사용할 수 있게 되면
+                TLS 트래픽에 막대한 영향을 미칠 것이다(예: <span>[<a href="#RFC9958" class="cite xref">RFC9958</a>]</span>의 <span><a
+                        href="https://rfc-editor.org/rfc/rfc9958#section-3" class="relref">제3절</a></span> 참조).
+                이를 완화하기 위해 TLS 애플리케이션은
+                포스트 양자 암호(PQC) <span>[<a href="#PQC" class="cite xref">PQC</a>]</span>로 마이그레이션해야 한다. 애플리케이션에 PQC가 필요한
+                시점이나
+                CRQC가 애플리케이션이 방어해야 하는 위협이 되는 시점에 관한 상세한 고려 사항은
+                이 문서의 범위를
+                벗어난다.<a href="#section-3-1" class="pilcrow">¶</a></p>
+            <p id="section-3-2">
+                TLS 워킹 그룹이 TLS 1.3
+                이상에 노력을 집중하고 있으며 TLS 1.2는 지원되지 않는다는 점에 유의해야 한다(<span>[<a href="#RFC9851"
+                        class="cite xref">TLS12FROZEN</a>]</span> 참조).
+                이것은 새 프로토콜이 TLS의 기본값으로 TLS 1.3을 요구해야 하는 또 하나의 이유이다.
+                TLS 1.3에서는
+                PQC가 활발하게 표준화되고 있으므로 새 애플리케이션에
+                PQC를 사용할 수 있는 선택권을 제공한다.<a href="#section-3-2" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="tls-use-by-other-protocols-and-applications">
+        <section id="section-4">
+            <h2 id="name-tls-use-by-other-protocols-">
+                <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-tls-use-by-other-protocols-"
+                    class="section-name selfRef">다른 프로토콜 및 애플리케이션의 TLS 사용</a>
+            </h2>
+            <p id="section-4-1">TLS를 사용하는 모든 새 프로토콜은 TLS 1.3을 기본값으로 <span class="bcp14">반드시</span>
+                지정해야 한다.
+                예를 들어 QUIC <span>[<a href="#RFC9001" class="cite xref">QUICTLS</a>]</span>은 TLS 1.3을 요구하며,
+                이전 버전이 사용되는 경우 엔드포인트가 연결을
+                <span class="bcp14">반드시</span> 종료해야 한다고 명시한다.<a href="#section-4-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-4-2">배포 고려 사항이 문제가 되는 경우, 프로토콜은 TLS 1.2를
+                기본값이 아닌 추가 옵션으로
+                지정할 <span class="bcp14">수 있다</span>.
+                반대 사례로, DNS over TLS 사용 프로필 <span>[<a href="#RFC8310" class="cite xref">DNSTLS</a>]</span>은
+                TLS 1.2를 기본값으로 지정하면서 TLS 1.3도 허용한다.
+                TLS 1.2 지원을 선택하는 최신 명세에서는 이러한 우선순위를
+                반대로 해야 한다.<a href="#section-4-2" class="pilcrow">¶</a></p>
+            <p id="section-4-3">초기 TLS 핸드셰이크를 통해 클라이언트는 지원하는
+                TLS 버전을 지정할 수 있으며, 서버는 자신도 지원하는 버전 중 가장 높은
+                버전을 선택하도록 되어 있다. 이를 "TLS 버전
+                협상"이라고 하며, 프로토콜 및 협상에 관한 자세한 내용은 <span>[<a href="#RFC9846" class="cite xref">TLS13</a>]</span>의 <span><a
+                        href="https://rfc-editor.org/rfc/rfc9846#section-4.2.1" class="relref">제4.2.1절</a></span>과
+                <span>[<a href="#RFC5246" class="cite xref">TLS12</a>]</span>의 <span><a
+                        href="https://rfc-editor.org/rfc/rfc5246#appendix-E" class="relref">부록 E</a></span>에서
+                논의한다. 많은 TLS 라이브러리는
+                최저 버전이나 최고 버전만 지정하는 열린 구간을 포함하여
+                애플리케이션이 원하는 버전 범위를 지정할 수 있는 방법을 제공한다.<a href="#section-4-3" class="pilcrow">¶</a>
+            </p>
+            <p id="section-4-4">애플리케이션이 TLS 버전 협상을 지원하는 TLS 구현을 사용하고
+                해당 TLS 구현이 지원되는 가장 높은 버전을 사용한다는 것을 알고 있다면,
+                클라이언트는 원하는 최저 버전만 지정하는 것이 <span class="bcp14">좋다</span>.
+                이는 위 문단에 설명된 상황에 따라 TLS 1.3 또는 TLS 1.2여야
+                <span class="bcp14">한다</span>.<a href="#section-4-4" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="rfc9325-updates">
+        <section id="section-5">
+            <h2 id="name-changes-to-rfc-9325">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-changes-to-rfc-9325"
+                    class="section-name selfRef">RFC 9325의 변경 사항</a>
+            </h2>
+            <p id="section-5-1"><span>[<a href="#RFC9325" class="cite xref">RFC9325</a>]</span>는 TLS와, 이 문서와 달리
+                DTLS도 사용하는 배포된 서비스의 보안을
+                보장하기 위한 권고 사항을 제공한다.
+                <span>[<a href="#RFC9325" class="cite xref">RFC9325</a>]</span>는 TLS 1.3을
+                "널리 제공되는" 것으로 설명하며, 해당 문서가 발행된 이후 TLS 1.3으로의 전환은 더욱 확대되었다.
+                따라서 이 문서는 <span>[<a href="#RFC9325" class="cite xref">RFC9325</a>]</span>의 <span><a
+                        href="https://rfc-editor.org/rfc/rfc9325#section-3.1.1" class="relref">제3.1.1절</a></span>에 있는 권고
+                사항을 두 가지 변경한다.<a href="#section-5-1" class="pilcrow">¶</a>
+            </p>
+            <ul class="normal">
+                <li class="normal" id="section-5-2.1">
+                    <p id="section-5-2.1.1">해당 절에서는 TLS 1.3을 지원하는 것이 <span class="bcp14">좋다</span>고
+                        명시하지만, 이 문서는 TLS를 사용하는 새 프로토콜이
+                        TLS 1.3을 <span class="bcp14">반드시</span> 지원하도록 요구한다.<a href="#section-5-2.1.1"
+                            class="pilcrow">¶</a></p>
+                </li>
+                <li class="normal" id="section-5-2.2">
+                    <p id="section-5-2.2.1">해당 절에서는 TLS 1.2를 <span class="bcp14">반드시</span> 지원해야 한다고
+                        명시하지만, 이 문서는 위에서 설명한 대로
+                        TLS 1.2를 지원할 <span class="bcp14">수 있다</span>고 명시한다.<a href="#section-5-2.2.1"
+                            class="pilcrow">¶</a></p>
+                </li>
+            </ul>
+            <p id="section-5-3">다시 말하지만, 이러한 변경 사항은 TLS에만 적용되며 DTLS에는 적용되지 않는다.<a href="#section-5-3"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="sec-considerations">
+        <section id="section-6">
+            <h2 id="name-security-considerations">
+                <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations"
+                    class="section-name selfRef">보안 고려 사항</a>
+            </h2>
+            <p id="section-6-1">TLS 1.2는 시간이 지남에 따라 상당히 취약해진 여러 암호학적 기본 요소와
+                설계 선택을 사용하여 명세되었다. 이 절의 목적은 프로토콜에 영향을 준
+                대표적인 문제 몇 가지를 간략히 살펴보는 것이다.
+                그러나 TLS 1.2도 안전하게 구성할 수 있다는 점에 유의해야 한다. 다만
+                현대적인 후속 버전인 TLS 1.3을 사용하는 것보다 안전하게 구성하기가
+                훨씬 더 어려울 뿐이다. TLS 1.2의 안전한 배포에 관한
+                더 자세한 지침은 <span>[<a href="#RFC9325" class="cite xref">RFC9325</a>]</span>를 참조한다.<a href="#section-6-1"
+                    class="pilcrow">¶</a></p>
+            <p id="section-6-2">첫째, 확장을 사용하지 않는 TLS 1.2는
+                재협상 공격(<span>[<a href="#RENEG1" class="cite xref">RENEG1</a>]</span> 및 <span>[<a href="#RENEG2"
+                        class="cite xref">RENEG2</a>]</span> 참조)과
+                삼중 핸드셰이크 공격(<span>[<a href="#TRIPLESHAKE" class="cite xref">TRIPLESHAKE</a>]</span> 참조)에
+                취약하다. 대체로 이러한 공격은 재협상에 대한 프로토콜의 지원을
+                악용하여 공격자가 선택한 접두부를 평문 스트림에 삽입한다.
+                이는 일반적으로 실제 환경에서 치명적인 위협이다(예: 공격자가 웹 환경에서 비밀 쿠키를
+                획득할 수 있게 한다).
+                위 문제를 고려하여 <span>[<a href="#RFC5746" class="cite xref">RFC5746</a>]</span>은 이러한
+                공격 범주를 방지하는 확장을 명시한다. TLS 1.2를 안전하게 배포하려면 재협상을
+                완전히 비활성화하거나 이 확장을 사용해야 한다. 또한 클라이언트는
+                연결 중 서버가 인증서를 재협상하도록 허용해서는 안 된다.<a href="#section-6-2" class="pilcrow">¶</a></p>
+            <p id="section-6-3">둘째, TLS 1.2에 명시된 원래의 키 교환 방식인
+                RSA 키 교환과 유한체 Diffie-Hellman에는 여러
+                취약점이 있다. 프로토콜을 안전하게 배포하려면
+                이러한 키 교환
+                방식의 대부분을 비활성화해야 한다.
+                자세한 내용은 <span>[<a href="#RFC10015" class="cite xref">RFC10015</a>]</span>를 참조한다.<a href="#section-6-3"
+                    class="pilcrow">¶</a></p>
+            <p id="section-6-4">셋째, TLS 1.2에서 널리 사용되는 대칭 암호인 RC4와
+                암호 블록 체인(CBC) 암호 스위트에는 여러 취약점이 있다. RC4의 키 스트림에는
+                악용 가능한 편향이 있다. <span>[<a href="#RFC7465" class="cite xref">RFC7465</a>]</span>를 참조한다. CBC 암호 스위트는
+                오랫동안 취약점의 원인이 되어 왔다. 이러한 암호 스위트를 단순하게
+                구현하면 본질적으로 Lucky13 타이밍
+                공격 <span>[<a href="#LUCKY13" class="cite xref">LUCKY13</a>]</span>에 취약하다. 암호 스위트를
+                상수 시간으로 구현하려는 최초의 시도는
+                훨씬 더 심각한 취약점 <span>[<a href="#LUCKY13FIX" class="cite xref">LUCKY13FIX</a>]</span>을 초래했다.
+                CBC 암호 스위트의 또 다른 취약점 사례와 유사 연구에 대한 조사는
+                <span>[<a href="#CBCSCANNING" class="cite xref">CBCSCANNING</a>]</span>을 참조한다.<a href="#section-6-4"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-6-5">또한 TLS 1.2는 TLS 1.3에는 영향을 미치지 않는
+                여러 다른 공격의 영향을 받았다.
+                BEAST <span>[<a href="#BEAST" class="cite xref">BEAST</a>]</span>, Logjam <span>[<a href="#WEAKDH"
+                        class="cite xref">WEAKDH</a>]</span>, FREAK <span>[<a href="#FREAK"
+                        class="cite xref">FREAK</a>]</span> 및 SLOTH <span>[<a href="#SLOTH"
+                        class="cite xref">SLOTH</a>]</span>이다.<a href="#section-6-5" class="pilcrow">¶</a></p>
+            <p id="section-6-6">마지막으로
+                TLS 1.2의 애플리케이션 계층 트래픽은 항상 암호화되지만, 핸드셰이크
+                메시지 내용의 대부분은 암호화되지 않는다. 따라서 제공되는 개인정보 보호 수준은 최적이 아니다.
+                이는 구성으로 해결할 수 없는 프로토콜 문제이다.<a href="#section-6-6" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="iana">
+        <section id="section-7">
+            <h2 id="name-iana-considerations">
+                <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations"
+                    class="section-name selfRef">IANA 고려 사항</a>
+            </h2>
+            <p id="section-7-1">이 문서에는 IANA 조치가 없다.<a href="#section-7-1" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="sec-combined-references">
+        <section id="section-8">
+            <h2 id="name-references">
+                <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references"
+                    class="section-name selfRef">참고 문헌</a>
+            </h2>
+            <div id="sec-normative-references">
+                <section id="section-8.1">
+                    <h3 id="name-normative-references">
+                        <a href="#section-8.1" class="section-number selfRef">8.1. </a><a
+                            href="#name-normative-references" class="section-name selfRef">규범적 참고 문헌</a>
+                    </h3>
+                    <dl class="references">
+                        <dt id="RFC2119">[RFC2119]</dt>
+                        <dd>
+                            <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"요구 사항 수준을 나타내기 위해
+                                RFC에서 사용하는 핵심 단어"</span>, <span class="seriesInfo">BCP 14</span>,
+                            <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">1997년 3월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC8174">[RFC8174]</dt>
+                        <dd>
+                            <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"RFC 2119 핵심 단어에서
+                                대문자와 소문자의 모호성"</span>, <span class="seriesInfo">BCP 14</span>, <span
+                                class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">2017년 5월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9325">[RFC9325]</dt>
+                        <dd>
+                            <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Saint-Andre, P.</span>,
+                            및 <span class="refAuthor">T. Fossati</span>, <span class="refTitle">"전송 계층 보안
+                                (TLS) 및 데이터그램 전송 계층 보안
+                                (DTLS)의 안전한 사용을 위한 권고 사항"</span>, <span class="seriesInfo">BCP 195</span>, <span
+                                class="seriesInfo">RFC
+                                9325</span>, <span class="seriesInfo">DOI 10.17487/RFC9325</span>, <time
+                                datetime="2022-11" class="refDate">2022년 11월</time>, <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9325">https://www.rfc-editor.org/info/rfc9325</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC5246">[TLS12]</dt>
+                        <dd>
+                            <span class="refAuthor">Dierks, T.</span> 및 <span class="refAuthor">E. Rescorla</span>,
+                            <span class="refTitle">"전송 계층 보안(TLS) 프로토콜 버전 1.2"</span>,
+                            <span class="seriesInfo">RFC 5246</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC5246</span>, <time datetime="2008-08" class="refDate">2008년 8월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc5246">https://www.rfc-editor.org/info/rfc5246</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9851">[TLS12FROZEN]</dt>
+                        <dd>
+                            <span class="refAuthor">Salz, R.</span> 및 <span class="refAuthor">N. Aviram</span>, <span
+                                class="refTitle">"TLS 1.2 기능 동결"</span>, <span class="seriesInfo">RFC
+                                9851</span>, <span class="seriesInfo">DOI 10.17487/RFC9851</span>, <time
+                                datetime="2026-07" class="refDate">2026년 7월</time>, <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9851">https://www.rfc-editor.org/info/rfc9851</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9846">[TLS13]</dt>
+                        <dd>
+                            <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"전송 계층
+                                보안(TLS) 프로토콜 버전 1.3"</span>, <span class="seriesInfo">RFC 9846</span>,
+                            <span class="seriesInfo">DOI 10.17487/RFC9846</span>, <time datetime="2026-07"
+                                class="refDate">2026년 7월</time>, <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9846">https://www.rfc-editor.org/info/rfc9846</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+            <div id="sec-informative-references">
+                <section id="section-8.2">
+                    <h3 id="name-informative-references">
+                        <a href="#section-8.2" class="section-number selfRef">8.2. </a><a
+                            href="#name-informative-references" class="section-name selfRef">정보 제공용 참고 문헌</a>
+                    </h3>
+                    <dl class="references">
+                        <dt id="BEAST">[BEAST]</dt>
+                        <dd>
+                            <span class="refAuthor">Duong, T.</span> 및 <span class="refAuthor">J. Rizzo</span>, <span
+                                class="refTitle">"XOR 닌자들이 온다"</span>, <time datetime="2011-05" class="refDate">2011년
+                                5월</time>, <span>&lt;<a
+                                    href="http://www.hpcc.ecs.soton.ac.uk/dan/talks/bullrun/Beast.pdf">http://www.hpcc.ecs.soton.ac.uk/dan/talks/bullrun/Beast.pdf</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="CBCSCANNING">[CBCSCANNING]</dt>
+                        <dd>
+                            <span class="refAuthor">Merget, R.</span>, <span class="refAuthor">Somorovsky, J.</span>,
+                            <span class="refAuthor">Aviram, N.</span>, <span class="refAuthor">Young, C.</span>, <span
+                                class="refAuthor">Fliegenschmidt, J.</span>, <span class="refAuthor">Schwenk, J.</span>,
+                            및 <span class="refAuthor">Y. Shavitt</span>, <span class="refTitle">"TLS 패딩 오라클 취약점의
+                                확장 가능한 스캔 및 자동 분류"</span>, <span class="refContent">제28회 USENIX 보안 심포지엄(USENIX Security
+                                19)</span>, <time datetime="2019-08" class="refDate">2019년 8월</time>, <span>&lt;<a
+                                    href="https://www.usenix.org/system/files/sec19-merget.pdf">https://www.usenix.org/system/files/sec19-merget.pdf</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC8310">[DNSTLS]</dt>
+                        <dd>
+                            <span class="refAuthor">Dickinson, S.</span>, <span class="refAuthor">Gillmor, D.</span>,
+                            및 <span class="refAuthor">T. Reddy</span>, <span class="refTitle">"DNS
+                                over TLS 및 DNS over DTLS 사용 프로필"</span>, <span class="seriesInfo">RFC 8310</span>, <span
+                                class="seriesInfo">DOI 10.17487/RFC8310</span>, <time datetime="2018-03"
+                                class="refDate">2018년 3월</time>, <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc8310">https://www.rfc-editor.org/info/rfc8310</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="FREAK">[FREAK]</dt>
+                        <dd>
+                            <span class="refAuthor">Beurdouche, B.</span>, <span class="refAuthor">Bhargavan, K.</span>,
+                            <span class="refAuthor">Delignat-Lavaud, A.</span>, <span class="refAuthor">Fournet,
+                                C.</span>, <span class="refAuthor">Kohlweiss, M.</span>, <span
+                                class="refAuthor">Pironti, A.</span>, <span class="refAuthor">Strub, P.-Y.</span>, 및
+                            <span class="refAuthor">J. K. Zinzindohoue</span>, <span class="refTitle">"혼란스러운
+                                연합 상태: TLS의 복합 상태 머신 길들이기"</span>, <span class="refContent">2015년 IEEE 보안 및 개인정보 보호
+                                심포지엄</span>, <span class="seriesInfo">HAL ID: hal-01114250</span>, <time
+                                datetime="2015-05" class="refDate">2015년 5월</time>, <span>&lt;<a
+                                    href="https://inria.hal.science/hal-01114250/file/messy-state-of-the-union-oakland15.pdf">https://inria.hal.science/hal-01114250/file/messy-state-of-the-union-oakland15.pdf</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="LUCKY13">[LUCKY13]</dt>
+                        <dd>
+                            <span class="refAuthor">Al Fardan, N. J.</span> 및 <span class="refAuthor">K. G.
+                                Paterson</span>, <span class="refTitle">"Lucky Thirteen: TLS 및 DTLS
+                                레코드 프로토콜 무력화"</span>, <time datetime="2013-02" class="refDate">2013년 2월</time>,
+                            <span>&lt;<a
+                                    href="http://www.isg.rhul.ac.uk/tls/TLStiming.pdf">http://www.isg.rhul.ac.uk/tls/TLStiming.pdf</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="LUCKY13FIX">[LUCKY13FIX]</dt>
+                        <dd>
+                            <span class="refAuthor">Somorovsky, J.</span>, <span class="refTitle">"TLS 라이브러리의
+                                체계적인 퍼징 및 테스트"</span>, <span class="refContent">CCS '16: 2016년
+                                ACM SIGSAC 컴퓨터 및 통신 보안 학술대회 논문집, 1492~1504쪽</span>, <span class="seriesInfo">DOI
+                                10.1145/2976749.2978411</span>, <time datetime="2016-10" class="refDate">2016년
+                                10월</time>, <span>&lt;<a
+                                    href="https://nds.rub.de/media/nds/veroeffentlichungen/2016/10/19/tls-attacker-ccs16.pdf">https://nds.rub.de/media/nds/veroeffentlichungen/2016/10/19/tls-attacker-ccs16.pdf</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="PQC">[PQC]</dt>
+                        <dd>
+                            <span class="refAuthor">NIST</span>, <span class="refTitle">"포스트 양자
+                                암호란 무엇인가?"</span>, <time datetime="2025-06" class="refDate">2025년 6월</time>,
+                            <span>&lt;<a
+                                    href="https://www.nist.gov/cybersecurity/what-post-quantum-cryptography">https://www.nist.gov/cybersecurity/what-post-quantum-cryptography</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9001">[QUICTLS]</dt>
+                        <dd>
+                            <span class="refAuthor">Thomson, M., 편집자</span> 및 <span class="refAuthor">S. Turner,
+                                편집자</span>, <span class="refTitle">"TLS를 사용하여 QUIC 보호하기"</span>, <span
+                                class="seriesInfo">RFC 9001</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC9001</span>, <time datetime="2021-05" class="refDate">2021년 5월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9001">https://www.rfc-editor.org/info/rfc9001</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RENEG1">[RENEG1]</dt>
+                        <dd>
+                            <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"TLS
+                                재협상 공격 이해하기"</span>, <span class="refContent">Wayback Machine 보관본</span>,
+                            <time datetime="2009-11-05" class="refDate">2009년 11월 5일</time>, <span>&lt;<a
+                                    href="https://web.archive.org/web/20091231034700/http://www.educatedguesswork.org/2009/11/understanding_the_tls_renegoti.html">https://web.archive.org/web/20091231034700/http://www.educatedguesswork.org/2009/11/understanding_the_tls_renegoti.html</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RENEG2">[RENEG2]</dt>
+                        <dd>
+                            <span class="refAuthor">Ray, M.</span>, <span class="refTitle">"TLS
+                                재협상의 인증 공백"</span>, <span class="refContent">Wayback Machine 보관본</span>,
+                            <span>&lt;<a
+                                    href="https://web.archive.org/web/20091228061844/http://extendedsubset.com/?p=8">https://web.archive.org/web/20091228061844/http://extendedsubset.com/?p=8</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC5746">[RFC5746]</dt>
+                        <dd>
+                            <span class="refAuthor">Rescorla, E.</span>, <span class="refAuthor">Ray, M.</span>, <span
+                                class="refAuthor">Dispensa, S.</span>, 및 <span class="refAuthor">N. Oskov</span>,
+                            <span class="refTitle">"전송 계층 보안(TLS) 재협상 표시
+                                확장"</span>, <span class="seriesInfo">RFC 5746</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC5746</span>, <time datetime="2010-02" class="refDate">2010년 2월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc5746">https://www.rfc-editor.org/info/rfc5746</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC7465">[RFC7465]</dt>
+                        <dd>
+                            <span class="refAuthor">Popov, A.</span>, <span class="refTitle">"RC4 암호 스위트
+                                금지"</span>, <span class="seriesInfo">RFC 7465</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC7465</span>, <time datetime="2015-02" class="refDate">2015년 2월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc7465">https://www.rfc-editor.org/info/rfc7465</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9958">[RFC9958]</dt>
+                        <dd>
+                            <span class="refAuthor">Banerjee, A.</span>, <span class="refAuthor">Reddy.K, T.</span>,
+                            <span class="refAuthor">Schoinianakis, D.</span>, <span class="refAuthor">Hollebeek,
+                                T.</span>, 및 <span class="refAuthor">M. Ounsworth</span>, <span class="refTitle">"엔지니어를
+                                위한 포스트 양자 암호"</span>, <span class="seriesInfo">RFC 9958</span>, <span
+                                class="seriesInfo">DOI
+                                10.17487/RFC9958</span>, <time datetime="2026-06" class="refDate">2026년 6월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9958">https://www.rfc-editor.org/info/rfc9958</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC10015">[RFC10015]</dt>
+                        <dd>
+                            <span class="refAuthor">Aviram, N.</span>, <span class="refTitle">"TLS 1.2 및 DTLS 1.2의
+                                구식 키 교환 방식 사용 중단"</span>, <span class="seriesInfo">RFC
+                                10015</span>, <span class="seriesInfo">DOI 10.17487/RFC10015</span>, <time
+                                datetime="2026-07" class="refDate">2026년 7월</time>, <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc10015">https://www.rfc-editor.org/info/rfc10015</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="SLOTH">[SLOTH]</dt>
+                        <dd>
+                            <span class="refAuthor">Bhargavan, K.</span> 및 <span class="refAuthor">G. Leurent</span>,
+                            <span class="refTitle">"트랜스크립트 충돌 공격: TLS, IKE 및 SSH의 인증
+                                무력화"</span>, <span class="refContent">네트워크 및 분산 시스템 보안
+                                심포지엄 - NDSS 2016</span>, <span class="seriesInfo">DOI
+                                10.14722/ndss.2016.23418</span>, <span class="seriesInfo">HAL ID: hal-01244855</span>,
+                            <time datetime="2016-02" class="refDate">2016년 2월</time>, <span>&lt;<a
+                                    href="https://inria.hal.science/hal-01244855/file/SLOTH_NDSS16.pdf">https://inria.hal.science/hal-01244855/file/SLOTH_NDSS16.pdf</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="TRIPLESHAKE">[TRIPLESHAKE]</dt>
+                        <dd>
+                            <span class="refTitle">"해로운 것으로 간주되는 삼중 핸드셰이크: TLS상의 인증
+                                무력화 및 수정"</span>, <span class="refContent">Wayback Machine
+                                보관본</span>, <span>&lt;<a
+                                    href="https://web.archive.org/web/20250804151857/https://mitls.org/pages/attacks/3SHAKE">https://web.archive.org/web/20250804151857/https://mitls.org/pages/attacks/3SHAKE</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="WEAKDH">[WEAKDH]</dt>
+                        <dd>
+                            <span class="refAuthor">Adrian, D.</span>, <span class="refAuthor">Bhargavan, K.</span>,
+                            <span class="refAuthor">Durumeric, Z.</span>, <span class="refAuthor">Gaudry, P.</span>,
+                            <span class="refAuthor">Green, M.</span>, <span class="refAuthor">Halderman, J. A.</span>,
+                            <span class="refAuthor">Heninger, N.</span>, <span class="refAuthor">Springall, D.</span>,
+                            <span class="refAuthor">Thome, E.</span>, <span class="refAuthor">Valenta, L.</span>, <span
+                                class="refAuthor">VanderSloot, B.</span>, <span class="refAuthor">Wustrow, E.</span>,
+                            <span class="refAuthor">Zanella-Beguelin, S.</span>, 및 <span class="refAuthor">P.
+                                Zimmerman</span>, <span class="refTitle">"불완전한 순방향 비밀성: Diffie-Hellman이
+                                실제 환경에서 실패하는 방식"</span>, <span class="refContent">CCS '15: 제22회 ACM
+                                SIGSAC 컴퓨터 및 통신 보안 학술대회 논문집, 5~17쪽</span>, <span class="seriesInfo">DOI
+                                10.1145/2810103.2813707</span>, <time datetime="2015-10" class="refDate">2015년
+                                10월</time>, <span>&lt;<a
+                                    href="https://dl.acm.org/doi/pdf/10.1145/2810103.2813707">https://dl.acm.org/doi/pdf/10.1145/2810103.2813707</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="authors-addresses">
+        <section id="appendix-A">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Rich Salz</span></div>
+                <div dir="auto" class="left"><span class="org">Akamai Technologies</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:rsalz@akamai.com" class="email">rsalz@akamai.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Nimrod Aviram</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:nimrod.aviram@gmail.com" class="email">nimrod.aviram@gmail.com</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script>const toc = document.getElementById("toc");
+        toc.querySelector("h2").addEventListener("click", e => {
+            toc.classList.toggle("active");
+        });
+        toc.querySelector("nav").addEventListener("click", e => {
+            toc.classList.remove("active");
+        });
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
