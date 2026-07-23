@@ -110,6 +110,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Developing Localizable Manifests](https://ko.htmlspecs.com/localizable-manifests/)（[Source](https://www.w3.org/TR/2025/NOTE-localizable-manifests-20250214/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Web App Manifest - Application Information](https://ko.htmlspecs.com/manifest-app-info/)（[Source](https://www.w3.org/TR/2023/NOTE-manifest-app-info-20230821/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Get Installed Related Apps API](https://ko.htmlspecs.com/get-installed-related-apps/)（[Source](https://wicg.github.io/get-installed-related-apps/spec/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Sub Apps API](https://ko.htmlspecs.com/sub-apps/)（[Source](https://wicg.github.io/sub-apps/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Service Workers Nightly](https://ko.htmlspecs.com/service-workers/)（[Source](https://www.w3.org/TR/2026/CRD-service-workers-20260717/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 
 ### MiniApp, 소형 앱 및 크로스 플랫폼 앱
@@ -467,7 +468,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [EPUB Reading Systems 3.3](https://ko.htmlspecs.com/epub-rs-33/)（[Source](https://www.w3.org/TR/2024/REC-epub-rs-33-20241017/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [EPUB 3.4](https://ko.htmlspecs.com/epub-34/)（[Source](https://www.w3.org/TR/2026/CRD-epub-34-20260721/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [EPUB Reading Systems 3.4](https://ko.htmlspecs.com/epub-rs-34/)（[Source](https://www.w3.org/TR/2026/CRD-epub-rs-34-20260721/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [EPUB Accessibility 1.2](https://htmlspecs.com/epub-a11y-12/)（[Source](https://www.w3.org/TR/2026/CRD-epub-a11y-12-20260721/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
+- [EPUB Accessibility 1.2](https://ko.htmlspecs.com/epub-a11y-12/)（[Source](https://www.w3.org/TR/2026/CRD-epub-a11y-12-20260721/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Publication Manifest](https://ko.htmlspecs.com/pub-manifest/)（[Source](https://www.w3.org/TR/2020/REC-pub-manifest-20201110/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Audiobooks](https://ko.htmlspecs.com/audiobooks/)（[Source](https://www.w3.org/TR/2020/REC-audiobooks-20201110/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 
