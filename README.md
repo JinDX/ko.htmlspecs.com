@@ -240,7 +240,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Identifiers for WebRTC&#39;s Statistics API](https://ko.htmlspecs.com/webrtc-stats/)（[Source](https://www.w3.org/TR/2025/CRD-webrtc-stats-20250925/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [WebRTC Encoded Transform](https://ko.htmlspecs.com/webrtc-encoded-transform/)（[Source](https://www.w3.org/TR/2026/WD-webrtc-encoded-transform-20260625/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Scalable Video Coding (SVC) Extension for WebRTC](https://ko.htmlspecs.com/webrtc-svc/)（[Source](https://www.w3.org/TR/2024/WD-webrtc-svc-20240817/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Screen Capture](https://ko.htmlspecs.com/screen-capture/)（[Source](https://www.w3.org/TR/2026/WD-screen-capture-20260716/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Screen Capture](https://ko.htmlspecs.com/screen-capture/)（[Source](https://www.w3.org/TR/2026/WD-screen-capture-20260723/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Viewport Capture](https://ko.htmlspecs.com/mediacapture-viewport/)（[Source](https://www.w3.org/TR/2024/WD-mediacapture-viewport-20241009/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Region Capture](https://ko.htmlspecs.com/mediacapture-region/)（[Source](https://www.w3.org/TR/2023/WD-mediacapture-region-20230712/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Capture Handle - Bootstrapping Collaboration when Screensharing](https://ko.htmlspecs.com/capture-handle-identity/)（[Source](https://www.w3.org/TR/2025/WD-capture-handle-identity-20250306/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
