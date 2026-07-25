@@ -356,6 +356,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 보안, 콘텐츠 보호 및 정책
 - [Web Cryptography Level 2](https://ko.htmlspecs.com/webcrypto-2/)（[Source](https://www.w3.org/TR/2025/WD-webcrypto-2-20250422/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Modern Algorithms in the Web Cryptography API](https://ko.htmlspecs.com/webcrypto-modern-algos/)（[Source](https://wicg.github.io/webcrypto-modern-algos/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [HTML Sanitizer API](https://ko.htmlspecs.com/sanitizer-api/)（[Source](https://wicg.github.io/sanitizer-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Subresource Integrity (SRI)](https://ko.htmlspecs.com/sri/)（[Source](https://www.w3.org/TR/2016/REC-SRI-20160623/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Subresource Integrity (SRI) 2](https://ko.htmlspecs.com/sri-2/)（[Source](https://www.w3.org/TR/2026/WD-sri-2-20260320/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
