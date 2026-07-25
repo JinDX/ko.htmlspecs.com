@@ -421,6 +421,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 프라이버시, 권한 및 추적 방지
 - [Permissions](https://ko.htmlspecs.com/permissions/)（[Source](https://www.w3.org/TR/2025/WD-permissions-20251006/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Requesting Permissions](https://ko.htmlspecs.com/permissions-request/)（[Source](https://wicg.github.io/permissions-request/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [The HTML Permission Elements](https://ko.htmlspecs.com/permission-elements/)（[Source](https://wicg.github.io/PEPC/permission-elements.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Self-Review Questionnaire: Security and Privacy](https://ko.htmlspecs.com/security-privacy-questionnaire/)（[Source](https://www.w3.org/TR/2025/NOTE-security-privacy-questionnaire-20250418/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Permissions Policy](https://ko.htmlspecs.com/permissions-policy/)（[Source](https://www.w3.org/TR/2026/WD-permissions-policy-1-20260618/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Document Policy](https://ko.htmlspecs.com/document-policy/)（[Source](https://wicg.github.io/document-policy/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
