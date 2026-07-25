@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>JS 자체 프로파일링 API</title>
+    <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove"></script>
+    <script class="remove">
+        var respecConfig = {
+            specStatus: "CG-DRAFT",
+            editors: [
+                {
+                    name: "Andrew Comminos",
+                    mailto: "acomminos@fb.com",
+                    company: "Facebook",
+                    companyURL: "https://facebook.com",
+                },
+                {
+                    name: "Vladan Djeric",
+                    mailto: "vdjeric@fb.com",
+                    company: "Facebook",
+                    companyURL: "https://facebook.com",
+                },
+            ],
+            shortName: "js-self-profiling",
+            group: "wicg",
+            xref: ["DOM", "HTML", "Infra", "WebIDL"],
+            github: "https://github.com/WICG/js-self-profiling/"
+        };
+    </script>
+</head>
+
+<body>
+    <section id="abstract">
+        <p>
+            이 명세는 클라이언트 JavaScript 실행 시간을 측정하기 위한 샘플링 프로파일러를 웹 애플리케이션이
+            제어할 수 있도록 하는 API를 설명한다.
+        </p>
+    </section>
+    <section id="sotd">
+    </section>
+    <section class="informative" id="introduction">
+        <h2>소개</h2>
+        <p>
+            현재 복잡한 웹 애플리케이션은 클라이언트에서 JS 실행 시간이
+            어디에 소비되는지 파악할 수 있는 수단이 제한적이다. 스택 샘플을 효율적으로
+            수집할 수 없으므로, 애플리케이션은 부정확하고 실행 속도를
+            크게 저하시킬 수 있는 프로파일링 훅을 코드에 계측해야 한다.
+            샘플링 프로파일러를 조작하는 API를 제공함으로써
+            애플리케이션은 최소한의 오버헤드로 집계 및 분석을 위한
+            풍부한 실행 데이터를 수집할 수 있다.
+        </p>
+        <section class="informative">
+            <h2>예시</h2>
+            <p>다음 예시는 사용자가 비용이 많이 드는 작업을 프로파일링하면서 10ms마다 JS 실행
+                샘플을 수집하는 방법을 보여 준다. 이상값을 디버깅하고 집계된 JS 실행 특성을 분석하기 위해
+                추적 데이터를 서버로 전송할 수 있다.</p>
+            <pre class="example" title="계산 집약적인 작업 프로파일링.">
+        const profiler = new Profiler({ sampleInterval: 10, maxBufferSize: 10000 });
+        const start = performance.now();
+        for (let i = 0; i &lt; 1000000; i++) {
+             doWork();
+        }
+        const duration = performance.now() - start;
+        const trace = await profiler.stop();
+        const traceJson = JSON.stringify({
+          duration,
+          trace,
+        });
+        sendTrace(traceJson);
+        </pre>
+            <p>또 다른 일반적인 실제 사용 사례는 페이지 로드 전반에서 JS를 프로파일링하는 것이다. 이 예시는 onload
+                이벤트를 프로파일링하고 추적 데이터와 함께 성능 타이밍 데이터를 전송한다.</p>
+            <pre class="example" title="페이지 로드 프로파일링.">
+        const profiler = new Profiler({ sampleInterval: 10, maxBufferSize: 10000 });
+
+        window.addEventListener('load', async () => {
+          const trace = await profiler.stop();
+          const traceJson = JSON.stringify({
+            timing: performance.timing,
+            trace,
+          });
+          sendTrace(traceJson);
+        });
+
+        // 페이지의 나머지 JS 초기화 로직
+        </pre>
+        </section>
+    </section>
+    <section id="conformance">
+    </section>
+    <section>
+        <h2>정의</h2>
+        <p>
+            <dfn data-lt="sample|samples">샘플</dfn>은 주어진 시점에서의
+            순간적인 실행 상태를 설명하는 기술자이다. 각 샘플은
+            <a>스택</a>과 연결된다.
+        </p>
+        <p>
+            <dfn>스택</dfn>은 가장 바깥쪽 프레임부터 가장 안쪽 프레임까지
+            순차적으로 정렬되어야 하는 <a>프레임</a> 목록이다.
+        </p>
+        <p>
+            <dfn data-lt="frame|frames">프레임</dfn>은 현재 실행 상태에 관한 정보를 포함하는
+            <a>스택</a> 컨텍스트의 요소이다.
+        </p>
+    </section>
+    <section>
+        <h2>프로파일링 세션</h2>
+        <p>
+            <dfn>프로파일링 세션</dfn>은 <a>샘플</a>을 생성하는 추상적인 생성자이다. 각 세션에는 다음이 있다.
+        </p>
+        <ol>
+            <li><code>{started, paused, stopped}</code> 중 하나인 <dfn>상태</dfn>.</li>
+            <li>
+                세션이 샘플을 획득하는 주기성으로 정의되는 <dfn>샘플 간격</dfn>.
+                <p class="note">
+                    UA는 반드시 이 빈도로 샘플을 수집할 필요는 없다. 그러나 더 높은 품질의
+                    추적 데이터를 생성하기 위해 이 빈도로 샘플을 수집하도록 샘플링에 우선순위를
+                    부여하는 것이 좋다.
+                </p>
+            </li>
+            <li>프로파일링할 <dfn data-cite="!ECMA-262#agent">에이전트</dfn>.</li>
+            <li>프로파일링할 <dfn data-cite="!ECMA-262#realm">렐름</dfn>.</li>
+            <li>샘플의 타임스탬프가 이를 기준으로 측정되는 <dfn data-cite="!HR-TIME-2#dfn-time-origin">시간 원점</dfn>.</li>
+            <li><dfn>샘플 버퍼 크기 제한</dfn>.</li>
+            <li>캡처한 <a>샘플</a>을 저장하는 <a>ProfilerTrace</a>.</li>
+        </ol>
+        <p>
+            동일한 페이지에서 여러 프로파일링 세션을 지원하는 것이 좋다.
+        </p>
+        <section>
+            <h2>상태</h2>
+            <p>
+                <code>started</code> 상태에서 UA는 <a>샘플 간격</a>이 경과할 때마다
+                <a>샘플 수집</a> 알고리즘을 [= in parallel =] 실행하여 샘플을 캡처하도록
+                최선의 노력을 기울이는 것이 좋다.
+                <code>paused</code> 및 <code>stopped</code> 상태에서 UA는 샘플을 캡처하지 않는 것이 좋다.
+            </p>
+            <p>
+                프로파일링 세션은 반드시 <code>started</code> 상태에서 시작해야 한다.
+            </p>
+            <p>
+                UA는 세션을 <code>started</code>에서 <code>paused</code>로, 그리고 <code>paused</code>에서
+                <code>started</code>로 전환할 수 있다.
+            </p>
+            <p class="note">
+                브라우징 컨텍스트가 포그라운드에 있지 않은 경우 사용자 에이전트는 프로파일링 세션의
+                샘플링을 일시 중지하는 것이 좋다.
+            </p>
+            <p>
+                <code>stopped</code> 세션은 <code>started</code> 또는 <code>paused</code> 상태로 전환해서는 안 된다.
+            </p>
+        </section>
+    </section>
+    <section>
+        <h2>처리 모델</h2>
+        <p>
+            <a>프로파일링 세션</a>이 주어졌을 때 <dfn>샘플을 수집</dfn>하려면 다음 단계를 수행한다.
+        </p>
+        <ol>
+            <li><a>ProfilerTrace.samples</a>의 길이가 프로파일링 세션과 연결된 <a>샘플 버퍼 크기
+                    제한</a>보다 크거나 같으면, 연결된 <a>Profiler</a>에
+                <dfn>samplebufferfull</dfn> 유형의 새 이벤트를 발생시키고 상태를 <code>stopped</code>로 전환한 후
+                반환한다.
+            </li>
+            <li><var>sample</var>을 새 <a>ProfilerSample</a>로 설정한다.</li>
+            <li><var>sample</var>의 <a>ProfilerSample.timestamp</a> 속성을 <a>프로파일링 세션</a>의
+                <a>시간 원점</a>을 기준으로 한 <dfn data-cite="!hr-time-2#dfn-current-high-resolution-time">현재 고해상도 시간</dfn>으로
+                설정한다.
+            </li>
+            <li><var>stack</var>을 프로파일링 세션의 <a>에이전트</a>와 연결된 <dfn data-cite="!ECMA-262#execution-context-stack">실행 컨텍스트
+                    스택</dfn>으로 설정한다.</li>
+            <li><var>sample</var>의 <a>ProfilerSample.stackId</a> 속성을 <var>stack</var>에
+                <a>스택 ID 가져오기</a> 알고리즘을 실행한 결과로 설정한다.
+            </li>
+            <li><var>sample</var>을 세션의 <a>ProfilerTrace</a>와 연결된 <a>ProfilerTrace.samples</a>에
+                추가한다.
+            </li>
+        </ol>
+        <p>
+            <var>stack</var>에 바인딩된 <a>실행 컨텍스트 스택</a>이 주어졌을 때 <dfn>스택 ID를 가져오려면</dfn>
+            다음 단계를 수행한다.
+        <ol>
+            <li><var>stack</var>이 비어 있으면 <code>undefined</code>를 반환한다.</li>
+            <li><var>head</var>를 <var>stack</var>의 최상위 요소로 설정하고, <var>tail</var>을
+                최상위 요소를 제거한 후 남은 <var>stack</var>으로 설정한다.
+            </li>
+            <li><var>parentId</var>를 <var>tail</var>에 <a>스택 ID 가져오기</a>를 재귀적으로 호출한 결과로 설정한다.
+            </li>
+            <li><var>frameId</var>를 <var>head</var>에 <a>프레임 ID 가져오기</a>를 호출한 결과로 설정한다.</li>
+            <li><var>frameId</var>가 <code>undefined</code>이면 <var>parentId</var>를 반환한다.</li>
+            <li><var>profilerStack</var>을 <a>ProfilerStack.frameId</a>가
+                <var>frameId</var>와 같고 <a>ProfilerStack.parentId</a>가 <var>parentId</var>와 같은
+                새 <a>ProfilerStack</a>으로 설정한다.</a>
+            <li><var>profilerStack</var>과 <a>ProfilerTrace.stacks</a>에
+                <a>요소 ID 가져오기</a>를 실행한 결과를 반환한다.
+            </li>
+        </ol>
+        </p>
+        <p>
+            <var>context</var>에 바인딩된 <dfn data-cite="!ECMA-262#sec-execution-contexts">실행
+                컨텍스트</dfn>가 주어졌을 때 <dfn>프레임 ID를 가져오려면</dfn> 다음 단계를 수행한다.
+        <ol>
+            <li><var>context</var>와 연결된 [= realm =]이 프로파일링 세션과 연결된 렐름과 일치하지 않으면
+                <code>undefined</code>를 반환한다.
+            </li>
+            <li><var>instance</var>를 <var>context</var>와 연결된 <dfn data-cite="!ECMA-262#sec-function-instances">함수
+                    인스턴스</dfn>와 같게 설정한다.</li>
+            <li><var>scriptOrModule</var>을 <var>context</var>와 연결된 <code>ScriptOrModule</code>과
+                같게 설정한다.
+            </li>
+            <li>
+                |attributedScriptOrModule : ScriptOrModule|을 다음 알고리즘을 실행한 결과와 같게
+                설정한다.
+                <ol>
+                    <li>|scriptOrModule|이 null이 아니면 |scriptOrModule|을 반환한다.</li>
+                    <li>|instance|가 내장 함수 객체이면 |instance|를 호출한 함수를 포함하는
+                        <code>ScriptOrModule</code>을 반환한다.
+                        <p class="ednote">
+                            위 로직의 목적은 접근할 수 없는 스크립트가 호출한 내장 함수가 추적 데이터에
+                            노출되지 않도록, 해당 함수의 귀속에 그 함수를 호출한 <code>ScriptOrModule</code>을
+                            사용하는 것이다.
+                        </p>
+                        <p class="issue">
+                            “|instance|를 호출한 함수를 포함하는 <code>ScriptOrModule</code>”은
+                            더 엄밀하게 정의해야 한다. 이를 제공하기 위해 스택에서
+                            <code>ScriptOrModule</code>을 정의하는 최상위 실행 컨텍스트를 활용할 수 있지만,
+                            이는 이상적이지 않다. 이론적으로 내장 함수가 실행 컨텍스트 스택에 대기열로 추가되는
+                            다른 메커니즘이 존재할 수 있으며, 이 경우 귀속은 유효하지 않게 된다.
+                        </p>
+                    </li>
+                    <li>그렇지 않으면 null을 반환한다.</li>
+                </ol>
+            </li>
+            <li>|attributedScriptOrModule|이 null이면 <code>undefined</code>를 반환한다.</li>
+            <li>|attributedScript : Script|를
+                |attributedScriptOrModule|.[[\HostDefined]]에서 얻은 [= script =]로 설정한다.</li>
+            <li>
+                |attributedScript|가 [= classic script =]이고 해당 <dfn data-cite="HTML5#muted-errors">오류 음소거</dfn>
+                불리언이 <code>true</code>와 같으면 <code>undefined</code>를 반환한다.
+                <p class="ednote">
+                    이 검사는 CORS 교차 출처 응답으로 제공된 교차 출처 스크립트의 스택 프레임을
+                    포함하지 않도록 보장한다. 이 사용 사례를 더 잘 반영하도록 <a>오류 음소거</a>의 이름을
+                    변경하는 것을 고려할 수 있다.
+                <p>
+            </li>
+            <li><var>frame</var>을 새 <a>ProfilerFrame</a>으로 설정한다.</li>
+            <li><var>frame</var>의 <a>ProfilerFrame.name</a>을 |instance|와 연결된 <dfn
+                    data-cite="!ECMA-262#sec-function-instances-name">함수 인스턴스 이름</dfn>으로
+                설정한다.</li>
+            <li>
+                |scriptOrModule|이 null이 아니면:
+                <ol>
+                    <li><var>script</var>를
+                        <var>scriptOrModule</var>.[[\HostDefined]]에서 얻은 <dfn
+                            data-cite="HTML5#concept-script">스크립트</dfn>로 설정한다.
+                    </li>
+                    <li><var>resourceString</var>을 <var>script</var>의 <dfn data-cite="HTML5#concept-script-base-url">기준
+                            URL</dfn>과 같게 설정한다.</li>
+                    <li><a>ProfilerFrame.resourceId</a>를 <var>resourceString</var>과
+                        <a>ProfilerTrace.resources</a>에 <a>요소 ID 가져오기</a>를 실행한 결과로
+                        설정한다.
+                    </li>
+                    <li><var>frame</var>의 <a>ProfilerFrame.line</a>을 |script|에서
+                        <var>instance</var>가 정의된 줄의 1부터 시작하는 인덱스로 설정한다.
+                    </li>
+                    <li><var>frame</var>의 <a>ProfilerFrame.column</a>을 |script|에서
+                        <var>instance</var>가 정의된 열의 1부터 시작하는 인덱스로 설정한다.
+                    </li>
+                </ol>
+            <li><var>frame</var>과 <a>ProfilerTrace.frames</a>에
+                <a>요소 ID 가져오기</a>를 실행한 결과를 반환한다.
+            </li>
+        </ol>
+        </p>
+        <p>
+            <var>list</var>에 있는 <var>item</var>의 <dfn>요소 ID를 가져오려면</dfn> 다음 단계를 실행한다.
+        <ol>
+            <li><var>list</var>에 <var>item</var>과 구성 요소별로 동일한 요소가 있으면 해당 인덱스를 반환한다.
+            </li>
+            <li>그렇지 않으면 <var>item</var>을 <var>list</var>의 끝에 추가하고 해당 인덱스를 반환한다.</li>
+        </ol>
+        </p>
+    </section>
+
+    <section data-dfn-for="Profiler" data-link-for="Profiler">
+        <h2><dfn>Profiler</dfn> 인터페이스</h2>
+        <pre class="idl">
+      [Exposed=(Window, Worker)]
+      interface Profiler : EventTarget {
+        readonly attribute DOMHighResTimeStamp sampleInterval;
+        readonly attribute boolean stopped;
+
+        constructor(ProfilerInitOptions options);
+        Promise&lt;ProfilerTrace&gt; stop();
+      };
+      </pre>
+        <p>각 <a>Profiler</a>는 반드시 정확히 하나의 <a>프로파일링 세션</a>과 연결되어야 한다.</p>
+        <p><dfn>sampleInterval</dfn> 속성은 연결된 <a>프로파일링 세션</a>의 <a>샘플 간격</a>을
+            <dfn data-cite="!hr-time-2#sec-domhighrestimestamp">DOMHighResTimeStamp</dfn>로 표현하여
+            반영해야 한다.
+        </p>
+        <p><dfn>stopped</dfn> 속성은 <a>프로파일링 세션</a>의 상태가
+            <code>stopped</code>인 경우에만 true여야 한다.
+        </p>
+        <section>
+            <h2><dfn data-lt="constructor()">new Profiler(options)</dfn></h2>
+            <a>new Profiler(options)</a>는 <a>ProfilerInitOptions</a> 유형의 객체 <var>options</var>가
+            주어졌을 때 다음 단계를 실행한다.
+            <ol>
+                <li><var>options</var>의 {{ProfilerInitOptions/sampleInterval}}이 0보다 작으면
+                    <code>RangeError</code>를 발생시킨다.
+                </li>
+                <li>
+                    |globalObject|를 <dfn data-cite="!HTML5#current-global-object">현재 전역 객체</dfn>로 설정한다.
+                </li>
+                <li>
+                    |globalObject|가 <dfn data-cite="!HTML5#window">Window</dfn> 또는 <dfn
+                        data-cite="!HTML5#the-workerglobalscope-common-interface">WorkerGlobalScope</dfn>이면:
+                    <ol>
+                        <li>
+                            |globalObject|에서 <code>"js-profiling-mode"</code>에 대한
+                            <a
+                                href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#algo-get-policy-value">정책
+                                값을 가져온다</a>. 그 결과를 |profilingMode|로 설정한다.
+                        </li>
+                        <li>
+                            |profilingMode|가 <code>"eager"</code> 또는 <code>"lazy"</code>가 아니면:
+                            <ol>
+                                <li>
+                                    |globalObject|에서 <code>"js-profiling"</code>에 대한
+                                    <a
+                                        href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#algo-get-policy-value">정책
+                                        값을 가져온다</a>. 그 결과를 |jsProfilingEnabled|로 설정한다.
+                                </li>
+                                <li>
+                                    |jsProfilingEnabled|가 false이면 <code>"NotAllowedError"</code>
+                                    DOMException을 발생시킨다.
+                                </li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    그렇지 않으면 <code>"NotAllowedError"</code> DOMException을 발생시킨다.
+                </li>
+                <li>다음과 같은 새 <a>프로파일링 세션</a>을 생성한다.</li>
+                <ol>
+                    <li>연결된 <a>샘플 간격</a>을 <a>ProfilerInitOptions.sampleInterval</a>
+                        또는 UA가 지원하는 그다음으로 낮은 간격으로 설정한다.</li>
+                    <li>연결된 <a>시간 원점</a>을 |globalObject|의 시간 원점과 같게 설정한다.</li>
+                    <li>연결된 <a>샘플 버퍼 크기 제한</a>을 {{ProfilerInitOptions/maxBufferSize}}로 설정한다.
+                    </li>
+                    <li>연결된 [= agent =]를 <dfn data-cite="!ECMA-262#surrounding-agent">주변 에이전트</dfn>로 설정한다.</li>
+                    <li>연결된 [= realm =]을 <dfn data-cite="!ECMA-262#current-realm">현재 렐름
+                            레코드</dfn>로 설정한다.</li>
+                    <li>연결된 <a>ProfilerTrace</a>를
+                        <code>«[{{ProfilerTrace/resources}} → «», {{ProfilerTrace/frames}} → «», {{ProfilerTrace/stacks}} → «», {{ProfilerTrace/samples}} → «»]»</code>로
+                        설정한다.
+                    </li>
+                </ol>
+                <li>새로 생성한 <a>프로파일링 세션</a>과 연결된 새 <a>Profiler</a>를 반환한다.</li>
+            </ol>
+            </p>
+        </section>
+        <section>
+            <h2><dfn>stop()</dfn> 메서드</h2>
+            <p>
+                프로파일러를 중지하고 추적 데이터를 반환한다. 이 메서드는 반드시 다음 단계를 실행해야 한다.
+            </p>
+            <ol>
+                <li>연결된 [= profiling session =]의 상태가 <code>stopped</code>이면, <code>"InvalidStateError"</code>
+                    DOMException으로 [= a promise
+                    rejected with =]를 반환한다.
+                <li>[= profiling session =]의 상태를 <code>stopped</code>로 설정한다.</li>
+                <li>|p:Promise|를 [= a new promise =]로 설정한다.</li>
+                <li>
+                    다음 단계를 [= in parallel =] 실행한다.
+                    <ol>
+                        <li>[= profiling session =]을 중지하기 위해 [= implementation-defined =] 작업을 수행한다.</li>
+                        <li>프로파일러의 [= profiling session
+                            =]과 연결된 {{ProfilerTrace}}로 |p|를 이행한다.</li>
+                    </ol>
+                </li>
+                <li>|p|를 반환한다.</li>
+            </ol>
+            <p>
+                <a>stop()</a>을 호출한 후 수집된 모든 <a>샘플</a>은 <a>프로파일링 세션</a>에
+                포함하지 않는 것이 좋다.
+            </p>
+        </section>
+    </section>
+    <section data-dfn-for="ProfilerTrace" data-link-for="ProfilerTrace">
+        <h2><dfn>ProfilerTrace</dfn> 딕셔너리</h2>
+        <pre class="idl">
+      typedef DOMString ProfilerResource;
+
+      dictionary ProfilerTrace {
+        required sequence&lt;ProfilerResource&gt; resources;
+        required sequence&lt;ProfilerFrame&gt; frames;
+        required sequence&lt;ProfilerStack&gt; stacks;
+        required sequence&lt;ProfilerSample&gt; samples;
+      };
+      </pre>
+        <p><dfn>resources</dfn> 속성은 <a>샘플 수집</a> 알고리즘이 설정한
+            <dfn>ProfilerResource</dfn> 목록을 반환해야 한다.
+        </p>
+
+        <p><dfn>frames</dfn> 속성은 <a>샘플 수집</a> 알고리즘이 설정한 <a>ProfilerFrame</a>
+            목록을 반환해야 한다.</p>
+        <p><dfn>stacks</dfn> 속성은 <a>샘플 수집</a> 알고리즘이 설정한 <a>ProfilerStack</a>
+            목록을 반환해야 한다.</p>
+        <p><dfn>samples</dfn> 속성은 <a>샘플 수집</a> 알고리즘이 설정한 <a>ProfilerSample</a>
+            목록을 반환해야 한다.</p>
+        <p class="note">
+            이 표현은 <a href="https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/preview#">V8
+                추적
+                이벤트 형식</a>
+            및 <a href="https://github.com/devtools-html/perf.html/blob/master/docs-developer/gecko-profile-format.md">Gecko
+                프로파일 형식</a>에서 영감을 얻었으며,
+            쉽고 효율적으로 직렬화할 수 있도록 설계되었다.
+        </p>
+        <section data-dfn-for="ProfilerSample" data-link-for="ProfilerSample">
+            <h2><dfn>ProfilerSample</dfn> 딕셔너리</h2>
+            <pre class="idl">
+        dictionary ProfilerSample {
+          required DOMHighResTimeStamp timestamp;
+          unsigned long long stackId;
+        };
+        </pre>
+            <p><dfn>timestamp</dfn>는 초기화된 값을 반환해야 한다.</p>
+            <p><dfn>stackId</dfn>는 초기화된 값을 반환해야 한다.</p>
+        </section>
+        <section data-dfn-for="ProfilerStack" data-link-for="ProfilerStack">
+            <h2><dfn>ProfilerStack</dfn> 딕셔너리</h2>
+            <pre class="idl">
+        dictionary ProfilerStack {
+          unsigned long long parentId;
+          required unsigned long long frameId;
+        };
+        </pre>
+            <p><dfn>parentId</dfn>는 초기화된 값을 반환해야 한다.</p>
+            <p><dfn>frameId</dfn>는 초기화된 값을 반환해야 한다.</p>
+        </section>
+        <section data-dfn-for="ProfilerFrame" data-link-for="ProfilerFrame">
+            <h2><dfn>ProfilerFrame</dfn> 딕셔너리</h2>
+            <pre class="idl">
+        dictionary ProfilerFrame {
+          required DOMString name;
+          unsigned long long resourceId;
+          unsigned long long line;
+          unsigned long long column;
+        };
+        </pre>
+            <p><dfn>name</dfn>은 초기화된 값을 반환해야 한다.</p>
+            <p><dfn>resourceId</dfn>는 초기화된 값을 반환해야 한다.</p>
+            <p><dfn>line</dfn>은 초기화된 값을 반환해야 한다.</p>
+            <p><dfn>column</dfn>은 초기화된 값을 반환해야 한다.</p>
+        </section>
+    </section>
+    <section data-dfn-for="ProfilerInitOptions" data-link-for="ProfilerInitOptions">
+        <h2><dfn>ProfilerInitOptions</dfn> 딕셔너리</h2>
+        <pre class="idl">
+      dictionary ProfilerInitOptions {
+        required DOMHighResTimeStamp sampleInterval;
+        required unsigned long maxBufferSize;
+      };
+      </pre>
+        <p><a>ProfilerInitOptions</a>는 다음 필드를 지원해야 한다.</p>
+        <ul>
+            <li><dfn>sampleInterval</dfn>은 애플리케이션이 원하는 <a>샘플 간격</a>이다. 이 값은
+                반드시 0보다 크거나 같아야 한다.</li>
+            <li><dfn>maxBufferSize</dfn>는 샘플 단위로 나타낸 원하는 <a>샘플 버퍼 크기 제한</a>이다.</li>
+        </ul>
+    </section>
+    <section id="document-policy">
+        <h2>문서 정책</h2>
+        <p>
+            이 명세는 프로파일링 기능과 초기화 동작을 제어하기 위해
+            <a href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html">문서
+                정책</a>의 <a
+                href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#configuration-point">구성
+                지점</a>을 정의한다.
+        </p>
+        <section>
+            <h2><code>js-profiling-mode</code></h2>
+            <p>
+                이 명세는 이름이 <code>js-profiling-mode</code>인 <a
+                    href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#configuration-point">구성
+                    지점</a>을 정의한다. 해당 <a
+                    href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#configuration-point-type">유형</a>은
+                <code>enum</code>이며 허용되는 값은 <code>"eager"</code>와 <code>"lazy"</code>이다. <a
+                    href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#configuration-point-default-value">기본
+                    값</a>은 빈 문자열이다.
+            </p>
+            <p>
+                이 정책이 설정되면 스크립트가 JS 자체 프로파일링 API를 사용하도록 허용한다.
+            </p>
+            <section>
+                <h2><code>eager</code></h2>
+                <p>
+                    <code>js-profiling-mode</code>가 <code>"eager"</code>로 설정되면 페이지 로드 중에
+                    프로파일링이 예상된다는 것을 UA에 알린다.
+                </p>
+                <p class="note">
+                    UA는 이 힌트를 사용하여 프로파일링 인프라를 조기에 초기화하고, 문서 로드 중 가능한 한
+                    이른 시점에 필요한 메타데이터를 저장하고 프로파일링 구성 요소를 준비할 수 있다. 그러나
+                    프로파일링을 실제로 사용하지 않더라도 무시할 수 없는 성능 오버헤드가 발생할 수 있다.
+                    이 오버헤드는 최초 콘텐츠풀 페인트(FCP) 및 최대 콘텐츠풀 페인트(LCP)와 같은 지표에
+                    부정적인 영향을 줄 수 있다.
+                </p>
+            </section>
+            <section>
+                <h2><code>lazy</code></h2>
+                <p>
+                    <code>js-profiling-mode</code>가 <code>"lazy"</code>로 설정되면 프로파일링이
+                    조건부로 사용될 것임을 UA에 알린다.
+                </p>
+                <p class="note">
+                    UA는 이 힌트를 사용하여 첫 번째 <a>Profiler</a>가 인스턴스화될 때까지 프로파일링 관련
+                    초기화 오버헤드를 지연함으로써, 프로파일링을 실제로 사용하지 않을 때 중요한 렌더링
+                    기간의 성능 비용을 방지할 수 있다. 그러나 사용자 상호작용을 처리하는 동안 초기화가
+                    발생하면 다음 페인트까지의 상호작용(INP)에 부정적인 영향을 줄 수 있다. 이 모드는
+                    샘플링 결정에 따라 프로파일링을 조건부로 활성화하는 문서에 특히 적합하다.
+                </p>
+            </section>
+        </section>
+        <section>
+            <h2><code>js-profiling</code>(사용 중단됨)</h2>
+            <p>
+                이 명세는 이름이 <code>js-profiling</code>인 <a
+                    href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#configuration-point">구성
+                    지점</a>도 정의한다. 해당 <a
+                    href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#configuration-point-type">유형</a>은
+                <code>boolean</code>이며 <a
+                    href="https://w3c.github.io/webappsec-permissions-policy/document-policy.html#configuration-point-default-value">기본
+                    값</a>은 <code>false</code>이다.
+            </p>
+            <p>
+                이 정책이 활성화되면 스크립트가 JS 자체 프로파일링 API를 사용하도록 허용하고, UA에
+                프로파일링 인프라를 조기에 초기화하도록 알린다. 이는 의미론적으로
+                <code>js-profiling-mode=eager</code>와 동일하다.
+            </p>
+            <p class="note">
+                <code>js-profiling</code> 불리언 구성 지점은 <code>js-profiling-mode</code>를 위해
+                사용 중단되었다. 둘 다 지정된 경우 <code>js-profiling-mode</code>가 우선하며
+                <code>js-profiling</code>은 반드시 무시해야 한다. 구현은 이전 버전과의 호환성을 위해
+                <code>js-profiling</code>을 지원하는 것이 좋지만 향후 지원을 제거할 수 있다.
+            </p>
+        </section>
+    </section>
+    <section>
+        <h2>자동화</h2>
+        <p>
+            사용자 에이전트 자동화 및 애플리케이션 테스트를 위해 이 문서는 다음 [[WebDriver]]
+            <a data-cite="webdriver#dfn-extension-command">확장 명령</a>을 정의한다.
+        </p>
+        <section>
+            <h2>강제 샘플 수집</h2>
+            <table class="data">
+                <thead>
+                    <tr>
+                        <th>HTTP 메서드</th>
+                        <th>URI 템플릿</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>POST</td>
+                        <td>`/session/{session id}/forcesample`</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>
+                <dfn>강제 샘플 수집</dfn> <a data-cite="webdriver#dfn-extension-command">확장 명령</a>은
+                더 결정적인 테스트를 가능하게 하기 위해 모든 [=프로파일링 세션=]이 [=샘플을 수집=]하도록 강제한다.
+            </p>
+            <p>
+                <a data-cite="webdriver#dfn-remote-end-steps">원격 끝 단계</a>는 다음과 같다.
+            <ol>
+                <li>|sessions:list|를 <a data-cite="webdriver#dfn-current-browsing-context">현재 브라우징 컨텍스트</a>에서 생성된
+                    모든 [=프로파일링 세션=]의 [=목록=]으로 설정한다.</li>
+                <li>
+                    |sessions|의 각 |session:profiling session|에 대해:
+                    <ol>
+                        <li>|session|의 [=상태=]가 <code>started</code>이면 |session|으로 [=샘플을 수집=]한다.
+                        </li>
+                    </ol>
+                </li>
+                <li>데이터 <code>null</code>과 함께 <a data-cite="webdriver#dfn-success">성공</a>을 반환한다.</li>
+            </ol>
+            </p>
+        </section>
+    </section>
+    <section id="privacy-security" class="informative">
+        <h2>개인정보 보호 및 보안</h2>
+        <p>다음 절에서는 API의 개인정보 보호 및 보안 관련 선택 사항을 자세히 설명하고, 다양한 유형의
+            공격에 대한 보호 전략을 보여 준다.</p>
+        <section>
+            <h2>교차 출처 스크립트 콘텐츠</h2>
+            <p>
+                API는 <a>샘플 수집</a> 알고리즘을 통해 포함되는 모든 함수가 <a>오류 음소거</a> 속성을 이용하여
+                <dfn data-cite="HTML5#cors-same-origin">CORS 동일 출처</dfn>로 제공된 스크립트에
+                정의되도록 요구함으로써 교차 출처 스크립트의 콘텐츠가 노출되는 것을 방지한다.
+                브라우저 내장 기능(예: <code>performance.now()</code>)도 [= CORS-same-origin =] 스크립트에서
+                호출된 경우에만 포함해야 한다.
+            </p>
+            <p>
+                따라서 API는 수동 계측으로 이미 확인할 수 있는 것 이상으로 교차 출처 스크립트의 콘텐츠나
+                실행 특성에 관한 새로운 정보를 노출하지 않는다. UA가 매우 낮은 <a>샘플 간격</a> 값
+                (예: 1밀리초 미만)을 지원하기로 선택한 경우에도 이 특성이 유지되는지 확인하는 것이 권장된다.
+            </p>
+        </section>
+        <section>
+            <h2>교차 출처 실행</h2>
+            <p>
+                교차 출처 실행 컨텍스트는 <a>샘플 수집</a> 알고리즘의 렐름 검사를 통해 API에서
+                관찰할 수 없어야 한다. 따라서 프로파일러와 <a>에이전트</a>를 공유하는 교차 출처
+                <code>iframe</code> 및 기타 실행 컨텍스트의 실행은 이 API를 통해 관찰할 수 없다.
+            </p>
+        </section>
+        <section>
+            <h2>타이밍 공격</h2>
+            <p>
+                새로운 고해상도 타이밍 정보 소스를 도입할 수 있는 모든 API에서 타이밍 공격은 여전히
+                우려 사항이다. 추적 데이터에서 수집되는 타임스탬프는 새로운 부채널 공격 벡터가 노출되지 않도록
+                [[?HR-Time]]의 <a>현재 고해상도 시간</a>과 동일한 소스에서 얻어야 한다.
+            <p class="note">
+                [[?HR-Time]]의 <a href="https://www.w3.org/TR/hr-time-2/#clock-resolution">시계
+                    해상도</a>에 관한 논의를 참조한다.
+            </p>
+        </section>
+    </section>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
