@@ -159,6 +159,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Locks API](https://ko.htmlspecs.com/web-locks/)（[Source](https://www.w3.org/TR/2025/WD-web-locks-20250924/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Storage Access API](https://ko.htmlspecs.com/storage-access/)（[Source](https://privacycg.github.io/storage-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Shared Storage API](https://ko.htmlspecs.com/shared-storage/)（[Source](https://wicg.github.io/shared-storage/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Cross-Origin Storage](https://ko.htmlspecs.com/cross-origin-storage/)（[Source](https://wicg.github.io/cross-origin-storage/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Subresource Loading with Web Bundles](https://ko.htmlspecs.com/webpackage-subresource-loading/)（[Source](https://wicg.github.io/webpackage/subresource-loading.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 입력, 편집 및 클립보드
