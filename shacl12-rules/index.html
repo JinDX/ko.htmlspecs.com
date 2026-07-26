@@ -915,12 +915,12 @@
     "informative-dfn": false,
     "no-unused-dfns": false
   },
-  "gitRevision": "485c780a90e542c9cbb81b4de6809b2306dc0984",
-  "publishDate": "2026-07-22",
+  "gitRevision": "e2259cda458411d9c03c1a82d7acf0d221ab4307",
+  "publishDate": "2026-07-25",
   "previousMaturity": "WD",
-  "previousPublishDate": "2026-07-21",
-  "publishISODate": "2026-07-22T00:00:00.000Z",
-  "generatedSubtitle": "W3C Working Draft 22 July 2026"
+  "previousPublishDate": "2026-07-25",
+  "publishISODate": "2026-07-25T00:00:00.000Z",
+  "generatedSubtitle": "W3C Working Draft 25 July 2026"
 }</script>
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-WD">
     <link rel="stylesheet" media="(prefers-color-scheme: dark)" href="https://www.w3.org/StyleSheets/TR/2021/dark.css">
@@ -933,14 +933,14 @@
             </a></p>
         <h1 id="title" class="title">SHACL 1.2 규칙</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C 작업 초안</a> <time class="dt-published"
-                datetime="2026-07-22">2026년 7월 22일</time></p>
+                datetime="2026-07-25">2026년 7월 25일</time></p>
         <details open="">
             <summary>이 문서에 대한 자세한 정보</summary>
             <dl>
                 <dt>이 버전:</dt>
                 <dd>
                     <a class="u-url"
-                        href="https://www.w3.org/TR/2026/WD-shacl12-rules-20260722/">https://www.w3.org/TR/2026/WD-shacl12-rules-20260722/</a>
+                        href="https://www.w3.org/TR/2026/WD-shacl12-rules-20260725/">https://www.w3.org/TR/2026/WD-shacl12-rules-20260725/</a>
                 </dd>
                 <dt>최신 공개 버전:</dt>
                 <dd>
@@ -1185,6 +1185,17 @@
                     </li>
                     <li class="tocline"><a class="tocxref" href="#eval-rule-set"><bdi class="secno">6.5 </bdi>규칙 집합의
                             평가</a></li>
+                    <li class="tocline"><a class="tocxref" href="#eval-worked-example"><bdi class="secno">6.6
+                            </bdi>실제 예제</a>
+                        <ol class="toc">
+                            <li class="tocline"><a class="tocxref" href="#worked-example-dependencies"><bdi
+                                        class="secno">6.6.1 </bdi>종속성 결정</a></li>
+                            <li class="tocline"><a class="tocxref" href="#worked-example-stratification"><bdi
+                                        class="secno">6.6.2 </bdi>계층화 계산</a></li>
+                            <li class="tocline"><a class="tocxref" href="#worked-example-evaluation"><bdi
+                                        class="secno">6.6.3 </bdi>계층 평가</a></li>
+                        </ol>
+                    </li>
                 </ol>
             </li>
             <li class="tocline"><a class="tocxref" href="#shapes-rules-grammar"><bdi class="secno">7. </bdi>Shape Rules
@@ -1567,6 +1578,13 @@
             </div>
 
 
+            <p>
+                이 절의 예제에서는 소프트웨어 구성 요소와
+                그 종속성을 설명한다. 프런트엔드는 애플리케이션 서버를 호출하고,
+                애플리케이션 서버는 알려진
+                취약점이 있는 데이터베이스를 조회한다.
+            </p>
+
             <p>이 첫 번째 예제에는 다음 데이터 그래프와 규칙 집합이 있습니다:</p>
 
             <aside class="example" id="example-basic-example">
@@ -1574,42 +1592,40 @@
                     <a class="self-link" href="#example-basic-example">예제<bdi> 1</bdi></a><span class="example-title">:
                         기본 예제</span>
                 </div>
-                <pre class="block ex-data" aria-busy="false"><code class="hljs">:A :fatherOf :X .
-:B :motherOf :X .
-:C :motherOf :A .</code></pre>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }
-RULE { ?x :childOf ?y } WHERE { ?y :motherOf ?x }</code></pre>
-                <pre class="block ex-inferred" aria-busy="false"><code class="hljs">:X :childOf :A .
-:X :childOf :B .
-:A :childOf :C .</code></pre>
+                <pre class="block ex-data" aria-busy="false"><code class="hljs">:frontend :callsService :app .
+:app      :queriesDatabase :db .
+:db       :hasVulnerability :vuln1 .</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :dependsOn ?y } WHERE { ?x :callsService ?y }
+RULE { ?x :dependsOn ?y } WHERE { ?x :queriesDatabase ?y }</code></pre>
+                <pre class="block ex-inferred" aria-busy="false"><code class="hljs">:frontend :dependsOn :app .
+:app      :dependsOn :db .</code></pre>
             </aside>
 
-            <p>위의 규칙을 데이터에 적용하면
-                <code>:X</code>가 <code>:A</code>와 <code>:B</code>의 <code>:childOf</code>임을
-                결론짓습니다:
+            <p>위 규칙을 데이터에 적용하면,
+                <code>:frontend</code>가 <code>:app</code>에 종속되고, <code>:app</code>이
+                종속성의 종류와 관계없이 <code>:db</code>에 종속된다는 결론을 내린다.
             </p>
 
             <p>
-                그런 다음 다른 규칙이 생성한 <code>:childOf</code> 트리플에 의존하는 규칙을
-                추가하여 <code>:descendedFrom</code> 관계를 도출할 수 있습니다:
+                그런 다음 다른 규칙이 생성한 <code>:dependsOn</code> 트리플에 종속되는 규칙을 추가하여
+                <code>:exposedTo</code> 관계를 도출할 수 있다(아래의 <a href="#rule-dependency" class="sectionRef sec-ref"><bdi
+                        class="secno">4.3 </bdi>규칙 종속성</a>도 참조):
             </p>
 
-            <aside class="example" id="example-2">
+            <aside class="example" id="example-depending-on-inferred-triples">
                 <div class="marker">
-                    <a class="self-link" href="#example-2">예제<bdi> 2</bdi></a>
+                    <a class="self-link" href="#example-depending-on-inferred-triples">예제<bdi> 2</bdi></a><span
+                        class="example-title">: 추론된 트리플에 종속</span>
                 </div>
-                <pre class="block ex-data" aria-busy="false"><code class="hljs">:A :fatherOf :X .
-:B :motherOf :X .
-:C :motherOf :A .</code></pre>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }
-RULE { ?x :childOf ?y } WHERE { ?y :motherOf ?x }
-RULE { ?x :descendedFrom ?y } WHERE { ?x :childOf ?y }</code></pre>
-                <pre class="block ex-inferred" aria-busy="false"><code class="hljs">:A :descendedFrom :C .
-:X :descendedFrom :B .
-:X :descendedFrom :A .
-:X :childOf :B .
-:X :childOf :A .
-:A :childOf :C .</code></pre>
+                <pre class="block ex-data" aria-busy="false"><code class="hljs">:frontend :callsService :app .
+:app      :queriesDatabase :db .
+:db       :hasVulnerability :vuln1 .</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :dependsOn ?y } WHERE { ?x :callsService ?y }
+RULE { ?x :dependsOn ?y } WHERE { ?x :queriesDatabase ?y }
+RULE { ?x :exposedTo ?v } WHERE { ?x :dependsOn ?y . ?y :hasVulnerability ?v }</code></pre>
+                <pre class="block ex-inferred" aria-busy="false"><code class="hljs">:app      :exposedTo :vuln1 .
+:frontend :dependsOn :app .
+:app      :dependsOn :db .</code></pre>
             </aside>
 
         </section>
@@ -1620,8 +1636,13 @@ RULE { ?x :descendedFrom ?y } WHERE { ?x :childOf ?y }</code></pre>
             </div>
 
             <p>
-                <code>:descendedFrom</code> 트리플에 의존하는 규칙을 추가하여
-                <code>:X</code>가 <code>:C</code>의 <code>:descendedFrom</code>임을 추론할 수 있습니다:
+                이전 절의 <code>:exposedTo</code> 규칙은 직접적인
+                종속성에만 도달한다. <code>:frontend</code>는 <code>:db</code>에 직접 종속되지 않으므로,
+                <code>:frontend</code>에 대한 <code>:exposedTo</code> 트리플은 추론되지 않는다.
+                임의 길이의 종속성 체인을 따라 노출을 전파하기 위해
+                해당 규칙을 두 규칙으로 대체한다. 구성 요소는 자신이 가진
+                취약점에 노출되며, 구성 요소는 직접 종속 대상이 노출된
+                모든 취약점에 노출된다.
             </p>
 
             <aside class="example" id="example-rule-recursion">
@@ -1629,23 +1650,30 @@ RULE { ?x :descendedFrom ?y } WHERE { ?x :childOf ?y }</code></pre>
                     <a class="self-link" href="#example-rule-recursion">예제<bdi> 3</bdi></a><span class="example-title">:
                         규칙 재귀</span>
                 </div>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }
-RULE { ?x :childOf ?y } WHERE { ?y :motherOf ?x }
-RULE { ?x :descendedFrom ?y } WHERE { ?x :childOf ?y }
-RULE { ?x :descendedFrom ?y } WHERE { ?x :childOf ?z . ?z :descendedFrom ?y }</code></pre>
-                <pre class="block ex-inferred" aria-busy="false"><code class="hljs">:A :descendedFrom :C .
-:X :descendedFrom :C .
-:X :descendedFrom :B .
-:X :descendedFrom :A .
-:X :childOf :B .
-:X :childOf :A .
-:A :childOf :C .</code></pre>
+                <pre class="block ex-data" aria-busy="false"><code class="hljs">:frontend :callsService :app .
+:app      :queriesDatabase :db .
+:db       :hasVulnerability :vuln1 .</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :dependsOn ?y } WHERE { ?x :callsService ?y }
+RULE { ?x :dependsOn ?y } WHERE { ?x :queriesDatabase ?y }
+RULE { ?x :exposedTo ?v } WHERE { ?x :hasVulnerability ?v }
+RULE { ?x :exposedTo ?v } WHERE { ?x :dependsOn ?y . ?y :exposedTo ?v }</code></pre>
+                <pre class="block ex-inferred" aria-busy="false"><code class="hljs">:db       :exposedTo :vuln1 .
+:app      :exposedTo :vuln1 .
+:frontend :exposedTo :vuln1 .
+:frontend :dependsOn :app .
+:app      :dependsOn :db .</code></pre>
             </aside>
 
-            <p>이것은 <code>:X :descendedFrom :C</code> 트리플을 추가합니다.</p>
             <p>
-                이 마지막 규칙은 <i>재귀</i> 규칙이며, 규칙의 본문은
-                규칙의 머리부에 의존합니다.
+                이전 예제와 비교하면 여기에는
+                <code>:db :exposedTo :vuln1</code>이 추가된다. 즉, 데이터베이스는
+                자체 취약점에 노출된다. 또한 <code>:frontend :exposedTo :vuln1</code>도 추가된다.
+                체인의 길이에 관계없이 노출이 종속성 체인을 통해
+                <code>:frontend</code>에 도달한다.
+            </p>
+            <p>
+                이 마지막 규칙은 <i>재귀</i> 규칙이다. 규칙의 본문이
+                규칙의 머리부에 종속된다.
             </p>
 
         </section>
@@ -1657,34 +1685,40 @@ RULE { ?x :descendedFrom ?y } WHERE { ?x :childOf ?z . ?z :descendedFrom ?y }</c
             </div>
 
             <p>
-                규칙 본문에서 표현식을 사용하여 본문의 일치에서 변수 값을 제한할 수 있습니다.
-                예를 들어, 마을과 그 인구에 대한 데이터가 주어졌을 때,
-                인구가 1500보다 큰 마을에 대한 클래스를 추론할 수 있습니다:
+                규칙 본문의 표현식을 사용하여 본문을 일치시키는 과정에서 변수의 값을
+                제한할 수 있다.
+                예를 들어 각 취약점의 심각도가 주어지면,
+                심각한 취약점에 노출된 구성 요소에 상태를
+                부여할 수 있다.
             </p>
 
-            <aside class="example" id="example-4">
+            <aside class="example" id="example-filtering">
                 <div class="marker">
-                    <a class="self-link" href="#example-4">예제<bdi> 4</bdi></a>
+                    <a class="self-link" href="#example-filtering">예제<bdi> 4</bdi></a><span class="example-title">:
+                        필터링</span>
                 </div>
-                <pre class="block ex-data" aria-busy="false"><code class="hljs">:town1 :population 1000 .
-:town2 :population 2000 .</code></pre>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x rdf:type :largeTown } 
-WHERE { 
-    ?x :population ?p 
-    FILTER(?p &gt; 1500)
+                <pre class="block ex-data" aria-busy="false"><code class="hljs">:app1 :exposedTo :vuln1 .
+:app2 :exposedTo :vuln2 .
+:vuln1 :severity 9.1 .
+:vuln2 :severity 4.3 .</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :status :criticallyExposed }
+WHERE {
+    ?x :exposedTo ?v .
+    ?v :severity ?s .
+    FILTER(?s &gt;= 9.0)
 }</code></pre>
                 <pre class="block ex-inferred"
-                    aria-busy="false"><code class="hljs">:town2 rdf:type :largeTown .</code></pre>
+                    aria-busy="false"><code class="hljs">:app1 :status :criticallyExposed .</code></pre>
             </aside>
 
             <p>
-                <code>FILTER</code>는 표현식을 평가하고 표현식이 true로 평가되면 현재
-                변수 바인딩 집합을 유지하며, 표현식이 false로 평가되면 현재 변수
-                바인딩 집합을 폐기합니다.
+                <code>FILTER</code>는 표현식을 평가하고 표현식이 참으로 평가되면 현재
+                변수 바인딩 집합을 유지하며, 표현식이 거짓으로 평가되면
+                현재 변수 바인딩 집합을 폐기한다.
                 이는
                 <a href="https://www.w3.org/TR/sparql12-query/#termConstraint"
-                    id="ref-for-index-term-filter-operation-of-sparql-1">SPARQL의 <code>FILTER</code> 작업</a>과
-                동일하며, SHACL Rules는 SPARQL과 동일한 많은 함수와 연산자를 제공합니다.
+                    id="ref-for-index-term-filter-operation-of-sparql-1">SPARQL의 <code>FILTER</code> 연산</a>과
+                동일하며, SHACL 규칙은 SPARQL과 동일한 함수 및 연산자를 다수 제공한다.
             </p>
         </section>
 
@@ -1695,16 +1729,18 @@ WHERE {
             </div>
 
             <p>
-                부정은 일치해서는 안 되는 패턴을 지정할 수 있게 합니다.
-                이를 "실패로서의 부정"이라고 합니다.
+                부정은 일치해서는 안 되는 패턴을 지정할 수 있게 한다.
+                이를 "실패로서의 부정"이라고 한다.
             </p>
             <p>
-                부정 요소를 평가하기 위해 규칙 평가 알고리즘은 부정 요소의 패턴과
-                일치하는 트리플을 생성할 수 있는 모든 규칙이 완료되었는지 보장합니다.
-                이를 <i><a data-link-type="dfn|abstract-op" href="#dfn-stratification" class="internalDFN"
+                부정 요소를 평가하기 위해 규칙 평가 알고리즘은
+                부정 요소의 패턴과 일치하는 트리플을 생성할 수 있는 모든 규칙이
+                완료되었는지 확인한다. 이를
+                <i><a data-link-type="dfn|abstract-op" href="#dfn-stratification" class="internalDFN"
                         id="ref-for-dfn-stratification-1">계층화</a></i>라고 하며, 부정이 데이터에서 온 것이든
-                다른 규칙이 추론한 추론 트리플에서 온 것이든 모든 관련 가능한
-                트리플에 기반하도록 보장합니다.
+                부정 요소에서 온 것이든 관련된 모든 가능한 트리플을 기반으로 하도록 보장한다.
+                부정을 포함하는 규칙은 이러한 트리플을 생성하는 규칙에 _종속_된다고 한다(아래의 <a href="#rule-dependency" class="sectionRef sec-ref"><bdi
+                        class="secno">4.3 </bdi>규칙 종속성</a> 참조).
             </p>
 
             <aside class="example" id="example-negation-as-failure">
@@ -1712,20 +1748,17 @@ WHERE {
                     <a class="self-link" href="#example-negation-as-failure">예제<bdi> 5</bdi></a><span
                         class="example-title">: 실패로서의 부정</span>
                 </div>
-                <pre class="block ex-data" aria-busy="false"><code class="hljs">:X1 rdf:type :Place ;
-:population 1000 .
+                <pre class="block ex-data" aria-busy="false"><code class="hljs">:app rdf:type :Component ;
+:status :criticallyExposed .
 
-:X2 rdf:type :Place ;
-:population 2000 .
-
-:X3 rdf:type :Place .</code></pre>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x rdf:type :UnclassifiedSize } 
-WHERE { 
-    ?x rdf:type :Place .
-    NOT { ?x :population ?p . }
+:logger rdf:type :Component .</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :status :safeToDeploy }
+WHERE {
+    ?x rdf:type :Component .
+    NOT { ?x :status :criticallyExposed }
 }</code></pre>
                 <pre class="block ex-inferred"
-                    aria-busy="false"><code class="hljs">:X3 rdf:type :UnclassifiedSize .</code></pre>
+                    aria-busy="false"><code class="hljs">:logger :status :safeToDeploy .</code></pre>
             </aside>
 
         </section>
@@ -1737,61 +1770,59 @@ WHERE {
             </div>
 
             <p>
-                할당은 규칙 본문에서 표현식의 결과를 변수에 할당할 수 있게 합니다.
-                이는 데이터를 기반으로 새로운 RDF 용어를 생성하는 데 사용할 수 있습니다.
+                할당을 사용하면 규칙 본문에서 표현식의 결과를 변수에
+                할당할 수 있다. 이를 사용하여 데이터를 기반으로 새로운 RDF 용어를
+                생성할 수 있다.
             </p>
 
-            <aside class="example" id="example-6">
+            <aside class="example" id="example-assignment">
                 <div class="marker">
-                    <a class="self-link" href="#example-6">예제<bdi> 6</bdi></a>
+                    <a class="self-link" href="#example-assignment">예제<bdi> 6</bdi></a><span class="example-title">:
+                        할당</span>
                 </div>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :calculatedDistanceKm ?kilometers }
-WHERE { 
-    ?x :distanceMiles ?miles .
-    SET ( ?kilometers := ?miles * 1.60934 )
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?v :riskScore ?r }
+WHERE {
+    ?v :severity ?s .
+    ?v :exploitLikelihood ?p .
+    SET ( ?r := ?s * ?p )
 }</code></pre>
             </aside>
 
             <p>
-                빈 노드는 규칙 머리부에서 사용할 수 있으며, 규칙 평가가 트리플을 생성할 때마다
-                각각 새 빈 노드를 생성합니다.
+                규칙 머리부에서 빈 노드를 사용할 수 있으며, 각 빈 노드는 규칙 평가에서 트리플이
+                생성될 때마다 새로운 빈 노드를 생성한다.
             </p>
 
-            <aside class="example" id="example-7">
+            <aside class="example" id="example-blank-node-in-the-rule-head">
                 <div class="marker">
-                    <a class="self-link" href="#example-7">예제<bdi> 7</bdi></a>
+                    <a class="self-link" href="#example-blank-node-in-the-rule-head">예제<bdi> 7</bdi></a><span
+                        class="example-title">: 규칙 머리부의 빈 노드</span>
                 </div>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { [] rdf:type :Person ;
-          ex:name ?name 
-       }
-WHERE { 
-    ...
-}</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { [] rdf:type :Notification ; :concerns ?x }
+WHERE { ?x :status :criticallyExposed }</code></pre>
             </aside>
 
             <p>
                 <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element" class="internalDFN"
-                    id="ref-for-dfn-assignment-element-1">할당</a>을 포함하는 규칙과
+                    id="ref-for-dfn-assignment-element-1">할당</a>이 포함된 규칙과
                 <a data-link-type="dfn|abstract-op" href="#dfn-rule-head" class="internalDFN"
-                    id="ref-for-dfn-rule-head-2">규칙 머리부</a>에서 빈 노드를 생성하는 규칙은
-                <a data-link-type="dfn|abstract-op" href="#dfn-run-once-rule" class="internalDFN"
-                    id="ref-for-dfn-run-once-rule-1">한 번만 실행되는 규칙</a>입니다.
-                이러한 규칙은 자신이 의존하는 데이터를 생성할 수 있는 모든 규칙이 실행된 뒤,
-                그리고 자신이 생성하는 데이터에 의존하는 모든 규칙보다 먼저 실행됩니다.
+                    id="ref-for-dfn-rule-head-2">규칙 머리부</a>에서 빈 노드를 생성하는 규칙은 <a data-link-type="dfn|abstract-op"
+                    href="#dfn-run-once-rule" class="internalDFN" id="ref-for-dfn-run-once-rule-1">일회 실행 규칙</a>이다.
+                이러한 규칙은 자신이 종속되는 데이터를 생성할 수 있는 모든 규칙이 실행된 후,
+                그리고 자신이 생성하는 데이터에 종속되는 모든 규칙이 실행되기 전에 실행된다.
                 <a data-link-type="dfn|abstract-op" href="#dfn-rule-head" class="internalDFN"
-                    id="ref-for-dfn-rule-head-3">규칙 머리부</a>에 빈 노드를 포함하는 규칙도
-                새로운 RDF 용어를 생성하며 한 번만 실행되는 규칙입니다.
+                    id="ref-for-dfn-rule-head-3">규칙 머리부</a>에 빈 노드가 포함된 규칙도 새로운
+                RDF 용어를 생성하며 일회 실행 규칙이다.
             </p>
             <p>
-                이 조건은 RDF 용어를 생성하는 규칙이 잠재적으로 서로 다른 결과로
-                새로운 용어를 여러 번 생성하지 않도록 하고, 또한 그러한 규칙이 자신에게
-                되돌아가 무한한 수의 RDF 용어를 발생시키지 않도록 보장합니다.
+                이 조건은 이러한 규칙이 자기 자신으로 되돌아가 반복되어 무제한으로 많은
+                RDF 용어를 생성하지 않도록 보장한다.
             </p>
             <p>
                 <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element" class="internalDFN"
-                    id="ref-for-dfn-assignment-element-2">할당</a>에서 표현식을 평가할 때
-                오류가 발생하면, 현재 해 매핑은 해당 <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element"
-                    class="internalDFN" id="ref-for-dfn-assignment-element-3">할당</a>에 의해 거부됩니다.
+                    id="ref-for-dfn-assignment-element-2">할당</a>에서 표현식을 평가할 때 오류가 발생하면,
+                현재 해 매핑은 해당 <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element" class="internalDFN"
+                    id="ref-for-dfn-assignment-element-3">할당</a>에 의해 거부된다.
             </p>
         </section>
 
@@ -1826,11 +1857,15 @@ WHERE {
             </div>
 
             <p>
-                데이터 블록은 규칙 집합 평가에 직접 RDF 트리플을 간결하게 제공할 수 있게 합니다.
-                데이터 블록의 트리플은 추론 그래프에 추가되며 규칙 본문의 일치에
-                사용할 수 있습니다.
+                데이터 블록을 사용하면 RDF 트리플을 규칙 집합 평가에 직접 간결하게 제공할 수 있다.
+                데이터 블록의 트리플은 추론 그래프에 추가되며 규칙 본문에서
+                일치시키는 데 사용할 수 있다.
             </p>
-            <p>@@예제가 업데이트될 예정</p>
+
+            <p>
+                예를 들어 규칙 집합에는 데이터에서 도출하는 대신 알려진 사실을
+                직접 명시하여 포함할 수 있다.
+            </p>
 
             <aside class="example" id="example-include-data-in-a-rule-set">
                 <div class="marker">
@@ -1838,10 +1873,22 @@ WHERE {
                         class="example-title">: 규칙 집합에 데이터 포함</span>
                 </div>
                 <pre class="block ex-rules" aria-busy="false"><code class="hljs">DATA {
-    :father rdfs:subClassOf :familyRelationship .
-    :mother rdfs:subClassOf :familyRelationship .
+    # 버전 2.0.0 이하에는 알려진 취약점이 있으며
+    # 심각하게 노출된 것으로 간주된다.
+    :appV2 rdf:type :Component ;
+           :version "2.0.0" ;
+           :status :criticallyExposed .
 }</code></pre>
             </aside>
+
+            <div class="note" role="note" id="issue-container-generatedID-2">
+                <div class="note-title marker" id="h-note-1"><span>참고</span></div>
+                <p class="">
+                    데이터 블록은 본문이 비어 있는 규칙과 동등하다.
+                    해당 트리플은 어떠한 규칙도 평가하지 않고
+                    추론 그래프의 일부가 된다.
+                </p>
+            </div>
 
         </section>
 
@@ -1982,47 +2029,48 @@ WHERE DATA { ... }</code></pre>
             <ul>
                 <li>
                     규칙에는 변수가 사용되기 전에 항상 바인딩되도록 보장하는
-                    추가적인 올바른 형식 조건이 있습니다.
+                    추가적인 올바른 형식 조건이 있다.
                 </li>
                 <li>
                     규칙 본문의 구문은 SPARQL <code>CONSTRUCT</code> 쿼리와 유사하지만,
-                    <code>UNION</code> 또는 <code>OPTIONAL</code> 구문을 포함할 수 없는 등의 제한이 있습니다.
+                    <code>UNION</code> 또는 <code>OPTIONAL</code> 구문을 허용하지 않는 등의 제한이 있다.
                     이러한 제한은 변수가 항상 바인딩되도록 보장하지만, SPARQL에서는 일부
-                    변수가 모든 패턴 해법에서 바인딩되지 않을 수 있습니다.
+                    변수가 모든 패턴 해에서 바인딩되지 않을 수도 있다.
                     이러한 효과는 <a data-link-type="dfn|abstract-op" href="#dfn-well-formed-rule" class="internalDFN"
                         id="ref-for-dfn-well-formed-rule-1">올바른 형식의
                         규칙</a>을 사용하여 달성할 수 있으므로
                     <a data-link-type="dfn|abstract-op" href="#dfn-rule-set" class="internalDFN"
-                        id="ref-for-dfn-rule-set-6">규칙 집합</a>을 분석할 수 있습니다.
+                        id="ref-for-dfn-rule-set-6">규칙 집합</a>을 분석할 수 있다.
                 </li>
                 <li>
                     규칙의 <code>SET</code> 형식과 SPARQL의 <code>BIND</code> 형식은 오류 처리
-                    동작이 서로 다릅니다.
-                    <code>SET</code>에서 발생한 오류는 현재 해법을 필터링하여 제외하지만,
-                    <code>BIND</code>는 현재 해법에서 변수를 설정하지 않습니다.
+                    동작이 서로 다르다.
+                    <code>SET</code>에서 발생한 오류는 현재 해를 필터링하여 제외하지만,
+                    <code>BIND</code>는 현재 해에서 변수를 설정하지 않는다.
                     <code>SET(?var := <i>expr</i>)</code>는
-                    <code>BIND(<i>expr</i> AS ?var)</code> 뒤에
-                    <code>FILTER(BOUND(?var))</code>가 오는 SPARQL과 동일합니다.
+                    SPARQL에서
+                    <code>BIND(<i>expr</i> AS ?var)</code> 다음에
+                    <code>FILTER(BOUND(?var))</code>가 오는 것과 동일하다.
                 </li>
                 <li>
-                    <code>NOT</code>의 구문은
+                    <code>NOT</code> 구문은
                     SPARQL의 <code>EXISTS</code> 및 <code>NOT EXISTS</code>와 달리
-                    내부 본문이 트리플 패턴과 필터로 제한되며,
-                    중첩 패턴을 허용하지 않습니다.
+                    내부 본문을 트리플 패턴과 필터로 제한하며,
+                    중첩된 패턴을 허용하지 않는다.
                 </li>
                 <li>
-                    속성 경로 구문은 트리플 패턴으로 확장할 수 있는 경로만 다룹니다.
-                    임의 길이 연산자 <code>*</code> 및 <code>+</code>는 허용하지 않습니다.
-                    임의 길이 경로는 더 일반적인 접근 방식인 재귀를 사용하여
-                    SHACL 규칙에서 표현할 수 있습니다.
+                    속성 경로 구문은 트리플 패턴으로 확장할 수 있는 경로만 다룬다.
+                    임의 길이 연산자 <code>*</code>와 <code>+</code>는 허용하지 않는다.
+                    SHACL 규칙에서는 더 일반적인 접근 방식인 재귀를 사용하여
+                    임의 길이 경로를 표현할 수 있다.
                 </li>
                 <li>
-                    일부 함수는 SRL 구문에 포함되지 않습니다.
-                    <code>COALESCE</code>와 <code>BOUND</code>가 없습니다.
-                    해시 함수도 없습니다.
-                    호출될 때마다 다른 결과를 생성하는 <code>RAND</code>도 없습니다.
+                    일부 함수는 SRL 구문에 포함되지 않는다.
+                    <code>COALESCE</code>와 <code>BOUND</code>는 없다.
+                    해시 함수도 없다.
+                    호출될 때마다 다른 결과를 반환하는 <code>RAND</code>도 없다.
                     <code>NOW()</code>는 허용되며 SPARQL의 동작과 유사하게
-                    규칙 집합 평가 전체에서 동일한 시점을 반환하도록 정의됩니다.
+                    규칙 집합 평가 전체에서 동일한 시점을 반환하도록 정의된다.
                 </li>
             </ul>
         </section>
@@ -2341,8 +2389,8 @@ WHERE DATA { ... }</code></pre>
                 위치 3은 비공식적으로 <em>목적어</em>라고 불립니다.
             </p>
 
-            <div class="note" role="note" id="issue-container-generatedID-2">
-                <div class="note-title marker" id="h-note-1"><span>참고</span></div>
+            <div class="note" role="note" id="issue-container-generatedID-3">
+                <div class="note-title marker" id="h-note-2"><span>참고</span></div>
                 <p class="">
                     <a data-link-type="dfn|abstract-op" href="#dfn-rule-element" class="internalDFN"
                         id="ref-for-dfn-rule-element-7">규칙 요소</a> 시퀀스의 요소에는
@@ -2563,21 +2611,32 @@ WHERE DATA { ... }</code></pre>
             <aside class="example" id="example-open-dependency">
                 <div class="marker">
                     <a class="self-link" href="#example-open-dependency">예제<bdi> 9</bdi></a><span
-                        class="example-title">: 열린 의존성</span>
+                        class="example-title">: 개방 종속성</span>
                 </div>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :descendedFrom ?y } WHERE { ?x :childOf ?y }
-RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :exposedTo ?v } WHERE { ?x :dependsOn ?y . ?y :hasVulnerability ?v }
+RULE { ?x :dependsOn ?y } WHERE { ?x :callsService ?y }</code></pre>
             </aside>
 
             <p>
-                이 두 번째 예제에서 첫 번째 규칙은 두 번째 규칙에 대해 닫힌 의존성을 가집니다.
+                이 두 번째 예제에서 첫 번째 규칙은 두 번째 규칙에 대해
+                폐쇄 종속성을 가진다. 트리플 패턴 <code>?x :status :criticallyExposed</code>은
+                첫 번째 규칙의 <a data-link-type="dfn|abstract-op" href="#dfn-negation-element" class="internalDFN"
+                    id="ref-for-dfn-negation-element-7">부정 요소</a> 내부에 나타나며
+                두 번째 규칙의 머리부에 있는 <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
+                    id="ref-for-dfn-triple-template-7">트리플 템플릿</a>과 일치한다.
+                두 번째 규칙이 가능한 모든 출력을 생성할 때까지
+                첫 번째 규칙을 평가할 수 없다.
             </p>
 
-            <aside class="example" id="example-10">
+            <aside class="example" id="example-closed-dependency">
                 <div class="marker">
-                    <a class="self-link" href="#example-10">예제<bdi> 10</bdi></a>
+                    <a class="self-link" href="#example-closed-dependency">예제<bdi> 10</bdi></a><span
+                        class="example-title">: 폐쇄 종속성</span>
                 </div>
-                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE @@</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs">RULE { ?x :status :safeToDeploy }
+WHERE { ?x rdf:type :Component . NOT { ?x :status :criticallyExposed } }
+
+RULE { ?x :status :criticallyExposed } WHERE { ?x :exposedTo ?v }</code></pre>
             </aside>
 
             <dl>
@@ -2586,148 +2645,145 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
                 <dd>
                     <p>
                         <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
-                            id="ref-for-dfn-triple-pattern-5">트리플 패턴</a>은
-                        트리플 템플릿이 트리플 패턴과 일치하는 트리플을 생성할 수 있는 경우
-                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
-                            id="ref-for-dfn-triple-template-7">트리플 템플릿</a>과 일치합니다.
+                            id="ref-for-dfn-triple-pattern-5">트리플 패턴</a>은 <a data-link-type="dfn|abstract-op"
+                            href="#dfn-triple-template" class="internalDFN" id="ref-for-dfn-triple-template-8">트리플
+                            템플릿</a>이
+                        트리플 패턴과 일치하는 트리플을 생성할 수 있는 경우 해당 트리플 템플릿과 일치한다.
                     </p>
                 </dd>
 
                 <dt><dfn data-lt="triple-pattern-dependency|Triple pattern dependency"
                         id="dfn-triple-pattern-dependency" tabindex="0" aria-haspopup="dialog" data-dfn-type="dfn">트리플
-                        패턴 의존성</dfn></dt>
+                        패턴 종속성</dfn></dt>
                 <dd>
                     <p>
                         <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
                             id="ref-for-dfn-triple-pattern-6">트리플 패턴</a>은
-                        해당 <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
-                            id="ref-for-dfn-triple-pattern-7">트리플 패턴</a>이
-                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
-                            id="ref-for-dfn-triple-template-9">트리플 템플릿</a>과 일치할 가능성이 있는 경우
                         <dfn data-local-lt="depends-pattern-template" id="dfn-depends-on-a-triple-template" tabindex="0"
                             aria-haspopup="dialog" data-dfn-type="dfn"><a data-link-type="dfn|abstract-op"
-                                href="#dfn-triple-template" class="internalDFN" id="ref-for-dfn-triple-template-8">트리플
-                                템플릿</a>에 의존합니다</dfn>.
+                                href="#dfn-triple-template" class="internalDFN" id="ref-for-dfn-triple-template-9">트리플
+                                템플릿</a>에 종속된다</dfn>.
+                        이는 <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
+                            id="ref-for-dfn-triple-pattern-7">트리플 패턴</a>이 해당 <a data-link-type="dfn|abstract-op"
+                            href="#dfn-triple-template" class="internalDFN" id="ref-for-dfn-triple-template-10">트리플
+                            템플릿</a>과 일치할 가능성이 있는 경우이다.
                     </p>
                     <p>
                         <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
                             id="ref-for-dfn-triple-pattern-8">트리플 패턴</a>은
-                        <a data-link-type="dfn|abstract-op" href="#dfn-rule-head" class="internalDFN"
-                            id="ref-for-dfn-rule-head-9">규칙 머리부</a>에 있는
-                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
-                            id="ref-for-dfn-triple-template-10">트리플 템플릿</a> 중 어느 하나에 대해
-                        의존성이 있는 경우
                         <dfn data-local-lt="depends-pattern-rule" id="dfn-depends-on-a-rule" tabindex="0"
                             aria-haspopup="dialog" data-dfn-type="dfn"><a data-link-type="dfn|abstract-op"
-                                href="#dfn-rule" class="internalDFN" id="ref-for-dfn-rule-7">규칙</a>에 의존합니다</dfn>.
+                                href="#dfn-rule" class="internalDFN" id="ref-for-dfn-rule-7">규칙</a>에 종속된다</dfn>.
+                        이는 <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
+                            id="ref-for-dfn-triple-pattern-9">트리플 패턴</a>이 해당 규칙의 <a data-link-type="dfn|abstract-op"
+                            href="#dfn-rule-head" class="internalDFN" id="ref-for-dfn-rule-head-9">머리부</a>에 있는 <a
+                            data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
+                            id="ref-for-dfn-triple-template-11">트리플 템플릿</a> 중 하나에
+                        종속되는 경우이다.
                     </p>
                 </dd>
                 <dt><dfn data-lt="rule dependency|depends on|Rule dependency" id="dfn-rule-dependency" tabindex="0"
-                        aria-haspopup="dialog" data-dfn-type="dfn">규칙 의존성</dfn></dt>
+                        aria-haspopup="dialog" data-dfn-type="dfn">규칙 종속성</dfn></dt>
                 <dd>
                     <p>
-                        규칙 <code>R1</code>은 <code>R1</code>의 본문 안에 있는 어떤
+                        규칙 <code>R1</code>의 본문에 있는 임의의
                         <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
-                            id="ref-for-dfn-triple-pattern-10">트리플 패턴</a>이,
+                            id="ref-for-dfn-triple-pattern-10">트리플 패턴</a>이
                         <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern-element" class="internalDFN"
                             id="ref-for-dfn-triple-pattern-element-8">트리플 패턴 요소</a>로서든
                         <a data-link-type="dfn|abstract-op" href="#dfn-negation-element" class="internalDFN"
-                            id="ref-for-dfn-negation-element-7">부정 요소</a> 내부에서든,
+                            id="ref-for-dfn-negation-element-8">부정 요소</a> 내부에서든,
 
-                        <code>R2</code>의 머리부 안에 있는
-                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
-                            id="ref-for-dfn-triple-template-11">트리플 템플릿</a>에
-                        <a href="#dfn-triple-pattern-dependency" id="ref-for-dfn-triple-pattern-dependency-1">의존</a>하는
-                        경우
-                        규칙 <code>R2</code>에 <a data-link-type="dfn|abstract-op" href="#dfn-rule-dependency"
-                            class="internalDFN" id="ref-for-dfn-rule-dependency-1">의존합니다</a>.
+                        <code>R2</code>의 머리부에 있는 <a href="#dfn-triple-pattern-dependency"
+                            id="ref-for-dfn-triple-pattern-dependency-1">트리플
+                            템플릿에 종속되는</a>
+                        경우 규칙 <code>R1</code>은 <code>R2</code>에 <a data-link-type="dfn|abstract-op"
+                            href="#dfn-rule-dependency" class="internalDFN" id="ref-for-dfn-rule-dependency-1">종속된다</a>.
                     </p>
                 </dd>
                 <dt><dfn data-plurals="closed dependencies" id="dfn-closed-dependency" tabindex="0"
-                        aria-haspopup="dialog" data-dfn-type="dfn">닫힌 의존성</dfn></dt>
+                        aria-haspopup="dialog" data-dfn-type="dfn">폐쇄 종속성</dfn></dt>
                 <dd>
                     <p>
-                        규칙 <code>R1</code>이 규칙 <code>R2</code>에 갖는
-                        <a data-link-type="dfn|abstract-op" href="#dfn-rule-dependency" class="internalDFN"
-                            id="ref-for-dfn-rule-dependency-2">규칙 의존성</a>은
-                        다음 조건 중 하나가 성립하면
-                        <a data-link-type="dfn|abstract-op" href="#dfn-closed-dependency" class="internalDFN"
-                            id="ref-for-dfn-closed-dependency-2">닫힌 의존성</a>입니다:
+                        다음 조건 중 하나라도 충족되는 경우 규칙 <code>R1</code>의 규칙
+                        <code>R2</code>에 대한 <a data-link-type="dfn|abstract-op" href="#dfn-rule-dependency"
+                            class="internalDFN" id="ref-for-dfn-rule-dependency-2">규칙 종속성</a>은 <a
+                            data-link-type="dfn|abstract-op" href="#dfn-closed-dependency" class="internalDFN"
+                            id="ref-for-dfn-closed-dependency-2">폐쇄 종속성</a>이다.
                     </p>
                     <ul>
                         <li><code>R1</code>의 <a data-link-type="dfn|abstract-op" href="#dfn-negation-element"
-                                class="internalDFN" id="ref-for-dfn-negation-element-8">부정 요소</a> 내부에 나타나는
-                            <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
-                                id="ref-for-dfn-triple-pattern-11">트리플 패턴</a>이
-                            <code>R2</code>의 <a data-link-type="dfn|abstract-op" href="#dfn-rule-head"
-                                class="internalDFN" id="ref-for-dfn-rule-head-10">규칙 머리부</a>에 있는
-                            <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
-                                id="ref-for-dfn-triple-template-12">트리플 템플릿</a>과 일치합니다.
+                                class="internalDFN" id="ref-for-dfn-negation-element-9">부정 요소</a> 내부에 나타나는 <a
+                                data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
+                                id="ref-for-dfn-triple-pattern-11">트리플 패턴</a>이 <code>R2</code>의 <a
+                                data-link-type="dfn|abstract-op" href="#dfn-rule-head" class="internalDFN"
+                                id="ref-for-dfn-rule-head-10">규칙 머리부</a>에 있는 <a data-link-type="dfn|abstract-op"
+                                href="#dfn-triple-template" class="internalDFN" id="ref-for-dfn-triple-template-13">트리플
+                                템플릿</a>과 일치한다.
                         </li>
                         <li>규칙 <code>R1</code>이 규칙
                             <code>R2</code>에 <a data-link-type="dfn|abstract-op" href="#dfn-rule-dependency"
-                                class="internalDFN" id="ref-for-dfn-rule-dependency-3">의존</a>하고,
+                                class="internalDFN" id="ref-for-dfn-rule-dependency-3">종속되고</a>
                             <code>R1</code>에 <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element"
-                                class="internalDFN" id="ref-for-dfn-assignment-element-10">할당 요소</a>가 있습니다.
+                                class="internalDFN" id="ref-for-dfn-assignment-element-10">할당 요소</a>가 있다.
                         </li>
                         <li>규칙 <code>R1</code>이 규칙
                             <code>R2</code>에 <a data-link-type="dfn|abstract-op" href="#dfn-rule-dependency"
-                                class="internalDFN" id="ref-for-dfn-rule-dependency-4">의존</a>하고,
+                                class="internalDFN" id="ref-for-dfn-rule-dependency-4">종속되고</a>
                             <code>R1</code>의 <a data-link-type="dfn|abstract-op" href="#dfn-rule-head"
-                                class="internalDFN" id="ref-for-dfn-rule-head-11">규칙 머리부</a>에 빈 노드가 있습니다.
+                                class="internalDFN" id="ref-for-dfn-rule-head-11">규칙 머리부</a>에 빈 노드가 있다.
                         </li>
                     </ul>
                 </dd>
                 <dt><dfn data-plurals="open dependencies" id="dfn-open-dependency" tabindex="0" aria-haspopup="dialog"
-                        data-dfn-type="dfn">열린 의존성</dfn></dt>
+                        data-dfn-type="dfn">개방 종속성</dfn></dt>
                 <dd>
                     <p>
-                        규칙 <code>R1</code>이 규칙
-                        <code>R2</code>에 갖는 <a data-link-type="dfn|abstract-op" href="#dfn-rule-dependency"
-                            class="internalDFN" id="ref-for-dfn-rule-dependency-5">규칙 의존성</a>은 그 의존성이
+                        규칙 <code>R1</code>의 규칙
+                        <code>R2</code>에 대한 <a data-link-type="dfn|abstract-op" href="#dfn-rule-dependency"
+                            class="internalDFN" id="ref-for-dfn-rule-dependency-5">규칙 종속성</a>은 해당 종속성이
                         <a data-link-type="dfn|abstract-op" href="#dfn-closed-dependency" class="internalDFN"
-                            id="ref-for-dfn-closed-dependency-3">닫힌 의존성</a>이 아닌 경우
-                        <a data-link-type="dfn|abstract-op" href="#dfn-open-dependency" class="internalDFN"
-                            id="ref-for-dfn-open-dependency-2">열린 의존성</a>입니다.
-                        즉, <code>R2</code>에 의존하는 <code>R1</code>의 모든
-                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern" class="internalDFN"
-                            id="ref-for-dfn-triple-pattern-12">트리플 패턴</a>은
-                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern-element" class="internalDFN"
-                            id="ref-for-dfn-triple-pattern-element-9">트리플 패턴 요소</a>로서만 나타납니다.
+                            id="ref-for-dfn-closed-dependency-3">폐쇄 종속성</a>이 아닌 경우 <a data-link-type="dfn|abstract-op"
+                            href="#dfn-open-dependency" class="internalDFN" id="ref-for-dfn-open-dependency-2">개방
+                            종속성</a>이다.
+                        즉, <code>R2</code>에 종속되는 <code>R1</code>의 모든 <a data-link-type="dfn|abstract-op"
+                            href="#dfn-triple-pattern" class="internalDFN" id="ref-for-dfn-triple-pattern-12">트리플
+                            패턴</a>은 오직 <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern-element"
+                            class="internalDFN" id="ref-for-dfn-triple-pattern-element-9">트리플 패턴 요소</a>로만 나타난다.
                     </p>
                 </dd>
             </dl>
 
-            <div class="note" role="note" id="issue-container-generatedID-3">
-                <div class="note-title marker" id="h-note-2"><span>참고</span></div>
+            <div class="note" role="note" id="issue-container-generatedID-4">
+                <div class="note-title marker" id="h-note-3"><span>참고</span></div>
                 <div class="">
                     <p>
-                        구성 요소가 <code>tSubj</code>, <code>tPred</code>, <code>tObj</code>인
-                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
-                            id="ref-for-dfn-triple-template-13">트리플 템플릿</a>은
-                        다음 조건이 모두 참인 경우 RDF 용어 구성 요소
-                        <code>s</code>, <code>p</code>, <code>o</code>를 가진 트리플을
-                        생성할 수 있습니다:
+                        구성 요소가 <code>tSubj</code>,
+                        <code>tPred</code>, <code>tObj</code>인 <a data-link-type="dfn|abstract-op"
+                            href="#dfn-triple-template" class="internalDFN" id="ref-for-dfn-triple-template-14">트리플
+                            템플릿</a>은
+                        다음 조건이 모두 참인 경우 구성 요소 RDF 용어가
+                        <code>s</code>, <code>p</code>, <code>o</code>인 트리플을 생성할 수 있다.
                     </p>
                     <ul>
                         <li><code>tSubj</code>가 변수이거나, <code>tSubj</code>가 <code>s</code>와
                             <a href="https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-term-equality"
-                                id="ref-for-index-term-same-rdf-term-1">동일한 RDF 용어</a>입니다
+                                id="ref-for-index-term-same-rdf-term-1">동일한 RDF 용어</a>이다.
                         </li>
                         <li><code>tPred</code>가 변수이거나, <code>tPred</code>가 <code>p</code>와
                             <a href="https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-term-equality"
-                                id="ref-for-index-term-same-rdf-term-2">동일한 RDF 용어</a>입니다
+                                id="ref-for-index-term-same-rdf-term-2">동일한 RDF 용어</a>이다.
                         </li>
                         <li><code>tObj</code>가 변수이거나, <code>tObj</code>가 <code>o</code>와
                             <a href="https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-term-equality"
-                                id="ref-for-index-term-same-rdf-term-3">동일한 RDF 용어</a>입니다
+                                id="ref-for-index-term-same-rdf-term-3">동일한 RDF 용어</a>이다.
                         </li>
                     </ul>
                     <p>
-                        또한 <code>tSubj</code>, <code>tPred</code>, <code>tObj</code> 중 어떤 쌍이
-                        동일한 변수라면,
-                        대응하는 <code>s</code>, <code>p</code>, <code>o</code>의 쌍도
-                        동일해야 합니다.
+                        또한 <code>tSubj</code>, <code>tPred</code>, <code>tObj</code> 중 임의의 두 항이
+                        동일한 변수인 경우,
+                        이에 대응하는 <code>s</code>, <code>p</code>, <code>o</code>의 두 항도
+                        동일해야 한다.
                     </p>
                 </div>
             </div>
@@ -2790,8 +2846,8 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
                         </p>
                     </dd>
                 </dl>
-                <div class="note" role="note" id="issue-container-generatedID-4">
-                    <div class="note-title marker" id="h-note-3"><span>참고</span></div>
+                <div class="note" role="note" id="issue-container-generatedID-5">
+                    <div class="note-title marker" id="h-note-4"><span>참고</span></div>
                     <p class="">
                         의존성 그래프는 데이터 그래프의 영향을 받지 않습니다.
                     </p>
@@ -2934,7 +2990,7 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
                 <a data-link-type="dfn|abstract-op" href="#dfn-rule" class="internalDFN" id="ref-for-dfn-rule-9">규칙</a>
                 간의 의존성에 제약을 부과하여
                 <a data-link-type="dfn|abstract-op" href="#dfn-negation-element" class="internalDFN"
-                    id="ref-for-dfn-negation-element-9">부정 요소</a>,
+                    id="ref-for-dfn-negation-element-10">부정 요소</a>,
                 <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element" class="internalDFN"
                     id="ref-for-dfn-assignment-element-11">할당
                     요소</a>, 그리고
@@ -2951,8 +3007,8 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
                     id="ref-for-dfn-rule-set-19">규칙 집합</a>의 평가에서
                 단일하고 잘 정의되며 유한한 결과를 보장합니다.
             </p>
-            <div class="note" role="note" id="issue-container-generatedID-5">
-                <div class="note-title marker" id="h-note-4"><span>참고</span></div>
+            <div class="note" role="note" id="issue-container-generatedID-6">
+                <div class="note-title marker" id="h-note-5"><span>참고</span></div>
                 <div class="">
                     <p>
                         계층화 과정은 다른 평가 결정을 내리는 데에도 사용될 수 있습니다.
@@ -3038,7 +3094,7 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
                         id="ref-for-dfn-dependency-graph-7">의존성 그래프</a>의 어떤 추이적 의존성 순환에도
                     <code>NOT</code> 또는 한 번만 실행되는 규칙(할당 또는 빈 노드를 포함하는 규칙
                     <a data-link-type="dfn|abstract-op" href="#dfn-triple-template" class="internalDFN"
-                        id="ref-for-dfn-triple-template-14">트리플 템플릿</a>)이 없습니다.
+                        id="ref-for-dfn-triple-template-15">트리플 템플릿</a>)이 없습니다.
                 </p>
             </section>
 
@@ -3124,8 +3180,8 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
     <span class="hljs-string">the</span> <span class="hljs-string">result</span> <span class="hljs-string">is</span> <span class="hljs-string">stratumLevels</span>
 <span class="hljs-string">enddefine</span></code></pre>
                 </div>
-                <div class="note" role="note" id="issue-container-generatedID-6">
-                    <div class="note-title marker" id="h-note-5"><span>참고</span></div>
+                <div class="note" role="note" id="issue-container-generatedID-7">
+                    <div class="note-title marker" id="h-note-6"><span>참고</span></div>
                     <p class="">
                         <a data-link-type="dfn|abstract-op" href="#dfn-stratification-condition" class="internalDFN"
                             id="ref-for-dfn-stratification-condition-2">계층화 조건</a>의
@@ -3136,6 +3192,13 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
                         변경되지 않는다는 것입니다.
                     </p>
                 </div>
+                <p>
+                    전체 규칙 집합에 종속성 분석과
+                    계층화를 단계별로 적용한 뒤
+                    평가까지 수행하는 과정은
+                    <a href="#eval-worked-example" class="sectionRef sec-ref"><bdi class="secno">6.6 </bdi>실제
+                        예제</a>에 제시되어 있다.
+                </p>
             </section>
         </section>
     </section>
@@ -3153,8 +3216,8 @@ RULE { ?x :childOf ?y } WHERE { ?y :fatherOf ?x }</code></pre>
             <li><a href="#rdf-rules-syntax">RDF Rule 구문</a></li>
         </ul>
 
-        <div class="note" role="note" id="issue-container-generatedID-7">
-            <div class="note-title marker" id="h-note-6"><span>참고</span></div>
+        <div class="note" role="note" id="issue-container-generatedID-8">
+            <div class="note-title marker" id="h-note-7"><span>참고</span></div>
             <aside class="">
                 Shape Rules Language(SRL) 구문에는 동등한 RDF 구문 형식이 있습니다.
                 올바른 형식의 RDF 구문은 Shape Rules Language 구문으로 번역될 수 있습니다.
@@ -3283,7 +3346,7 @@ PREFIX sparql: &lt;http://www.w3.org/ns/sparql#&gt;
             </div>
 
             <p><a href="#shapes-rules-grammar">문법</a>은 아래에 제공됩니다.</p>
-            <div class="note" id="issue-container-generatedID-8">
+            <div class="note" id="issue-container-generatedID-9">
                 <div class="ednote-title marker" id="h-ednote-0"><span>편집자 주</span></div>
                 <p class="">AST를 추상 구문에 매핑합니다.</p>
             </div>
@@ -3303,7 +3366,7 @@ PREFIX sparql: &lt;http://www.w3.org/ns/sparql#&gt;
                 SHACL 도형: <a href="./rules-rdf-syntax/rdf-syntax-shapes.ttl">rdf-syntax-shapes.ttl</a>
             </p>
 
-            <div class="note" id="issue-container-generatedID-9">
+            <div class="note" id="issue-container-generatedID-10">
                 <div class="ednote-title marker" id="h-ednote-1"><span>편집자 주</span></div>
                 <div class="">
                     <p>정형성:</p>
@@ -3315,7 +3378,7 @@ PREFIX sparql: &lt;http://www.w3.org/ns/sparql#&gt;
                     </ul>
                 </div>
             </div>
-            <div class="note" id="issue-container-generatedID-10">
+            <div class="note" id="issue-container-generatedID-11">
                 <div class="ednote-title marker" id="h-ednote-2"><span>편집자 주</span></div>
                 <div class="">
                     <p>
@@ -3324,7 +3387,7 @@ PREFIX sparql: &lt;http://www.w3.org/ns/sparql#&gt;
                 </div>
             </div>
 
-            <div class="note" id="issue-container-generatedID-11">
+            <div class="note" id="issue-container-generatedID-12">
                 <div class="ednote-title marker" id="h-ednote-3"><span>편집자 주</span></div>
                 <div class="">
                     <p>프로세스: 누산기, 상향식/구조 순회.</p>
@@ -3630,7 +3693,7 @@ PREFIX srl:    &lt;http://www.w3.org/ns/shacl-rules#&gt;
                     and compatible(μ1, μ2)
                     μ(v) = merge(μ1, μ2) }</span></code></pre>
                     </div>
-                    <div class="note" id="issue-container-generatedID-12">
+                    <div class="note" id="issue-container-generatedID-13">
                         <div class="ednote-title marker" id="h-ednote-4"><span>편집자 주</span></div>
                         <div class="">
                             <p>
@@ -3969,6 +4032,489 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
 <span class="hljs-string">the</span> <span class="hljs-string">result</span> <span class="hljs-string">is</span> <span class="hljs-string">GI</span></code></pre>
             </div>
         </section>
+        <section id="eval-worked-example" class="informative">
+            <div class="header-wrapper">
+                <h3 id="x6-6-worked-example"><bdi class="secno">6.6 </bdi>실제 예제</h3><a class="self-link"
+                    href="#eval-worked-example" aria-label="6.6절의 영구 링크"></a>
+            </div>
+            <p><em>이 절은 비규범적이다.</em></p>
+
+            <p>
+                이 절에서는 완전한
+                <a data-link-type="dfn|abstract-op" href="#dfn-rule-set" class="internalDFN"
+                    id="ref-for-dfn-rule-set-29">규칙 집합</a>의 평가 과정을 단계별로 설명한다. 규칙 종속성을 결정하고
+                (<a href="#rule-dependency" class="sectionRef sec-ref"><bdi class="secno">4.3 </bdi>규칙
+                    종속성</a>),
+                계층화를 계산하며
+                (<a href="#stratification" class="sectionRef sec-ref"><bdi class="secno">4.4 </bdi>계층화</a>),
+                각 계층을 차례로 평가하여
+                <a data-link-type="dfn|abstract-op" href="#dfn-inference-graph" class="internalDFN"
+                    id="ref-for-dfn-inference-graph-6">추론 그래프</a>를 생성한다
+                (<a href="#eval-rule-set" class="sectionRef sec-ref"><bdi class="secno">6.5 </bdi>규칙 집합
+                    평가</a>).
+            </p>
+            <p>
+                이 예제에서는 소프트웨어 구성 요소와 그 종속성을 설명한다.
+                프런트엔드는 애플리케이션 서버에 종속되고, 애플리케이션 서버는
+                데이터베이스와 로깅 라이브러리에 종속된다. 데이터베이스에는 알려진
+                취약점이 있다. 규칙은 종속성 체인을 따라 취약점에 대한 노출을
+                전파하고, 심각한 취약점에 노출된 구성 요소에는
+                <code>:criticallyExposed</code> 상태를 부여하며, 심각하지 않은 구성 요소에는
+                <code>:safeToDeploy</code> 상태를 부여하고, 심각하게 노출된 각 구성 요소에 대한
+                알림을 생성한다.
+                (실제로 취약점이 구성 요소에 영향을 미치는지는
+                배포된 버전에 따라 달라진다. 이 예제에서는 버전을 생략하고
+                취약점을 직접 명시한다.)
+                간결성을 위해 기본 그래프는
+                <a href="#desc-basic" class="sectionRef sec-ref"><bdi class="secno">3.1 </bdi>기본 패턴</a>에서처럼
+                더 구체적인 관계로부터 도출하지 않고 <code>:dependsOn</code> 트리플을 직접 명시한다.
+            </p>
+
+            <aside class="example" id="example-worked-example-data-and-rules">
+                <div class="marker">
+                    <a class="self-link" href="#example-worked-example-data-and-rules">예제<bdi> 15</bdi></a><span
+                        class="example-title">: 실제 예제: 데이터와 규칙</span>
+                </div>
+                <pre class="block ex-data" aria-busy="false"><code class="hljs">:frontend rdf:type :Component ;
+          :dependsOn :app .
+:app      rdf:type :Component ;
+          :dependsOn :db ;
+          :dependsOn :logger .
+:db       rdf:type :Component ;
+          :hasVulnerability :vuln1 .
+:logger   rdf:type :Component .
+:vuln1    :severity 9.1 .</code></pre>
+                <pre class="block ex-rules" aria-busy="false"><code class="hljs"># R1
+RULE { ?x :exposedTo ?v } WHERE { ?x :hasVulnerability ?v }
+
+# R2
+RULE { ?x :exposedTo ?v } WHERE { ?x :dependsOn ?y . ?y :exposedTo ?v }
+
+# R3
+RULE { ?x :status :criticallyExposed }
+WHERE { ?x :exposedTo ?v . ?v :severity ?s . FILTER(?s &gt;= 9.0) }
+
+# R4
+RULE { ?x :status :safeToDeploy }
+WHERE { ?x rdf:type :Component . NOT { ?x :status :criticallyExposed } }
+
+# R5
+RULE { [] rdf:type :Notification ; :concerns ?x }
+WHERE { ?x :status :criticallyExposed }</code></pre>
+            </aside>
+
+            <p>
+                규칙은 주석에서 <code>R1</code>부터 <code>R5</code>까지의 레이블로 표시되며, 이 절의 나머지 부분에서는
+                이러한 레이블로 규칙을 참조한다.
+                이 규칙들은
+                <a href="#desc-recursion" class="sectionRef sec-ref"><bdi class="secno">3.2 </bdi>재귀</a>부터
+                <a href="#desc-creating-rdf-terms" class="sectionRef sec-ref"><bdi class="secno">3.5 </bdi>할당과
+                    RDF 용어 생성</a>까지에서 소개한 규칙이다.
+                규칙 집합에는 <code>IMPORTS</code>가 없으므로 가져오기 처리를 거쳐도
+                변경되지 않으며, <code>DATA</code> 블록도 없으므로 평가는
+                기본 그래프만으로 시작한다.
+            </p>
+
+            <section id="worked-example-dependencies">
+                <div class="header-wrapper">
+                    <h4 id="x6-6-1-determining-the-dependencies"><bdi class="secno">6.6.1 </bdi>종속성
+                        결정</h4><a class="self-link" href="#worked-example-dependencies" aria-label="6.6.1절의 영구 링크"></a>
+                </div>
+
+                <p>
+                    어떤 규칙이 어떤 규칙에 종속되는지 결정하기 위해
+                    각 규칙 본문의 각 트리플 패턴을 모든 규칙 머리부의
+                    트리플 템플릿과 비교한다
+                    (<a href="#rule-dependency" class="sectionRef sec-ref"><bdi class="secno">4.3 </bdi>규칙
+                        종속성</a>).
+                </p>
+                <ul>
+                    <li>
+                        <code>R1</code>의 본문은 단일 트리플 패턴
+                        <code>?x :hasVulnerability ?v</code>이다. 어떤 규칙 머리부에도
+                        술어가 <code>:hasVulnerability</code>인 트리플을 생성할 수 있는 트리플 템플릿이
+                        없으므로 이 패턴은 데이터와만 일치할 수 있다.
+                        <code>R1</code>에는 종속성이 없다.
+                    </li>
+                    <li>
+                        <code>R2</code>의 본문에는 두 개의 트리플 패턴이 있다.
+                        <code>?x :dependsOn ?y</code>는 어떤 규칙 머리부와도 일치할 수 없으므로
+                        데이터와만 일치한다. <code>?y :exposedTo ?v</code>는 <code>R1</code>의 머리부 템플릿
+                        <code>?x :exposedTo ?v</code>과 일치하고, <code>R2</code> 자체의 머리부와도 일치한다.
+                        두 항목 모두 <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern-element"
+                            class="internalDFN" id="ref-for-dfn-triple-pattern-element-10">트리플 패턴 요소</a>이다
+                        (<a data-link-type="dfn|abstract-op" href="#dfn-negation-element" class="internalDFN"
+                            id="ref-for-dfn-negation-element-11">부정 요소</a> 내부에 나타나지 않으며,
+                        <code>R2</code>에는
+                        <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element" class="internalDFN"
+                            id="ref-for-dfn-assignment-element-14">할당 요소</a>도 없고 머리부에 빈 노드도
+                        없다). 따라서
+                        <code>R2</code>는 <code>R1</code>에 대한 <em>개방</em> 종속성과
+                        자기 자신에 대한 <em>개방</em> 종속성을 가진다.
+                        <code>R2</code>의 자기 자신에 대한 종속성으로 인해 <code>R2</code>는 재귀 규칙이 된다.
+                    </li>
+                    <li>
+                        <code>R3</code>의 본문에서 패턴 <code>?x :exposedTo ?v</code>는
+                        <code>R1</code>과 <code>R2</code>의 머리부와 일치하므로 <code>R3</code>는 각각에 대해
+                        <em>개방</em> 종속성을 가진다. 패턴 <code>?v :severity ?s</code>는 어떤
+                        규칙 머리부와도 일치하지 않는다.
+                    </li>
+                    <li>
+                        <code>R4</code>의 본문에서 패턴 <code>?x rdf:type :Component</code>는
+                        어떤 규칙 머리부와도 일치하지 않는다. 술어가
+                        <code>rdf:type</code>인 유일한 머리부 템플릿은 <code>R5</code>에 있으며, 그 목적어
+                        <code>:Notification</code>은 <code>:Component</code>와 다른 RDF 용어이므로 생성된
+                        어떤 트리플도 일치할 수 없다.
+                        패턴 <code>?x :status :criticallyExposed</code>는
+                        <a data-link-type="dfn|abstract-op" href="#dfn-negation-element" class="internalDFN"
+                            id="ref-for-dfn-negation-element-12">부정 요소</a>
+                        <code>NOT { ?x :status :criticallyExposed }</code> 내부에 나타나며
+                        <code>R3</code>의 머리부 템플릿과 일치한다. 패턴이
+                        부정 요소에 나타나므로 <code>R4</code>는 <code>R3</code>에 대한 <em>폐쇄</em>
+                        종속성을 가진다.
+                    </li>
+                    <li>
+                        <code>R5</code>의 본문에서 패턴 <code>?x :status :criticallyExposed</code>는
+                        <code>R3</code>의 머리부와 일치한다. <code>R5</code>의 머리부에는
+                        빈 노드가 포함되므로, 해당 패턴이 일반
+                        <a data-link-type="dfn|abstract-op" href="#dfn-triple-pattern-element" class="internalDFN"
+                            id="ref-for-dfn-triple-pattern-element-11">트리플 패턴 요소</a>임에도
+                        <code>R3</code>에 대한 종속성은 <em>폐쇄</em>
+                        종속성이다.
+                        어떤 규칙 본문의 패턴도 <code>R5</code>의 머리부 템플릿과
+                        일치하지 않으므로 어떤 규칙도 <code>R5</code>에 종속되지 않는다.
+                    </li>
+                </ul>
+                <p>
+                    따라서 <a data-link-type="dfn|abstract-op" href="#dfn-dependency-graph" class="internalDFN"
+                        id="ref-for-dfn-dependency-graph-9">종속성 그래프</a>에는 정점 5개와 간선 6개가
+                    있다.
+                </p>
+                <ul>
+                    <li>
+                        <code>R2 → R1</code> (개방)
+                    </li>
+                    <li>
+                        <code>R2 → R2</code> (개방)
+                    </li>
+                    <li>
+                        <code>R3 → R1</code> (개방)
+                    </li>
+                    <li>
+                        <code>R3 → R2</code> (개방)
+                    </li>
+                    <li>
+                        <code>R4 → R3</code> (폐쇄)
+                    </li>
+                    <li>
+                        <code>R5 → R3</code> (폐쇄)
+                    </li>
+                </ul>
+                <p>
+                    <code>R4</code>와 <code>R5</code>는 <code>R1</code> 또는
+                    <code>R2</code>에 직접 종속되지 않지만, 각각 <code>R3</code>을 통해 양쪽 모두에
+                    <a data-link-type="dfn|abstract-op" href="#dfn-transitive-rule-dependency" class="internalDFN"
+                        id="ref-for-dfn-transitive-rule-dependency-2">전이적 종속성</a>을 가진다.
+                </p>
+
+                <figure id="fig-worked-example-dep-graph">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 350" width="480"
+                        style="max-width: 480px; height: auto;" role="img"
+                        aria-labelledby="depgraph-title depgraph-desc">
+                        <title id="depgraph-title">실제 예제 규칙 집합의 종속성 그래프</title>
+                        <desc id="depgraph-desc">
+                            R1, R2, R3, R4, R5로 표시된 다섯 개의 정점.
+                            점선 화살표는 개방 종속성을 나타낸다. R2에서 R1로,
+                            R2에서 자기 자신으로, R3에서 R1로, R3에서 R2로 향한다.
+                            실선 화살표는 폐쇄 종속성을 나타낸다. R4에서 R3으로,
+                            R5에서 R3으로 향한다.
+                        </desc>
+                        <defs>
+                            <marker id="dep-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+                                markerHeight="7" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+                            </marker>
+                        </defs>
+                        <g fill="none" stroke="currentColor" stroke-width="1.5">
+
+                            <g stroke-dasharray="6 4" marker-end="url(#dep-arrow)">
+
+                                <line x1="223.6" y1="135.3" x2="156.4" y2="74.7"></line>
+
+                                <line x1="256.4" y1="135.3" x2="323.6" y2="74.7"></line>
+
+                                <line x1="162" y1="60" x2="316" y2="60"></line>
+
+                                <path d="M 124.4 44.4 C 60 15, 60 105, 124.4 75.6"></path>
+                            </g>
+
+                            <g marker-end="url(#dep-arrow)">
+
+                                <line x1="156.4" y1="225.3" x2="223.6" y2="164.7"></line>
+
+                                <line x1="323.6" y1="225.3" x2="256.4" y2="164.7"></line>
+                            </g>
+
+                            <circle cx="140" cy="60" r="22"></circle>
+                            <circle cx="340" cy="60" r="22"></circle>
+                            <circle cx="240" cy="150" r="22"></circle>
+                            <circle cx="140" cy="240" r="22"></circle>
+                            <circle cx="340" cy="240" r="22"></circle>
+                        </g>
+                        <g fill="currentColor" font-size="15" font-weight="bold" text-anchor="middle">
+                            <text x="140" y="65">R2</text>
+                            <text x="340" y="65">R1</text>
+                            <text x="240" y="155">R3</text>
+                            <text x="140" y="245">R4</text>
+                            <text x="340" y="245">R5</text>
+                        </g>
+
+                        <g stroke="currentColor" stroke-width="1.5">
+                            <line x1="55" y1="325" x2="105" y2="325" stroke-dasharray="6 4"></line>
+                            <line x1="245" y1="325" x2="295" y2="325"></line>
+                        </g>
+                        <g fill="currentColor" font-size="14">
+                            <text x="113" y="330">개방 종속성</text>
+                            <text x="303" y="330">폐쇄 종속성</text>
+                        </g>
+                    </svg>
+                    <figcaption><a class="self-link" href="#fig-worked-example-dep-graph">그림 <bdi
+                                class="figno">1</bdi></a> <span class="fig-title">
+                            실제 예제 규칙 집합의 종속성 그래프.
+                            개방 종속성은 점선 화살표로, 폐쇄
+                            종속성은 실선 화살표로 표시한다. 각 간선은 본문에
+                            일치하는 트리플 패턴이 포함된 규칙에서
+                            머리부가 일치하는 트리플을 생성할 수 있는 규칙을 향한다.
+                            규칙은 계층 0을 위쪽에 두고 더 높은
+                            계층을 아래쪽에 두어 평가 순서와 일치하도록 배치한다.
+                        </span></figcaption>
+                </figure>
+                <p>
+                    그래프의 유일한 순환은 자기 간선 <code>R2 → R2</code>이며,
+                    이는 개방 종속성이다. 폐쇄
+                    종속성이 포함된 순환은 없으므로 <a data-link-type="dfn|abstract-op" href="#dfn-stratification-condition"
+                        class="internalDFN" id="ref-for-dfn-stratification-condition-3">계층화 조건</a>이
+                    충족되며
+                    규칙 집합은 명확하게 정의된 결과를 가진다.
+                </p>
+            </section>
+
+            <section id="worked-example-stratification">
+                <div class="header-wrapper">
+                    <h4 id="x6-6-2-calculating-the-stratification"><bdi class="secno">6.6.2 </bdi>계층화
+                        계산</h4><a class="self-link" href="#worked-example-stratification"
+                        aria-label="6.6.2절의 영구 링크"></a>
+                </div>
+
+                <p>
+                    <a href="#stratification-algorithm">계층화 알고리즘</a>에 따라
+                    모든 규칙은 계층 0에서 시작한다. 그런 다음 아무것도 변경되지 않을 때까지
+                    간선을 반복해서 검사한다.
+                </p>
+                <ul>
+                    <li>
+                        <em>개방</em> 간선에서는 출발 규칙이 대상 규칙과
+                        동일하거나 더 높은 계층에 있어야 한다. 모든 규칙이 계층 0에 있을 때
+                        네 개의 개방 간선이 이미 이 조건을 충족하므로
+                        변경이 발생하지 않는다.
+                    </li>
+                    <li>
+                        <em>폐쇄</em> 간선에서는 대상 규칙이 먼저 완료되어야 하므로
+                        출발 규칙이 대상 규칙보다 엄격히 더 높은 계층에
+                        있어야 한다. 간선 <code>R4 → R3</code>
+                        (폐쇄)을 검사하면 <code>R4</code>와 <code>R3</code>이 모두 계층 0에 있으므로 <code>R4</code>를
+                        계층 1로 이동한다. 마찬가지로 간선 <code>R5 → R3</code>
+                        (폐쇄)은 <code>R5</code>를 계층 1로 이동한다.
+                    </li>
+                </ul>
+                <p>
+                    간선을 한 번 더 순회해도 변경이 발생하지 않으므로 계층은
+                    확정된다. 그런 다음 각 계층을
+                    <a data-link-type="dfn|abstract-op" href="#dfn-run-once-rule" class="internalDFN"
+                        id="ref-for-dfn-run-once-rule-7">일회 실행 규칙</a>과 <a data-link-type="dfn|abstract-op"
+                        href="#dfn-general-rule" class="internalDFN" id="ref-for-dfn-general-rule-3">일반 규칙</a>으로 나눈다.
+                    <code>R5</code>의 머리부에는 빈
+                    노드가 있으므로 <a data-link-type="dfn|abstract-op" href="#dfn-run-once-rule" class="internalDFN"
+                        id="ref-for-dfn-run-once-rule-8">일회 실행 규칙</a>이다. 다른 규칙에는
+                    <a data-link-type="dfn|abstract-op" href="#dfn-assignment-element" class="internalDFN"
+                        id="ref-for-dfn-assignment-element-15">할당 요소</a>나 머리부의 빈 노드가 없다.
+                    계층화 결과는 다음과 같다.
+                </p>
+                <ul>
+                    <li>계층 0: 일반 규칙 <code>R1</code>, <code>R2</code>, <code>R3</code>; 일회 실행 규칙 없음</li>
+                    <li>계층 1: 일회 실행 규칙 <code>R5</code>; 일반 규칙 <code>R4</code></li>
+                </ul>
+                <p>
+                    이 순서는 더 높은 계층에 있는 규칙의 의도를
+                    반영한다. 구성 요소를 안전하게 배포할 수 있는지와
+                    어떤 구성 요소에 알림이 필요한지는
+                    <em>모든</em> <code>:status :criticallyExposed</code> 트리플이 도출된 후에만
+                    결정할 수 있다. 그리고 이를 도출하는 규칙 <code>R3</code>은
+                    데이터를 제공하는 규칙 <code>R1</code> 및 <code>R2</code>와 함께
+                    아래 계층에서 완료된다.
+                </p>
+            </section>
+
+            <section id="worked-example-evaluation">
+                <div class="header-wrapper">
+                    <h4 id="x6-6-3-evaluating-the-strata"><bdi class="secno">6.6.3 </bdi>계층 평가</h4><a class="self-link"
+                        href="#worked-example-evaluation" aria-label="6.6.3절의 영구 링크"></a>
+                </div>
+
+                <p>
+                    평가는
+                    <a href="#eval-rule-set" class="sectionRef sec-ref"><bdi class="secno">6.5 </bdi>규칙 집합
+                        평가</a> 알고리즘을 따른다.
+                    평가 그래프 <code>GE</code>는 기본 그래프로 시작하고
+                    추론 그래프 <code>GI</code>는 빈 상태로 시작한다. 각 계층은 순서대로
+                    완료될 때까지 평가한다. 계층의 규칙을 여러 차례 순회하여 평가하며,
+                    한 번의 순회에서 새 트리플이 생성되지 않을 때까지 순회를 반복한다.
+                    알고리즘은 한 번의 순회 중에 계층의 규칙을 평가하는
+                    순서를 정하지 않는다. 이 추적에서는
+                    <code>R1</code>, <code>R2</code>, <code>R3</code> 순서를 사용한다. 다른 순서는 동일한
+                    추론을 서로 다른 횟수의 순회에 분산시킬 수 있지만,
+                    계층 0을 완료될 때까지 실행하므로 동일한 최종 그래프를 생성한다.
+                </p>
+                <p>
+                    이 규칙 집합에는 <code>DATA</code> 블록이 없으므로 평가의 모든 시점에서
+                    <code>GE</code>는 <code>G0</code>와 <code>GI</code>를 합친 것이다. 따라서 이 추적에서는
+                    <code>GI</code>만 추적하고, 평가가 진행됨에 따라 그 상태를 표시하며
+                    각 새 트리플에 이를 생성한 규칙을 표시한다.
+                </p>
+                <p><strong>계층 0, 첫 번째 순회.</strong></p>
+                <ul>
+                    <li>
+                        <code>R1</code>: 본문이
+                        <code>:db :hasVulnerability :vuln1</code>과 일치하여
+                        <code>?x = :db</code>와 <code>?v = :vuln1</code>을 바인딩한다.
+                        머리부는 <code>:db :exposedTo :vuln1</code>을 생성한다.
+                        이 트리플은 <code>GE</code>에 없으므로 <code>GE</code>와 <code>GI</code>에 추가한다.
+                    </li>
+                    <li>
+                        <code>R2</code>: 본문은 <code>?x :dependsOn ?y</code>와
+                        <code>?y :exposedTo ?v</code>를 조인한다. 이제 <code>GE</code>에는
+                        <code>:db :exposedTo :vuln1</code>이 포함되어 있으므로 조인 결과로 하나의 해가 나온다.
+                        <code>?x = :app</code>, <code>?y = :db</code>, <code>?v = :vuln1</code>이다
+                        (<code>:app :dependsOn :db</code>에서 유래).
+                        머리부는 새로운 <code>:app :exposedTo :vuln1</code>을 생성하여
+                        추가한다. 아직 <code>:frontend</code>에 대한 해는 없다. 이
+                        <code>R2</code> 평가가 시작될 때 <code>:app :exposedTo :vuln1</code>이
+                        <code>GE</code>에 없었기 때문이다.
+                    </li>
+                    <li>
+                        <code>R3</code>: 이제 <code>?x :exposedTo ?v</code>는 <code>:db</code>와
+                        <code>:app</code>에 대해 일치한다.
+                        <code>:vuln1 :severity 9.1</code>과 조인하고
+                        <code>FILTER(?s &gt;= 9.0)</code>을 적용하면 두 해가 모두 유지된다.
+                        머리부는 새로운 <code>:db :status :criticallyExposed</code>와
+                        <code>:app :status :criticallyExposed</code>를 생성한다.
+                    </li>
+                </ul>
+                <pre class="block ex-inferred" aria-busy="false"><code class="hljs"># 계층 0의 첫 번째 순회 후 GI
+:db  :exposedTo :vuln1 .                    # 신규 (R1)
+:app :exposedTo :vuln1 .                    # 신규 (R2)
+:db  :status :criticallyExposed .           # 신규 (R3)
+:app :status :criticallyExposed .           # 신규 (R3)</code></pre>
+                <p>
+                    새 트리플이 생성되었으므로 계층 0의 평가는
+                    다음 순회로 계속된다.
+                </p>
+                <p><strong>계층 0, 두 번째 순회.</strong></p>
+                <ul>
+                    <li>
+                        <code>R1</code>: 이전과 같이 일치한다. <code>:db :exposedTo :vuln1</code>은 이미
+                        <code>GE</code>에 있으므로 새로운 것은 생성되지 않는다.
+                    </li>
+                    <li>
+                        <code>R2</code>: 이제 조인 결과에
+                        <code>?x = :frontend</code>, <code>?y = :app</code>, <code>?v = :vuln1</code>도 포함되어
+                        새로운 트리플 <code>:frontend :exposedTo :vuln1</code>을 생성한다.
+                        노출이 종속성 체인의 두 단계를 이동하는 데
+                        두 번의 순회가 걸렸다.
+                    </li>
+                    <li>
+                        <code>R3</code>: 새로운 트리플
+                        <code>:frontend :status :criticallyExposed</code>을 생성한다.
+                    </li>
+                </ul>
+                <pre class="block ex-inferred" aria-busy="false"><code class="hljs"># 계층 0의 두 번째 순회 후 GI
+:db       :exposedTo :vuln1 .
+:app      :exposedTo :vuln1 .
+:frontend :exposedTo :vuln1 .               # 신규 (R2)
+:db       :status :criticallyExposed .
+:app      :status :criticallyExposed .
+:frontend :status :criticallyExposed .      # 신규 (R3)</code></pre>
+                <p><strong>계층 0, 세 번째 순회.</strong>
+                    이제 모든 규칙의 모든 해는 이미
+                    <code>GE</code>에 있는 트리플만 생성한다. <code>GI</code>는 변경되지 않는다.
+                    새 트리플이 없으므로 계층 0이 완료된다. 도출될 수 있는 모든
+                    <code>:exposedTo</code> 트리플과 모든 <code>:status :criticallyExposed</code> 트리플이
+                    도출되었다.
+                </p>
+                <p><strong>계층 1, 일회 실행 규칙.</strong>
+                    계층의 <a data-link-type="dfn|abstract-op" href="#dfn-run-once-rule" class="internalDFN"
+                        id="ref-for-dfn-run-once-rule-9">일회 실행 규칙</a>을 먼저
+                    각각 정확히 한 번씩 평가한다.
+                </p>
+                <ul>
+                    <li>
+                        <code>R5</code>: 본문은 세 개의 <code>:status :criticallyExposed</code>
+                        트리플과 일치하여 <code>?x = :db</code>, <code>?x = :app</code>,
+                        <code>?x = :frontend</code>인 해를 얻는다. 각 해에서 머리부를
+                        인스턴스화하면 <em>새로운</em> 빈 노드가 생성되어 해마다
+                        두 개의 트리플, 즉 심각한 각 구성 요소에 대한
+                        알림을 생성한다. 이제 계층의 일반 규칙을
+                        반복적으로 평가하더라도 <code>R5</code>는 다시 평가하지 않는다.
+                    </li>
+                </ul>
+                <p><strong>계층 1, 일반 규칙의 첫 번째 순회.</strong></p>
+                <ul>
+                    <li>
+                        <code>R4</code>: 패턴 <code>?x rdf:type :Component</code>는
+                        <code>:frontend</code>, <code>:app</code>, <code>:db</code>, <code>:logger</code>와 일치한다.
+                        (<code>R5</code>가 방금 생성한 <code>rdf:type :Notification</code> 트리플과는
+                        일치하지 않는다.)
+                        부정 요소 <code>NOT { ?x :status :criticallyExposed }</code>는
+                        <code>:frontend</code>, <code>:app</code>, <code>:db</code>에 대한 해를 거부한다.
+                        <code>GE</code>에 각각에 대한 <code>:status :criticallyExposed</code> 트리플이
+                        포함되어 있기 때문이다.
+                        <code>?x = :logger</code>인 해만 남아 새로운
+                        트리플 <code>:logger :status :safeToDeploy</code>을 생성한다.
+                    </li>
+                </ul>
+                <pre class="block ex-inferred" aria-busy="false"><code class="hljs"># 계층 1 이후의 GI
+:db       :exposedTo :vuln1 .
+:app      :exposedTo :vuln1 .
+:frontend :exposedTo :vuln1 .
+:db       :status :criticallyExposed .
+:app      :status :criticallyExposed .
+:frontend :status :criticallyExposed .
+_:n1      rdf:type :Notification .          # 신규 (R5)
+_:n1      :concerns :db .                   # 신규 (R5)
+_:n2      rdf:type :Notification .          # 신규 (R5)
+_:n2      :concerns :app .                  # 신규 (R5)
+_:n3      rdf:type :Notification .          # 신규 (R5)
+_:n3      :concerns :frontend .             # 신규 (R5)
+:logger   :status :safeToDeploy .           # 신규 (R4)</code></pre>
+                <p><strong>계층 1, 일반 규칙의 두 번째 순회.</strong>
+                    새 트리플은 없다. 평가가 완료되었으며, 위에 표시된 <code>GI</code>가
+                    결과 <a data-link-type="dfn|abstract-op" href="#dfn-inference-graph" class="internalDFN"
+                        id="ref-for-dfn-inference-graph-7">추론 그래프</a>이다.
+                </p>
+                <p>
+                    계층화는 이 결과를 신뢰할 수 있도록 한다.
+                    <code>:frontend :status :criticallyExposed</code>이 도출되기 전인
+                    계층 0의 첫 번째 순회 중에 평가했다면, <code>R4</code>는
+                    <code>:frontend :status :safeToDeploy</code>이라고 잘못 결론 내렸을 것이며,
+                    <code>R5</code>는 <code>:db</code>와 <code>:app</code>에 대한 알림은 생성했지만
+                    <code>:frontend</code>에 대한 알림은 생성하지 않았을 것이다.
+                    두 규칙을 계층 1까지 지연하면 완전한
+                    <code>:status :criticallyExposed</code> 트리플 집합을 확인하게 되므로
+                    각 계층 내에서 규칙을 평가하는 순서가
+                    최종 결과에 영향을 주지 않는다.
+                </p>
+            </section>
+        </section>
     </section>
 
     <section id="shapes-rules-grammar">
@@ -4283,8 +4829,8 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                 </tbody>
             </table>
 
-            <div class="note" role="note" id="issue-container-generatedID-13">
-                <div class="note-title marker" id="h-note-7"><span>참고</span></div>
+            <div class="note" role="note" id="issue-container-generatedID-14">
+                <div class="note-title marker" id="h-note-8"><span>참고</span></div>
                 <p class="">%-인코딩된 시퀀스는
                     <a href="#rIRIREF">IRI의 문자 범위</a>에 있으며
                     로컬 이름에서 <a href="#rPERCENT">명시적으로 허용</a>됩니다.
@@ -6432,7 +6978,7 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                 <dt id="bib-rdf12-turtle">[RDF12-TURTLE]</dt>
                 <dd>
                     <a href="https://www.w3.org/TR/rdf12-turtle/"><cite>RDF 1.2 Turtle</cite></a>. Gregg Kellogg; Andy
-                    Seaborne; Dominik Tomaszuk. W3C. 2026년 6월 12일. W3C Working Draft. URL: <a
+                    Seaborne; Dominik Tomaszuk. W3C. 2026년 7월 23일. W3C Working Draft. URL: <a
                         href="https://www.w3.org/TR/rdf12-turtle/">https://www.w3.org/TR/rdf12-turtle/</a>
                 </dd>
                 <dt id="bib-rfc2119">[RFC2119]</dt>
@@ -6604,10 +7150,11 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                     href="#ref-for-dfn-triple-template-10" title="Reference 5">(5)</a> <a
                     href="#ref-for-dfn-triple-template-11" title="Reference 6">(6)</a> <a
                     href="#ref-for-dfn-triple-template-12" title="Reference 7">(7)</a> <a
-                    href="#ref-for-dfn-triple-template-13" title="Reference 8">(8)</a>
+                    href="#ref-for-dfn-triple-template-13" title="Reference 8">(8)</a> <a
+                    href="#ref-for-dfn-triple-template-14" title="Reference 9">(9)</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-triple-template-14" title="§ 4.4.1 Stratification Condition">§ 4.4.1
+                <a href="#ref-for-dfn-triple-template-15" title="§ 4.4.1 Stratification Condition">§ 4.4.1
                     Stratification Condition</a>
             </li>
         </ul>
@@ -6704,6 +7251,11 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                 <a href="#ref-for-dfn-triple-pattern-element-8" title="Reference 2">(2)</a> <a
                     href="#ref-for-dfn-triple-pattern-element-9" title="Reference 3">(3)</a>
             </li>
+            <li>
+                <a href="#ref-for-dfn-triple-pattern-element-10" title="§ 6.6.1 Determining the Dependencies">§ 6.6.1
+                    Determining the Dependencies</a> <a href="#ref-for-dfn-triple-pattern-element-11"
+                    title="Reference 2">(2)</a>
+            </li>
         </ul>
     </div>
     <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-negation-element"
@@ -6733,10 +7285,16 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
             <li>
                 <a href="#ref-for-dfn-negation-element-6" title="§ 4.3 Rule Dependency">§ 4.3 Rule Dependency</a> <a
                     href="#ref-for-dfn-negation-element-7" title="Reference 2">(2)</a> <a
-                    href="#ref-for-dfn-negation-element-8" title="Reference 3">(3)</a>
+                    href="#ref-for-dfn-negation-element-8" title="Reference 3">(3)</a> <a
+                    href="#ref-for-dfn-negation-element-9" title="Reference 4">(4)</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-negation-element-9" title="§ 4.4 Stratification">§ 4.4 Stratification</a>
+                <a href="#ref-for-dfn-negation-element-10" title="§ 4.4 Stratification">§ 4.4 Stratification</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-negation-element-11" title="§ 6.6.1 Determining the Dependencies">§ 6.6.1
+                    Determining the Dependencies</a> <a href="#ref-for-dfn-negation-element-12"
+                    title="Reference 2">(2)</a>
             </li>
         </ul>
     </div>
@@ -6797,6 +7355,14 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
             <li>
                 <a href="#ref-for-dfn-assignment-element-13" title="§ 6.3 Evaluation of an Expression">§ 6.3 Evaluation
                     of an Expression</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-assignment-element-14" title="§ 6.6.1 Determining the Dependencies">§ 6.6.1
+                    Determining the Dependencies</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-assignment-element-15" title="§ 6.6.2 Calculating the Stratification">§ 6.6.2
+                    Calculating the Stratification</a>
             </li>
         </ul>
     </div>
@@ -7019,6 +7585,15 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                 <a href="#ref-for-dfn-run-once-rule-6" title="§ 6.5 Evaluation of a Rule Set">§ 6.5 Evaluation of a Rule
                     Set</a>
             </li>
+            <li>
+                <a href="#ref-for-dfn-run-once-rule-7" title="§ 6.6.2 Calculating the Stratification">§ 6.6.2
+                    Calculating the Stratification</a> <a href="#ref-for-dfn-run-once-rule-8"
+                    title="Reference 2">(2)</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-run-once-rule-9" title="§ 6.6.3 Evaluating the Strata">§ 6.6.3 Evaluating the
+                    Strata</a>
+            </li>
         </ul>
     </div>
     <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-general-rule"
@@ -7039,6 +7614,10 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
             <li>
                 <a href="#ref-for-dfn-general-rule-2" title="§ 6.5 Evaluation of a Rule Set">§ 6.5 Evaluation of a Rule
                     Set</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-general-rule-3" title="§ 6.6.2 Calculating the Stratification">§ 6.6.2 Calculating
+                    the Stratification</a>
             </li>
         </ul>
     </div>
@@ -7110,6 +7689,9 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
             <li>
                 <a href="#ref-for-dfn-rule-set-28" title="§ 6.5 Evaluation of a Rule Set">§ 6.5 Evaluation of a Rule
                     Set</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-rule-set-29" title="§ 6.6 Worked Example">§ 6.6 Worked Example</a>
             </li>
         </ul>
     </div>
@@ -7195,6 +7777,13 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
             <li>
                 <a href="#ref-for-dfn-inference-graph-4" title="§ 4.1 Elements of the Abstract Syntax">§ 4.1 Elements of
                     the Abstract Syntax</a> <a href="#ref-for-dfn-inference-graph-5" title="Reference 2">(2)</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-inference-graph-6" title="§ 6.6 Worked Example">§ 6.6 Worked Example</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-inference-graph-7" title="§ 6.6.3 Evaluating the Strata">§ 6.6.3 Evaluating the
+                    Strata</a>
             </li>
         </ul>
     </div>
@@ -7440,6 +8029,10 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                 <a href="#ref-for-dfn-dependency-graph-8" title="§ 6.2.2 Calculate Stratification">§ 6.2.2 Calculate
                     Stratification</a>
             </li>
+            <li>
+                <a href="#ref-for-dfn-dependency-graph-9" title="§ 6.6.1 Determining the Dependencies">§ 6.6.1
+                    Determining the Dependencies</a>
+            </li>
         </ul>
     </div>
     <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-transitive-rule-dependency"
@@ -7456,6 +8049,10 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
             <li>
                 <a href="#ref-for-dfn-transitive-rule-dependency-1" title="§ 4.3.1 Dependency Graph">§ 4.3.1 Dependency
                     Graph</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-transitive-rule-dependency-2" title="§ 6.6.1 Determining the Dependencies">§ 6.6.1
+                    Determining the Dependencies</a>
             </li>
         </ul>
     </div>
@@ -7559,6 +8156,10 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
             <li>
                 <a href="#ref-for-dfn-stratification-condition-2" title="§ 4.4.2 Stratification Algorithm">§ 4.4.2
                     Stratification Algorithm</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-stratification-condition-3" title="§ 6.6.1 Determining the Dependencies">§ 6.6.1
+                    Determining the Dependencies</a>
             </li>
         </ul>
     </div>
@@ -8187,7 +8788,7 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                     [...HL_COLORS.keys()].forEach(key => HL_COLORS.set(key, true));
                 };
                 if (hightligtedElems.length) {
-                    document.body.addEventListener("click", resetListener, { once: true });
+                    document.body.addEventListener("click", resetListener, {once: true});
                 }
             }
 
@@ -8207,7 +8808,7 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
              */
             function getHighlightColor(target) {
                 // return current colors if applicable
-                const { value } = target.classList;
+                const {value} = target.classList;
                 const re = /respec-hl-\w+/;
                 const activeClass = re.test(value) && value.match(re);
                 if (activeClass) return activeClass[0];
@@ -8298,7 +8899,7 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                                                     * @param {KeyboardEvent|MouseEvent} event
                                                     */
                                                    return event => {
-                                                       const { target, type } = event;
+                                                       const {target, type} = event;
 
                                                        if (!(target instanceof HTMLElement)) return;
 
@@ -8359,14 +8960,14 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                                                        event.clientY >= rect.top
                                                    ) {
                                                        // The event probably happened inside the bounding rect...
-                                                       return { x: event.clientX, y: event.clientY };
+                                                       return {x: event.clientX, y: event.clientY};
                                                    }
 
                                                    // Offset to the middle of the element
                                                    const x = rect.x + rect.width / 2;
                                                    // Placed at the bottom of the element
                                                    const y = rect.y + rect.height;
-                                                   return { x, y };
+                                                   return {x, y};
                                                }
 
                                                /**
@@ -8397,7 +8998,7 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                                                 * @param {HTMLElement} panel
                                                 * @param {{ x: number, y: number }} clickPosition
                                                 */
-                                               function displayPanel(dfn, panel, { x, y }) {
+                                               function displayPanel(dfn, panel, {x, y}) {
                                                    panel.hidden = false;
                                                    // distance (px) between edge of panel and the pointing triangle (caret)
                                                    const MARGIN = 20;
@@ -8407,7 +9008,7 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                                                    let closestTop = 0;
                                                    let minDiff = Infinity;
                                                    for (const rect of dfnRects) {
-                                                       const { top, bottom } = rect;
+                                                       const {top, bottom} = rect;
                                                        const diffFromClickY = Math.abs((top + bottom) / 2 - y);
                                                        if (diffFromClickY < minDiff) {
                                                            minDiff = diffFromClickY;
@@ -8465,7 +9066,7 @@ result is <span class="hljs-title function_">imports</span>(<span class="hljs-va
                                                            mo.disconnect();
                                                        }
                                                    });
-                                                   mo.observe(panel, { attributes: true, attributeFilter: ["hidden"] });
+                                                   mo.observe(panel, {attributes: true, attributeFilter: ["hidden"]});
                                                }
 
                                                /**
