@@ -301,6 +301,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebXR Gamepads Module - Level 1](https://ko.htmlspecs.com/webxr-gamepads-module-1/)（[Source](https://www.w3.org/TR/2025/WD-webxr-gamepads-module-1-20250707/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebXR Hit Test Module](https://ko.htmlspecs.com/webxr-hit-test-1/)（[Source](https://www.w3.org/TR/2025/WD-webxr-hit-test-1-20251211/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebXR Plane Detection Module](https://ko.htmlspecs.com/webxr-plane-detection/)（[Source](https://immersive-web.github.io/plane-detection/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [WebXR Mesh Detection Module](https://ko.htmlspecs.com/webxr-mesh-detection/)（[Source](https://immersive-web.github.io/real-world-meshing/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebXR DOM Overlays Module](https://ko.htmlspecs.com/webxr-dom-overlays-1/)（[Source](https://www.w3.org/TR/2024/WD-webxr-dom-overlays-1-20240924/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebXR Layers API Level 1](https://ko.htmlspecs.com/webxrlayers-1/)（[Source](https://www.w3.org/TR/2026/WD-webxrlayers-1-20260612/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [WebXR Depth Sensing Module](https://ko.htmlspecs.com/webxr-depth-sensing-1/)（[Source](https://www.w3.org/TR/2025/WD-webxr-depth-sensing-1-20251210/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
