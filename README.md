@@ -3,6 +3,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 플랫폼 핵심, 언어 및 기반
 - [HTML](https://ko.htmlspecs.com/)（[Source](https://html.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
+- [HTML Ruby Markup Extensions](https://ko.htmlspecs.com/html-ruby-extensions/)（[Source](https://www.w3.org/TR/2026/CR-html-ruby-extensions-20260604/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [ECMAScript® 2027 Language Specification](https://ecma262.com/k)（[Source](https://tc39.es/ecma262/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)），[How to Read](https://ko.htmlspecs.com/es-howto/)（[Source](https://timothygu.me/es-howto/)）
 - [Source map format specification](https://ko.htmlspecs.com/ecma426/)（[Source](https://tc39.es/ecma426/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebAssembly JavaScript Interface](https://ko.htmlspecs.com/wasm-js-api-2/)（[Source](https://www.w3.org/TR/2026/CRD-wasm-js-api-2-20260724/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
