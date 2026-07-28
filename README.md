@@ -65,7 +65,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Micropub](https://ko.htmlspecs.com/micropub/)（[Source](https://www.w3.org/TR/2017/REC-micropub-20170523/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Annotation Data Model](https://ko.htmlspecs.com/annotation-model/)（[Source](https://www.w3.org/TR/2017/REC-annotation-model-20170223/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Data on the Web Best Practices](https://ko.htmlspecs.com/dwbp/)（[Source](https://www.w3.org/TR/2017/REC-dwbp-20170131/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
-- [Linked Web Storage Protocol 1.0](https://ko.htmlspecs.com/lws10-core/)（[Source](https://www.w3.org/TR/2026/WD-lws10-core-20260724/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Linked Web Storage Protocol 1.0](https://ko.htmlspecs.com/lws10-core/)（[Source](https://www.w3.org/TR/2026/WD-lws10-core-20260728/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [LWS 1.0 Authentication Suite: OpenID Connect](https://ko.htmlspecs.com/lws10-authn-openid/)（[Source](https://www.w3.org/TR/2026/WD-lws10-authn-openid-20260609/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [LWS 1.0 Authentication Suite: SAML 2.0](https://ko.htmlspecs.com/lws10-authn-saml/)（[Source](https://www.w3.org/TR/2026/WD-lws10-authn-saml-20260609/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [LWS 1.0 Authentication Suite: Self-signed Identity using Controlled Identifiers](https://ko.htmlspecs.com/lws10-authn-ssi-cid/)（[Source](https://www.w3.org/TR/2026/WD-lws10-authn-ssi-cid-20260609/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
