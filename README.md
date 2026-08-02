@@ -183,6 +183,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Selection API](https://ko.htmlspecs.com/selection-api/)（[Source](https://www.w3.org/TR/2026/WD-selection-api-20260611/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Input Events Level 1](https://ko.htmlspecs.com/input-events-1/)（[Source](https://www.w3.org/TR/2023/DISC-input-events-1-20230928/) ![Discontinued Draft](https://img.shields.io/badge/DISC-ffcc00)）
 - [Input Events Level 2](https://ko.htmlspecs.com/input-events-2/)（[Source](https://www.w3.org/TR/2026/WD-input-events-2-20260501/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Autofill Event](https://ko.htmlspecs.com/autofill-event/)（[Source](https://wicg.github.io/autofill-event/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 기기, 센서 및 하드웨어 인터페이스
 - [Web Serial API](https://ko.htmlspecs.com/serial/)（[Source](https://wicg.github.io/serial/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
