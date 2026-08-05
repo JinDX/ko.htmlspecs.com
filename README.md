@@ -465,7 +465,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Accessible Rich Internet Applications (WAI-ARIA) 1.3](https://ko.htmlspecs.com/wai-aria-1.3/)（[Source](https://www.w3.org/TR/2026/WD-wai-aria-1.3-20260604/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Publishing WAI-ARIA Module 1.1](https://ko.htmlspecs.com/dpub-aria-1.1/)（[Source](https://www.w3.org/TR/2025/REC-dpub-aria-1.1-20250612/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Core Accessibility API Mappings 1.2](https://ko.htmlspecs.com/core-aam-1.2/)（[Source](https://www.w3.org/TR/2026/CRD-core-aam-1.2-20260805/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [HTML Accessibility API Mappings 1.0](https://ko.htmlspecs.com/html-aam-1.0/)（[Source](https://www.w3.org/TR/2026/WD-html-aam-1.0-20260729/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [HTML Accessibility API Mappings 1.0](https://ko.htmlspecs.com/html-aam-1.0/)（[Source](https://www.w3.org/TR/2026/WD-html-aam-1.0-20260805/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [SVG Accessibility API Mappings](https://ko.htmlspecs.com/svg-aam-1.0/)（[Source](https://www.w3.org/TR/2026/WD-svg-aam-1.0-20260727/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Digital Publishing Accessibility API Mappings 1.1](https://ko.htmlspecs.com/dpub-aam-1.1/)（[Source](https://www.w3.org/TR/2025/REC-dpub-aam-1.1-20250612/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Graphics Accessibility API Mappings](https://ko.htmlspecs.com/graphics-aam-1.0/)（[Source](https://www.w3.org/TR/2018/REC-graphics-aam-1.0-20181002/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
