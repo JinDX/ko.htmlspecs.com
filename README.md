@@ -399,7 +399,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Email Verification API](https://ko.htmlspecs.com/email-verification/)（[Source](https://wicg.github.io/email-verification/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Digital Credentials](https://ko.htmlspecs.com/digital-credentials/)（[Source](https://www.w3.org/TR/2026/WD-digital-credentials-20260803/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Decentralized Identifiers (DIDs) v1.1](https://ko.htmlspecs.com/did-1.1/)（[Source](https://www.w3.org/TR/2026/CR-did-1.1-20260305/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
-- [Decentralized Identifier Resolution (DID Resolution) v1](https://ko.htmlspecs.com/did-resolution/)（[Source](https://www.w3.org/TR/2026/WD-did-resolution-20260724/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Decentralized Identifier Resolution (DID Resolution) v1](https://ko.htmlspecs.com/did-resolution/)（[Source](https://www.w3.org/TR/2026/CR-did-resolution-1.0-20260806/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
 - [Verifiable Credentials Data Model v2.0](https://ko.htmlspecs.com/vc-data-model-2.0/)（[Source](https://www.w3.org/TR/2025/REC-vc-data-model-2.0-20250515/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Securing Verifiable Credentials using JOSE and COSE](https://ko.htmlspecs.com/vc-jose-cose/)（[Source](https://www.w3.org/TR/2025/REC-vc-jose-cose-20250515/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Verifiable Credential Data Integrity 1.1](https://ko.htmlspecs.com/vc-data-integrity-1.1/)（[Source](https://www.w3.org/TR/2026/WD-vc-data-integrity-1.1-20260416/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
