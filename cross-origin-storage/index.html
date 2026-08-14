@@ -1485,7 +1485,7 @@ For darkmode:
     <div class="head">
         <h1 class="no-ref p-name" id="title">교차 출처 저장소</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">커뮤니티 그룹 보고서 초안</a>,
-            <time class="dt-updated" datetime="2026-08-13">2026년 8월 13일</time>
+            <time class="dt-updated" datetime="2026-08-14">2026년 8월 14일</time>
         </p>
         <div data-fill-with="spec-metadata">
             <dl>
@@ -1595,6 +1595,8 @@ For darkmode:
                     <li><a href="#eviction"><span class="secno">5.2</span> <span class="content">축출</span></a>
                     <li><a href="#manually-added-entries"><span class="secno">5.3</span> <span class="content">수동으로
                                 추가된 항목</span></a>
+                    <li><a href="#provenance-metadata"><span class="secno">5.4</span> <span class="content">출처
+                                메타데이터</span></a>
                 </ol>
             <li><a href="#permissions-policy-integration"><span class="secno">6</span> <span class="content">권한
                         정책 통합</span></a>
@@ -3062,6 +3064,79 @@ For darkmode:
                 id="ref-for-on-the-phl③">PHL에 있음</a> 검사도
             포함된다. 이는 수동 추가의 기본값이지만 유일하게 가능한 결과는 아니다.
         </p>
+        <h3 class="heading settled" data-level="5.4" id="provenance-metadata"><span class="secno">5.4. </span><span
+                class="content">출처 메타데이터</span><a class="self-link" href="#provenance-metadata"></a></h3>
+        <p><em>이 절은 비규범적이다.</em></p>
+        <p><a data-link-type="dfn" href="#cos-entry" id="ref-for-cos-entry①⑦">COS 엔트리</a>는 바이트가 어디에서 왔는지에 관한
+            정보를 의도적으로 기록하지 않는다. 식별자는 오직
+            <a data-link-type="dfn" href="#cos-entry-hash" id="ref-for-cos-entry-hash①⓪">해시</a>뿐이다. 동일한 바이트는
+            이를 저장한 오리진의 수나 가져온 URL의 수와 관계없이 동일한 엔트리이다(<a href="#cos-entries">§ 2.2 COS 엔트리</a> 참조). URL은
+            엔트리 자체가 아니라 한
+            작성자의 가져오기 작업에 관한 속성이므로, 여러 오리진이 작성한 엔트리에 대해 하나를 선택하는 비자의적인 방법은
+            없다. 이는 바이트처럼 검증할 수 없으며(<a href="#resource-integrity">§ 7.1
+                리소스 무결성</a> 참조),
+            경로나 쿼리 문자열이 특정 문서,
+            계정 또는 세션을 지칭할 수 있으므로 <a data-link-type="dfn"
+                href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin"
+                id="ref-for-concept-origin①⑦">오리진</a> 값보다 사용자의 브라우징에 관해 훨씬 더 많은 정보를
+            <a data-link-type="dfn" href="#cos-entry-storing-origins" id="ref-for-cos-entry-storing-origins①③">저장
+                오리진</a>에 담는다. 따라서 이를 엔트리에 기록하면
+            <a data-link-type="dfn" href="#cos-entry-origins" id="ref-for-cos-entry-origins②④">오리진</a>과 <a
+                href="#availability-gating">§ 7.3 가용성
+                게이팅</a>이 부과하려는 공개 제한을 우회하여 고엔트로피 신호를 전달하게 된다.
+        </p>
+        <p>그럼에도 이를 원하는 동기는 현실적이다. <a href="#eviction">§ 5.2 축출</a>에 설명된
+            설정 UI에서 수 기가바이트 크기의 파일을 보고 있는 사용자와,
+            <code
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①④">requestFileHandle()</a></code>
+            호출이 실패한 이유를 디버깅하는 개발자 모두 파일이
+            어디에서 왔는지 알고 싶어 할 것이다. 사용자 에이전트는 엔트리와 함께 구현 전용 출처 기록을 유지하여
+            이를 제공할 수 있다. 예를 들어 각 <a data-link-type="dfn" href="#cos-entry-storing-origins"
+                id="ref-for-cos-entry-storing-origins①④">저장 오리진</a>이 바이트를 가져온
+            URL과
+            그 시각을 기록할 수 있다. 단, 이 기록은 엔트리의 일부가 아니라 사용자 에이전트 상태로 취급되어야
+            한다.
+        </p>
+        <ul>
+            <li data-md>
+                <p>이는 절대로 스크립트에 노출되지 않는다. 이 명세의 어떠한 내용도 이를 공개하지 않으며, 나중에 추가되는 어떠한 내용도
+                    그렇게 해서는 안 된다. <code
+                        class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑤">requestFileHandle()</a></code>도,
+                    이 메서드가 반환하는
+                    <code
+                        class="idl"><a data-link-type="idl" href="https://fs.spec.whatwg.org/#filesystemfilehandle" id="ref-for-filesystemfilehandle⑥">FileSystemFileHandle</a></code>도
+                    그러한 기록의 존재 여부는 물론
+                    그 내용까지 드러내서는 안 된다. 특히 요청하는 <a data-link-type="dfn"
+                        href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin"
+                        id="ref-for-concept-origin①⑧">오리진</a>은 자신이 직접 생성하지 않은 기록을 관찰할 수 없어야
+                    한다.
+                </p>
+            <li data-md>
+                <p>이는 신뢰할 수 있는 비웹 표면을 통해서만 표시된다. 즉, 사용자 에이전트 자체의 설정 및 저장소
+                    검사 UI, 개발자 도구, 그리고 사용자 에이전트에 확장 프로그램 플랫폼이 있는 경우 명시적으로 사용자가 부여한 권한으로 제한되는 확장 프로그램
+                    API를 통해서만 표시되며, 이는 브라우징 기록을 노출하는 다른
+                    API와 동일한 수준으로 취급된다. 고려 중인 확장 프로그램 표면에 대해서는 이
+                    저장소의 <a href="extensions/extensions-explainer.md">브라우저 확장 프로그램 통합 지점 설명 문서</a>를
+                    참조한다.
+                </p>
+            <li data-md>
+                <p>이는 검증되지 않으며, 그렇게 표시된다. 여기에 있는 URL은 바이트를 작성한 오리진의
+                    주장이지 해당 바이트에 대한 증명이 아니다. 콘텐츠를 보장하는 것은 오직 <a data-link-type="dfn" href="#cos-entry-hash"
+                        id="ref-for-cos-entry-hash①①">해시</a>뿐이다(
+                    <a href="#resource-integrity">§ 7.1 리소스 무결성</a> 참조). 두 오리진은 동일한 엔트리에 대해 서로 다른 URL을
+                    기록할 수 있으며, 어느 쪽이든
+                    부정확하거나 의도적으로 오도할 수 있다.
+                </p>
+            <li data-md>
+                <p>이는 엔트리 및 자신이 귀속된 오리진과 수명을 공유한다. 엔트리가 축출되거나 삭제되면
+                    폐기되며, 오리진에 귀속된 부분은 해당 오리진이 <a data-link-type="dfn" href="#cos-entry-storing-origins"
+                        id="ref-for-cos-entry-storing-origins①⑤">저장 오리진</a>에서 제거될 때 폐기된다. 여기에는 사용자가
+                    해당
+                    오리진의 사이트 데이터를 지우는 경우도 포함된다(<a href="#eviction">§ 5.2 축출</a> 참조).</p>
+        </ul>
+        <p>이러한 기록은 콘텐츠에서 보이지 않으므로, 사용자 에이전트가 이를 유지하는지 여부와 얼마나 많이
+            유지하는지는 전적으로 구현에 맡겨진다. 이 명세의 어떠한 내용도 이에 의존하지 않으며, 사이트는 그
+            존재 여부를 감지할 수 없다.</p>
         <h2 class="heading settled" data-level="6" id="permissions-policy-integration"><span class="secno">6.
             </span><span class="content">권한 정책 통합</span><a class="self-link" href="#permissions-policy-integration"></a>
         </h2>
@@ -3080,7 +3155,7 @@ For darkmode:
                 href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document②">Document</a>인 워커에서)
             이루어진 모든
             <code
-                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①④">requestFileHandle()</a></code>
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑥">requestFileHandle()</a></code>
             호출이 해시 검증, 레지스트리 조회 또는 쓰기가 이루어지기 전에 "<code
                 class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror④">NotAllowedError</a></code>"
             <code
@@ -3094,11 +3169,11 @@ For darkmode:
                 <a href="security-privacy-questionnaire.md">보안 및 개인정보 보호 설문</a>도 참조한다.</em></p>
         <h3 class="heading settled" data-level="7.1" id="resource-integrity"><span class="secno">7.1. </span><span
                 class="content">리소스 무결성</span><a class="self-link" href="#resource-integrity"></a></h3>
-        <p>모든 <a data-link-type="dfn" href="#cos-entry" id="ref-for-cos-entry①⑦">COS 항목</a>은
+        <p>모든 <a data-link-type="dfn" href="#cos-entry" id="ref-for-cos-entry①⑧">COS 항목</a>은
             암호학적 해시를 키로 사용하며 해당 해시를 기준으로 바이트를 검증한다
             (<a href="#creating-and-writing-files">§ 3.3 파일 생성 및 쓰기</a> 참조). 따라서 사이트는
             <code
-                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑤">requestFileHandle()</a></code>을
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑦">requestFileHandle()</a></code>을
             통해 얻은 파일의 바이트가 <var>hash</var>를 직접 가져왔을 때 얻었을 바이트와 정확히 같음을 확신할 수 있다.
             개발자는 교차 출처 저장소의 내용을 열거하거나 해시를 이미 알지 못하는 파일에 접근할 수 없다.
         </p>
@@ -3107,7 +3182,7 @@ For darkmode:
             종류의 리소스에서는 일반적으로 공개된 정보이다. 예를 들어 모델이나 라이브러리의 릴리스와 함께 게시된다.
             따라서 해시를 알면 항목을 조회할 수 있지만, 기능 URL이나 소지자 토큰과 달리 해시 자체는 접근 권한을 부여하지 않는다.
             조회 성공 여부는 해시가 공개되지 않은 상태로 유지되었는지가 아니라 전적으로 <a data-link-type="dfn" href="#cos-entry-origins"
-                id="ref-for-cos-entry-origins②④">출처</a>와
+                id="ref-for-cos-entry-origins②⑤">출처</a>와
             <a href="#availability-gating">§ 7.3 가용성 게이팅</a>에 의해 결정된다. 개발자는 공개되지 않은 해시를
             접근 제어 수단으로 취급해서는 안 된다. 특정 파일에 관심 있는 공격자는 해시를 추측할 필요 없이 파일 자체를
             얻기만 하면 된다(<a href="#cross-site-probing">§ 7.2 교차 사이트 탐색</a> 참조).
@@ -3117,69 +3192,78 @@ For darkmode:
         <p>리소스를 사용하는 사이트가 소수에 불과하면, 공격자는 해당 리소스가 교차 출처 저장소에 존재함을 알아내어
             사용자가 해당 사이트 중 하나를 방문했을 가능성이 높다고 추론할 수 있다.
             <code
-                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑥">requestFileHandle()</a></code>이
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑧">requestFileHandle()</a></code>이
             존재 여부를 알아내는 메커니즘이므로 각 호출은 사실상 탐색이다. 이 명세의 두 독립적인 메커니즘은 탐색으로
             알아낼 수 있는 정보를 제한한다.
         </p>
         <ul>
             <li data-md>
-                <p><a data-link-type="dfn" href="#cos-entry-origins" id="ref-for-cos-entry-origins②⑤">출처</a>
-                    (<a href="#resource-visibility-upgrades">§ 3.4 리소스 가시성 상향</a> 참조)를 사용하면 저장 출처가
-                    공개 범위를 선택한 출처 집합으로 제한할 수 있다. 따라서 독점적이거나 인기가 낮은 리소스를 전역에서
-                    탐색할 수 있게 할 필요가 없다.
+                <p><a data-link-type="dfn" href="#cos-entry-origins" id="ref-for-cos-entry-origins②⑥">오리진</a>(<a
+                        href="#resource-visibility-upgrades">§ 3.4 리소스 가시성 업그레이드</a> 참조)을 통해 저장
+                    오리진은 공개를 선택한 오리진 집합으로 제한할 수 있으므로, 독점적이거나 인기가 낮은 리소스를
+                    전역에서 탐색 가능하게 만들 필요가 전혀 없다.
                 </p>
             <li data-md>
-                <p><a href="#availability-gating">§ 7.3 가용성 게이팅</a>은 해시가
-                    <a data-link-type="dfn" href="#on-the-phl" id="ref-for-on-the-phl④">PHL에 있지 않으면</a>
-                    "<code>*</code>" 범위 리소스를 <a data-link-type="dfn" href="#cos-entry-storing-origins"
-                        id="ref-for-cos-entry-storing-origins①③">저장 출처</a> 외부의 요청 출처에 공개하지 않는다.
-                    따라서 <code
+                <p><a href="#availability-gating">§ 7.3 가용성 게이팅</a>은 또한
+                    "<code>*</code>" 범위의 리소스에 대해 해당 해시가 <a data-link-type="dfn" href="#on-the-phl"
+                        id="ref-for-on-the-phl④">PHL에 있는</a> 경우가 아니면
+                    그 <a data-link-type="dfn" href="#cos-entry-storing-origins"
+                        id="ref-for-cos-entry-storing-origins①⑥">저장 오리진</a> 외부의 요청 오리진에 대한 공개를 보류하므로,
+                    <code
                         class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragerequestfilehandleoptions-origins" id="ref-for-dom-crossoriginstoragerequestfilehandleoptions-origins⑧">origins</a></code>:
-                    "<code>*</code>"로 저장한 리소스를 웹의 모든 출처에서 자동으로 탐색할 수 있는 것은 아니다.
-                    이 게이트는 "<code>*</code>" 범위 항목에만 적용된다. 목록 범위 및 동일 사이트 범위 항목에서는
-                    저장 출처가 공개 범위를 이미 명시적으로 제한했으므로 첫 번째 항목의 제한이 유일한 게이트이다.
+                    "<code>*</code>"로 저장된 리소스가
+                    웹의 모든 오리진에서 자동으로 탐색 가능해지는 것을 방지한다. 이 게이트는
+                    "<code>*</code>" 범위의
+                    엔트리에만 적용된다. 목록 범위 및 동일 사이트 범위 엔트리의 경우 저장 오리진이 이미 해당 엔트리에 대한 공개 범위를 명시적으로 제한했으므로, 첫 번째 항목의 제한만이 유일한
+                    게이트이다.
                 </p>
         </ul>
-        <p>첫 번째 항목은 "선택된 오리진 집합"이 웹 전체보다 의미 있게 작은 상태로 유지되는 경우에만 성립한다.
+        <p>첫 번째 항목은 "선택한 오리진 집합"이 웹 전체보다 의미 있게 작은 상태로 유지되는 경우에만 성립한다.
             <code
                 class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragerequestfilehandleoptions-origins" id="ref-for-dom-crossoriginstoragerequestfilehandleoptions-origins⑨">origins</a></code>의
-            형태에는 호출자가 매우 많은 수의 오리진을 열거하지 못하게 하는 것이 없다. 예를 들어 공개
-            인기 사이트 순위에서 조합한 목록은 "<code>*</code>"만이 요구하는 의도적이고 명시적인 옵트인을
-            우회하면서 기능적으로 전역 공개에 근접할 수 있다. <a data-link-type="dfn" href="#maximum-origins-list-length"
+            형태 자체는 호출자가
+            매우 많은 수의 오리진을 열거하는 것을 막지 않는다. 예를 들어 공개된
+            상위 사이트 순위에서 조합한 목록은 "<code>*</code>"만이 요구하는
+            의도적이고 명시적인 옵트인을 우회하면서 기능적으로 전역 공개에 근접할 수 있다. <a data-link-type="dfn" href="#maximum-origins-list-length"
                 id="ref-for-maximum-origins-list-length②">최대 오리진 목록
-                길이</a>(<a href="#storage-limits">§ 5.1 저장소 제한</a> 참조)는 이를 제한한다. 진정한
-            다중 속성 사용 사례(공통 제어 아래 있는 소수의 관련 오리진)를 수용할 만큼 충분히 작으면서도
-            "모든 오리진"에 대한 의미 있는 근사치에는 훨씬 못 미치는 제한은 <a data-link-type="dfn" href="#cos-entry-origins"
-                id="ref-for-cos-entry-origins②⑥">오리진</a>의 제한된 오리진 형식이
+                길이</a>(<a href="#storage-limits">§ 5.1 저장소 제한</a> 참조)가 이를 제한한다. 즉, 실제
+            다중 속성 사용 사례
+            (공통 제어하에 있는 소수의 관련 오리진)를 수용할 만큼은 충분히 크지만 "모든 오리진"에 의미 있게 근접하기에는
+            훨씬 작은 제한을 두어, <a data-link-type="dfn" href="#cos-entry-origins"
+                id="ref-for-cos-entry-origins②⑦">origins</a>의 제한된 오리진 형식이
             "<code>*</code>"를 대신하는 선언되지 않은 대체 수단으로 사용되지 못하게 한다.
         </p>
-        <p>사용자 에이전트는 추가로 단일 오리진에서 반복되는
+        <p>사용자 에이전트는 또한 단일 오리진에서 반복되는
             <code
-                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑦">requestFileHandle()</a></code>
-            호출의 속도를 제한하거나 다른 방식으로 조절해야 하며, 탐색 대상
-            해시가 <a data-link-type="dfn" href="#on-the-phl" id="ref-for-on-the-phl⑤">PHL에 있는지</a>와 관계없이
-            온디바이스 휴리스틱(예를 들어 사용자별로 생성된 것으로 보이는 해시에 대한 요청 패턴을 감지하는 것)을 적용하여
-            탐색 시도를 식별하고 차단할 수 있다.
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑨">requestFileHandle()</a></code>
+            호출에 속도 제한을 적용하거나 다른 방식으로 조절해야 하며,
+            탐색 대상 해시가 <a data-link-type="dfn" href="#on-the-phl" id="ref-for-on-the-phl⑤">PHL에 있는지</a> 여부와 관계없이
+            탐색 시도를 식별하고 차단하기 위해 온디바이스 휴리스틱(예: 사용자별로
+            생성된 것으로 보이는 해시에 대한 요청 패턴 감지)을 적용할 수 있다.
         </p>
         <h3 class="heading settled" data-level="7.3" id="availability-gating"><span class="secno">7.3. </span><span
                 class="content">가용성 게이팅</span><a class="self-link" href="#availability-gating"></a></h3>
-        <p><a data-link-type="dfn" href="#cos-entry-storing-origins" id="ref-for-cos-entry-storing-origins①④">저장
-                오리진</a>에 포함되지 않은 오리진에서 수행한 <code
-                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑧">requestFileHandle()</a></code>
-            읽기의 성공 여부는 항상 요청 오리진이 해당 항목을 읽도록
-            <em>허용되는지</em>에 달려 있으며, 이는 <a data-link-type="dfn" href="#cos-entry-origins"
-                id="ref-for-cos-entry-origins②⑦">오리진</a>에 의해 제어된다. "<code>*</code>" 범위의 항목에는 두 번째로,
-            독립적인 질문도 적용된다. 즉, 사용자 에이전트가 <em>해당 항목이 존재한다는 사실 자체를
-                공개할 의향이 있는지</em>이며, 이는 <a data-link-type="dfn" href="#on-the-phl" id="ref-for-on-the-phl⑥">PHL
-                포함 여부</a>와 <a href="#greasing">GREASE 적용</a>에 의해 제어된다. 이러한 항목에는 두 조건이 모두
-            충족되어야 한다. 목록 범위 또는 동일 사이트 범위의 항목에는 첫 번째 질문만 적용되지만,
-            GREASE 적용은 <a data-link-type="dfn" href="#cos-entry-origins" id="ref-for-cos-entry-origins②⑧">오리진</a>이 원래
-            허용했을 공개를 여전히 억제할 수 있다. 규범적 알고리즘은 <a href="#reading-files">§ 3.2 파일 읽기</a>를 참조하라. 따라서 "<code
+        <p>저장
+            <a data-link-type="dfn" href="#cos-entry-storing-origins" id="ref-for-cos-entry-storing-origins①⑦">오리진</a>
+            외부의 오리진에서 <code
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle②⓪">requestFileHandle()</a></code>로
+            읽기가 성공하는지 여부는 항상 요청하는 오리진이 해당 엔트리를 읽도록
+            <em>허용되는지</em>에 따라 달라지며, 이는 <a data-link-type="dfn" href="#cos-entry-origins"
+                id="ref-for-cos-entry-origins②⑧">origins</a>에 의해 결정된다. "<code>*</code>" 범위의 엔트리에는 두 번째의
+            독립적인 문제도 적용된다. 즉, 사용자 에이전트가 <em>해당 엔트리가
+                존재한다는 사실 자체를 공개할 의향이 있는지</em>이며, 이는 <a data-link-type="dfn" href="#on-the-phl"
+                id="ref-for-on-the-phl⑥">PHL
+                포함 여부</a>와 <a href="#greasing">GREASE 적용</a>에 의해 결정된다. 이러한 엔트리에서는 두 조건이 모두
+            충족되어야 한다. 목록 범위 또는 동일 사이트 범위의 엔트리에는 첫 번째 문제만 적용되지만,
+            GREASE 적용으로 인해 <a data-link-type="dfn" href="#cos-entry-origins"
+                id="ref-for-cos-entry-origins②⑨">origins</a>가 원래
+            허용했을 공개가 여전히 억제될 수 있다. 규범적 알고리즘은 <a href="#reading-files">§ 3.2 파일 읽기</a>를 참조한다. "<code
                 class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notfounderror" id="ref-for-notfounderror④">NotFoundError</a></code>"는
+            따라서
             리소스가 없다는
-            증거가 아니다. 이는 리소스가 존재하지 않거나, 요청 오리진이 범위를 벗어났거나, "<code>*</code>" 범위
-            리소스의 해시가 PHL에 아직 없거나 앞으로도 없거나, GREASE 적용이 참 양성을 억제했음을 의미할 수 있다.
-            개발자는 "<code
+            증거가 아니다. 이는 리소스가 존재하지 않거나, 요청하는
+            오리진이 범위 밖에 있거나, "<code>*</code>" 범위 리소스의 해시가 PHL에 (아직 또는 영원히) 없거나,
+            GREASE 적용으로 참 양성이 억제되었음을 의미할 수 있다. 개발자는 "<code
                 class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notfounderror" id="ref-for-notfounderror⑤">NotFoundError</a></code>"를
             "네트워크로 폴백하라"보다
             더 구체적인 의미로 취급해서는 안 된다.
@@ -3213,13 +3297,13 @@ For darkmode:
             </span><span class="content">다른 명세와의 통합</span><a class="self-link"
                 href="#integration-with-other-specifications"></a></h2>
         <p><em>이 절은 비규범적이다.</em></p>
-        <p>여기에서 정의한 <a data-link-type="dfn" href="#cos-registry" id="ref-for-cos-registry⑧">COS 레지스트리</a>는
+        <p>여기에서 정의된 <a data-link-type="dfn" href="#cos-registry" id="ref-for-cos-registry⑧">COS 레지스트리</a>는
             <code
-                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle①⑨">requestFileHandle()</a></code>을
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle②①">requestFileHandle()</a></code>를
             직접 거치지 않고도 세 가지 호스트 언어에서 접근할 수 있다. 각
-            통합은 이 문서가 아니라 해당 호스트 언어 자체의 명세에서 정의된다. 이
-            명세에서는 이러한 통합의 기반이 될 것으로 예상되는 공유 기반 개념(<a data-link-type="dfn" href="#cos-hash" id="ref-for-cos-hash⑨">COS
-                해시</a>, <a data-link-type="dfn" href="#cos-entry" id="ref-for-cos-entry①⑧">COS 항목</a>,
+            통합은 이 문서가 아니라 해당 호스트 언어의 명세에서 정의된다. 이
+            명세는 이러한 통합이 기반으로 삼을 것으로 예상되는 공통 기반 개념(<a data-link-type="dfn" href="#cos-hash" id="ref-for-cos-hash⑨">COS
+                해시</a>, <a data-link-type="dfn" href="#cos-entry" id="ref-for-cos-entry①⑨">COS 엔트리</a>,
             <a href="#availability-gating">가용성 게이팅</a>, 그리고 <a data-link-type="dfn" href="#dfn-public-hash-list"
                 id="ref-for-dfn-public-hash-list①">공개 해시 목록</a>)만 정의한다.
         </p>
@@ -3227,32 +3311,28 @@ For darkmode:
             <li data-md>
                 <p><strong>HTML</strong>: 이미
                     <code>integrity</code>를 포함하는
-                    <code><a data-link-type="element" href="[https://html.spec.whatwg.org/multipage/semantics.html#the-link-element](https://html.spec.whatwg.org/multipage/semantics.html#the-link-element)" id="ref-for-the-link-element①">link</a></code>
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/semantics.html#the-link-element" id="ref-for-the-link-element①">link</a></code>
                     및
-                    <code><a data-link-type="element" href="[https://html.spec.whatwg.org/multipage/scripting.html#script](https://html.spec.whatwg.org/multipage/scripting.html#script)" id="ref-for-script①">script</a></code>
+                    <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/scripting.html#script" id="ref-for-script①">script</a></code>
                     요소의 <code>crossoriginstorage</code> 속성으로,
                     <a data-link-type="biblio" href="#biblio-sri" title="서브리소스 무결성">[SRI]</a>를 사용하며, WHATWG에
-                    <a
-                        href="[https://github.com/whatwg/html/issues/12770](https://github.com/whatwg/html/issues/12770)">whatwg/html#12770</a>으로
+                    <a href="https://github.com/whatwg/html/issues/12770">whatwg/html#12770</a>으로
                     제안되었다.
                 </p>
             <li data-md>
                 <p><strong>JavaScript</strong>: 호스트가 정의하는 <code>crossOriginStorage</code> import 속성으로,
                     <code>integrity</code>와 함께 사용할 수 있으며,
-                    <a
-                        href="[https://github.com/tc39/proposal-import-attributes](https://github.com/tc39/proposal-import-attributes)">Import
+                    <a href="https://github.com/tc39/proposal-import-attributes">Import
                         Attributes</a>
                     제안을 기반으로 하며, WHATWG에
-                    <a
-                        href="[https://github.com/whatwg/html/issues/12771](https://github.com/whatwg/html/issues/12771)">whatwg/html#12771</a>으로
+                    <a href="https://github.com/whatwg/html/issues/12771">whatwg/html#12771</a>으로
                     제안되었다.
                 </p>
             <li data-md>
                 <p><strong>CSS</strong>: <code>integrity()</code>와 함께 사용할 수 있는
                     <code>cross-origin-storage()</code> <code>&lt;request-url-modifier></code>로,
                     CSS Working Group에
-                    <a
-                        href="[https://github.com/w3c/csswg-drafts/issues/14056](https://github.com/w3c/csswg-drafts/issues/14056)">w3c/csswg-drafts#14056</a>으로
+                    <a href="https://github.com/w3c/csswg-drafts/issues/14056">w3c/csswg-drafts#14056</a>으로
                     제안되었다.
                 </p>
         </ul>
@@ -3279,7 +3359,7 @@ For darkmode:
             성공적으로 가져와 무결성이 검증된 리소스를 <a data-link-type="dfn" href="#cos-registry" id="ref-for-cos-registry①⓪">COS
                 레지스트리</a>에 저장하여 다른 origin에서
             재사용할 수 있도록 하는 처리 모델을 공유할 것으로 예상된다. 이는 <code
-                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle②⓪">requestFileHandle()</a></code>이
+                class="idl"><a data-link-type="idl" href="#dom-crossoriginstoragemanager-requestfilehandle" id="ref-for-dom-crossoriginstoragemanager-requestfilehandle②②">requestFileHandle()</a></code>이
             수행하는 방식과 정확히 동일하다. 이러한
             통합에 관한 논의는 이 저장소의 이슈 트래커가 아니라 이를 포함하게 될 호스트 언어 명세의 트래커에서 이루어져야 한다.</p>
         <h2 class="heading no-num settled" id="acks"><span class="content">감사의 말</span><a class="self-link"
@@ -3837,7 +3917,7 @@ For darkmode:
                 "0204d188": { "dfnID": "0204d188", "dfnText": "size", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-list-size" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-list-size\u2460" }], "title": "3.4. Resource visibility upgrades" }], "url": "https://infra.spec.whatwg.org/#list-size" },
                 "027e3e49": { "dfnID": "027e3e49", "dfnText": "clone", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-list-clone" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-list-clone\u2460" }], "title": "3.4. Resource visibility upgrades" }], "url": "https://infra.spec.whatwg.org/#list-clone" },
                 "0698d556": { "dfnID": "0698d556", "dfnText": "string", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-string" }, { "id": "ref-for-string\u2460" }], "title": "2.1. Hashes" }, { "refs": [{ "id": "ref-for-string\u2461" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-string\u2462" }], "title": "3.3. Creating and writing files" }], "url": "https://infra.spec.whatwg.org/#string" },
-                "086e3aff": { "dfnID": "086e3aff", "dfnText": "origin", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-concept-origin" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-concept-origin\u2460" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-concept-origin\u2461" }, { "id": "ref-for-concept-origin\u2462" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-concept-origin\u2463" }, { "id": "ref-for-concept-origin\u2464" }, { "id": "ref-for-concept-origin\u2465" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-concept-origin\u2466" }, { "id": "ref-for-concept-origin\u2467" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-concept-origin\u2468" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-concept-origin\u2460\u24ea" }, { "id": "ref-for-concept-origin\u2460\u2460" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-concept-origin\u2460\u2461" }, { "id": "ref-for-concept-origin\u2460\u2462" }, { "id": "ref-for-concept-origin\u2460\u2463" }, { "id": "ref-for-concept-origin\u2460\u2464" }], "title": "5.1. Storage limits" }, { "refs": [{ "id": "ref-for-concept-origin\u2460\u2465" }], "title": "5.3. Manually added entries" }], "url": "https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" },
+                "086e3aff": { "dfnID": "086e3aff", "dfnText": "origin", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-concept-origin" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-concept-origin\u2460" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-concept-origin\u2461" }, { "id": "ref-for-concept-origin\u2462" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-concept-origin\u2463" }, { "id": "ref-for-concept-origin\u2464" }, { "id": "ref-for-concept-origin\u2465" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-concept-origin\u2466" }, { "id": "ref-for-concept-origin\u2467" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-concept-origin\u2468" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-concept-origin\u2460\u24ea" }, { "id": "ref-for-concept-origin\u2460\u2460" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-concept-origin\u2460\u2461" }, { "id": "ref-for-concept-origin\u2460\u2462" }, { "id": "ref-for-concept-origin\u2460\u2463" }, { "id": "ref-for-concept-origin\u2460\u2464" }], "title": "5.1. Storage limits" }, { "refs": [{ "id": "ref-for-concept-origin\u2460\u2465" }], "title": "5.3. Manually added entries" }, { "refs": [{ "id": "ref-for-concept-origin\u2460\u2466" }, { "id": "ref-for-concept-origin\u2460\u2467" }], "title": "5.4. Provenance metadata" }], "url": "https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" },
                 "0cf3964f": { "dfnID": "0cf3964f", "dfnText": "script", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-script" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-script\u2460" }], "title": "8. Integration with other specifications" }], "url": "https://html.spec.whatwg.org/multipage/scripting.html#script" },
                 "0e6b2056": { "dfnID": "0e6b2056", "dfnText": "set (for map)", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-map-set" }], "title": "3.3. Creating and writing files" }], "url": "https://infra.spec.whatwg.org/#map-set" },
                 "1014b9fc": { "dfnID": "1014b9fc", "dfnText": "serialization", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-ascii-serialisation-of-an-origin" }], "title": "3.2. Reading files" }], "url": "https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin" },
@@ -3898,20 +3978,20 @@ For darkmode:
                 "ba556545": { "dfnID": "ba556545", "dfnText": "NotAllowedError", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-notallowederror" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-notallowederror\u2460" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-notallowederror\u2461" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-notallowederror\u2462" }], "title": "4. The Cross-Origin Storage file system" }, { "refs": [{ "id": "ref-for-notallowederror\u2463" }], "title": "6. Permissions Policy integration" }], "url": "https://webidl.spec.whatwg.org/#notallowederror" },
                 "bdbd19d1": { "dfnID": "bdbd19d1", "dfnText": "Promise", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-idl-promise" }], "title": "3. The CrossOriginStorageManager interface" }], "url": "https://webidl.spec.whatwg.org/#idl-promise" },
                 "be0c27b2": { "dfnID": "be0c27b2", "dfnText": "Navigator", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-navigator" }, { "id": "ref-for-navigator\u2460" }], "title": "3. The CrossOriginStorageManager interface" }], "url": "https://html.spec.whatwg.org/multipage/system-state.html#navigator" },
-                "c551a16f": { "dfnID": "c551a16f", "dfnText": "FileSystemFileHandle", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-filesystemfilehandle" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2460" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2461" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2462" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2463" }, { "id": "ref-for-filesystemfilehandle\u2464" }], "title": "4. The Cross-Origin Storage file system" }], "url": "https://fs.spec.whatwg.org/#filesystemfilehandle" },
+                "c551a16f": { "dfnID": "c551a16f", "dfnText": "FileSystemFileHandle", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-filesystemfilehandle" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2460" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2461" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2462" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2463" }, { "id": "ref-for-filesystemfilehandle\u2464" }], "title": "4. The Cross-Origin Storage file system" }, { "refs": [{ "id": "ref-for-filesystemfilehandle\u2465" }], "title": "5.4. Provenance metadata" }], "url": "https://fs.spec.whatwg.org/#filesystemfilehandle" },
                 "c88f3887": { "dfnID": "c88f3887", "dfnText": "item", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-struct-item" }], "title": "2.1. Hashes" }, { "refs": [{ "id": "ref-for-struct-item\u2460" }], "title": "2.2. COS entries" }], "url": "https://infra.spec.whatwg.org/#struct-item" },
                 "cc890cc1": { "dfnID": "cc890cc1", "dfnText": "policy-controlled feature", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-policy-controlled-feature" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-policy-controlled-feature\u2460" }], "title": "6. Permissions Policy integration" }], "url": "https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature" },
                 "cd028611": { "dfnID": "cd028611", "dfnText": "File", "external": true, "refSections": [{ "refs": [{ "id": "ref-for-dfn-file" }], "title": "4. The Cross-Origin Storage file system" }], "url": "https://w3c.github.io/FileAPI/#dfn-file" },
                 "complete-a-create-request": { "dfnID": "complete-a-create-request", "dfnText": "complete a create request", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-complete-a-create-request" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-complete-a-create-request\u2460" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-complete-a-create-request\u2461" }], "title": "3.3. Creating and writing files" }], "url": "#complete-a-create-request" },
                 "complete-a-read-request": { "dfnID": "complete-a-read-request", "dfnText": "complete a read request", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-complete-a-read-request" }], "title": "3.1. The requestFileHandle() method" }], "url": "#complete-a-read-request" },
                 "content-addressable": { "dfnID": "content-addressable", "dfnText": "content-addressable", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-content-addressable" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-content-addressable\u2460" }], "title": "2.1. Hashes" }, { "refs": [{ "id": "ref-for-content-addressable\u2461" }], "title": "5.1. Storage limits" }], "url": "#content-addressable" },
-                "cos-entry": { "dfnID": "cos-entry", "dfnText": "COS entry", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry\u2460" }, { "id": "ref-for-cos-entry\u2461" }, { "id": "ref-for-cos-entry\u2462" }, { "id": "ref-for-cos-entry\u2463" }, { "id": "ref-for-cos-entry\u2464" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry\u2465" }, { "id": "ref-for-cos-entry\u2466" }, { "id": "ref-for-cos-entry\u2467" }, { "id": "ref-for-cos-entry\u2468" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u24ea" }, { "id": "ref-for-cos-entry\u2460\u2460" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2461" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2462" }, { "id": "ref-for-cos-entry\u2460\u2463" }], "title": "4. The Cross-Origin Storage file system" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2464" }, { "id": "ref-for-cos-entry\u2460\u2465" }], "title": "5.2. Eviction" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2466" }], "title": "7.1. Resource integrity" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2467" }], "title": "8. Integration with other specifications" }], "url": "#cos-entry" },
+                "cos-entry": { "dfnID": "cos-entry", "dfnText": "COS entry", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry\u2460" }, { "id": "ref-for-cos-entry\u2461" }, { "id": "ref-for-cos-entry\u2462" }, { "id": "ref-for-cos-entry\u2463" }, { "id": "ref-for-cos-entry\u2464" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry\u2465" }, { "id": "ref-for-cos-entry\u2466" }, { "id": "ref-for-cos-entry\u2467" }, { "id": "ref-for-cos-entry\u2468" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u24ea" }, { "id": "ref-for-cos-entry\u2460\u2460" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2461" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2462" }, { "id": "ref-for-cos-entry\u2460\u2463" }], "title": "4. The Cross-Origin Storage file system" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2464" }, { "id": "ref-for-cos-entry\u2460\u2465" }], "title": "5.2. Eviction" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2466" }], "title": "5.4. Provenance metadata" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2467" }], "title": "7.1. Resource integrity" }, { "refs": [{ "id": "ref-for-cos-entry\u2460\u2468" }], "title": "8. Integration with other specifications" }], "url": "#cos-entry" },
                 "cos-entry-bytes": { "dfnID": "cos-entry-bytes", "dfnText": "bytes", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-bytes" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry-bytes\u2460" }, { "id": "ref-for-cos-entry-bytes\u2461" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-bytes\u2462" }, { "id": "ref-for-cos-entry-bytes\u2463" }], "title": "4. The Cross-Origin Storage file system" }], "url": "#cos-entry-bytes" },
-                "cos-entry-hash": { "dfnID": "cos-entry-hash", "dfnText": "hash", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-hash" }, { "id": "ref-for-cos-entry-hash\u2460" }, { "id": "ref-for-cos-entry-hash\u2461" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2462" }, { "id": "ref-for-cos-entry-hash\u2463" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2464" }, { "id": "ref-for-cos-entry-hash\u2465" }, { "id": "ref-for-cos-entry-hash\u2466" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2467" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2468" }], "title": "3.4.1. Original storer access" }], "url": "#cos-entry-hash" },
-                "cos-entry-origins": { "dfnID": "cos-entry-origins", "dfnText": "origins", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-origins" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2460" }], "title": "2.3. The Public Hash List" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461" }, { "id": "ref-for-cos-entry-origins\u2462" }, { "id": "ref-for-cos-entry-origins\u2463" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2464" }, { "id": "ref-for-cos-entry-origins\u2465" }, { "id": "ref-for-cos-entry-origins\u2466" }, { "id": "ref-for-cos-entry-origins\u2467" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2468" }, { "id": "ref-for-cos-entry-origins\u2460\u24ea" }, { "id": "ref-for-cos-entry-origins\u2460\u2460" }, { "id": "ref-for-cos-entry-origins\u2460\u2461" }, { "id": "ref-for-cos-entry-origins\u2460\u2462" }, { "id": "ref-for-cos-entry-origins\u2460\u2463" }, { "id": "ref-for-cos-entry-origins\u2460\u2464" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2460\u2465" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2460\u2466" }, { "id": "ref-for-cos-entry-origins\u2460\u2467" }, { "id": "ref-for-cos-entry-origins\u2460\u2468" }], "title": "5.1. Storage limits" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u24ea" }, { "id": "ref-for-cos-entry-origins\u2461\u2460" }, { "id": "ref-for-cos-entry-origins\u2461\u2461" }, { "id": "ref-for-cos-entry-origins\u2461\u2462" }], "title": "5.3. Manually added entries" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u2463" }], "title": "7.1. Resource integrity" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u2464" }, { "id": "ref-for-cos-entry-origins\u2461\u2465" }], "title": "7.2. Cross-site probing" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u2466" }, { "id": "ref-for-cos-entry-origins\u2461\u2467" }], "title": "7.3. Availability gating" }], "url": "#cos-entry-origins" },
+                "cos-entry-hash": { "dfnID": "cos-entry-hash", "dfnText": "hash", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-hash" }, { "id": "ref-for-cos-entry-hash\u2460" }, { "id": "ref-for-cos-entry-hash\u2461" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2462" }, { "id": "ref-for-cos-entry-hash\u2463" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2464" }, { "id": "ref-for-cos-entry-hash\u2465" }, { "id": "ref-for-cos-entry-hash\u2466" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2467" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2468" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-cos-entry-hash\u2460\u24ea" }, { "id": "ref-for-cos-entry-hash\u2460\u2460" }], "title": "5.4. Provenance metadata" }], "url": "#cos-entry-hash" },
+                "cos-entry-origins": { "dfnID": "cos-entry-origins", "dfnText": "origins", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-origins" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2460" }], "title": "2.3. The Public Hash List" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461" }, { "id": "ref-for-cos-entry-origins\u2462" }, { "id": "ref-for-cos-entry-origins\u2463" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2464" }, { "id": "ref-for-cos-entry-origins\u2465" }, { "id": "ref-for-cos-entry-origins\u2466" }, { "id": "ref-for-cos-entry-origins\u2467" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2468" }, { "id": "ref-for-cos-entry-origins\u2460\u24ea" }, { "id": "ref-for-cos-entry-origins\u2460\u2460" }, { "id": "ref-for-cos-entry-origins\u2460\u2461" }, { "id": "ref-for-cos-entry-origins\u2460\u2462" }, { "id": "ref-for-cos-entry-origins\u2460\u2463" }, { "id": "ref-for-cos-entry-origins\u2460\u2464" }], "title": "3.4. Resource visibility upgrades" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2460\u2465" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2460\u2466" }, { "id": "ref-for-cos-entry-origins\u2460\u2467" }, { "id": "ref-for-cos-entry-origins\u2460\u2468" }], "title": "5.1. Storage limits" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u24ea" }, { "id": "ref-for-cos-entry-origins\u2461\u2460" }, { "id": "ref-for-cos-entry-origins\u2461\u2461" }, { "id": "ref-for-cos-entry-origins\u2461\u2462" }], "title": "5.3. Manually added entries" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u2463" }], "title": "5.4. Provenance metadata" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u2464" }], "title": "7.1. Resource integrity" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u2465" }, { "id": "ref-for-cos-entry-origins\u2461\u2466" }], "title": "7.2. Cross-site probing" }, { "refs": [{ "id": "ref-for-cos-entry-origins\u2461\u2467" }, { "id": "ref-for-cos-entry-origins\u2461\u2468" }], "title": "7.3. Availability gating" }], "url": "#cos-entry-origins" },
                 "cos-entry-pending-writer-count": { "dfnID": "cos-entry-pending-writer-count", "dfnText": "pending writer count", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-pending-writer-count" }, { "id": "ref-for-cos-entry-pending-writer-count\u2460" }, { "id": "ref-for-cos-entry-pending-writer-count\u2461" }, { "id": "ref-for-cos-entry-pending-writer-count\u2462" }], "title": "3.3. Creating and writing files" }], "url": "#cos-entry-pending-writer-count" },
                 "cos-entry-state": { "dfnID": "cos-entry-state", "dfnText": "state", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-state" }, { "id": "ref-for-cos-entry-state\u2460" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry-state\u2461" }, { "id": "ref-for-cos-entry-state\u2462" }, { "id": "ref-for-cos-entry-state\u2463" }, { "id": "ref-for-cos-entry-state\u2464" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-state\u2465" }, { "id": "ref-for-cos-entry-state\u2466" }], "title": "4. The Cross-Origin Storage file system" }, { "refs": [{ "id": "ref-for-cos-entry-state\u2467" }], "title": "5.3. Manually added entries" }], "url": "#cos-entry-state" },
-                "cos-entry-storing-origins": { "dfnID": "cos-entry-storing-origins", "dfnText": "storing origins", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-storing-origins" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460" }], "title": "2.3. The Public Hash List" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2461" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2462" }, { "id": "ref-for-cos-entry-storing-origins\u2463" }, { "id": "ref-for-cos-entry-storing-origins\u2464" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2465" }, { "id": "ref-for-cos-entry-storing-origins\u2466" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2467" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2468" }, { "id": "ref-for-cos-entry-storing-origins\u2460\u24ea" }, { "id": "ref-for-cos-entry-storing-origins\u2460\u2460" }], "title": "5.2. Eviction" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460\u2461" }], "title": "5.3. Manually added entries" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460\u2462" }], "title": "7.2. Cross-site probing" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460\u2463" }], "title": "7.3. Availability gating" }], "url": "#cos-entry-storing-origins" },
+                "cos-entry-storing-origins": { "dfnID": "cos-entry-storing-origins", "dfnText": "storing origins", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-entry-storing-origins" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460" }], "title": "2.3. The Public Hash List" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2461" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2462" }, { "id": "ref-for-cos-entry-storing-origins\u2463" }, { "id": "ref-for-cos-entry-storing-origins\u2464" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2465" }, { "id": "ref-for-cos-entry-storing-origins\u2466" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2467" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2468" }, { "id": "ref-for-cos-entry-storing-origins\u2460\u24ea" }, { "id": "ref-for-cos-entry-storing-origins\u2460\u2460" }], "title": "5.2. Eviction" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460\u2461" }], "title": "5.3. Manually added entries" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460\u2462" }, { "id": "ref-for-cos-entry-storing-origins\u2460\u2463" }, { "id": "ref-for-cos-entry-storing-origins\u2460\u2464" }], "title": "5.4. Provenance metadata" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460\u2465" }], "title": "7.2. Cross-site probing" }, { "refs": [{ "id": "ref-for-cos-entry-storing-origins\u2460\u2466" }], "title": "7.3. Availability gating" }], "url": "#cos-entry-storing-origins" },
                 "cos-hash": { "dfnID": "cos-hash", "dfnText": "COS hash", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-hash" }, { "id": "ref-for-cos-hash\u2460" }], "title": "2.1. Hashes" }, { "refs": [{ "id": "ref-for-cos-hash\u2461" }, { "id": "ref-for-cos-hash\u2462" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-hash\u2463" }, { "id": "ref-for-cos-hash\u2464" }], "title": "2.3. The Public Hash List" }, { "refs": [{ "id": "ref-for-cos-hash\u2465" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-hash\u2466" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-cos-hash\u2467" }], "title": "7.1. Resource integrity" }, { "refs": [{ "id": "ref-for-cos-hash\u2468" }], "title": "8. Integration with other specifications" }], "url": "#cos-hash" },
                 "cos-hash-algorithm": { "dfnID": "cos-hash-algorithm", "dfnText": "algorithm", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-hash-algorithm" }, { "id": "ref-for-cos-hash-algorithm\u2460" }, { "id": "ref-for-cos-hash-algorithm\u2461" }, { "id": "ref-for-cos-hash-algorithm\u2462" }], "title": "2.1. Hashes" }, { "refs": [{ "id": "ref-for-cos-hash-algorithm\u2463" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-cos-hash-algorithm\u2464" }], "title": "3.3. Creating and writing files" }], "url": "#cos-hash-algorithm" },
                 "cos-hash-equal": { "dfnID": "cos-hash-equal", "dfnText": "equal", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-cos-hash-equal" }, { "id": "ref-for-cos-hash-equal\u2460" }], "title": "2.1. Hashes" }, { "refs": [{ "id": "ref-for-cos-hash-equal\u2461" }], "title": "2.3. The Public Hash List" }, { "refs": [{ "id": "ref-for-cos-hash-equal\u2462" }], "title": "3.2. Reading files" }, { "refs": [{ "id": "ref-for-cos-hash-equal\u2463" }], "title": "3.3. Creating and writing files" }], "url": "#cos-hash-equal" },
@@ -3928,7 +4008,7 @@ For darkmode:
                 "dfn-public-hash-list": { "dfnID": "dfn-public-hash-list", "dfnText": "Public Hash List", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-dfn-public-hash-list" }], "title": "2.3. The Public Hash List" }, { "refs": [{ "id": "ref-for-dfn-public-hash-list\u2460" }], "title": "8. Integration with other specifications" }], "url": "#dfn-public-hash-list" },
                 "dictdef-crossoriginstoragerequestfilehandlehash": { "dfnID": "dictdef-crossoriginstoragerequestfilehandlehash", "dfnText": "CrossOriginStorageRequestFileHandleHash", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-dictdef-crossoriginstoragerequestfilehandlehash" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-dictdef-crossoriginstoragerequestfilehandlehash\u2460" }], "title": "3.1. The requestFileHandle() method" }], "url": "#dictdef-crossoriginstoragerequestfilehandlehash" },
                 "dictdef-crossoriginstoragerequestfilehandleoptions": { "dfnID": "dictdef-crossoriginstoragerequestfilehandleoptions", "dfnText": "CrossOriginStorageRequestFileHandleOptions", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-dictdef-crossoriginstoragerequestfilehandleoptions" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-dictdef-crossoriginstoragerequestfilehandleoptions\u2460" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-dictdef-crossoriginstoragerequestfilehandleoptions\u2461" }], "title": "3.3. Creating and writing files" }], "url": "#dictdef-crossoriginstoragerequestfilehandleoptions" },
-                "dom-crossoriginstoragemanager-requestfilehandle": { "dfnID": "dom-crossoriginstoragemanager-requestfilehandle", "dfnText": "requestFileHandle(hash, options)", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2461" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2462" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2463" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2464" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2465" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2466" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2467" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2468" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u24ea" }], "title": "4. The Cross-Origin Storage file system" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2460" }], "title": "5.1. Storage limits" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2461" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2462" }], "title": "5.3. Manually added entries" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2463" }], "title": "6. Permissions Policy integration" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2464" }], "title": "7.1. Resource integrity" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2465" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2466" }], "title": "7.2. Cross-site probing" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2467" }], "title": "7.3. Availability gating" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2468" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2461\u24ea" }], "title": "8. Integration with other specifications" }], "url": "#dom-crossoriginstoragemanager-requestfilehandle" },
+                "dom-crossoriginstoragemanager-requestfilehandle": { "dfnID": "dom-crossoriginstoragemanager-requestfilehandle", "dfnText": "requestFileHandle(hash, options)", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle" }], "title": "1. Introduction" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460" }], "title": "2.2. COS entries" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2461" }], "title": "3. The CrossOriginStorageManager interface" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2462" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2463" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2464" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2465" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2466" }], "title": "3.1. The requestFileHandle() method" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2467" }], "title": "3.3. Creating and writing files" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2468" }], "title": "3.4.1. Original storer access" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u24ea" }], "title": "4. The Cross-Origin Storage file system" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2460" }], "title": "5.1. Storage limits" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2461" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2462" }], "title": "5.3. Manually added entries" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2463" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2464" }], "title": "5.4. Provenance metadata" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2465" }], "title": "6. Permissions Policy integration" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2466" }], "title": "7.1. Resource integrity" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2467" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2460\u2468" }], "title": "7.2. Cross-site probing" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2461\u24ea" }], "title": "7.3. Availability gating" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2461\u2460" }, { "id": "ref-for-dom-crossoriginstoragemanager-requestfilehandle\u2461\u2461" }], "title": "8. Integration with other specifications" }], "url": "#dom-crossoriginstoragemanager-requestfilehandle" },
                 "dom-crossoriginstoragemanager-requestfilehandle-hash-options-hash": { "dfnID": "dom-crossoriginstoragemanager-requestfilehandle-hash-options-hash", "dfnText": "hash", "external": false, "refSections": [], "url": "#dom-crossoriginstoragemanager-requestfilehandle-hash-options-hash" },
                 "dom-crossoriginstoragemanager-requestfilehandle-hash-options-options": { "dfnID": "dom-crossoriginstoragemanager-requestfilehandle-hash-options-options", "dfnText": "options", "external": false, "refSections": [], "url": "#dom-crossoriginstoragemanager-requestfilehandle-hash-options-options" },
                 "dom-crossoriginstoragerequestfilehandlehash-algorithm": { "dfnID": "dom-crossoriginstoragerequestfilehandlehash-algorithm", "dfnText": "algorithm", "external": false, "refSections": [{ "refs": [{ "id": "ref-for-dom-crossoriginstoragerequestfilehandlehash-algorithm" }], "title": "2.1. Hashes" }, { "refs": [{ "id": "ref-for-dom-crossoriginstoragerequestfilehandlehash-algorithm\u2460" }, { "id": "ref-for-dom-crossoriginstoragerequestfilehandlehash-algorithm\u2461" }], "title": "3.1. The requestFileHandle() method" }], "url": "#dom-crossoriginstoragerequestfilehandlehash-algorithm" },
