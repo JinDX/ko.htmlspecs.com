@@ -401,7 +401,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [VCALM v1.0](https://ko.htmlspecs.com/vcalm-1.0/)（[Source](https://www.w3.org/TR/2026/WD-vcalm-1.0-20260821/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Verifiable Credential Forgery Defense v1.0](https://ko.htmlspecs.com/vc-forgery-defense-1.0/)（[Source](https://www.w3.org/TR/2026/WD-vc-forgery-defense-1.0-20260714/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Verifiable Credential Rendering Methods v1.0](https://ko.htmlspecs.com/vc-render-method/)（[Source](https://www.w3.org/TR/2026/WD-vc-render-method-20260822/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Verifiable Credential Barcodes v1.0](https://ko.htmlspecs.com/vc-barcodes-1.0/)（[Source](https://www.w3.org/TR/2026/WD-vc-barcodes-1.0-20260806/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Verifiable Credential Barcodes v1.0](https://ko.htmlspecs.com/vc-barcodes-1.0/)（[Source](https://www.w3.org/TR/2026/WD-vc-barcodes-1.0-20260822/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Recognized Entities v1.0](https://ko.htmlspecs.com/vc-recognized-entities-1.0/)（[Source](https://www.w3.org/TR/2026/WD-vc-recognized-entities-1.0-20260816/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### OAuth 및 인가 프로토콜
