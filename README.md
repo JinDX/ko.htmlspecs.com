@@ -84,7 +84,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [SHACL 1.2 Core](https://ko.htmlspecs.com/shacl12-core/)（[Source](https://www.w3.org/TR/2026/WD-shacl12-core-20260803/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [SHACL 1.2 Profiling](https://ko.htmlspecs.com/shacl12-profiling/)（[Source](https://www.w3.org/TR/2026/WD-shacl12-profiling-20260702/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [SHACL 1.2 SPARQL Extensions](https://ko.htmlspecs.com/shacl12-sparql/)（[Source](https://www.w3.org/TR/2026/WD-shacl12-sparql-20260821/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [SHACL 1.2 Rules](https://ko.htmlspecs.com/shacl12-rules/)（[Source](https://www.w3.org/TR/2026/WD-shacl12-rules-20260819/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [SHACL 1.2 Rules](https://ko.htmlspecs.com/sparql12-rl/)（[Source](https://www.w3.org/TR/2026/WD-sparql12-rl-20260825/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Data Catalog Vocabulary (DCAT) - Version 3](https://ko.htmlspecs.com/vocab-dcat-3/)（[Source](https://www.w3.org/TR/2024/REC-vocab-dcat-3-20240822/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Content Negotiation by Profile](https://ko.htmlspecs.com/dx-prof-conneg/)（[Source](https://www.w3.org/TR/2026/WD-dx-prof-conneg-20260703/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [ODRL Information Model 2.2](https://ko.htmlspecs.com/odrl-model/)（[Source](https://www.w3.org/TR/2018/REC-odrl-model-20180215/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
