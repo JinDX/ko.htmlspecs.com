@@ -68,7 +68,7 @@
         <a href="https://github.com/whatwg/html/commits" class="changes"><span><strong>커밋</strong>
             <code>GitHub에서</code></span></a>
         <a id="commit-snapshot-link"
-          href="https://html.spec.whatwg.org/commit-snapshots/ae6c5d8ddfe6c819730f8f766d550dd1417e66c9/"
+          href="https://html.spec.whatwg.org/commit-snapshots/df14ce3085887cc99d821d238c5192857904de58/"
           class="changes"><span><strong>스냅샷</strong> <code>이 커밋 기준</code></span></a>
       </div>
       <div>
@@ -161021,8 +161021,14 @@ button2<c- p="">.</c->onclick <c- o="">=</c-> <c- p="">()</c-> <c- p="">=&gt;</c
         </ol>
       </li>
       <li>
-        <p><var>noopener</var>가 true이거나 <var>windowType</var>이 "<code>new with no
-   opener</code>"이면 null을 반환한다.</p>
+        <p><var>windowType</var>이 "<code>new with no opener</code>"이면 null을 반환한다.</p>
+      </li>
+      <li>
+        <p><var>noopener</var>가 true이고 <var>target</var>이 "<code>_self</code>", "<code>_parent</code>" 또는
+          "<code>_top</code>"과 <a id="apis-for-creating-and-navigating-browsing-contexts-by-name:ascii-case-insensitive"
+            href="https://infra.spec.whatwg.org/#ascii-case-insensitive" data-x-internal="ascii-case-insensitive">ASCII
+            대소문자를 구분하지 않는</a> 일치가 아니면
+          null을 반환한다.</p>
       </li>
       <li>
         <p><var>targetNavigable</var>의 <a href="#nav-wp"
@@ -236342,13 +236348,10 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
             요소 스택</a>의 마지막 노드로 설정합니다.</p>
       </li>
       <li>
-        <p><i>루프</i>: <var>node</var>가 열린 요소 스택의 첫 번째 노드이면,
-          <var>last</var>를 true로 설정하고, 파서가 <a href="#html-fragment-parsing-algorithm"
-            id="the-insertion-mode:html-fragment-parsing-algorithm">HTML
-            프래그먼트
-            파싱 알고리즘</a>의 일부로 생성된 경우(<a href="#fragment-case" id="the-insertion-mode:fragment-case">프래그먼트인 경우</a>),
-          <var>node</var>를 해당 알고리즘에 전달된 <var id="the-insertion-mode:concept-frag-parse-context"><a
-              href="#concept-frag-parse-context">컨텍스트</a></var> 요소로 설정합니다.
+        <p><i>루프</i>: <var>node</var>가 열린 요소 스택의 첫 번째 노드이면
+          <var>last</var>를 true로 설정하고, 파서의 <a href="#fragment-context-element"
+            id="the-insertion-mode:fragment-context-element">조각 컨텍스트 요소</a>가 null이 아니면
+          <var>node</var>를 해당 요소로 설정한다(<a href="#fragment-case" id="the-insertion-mode:fragment-case">조각인 경우</a>).
         </p>
       </li>
       <li>
@@ -236515,15 +236518,13 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
   </div>
 
   <div data-algorithm="">
-    <p>파서가 <a href="#html-fragment-parsing-algorithm"
-        id="the-stack-of-open-elements:html-fragment-parsing-algorithm-2">HTML 프래그먼트 파싱
-        알고리즘</a>의 일부로 생성되었고 <a href="#stack-of-open-elements"
-        id="the-stack-of-open-elements:stack-of-open-elements-3">열린 요소 스택</a>에 요소가 하나만
-      있는 경우(<a href="#fragment-case" id="the-stack-of-open-elements:fragment-case-3">프래그먼트 경우</a>) <dfn
-        id="adjusted-current-node">조정된 현재 노드</dfn>는 <i id="the-stack-of-open-elements:concept-frag-parse-context"><a
-          href="#concept-frag-parse-context">컨텍스트</a></i> 요소입니다. 그렇지 않으면 <a href="#adjusted-current-node"
-        id="the-stack-of-open-elements:adjusted-current-node">조정된 현재 노드</a>는 <a href="#current-node"
-        id="the-stack-of-open-elements:current-node">현재 노드</a>입니다.
+    <p><dfn id="adjusted-current-node">조정된 현재 노드</dfn>는 해당 요소가 null이 아니고 <a href="#stack-of-open-elements"
+        id="the-stack-of-open-elements:stack-of-open-elements-3">열린 요소 스택</a>에 요소가 하나만 있는
+      경우(<a href="#fragment-case" id="the-stack-of-open-elements:fragment-case-3">조각인 경우</a>) 파서의 <a
+        href="#fragment-context-element" id="the-stack-of-open-elements:fragment-context-element">조각 컨텍스트
+        요소</a>이다. 그렇지 않으면 <a href="#adjusted-current-node" id="the-stack-of-open-elements:adjusted-current-node">조정된 현재
+        노드</a>는
+      <a href="#current-node" id="the-stack-of-open-elements:current-node">현재 노드</a>이다.
     </p>
   </div>
 
@@ -237045,15 +237046,26 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
   <h5 id="other-parsing-state-flags"><span class="secno">13.2.4.5</span> 기타 파싱 상태 플래그<a
       href="#other-parsing-state-flags" class="self-link"></a></h5>
 
-  <p><dfn id="root-insertion-target">루트 삽입 대상</dfn>은 null 또는 <code id="other-parsing-state-flags:documentfragment"><a data-x-internal="documentfragment"
-        href="https://dom.spec.whatwg.org/#interface-documentfragment">DocumentFragment</a></code>이며
-    처음에는 null입니다.</p>
+  <p>null 또는 <code
+      id="other-parsing-state-flags:documentfragment"><a data-x-internal="documentfragment" href="https://dom.spec.whatwg.org/#interface-documentfragment">DocumentFragment</a></code>인
+    <dfn id="root-insertion-target">루트 삽입 대상</dfn>
+    (초기값은 null).
+  </p>
 
-  <p>불리언 <dfn id="allow-declarative-shadow-roots">선언적 섀도 루트 허용</dfn>은 처음에는
-    false입니다.</p>
+  <p><code
+      id="other-parsing-state-flags:element"><a data-x-internal="element" href="https://dom.spec.whatwg.org/#interface-element">Element</a></code>-또는-null인
+    <dfn id="fragment-context-element">조각 컨텍스트 요소</dfn>. 초기값은 null이다.
+  </p>
+
+  <p>불리언 <dfn id="allow-declarative-shadow-roots">선언적 섀도 루트 허용</dfn>(초기값은 false).</p>
 
   <p><dfn id="scripting-mode">스크립팅 모드</dfn>는 <a href="#parser-scripting-mode"
-      id="other-parsing-state-flags:parser-scripting-mode">파서 스크립팅 모드</a>입니다.</p>
+      id="other-parsing-state-flags:parser-scripting-mode">파서 스크립팅 모드</a>이다. 파서가 생성될 때 파서와 연결된 <code
+      id="other-parsing-state-flags:document"><a href="#document">Document</a></code>에 대해 <a href="#concept-n-script"
+      id="other-parsing-state-flags:concept-n-script">스크립팅이 활성화되어 있었다면</a> 처음에 <a href="#scripting-mode-normal"
+      id="other-parsing-state-flags:scripting-mode-normal">일반</a>으로
+    설정되고, 그렇지 않으면 <a href="#scripting-mode-disabled" id="other-parsing-state-flags:scripting-mode-disabled">비활성화</a>로
+    설정된다.</p>
 
   <p><dfn id="parser-scripting-mode">파서 스크립팅 모드</dfn>는 다음 중 하나입니다.</p>
 
@@ -240731,12 +240743,11 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
     </ul>
   </div>
 
-  <p class="note">해당 노드가 <a href="#html-fragment-parsing-algorithm"
-      id="tree-construction:html-fragment-parsing-algorithm">HTML 프래그먼트 파싱 알고리즘</a>에 전달된 <var
-      id="tree-construction:concept-frag-parse-context"><a href="#concept-frag-parse-context">컨텍스트</a></var> 요소이면 그 요소의
-    시작 태그 토큰은 해당 <a href="#html-fragment-parsing-algorithm"
-      id="tree-construction:html-fragment-parsing-algorithm-2">HTML 프래그먼트 파싱 알고리즘</a> 중에 생성된
-    "가짜" 토큰입니다.</p>
+  <p class="note">해당 노드가 파서의 <a href="#fragment-context-element" id="tree-construction:fragment-context-element">조각 컨텍스트
+      요소</a>인 경우,
+    해당 요소의 시작 태그 토큰은 <a href="#html-fragment-parsing-algorithm"
+      id="tree-construction:html-fragment-parsing-algorithm">HTML 조각
+      파싱 알고리즘</a>이 생성한 "가짜" 토큰이다.</p>
 
   <hr>
 
@@ -240756,160 +240767,130 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
   <h5 id="creating-and-inserting-nodes"><span class="secno">13.2.6.1</span> 노드 생성 및 삽입하기<a
       href="#creating-and-inserting-nodes" class="self-link"></a></h5>
 
-  <p>파서가 토큰을 처리하는 동안 <dfn id="foster-parent">위탁 부모 지정</dfn>을 활성화하거나 비활성화할
-    수 있습니다. 이는 다음 알고리즘에 영향을 줍니다.</p>
+  <p><dfn id="insertion-location">삽입 위치</dfn>는 <dfn id="insertion-location-target-parent">대상 부모</dfn>(<code
+      id="creating-and-inserting-nodes:node"><a data-x-internal="node" href="https://dom.spec.whatwg.org/#interface-node">Node</a></code>)와
+    <dfn id="insertion-location-reference-child">참조 자식</dfn>(<code
+      id="creating-and-inserting-nodes:node-2"><a data-x-internal="node" href="https://dom.spec.whatwg.org/#interface-node">Node</a></code>
+    또는
+    null)으로 구성된 <a id="creating-and-inserting-nodes:tuple" href="https://infra.spec.whatwg.org/#tuple"
+      data-x-internal="tuple">튜플</a>이다.
+  </p>
+
+  <p>파서가 토큰을 처리하는 동안 <dfn id="foster-parent">위탁 부모 지정</dfn>을 활성화하거나 비활성화할 수 있다.
+    이는 다음 알고리즘에 영향을 준다.</p>
 
   <div data-algorithm="">
-    <p><dfn id="appropriate-place-for-inserting-a-node">노드를 삽입하기 위한 적절한 위치</dfn>는 선택적으로
-      특정
-      <i>재정의 대상</i>을 사용하여 다음 단계를 실행하여 반환되는 노드 내 위치이다:
+    <p>선택적
+      <code
+        id="creating-and-inserting-nodes:node-3"><a data-x-internal="node" href="https://dom.spec.whatwg.org/#interface-node">Node</a></code>
+      <var>overrideTarget</var>(기본값 null)이 주어졌을 때 <dfn id="appropriate-place-for-inserting-a-node">노드를 삽입하기에 적절한
+        위치</dfn>를 찾으려면
+      다음 단계를 수행한다. 이 단계는 <a href="#insertion-location" id="creating-and-inserting-nodes:insertion-location">삽입
+        위치</a>를 반환한다.
     </p>
 
     <ol>
       <li>
-        <p><i>재정의 대상</i>이 지정되었으면 <var>target</var>을 <i>재정의 대상</i>으로 둡니다.
+        <p><var>overrideTarget</var>이 null이 아니면 <var>targetParent</var>를 <var>overrideTarget</var>으로 설정하고, 그렇지 않으면
+          <a href="#current-node" id="creating-and-inserting-nodes:current-node">현재 노드</a>로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>referenceChild</var>를 null로 설정한다.</p>
+      </li>
+      <li>
+        <p><a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent">위탁 부모 지정</a>이 활성화되어
+          있고
+          <var>targetParent</var>가 <code
+            id="creating-and-inserting-nodes:the-table-element"><a href="#the-table-element">table</a></code>, <code
+            id="creating-and-inserting-nodes:the-tbody-element"><a href="#the-tbody-element">tbody</a></code>, <code
+            id="creating-and-inserting-nodes:the-tfoot-element"><a href="#the-tfoot-element">tfoot</a></code>,
+          <code id="creating-and-inserting-nodes:the-thead-element"><a href="#the-thead-element">thead</a></code> 또는
+          <code id="creating-and-inserting-nodes:the-tr-element"><a href="#the-tr-element">tr</a></code> 요소인 경우:
         </p>
 
-        <p>그렇지 않으면 <var>target</var>을 <a href="#current-node" id="creating-and-inserting-nodes:current-node">현재 노드</a>로
-          둡니다.</p>
-      </li>
-      <li>
-        <p>다음 목록에서 처음으로 일치하는 단계를 사용하여 <var>adjusted insertion location</var>를 결정합니다.</p>
-
-        <dl class="switch">
-          <dt><a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent">위탁 부모 지정</a>이
-            활성화되어 있고 <var>target</var>이 <code
-              id="creating-and-inserting-nodes:the-table-element"><a href="#the-table-element">table</a></code>,
-            <code id="creating-and-inserting-nodes:the-tbody-element"><a href="#the-tbody-element">tbody</a></code>,
-            <code id="creating-and-inserting-nodes:the-tfoot-element"><a href="#the-tfoot-element">tfoot</a></code>,
-            <code id="creating-and-inserting-nodes:the-thead-element"><a href="#the-thead-element">thead</a></code> 또는
-            <code id="creating-and-inserting-nodes:the-tr-element"><a href="#the-tr-element">tr</a></code> 요소인
-            경우
-          </dt>
-          <dd>
-            <p class="note">위탁 부모 지정은 콘텐츠가 표에서 잘못 중첩되었을 때 발생합니다.</p>
-
-            <p>다음 하위 단계를 실행합니다.</p>
-
-            <ol>
-              <li>
-                <p><var>last template</var>를 <a href="#stack-of-open-elements"
-                    id="creating-and-inserting-nodes:stack-of-open-elements">열린 요소 스택</a>에 있는 마지막
-                  <code
-                    id="creating-and-inserting-nodes:the-template-element"><a href="#the-template-element">template</a></code>
-                  요소가 있으면 해당 요소로 둡니다.
-                </p>
-
-              </li>
-              <li>
-                <p><var>last table</var>을 <a href="#stack-of-open-elements"
-                    id="creating-and-inserting-nodes:stack-of-open-elements-2">열린 요소 스택</a>에 있는 마지막
-                  <code
-                    id="creating-and-inserting-nodes:the-table-element-2"><a href="#the-table-element">table</a></code>
-                  요소가 있으면 해당 요소로 둡니다.
-                </p>
-
-              </li>
-              <li>
-                <p><var>last template</var>이 있고 <var>last table</var>이 없거나, <var>last table</var>이
-                  있지만 <var>last template</var>이 <a href="#stack-of-open-elements"
-                    id="creating-and-inserting-nodes:stack-of-open-elements-3">열린 요소
-                    스택</a>에서 <var>last table</var>보다 아래, 즉 더 최근에 추가되었다면
-                  <var>adjusted insertion location</var>를 <var>last template</var>의 <a href="#template-contents"
-                    id="creating-and-inserting-nodes:template-contents">템플릿
-                    콘텐츠</a> 안에서 마지막 자식이 있으면 그 뒤로 설정하고 이 단계를 중단합니다.
-                </p>
-              </li>
-              <li>
-                <p><var>last table</var>이 없으면 <var>adjusted insertion location</var>를 <a href="#stack-of-open-elements"
-                    id="creating-and-inserting-nodes:stack-of-open-elements-4">열린 요소 스택</a>의 첫 번째 요소,
-                  즉 <code id="creating-and-inserting-nodes:the-html-element"><a
-                      href="#the-html-element">html</a></code> 요소 안에서 마지막 자식이 있으면 그 뒤로
-                  설정하고 이 단계를 중단합니다.
-                  (<a href="#fragment-case" id="creating-and-inserting-nodes:fragment-case">프래그먼트 경우</a>)
-                </p>
-
-
-
-              </li>
-              <li>
-                <p><var>last table</var>에 부모 노드가 있으면 <var>adjusted insertion location</var>를
-                  <var>last table</var>의 부모 노드 안에서 <var>last table</var> 바로 앞으로 설정하고
-                  이 단계를 중단합니다.
-                </p>
-              </li>
-              <li>
-                <p><var>previous element</var>를 <a href="#stack-of-open-elements"
-                    id="creating-and-inserting-nodes:stack-of-open-elements-5">열린 요소 스택</a>에서
-                  <var>last table</var> 바로 위의 요소로 둡니다.
-                </p>
-              </li>
-              <li>
-                <p><var>adjusted insertion location</var>를 <var>previous element</var> 안에서 마지막 자식이 있으면
-                  그 뒤로 설정합니다.</p>
-              </li>
-            </ol>
-
-            <p class="note">이 단계가 필요한 이유 중 하나는 요소, 특히 이 경우의 <code id="creating-and-inserting-nodes:the-table-element-3"><a
-                  href="#the-table-element">table</a></code> 요소가 파서에서 삽입된 뒤 스크립트에 의해
-              DOM 안의 다른 위치로 이동되거나 DOM에서 완전히 제거될 수 있기 때문입니다.
-            </p>
-          </dd>
-          <dt>그 밖의 경우</dt>
-          <dd>
-            <p><var>adjusted insertion location</var>를 <var>target</var> 안에서 마지막 자식이 있으면 그 뒤로
-              설정합니다.</p>
-          </dd>
-        </dl>
-      </li>
-      <li>
-        <p><var>adjusted insertion location</var>이 <code
-            id="creating-and-inserting-nodes:the-template-element-2"><a href="#the-template-element">template</a></code>
-          요소 내부에 있으면:</p>
+        <p class="note">위탁 부모 지정은 콘텐츠가 테이블 내부에 잘못 중첩되었을 때 발생한다.</p>
 
         <ol>
           <li>
-            <p>해당 요소를 <var>template</var>으로 설정한다.</p>
+            <p><a href="#stack-of-open-elements" id="creating-and-inserting-nodes:stack-of-open-elements">열린 요소 스택</a>에
+              마지막 <code
+                id="creating-and-inserting-nodes:the-template-element"><a href="#the-template-element">template</a></code>
+              또는
+              <code id="creating-and-inserting-nodes:the-table-element-2"><a href="#the-table-element">table</a></code>
+              요소가 있으면 <var>lastTemplateOrTable</var>을 해당 요소로 설정하고,
+              그렇지 않으면 null로 설정한다.
+            </p>
           </li>
           <li>
-            <p><var>target</var>을 <var>template</var>의 <a href="#insertion-target"
-                id="creating-and-inserting-nodes:insertion-target">insertion target</a>으로 설정한다.</p>
+            <p><var>lastTemplateOrTable</var>이 null이면 (<a href="#stack-of-open-elements"
+                id="creating-and-inserting-nodes:stack-of-open-elements-2">열린
+                요소 스택</a>의 첫 번째 요소(<code
+                id="creating-and-inserting-nodes:the-html-element"><a href="#the-html-element">html</a></code> 요소),
+              null)을 반환한다.
+              (<a href="#fragment-case" id="creating-and-inserting-nodes:fragment-case">조각인 경우</a>)
+            </p>
           </li>
           <li>
-            <p><var>target</var>이 null이 아니면:</p>
-
-            <ol>
-              <li>
-                <p><var>template</var>의 <a href="#insertion-end-marker"
-                    id="creating-and-inserting-nodes:insertion-end-marker">insertion end marker</a>가 null이 아니고,
-                  해당 <a id="creating-and-inserting-nodes:parent" href="https://dom.spec.whatwg.org/#concept-tree-parent"
-                    data-x-internal="parent">parent</a>가 <var>target</var>이면,
-                  <var>adjusted insertion location</var>을 <var>target</var> 내부의
-                  <var>template</var>의 <a href="#insertion-end-marker"
-                    id="creating-and-inserting-nodes:insertion-end-marker-2">insertion end
-                    marker</a> 앞 위치로 설정한다.
-                </p>
-
-                <p class="note">종료 마커가 제거되었거나 다른 노드로 이동한 경우, 다음 단계에서 노드는 대신
-                  <var>target</var>에 추가된다.
-                </p>
-              </li>
-              <li>
-                <p>그렇지 않으면 <var>adjusted insertion location</var>을 <var>target</var> 내부의
-                  마지막 자식 뒤 위치(존재하는 경우)로 설정한다.</p>
-              </li>
-            </ol>
+            <p><var>lastTemplateOrTable</var>이 <code
+                id="creating-and-inserting-nodes:the-template-element-2"><a href="#the-template-element">template</a></code>
+              요소이면
+              <var>targetParent</var>를 <var>lastTemplateOrTable</var>로 설정한다.
+            </p>
           </li>
           <li>
-            <p>그렇지 않으면 <var>adjusted insertion location</var>을 <var>template</var>의
-              <a href="#template-contents" id="creating-and-inserting-nodes:template-contents-2">template contents</a>
-              내부의 마지막 자식 뒤 위치(존재하는 경우)로 설정한다.
+            <p>그렇지 않고 <var>lastTemplateOrTable</var>의 <a id="creating-and-inserting-nodes:parent"
+                href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가 null이 아니면,
+              <var>targetParent</var>를 <var>lastTemplateOrTable</var>의 <a id="creating-and-inserting-nodes:parent-2"
+                href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>로 설정하고
+              <var>referenceChild</var>를 <var>lastTemplateOrTable</var>로 설정한다.
+            </p>
+          </li>
+          <li>
+            <p>그렇지 않으면 <var>targetParent</var>를 <a href="#stack-of-open-elements"
+                id="creating-and-inserting-nodes:stack-of-open-elements-3">열린 요소 스택</a>에서
+              <var>lastTemplateOrTable</var> 바로 위에 있는 요소로 설정한다.
             </p>
           </li>
         </ol>
+
+        <p class="note">이 단계들이 필요한 이유 중 하나는 요소, 특히 이 경우
+          <code id="creating-and-inserting-nodes:the-table-element-3"><a href="#the-table-element">table</a></code>
+          요소가 파서에 의해 삽입된 후 스크립트에 의해
+          DOM 내의 다른 위치로 이동되거나, 실제로 DOM에서 완전히 제거될 수도 있기 때문이다.
+        </p>
       </li>
       <li>
-        <p><var>adjusted insertion location</var>을 반환한다.</p>
+        <p><var>targetParent</var>가 <code
+            id="creating-and-inserting-nodes:the-template-element-3"><a href="#the-template-element">template</a></code>
+          요소가 아니면
+          (<var>targetParent</var>, <var>referenceChild</var>)를 반환한다.</p>
+      </li>
+      <li>
+        <p><var>patchInsertionTarget</var>을 <var>targetParent</var>의
+          <a href="#insertion-target" id="creating-and-inserting-nodes:insertion-target">삽입 대상</a>으로 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>patchInsertionTarget</var>이 null이면 (<var>targetParent</var>의
+          <a href="#template-contents" id="creating-and-inserting-nodes:template-contents">템플릿 내용</a>, null)을 반환한다.
+        </p>
+      </li>
+      <li>
+        <p><var>targetParent</var>의 <a href="#insertion-end-marker"
+            id="creating-and-inserting-nodes:insertion-end-marker">삽입 종료 마커</a>가 null이 아니고 그
+          <a id="creating-and-inserting-nodes:parent-3" href="https://dom.spec.whatwg.org/#concept-tree-parent"
+            data-x-internal="parent">부모</a>가 <var>patchInsertionTarget</var>이면,
+          (<var>patchInsertionTarget</var>, <var>targetParent</var>의
+          <a href="#insertion-end-marker" id="creating-and-inserting-nodes:insertion-end-marker-2">삽입 종료
+            마커</a>)를 반환한다.
+        </p>
+
+        <p class="note">종료 마커가 제거되었거나 다른 노드로 이동된 경우, 다음 단계에서는 노드가
+          대신 <var>patchInsertionTarget</var>에 추가된다.</p>
+      </li>
+      <li>
+        <p>(<var>patchInsertionTarget</var>, null)을 반환한다.</p>
       </li>
     </ol>
   </div>
@@ -240917,240 +240898,247 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
   <hr>
 
   <div data-algorithm="">
-    <p>토큰 <var>token</var>, 문자열 <var>namespace</var> 및 <code id="creating-and-inserting-nodes:node"><a data-x-internal="node"
-          href="https://dom.spec.whatwg.org/#interface-node">Node</a></code> 객체
-      <var>intendedParent</var>가 주어졌을 때 <dfn id="create-an-element-for-the-token">토큰을 위한
-        요소를 생성하려면</dfn> 다음을 수행합니다.
+    <p>토큰 <var>token</var>, 문자열 <var>namespace</var>, 그리고 <code
+        id="creating-and-inserting-nodes:node-4"><a data-x-internal="node" href="https://dom.spec.whatwg.org/#interface-node">Node</a></code>
+      객체
+      <var>intendedParent</var>가 주어졌을 때 <dfn id="create-an-element-for-the-token">토큰에 대한 요소를 생성</dfn>하려면:
     </p>
 
     <ol>
       <li>
         <p><a href="#active-speculative-html-parser" id="creating-and-inserting-nodes:active-speculative-html-parser">활성
-            추측 HTML 파서</a>가 null이
-          아니면 <var>namespace</var>, <var>token</var>의 태그 이름 및 <var>token</var>의 속성이
-          주어졌을 때 <a href="#create-a-speculative-mock-element"
-            id="creating-and-inserting-nodes:create-a-speculative-mock-element">추측 모의 요소를 생성한</a>
-          결과를 반환합니다.
+            추측적 HTML 파서</a>가
+          null이 아니면 <var>namespace</var>, <var>token</var>의 태그 이름 및 <var>token</var>의
+          속성이 주어진
+          <a href="#create-a-speculative-mock-element"
+            id="creating-and-inserting-nodes:create-a-speculative-mock-element">추측적 모의 요소 생성</a>의 결과를 반환한다.
         </p>
       </li>
       <li>
-        <p>그렇지 않으면 선택적으로 <var>namespace</var>, <var>token</var>의 태그 이름 및
-          <var>token</var>의 속성이 주어졌을 때 <a href="#create-a-speculative-mock-element"
-            id="creating-and-inserting-nodes:create-a-speculative-mock-element-2">추측 모의 요소를
-            생성합니다</a>.
+        <p>그렇지 않으면 <var>namespace</var>, <var>token</var>의 태그 이름 및 <var>token</var>의 속성이
+          주어졌을 때 선택적으로 <a href="#create-a-speculative-mock-element"
+            id="creating-and-inserting-nodes:create-a-speculative-mock-element-2">추측적 모의 요소를 생성</a>한다.
         </p>
 
-        <p class="note">결과는 사용하지 않습니다. 이 단계는 비추측 파싱에서 <a href="#speculative-fetch"
-            id="creating-and-inserting-nodes:speculative-fetch">추측
-            가져오기</a>를 시작할 수 있게 합니다. 예를 들어 요소가 삽입될 때쯤
-          <var>intendedParent</var>가 문서에서 제거되었을 수 있으므로 이 시점의 가져오기는 여전히
-          추측적입니다.
-        </p>
+        <p class="note">그 결과는 사용되지 않는다. 이 단계에서는 비추측적 파싱에서 <a href="#speculative-fetch"
+            id="creating-and-inserting-nodes:speculative-fetch">추측적 가져오기</a>를
+          시작할 수 있다. 이 시점에서도 가져오기는 여전히 추측적인데,
+          예를 들어 요소가 삽입될 때쯤에는 <var>intendedParent</var>가
+          문서에서 제거되었을 수도 있기 때문이다.</p>
       </li>
       <li>
         <p><var>document</var>를 <var>intendedParent</var>의 <a id="creating-and-inserting-nodes:node-document"
-            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드
-            문서</a>로 둡니다.
+            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드 문서</a>로 설정한다.
         </p>
       </li>
       <li>
-        <p><var>localName</var>을 <var>token</var>의 태그 이름으로 둡니다.</p>
+        <p><var>localName</var>을 <var>token</var>의 태그 이름으로 설정한다.</p>
       </li>
       <li>
-        <p><var>token</var>에 "<code id="creating-and-inserting-nodes:attr-is"><a href="#attr-is">is</a></code>" 속성이 있으면
-          <var>is</var>를 해당 속성의 값으로, 그렇지 않으면 null로 둡니다.
+        <p>그러한 속성이 존재하면 <var>is</var>를 <var>token</var>에 있는 "<code
+            id="creating-and-inserting-nodes:attr-is"><a href="#attr-is">is</a></code>" 속성의 값으로 설정하고,
+          그렇지 않으면 null로 설정한다.
         </p>
       </li>
       <li>
-        <p><var>registry</var>를 <var>intendedParent</var>가 주어졌을 때 <a href="#look-up-a-custom-element-registry"
-            id="creating-and-inserting-nodes:look-up-a-custom-element-registry">사용자 정의 요소 레지스트리를
-            조회한</a> 결과로 둡니다.</p>
+        <p><var>registry</var>를 <var>intendedParent</var>가 주어진 <a href="#look-up-a-custom-element-registry"
+            id="creating-and-inserting-nodes:look-up-a-custom-element-registry">사용자 정의 요소 레지스트리 조회</a>의
+          결과로 설정한다.</p>
       </li>
       <li>
-        <p><var>definition</var>을 <var>registry</var>, <var>namespace</var>,
-          <var>localName</var> 및 <var>is</var>가 주어졌을 때 <a href="#look-up-a-custom-element-definition"
-            id="creating-and-inserting-nodes:look-up-a-custom-element-definition">사용자 정의 요소 정의를
-            조회한</a> 결과로 둡니다.
+        <p><var>definition</var>을 <var>registry</var>,
+          <var>namespace</var>, <var>localName</var> 및 <var>is</var>가 주어진 <a href="#look-up-a-custom-element-definition"
+            id="creating-and-inserting-nodes:look-up-a-custom-element-definition">사용자 정의 요소
+            정의 조회</a>의 결과로 설정한다.
         </p>
       </li>
       <li>
-        <p><var>definition</var>이 null이 아니고 파서가 <a href="#html-fragment-parsing-algorithm"
-            id="creating-and-inserting-nodes:html-fragment-parsing-algorithm">HTML 프래그먼트 파싱 알고리즘</a>의
-          일부로 생성되지 않았으면 <var>willExecuteScript</var>를 true로, 그렇지 않으면 false로
-          둡니다.</p>
+        <p><var>definition</var>이 null이 아니고 파서의 <a href="#fragment-context-element"
+            id="creating-and-inserting-nodes:fragment-context-element">조각 컨텍스트 요소</a>가 null이면
+          <var>willExecuteScript</var>를 true로 설정하고, 그렇지 않으면
+          false로 설정한다.
+        </p>
       </li>
       <li>
-        <p><var>willExecuteScript</var>가 true이면 다음을 수행합니다.</p>
+        <p><var>willExecuteScript</var>가 true이면:</p>
 
         <ol>
           <li>
             <p><var>document</var>의 <a href="#throw-on-dynamic-markup-insertion-counter"
-                id="creating-and-inserting-nodes:throw-on-dynamic-markup-insertion-counter">동적 마크업 삽입 시
-                예외 발생 카운터</a>를 1 증가시킵니다.</p>
+                id="creating-and-inserting-nodes:throw-on-dynamic-markup-insertion-counter">동적 마크업 삽입 시 예외 발생
+                카운터</a>를 증가시킨다.</p>
           </li>
           <li>
             <p><a id="creating-and-inserting-nodes:javascript-execution-context-stack"
                 href="https://tc39.es/ecma262/#execution-context-stack"
-                data-x-internal="javascript-execution-context-stack">JavaScript 실행 컨텍스트 스택</a>이 비어
-              있으면 <a href="#perform-a-microtask-checkpoint"
-                id="creating-and-inserting-nodes:perform-a-microtask-checkpoint">마이크로태스크 체크포인트를
-                수행합니다</a>.</p>
+                data-x-internal="javascript-execution-context-stack">JavaScript 실행 컨텍스트 스택</a>이 비어 있으면
+              <a href="#perform-a-microtask-checkpoint"
+                id="creating-and-inserting-nodes:perform-a-microtask-checkpoint">마이크로태스크
+                체크포인트를 수행</a>한다.
+            </p>
           </li>
           <li>
-            <p>새로운 <a href="#element-queue" id="creating-and-inserting-nodes:element-queue">요소 큐</a>를
+            <p>새 <a href="#element-queue" id="creating-and-inserting-nodes:element-queue">요소 큐</a>를
               <var>document</var>의 <a href="#relevant-agent" id="creating-and-inserting-nodes:relevant-agent">관련
                 에이전트</a>의 <a href="#custom-element-reactions-stack"
-                id="creating-and-inserting-nodes:custom-element-reactions-stack">사용자 정의 요소 반응 스택</a>에
-              푸시합니다.
+                id="creating-and-inserting-nodes:custom-element-reactions-stack">사용자 정의 요소 반응 스택</a>에 푸시한다.
             </p>
           </li>
         </ol>
       </li>
       <li>
-        <p><var>element</var>를 <var>document</var>, <var>localName</var>,
-          <var>namespace</var>, null, <var>is</var>, <var>willExecuteScript</var> 및
-          <var>registry</var>가 주어졌을 때 <a href="https://dom.spec.whatwg.org/#concept-create-element"
-            id="creating-and-inserting-nodes:create-an-element" data-x-internal="create-an-element">요소를
-            생성한</a> 결과로 둡니다.
+        <p><var>element</var>를 <var>document</var>, <var>localName</var>, <var>namespace</var>, null,
+          <var>is</var>, <var>willExecuteScript</var> 및 <var>registry</var>가 주어진 <a
+            href="https://dom.spec.whatwg.org/#concept-create-element"
+            id="creating-and-inserting-nodes:create-an-element" data-x-internal="create-an-element">요소
+            생성</a>의 결과로 설정한다.
         </p>
 
         <p class="note"><var>willExecuteScript</var>가 true이면 이로 인해 <a href="#custom-element-constructor"
             id="creating-and-inserting-nodes:custom-element-constructor">사용자 정의 요소
-            생성자</a>가 실행됩니다. 그러나 <a href="#throw-on-dynamic-markup-insertion-counter"
-            id="creating-and-inserting-nodes:throw-on-dynamic-markup-insertion-counter-2">동적 마크업 삽입 시
-            예외 발생 카운터</a>를 증가시켰으므로 이로 인해 <a href="#dom-document-write"
-            id="creating-and-inserting-nodes:dom-document-write">토크나이저에 새로운 문자가 삽입</a>되거나
-          <a href="#dom-document-open" id="creating-and-inserting-nodes:dom-document-open">문서가
-            제거</a>될 수 없습니다.
+            생성자</a>가 실행된다. 그러나 <a href="#throw-on-dynamic-markup-insertion-counter"
+            id="creating-and-inserting-nodes:throw-on-dynamic-markup-insertion-counter-2">동적 마크업 삽입 시 예외 발생
+            카운터</a>를 증가시켰으므로, 이로 인해 <a href="#dom-document-write" id="creating-and-inserting-nodes:dom-document-write">새
+            문자가 토크나이저에 삽입</a>되거나
+          <a href="#dom-document-open" id="creating-and-inserting-nodes:dom-document-open">문서가 완전히
+            제거</a>될 수 없다.
         </p>
       </li>
       <li>
         <p>주어진 토큰의 각 속성을 <var>element</var>에 <a href="https://dom.spec.whatwg.org/#concept-element-attributes-append"
             id="creating-and-inserting-nodes:concept-element-attributes-append"
-            data-x-internal="concept-element-attributes-append">추가합니다</a>.</p>
+            data-x-internal="concept-element-attributes-append">추가</a>한다.</p>
 
-        <p class="note">이로 인해 <code>attributeChangedCallback</code>을 위한 <a
+        <p class="note">이로 인해 <code>attributeChangedCallback</code>에 대한 <a
             href="#enqueue-a-custom-element-callback-reaction"
-            id="creating-and-inserting-nodes:enqueue-a-custom-element-callback-reaction">사용자 정의 요소 콜백
-            반응이 큐에 추가</a>될 수 있으며, 이는 다음 단계에서 즉시 실행될 수 있습니다.
+            id="creating-and-inserting-nodes:enqueue-a-custom-element-callback-reaction">사용자 정의 요소
+            콜백 반응이 대기열에 추가</a>될 수 있으며, 이는 즉시(다음
+          단계에서) 실행될 수도 있다.
         </p>
 
         <p class="note"><code id="creating-and-inserting-nodes:attr-is-2"><a href="#attr-is">is</a></code> 속성이 <a
             href="https://dom.spec.whatwg.org/#concept-create-element"
-            id="creating-and-inserting-nodes:create-an-element-2" data-x-internal="create-an-element">사용자 정의
-            빌트인 요소의 생성</a>을 제어하지만 관련 <a href="#custom-element-constructor"
-            id="creating-and-inserting-nodes:custom-element-constructor-2">사용자 정의 요소 생성자</a>가
-          실행되는 동안에는 존재하지 않습니다. 이 단계에서 다른 모든 속성과 함께 추가됩니다.
+            id="creating-and-inserting-nodes:create-an-element-2" data-x-internal="create-an-element">사용자 정의된
+            내장 요소</a>의 <a href="#customized-built-in-element"
+            id="creating-and-inserting-nodes:customized-built-in-element">생성</a>을 제어하지만, 관련 <a
+            href="#custom-element-constructor" id="creating-and-inserting-nodes:custom-element-constructor-2">사용자 정의 요소
+            생성자</a>가 실행되는 동안에는
+          존재하지 않는다. 이 단계에서 다른 모든 속성과 함께
+          추가된다.
         </p>
       </li>
       <li>
-        <p><var>willExecuteScript</var>가 true이면 다음을 수행합니다.</p>
+        <p><var>willExecuteScript</var>가 true이면:</p>
 
         <ol>
           <li>
             <p><var>queue</var>를 <var>document</var>의 <a href="#relevant-agent"
                 id="creating-and-inserting-nodes:relevant-agent-2">관련
                 에이전트</a>의 <a href="#custom-element-reactions-stack"
-                id="creating-and-inserting-nodes:custom-element-reactions-stack-2">사용자 정의 요소 반응
-                스택</a>에서 팝한 결과로 둡니다. 이는 위에서 푸시한 것과 동일한 <a href="#element-queue"
-                id="creating-and-inserting-nodes:element-queue-2">요소 큐</a>입니다.
+                id="creating-and-inserting-nodes:custom-element-reactions-stack-2">사용자 정의 요소 반응 스택</a>에서 팝한 결과로 설정한다.
+              (이는 위에서 푸시한 것과 동일한
+              <a href="#element-queue" id="creating-and-inserting-nodes:element-queue-2">요소 큐</a>이다.)
             </p>
           </li>
           <li>
-            <p><var>queue</var>의 <a href="#invoke-custom-element-reactions"
-                id="creating-and-inserting-nodes:invoke-custom-element-reactions">사용자 정의 요소 반응을
-                호출합니다</a>.
+            <p><var>queue</var>에서 <a href="#invoke-custom-element-reactions"
+                id="creating-and-inserting-nodes:invoke-custom-element-reactions">사용자 정의 요소 반응을 호출</a>한다.
             </p>
           </li>
           <li>
             <p><var>document</var>의 <a href="#throw-on-dynamic-markup-insertion-counter"
-                id="creating-and-inserting-nodes:throw-on-dynamic-markup-insertion-counter-3">동적 마크업 삽입 시
-                예외 발생 카운터</a>를 1 감소시킵니다.</p>
+                id="creating-and-inserting-nodes:throw-on-dynamic-markup-insertion-counter-3">동적 마크업 삽입 시 예외 발생
+                카운터</a>를 감소시킨다.</p>
           </li>
         </ol>
       </li>
       <li>
-        <p><var>element</var>에 <em><a id="creating-and-inserting-nodes:xmlns-namespace"
-              href="https://infra.spec.whatwg.org/#xmlns-namespace" data-x-internal="xmlns-namespace">XMLNS
-              네임스페이스</a>의</em> <code>xmlns</code> 속성이 있고
-          그 값이 요소의 네임스페이스와 정확히 같지 않으면 이는 <a href="#parse-errors" id="creating-and-inserting-nodes:parse-errors">파싱
-            오류</a>입니다. 마찬가지로
-          <var>element</var>에 <a id="creating-and-inserting-nodes:xmlns-namespace-2"
-            href="https://infra.spec.whatwg.org/#xmlns-namespace" data-x-internal="xmlns-namespace">XMLNS 네임스페이스</a>의
-          <code>xmlns:xlink</code> 속성이 있고
-          그 값이 <a id="creating-and-inserting-nodes:xlink-namespace"
-            href="https://infra.spec.whatwg.org/#xlink-namespace" data-x-internal="xlink-namespace">XLink 네임스페이스</a>가
-          아니면 이는 <a href="#parse-errors" id="creating-and-inserting-nodes:parse-errors-2">파싱 오류</a>입니다.
+        <p><var>element</var>에 값이 요소의 네임스페이스와 정확히 같지 않은 <code>xmlns</code> 속성이 <em><a
+              id="creating-and-inserting-nodes:xmlns-namespace" href="https://infra.spec.whatwg.org/#xmlns-namespace"
+              data-x-internal="xmlns-namespace">XMLNS
+              네임스페이스</a>에</em> 있으면 이는
+          <a href="#parse-errors" id="creating-and-inserting-nodes:parse-errors">파싱 오류</a>이다. 마찬가지로
+          <var>element</var>에 값이 <a id="creating-and-inserting-nodes:xlink-namespace"
+            href="https://infra.spec.whatwg.org/#xlink-namespace" data-x-internal="xlink-namespace">XLink 네임스페이스</a>가 아닌
+          <code>xmlns:xlink</code> 속성이 <a id="creating-and-inserting-nodes:xmlns-namespace-2"
+            href="https://infra.spec.whatwg.org/#xmlns-namespace" data-x-internal="xmlns-namespace">XMLNS 네임스페이스</a>에
+          있으면 이는 <a href="#parse-errors" id="creating-and-inserting-nodes:parse-errors-2">파싱 오류</a>이다.
         </p>
       </li>
       <li>
         <p><var>element</var>가 <a href="#category-reset" id="creating-and-inserting-nodes:category-reset">재설정 가능한
-            요소</a>이고 <a href="#form-associated-custom-element"
-            id="creating-and-inserting-nodes:form-associated-custom-element">폼 관련 사용자 정의 요소</a>가
-          아니면 해당 요소의 <a href="#concept-form-reset-control"
-            id="creating-and-inserting-nodes:concept-form-reset-control">재설정 알고리즘</a>을 호출합니다.
-          이는 요소의 속성을 기반으로 요소의 <a href="#concept-fe-value" id="creating-and-inserting-nodes:concept-fe-value">값</a>과 <a
-            href="#concept-fe-checked" id="creating-and-inserting-nodes:concept-fe-checked">체크 상태</a>를 초기화합니다.</p>
-      </li>
-      <li>
-        <p><var>element</var>가 <a href="#form-associated-element"
-            id="creating-and-inserting-nodes:form-associated-element">폼 관련 요소</a>이고 <a
-            href="#form-associated-custom-element" id="creating-and-inserting-nodes:form-associated-custom-element-2">폼
-            관련 사용자 정의 요소</a>가
-          아니며, <a href="#form-element-pointer" id="creating-and-inserting-nodes:form-element-pointer"><code>form</code>
-            요소 포인터</a>가 null이 아니고, <a href="#stack-of-open-elements"
-            id="creating-and-inserting-nodes:stack-of-open-elements-6">열린 요소 스택</a>에 <code
-            id="creating-and-inserting-nodes:the-template-element-3"><a
-              href="#the-template-element">template</a></code> 요소가 없으며, <var>element</var>가 <a href="#category-listed"
-            id="creating-and-inserting-nodes:category-listed">나열된 요소</a>가 아니거나
-          <code id="creating-and-inserting-nodes:attr-fae-form"><a
-              href="#attr-fae-form">form</a></code> 속성을 가지지 않으며, <var>intendedParent</var>가 <a
-            href="#form-element-pointer" id="creating-and-inserting-nodes:form-element-pointer-2"><code>form</code> 요소
-            포인터</a>가 가리키는 요소와 같은 <a id="creating-and-inserting-nodes:tree"
-            href="https://dom.spec.whatwg.org/#concept-tree" data-x-internal="tree">트리</a>에 있으면 <var>element</var>를 <a
-            href="#form-element-pointer" id="creating-and-inserting-nodes:form-element-pointer-3"><code>form</code> 요소
-            포인터</a>가 가리키는 <code id="creating-and-inserting-nodes:the-form-element"><a
-              href="#the-form-element">form</a></code> 요소와 <a href="#concept-form-association"
-            id="creating-and-inserting-nodes:concept-form-association">연결</a>하고
-          <var>element</var>의 <a href="#parser-inserted-flag" id="creating-and-inserting-nodes:parser-inserted-flag">파서
-            삽입 플래그</a>를 설정합니다.
+            요소</a>이고
+          <a href="#form-associated-custom-element" id="creating-and-inserting-nodes:form-associated-custom-element">폼
+            연관 사용자 정의 요소</a>가 아니면
+          해당 요소의 <a href="#concept-form-reset-control" id="creating-and-inserting-nodes:concept-form-reset-control">재설정
+            알고리즘</a>을 호출한다. (이는
+          요소의 속성을 기반으로 요소의 <a href="#concept-fe-value" id="creating-and-inserting-nodes:concept-fe-value">값</a>과 <a
+            href="#concept-fe-checked" id="creating-and-inserting-nodes:concept-fe-checked">체크 상태</a>를
+          초기화한다.)
         </p>
       </li>
       <li>
-        <p><var>element</var>를 반환합니다.</p>
+        <p><var>element</var>가 <a href="#form-associated-element"
+            id="creating-and-inserting-nodes:form-associated-element">폼 연관 요소</a>이고
+          <a href="#form-associated-custom-element" id="creating-and-inserting-nodes:form-associated-custom-element-2">폼
+            연관 사용자 정의 요소</a>가 아니며,
+          <a href="#form-element-pointer" id="creating-and-inserting-nodes:form-element-pointer"><code>form</code>
+            요소 포인터</a>가 null이 아니고,
+          <a href="#stack-of-open-elements" id="creating-and-inserting-nodes:stack-of-open-elements-4">열린 요소 스택</a>에
+          <code
+            id="creating-and-inserting-nodes:the-template-element-4"><a href="#the-template-element">template</a></code>
+          요소가 없으며, <var>element</var>가
+          <a href="#category-listed" id="creating-and-inserting-nodes:category-listed">나열된 요소</a>가 아니거나
+          <code id="creating-and-inserting-nodes:attr-fae-form"><a href="#attr-fae-form">form</a></code>
+          속성을 갖지 않고, <var>intendedParent</var>가 <a href="#form-element-pointer"
+            id="creating-and-inserting-nodes:form-element-pointer-2"><code>form</code> 요소
+            포인터</a>가 가리키는 요소와 동일한
+          <a id="creating-and-inserting-nodes:tree" href="https://dom.spec.whatwg.org/#concept-tree"
+            data-x-internal="tree">트리</a>에 있으면, <var>element</var>를
+          <a href="#form-element-pointer" id="creating-and-inserting-nodes:form-element-pointer-3"><code>form</code> 요소
+            포인터</a>가 가리키는 <code
+            id="creating-and-inserting-nodes:the-form-element"><a href="#the-form-element">form</a></code>
+          요소와 <a href="#concept-form-association" id="creating-and-inserting-nodes:concept-form-association">연결</a>하고
+          <var>element</var>의 <a href="#parser-inserted-flag" id="creating-and-inserting-nodes:parser-inserted-flag">파서
+            삽입 플래그</a>를 설정한다.
+        </p>
+      </li>
+      <li>
+        <p><var>element</var>를 반환한다.</p>
       </li>
     </ol>
   </div>
 
   <div data-algorithm="">
-    <p>선택적 삽입 위치 <var>insertionLocation</var>, 기본값 null을 사용하여 <dfn id="adjusted-insertion-location">조정된 삽입 위치</dfn>를
-      계산하려면 다음을 수행합니다.
-    </p>
+    <p>선택적 <a href="#insertion-location" id="creating-and-inserting-nodes:insertion-location-2">삽입
+        위치</a> <var>insertionLocation</var>(기본값 null)을 사용하여 <dfn id="adjusted-insertion-location">조정된 삽입 위치</dfn>를
+      계산하려면:</p>
 
     <ol>
       <li>
-        <p><var>insertionLocation</var>이 null이면 <var>overrideTarget</var>을 null로, 그렇지 않으면
-          <var>insertionLocation</var>이 속한 노드로 둡니다.
-        </p>
+        <p><var>insertionLocation</var>이 null이면 <var>overrideTarget</var>을 null로 설정하고,
+          그렇지 않으면 <var>insertionLocation</var>의 <a href="#insertion-location-target-parent"
+            id="creating-and-inserting-nodes:insertion-location-target-parent">대상 부모</a>로 설정한다.</p>
       </li>
       <li>
-        <p><var>adjustedInsertionLocation</var>을 <var>overrideTarget</var>이 주어졌을 때의 <a
+        <p><var>adjustedInsertionLocation</var>을 <var>overrideTarget</var>이 주어진 <a
             href="#appropriate-place-for-inserting-a-node"
             id="creating-and-inserting-nodes:appropriate-place-for-inserting-a-node">노드를 삽입하기에 적절한
-            위치</a>로 둡니다.</p>
+            위치</a>로 설정한다.</p>
       </li>
       <li>
-        <p><var>adjustedInsertionLocation</var>이 속한 노드가 <a href="#stack-of-open-elements"
-            id="creating-and-inserting-nodes:stack-of-open-elements-7">열린 요소 스택</a>의 첫 번째 요소이고
-          파서의 <a href="#root-insertion-target" id="creating-and-inserting-nodes:root-insertion-target">루트 삽입 대상</a>이
-          null이 아니면
-          <var>adjustedInsertionLocation</var>을 파서의 <a href="#root-insertion-target"
-            id="creating-and-inserting-nodes:root-insertion-target-2">루트 삽입 대상</a> 안에서 마지막 자식이
-          있으면 그 뒤로 설정합니다.
+        <p><var>adjustedInsertionLocation</var>의 <a href="#insertion-location-target-parent"
+            id="creating-and-inserting-nodes:insertion-location-target-parent-2">대상 부모</a>가
+          <a href="#stack-of-open-elements" id="creating-and-inserting-nodes:stack-of-open-elements-5">열린
+            요소 스택</a>의 첫 번째 요소이고 파서의 <a href="#root-insertion-target"
+            id="creating-and-inserting-nodes:root-insertion-target">루트 삽입 대상</a>이
+          null이 아니면 <var>adjustedInsertionLocation</var>을 (파서의 <a href="#root-insertion-target"
+            id="creating-and-inserting-nodes:root-insertion-target-2">루트 삽입
+            대상</a>, null)으로 설정한다.
         </p>
       </li>
       <li>
-        <p><var>adjustedInsertionLocation</var>을 반환합니다.</p>
+        <p><var>adjustedInsertionLocation</var>을 반환한다.</p>
       </li>
     </ol>
   </div>
@@ -241158,72 +241146,73 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
   <hr>
 
   <div data-algorithm="">
-    <p>요소 <var>element</var>와 선택적인 삽입 위치 <var>insertionLocation</var>(기본값은
-      null)을 사용하여 <dfn id="insert-an-element-at-the-adjusted-insertion-location">조정된 삽입 위치에 요소를
-        삽입</dfn>하려면:
+    <p>요소
+      <var>element</var>와 선택적 <a href="#insertion-location" id="creating-and-inserting-nodes:insertion-location-3">삽입
+        위치</a> <var>insertionLocation</var>
+      (기본값 null)을 사용하여 <dfn id="insert-an-element-at-the-adjusted-insertion-location">조정된 삽입
+        위치에 요소를 삽입</dfn>하려면:
     </p>
 
     <ol>
       <li>
-        <p><var>insertionLocation</var>을 <var>insertionLocation</var>이 주어졌을 때의 <a href="#adjusted-insertion-location"
-            id="creating-and-inserting-nodes:adjusted-insertion-location">조정된 삽입 위치</a>로 설정한다.
-        </p>
-      </li>
-      <li>
-        <p><var>target</var>을 <var>insertionLocation</var>이 위치하는 노드로
-          둔다.</p>
+        <p>(<var>targetParent</var>, <var>referenceChild</var>)를 <var>insertionLocation</var>이 주어진 <a
+            href="#adjusted-insertion-location" id="creating-and-inserting-nodes:adjusted-insertion-location">조정된 삽입
+            위치</a>로 설정한다.</p>
       </li>
       <li>
         <p>다음 중 하나라도 참이면:</p>
 
         <ul>
-          <li><var>element</var>의 <a id="creating-and-inserting-nodes:parent-2"
-              href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가 null이 아니다;
+          <li><var>element</var>의 <a id="creating-and-inserting-nodes:parent-4"
+              href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가 null이 아닌 경우;
           </li>
-          <li><var>element</var>이 <var>target</var>의 <a
+          <li><var>element</var>가 <var>targetParent</var>의 <a
               id="creating-and-inserting-nodes:host-including-inclusive-ancestor"
               href="https://dom.spec.whatwg.org/#concept-tree-host-including-inclusive-ancestor"
-              data-x-internal="host-including-inclusive-ancestor">호스트를 포함하는 포괄 조상</a>이다;
-            또는
+              data-x-internal="host-including-inclusive-ancestor">호스트를 포함하는 포괄적 조상</a>인 경우; 또는
           </li>
-          <li><var>target</var>이 이미 요소 자식을 가진 <code
-              id="creating-and-inserting-nodes:document"><a href="#document">Document</a></code> 노드이다,</li>
+          <li><var>targetParent</var>가 이미 요소 자식을 가진 <code
+              id="creating-and-inserting-nodes:document"><a href="#document">Document</a></code> 노드인
+            경우,</li>
         </ul>
 
-        <p>그러면 반환한다.</p>
+        <p>반환한다.</p>
       </li>
       <li>
         <p><a id="creating-and-inserting-nodes:assert" href="https://infra.spec.whatwg.org/#assert"
             data-x-internal="assert">단언</a>: <var>element</var>,
-          <var>target</var>, null, « »이 주어졌을 때 <a id="creating-and-inserting-nodes:ensure-pre-insert-validity"
+          <var>targetParent</var>, <var>referenceChild</var> 및 « »가 주어졌을 때 <a
+            id="creating-and-inserting-nodes:ensure-pre-insert-validity"
             href="https://dom.spec.whatwg.org/#concept-node-ensure-pre-insertion-validity"
-            data-x-internal="ensure-pre-insert-validity">사전 삽입 유효성을 확인</a>해도 예외가 발생하지 않는다.
+            data-x-internal="ensure-pre-insert-validity">삽입 전 유효성 보장</a>은 예외를 발생시키지 않는다.
         </p>
       </li>
       <li>
-        <p>파서가 <a href="#html-fragment-parsing-algorithm"
-            id="creating-and-inserting-nodes:html-fragment-parsing-algorithm-2">HTML 조각 파싱
-            알고리즘</a>의 일부로 생성되지 않았다면, 새로운 <a href="#element-queue" id="creating-and-inserting-nodes:element-queue-3">요소
-            큐</a>를 <var>element</var>의
-          <a href="#relevant-agent" id="creating-and-inserting-nodes:relevant-agent-3">관련 에이전트</a>의 <a
-            href="#custom-element-reactions-stack"
-            id="creating-and-inserting-nodes:custom-element-reactions-stack-3">사용자 정의 요소 반응 스택</a>에 푸시한다.
+        <p>파서의 <a href="#fragment-context-element" id="creating-and-inserting-nodes:fragment-context-element-2">조각 컨텍스트
+            요소</a>가 null이면 새
+          <a href="#element-queue" id="creating-and-inserting-nodes:element-queue-3">요소 큐</a>를
+          <var>element</var>의 <a href="#relevant-agent" id="creating-and-inserting-nodes:relevant-agent-3">관련
+            에이전트</a>의 <a href="#custom-element-reactions-stack"
+            id="creating-and-inserting-nodes:custom-element-reactions-stack-3">사용자 정의
+            요소 반응 스택</a>에 푸시한다.
         </p>
       </li>
       <li>
-        <p><var>element</var>을 <var>insertionLocation</var>에 삽입한다.</p>
+        <p><var>element</var>를
+          <var>targetParent</var> 안의 <var>referenceChild</var> 앞에 <a
+            href="https://dom.spec.whatwg.org/#concept-node-insert"
+            id="creating-and-inserting-nodes:concept-node-insert" data-x-internal="concept-node-insert">삽입</a>한다.
+        </p>
       </li>
       <li>
-        <p>파서가 <a href="#html-fragment-parsing-algorithm"
-            id="creating-and-inserting-nodes:html-fragment-parsing-algorithm-3">HTML 조각 파싱
-            알고리즘</a>의 일부로 생성되지 않았다면, <var>element</var>의
-          <a href="#relevant-agent" id="creating-and-inserting-nodes:relevant-agent-4">관련 에이전트</a>의 <a
-            href="#custom-element-reactions-stack"
-            id="creating-and-inserting-nodes:custom-element-reactions-stack-4">사용자 정의 요소 반응 스택</a>에서 <a
-            href="#element-queue" id="creating-and-inserting-nodes:element-queue-4">요소 큐</a>를 팝하고, 해당 큐에서
-          <a href="#invoke-custom-element-reactions"
-            id="creating-and-inserting-nodes:invoke-custom-element-reactions-2">사용자 정의 요소 반응을
-            호출한다</a>.
+        <p>파서의 <a href="#fragment-context-element" id="creating-and-inserting-nodes:fragment-context-element-3">조각 컨텍스트
+            요소</a>가 null이면
+          <var>element</var>의 <a href="#relevant-agent" id="creating-and-inserting-nodes:relevant-agent-4">관련 에이전트</a>의
+          <a href="#custom-element-reactions-stack"
+            id="creating-and-inserting-nodes:custom-element-reactions-stack-4">사용자 정의 요소
+            반응 스택</a>에서 <a href="#element-queue" id="creating-and-inserting-nodes:element-queue-4">요소
+            큐</a>를 팝하고, 해당 큐에서 <a href="#invoke-custom-element-reactions"
+            id="creating-and-inserting-nodes:invoke-custom-element-reactions-2">사용자 정의 요소 반응을 호출</a>한다.
         </p>
       </li>
     </ol>
@@ -241232,32 +241221,35 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
 
 
   <div data-algorithm="">
-    <p>토큰 <var>token</var>, 문자열 <var>namespace</var> 및 부울 <var>onlyAddToElementStack</var>이 주어진 경우
-      <dfn id="insert-a-foreign-element">외부 요소 삽입</dfn>을 하려면:
+    <p>토큰 <var>token</var>, 문자열
+      <var>namespace</var>, 그리고 불리언 <var>onlyAddToElementStack</var>이 주어졌을 때 <dfn id="insert-a-foreign-element">외부 요소를
+        삽입</dfn>하려면:
     </p>
 
     <ol>
       <li>
         <p><var>adjustedInsertionLocation</var>을 <a href="#appropriate-place-for-inserting-a-node"
-            id="creating-and-inserting-nodes:appropriate-place-for-inserting-a-node-2">노드를 삽입하기 위한 적절한
-            위치</a>로 한다.</p>
+            id="creating-and-inserting-nodes:appropriate-place-for-inserting-a-node-2">노드를 삽입하기에 적절한
+            위치</a>로 설정한다.</p>
       </li>
       <li>
-        <p><var>element</var>를 <var>token</var>, <var>namespace</var> 및
-          <var>adjustedInsertionLocation</var>이 속한 노드가 주어진 <a href="#create-an-element-for-the-token"
-            id="creating-and-inserting-nodes:create-an-element-for-the-token">토큰에 대한 요소 생성</a>의 결과로 한다.
-        </p>
+        <p><var>element</var>를 <var>token</var>, <var>namespace</var>,
+          그리고 <var>adjustedInsertionLocation</var>의 <a href="#insertion-location-target-parent"
+            id="creating-and-inserting-nodes:insertion-location-target-parent-3">대상 부모</a>가 주어진 <a
+            href="#create-an-element-for-the-token"
+            id="creating-and-inserting-nodes:create-an-element-for-the-token">토큰에 대한 요소
+            생성</a>의 결과로 설정한다.</p>
       </li>
       <li>
-        <p><var>onlyAddToElementStack</var>이 false인 경우, <var>element</var>를 사용하여 <a
+        <p><var>onlyAddToElementStack</var>가 false이면 <var>element</var>를 사용하여 <a
             href="#insert-an-element-at-the-adjusted-insertion-location"
-            id="creating-and-inserting-nodes:insert-an-element-at-the-adjusted-insertion-location">조정된 삽입 위치에
-            요소 삽입</a>을 실행한다.</p>
+            id="creating-and-inserting-nodes:insert-an-element-at-the-adjusted-insertion-location">조정된
+            삽입 위치에 요소를 삽입</a>한다.</p>
       </li>
       <li>
         <p><var>element</var>를 <a href="#stack-of-open-elements"
-            id="creating-and-inserting-nodes:stack-of-open-elements-8">열린 요소 스택</a>에 푸시하여 새 <a href="#current-node"
-            id="creating-and-inserting-nodes:current-node-2">현재 노드</a>가 되도록 한다.
+            id="creating-and-inserting-nodes:stack-of-open-elements-6">열린 요소 스택</a>에 푸시하여 새
+          <a href="#current-node" id="creating-and-inserting-nodes:current-node-2">현재 노드</a>가 되도록 한다.
         </p>
       </li>
       <li>
@@ -241718,45 +241710,55 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
   <hr>
 
   <div data-algorithm="">
-    <p>아래 단계에서 사용자 에이전트가 토큰을 처리하는 동안 <dfn id="insert-a-character">문자를
-        삽입</dfn>하도록 요구하면 사용자 에이전트는 다음 단계를 실행해야 합니다.</p>
+    <p>아래 단계에서 토큰을 처리하는 동안 사용자 에이전트가 <dfn id="insert-a-character">문자를 삽입</dfn>해야 하는 경우,
+      사용자 에이전트는 다음 단계를 실행해야 한다:</p>
 
     <ol>
       <li>
-        <p><var>data</var>를 알고리즘에 전달된 문자로, 명시적으로 지정된 문자가 없으면 처리 중인 문자
-          토큰의 문자로 둡니다.</p>
+        <p><var>data</var>를 알고리즘에 전달된 문자로 설정하거나, 문자가 명시적으로
+          지정되지 않은 경우에는 처리 중인 문자 토큰의 문자로 설정한다.</p>
       </li>
       <li>
-        <p><var>insertionLocation</var>을 <a href="#adjusted-insertion-location"
-            id="creating-and-inserting-nodes:adjusted-insertion-location-2">조정된 삽입 위치</a>로 둡니다.</p>
+        <p>(<var>targetParent</var>, <var>referenceChild</var>)를 <a href="#adjusted-insertion-location"
+            id="creating-and-inserting-nodes:adjusted-insertion-location-2">조정된 삽입
+            위치</a>로 설정한다.</p>
       </li>
       <li>
-        <p><var>insertionLocation</var>이 <code
-            id="creating-and-inserting-nodes:document-2"><a href="#document">Document</a></code> 노드 안에
-          있으면 반환합니다.</p>
+        <p><var>targetParent</var>가 <code
+            id="creating-and-inserting-nodes:document-2"><a href="#document">Document</a></code> 노드이면 반환한다.</p>
 
         <p class="note">DOM은 <code id="creating-and-inserting-nodes:document-3"><a href="#document">Document</a></code>
-          노드가
-          <code id="creating-and-inserting-nodes:text"><a data-x-internal="text"
-              href="https://dom.spec.whatwg.org/#interface-text">Text</a></code> 노드 자식을 가지는 것을
-          허용하지 않으므로 해당 문자는 폐기됩니다.
+          노드가 <code
+            id="creating-and-inserting-nodes:text"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+          노드
+          자식을 갖도록 허용하지 않으므로, 이들은 폐기된다.</p>
+      </li>
+      <li>
+        <p><var>referenceChild</var>가 null이 아니면 <var>previousSibling</var>을 <var>referenceChild</var>의 <a
+            id="creating-and-inserting-nodes:previous-sibling"
+            href="https://dom.spec.whatwg.org/#concept-tree-previous-sibling" data-x-internal="previous-sibling">이전
+            형제</a>로 설정하고, 그렇지 않으면 <var>targetParent</var>의
+          <a id="creating-and-inserting-nodes:last-child" href="https://dom.spec.whatwg.org/#concept-tree-last-child"
+            data-x-internal="last-child">마지막 자식</a>으로 설정한다.
         </p>
       </li>
       <li>
-        <p><var>insertionLocation</var> 바로 앞에 <code id="creating-and-inserting-nodes:text-2"><a data-x-internal="text"
-              href="https://dom.spec.whatwg.org/#interface-text">Text</a></code> 노드가 있으면
-          <var>data</var>를 해당 <code id="creating-and-inserting-nodes:text-3"><a data-x-internal="text"
-              href="https://dom.spec.whatwg.org/#interface-text">Text</a></code> 노드의 <a
-            href="https://dom.spec.whatwg.org/#concept-cd-data" id="creating-and-inserting-nodes:concept-cd-data"
-            data-x-internal="concept-cd-data">데이터</a>에 추가합니다.
+        <p><var>previousSibling</var>이 <code
+            id="creating-and-inserting-nodes:text-2"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+          노드이면 <var>data</var>를
+          <var>previousSibling</var>의 <a href="https://dom.spec.whatwg.org/#concept-cd-data"
+            id="creating-and-inserting-nodes:concept-cd-data" data-x-internal="concept-cd-data">데이터</a>에 추가한다.
         </p>
 
-        <p>그렇지 않으면, <var>text</var>를 <var>insertionLocation</var>이 속한 노드의 <a
-            id="creating-and-inserting-nodes:node-document-2" href="https://dom.spec.whatwg.org/#concept-node-document"
-            data-x-internal="node-document">노드 문서</a>와
+        <p>그렇지 않으면 <var>text</var>를 <var>targetParent</var>의 <a id="creating-and-inserting-nodes:node-document-2"
+            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드 문서</a>와
           <var>data</var>가 주어진 <a href="https://dom.spec.whatwg.org/#create-a-text-node"
-            id="creating-and-inserting-nodes:create-a-text-node" data-x-internal="create-a-text-node">텍스트 노드 생성</a>의
-          결과로 하고, <var>text</var>를 <var>insertionLocation</var>에 삽입한다.
+            id="creating-and-inserting-nodes:create-a-text-node" data-x-internal="create-a-text-node">텍스트
+            노드 생성</a>의 결과로 설정하고,
+          <var>text</var>를
+          <var>targetParent</var> 안의 <var>referenceChild</var> 앞에 <a
+            href="https://dom.spec.whatwg.org/#concept-node-insert"
+            id="creating-and-inserting-nodes:concept-node-insert-2" data-x-internal="concept-node-insert">삽입</a>한다.
         </p>
       </li>
     </ol>
@@ -241764,16 +241766,16 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
 
   <div class="example">
 
-    <p>다음은 파서에 대한 몇 가지 입력 예와, 스크립트를 실행하는 사용자 에이전트를 가정할 때 그 결과로 생성되는 <code
-        id="creating-and-inserting-nodes:text-4"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-      노드의 해당 개수입니다.</p>
+    <p>다음은 스크립트를 실행하는 사용자 에이전트를 가정할 때, 파서에 대한 몇 가지 샘플 입력과 그 결과로 생성되는 <code
+        id="creating-and-inserting-nodes:text-3"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+      노드의 해당 개수이다.</p>
 
     <table>
       <thead>
         <tr>
           <th>입력 </th>
           <th><code
-              id="creating-and-inserting-nodes:text-5"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+              id="creating-and-inserting-nodes:text-4"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
             노드 수
           </th>
         </tr>
@@ -241786,9 +241788,9 @@ window<c- p="">.</c->fakeWorklet1<c- p="">.</c->addModule<c- p="">(</c-><c- u=""
 document<c- p="">.</c->body<c- p="">.</c->removeChild<c- p="">(</c->script<c- p="">);</c->
 <c- p="">&lt;/</c-><c- f="">script</c-><c- p="">&gt;</c->B</code></pre>
           </td>
-          <td>문서에 "AB"를 포함하는 하나의 <code
-              id="creating-and-inserting-nodes:text-6"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드가 있습니다.
+          <td>문서에 "AB"를 포함하는 <code
+              id="creating-and-inserting-nodes:text-5"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+            노드 하나.
           </td>
         </tr>
         <tr>
@@ -241798,12 +241800,12 @@ document<c- p="">.</c->body<c- p="">.</c->removeChild<c- p="">(</c->script<c- p=
 document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p="">);</c->
 <c- p="">&lt;/</c-><c- f="">script</c-><c- p="">&gt;</c->C</code></pre>
           </td>
-          <td>세 개의 <code
+          <td><code
+              id="creating-and-inserting-nodes:text-6"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+            노드 세 개. 스크립트 앞의 "A", 스크립트의 내용, 그리고 스크립트 뒤의 "BC"(파서는 스크립트가 생성한
+            <code
               id="creating-and-inserting-nodes:text-7"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드가 있습니다. 스크립트 앞의 "A", 스크립트의 콘텐츠, 그리고 스크립트 뒤의 "BC"입니다(파서는
-            스크립트가 생성한 <code
-              id="creating-and-inserting-nodes:text-8"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드에 추가합니다).
+            노드에 추가한다).
           </td>
         </tr>
         <tr>
@@ -241814,44 +241816,44 @@ text<c- p="">.</c->data&nbsp;<c- o="">=</c->&nbsp;<c- t="">'B'</c-><c- p="">;</c
 document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p="">);</c->
 <c- p="">&lt;/</c-><c- f="">script</c-><c- p="">&gt;</c->C</code></pre>
           </td>
-          <td>문서에 "A"와 "BC"를 포함하는 서로 인접한 두 개의 <code
-              id="creating-and-inserting-nodes:text-9"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드가 있습니다.
+          <td>문서에 서로 인접한 <code
+              id="creating-and-inserting-nodes:text-8"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+            노드 두 개가 있으며, 각각 "A"와 "BC"를 포함한다.
           </td>
         </tr>
         <tr>
           <td>
             <pre><code class="html">A<c- p="">&lt;</c-><c- f="">table</c-><c- p="">&gt;</c->B<c- p="">&lt;</c-><c- f="">tr</c-><c- p="">&gt;</c->C<c- p="">&lt;/</c-><c- f="">tr</c-><c- p="">&gt;</c->D<c- p="">&lt;/</c-><c- f="">table</c-><c- p="">&gt;</c-></code></pre>
           </td>
-          <td>테이블 앞에 "ABCD"를 포함하는 하나의 <code
-              id="creating-and-inserting-nodes:text-10"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드가 있습니다. (이는 <a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent-2">위탁 부모 지정</a>으로 인해
-            발생합니다.)
+          <td>테이블 앞에 "ABCD"를 포함하는 <code
+              id="creating-and-inserting-nodes:text-9"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+            노드 하나. (이는 <a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent-2">위탁 부모 지정</a>으로 인해
+            발생한다.)
           </td>
         </tr>
         <tr>
           <td>
             <pre><code class="html">A<c- p="">&lt;</c-><c- f="">table</c-><c- p="">&gt;&lt;</c-><c- f="">tr</c-><c- p="">&gt;</c->&nbsp;B<c- p="">&lt;/</c-><c- f="">tr</c-><c- p="">&gt;</c->&nbsp;C<c- p="">&lt;/</c-><c- f="">table</c-><c- p="">&gt;</c-></code></pre>
           </td>
-          <td>테이블 앞에 "A&nbsp;B&nbsp;C"(A-공백-B-공백-C)를 포함하는 하나의 <code
-              id="creating-and-inserting-nodes:text-11"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드가 있습니다. (이는 <a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent-3">위탁 부모 지정</a>으로 인해
-            발생합니다.)
+          <td>테이블 앞에 "A&nbsp;B&nbsp;C"(A-공백-B-공백-C)를 포함하는 <code
+              id="creating-and-inserting-nodes:text-10"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+            노드 하나. (이는 <a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent-3">위탁 부모 지정</a>으로 인해
+            발생한다.)
           </td>
         </tr>
         <tr>
           <td>
             <pre><code class="html">A<c- p="">&lt;</c-><c- f="">table</c-><c- p="">&gt;&lt;</c-><c- f="">tr</c-><c- p="">&gt;</c->&nbsp;B<c- p="">&lt;/</c-><c- f="">tr</c-><c- p="">&gt;</c->&nbsp;<c- p="">&lt;/</c-><c- f="">em</c-><c- p="">&gt;</c->C<c- p="">&lt;/</c-><c- f="">table</c-><c- p="">&gt;</c-></code></pre>
           </td>
-          <td>테이블 앞에 "A&nbsp;BC"(A-공백-B-C)를 포함하는 하나의 <code
+          <td>테이블 앞에 "A&nbsp;BC"(A-공백-B-C)를 포함하는 <code
+              id="creating-and-inserting-nodes:text-11"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
+            노드 하나와, 테이블 내부(<code
+              id="creating-and-inserting-nodes:the-tbody-element-2"><a href="#the-tbody-element">tbody</a></code>의 자식)에
+            공백 문자 하나를 포함하는 <code
               id="creating-and-inserting-nodes:text-12"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드와, 테이블 내부에(<code
-              id="creating-and-inserting-nodes:the-tbody-element-2"><a href="#the-tbody-element">tbody</a></code>의 자식으로)
-            단일 공백 문자를 포함하는 하나의 <code
-              id="creating-and-inserting-nodes:text-13"><a data-x-internal="text" href="https://dom.spec.whatwg.org/#interface-text">Text</a></code>
-            노드가 있습니다. (문자가 아닌 토큰에 의해 비공백 문자와 분리된 공백 문자는, 이후 해당 다른 토큰이
-            무시되더라도 <a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent-4">위탁
-              부모 지정</a>의 영향을 받지 않습니다.)
+            노드 하나가 있다. (문자가 아닌 토큰에 의해 비공백 문자와 분리된 공백 문자는
+            그러한 다른 토큰이 이후 무시되더라도 <a href="#foster-parent" id="creating-and-inserting-nodes:foster-parent-4">위탁
+              부모 지정</a>의 영향을 받지 않는다.)
           </td>
         </tr>
       </tbody>
@@ -241862,72 +241864,77 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
   <hr>
 
   <div data-algorithm="">
-    <p>아래 단계에서 사용자 에이전트가 주석 토큰을 처리하는 동안 선택적 삽입 위치
-      <var>insertionLocation</var>, 기본값 null을 사용하여 <dfn id="insert-a-comment">주석을
-        삽입</dfn>하도록 요구하면 사용자 에이전트는 다음 단계를 실행해야 합니다.
+    <p>아래 단계에서 주석 토큰을 처리하는 동안 사용자 에이전트가 <dfn id="insert-a-comment">주석을 삽입</dfn>해야 하는 경우,
+      선택적 <a href="#insertion-location" id="creating-and-inserting-nodes:insertion-location-4">삽입 위치</a>
+      <var>insertionLocation</var>
+      (기본값 null)을 사용하여 사용자 에이전트는 다음 단계를 실행해야 한다:
     </p>
 
     <ol>
       <li>
         <p><var>data</var>를 처리 중인 주석 토큰에 주어진 데이터로
-          설정합니다.</p>
+          설정한다.</p>
       </li>
       <li>
-        <p><var>insertionLocation</var>을 <var>insertionLocation</var>이 주어졌을 때의 <a href="#adjusted-insertion-location"
-            id="creating-and-inserting-nodes:adjusted-insertion-location-3">조정된 삽입 위치</a>로
-          설정합니다.
+        <p>(<var>targetParent</var>, <var>referenceChild</var>)를 <var>insertionLocation</var>이 주어진 <a
+            href="#adjusted-insertion-location" id="creating-and-inserting-nodes:adjusted-insertion-location-3">조정된 삽입
+            위치</a>로 설정한다.</p>
+      </li>
+      <li>
+        <p><var>comment</var>를 <var>targetParent</var>의 <a id="creating-and-inserting-nodes:node-document-3"
+            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드 문서</a>와
+          <var>data</var>가 주어진 <a href="https://dom.spec.whatwg.org/#create-a-comment-node"
+            id="creating-and-inserting-nodes:create-a-comment-node" data-x-internal="create-a-comment-node">주석
+            노드 생성</a>의 결과로 설정한다.
         </p>
       </li>
       <li>
         <p><var>comment</var>를
-          <var>insertionLocation</var>이 위치한 노드의 <a id="creating-and-inserting-nodes:node-document-3"
-            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드 문서</a>와
-          <var>data</var>가 주어졌을 때 <a href="https://dom.spec.whatwg.org/#create-a-comment-node"
-            id="creating-and-inserting-nodes:create-a-comment-node" data-x-internal="create-a-comment-node">주석
-            노드를 생성</a>한 결과로 설정합니다.
+          <var>targetParent</var> 안의 <var>referenceChild</var> 앞에 <a
+            href="https://dom.spec.whatwg.org/#concept-node-insert"
+            id="creating-and-inserting-nodes:concept-node-insert-3" data-x-internal="concept-node-insert">삽입</a>한다.
         </p>
-
-      </li>
-      <li>
-        <p><var>comment</var>를 <var>insertionLocation</var>에 삽입합니다.</p>
       </li>
     </ol>
   </div>
 
   <div data-algorithm="">
-    <p>아래 단계에서 사용자 에이전트가 처리 명령 토큰을 처리하는 동안, 선택적 삽입 위치
-      <var>insertionLocation</var>(기본값 null)을 사용하여 <dfn id="insert-a-processing-instruction">처리
-        명령을 삽입</dfn>하도록 요구하는 경우, 사용자 에이전트는 다음 단계를 실행해야 합니다:
+    <p>아래 단계에서 처리 명령 토큰을 처리하는 동안 사용자 에이전트가 <dfn id="insert-a-processing-instruction">처리
+        명령을 삽입</dfn>해야 하는 경우,
+      선택적 <a href="#insertion-location" id="creating-and-inserting-nodes:insertion-location-5">삽입 위치</a>
+      <var>insertionLocation</var>(기본값 null)을 사용하여 사용자 에이전트는 다음 단계를 실행해야 한다:
     </p>
 
     <ol>
       <li>
-        <p><var>target</var>을 처리 중인 처리 명령 토큰에 주어진 대상으로
-          설정합니다.</p>
+        <p><var>piTarget</var>을 처리 중인 처리 명령 토큰에 주어진 대상으로
+          설정한다.</p>
       </li>
       <li>
         <p><var>data</var>를 처리 중인 처리 명령 토큰에 주어진 데이터로
-          설정합니다.</p>
+          설정한다.</p>
       </li>
       <li>
-        <p><var>insertionLocation</var>을 <var>insertionLocation</var>이 주어졌을 때의 <a href="#adjusted-insertion-location"
-            id="creating-and-inserting-nodes:adjusted-insertion-location-4">조정된 삽입 위치</a>로
-          설정합니다.
-        </p>
+        <p>(<var>targetParent</var>, <var>referenceChild</var>)를 <var>insertionLocation</var>이 주어진 <a
+            href="#adjusted-insertion-location" id="creating-and-inserting-nodes:adjusted-insertion-location-4">조정된 삽입
+            위치</a>로 설정한다.</p>
       </li>
       <li>
-        <p><var>pi</var>를 <var>insertionLocation</var>이 위치한
-          노드의 <a id="creating-and-inserting-nodes:node-document-4"
-            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드 문서</a>,
-          <var>target</var>, 그리고
-          <var>data</var>가 주어졌을 때 <a href="https://dom.spec.whatwg.org/#create-a-processing-instruction-node"
+        <p><var>pi</var>를
+          <var>targetParent</var>의 <a id="creating-and-inserting-nodes:node-document-4"
+            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드
+            문서</a>, <var>piTarget</var> 및 <var>data</var>가 주어진 <a
+            href="https://dom.spec.whatwg.org/#create-a-processing-instruction-node"
             id="creating-and-inserting-nodes:create-a-processing-instruction-node"
-            data-x-internal="create-a-processing-instruction-node">처리 명령 노드를 생성</a>한 결과로 설정합니다.
+            data-x-internal="create-a-processing-instruction-node">처리 명령 노드 생성</a>의 결과로 설정한다.
         </p>
-
       </li>
       <li>
-        <p><var>pi</var>를 <var>insertionLocation</var>에 삽입합니다.</p>
+        <p><var>pi</var>를
+          <var>targetParent</var> 안의 <var>referenceChild</var> 앞에 <a
+            href="https://dom.spec.whatwg.org/#concept-node-insert"
+            id="creating-and-inserting-nodes:concept-node-insert-4" data-x-internal="concept-node-insert">삽입</a>한다.
+        </p>
       </li>
     </ol>
   </div>
@@ -242082,19 +242089,19 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
         TABULATION, U+000A LINE FEED (LF), U+000C FORM FEED (FF),
         U+000D CARRIAGE RETURN (CR) 또는 U+0020 SPACE 중 하나인 문자 토큰</dt>
       <dd>
-        <p>토큰을 무시합니다.</p>
+        <p>토큰을 무시한다.</p>
       </dd>
       <dt>주석 토큰</dt>
       <dd>
-        <p><code id="the-initial-insertion-mode:document-2"><a href="#document">Document</a></code> 객체의 마지막
-          자식으로 <a href="#insert-a-comment" id="the-initial-insertion-mode:insert-a-comment">주석을 삽입</a>합니다.
+        <p>(<code id="the-initial-insertion-mode:document-2"><a href="#document">Document</a></code> 객체, null)이
+          주어졌을 때 <a href="#insert-a-comment" id="the-initial-insertion-mode:insert-a-comment">주석을 삽입</a>한다.
         </p>
       </dd>
       <dt>처리 명령 토큰</dt>
       <dd>
-        <p><code id="the-initial-insertion-mode:document-3"><a href="#document">Document</a></code> 객체의
-          마지막 자식으로 <a href="#insert-a-processing-instruction"
-            id="the-initial-insertion-mode:insert-a-processing-instruction">처리 명령을 삽입</a>합니다.</p>
+        <p>(<code id="the-initial-insertion-mode:document-3"><a href="#document">Document</a></code> 객체,
+          null)이 주어졌을 때 <a href="#insert-a-processing-instruction"
+            id="the-initial-insertion-mode:insert-a-processing-instruction">처리 명령을 삽입</a>한다.</p>
       </dd>
       <dt>DOCTYPE 토큰</dt>
       <dd>
@@ -242102,163 +242109,162 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
           식별자가 누락되지 않았거나, 토큰의 시스템 식별자가 누락되지도 않았고
           "<code
             id="the-initial-insertion-mode:about:legacy-compat"><a href="#about:legacy-compat">about:legacy-compat</a></code>"도
-          아니면, <a href="#parse-errors" id="the-initial-insertion-mode:parse-errors">파싱 오류</a>가 발생합니다.</p>
+          아니면 <a href="#parse-errors" id="the-initial-insertion-mode:parse-errors">파싱 오류</a>이다.</p>
 
-        <p><var>doctype</var>를 <code id="the-initial-insertion-mode:document-4"><a href="#document">Document</a></code>
-          노드, DOCTYPE 토큰에 지정된 이름(또는 이름이 누락된 경우 빈 문자열), DOCTYPE 토큰에 지정된 공개 식별자(또는 공개 식별자가 누락된 경우 빈 문자열), 그리고 DOCTYPE 토큰에
-          지정된 시스템 식별자(또는 시스템 식별자가 누락된 경우 빈 문자열)가 주어진 <a href="https://dom.spec.whatwg.org/#create-a-doctype"
-            id="the-initial-insertion-mode:create-a-doctype" data-x-internal="create-a-doctype">doctype 생성</a>의 결과로 한다.
-          그런 다음
-          <code id="the-initial-insertion-mode:document-5"><a href="#document">Document</a></code> 노드에
-          <code
+        <p><var>doctype</var>을 <code id="the-initial-insertion-mode:document-4"><a href="#document">Document</a></code>
+          노드, DOCTYPE 토큰에 주어진 이름(또는
+          이름이 누락된 경우 빈 문자열), DOCTYPE 토큰에 주어진 공개 식별자(또는
+          공개 식별자가 누락된 경우 빈 문자열), 그리고 DOCTYPE 토큰에 주어진 시스템 식별자(또는
+          시스템 식별자가 누락된 경우 빈 문자열)가 주어진 <a href="https://dom.spec.whatwg.org/#create-a-doctype"
+            id="the-initial-insertion-mode:create-a-doctype" data-x-internal="create-a-doctype">doctype
+            생성</a>의 결과로 설정한다. 그런 다음
+          <code id="the-initial-insertion-mode:document-5"><a href="#document">Document</a></code> 노드에 <code
             id="the-initial-insertion-mode:documenttype"><a data-x-internal="documenttype" href="https://dom.spec.whatwg.org/#interface-documenttype">DocumentType</a></code>
-          자식도 요소 자식도 없는 경우,
-          <var>doctype</var>를 <code id="the-initial-insertion-mode:document-6"><a href="#document">Document</a></code>
+          자식도 요소 자식도 없으면,
+          <var>doctype</var>을 <code id="the-initial-insertion-mode:document-6"><a href="#document">Document</a></code>
           노드에 추가한다.
         </p>
 
         <p class="note">이는 또한 <code
             id="the-initial-insertion-mode:documenttype-2"><a data-x-internal="documenttype" href="https://dom.spec.whatwg.org/#interface-documenttype">DocumentType</a></code>
           노드가
+          <code id="the-initial-insertion-mode:document-7"><a href="#document">Document</a></code> 객체의
           <code
             id="the-initial-insertion-mode:dom-document-doctype"><a data-x-internal="dom-document-doctype" href="https://dom.spec.whatwg.org/#dom-document-doctype">doctype</a></code>
-          속성의 값으로 반환되도록 보장한다.
-          <code id="the-initial-insertion-mode:document-7"><a href="#document">Document</a></code> 객체의
+          속성 값으로 반환되도록 보장한다.
         </p>
 
-        <p id="quirks-mode-doctypes">그런 다음 문서가 <em>아닌</em> <a href="#an-iframe-srcdoc-document"
-            id="the-initial-insertion-mode:an-iframe-srcdoc-document"><code>iframe</code>
-            <code>srcdoc</code> 문서</a>이고, <a href="#parser-cannot-change-the-mode-flag"
-            id="the-initial-insertion-mode:parser-cannot-change-the-mode-flag">파서가 모드 플래그를 변경할 수 없음</a>이 false이며,
-          DOCTYPE 토큰이
-          다음 목록의 조건 중 하나와 일치하는 경우, <code
-            id="the-initial-insertion-mode:document-8"><a href="#document">Document</a></code>를 <a
+        <p id="quirks-mode-doctypes">그런 다음 문서가 <em><a href="#an-iframe-srcdoc-document"
+              id="the-initial-insertion-mode:an-iframe-srcdoc-document"><code>iframe</code>
+              <code>srcdoc</code> 문서</a>가 아니고</em>, <a href="#parser-cannot-change-the-mode-flag"
+            id="the-initial-insertion-mode:parser-cannot-change-the-mode-flag">파서가
+            모드 플래그를 변경할 수 없음</a>이 false이며, DOCTYPE 토큰이 다음 목록의 조건 중 하나와
+          일치하면 <code id="the-initial-insertion-mode:document-8"><a href="#document">Document</a></code>를 <a
             id="the-initial-insertion-mode:quirks-mode" href="https://dom.spec.whatwg.org/#concept-document-quirks"
-            data-x-internal="quirks-mode">quirks mode</a>로 설정한다:</p>
+            data-x-internal="quirks-mode">쿼크 모드</a>로 설정한다:</p>
 
         <ul class="brief">
           <li> <i id="the-initial-insertion-mode:force-quirks-flag"><a href="#force-quirks-flag">강제 쿼크
-                플래그</a></i>가 <i>켜짐</i>으로 설정되어 있습니다. </li>
-          <li> 이름이 "<code>html</code>"이 아닙니다. </li>
-          <li> 공개 식별자가 다음으로 설정되어 있습니다: "<code>-//W3O//DTD W3 HTML Strict 3.0//EN//</code>" </li>
-          <li> 공개 식별자가 다음으로 설정되어 있습니다: "<code>-/W3C/DTD HTML 4.0 Transitional/EN</code>" </li>
-          <li> 공개 식별자가 다음으로 설정되어 있습니다: "<code>HTML</code>" </li>
-          <li> 시스템 식별자가 다음으로 설정되어 있습니다:
+                플래그</a></i>가 <i>켜짐</i>으로 설정되어 있다. </li>
+          <li> 이름이 "<code>html</code>"이 아니다. </li>
+          <li> 공개 식별자가 다음으로 설정되어 있다: "<code>-//W3O//DTD W3 HTML Strict 3.0//EN//</code>" </li>
+          <li> 공개 식별자가 다음으로 설정되어 있다: "<code>-/W3C/DTD HTML 4.0 Transitional/EN</code>" </li>
+          <li> 공개 식별자가 다음으로 설정되어 있다: "<code>HTML</code>" </li>
+          <li> 시스템 식별자가 다음으로 설정되어 있다:
             "<code>http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>+//Silmaril//dtd html Pro v0r11 19970101//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//AS//DTD HTML 3.0 asWedit + extensions//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//AdvaSoft Ltd//DTD HTML 3.0 asWedit + extensions//</code>"
+          <li> 공개 식별자가 다음으로 시작한다: "<code>+//Silmaril//dtd html Pro v0r11 19970101//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//AS//DTD HTML 3.0 asWedit + extensions//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//AdvaSoft Ltd//DTD HTML 3.0 asWedit + extensions//</code>"
           </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 2.0 Level 1//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 2.0 Level 2//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 2.0 Strict Level 1//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 2.0 Strict Level 2//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 2.0 Strict//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 2.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 2.1E//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 3.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 3.2 Final//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 3.2//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML 3//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Level 0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Level 1//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Level 2//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Level 3//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Strict Level 0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Strict Level 1//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Strict Level 2//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Strict Level 3//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML Strict//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//IETF//DTD HTML//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Metrius//DTD Metrius Presentational//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Microsoft//DTD Internet Explorer 2.0 HTML Strict//</code>"
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 2.0 Level 1//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 2.0 Level 2//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 2.0 Strict Level 1//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 2.0 Strict Level 2//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 2.0 Strict//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 2.0//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 2.1E//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 3.0//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 3.2 Final//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 3.2//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML 3//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Level 0//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Level 1//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Level 2//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Level 3//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Strict Level 0//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Strict Level 1//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Strict Level 2//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Strict Level 3//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML Strict//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//IETF//DTD HTML//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Metrius//DTD Metrius Presentational//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Microsoft//DTD Internet Explorer 2.0 HTML Strict//</code>"
           </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Microsoft//DTD Internet Explorer 2.0 HTML//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Microsoft//DTD Internet Explorer 2.0 Tables//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Microsoft//DTD Internet Explorer 3.0 HTML Strict//</code>"
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Microsoft//DTD Internet Explorer 2.0 HTML//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Microsoft//DTD Internet Explorer 2.0 Tables//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Microsoft//DTD Internet Explorer 3.0 HTML Strict//</code>"
           </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Microsoft//DTD Internet Explorer 3.0 HTML//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Microsoft//DTD Internet Explorer 3.0 Tables//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Netscape Comm. Corp.//DTD HTML//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Netscape Comm. Corp.//DTD Strict HTML//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//O'Reilly and Associates//DTD HTML 2.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//O'Reilly and Associates//DTD HTML Extended 1.0//</code>"
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Microsoft//DTD Internet Explorer 3.0 HTML//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Microsoft//DTD Internet Explorer 3.0 Tables//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Netscape Comm. Corp.//DTD HTML//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Netscape Comm. Corp.//DTD Strict HTML//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//O'Reilly and Associates//DTD HTML 2.0//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//O'Reilly and Associates//DTD HTML Extended 1.0//</code>"
           </li>
-          <li> 공개 식별자가 다음으로 시작합니다:
+          <li> 공개 식별자가 다음으로 시작한다:
             "<code>-//O'Reilly and Associates//DTD HTML Extended Relaxed 1.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//SQ//DTD HTML 2.0 HoTMetaL + extensions//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다:
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//SQ//DTD HTML 2.0 HoTMetaL + extensions//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다:
             "<code>-//SoftQuad Software//DTD HoTMetaL PRO 6.0::19990601::extensions to HTML 4.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다:
+          <li> 공개 식별자가 다음으로 시작한다:
             "<code>-//SoftQuad//DTD HoTMetaL PRO 4.0::19971010::extensions to HTML 4.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Spyglass//DTD HTML 2.0 Extended//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Sun Microsystems Corp.//DTD HotJava HTML//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//Sun Microsystems Corp.//DTD HotJava Strict HTML//</code>"
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Spyglass//DTD HTML 2.0 Extended//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Sun Microsystems Corp.//DTD HotJava HTML//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//Sun Microsystems Corp.//DTD HotJava Strict HTML//</code>"
           </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML 3 1995-03-24//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML 3.2 Draft//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML 3.2 Final//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML 3.2//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML 3.2S Draft//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML 4.0 Frameset//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML 4.0 Transitional//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML Experimental 19960712//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD HTML Experimental 970421//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD W3 HTML//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3O//DTD W3 HTML 3.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//WebTechs//DTD Mozilla HTML 2.0//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//WebTechs//DTD Mozilla HTML//</code>" </li>
-          <li> 시스템 식별자가 누락되었거나 빈 문자열이고, 공개 식별자가 다음으로 시작합니다:
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML 3 1995-03-24//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML 3.2 Draft//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML 3.2 Final//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML 3.2//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML 3.2S Draft//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML 4.0 Frameset//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML 4.0 Transitional//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML Experimental 19960712//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD HTML Experimental 970421//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD W3 HTML//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3O//DTD W3 HTML 3.0//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//WebTechs//DTD Mozilla HTML 2.0//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//WebTechs//DTD Mozilla HTML//</code>" </li>
+          <li> 시스템 식별자가 누락되었거나 빈 문자열이고, 공개 식별자가 다음으로 시작한다:
             "<code>-//W3C//DTD HTML 4.01 Frameset//</code>" </li>
-          <li> 시스템 식별자가 누락되었거나 빈 문자열이고, 공개 식별자가 다음으로 시작합니다:
+          <li> 시스템 식별자가 누락되었거나 빈 문자열이고, 공개 식별자가 다음으로 시작한다:
             "<code>-//W3C//DTD HTML 4.01 Transitional//</code>" </li>
         </ul>
 
-        <p>그렇지 않고, 문서가 <a href="#an-iframe-srcdoc-document"
-            id="the-initial-insertion-mode:an-iframe-srcdoc-document-2"><code>iframe</code> <code>srcdoc</code>
-            문서</a>가 <em>아니고</em>, <a href="#parser-cannot-change-the-mode-flag"
+        <p>그렇지 않고 문서가 <em><a href="#an-iframe-srcdoc-document"
+              id="the-initial-insertion-mode:an-iframe-srcdoc-document-2"><code>iframe</code> <code>srcdoc</code>
+              문서</a>가 아니며</em>, <a href="#parser-cannot-change-the-mode-flag"
             id="the-initial-insertion-mode:parser-cannot-change-the-mode-flag-2">파서가
-            모드 플래그를 변경할 수 없음</a>이 false이며, DOCTYPE 토큰이 다음 목록의 조건 중 하나와
-          일치하면, <code id="the-initial-insertion-mode:document-9"><a href="#document">Document</a></code>를 <a
+            모드 플래그를 변경할 수 없음</a>이 false이고, DOCTYPE 토큰이 다음 목록의 조건 중 하나와
+          일치하면 <code id="the-initial-insertion-mode:document-9"><a href="#document">Document</a></code>를 <a
             id="the-initial-insertion-mode:limited-quirks-mode"
             href="https://dom.spec.whatwg.org/#concept-document-limited-quirks"
-            data-x-internal="limited-quirks-mode">제한적 쿼크 모드</a>로 설정합니다:</p>
+            data-x-internal="limited-quirks-mode">제한적 쿼크 모드</a>로 설정한다:</p>
 
         <ul class="brief">
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD XHTML 1.0 Frameset//</code>" </li>
-          <li> 공개 식별자가 다음으로 시작합니다: "<code>-//W3C//DTD XHTML 1.0 Transitional//</code>" </li>
-          <li> 시스템 식별자가 누락되지도 않았고 빈 문자열도 아니며, 공개 식별자가 다음으로 시작합니다:
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD XHTML 1.0 Frameset//</code>" </li>
+          <li> 공개 식별자가 다음으로 시작한다: "<code>-//W3C//DTD XHTML 1.0 Transitional//</code>" </li>
+          <li> 시스템 식별자가 누락되지도 않았고 빈 문자열도 아니며, 공개 식별자가 다음으로 시작한다:
             "<code>-//W3C//DTD HTML 4.01 Frameset//</code>" </li>
-          <li> 시스템 식별자가 누락되지도 않았고 빈 문자열도 아니며, 공개 식별자가 다음으로 시작합니다:
+          <li> 시스템 식별자가 누락되지도 않았고 빈 문자열도 아니며, 공개 식별자가 다음으로 시작한다:
             "<code>-//W3C//DTD HTML 4.01 Transitional//</code>" </li>
         </ul>
 
         <p>시스템 식별자와 공개 식별자 문자열은 위 목록에 주어진 값과 <a id="the-initial-insertion-mode:ascii-case-insensitive"
             href="https://infra.spec.whatwg.org/#ascii-case-insensitive" data-x-internal="ascii-case-insensitive">ASCII
-            대소문자를 구분하지 않는</a> 방식으로 비교해야 합니다. 값이
-          빈 문자열인 시스템 식별자는 위 조건의 목적상 누락된 것으로 간주되지 않습니다.</p>
+            대소문자를 구분하지 않는</a> 방식으로 비교해야 한다. 값이 빈 문자열인 시스템 식별자는
+          위 조건의 목적상 누락된 것으로 간주하지 않는다.</p>
 
         <p>그런 다음 <a href="#insertion-mode" id="the-initial-insertion-mode:insertion-mode-2">삽입
             모드</a>를 "<a href="#the-before-html-insertion-mode"
-            id="the-initial-insertion-mode:the-before-html-insertion-mode">html 이전</a>"으로 전환합니다.</p>
+            id="the-initial-insertion-mode:the-before-html-insertion-mode">html 이전</a>"으로 전환한다.</p>
       </dd>
       <dt>그 밖의 모든 것</dt>
       <dd>
-        <p>문서가 <a href="#an-iframe-srcdoc-document"
-            id="the-initial-insertion-mode:an-iframe-srcdoc-document-3"><code>iframe</code> <code>srcdoc</code>
-            문서</a>가 <em>아니면</em>, 이는 <a href="#parse-errors" id="the-initial-insertion-mode:parse-errors-2">파싱
-            오류</a>입니다. <a href="#parser-cannot-change-the-mode-flag"
-            id="the-initial-insertion-mode:parser-cannot-change-the-mode-flag-3">파서가 모드 플래그를 변경할 수
-            없음</a>이 false이면,
+        <p>문서가 <em><a href="#an-iframe-srcdoc-document"
+              id="the-initial-insertion-mode:an-iframe-srcdoc-document-3"><code>iframe</code> <code>srcdoc</code>
+              문서</a>가 아니면</em> 이는 <a href="#parse-errors" id="the-initial-insertion-mode:parse-errors-2">파싱
+            오류</a>이다. <a href="#parser-cannot-change-the-mode-flag"
+            id="the-initial-insertion-mode:parser-cannot-change-the-mode-flag-3">파서가 모드 플래그를 변경할 수 없음</a>이
+          false이면
           <code id="the-initial-insertion-mode:document-10"><a href="#document">Document</a></code>를 <a
             id="the-initial-insertion-mode:quirks-mode-2" href="https://dom.spec.whatwg.org/#concept-document-quirks"
-            data-x-internal="quirks-mode">쿼크 모드</a>로 설정합니다.
+            data-x-internal="quirks-mode">쿼크 모드</a>로 설정한다.
         </p>
 
         <p>어떤 경우든 <a href="#insertion-mode" id="the-initial-insertion-mode:insertion-mode-3">삽입
             모드</a>를 "<a href="#the-before-html-insertion-mode"
-            id="the-initial-insertion-mode:the-before-html-insertion-mode-2">html 이전</a>"으로 전환한 다음 토큰을
-          다시 처리합니다.
+            id="the-initial-insertion-mode:the-before-html-insertion-mode-2">html 이전</a>"으로 전환한 다음 토큰을 다시 처리한다.
         </p>
       </dd>
     </dl>
@@ -242277,74 +242283,75 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
     <dl class="switch">
       <dt>DOCTYPE 토큰</dt>
       <dd>
-        <p><a href="#parse-errors" id="the-before-html-insertion-mode:parse-errors">파싱 오류</a>입니다. 토큰을
-          무시합니다.
+        <p><a href="#parse-errors" id="the-before-html-insertion-mode:parse-errors">파싱 오류</a>. 토큰을 무시한다.
         </p>
       </dd>
       <dt>주석 토큰</dt>
       <dd>
-        <p><code id="the-before-html-insertion-mode:document"><a href="#document">Document</a></code> 객체의
-          마지막 자식으로 <a href="#insert-a-comment" id="the-before-html-insertion-mode:insert-a-comment">주석을 삽입합니다</a>.</p>
+        <p>(<code id="the-before-html-insertion-mode:document"><a href="#document">Document</a></code> 객체, null)이 주어졌을 때
+          <a href="#insert-a-comment" id="the-before-html-insertion-mode:insert-a-comment">주석을 삽입</a>한다.
+        </p>
       </dd>
       <dt>처리 명령 토큰</dt>
       <dd>
-        <p><code id="the-before-html-insertion-mode:document-2"><a href="#document">Document</a></code> 객체의 마지막
-          자식으로 <a href="#insert-a-processing-instruction"
-            id="the-before-html-insertion-mode:insert-a-processing-instruction">처리 명령을 삽입합니다</a>.</p>
+        <p>(<code id="the-before-html-insertion-mode:document-2"><a href="#document">Document</a></code>
+          객체,
+          null)이 주어졌을 때 <a href="#insert-a-processing-instruction"
+            id="the-before-html-insertion-mode:insert-a-processing-instruction">처리 명령을 삽입</a>한다.</p>
       </dd>
       <dt>U+0009 CHARACTER TABULATION, U+000A LINE FEED (LF), U+000C
         FORM FEED (FF), U+000D CARRIAGE RETURN (CR) 또는 U+0020 SPACE 중 하나인 문자 토큰</dt>
       <dd>
-        <p>토큰을 무시합니다.</p>
+        <p>토큰을 무시한다.</p>
       </dd>
       <dt>태그 이름이 "html"인 시작 태그</dt>
       <dd>
         <p><a href="#create-an-element-for-the-token"
-            id="the-before-html-insertion-mode:create-an-element-for-the-token">토큰에 대한 요소 생성</a>을
+            id="the-before-html-insertion-mode:create-an-element-for-the-token">토큰에 대한 요소를 생성</a>한다.
           <a id="the-before-html-insertion-mode:html-namespace-2" href="https://infra.spec.whatwg.org/#html-namespace"
-            data-x-internal="html-namespace-2">HTML 네임스페이스</a>에서
+            data-x-internal="html-namespace-2">HTML 네임스페이스</a>에서,
           <code id="the-before-html-insertion-mode:document-3"><a href="#document">Document</a></code>를 의도된
-          부모로 하여 수행한다. 해당 요소와 <code
-            id="the-before-html-insertion-mode:document-4"><a href="#document">Document</a></code>를 사용하여, 마지막 자식
-          (있는 경우) 뒤의 <a href="#insert-an-element-at-the-adjusted-insertion-location"
+          부모로 사용한다. 해당 요소와 (<code
+            id="the-before-html-insertion-mode:document-4"><a href="#document">Document</a></code>, null)을 사용하여 <a
+            href="#insert-an-element-at-the-adjusted-insertion-location"
             id="the-before-html-insertion-mode:insert-an-element-at-the-adjusted-insertion-location">조정된 삽입
-            위치에 요소 삽입</a>을 수행한다.
-          이 요소를 <a href="#stack-of-open-elements" id="the-before-html-insertion-mode:stack-of-open-elements">열린 요소
-            스택</a>에 넣는다.
+            위치에 요소를
+            삽입</a>한다. 이
+          요소를
+          <a href="#stack-of-open-elements" id="the-before-html-insertion-mode:stack-of-open-elements">열린
+            요소 스택</a>에 넣는다.
         </p>
 
         <p><a href="#insertion-mode" id="the-before-html-insertion-mode:insertion-mode-2">삽입 모드</a>를
           "<a href="#the-before-head-insertion-mode"
             id="the-before-html-insertion-mode:the-before-head-insertion-mode">head
-            앞</a>"으로 전환합니다.</p>
+            이전</a>"으로 전환한다.</p>
       </dd>
       <dt>태그 이름이 "head", "body", "html", "br" 중 하나인 종료 태그</dt>
       <dd>
-        <p>아래의 "그 밖의 모든 경우" 항목에 설명된 대로 처리합니다.</p>
+        <p>아래의 "그 밖의 모든 것" 항목에 설명된 대로 처리한다.</p>
       </dd>
       <dt>그 밖의 모든 종료 태그</dt>
       <dd>
-        <p><a href="#parse-errors" id="the-before-html-insertion-mode:parse-errors-2">파싱 오류</a>입니다. 토큰을
-          무시합니다.
+        <p><a href="#parse-errors" id="the-before-html-insertion-mode:parse-errors-2">파싱 오류</a>. 토큰을 무시한다.
         </p>
       </dd>
-      <dt>그 밖의 모든 경우</dt>
+      <dt>그 밖의 모든 것</dt>
       <dd>
         <p><a id="the-before-html-insertion-mode:node-document"
-            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드 문서</a>가 <code
-            id="the-before-html-insertion-mode:document-5"><a href="#document">Document</a></code> 객체인
-          <code id="the-before-html-insertion-mode:the-html-element"><a
-              href="#the-html-element">html</a></code> 요소를 생성합니다.
-          이를 <code id="the-before-html-insertion-mode:document-6"><a
-              href="#document">Document</a></code> 객체에 추가합니다.
-          이 요소를 <a href="#stack-of-open-elements" id="the-before-html-insertion-mode:stack-of-open-elements-2">열린 요소
-            스택</a>에 넣습니다.
+            href="https://dom.spec.whatwg.org/#concept-node-document" data-x-internal="node-document">노드 문서</a>가
+          <code id="the-before-html-insertion-mode:document-5"><a href="#document">Document</a></code> 객체인 <code
+            id="the-before-html-insertion-mode:the-html-element"><a href="#the-html-element">html</a></code> 요소를
+          생성한다.
+          이를 <code id="the-before-html-insertion-mode:document-6"><a href="#document">Document</a></code> 객체에 추가한다.
+          이 요소를 <a href="#stack-of-open-elements" id="the-before-html-insertion-mode:stack-of-open-elements-2">열린
+            요소 스택</a>에 넣는다.
         </p>
 
         <p><a href="#insertion-mode" id="the-before-html-insertion-mode:insertion-mode-3">삽입 모드</a>를
           "<a href="#the-before-head-insertion-mode"
             id="the-before-html-insertion-mode:the-before-head-insertion-mode-2">head
-            앞</a>"으로 전환한 다음 토큰을 다시 처리합니다.</p>
+            이전</a>"으로 전환한 다음 토큰을 다시 처리한다.</p>
       </dd>
     </dl>
   </div>
@@ -242567,87 +242574,93 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
           <li>
             <p><var>adjustedInsertionLocation</var>을 <a href="#appropriate-place-for-inserting-a-node"
                 id="parsing-main-inhead:appropriate-place-for-inserting-a-node">노드를 삽입하기에 적절한
-                위치</a>로 둡니다.</p>
+                위치</a>로 설정한다.</p>
           </li>
           <li>
             <p><a href="#create-an-element-for-the-token" id="parsing-main-inhead:create-an-element-for-the-token">토큰에
-                대한 요소 생성</a>을 <a id="parsing-main-inhead:html-namespace-2"
+                대한 요소를 생성</a>한다. <a id="parsing-main-inhead:html-namespace-2"
                 href="https://infra.spec.whatwg.org/#html-namespace" data-x-internal="html-namespace-2">HTML
-                네임스페이스</a>에서 수행하며,
-              의도된 부모는 <var>adjustedInsertionLocation</var>이 속한 노드이다.</p>
+                네임스페이스</a>에서,
+              의도된 부모를 <var>adjustedInsertionLocation</var>이 위치한 노드로 하여 생성한다.</p>
           </li>
           <li>
             <p><a href="#scripting-mode" id="parsing-main-inhead:scripting-mode-3">스크립팅 모드</a>가 <a
-                href="#scripting-mode-fragment" id="parsing-main-inhead:scripting-mode-fragment">프래그먼트</a>가 아니면 요소의
+                href="#scripting-mode-fragment" id="parsing-main-inhead:scripting-mode-fragment">조각</a>이 아니면,
+              요소의
               <a href="#parser-document" id="parsing-main-inhead:parser-document">파서 문서</a>를 <code
-                id="parsing-main-inhead:document"><a href="#document">Document</a></code>로 설정합니다.
+                id="parsing-main-inhead:document"><a href="#document">Document</a></code>로 설정한다.
             </p>
 
-            <p class="note"><a href="#scripting-mode-fragment"
-                id="parsing-main-inhead:scripting-mode-fragment-2">프래그먼트</a>
+            <p class="note"><a href="#scripting-mode-fragment" id="parsing-main-inhead:scripting-mode-fragment-2">조각</a>
               <a href="#scripting-mode" id="parsing-main-inhead:scripting-mode-4">스크립팅 모드</a>는 <a
-                href="#parser-inserted" id="parsing-main-inhead:parser-inserted">파서가 삽입한</a> 스크립트를
-              파서가 삽입하지 않은 것처럼 취급합니다. 이를 통해 예를 들어 <code id="parsing-main-inhead:dom-range-createcontextualfragment"><a
-                  href="#dom-range-createcontextualfragment">createContextualFragment()</a></code>로 생성된
-              프래그먼트를 적용할 때 스크립트를 실행할 수 있습니다.
+                href="#parser-inserted" id="parsing-main-inhead:parser-inserted">파서에 의해 삽입된</a> 스크립트를
+              파서에 의해 삽입되지 않은 것처럼 취급한다. 예를 들어,
+              <code
+                id="parsing-main-inhead:dom-range-createcontextualfragment"><a href="#dom-range-createcontextualfragment">createContextualFragment()</a></code>로
+              생성된 조각을 적용할 때
+              스크립트를 실행할 수 있게 한다.
             </p>
           </li>
           <li>
-            <p>요소의 <a href="#script-force-async" id="parsing-main-inhead:script-force-async">강제 비동기</a>를 false로 설정합니다.
-            </p>
+            <p>요소의 <a href="#script-force-async" id="parsing-main-inhead:script-force-async">강제
+                비동기</a>를 false로 설정한다.</p>
 
-            <p class="note">이는 스크립트가 외부 스크립트인 경우 스크립트 내의 모든 <code id="parsing-main-inhead:dom-document-write"><a
-                  href="#dom-document-write">document.write()</a></code> 호출이 대부분의 다른 경우처럼
-              문서를 제거하는 대신 인라인으로 실행되도록 보장합니다. 또한 종료 태그를 볼 때까지
-              스크립트가 실행되지 않도록 합니다.</p>
+            <p class="note">이는 스크립트가 외부 스크립트인 경우, 스크립트 내의 모든 <code
+                id="parsing-main-inhead:dom-document-write"><a href="#dom-document-write">document.write()</a></code>
+              호출이 대부분의 다른 경우처럼 문서를 없애 버리는 대신 인라인으로 실행되도록
+              보장한다. 또한 종료 태그를 만나기 전까지
+              스크립트가 실행되지 않도록 한다.</p>
           </li>
           <li>
-            <p>파서의 <a href="#scripting-mode" id="parsing-main-inhead:scripting-mode-5">스크립팅 모드</a>가 <a
-                href="#scripting-mode-inert" id="parsing-main-inhead:scripting-mode-inert">비활성</a>이면
-              <code id="parsing-main-inhead:the-script-element"><a
-                  href="#the-script-element">script</a></code> 요소의
-              <a href="#already-started" id="parsing-main-inhead:already-started">이미 시작됨</a>을 true로
-              설정합니다. (<a href="#fragment-case" id="parsing-main-inhead:fragment-case">프래그먼트 경우</a>)
+            <p>파서의 <a href="#scripting-mode" id="parsing-main-inhead:scripting-mode-5">스크립팅 모드</a>가
+              <a href="#scripting-mode-inert" id="parsing-main-inhead:scripting-mode-inert">비활성</a>이면,
+              <code id="parsing-main-inhead:the-script-element"><a href="#the-script-element">script</a></code>
+              요소의
+              <a href="#already-started" id="parsing-main-inhead:already-started">이미 시작됨</a>을 true로 설정한다. (<a
+                href="#fragment-case" id="parsing-main-inhead:fragment-case">조각인 경우</a>)
             </p>
           </li>
           <li id="document-written-scripts-intervention">
-            <p>파서가 <code id="parsing-main-inhead:dom-document-write-2"><a
-                  href="#dom-document-write">document.write()</a></code> 또는 <code
-                id="parsing-main-inhead:dom-document-writeln"><a
-                  href="#dom-document-writeln">document.writeln()</a></code> 메서드를 통해 호출되었다면
-              선택적으로 <code id="parsing-main-inhead:the-script-element-2"><a
-                  href="#the-script-element">script</a></code> 요소의 <a href="#already-started"
-                id="parsing-main-inhead:already-started-2">이미 시작됨</a>을 true로 설정합니다. 예를 들어
-              사용자 에이전트는 느린 네트워크 상태이거나 페이지를 로딩하는 데 이미 오랜 시간이 걸린
-              경우 이 조항을 사용하여 <code id="parsing-main-inhead:dom-document-write-3"><a
-                  href="#dom-document-write">document.write()</a></code>를 통해 삽입된 <a href="#concept-origin"
-                id="parsing-main-inhead:concept-origin">교차 출처</a> 스크립트의
-              실행을 방지할 수 있습니다.
+            <p>파서가 <code
+                id="parsing-main-inhead:dom-document-write-2"><a href="#dom-document-write">document.write()</a></code>
+              또는 <code
+                id="parsing-main-inhead:dom-document-writeln"><a href="#dom-document-writeln">document.writeln()</a></code>
+              메서드를 통해 호출된 경우, 선택적으로
+              <code id="parsing-main-inhead:the-script-element-2"><a href="#the-script-element">script</a></code>
+              요소의 <a href="#already-started" id="parsing-main-inhead:already-started-2">이미 시작됨</a>을
+              true로 설정한다. (예를 들어 사용자
+              에이전트는 느린
+              네트워크 조건에서 또는 페이지를 로드하는 데 이미 오랜 시간이 걸린 경우 <code
+                id="parsing-main-inhead:dom-document-write-3"><a href="#dom-document-write">document.write()</a></code>를
+              통해 삽입된 <a href="#concept-origin" id="parsing-main-inhead:concept-origin">교차 출처</a>
+              스크립트의 실행을 방지하기 위해 이 절을 사용할 수 있다.)
             </p>
           </li>
           <li>
-            <p>새로 생성한 요소를 <var>adjustedInsertionLocation</var>이 주어졌을 때의 <a href="#adjusted-insertion-location"
-                id="parsing-main-inhead:adjusted-insertion-location">조정된 삽입 위치</a>에 삽입합니다.
+            <p>새로 생성된
+              요소와 <var>adjustedInsertionLocation</var>을 사용하여 <a
+                href="#insert-an-element-at-the-adjusted-insertion-location"
+                id="parsing-main-inhead:insert-an-element-at-the-adjusted-insertion-location">조정된 삽입 위치에
+                요소를 삽입</a>한다.</p>
+          </li>
+          <li>
+            <p>요소를 <a href="#stack-of-open-elements" id="parsing-main-inhead:stack-of-open-elements-3">열린 요소 스택</a>에
+              푸시하여 새
+              <a href="#current-node" id="parsing-main-inhead:current-node-3">현재 노드</a>가 되도록 한다.
             </p>
           </li>
           <li>
-            <p>요소가 새로운 <a href="#current-node" id="parsing-main-inhead:current-node-3">현재 노드</a>가 되도록 <a
-                href="#stack-of-open-elements" id="parsing-main-inhead:stack-of-open-elements-3">열린 요소 스택</a>에 푸시합니다.
-            </p>
+            <p>토크나이저를 <a href="#script-data-state" id="parsing-main-inhead:script-data-state">스크립트 데이터 상태</a>로 전환한다.</p>
           </li>
           <li>
-            <p>토크나이저를 <a href="#script-data-state" id="parsing-main-inhead:script-data-state">스크립트 데이터 상태</a>로 전환합니다.
-            </p>
-          </li>
-          <li>
-            <p><a href="#original-insertion-mode" id="parsing-main-inhead:original-insertion-mode">원래 삽입 모드</a>를 현재 <a
-                href="#insertion-mode" id="parsing-main-inhead:insertion-mode-4">삽입
-                모드</a>로 설정합니다.</p>
+            <p><a href="#original-insertion-mode" id="parsing-main-inhead:original-insertion-mode">원래
+                삽입 모드</a>를 현재 <a href="#insertion-mode" id="parsing-main-inhead:insertion-mode-4">삽입
+                모드</a>로 설정한다.</p>
 
           </li>
           <li>
             <p><a href="#insertion-mode" id="parsing-main-inhead:insertion-mode-5">삽입 모드</a>를 "<a
-                href="#parsing-main-incdata" id="parsing-main-inhead:parsing-main-incdata">텍스트</a>"로 전환합니다.</p>
+                href="#parsing-main-incdata" id="parsing-main-inhead:parsing-main-incdata">텍스트</a>"로 전환한다.</p>
           </li>
         </ol>
       </dd>
@@ -242777,7 +242790,7 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
                     href="https://dom.spec.whatwg.org/#element-shadow-host" data-x-internal="shadow-host">섀도
                     호스트</a>이면,
                   <a href="#insert-an-element-at-the-adjusted-insertion-location"
-                    id="parsing-main-inhead:insert-an-element-at-the-adjusted-insertion-location">조정된 삽입 위치에
+                    id="parsing-main-inhead:insert-an-element-at-the-adjusted-insertion-location-2">조정된 삽입 위치에
                     요소 삽입</a>을
                   <var>template</var>과 <var>adjustedInsertionLocation</var>으로 수행한다.
                 </p>
@@ -242811,7 +242824,7 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
                     <ol>
                       <li>
                         <p><a href="#insert-an-element-at-the-adjusted-insertion-location"
-                            id="parsing-main-inhead:insert-an-element-at-the-adjusted-insertion-location-2">조정된 삽입
+                            id="parsing-main-inhead:insert-an-element-at-the-adjusted-insertion-location-3">조정된 삽입
                             위치에 요소 삽입</a>을
                           <var>template</var>과 <var>adjustedInsertionLocation</var>으로 수행한다.
                         </p>
@@ -242867,7 +242880,7 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
             <ol>
               <li>
                 <p><var>scope</var>를 <a href="#adjusted-insertion-location"
-                    id="parsing-main-inhead:adjusted-insertion-location-2">조정된 삽입
+                    id="parsing-main-inhead:adjusted-insertion-location">조정된 삽입
                     위치</a>를 포함하는 노드로 설정한다.</p>
 
                 <p class="note"><a href="#fragment-case" id="parsing-main-inhead:fragment-case-2">조각
@@ -242947,7 +242960,7 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
                   </li>
                   <li>
                     <p><a href="#insert-an-element-at-the-adjusted-insertion-location"
-                        id="parsing-main-inhead:insert-an-element-at-the-adjusted-insertion-location-3">조정된 삽입
+                        id="parsing-main-inhead:insert-an-element-at-the-adjusted-insertion-location-4">조정된 삽입
                         위치에 요소 삽입</a>을
                       <var>template</var>으로 수행한다.
                     </p>
@@ -244271,12 +244284,10 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
       </dd>
       <dt>태그 이름이 "input"인 시작 태그</dt>
       <dd>
-        <p>파서가 <a href="#html-fragment-parsing-algorithm" id="parsing-main-inbody:html-fragment-parsing-algorithm">HTML
-            프래그먼트 파싱 알고리즘</a>의 일부로
-          생성되었고(<a href="#fragment-case" id="parsing-main-inbody:fragment-case-3">프래그먼트 경우</a>) 해당 알고리즘에 전달된 <a
-            href="#concept-frag-parse-context" id="parsing-main-inbody:concept-frag-parse-context">컨텍스트</a> 요소가 <code
-            id="parsing-main-inbody:the-select-element"><a href="#the-select-element">select</a></code> 요소이면
-          다음을 수행합니다.</p>
+        <p>파서의 <a href="#fragment-context-element" id="parsing-main-inbody:fragment-context-element">조각 컨텍스트 요소</a>가
+          <code id="parsing-main-inbody:the-select-element"><a href="#the-select-element">select</a></code> 요소인 경우
+          (<a href="#fragment-case" id="parsing-main-inbody:fragment-case-3">조각인 경우</a>):
+        </p>
 
         <ol>
           <li>
@@ -244450,12 +244461,10 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
       </dd>
       <dt>태그 이름이 "select"인 시작 태그</dt>
       <dd>
-        <p>파서가 <a href="#html-fragment-parsing-algorithm"
-            id="parsing-main-inbody:html-fragment-parsing-algorithm-2">HTML 프래그먼트 파싱 알고리즘</a>의 일부로
-          생성되었고(<a href="#fragment-case" id="parsing-main-inbody:fragment-case-4">프래그먼트 경우</a>) 해당 알고리즘에 전달된 <a
-            href="#concept-frag-parse-context" id="parsing-main-inbody:concept-frag-parse-context-2">컨텍스트</a> 요소가 <code
-            id="parsing-main-inbody:the-select-element-3"><a href="#the-select-element">select</a></code> 요소이면
-          다음을 수행합니다.</p>
+        <p>파서의 <a href="#fragment-context-element" id="parsing-main-inbody:fragment-context-element-2">조각 컨텍스트 요소</a>가
+          <code id="parsing-main-inbody:the-select-element-3"><a href="#the-select-element">select</a></code> 요소인 경우
+          (<a href="#fragment-case" id="parsing-main-inbody:fragment-case-4">조각인 경우</a>):
+        </p>
 
         <ol>
           <li>
@@ -244933,87 +244942,84 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
             </ol>
           </li>
           <li>
-            <p><var>insertionLocation</var>을 <var>commonAncestor</var>로 하고, 자식이 있는 경우 마지막 자식 뒤로 한다.</p>
-          </li>
-          <li>
-            <p><var>adjustedInsertionLocation</var>을 <var>insertionLocation</var>이 주어진
-              <a href="#adjusted-insertion-location" id="parsing-main-inbody:adjusted-insertion-location">조정된 삽입 위치</a>로
-              한다.
-            </p>
-          </li>
-          <li>
-            <p><var>target</var>을 <var>adjustedInsertionLocation</var>이 속한 노드로 한다.</p>
-          </li>
-          <li>
-            <p><var>refNode</var>를 <var>adjustedInsertionLocation</var> 바로 앞에 있는 노드로 하며,
-              <var>adjustedInsertionLocation</var>이 <var>target</var>의 마지막 자식 뒤에 있는 경우 null로 한다.
-            </p>
+            <p>(<var>target</var>, <var>refNode</var>)를 (<var>commonAncestor</var>, null)이 주어진 <a
+                href="#adjusted-insertion-location" id="parsing-main-inbody:adjusted-insertion-location">조정된 삽입
+                위치</a>로 설정한다.</p>
           </li>
           <li>
             <p><var>lastNode</var>의 <a id="parsing-main-inbody:parent"
-                href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가 null이 아닌
-              경우 <a href="https://dom.spec.whatwg.org/#concept-node-remove" id="parsing-main-inbody:concept-node-remove"
-                data-x-internal="concept-node-remove">제거</a>한다.
+                href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가 null이 아니면,
+              <var>lastNode</var>를 <a href="https://dom.spec.whatwg.org/#concept-node-remove"
+                id="parsing-main-inbody:concept-node-remove" data-x-internal="concept-node-remove">제거</a>한다.
             </p>
           </li>
           <li>
-            <p>다음 조건이 모두 참인 경우:</p>
+            <p>다음이 모두 참이면:</p>
 
             <ul>
               <li><var>lastNode</var>의 <a id="parsing-main-inbody:parent-2"
-                  href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가 null이다;</li>
+                  href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가 null이다;
+              </li>
               <li><var>lastNode</var>가 <var>target</var>의 <a id="parsing-main-inbody:host-including-inclusive-ancestor"
                   href="https://dom.spec.whatwg.org/#concept-tree-host-including-inclusive-ancestor"
-                  data-x-internal="host-including-inclusive-ancestor">host-including 포함 조상</a>이 아니다;</li>
+                  data-x-internal="host-including-inclusive-ancestor">호스트를 포함하는 포괄적 조상</a>이 아니다;
+              </li>
               <li><var>target</var>이 <code id="parsing-main-inbody:document-2"><a href="#document">Document</a></code>
-                노드가 아니거나 요소 자식이 없다;</li>
+                노드가 아니거나 요소
+                자식을 갖지 않는다; 그리고</li>
               <li><var>refNode</var>가 null이거나 그 <a id="parsing-main-inbody:parent-3"
                   href="https://dom.spec.whatwg.org/#concept-tree-parent" data-x-internal="parent">부모</a>가
-                <var>target</var>이다;
+                <var>target</var>이다,
               </li>
             </ul>
 
-            <p>다음 단계를 수행한다:</p>
+            <p>그러면:</p>
 
             <ol>
               <li>
                 <p><a id="parsing-main-inbody:assert" href="https://infra.spec.whatwg.org/#assert"
-                    data-x-internal="assert">단언</a>: <var>lastNode</var>, <var>target</var>, <var>refNode</var> 및
-                  « »가 주어진 <a id="parsing-main-inbody:ensure-pre-insert-validity"
+                    data-x-internal="assert">단언</a>: <var>lastNode</var>, <var>target</var>,
+                  <var>refNode</var> 및 « »가 주어졌을 때 <a id="parsing-main-inbody:ensure-pre-insert-validity"
                     href="https://dom.spec.whatwg.org/#concept-node-ensure-pre-insertion-validity"
-                    data-x-internal="ensure-pre-insert-validity">사전 삽입 유효성 확인</a>은 예외를 발생시키지 않는다.
+                    data-x-internal="ensure-pre-insert-validity">삽입 전 유효성 보장</a>은 예외를 발생시키지 않는다.
                 </p>
               </li>
               <li>
-                <p><var>lastNode</var>를 <var>adjustedInsertionLocation</var>에 삽입한다.</p>
+                <p><var>lastNode</var>를
+                  <var>target</var> 안의 <var>refNode</var> 앞에 <a href="https://dom.spec.whatwg.org/#concept-node-insert"
+                    id="parsing-main-inbody:concept-node-insert" data-x-internal="concept-node-insert">삽입</a>한다.
+                </p>
               </li>
             </ol>
           </li>
           <li>
-            <p><a href="#create-an-element-for-the-token" id="parsing-main-inbody:create-an-element-for-the-token-2">토큰에
-                대한 요소 생성</a>을
-              <var>formattingElement</var>이 생성된 토큰에 대해,
+            <p><var>formattingElement</var>가 생성될 때 사용된 토큰에 대해 <a href="#create-an-element-for-the-token"
+                id="parsing-main-inbody:create-an-element-for-the-token-2">토큰에 대한 요소를 생성</a>한다.
               <a id="parsing-main-inbody:html-namespace-2-2" href="https://infra.spec.whatwg.org/#html-namespace"
                 data-x-internal="html-namespace-2">HTML 네임스페이스</a>에서 <var>furthestBlock</var>을 의도된
-              부모로 하여 수행한다.
+              부모로 하여 생성한다.
             </p>
           </li>
           <li>
-            <p><var>furthestBlock</var>의 모든 자식 노드를 가져와 마지막 단계에서 생성된 요소에 추가한다.</p>
+            <p><var>furthestBlock</var>의 모든 자식 노드를 가져와 마지막 단계에서 생성된
+              요소에 추가한다.</p>
           </li>
           <li>
-            <p>해당 새 요소를 <var>furthestBlock</var>에 추가한다.</p>
+            <p>그 새 요소를 <var>furthestBlock</var>에 추가한다.</p>
           </li>
           <li>
-            <p><var>formattingElement</var>을 <a href="#list-of-active-formatting-elements"
-                id="parsing-main-inbody:list-of-active-formatting-elements-13">활성 형식 지정 요소 목록</a>에서 제거하고,
-              새 요소를 앞서 언급한 책갈피 위치에 있는 <a href="#list-of-active-formatting-elements"
-                id="parsing-main-inbody:list-of-active-formatting-elements-14">활성 형식 지정 요소 목록</a>에 삽입한다.</p>
+            <p><var>formattingElement</var>를 <a href="#list-of-active-formatting-elements"
+                id="parsing-main-inbody:list-of-active-formatting-elements-13">활성 서식 지정
+                요소 목록</a>에서 제거하고, 앞서 언급한 북마크의 위치에 새 요소를 <a href="#list-of-active-formatting-elements"
+                id="parsing-main-inbody:list-of-active-formatting-elements-14">활성 서식 지정
+                요소 목록</a>에 삽입한다.</p>
           </li>
           <li>
-            <p><var>formattingElement</var>을 <a href="#stack-of-open-elements"
-                id="parsing-main-inbody:stack-of-open-elements-88">열린 요소 스택</a>에서 제거하고,
-              새 요소를 해당 스택에서 <var>furthestBlock</var> 위치 바로 아래에 삽입한다.</p>
+            <p><var>formattingElement</var>를 <a href="#stack-of-open-elements"
+                id="parsing-main-inbody:stack-of-open-elements-88">열린
+                요소 스택</a>에서 제거하고, 새 요소를 <a href="#stack-of-open-elements"
+                id="parsing-main-inbody:stack-of-open-elements-89">열린 요소 스택</a>에서
+              해당 스택의 <var>furthestBlock</var> 위치 바로 아래에 삽입한다.</p>
           </li>
         </ol>
       </li>
@@ -246384,55 +246390,60 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
       <dt>U+0009 CHARACTER TABULATION, U+000A LINE FEED (LF), U+000C
         FORM FEED (FF), U+000D CARRIAGE RETURN (CR) 또는 U+0020 SPACE 중 하나인 문자 토큰</dt>
       <dd>
-        <p>"<a href="#parsing-main-inbody" id="parsing-main-afterbody:parsing-main-inbody">body
-            안</a>" <a href="#insertion-mode" id="parsing-main-afterbody:insertion-mode-2">삽입 모드</a>의 <a
-            href="#using-the-rules-for" id="parsing-main-afterbody:using-the-rules-for">규칙을 사용하여</a> 토큰을 처리합니다.</p>
+        <p>토큰을 "<a href="#parsing-main-inbody" id="parsing-main-afterbody:parsing-main-inbody">본문
+            내부</a>" <a href="#insertion-mode" id="parsing-main-afterbody:insertion-mode-2">삽입 모드</a>의 <a
+            href="#using-the-rules-for" id="parsing-main-afterbody:using-the-rules-for">규칙을
+            사용하여</a> 처리한다.</p>
       </dd>
       <dt>주석 토큰</dt>
       <dd>
-        <p><a href="#stack-of-open-elements" id="parsing-main-afterbody:stack-of-open-elements">열린 요소 스택</a>의 첫 번째 요소, 즉
-          <code id="parsing-main-afterbody:the-html-element"><a href="#the-html-element">html</a></code> 요소의 마지막
-          자식으로 <a href="#insert-a-comment" id="parsing-main-afterbody:insert-a-comment">주석을 삽입합니다</a>.
+        <p>(<a href="#stack-of-open-elements" id="parsing-main-afterbody:stack-of-open-elements">열린
+            요소 스택</a>의 첫 번째 요소(<code
+            id="parsing-main-afterbody:the-html-element"><a href="#the-html-element">html</a></code> 요소), null)이 주어졌을 때
+          <a href="#insert-a-comment" id="parsing-main-afterbody:insert-a-comment">주석을 삽입</a>한다.
         </p>
       </dd>
       <dt>처리 명령 토큰</dt>
       <dd>
-        <p><a href="#stack-of-open-elements" id="parsing-main-afterbody:stack-of-open-elements-2">열린 요소 스택</a>의 첫 번째 요소,
-          즉 <code id="parsing-main-afterbody:the-html-element-2"><a href="#the-html-element">html</a></code> 요소의
-          마지막 자식으로 <a href="#insert-a-processing-instruction"
-            id="parsing-main-afterbody:insert-a-processing-instruction">처리 명령을 삽입합니다</a>.
+        <p>(<a href="#stack-of-open-elements" id="parsing-main-afterbody:stack-of-open-elements-2">열린
+            요소 스택</a>의 첫 번째 요소(<code
+            id="parsing-main-afterbody:the-html-element-2"><a href="#the-html-element">html</a></code> 요소), null)이 주어졌을
+          때 <a href="#insert-a-processing-instruction" id="parsing-main-afterbody:insert-a-processing-instruction">처리
+            명령을 삽입</a>한다.
         </p>
       </dd>
       <dt>DOCTYPE 토큰</dt>
       <dd>
-        <p><a href="#parse-errors" id="parsing-main-afterbody:parse-errors">파싱 오류</a>입니다. 토큰을 무시합니다.</p>
+        <p><a href="#parse-errors" id="parsing-main-afterbody:parse-errors">파싱 오류</a>. 토큰을 무시한다.</p>
       </dd>
       <dt>태그 이름이 "html"인 시작 태그</dt>
       <dd>
-        <p>"<a href="#parsing-main-inbody" id="parsing-main-afterbody:parsing-main-inbody-2">body
-            안</a>" <a href="#insertion-mode" id="parsing-main-afterbody:insertion-mode-3">삽입 모드</a>의 <a
-            href="#using-the-rules-for" id="parsing-main-afterbody:using-the-rules-for-2">규칙을 사용하여</a> 토큰을 처리합니다.</p>
+        <p>토큰을 "<a href="#parsing-main-inbody" id="parsing-main-afterbody:parsing-main-inbody-2">본문
+            내부</a>" <a href="#insertion-mode" id="parsing-main-afterbody:insertion-mode-3">삽입 모드</a>의 <a
+            href="#using-the-rules-for" id="parsing-main-afterbody:using-the-rules-for-2">규칙을
+            사용하여</a> 처리한다.</p>
       </dd>
       <dt>태그 이름이 "html"인 종료 태그</dt>
       <dd>
-        <p>파서가 <a href="#html-fragment-parsing-algorithm"
-            id="parsing-main-afterbody:html-fragment-parsing-algorithm">HTML 프래그먼트 파싱 알고리즘</a>의
-          일부로 생성되었으면 이는 <a href="#parse-errors" id="parsing-main-afterbody:parse-errors-2">파싱 오류</a>입니다. 토큰을 무시합니다. (<a
-            href="#fragment-case" id="parsing-main-afterbody:fragment-case">프래그먼트 경우</a>)</p>
+        <p>파서의 <a href="#fragment-context-element" id="parsing-main-afterbody:fragment-context-element">조각 컨텍스트 요소</a>가
+          null이 아니면 이는 <a href="#parse-errors" id="parsing-main-afterbody:parse-errors-2">파싱
+            오류</a>이다. 토큰을 무시한다. (<a href="#fragment-case" id="parsing-main-afterbody:fragment-case">조각인
+            경우</a>)</p>
 
-        <p>그렇지 않으면 <a href="#insertion-mode" id="parsing-main-afterbody:insertion-mode-4">삽입 모드</a>를 "<a
-            href="#the-after-after-body-insertion-mode"
-            id="parsing-main-afterbody:the-after-after-body-insertion-mode">body 뒤의 뒤</a>"로 전환합니다.</p>
+        <p>그렇지 않으면 <a href="#insertion-mode" id="parsing-main-afterbody:insertion-mode-4">삽입
+            모드</a>를 "<a href="#the-after-after-body-insertion-mode"
+            id="parsing-main-afterbody:the-after-after-body-insertion-mode">본문 이후 이후</a>"로 전환한다.</p>
       </dd>
       <dt>파일 끝 토큰</dt>
       <dd>
-        <p><a href="#stop-parsing" id="parsing-main-afterbody:stop-parsing">파싱을 중지합니다</a>.</p>
+        <p><a href="#stop-parsing" id="parsing-main-afterbody:stop-parsing">파싱을 중지</a>한다.</p>
       </dd>
-      <dt>그 밖의 모든 경우</dt>
+      <dt>그 밖의 모든 것</dt>
       <dd>
-        <p><a href="#parse-errors" id="parsing-main-afterbody:parse-errors-3">파싱 오류</a>입니다. <a href="#insertion-mode"
+        <p><a href="#parse-errors" id="parsing-main-afterbody:parse-errors-3">파싱 오류</a>. <a href="#insertion-mode"
             id="parsing-main-afterbody:insertion-mode-5">삽입 모드</a>를 "<a href="#parsing-main-inbody"
-            id="parsing-main-afterbody:parsing-main-inbody-3">body 안</a>"으로 전환하고 토큰을 다시 처리합니다.</p>
+            id="parsing-main-afterbody:parsing-main-inbody-3">본문 내부</a>"로 전환하고
+          토큰을 다시 처리한다.</p>
       </dd>
     </dl>
   </div>
@@ -246487,15 +246498,12 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
         <p>그렇지 않으면 <a href="#current-node" id="parsing-main-inframeset:current-node-2">현재 노드</a>를 <a
             href="#stack-of-open-elements" id="parsing-main-inframeset:stack-of-open-elements">열린 요소 스택</a>에서 팝합니다.</p>
 
-        <p>파서가 <a href="#html-fragment-parsing-algorithm"
-            id="parsing-main-inframeset:html-fragment-parsing-algorithm">HTML 프래그먼트 파싱 알고리즘</a>의
-          일부로 생성되지 않았고(<a href="#fragment-case" id="parsing-main-inframeset:fragment-case-2">프래그먼트 경우</a>), <a
-            href="#current-node" id="parsing-main-inframeset:current-node-3">현재 노드</a>가 더 이상
-          <code id="parsing-main-inframeset:frameset"><a href="#frameset">frameset</a></code> 요소가 아니면
-          <a href="#insertion-mode" id="parsing-main-inframeset:insertion-mode-3">삽입 모드</a>를 "<a
-            href="#parsing-main-afterframeset" id="parsing-main-inframeset:parsing-main-afterframeset">frameset 뒤</a>"로
-          전환합니다.
-        </p>
+        <p>파서의 <a href="#fragment-context-element" id="parsing-main-inframeset:fragment-context-element">조각 컨텍스트 요소</a>가
+          null이고 <a href="#current-node" id="parsing-main-inframeset:current-node-3">현재
+            노드</a>가 더 이상 <code id="parsing-main-inframeset:frameset"><a href="#frameset">frameset</a></code>
+          요소가 아니면 <a href="#insertion-mode" id="parsing-main-inframeset:insertion-mode-3">삽입
+            모드</a>를 "<a href="#parsing-main-afterframeset"
+            id="parsing-main-inframeset:parsing-main-afterframeset">frameset 이후</a>"로 전환한다.</p>
       </dd>
       <dt>태그 이름이 "frame"인 시작 태그</dt>
       <dd>
@@ -246521,7 +246529,7 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
         </p>
 
         <p class="note"><a href="#current-node" id="parsing-main-inframeset:current-node-6">현재 노드</a>는 <a
-            href="#fragment-case" id="parsing-main-inframeset:fragment-case-3">프래그먼트 경우</a>에만 루트
+            href="#fragment-case" id="parsing-main-inframeset:fragment-case-2">프래그먼트 경우</a>에만 루트
           <code id="parsing-main-inframeset:the-html-element-3"><a href="#the-html-element">html</a></code>
           요소일 수 있습니다.
         </p>
@@ -246611,37 +246619,37 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
     <dl class="switch">
       <dt>주석 토큰</dt>
       <dd>
-        <p><code id="the-after-after-body-insertion-mode:document"><a href="#document">Document</a></code> 객체의 마지막
-          자식으로 <a href="#insert-a-comment" id="the-after-after-body-insertion-mode:insert-a-comment">주석을 삽입합니다</a>.</p>
+        <p>(<code id="the-after-after-body-insertion-mode:document"><a href="#document">Document</a></code>
+          객체, null)이 주어졌을 때 <a href="#insert-a-comment" id="the-after-after-body-insertion-mode:insert-a-comment">주석을
+            삽입</a>한다.</p>
       </dd>
       <dt>처리 명령 토큰</dt>
       <dd>
-        <p><code id="the-after-after-body-insertion-mode:document-2"><a href="#document">Document</a></code> 객체의
-          마지막 자식으로 <a href="#insert-a-processing-instruction"
-            id="the-after-after-body-insertion-mode:insert-a-processing-instruction">처리 명령을 삽입합니다</a>.</p>
+        <p>(<code id="the-after-after-body-insertion-mode:document-2"><a href="#document">Document</a></code>
+          객체,
+          null)이 주어졌을 때 <a href="#insert-a-processing-instruction"
+            id="the-after-after-body-insertion-mode:insert-a-processing-instruction">처리 명령을 삽입</a>한다.</p>
       </dd>
       <dt>DOCTYPE 토큰</dt>
       <dt>U+0009 CHARACTER TABULATION, U+000A LINE FEED (LF), U+000C
         FORM FEED (FF), U+000D CARRIAGE RETURN (CR) 또는 U+0020 SPACE 중 하나인 문자 토큰</dt>
       <dt>태그 이름이 "html"인 시작 태그</dt>
       <dd>
-        <p>"<a href="#parsing-main-inbody" id="the-after-after-body-insertion-mode:parsing-main-inbody">body 안</a>" <a
-            href="#insertion-mode" id="the-after-after-body-insertion-mode:insertion-mode-2">삽입 모드</a>의
-          <a href="#using-the-rules-for" id="the-after-after-body-insertion-mode:using-the-rules-for">규칙을 사용하여</a> 토큰을
-          처리합니다.
+        <p>토큰을 "<a href="#parsing-main-inbody" id="the-after-after-body-insertion-mode:parsing-main-inbody">본문 내부</a>"
+          <a href="#insertion-mode" id="the-after-after-body-insertion-mode:insertion-mode-2">삽입 모드</a>의 <a
+            href="#using-the-rules-for" id="the-after-after-body-insertion-mode:using-the-rules-for">규칙을 사용하여</a> 처리한다.
         </p>
       </dd>
       <dt>파일 끝 토큰</dt>
       <dd>
-        <p><a href="#stop-parsing" id="the-after-after-body-insertion-mode:stop-parsing">파싱을 중지합니다</a>.</p>
+        <p><a href="#stop-parsing" id="the-after-after-body-insertion-mode:stop-parsing">파싱을 중지</a>한다.</p>
       </dd>
-      <dt>그 밖의 모든 경우</dt>
+      <dt>그 밖의 모든 것</dt>
       <dd>
-        <p><a href="#parse-errors" id="the-after-after-body-insertion-mode:parse-errors">파싱 오류</a>입니다. <a
-            href="#insertion-mode" id="the-after-after-body-insertion-mode:insertion-mode-3">삽입 모드</a>를
-          "<a href="#parsing-main-inbody" id="the-after-after-body-insertion-mode:parsing-main-inbody-2">body 안</a>"으로
-          전환하고 토큰을
-          다시 처리합니다.</p>
+        <p><a href="#parse-errors" id="the-after-after-body-insertion-mode:parse-errors">파싱 오류</a>. <a
+            href="#insertion-mode" id="the-after-after-body-insertion-mode:insertion-mode-3">삽입 모드</a>를 "<a
+            href="#parsing-main-inbody" id="the-after-after-body-insertion-mode:parsing-main-inbody-2">본문 내부</a>"로 전환하고
+          토큰을 다시 처리한다.</p>
       </dd>
     </dl>
   </div>
@@ -246661,46 +246669,45 @@ document<c- p="">.</c->body<c- p="">.</c->appendChild<c- p="">(</c->text<c- p=""
     <dl class="switch">
       <dt>주석 토큰</dt>
       <dd>
-        <p><code id="the-after-after-frameset-insertion-mode:document"><a href="#document">Document</a></code> 객체의
-          마지막 자식으로 <a href="#insert-a-comment" id="the-after-after-frameset-insertion-mode:insert-a-comment">주석을
-            삽입합니다</a>.</p>
+        <p>(<code id="the-after-after-frameset-insertion-mode:document"><a href="#document">Document</a></code> 객체,
+          null)이 주어졌을 때 <a href="#insert-a-comment" id="the-after-after-frameset-insertion-mode:insert-a-comment">주석을
+            삽입</a>한다.
+        </p>
       </dd>
       <dt>처리 명령 토큰</dt>
       <dd>
-        <p><code id="the-after-after-frameset-insertion-mode:document-2"><a href="#document">Document</a></code> 객체의
-          마지막 자식으로 <a href="#insert-a-processing-instruction"
-            id="the-after-after-frameset-insertion-mode:insert-a-processing-instruction">처리 명령을
-            삽입합니다</a>.</p>
+        <p>(<code id="the-after-after-frameset-insertion-mode:document-2"><a href="#document">Document</a></code> 객체,
+          null)이 주어졌을 때 <a href="#insert-a-processing-instruction"
+            id="the-after-after-frameset-insertion-mode:insert-a-processing-instruction">처리
+            명령을 삽입</a>한다.</p>
       </dd>
       <dt>DOCTYPE 토큰</dt>
       <dt>U+0009 CHARACTER TABULATION, U+000A LINE FEED (LF), U+000C
         FORM FEED (FF), U+000D CARRIAGE RETURN (CR) 또는 U+0020 SPACE 중 하나인 문자 토큰</dt>
       <dt>태그 이름이 "html"인 시작 태그</dt>
       <dd>
-        <p>"<a href="#parsing-main-inbody" id="the-after-after-frameset-insertion-mode:parsing-main-inbody">body 안</a>"
-          <a href="#insertion-mode" id="the-after-after-frameset-insertion-mode:insertion-mode-2">삽입 모드</a>의
+        <p>토큰을 "<a href="#parsing-main-inbody" id="the-after-after-frameset-insertion-mode:parsing-main-inbody">본문
+            내부</a>" <a href="#insertion-mode" id="the-after-after-frameset-insertion-mode:insertion-mode-2">삽입 모드</a>의
           <a href="#using-the-rules-for" id="the-after-after-frameset-insertion-mode:using-the-rules-for">규칙을 사용하여</a>
-          토큰을
-          처리합니다.
+          처리한다.
         </p>
       </dd>
       <dt>파일 끝 토큰</dt>
       <dd>
-        <p><a href="#stop-parsing" id="the-after-after-frameset-insertion-mode:stop-parsing">파싱을 중지합니다</a>.</p>
+        <p><a href="#stop-parsing" id="the-after-after-frameset-insertion-mode:stop-parsing">파싱을 중지</a>한다.</p>
       </dd>
       <dt>태그 이름이 "noframes"인 시작 태그</dt>
       <dd>
-        <p>"<a href="#parsing-main-inhead" id="the-after-after-frameset-insertion-mode:parsing-main-inhead">head 안</a>"
-          <a href="#insertion-mode" id="the-after-after-frameset-insertion-mode:insertion-mode-3">삽입 모드</a>의
+        <p>토큰을 "<a href="#parsing-main-inhead" id="the-after-after-frameset-insertion-mode:parsing-main-inhead">head
+            내부</a>" <a href="#insertion-mode" id="the-after-after-frameset-insertion-mode:insertion-mode-3">삽입 모드</a>의
           <a href="#using-the-rules-for" id="the-after-after-frameset-insertion-mode:using-the-rules-for-2">규칙을 사용하여</a>
-          토큰을
-          처리합니다.
+          처리한다.
         </p>
       </dd>
-      <dt>그 밖의 모든 경우</dt>
+      <dt>그 밖의 모든 것</dt>
       <dd>
-        <p><a href="#parse-errors" id="the-after-after-frameset-insertion-mode:parse-errors">파싱 오류</a>입니다. 토큰을 무시합니다.
-        </p>
+        <p><a href="#parse-errors" id="the-after-after-frameset-insertion-mode:parse-errors">파싱 오류</a>. 토큰을
+          무시한다.</p>
       </dd>
     </dl>
   </div>
@@ -249773,13 +249780,14 @@ console<c- p="">.</c->assert<c- p="">(</c->container<c- p="">.</c->firstChild <c
       반환합니다.
     </p>
 
-    <p class="note"><a href="#html-parser" id="parsing-html-fragments:html-parser">HTML 파서</a> 절의 알고리즘에서 <dfn
-        id="fragment-case">프래그먼트 경우</dfn>로 표시된 부분은 이 알고리즘을 위해 파서가 생성된
-      경우에만 발생하는 부분입니다. 이 표시는 정보 제공 목적으로만 알고리즘에 추가되었으며 규범적
-      효력은 없습니다. 파서가 이 알고리즘을 처리하기 위해 생성되지 않았는데도 <a href="#fragment-case" id="parsing-html-fragments:fragment-case">프래그먼트
-        경우</a>로 설명된 조건이 발생할 수 있다면 이는
-      명세의 오류입니다.
-    </p>
+    <p class="note"><a href="#html-parser" id="parsing-html-fragments:html-parser">HTML
+        파서</a> 절의 알고리즘에서 <dfn id="fragment-case">조각인 경우</dfn>라고 표시된 부분은 파서의 <a href="#fragment-context-element"
+        id="parsing-html-fragments:fragment-context-element">조각 컨텍스트
+        요소</a>가 null이 아닌 경우에만 발생하는 부분이다. 이러한 표시는
+      정보 제공 목적으로만 알고리즘에 주석으로 추가된 것이며, 규범적 효력은 없다. <a href="#fragment-case" id="parsing-html-fragments:fragment-case">조각인
+        경우</a>로 설명된 조건이 파서의 <a href="#fragment-context-element"
+        id="parsing-html-fragments:fragment-context-element-2">조각
+        컨텍스트 요소</a>가 null인 경우에도 발생할 수 있다면, 이는 명세의 오류이다.</p>
 
     <ol>
       <li>
@@ -249843,6 +249851,11 @@ console<c- p="">.</c->assert<c- p="">(</c->container<c- p="">.</c->firstChild <c
         </p>
       </li>
       <li>
+        <p>파서의 <a href="#fragment-context-element" id="parsing-html-fragments:fragment-context-element-3">조각 컨텍스트
+            요소</a>를 <var id="parsing-html-fragments:concept-frag-parse-context-3"><a
+              href="#concept-frag-parse-context">context</a></var>로 설정한다.</p>
+      </li>
+      <li>
         <p><var>contextDocument</var>의 <a href="#concept-n-script" id="parsing-html-fragments:concept-n-script">스크립팅이
             비활성화</a>되어 있으면 <var>scriptingMode</var>를 <a href="#scripting-mode-disabled"
             id="parsing-html-fragments:scripting-mode-disabled">비활성화</a>로 설정합니다.</p>
@@ -249853,7 +249866,7 @@ console<c- p="">.</c->assert<c- p="">(</c->container<c- p="">.</c->firstChild <c
         </p>
       </li>
       <li>
-        <p><var id="parsing-html-fragments:concept-frag-parse-context-3"><a
+        <p><var id="parsing-html-fragments:concept-frag-parse-context-4"><a
               href="#concept-frag-parse-context">context</a></var>에 따라 분기하여 <a href="#html-parser"
             id="parsing-html-fragments:html-parser-3">HTML 파서</a>의 <a href="#tokenization"
             id="parsing-html-fragments:tokenization">토큰화</a> 단계 상태를 다음과 같이 설정합니다.</p>
@@ -249935,7 +249948,7 @@ console<c- p="">.</c->assert<c- p="">(</c->container<c- p="">.</c->firstChild <c
         </p>
       </li>
       <li>
-        <p><var id="parsing-html-fragments:concept-frag-parse-context-4"><a
+        <p><var id="parsing-html-fragments:concept-frag-parse-context-5"><a
               href="#concept-frag-parse-context">context</a></var>가 <code
             id="parsing-html-fragments:the-template-element"><a
               href="#the-template-element">template</a></code> 요소이면 "<a href="#parsing-main-intemplate"
@@ -249948,13 +249961,13 @@ console<c- p="">.</c->assert<c- p="">(</c->container<c- p="">.</c->firstChild <c
         </p>
       </li>
       <li>
-        <p>이름이 <var id="parsing-html-fragments:concept-frag-parse-context-5"><a
+        <p>이름이 <var id="parsing-html-fragments:concept-frag-parse-context-6"><a
               href="#concept-frag-parse-context">context</a></var>의 로컬 이름이고 속성이 <var
-            id="parsing-html-fragments:concept-frag-parse-context-6"><a
+            id="parsing-html-fragments:concept-frag-parse-context-7"><a
               href="#concept-frag-parse-context">context</a></var>의 속성인 시작 태그 토큰을 생성합니다.
         </p>
 
-        <p>이 시작 태그 토큰을 <var id="parsing-html-fragments:concept-frag-parse-context-7"><a
+        <p>이 시작 태그 토큰을 <var id="parsing-html-fragments:concept-frag-parse-context-8"><a
               href="#concept-frag-parse-context">context</a></var>의 시작 태그 토큰으로 둡니다. 예를 들어
           이것이 <a href="#html-integration-point" id="parsing-html-fragments:html-integration-point">HTML 통합 지점</a>인지 결정할
           때 사용합니다.</p>
@@ -249964,8 +249977,8 @@ console<c- p="">.</c->assert<c- p="">(</c->container<c- p="">.</c->firstChild <c
             id="parsing-html-fragments:reset-the-insertion-mode-appropriately">파서의 삽입 모드를 적절하게
             재설정합니다</a>.</p>
 
-        <p class="note">파서는 해당 알고리즘의 일부로 <var id="parsing-html-fragments:concept-frag-parse-context-8"><a
-              href="#concept-frag-parse-context">context</a></var> 요소를 참조합니다.</p>
+        <p class="note">파서는 해당 알고리즘의 일부로 자신의 <a href="#fragment-context-element"
+            id="parsing-html-fragments:fragment-context-element-4">조각 컨텍스트 요소</a>를 참조한다.</p>
       </li>
       <li>
         <p><a href="#html-parser" id="parsing-html-fragments:html-parser-5">HTML 파서</a>의 <a href="#form-element-pointer"
