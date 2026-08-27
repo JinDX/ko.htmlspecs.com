@@ -1464,7 +1464,7 @@ For darkmode:
     <div class="head">
         <h1 class="no-ref p-name" id="title">연결 허용 목록</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">커뮤니티 그룹 보고서 초안</a>,
-            <time class="dt-updated" datetime="2026-07-29">2026년 7월 29일</time>
+            <time class="dt-updated" datetime="2026-08-26">2026년 8월 26일</time>
         </p>
         <div data-fill-with="spec-metadata">
             <dl>
@@ -1573,13 +1573,15 @@ For darkmode:
                                 컨텍스트</span></a>
                     <li><a href="#security-embedded-enforcement"><span class="secno">6.2</span> <span
                                 class="content">임베디드 적용</span></a>
-                    <li><a href="#security-service-worker"><span class="secno">6.3</span> <span class="content">서비스
+                    <li><a href="#security-service-workers"><span class="secno">6.3</span> <span class="content">서비스
                                 워커</span></a>
-                    <li><a href="#security-dns"><span class="secno">6.4</span> <span class="content">DNS</span></a>
-                    <li><a href="#security-postmessage"><span class="secno">6.5</span> <span
+                    <li><a href="#security-shared-workers"><span class="secno">6.4</span> <span class="content">공유
+                                워커</span></a>
+                    <li><a href="#security-dns"><span class="secno">6.5</span> <span class="content">DNS</span></a>
+                    <li><a href="#security-postmessage"><span class="secno">6.6</span> <span
                                 class="content"><code>postMessage(...)</code></span></a>
-                    <li><a href="#redirects"><span class="secno">6.6</span> <span class="content">리디렉션</span></a>
-                    <li><a href="#webrtc"><span class="secno">6.7</span> <span class="content">WebRTC</span></a>
+                    <li><a href="#redirects"><span class="secno">6.7</span> <span class="content">리디렉션</span></a>
+                    <li><a href="#webrtc"><span class="secno">6.8</span> <span class="content">WebRTC</span></a>
                 </ol>
             <li>
                 <a href="#impl"><span class="secno">7</span> <span class="content">구현
@@ -1697,12 +1699,12 @@ Connection-Allowlist: (response-origin "https://cdn.example" "https://*.example.
                     만들려는 서버의 결정에 클라이언트가 직접 협력할지 여부를 개발자가 선택할 수 있게 하는 것은
                     합리적으로 보입니다. 기본적으로, 대상과 관계없이 리디렉션 응답은 차단됩니다. 개발자는
                     헤더의 매개변수를 설정하여 모든 리디렉션 응답을 허용하도록 선택할 수 있습니다. 자세한 내용은
-                    <a href="#redirects">§ 6.6 리디렉션</a>을 참조하십시오.
+                    <a href="#redirects">§ 6.7 리디렉션</a>을 참조하십시오.
                 </p>
             <li data-md>
                 <p>마찬가지로 WebRTC 연결은 동적 엔드포인트 발견과 피어 투 피어 연결을 자주 포함하므로
                     URL 패턴으로 제한하기 어렵습니다. 개발자가 WebRTC 연결을 완전히 허용할지 차단할지
-                    선택할 수 있도록 전역 토글을 제공합니다. 자세한 내용은 <a href="#webrtc">§ 5.6 WebRTC</a>를 참조하십시오.</p>
+                    선택할 수 있도록 전역 토글을 제공합니다. 자세한 내용은 <a href="#webrtc">§ 6.8 WebRTC</a>를 참조하십시오.</p>
         </ul>
         <h3 class="heading settled" data-level="1.2" id="overlap-with-csp"><span class="secno">1.2. </span><span
                 class="content">Content Security Policy와의 중복</span><a class="self-link" href="#overlap-with-csp"></a>
@@ -3789,84 +3791,108 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
             경우, 제한 없이 로드되도록
             허용하는 대신 해당 컨텍스트를 반드시 차단해야 한다.
         </p>
-        <h3 class="heading settled" data-level="6.3" id="security-service-worker"><span class="secno">6.3. </span><span
-                class="content">서비스 워커</span><a class="self-link" href="#security-service-worker"></a></h3>
+        <h3 class="heading settled" data-level="6.3" id="security-service-workers"><span class="secno">6.3. </span><span
+                class="content">서비스 워커</span><a class="self-link" href="#security-service-workers"></a></h3>
         <p><a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker"
-                id="ref-for-dfn-service-worker">서비스 워커</a>는 다른 동일 출처 컨텍스트와 마찬가지로
-            허용 목록을 둘러싼 상황을 복잡하게 만든다.
-            서비스 워커는 자신이 관리하는 각 문서와는 별개의 <a data-link-type="dfn"
+                id="ref-for-dfn-service-worker">서비스 워커</a>는 다른 동일 출처 컨텍스트와 마찬가지로 허용 목록에 관한 문제를 복잡하게 만든다.
+            이들은 자신이 관리하는 각 문서와는 별개의 <a data-link-type="dfn"
                 href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container"
                 id="ref-for-policy-container②①">정책 컨테이너</a>를 가지므로,
-            허용 목록이 서비스 워커의 허용 목록과 다른 문서에서 시작된 메시지나 요청에
-            응답할 가능성이 충분히 있다. 이 제안은 다른 정책의 설계를 따르며,
-            이러한 기능 차이를 허용한다.</p>
-        <p>개발자가 서비스 워커의 요청 수행 능력을 제한하려면 워커 스크립트와 함께
-            허용 목록을 전달할 수 있지만, 이 허용 목록이 서비스 워커가 처리할 가능성이 있는 모든 문서의
-            허용 목록을 포함하는 상위 집합인지 확인해야 한다.</p>
-        <h3 class="heading settled" data-level="6.4" id="security-dns"><span class="secno">6.4. </span><span
+            서비스 워커의 허용 목록과 다른 허용 목록을 가진 문서에서 시작된 메시지나 요청에 응답할
+            가능성이 충분히 있다. 이 제안은 다른 정책의 설계를 따르며, 이러한 기능상의 차이를
+            허용한다.</p>
+        <p>문서의 연결 허용 목록은 서비스 워커가 요청을 가로채기 전에 적용된다는 점에 유의하라.
+            따라서 요청이 문서 자체의 연결 허용 목록에 의해 차단되는 경우 서비스 워커는 해당 문서의
+            요청을 절대로 볼 수 없다.</p>
+        <p>그러나 서비스 워커는 여전히 문서를 대신하여 외부로 fetch 요청을 수행함으로써 문서가 자체 연결 허용 목록을
+            우회하도록 도울 수 있다
+            (예: <code>postMessage(...)</code>를 통해). 이러한 데이터 유출 경로로부터 보호하기 위해 개발자는
+            워커 스크립트와 함께 동일하게 제한적인 허용 목록을 제공할 수 있다. 이는 모든 제공되는 스크립트에
+            적용하는 대신 <code>Sec-Fetch-Dest</code> 요청 헤더가 <code>serviceworker</code>일 때 조건부로
+            `<code><a data-link-type="http-header" href="#http-headerdef-connection-allowlist" id="ref-for-http-headerdef-connection-allowlist①②">Connection-Allowlist</a></code>`
+            헤더를 전송함으로써 효율적으로 수행할 수 있다.
+            서비스 워커의 경우 이 허용 목록은 워커가 처리할 수 있는 모든 문서의 허용 목록을 포함하는 상위 집합이어야
+            한다는 점에 유의하라.</p>
+        <h3 class="heading settled" data-level="6.4" id="security-shared-workers"><span class="secno">6.4. </span><span
+                class="content">공유 워커</span><a class="self-link" href="#security-shared-workers"></a></h3>
+        <p>서비스 워커와 마찬가지로 공유 워커는 별개의 <a data-link-type="dfn"
+                href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container"
+                id="ref-for-policy-container②②">정책 컨테이너</a>를 가지며 <code>postMessage(...)</code>를 통해
+            문서를 대신하여 잠재적으로 데이터 유출을 가능하게 할 수 있다. 개발자는 마찬가지로 공유 워커 스크립트와 함께
+            제한적인 허용 목록을 제공할 수 있다(<code>Sec-Fetch-Dest</code> 요청 헤더가
+            <code>sharedworker</code>인지 확인하여).
+            <code>blob:</code> URL에서 생성된 공유 워커는 고유한 우회 위험을 나타낸다. <code>data:</code>
+            URL 공유 워커는 시작자의 정책 컨테이너를 안전하게 상속하지만, <code>blob:</code> URL 공유 워커는
+            서로 다른 연결 허용 목록을 가진 여러 문서에서 연결될 수 있다. 이러한 문서 간 우회를 방지하기 위해
+            연결 허용 목록을 사용하는 개발자는
+            <code>blob:</code> URL을 제외하는 <code>worker-src</code> 콘텐츠 보안 정책 지시문을 지정하는 것이
+            권장된다.
+        </p>
+        <h3 class="heading settled" data-level="6.5" id="security-dns"><span class="secno">6.5. </span><span
                 class="content">DNS</span><a class="self-link" href="#security-dns"></a></h3>
-        <p>연결 허용 목록은 DNS 조회를 통한 데이터 유출 위험을 완화하는 것을 목표로 하며, DNS 요청을
-            보내기 전에 허용 목록을 검사하도록 Fetch의
+        <p>연결 허용 목록은 DNS 조회를 통한 데이터 유출 위험을 완화하는 것을 목표로 하며, Fetch의
             <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#resolve-an-origin"
-                id="ref-for-resolve-an-origin④">출처 확인</a> 알고리즘을 변경한다. 이는 요청을 보내는 요소와 API
+                id="ref-for-resolve-an-origin④">출처 확인</a> 알고리즘을 변경하여 DNS 요청을 보내기 전에 허용 목록을
+            확인한다. 이는 요청을 보내는 요소와 API를 사용함으로써 발생하는 암시적 조회
             (<code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element" id="ref-for-the-img-element">img</a></code>
             태그, <code
-                class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#dom-global-fetch" id="ref-for-dom-global-fetch①">fetch()</a></code>
-            등)를 사용하여 발생하는 암묵적 조회뿐만 아니라,
+                class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#dom-global-fetch" id="ref-for-dom-global-fetch①">fetch()</a></code>,
+            등)뿐만 아니라
             <a data-link-type="attr-value"
                 href="https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch"
-                id="ref-for-link-type-dns-prefetch③"><code>dns-prefetch</code></a>와 같은 메커니즘이 발생시키는
-            명시적 조회도 처리한다.
+                id="ref-for-link-type-dns-prefetch③"><code>dns-prefetch</code></a>와 같은 메커니즘에 의해 명시적으로 트리거되는 조회도
+            처리한다.
         </p>
-        <p>하지만 허용 목록은 주어진 엔드포인트가 허용 가능한지를 판단하기 위해 URL 기반 일치에
-            의존한다. 이는 DNS 조작에 대한 방어 수단이 아니며, 요청에 관여하는 DNS 서버를
-            제한하지도 않는다(DNS 확인이 재귀적으로 여러 서버와 통신할 가능성 포함). 또한 CNAME과 같은
-            구성이 허용 목록 외부 도메인에 대한 추가 조회를 발생시키는 것도 제한하지 않는다.
-            마찬가지로 허용 목록은 DNS가 가리키는 서버가 예상한 서버임을 보장할 수 없다.</p>
-        <p>개발자는 인증된 연결에 의존하여 DNS 하이재킹 및/또는 리바인딩 위험을 완화해야 한다.
-            보안 프로토콜만 허용 목록에 추가하면, TLS 핸드셰이크에서 관련 이름이 포함된 인증서를
-            소유해야 하므로 DNS를 제어하는 공격자가 트래픽을 임의의 엔드포인트로 전환하기가 훨씬
-            어려워진다.</p>
+        <p>그렇지만 허용 목록은 주어진 엔드포인트가 허용 가능한지 판단하기 위해 URL 기반 일치에 의존한다.
+            이는 DNS 조작에 대한 방어 수단이 아니며, 요청에 관여하는 DNS 서버를 제한하지도 않는다
+            (DNS 확인의 재귀적 특성으로 인해 여러 서버와 통신할 가능성도 포함한다). 또한 CNAME과 같은
+            구성이 허용 목록 밖의 도메인에 대해 추가 조회를 일으키는 것을 제한하지도 않는다. 마찬가지로 허용 목록은
+            DNS가 가리키는 서버가 예상한 서버임을 보장할 수 없다.</p>
+        <p>개발자는 인증된 연결에 의존하여 DNS 하이재킹 및/또는 리바인딩의 위험을 완화해야 한다.
+            보안 프로토콜만 허용 목록에 포함하면 DNS를 제어하는 공격자가 트래픽을 임의의 엔드포인트로
+            전환하기가 훨씬 어려워진다. TLS 핸드셰이크에는 관련 이름을 가진 인증서의
+            소유가 필요하기 때문이다.</p>
         <p class="issue" id="issue-e8ade575"><a class="self-link" href="#issue-e8ade575"></a> 허용 목록의
-            패턴을 보안 프로토콜을 나타내는 패턴으로 제한해야 하는가? 아니면
-            비보안 출처에 대해서는 헤더 전체를 포기해야 하는가?</p>
-        <h3 class="heading settled" data-level="6.5" id="security-postmessage"><span class="secno">6.5. </span><span
+            패턴을 보안 프로토콜을 나타내는 패턴으로 제한해야 하는가? 아니면 비보안 출처에 대해서는
+            헤더 자체를 완전히 포기해야 하는가?</p>
+        <h3 class="heading settled" data-level="6.6" id="security-postmessage"><span class="secno">6.6. </span><span
                 class="content"><code>postMessage(...)</code></span><a class="self-link"
                 href="#security-postmessage"></a></h3>
-        <p>이 제안은 전적으로 네트워크 연결만을 다루므로,
+        <p>이 제안은 전적으로 네트워크 연결만을 다루는데, 이는
             <code
                 class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/web-messaging.html#dom-window-postmessage-options" id="ref-for-dom-window-postmessage-options">postMessage(message, options)</a></code>,
             <code
                 class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/web-messaging.html#messagechannel" id="ref-for-messagechannel">MessageChannel</a></code>,
             <code
-                class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel" id="ref-for-broadcastchannel">BroadcastChannel</a></code>
-            등과 같은 명시적 통신 채널을 통한 통신도
-            포함될 것으로 예상한 개발자에게는 의외일 수 있다. 이러한 통신 방식도 모두 허용 목록과
-            의미 있게 비교할 수 있는 출처 기반 모델에 부합하므로, 이를 포함하도록 모델을 확장하는 것도
-            타당할 수 있다.
+                class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel" id="ref-for-broadcastchannel">BroadcastChannel</a></code>,
+            등과 같은 명시적인 통신 채널을 통한 통신도
+            포함될 것으로 예상하는 개발자에게는 의외일 수 있다. 이들 모두 허용 목록과 의미 있게 비교할 수 있는
+            출처 기반 모델에 부합하므로 모델을 확장하여 이들까지 포함하는 것도 타당할 수 있다.
         </p>
-        <h3 class="heading settled" data-level="6.6" id="redirects"><span class="secno">6.6. </span><span
+        <h3 class="heading settled" data-level="6.7" id="redirects"><span class="secno">6.7. </span><span
                 class="content">리디렉션</span><a class="self-link" href="#redirects"></a></h3>
-        <p>기본적으로 연결 허용 목록은 모든 리디렉션을 차단한다. 이는 오픈 리디렉션이나 기타
-            서버 측 리디렉션 메커니즘을 통한 데이터 유출을 방지하기 위한 보수적인 태도이다.
-            문서에 허용 목록이 적용된 경우, 허용 목록에서 리디렉션 허용을 명시적으로 옵트인하지 않는 한
-            리디렉션이 발생하는 모든 요청이 차단된다.</p>
+        <p>기본적으로 연결 허용 목록은 모든 리디렉션을 차단한다. 이는 오픈 리디렉션 또는 기타 서버 측
+            리디렉션 메커니즘을 통한 데이터 유출을 방지하기 위한 보수적인 방침이다.
+            문서에 허용 목록이 적용되는 경우, 리디렉션이 발생하는 모든 요청은 허용 목록이 명시적으로
+            이를 허용하도록 설정하지 않는 한 차단된다.</p>
         <p><a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects"
                 id="ref-for-grammardef-connection-allowlist-redirects①"><code>redirects</code></a> 매개변수를 사용하면
             개발자가
             이 동작을 제어할 수 있다.</p>
         <p><a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects-block"
-                id="ref-for-grammardef-connection-allowlist-redirects-block⑤"><code>block</code></a>(기본값)으로 설정하면,
-            리디렉션 체인 길이가 1보다 큰 모든 요청이 차단된다.</p>
+                id="ref-for-grammardef-connection-allowlist-redirects-block⑤"><code>block</code></a>으로 설정하면(기본값),
+            리디렉션 체인 길이가 1보다 큰 모든 요청이
+            차단된다.</p>
         <p><a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects-allow"
                 id="ref-for-grammardef-connection-allowlist-redirects-allow③"><code>allow</code></a>로 설정하면 허용 목록은
-            최초 요청에만 적용된다. 최초 요청이 허용 목록과 일치하면 이후의 모든 리디렉션은
-            위치와 관계없이 허용된다. 이 모드에서는 데이터 보안 책임이 서버로 이전된다.
-            요청이 클라이언트를 떠나도록 허용된 후에는 서버가 사용자 데이터를 신뢰할 수 없는 위치로
-            리디렉션하지 않도록 보장할 책임이 있다.</p>
+            초기 요청에만
+            적용된다. 초기 요청이 허용 목록과 일치하면 이후의 모든 리디렉션은
+            그 위치와 관계없이 허용된다. 이 모드는 데이터 보안에 대한 책임을 서버로 이전한다.
+            요청이 클라이언트에서 나가는 것이 허용된 이후에는 서버가
+            사용자의 데이터를 신뢰할 수 없는 위치로 리디렉션하지 않도록 보장할 책임이 있다.</p>
         <p>이 접근 방식은 애플리케이션마다 보안 요구 사항이 다르다는 점을 인정한다.
             매우 민감한 애플리케이션은 모든 리디렉션을 차단하도록 선택할 수 있으며, 다른 애플리케이션은
-            신뢰할 수 있는 엔드포인트가 리디렉션을 올바르게 처리한다고 의존할 수 있다.</p>
+            신뢰할 수 있는 엔드포인트가 리디렉션을 올바르게 처리하도록 의존할 수 있다.</p>
         <div class="example" id="example-redirects">
             <a class="self-link" href="#example-redirects"></a>
             다음 헤더가 있는 문서를 생각해 보자:
@@ -3874,39 +3900,39 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
 
             <pre class="highlight language-http">Connection-Allowlist: ("https://api.example")
 </pre>
-            <p><code>https://api.example/data</code>에 대한 요청이
-                <code>https://api.example/new-data</code>로의 <code>302 Found</code> 리디렉션을 반환하면,
-                리디렉션이 기본적으로 차단되므로 요청은 <strong>차단된다</strong>.
+            <p><code>https://api.example/data</code>에 대한 요청이 <code>https://api.example/new-data</code>로의
+                <code>302 Found</code> 리디렉션을 반환하면 기본적으로 리디렉션이 차단되므로 <strong>차단된다</strong>.
             </p>
             <p>대신 헤더가 다음과 같다면:</p>
             <pre class="highlight language-http">Connection-Allowlist: ("https://api.example");redirects=allow
 </pre>
-            <p><code>https://api.example/data</code>에 대한 동일한 요청은 <strong>허용되며</strong>,
-                이후의
-                <code>https://api.example/new-data</code>(또는 <code>https://attacker.com/</code>)로의 리디렉션도
+            <p><code>https://api.example/data</code>에 대한 동일한 요청은 <strong>허용되며</strong>, 이후의
+                <code>https://api.example/new-data</code>로의 리디렉션(또는 심지어 <code>https://attacker.com/</code>로의 리디렉션)도
                 <strong>허용된다</strong>.
             </p>
-            <p>마지막으로 순방향 호환성을 위해 알 수 없는 토큰은 <code>allow</code>로 취급된다:</p>
+            <p>마지막으로, 향후 호환성을 위해 알 수 없는 토큰은 <code>allow</code>로 처리된다:</p>
             <pre class="highlight language-http">Connection-Allowlist: ("https://api.example");redirects=some-future-policy
 </pre>
             <p>이 경우 <code>redirects</code> 매개변수는 존재하지만 그 값인
-                <code>some-future-policy</code>는 알 수 없다.
-                사용자 에이전트는 이를 <code>allow</code>로 취급하며 리디렉션은 <strong>허용된다</strong>.
-                이를 통해 기존 사이트를 손상시키지 않고
-                향후 추가 동작을 도입할 가능성을 확보할 수 있다.
+                <code>some-future-policy</code>는 알 수 없는 값이다.
+                사용자 에이전트는 이를 <code>allow</code>로 처리하며 리디렉션은 <strong>허용된다</strong>.
+                이를 통해
+                기존 사이트를 손상시키지 않고 향후 추가 동작을 도입할 가능성을 열어 둘 수 있다.
             </p>
         </div>
-        <h3 class="heading settled" data-level="6.7" id="webrtc"><span class="secno">6.7. </span><span
+        <h3 class="heading settled" data-level="6.8" id="webrtc"><span class="secno">6.8. </span><span
                 class="content">WebRTC</span><a class="self-link" href="#webrtc"></a></h3>
-        <p>기본적으로 연결 허용 목록은 모든 WebRTC 연결을 차단한다. 이는 URL 패턴만으로 제한하기 어려운
+        <p>기본적으로 연결 허용 목록은 모든 WebRTC 연결을 차단한다. 이는 URL 패턴만으로는 제한하기 어려울 수 있는
             WebRTC의 고유한 네트워킹 특성을 통한 데이터 유출 위험을 완화하기 위한
-            보수적인 태도이다.</p>
+            보수적인 방침이다.</p>
         <p><a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc"
                 id="ref-for-grammardef-connection-allowlist-webrtc①"><code>webrtc</code></a> 매개변수를 사용하면 개발자가
-            이 동작을 제어할 수 있다.</p>
+            이 동작을
+            제어할 수 있다.</p>
         <p><a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-block"
-                id="ref-for-grammardef-connection-allowlist-webrtc-block⑤"><code>block</code></a>(기본값)으로 설정하면
-            WebRTC 연결을 설정하려는 모든 시도가 차단된다.</p>
+                id="ref-for-grammardef-connection-allowlist-webrtc-block⑤"><code>block</code></a>으로 설정하면(기본값),
+            WebRTC 연결을
+            설정하려는 모든 시도가 차단된다.</p>
         <p><a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-allow"
                 id="ref-for-grammardef-connection-allowlist-webrtc-allow③"><code>allow</code></a>로 설정하면 WebRTC 연결이
             허용된다.</p>
@@ -3917,13 +3943,11 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
 
             <pre class="highlight language-http">Connection-Allowlist: ("https://api.example")
 </pre>
-            <p>WebRTC는 기본적으로 차단되므로 WebRTC 연결을 설정하려는 모든 시도가
-                <strong>차단된다</strong>.
-            </p>
+            <p>WebRTC는 기본적으로 차단되므로 WebRTC 연결을 설정하려는 모든 시도는 <strong>차단된다</strong>.</p>
             <p>대신 헤더가 다음과 같다면:</p>
             <pre class="highlight language-http">Connection-Allowlist: ("https://api.example"); webrtc=allow
 </pre>
-            <p>WebRTC 연결이 <strong>허용된다</strong>.</p>
+            <p>WebRTC 연결은 <strong>허용된다</strong>.</p>
         </div>
         <h2 class="heading settled" data-level="7" id="impl"><span class="secno">7. </span><span class="content">구현 고려
                 사항</span><a class="self-link" href="#impl"></a></h2>
@@ -4621,7 +4645,7 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
         {
             let dfnPanelData = {
                 "0204d188": {"dfnID": "0204d188", "dfnText": "size", "external": true, "refSections": [{"refs": [{"id": "ref-for-list-size"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-list-size\u2460"}], "title": "3.2. Matching"}], "url": "https://infra.spec.whatwg.org/#list-size"},
-                "02fb8691": {"dfnID": "02fb8691", "dfnText": "MessageChannel", "external": true, "refSections": [{"refs": [{"id": "ref-for-messagechannel"}], "title": "6.5. postMessage(...)"}], "url": "https://html.spec.whatwg.org/multipage/web-messaging.html#messagechannel"},
+                "02fb8691": {"dfnID": "02fb8691", "dfnText": "MessageChannel", "external": true, "refSections": [{"refs": [{"id": "ref-for-messagechannel"}], "title": "6.6. postMessage(...)"}], "url": "https://html.spec.whatwg.org/multipage/web-messaging.html#messagechannel"},
                 "0698d556": {"dfnID": "0698d556", "dfnText": "string", "external": true, "refSections": [{"refs": [{"id": "ref-for-string"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-string\u2460"}], "title": "3.3. Reporting"}, {"refs": [{"id": "ref-for-string\u2461"}, {"id": "ref-for-string\u2462"}, {"id": "ref-for-string\u2463"}, {"id": "ref-for-string\u2464"}, {"id": "ref-for-string\u2465"}, {"id": "ref-for-string\u2466"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-string\u2467"}, {"id": "ref-for-string\u2468"}], "title": "5.2. Integration with HTML"}], "url": "https://infra.spec.whatwg.org/#string"},
                 "07ad3048": {"dfnID": "07ad3048", "dfnText": "create navigation params by fetching", "external": true, "refSections": [{"refs": [{"id": "ref-for-create-navigation-params-by-fetching"}, {"id": "ref-for-create-navigation-params-by-fetching\u2460"}], "title": "5.2. Integration with HTML"}], "url": "https://html.spec.whatwg.org/multipage/browsing-the-web.html#create-navigation-params-by-fetching"},
                 "086e3aff": {"dfnID": "086e3aff", "dfnText": "origin", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-origin"}, {"id": "ref-for-concept-origin\u2460"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-concept-origin\u2461"}, {"id": "ref-for-concept-origin\u2462"}], "title": "4.2. Embedded Enforcement Headers"}, {"refs": [{"id": "ref-for-concept-origin\u2463"}], "title": "4.4. Obtaining and enforcing a requirement"}], "url": "https://html.spec.whatwg.org/multipage/browsers.html#concept-origin"},
@@ -4632,12 +4656,12 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
                 "10e25f42": {"dfnID": "10e25f42", "dfnText": "HTMLIFrameElement", "external": true, "refSections": [{"refs": [{"id": "ref-for-htmliframeelement"}], "title": "4.1. The connectionAllowlist attribute"}], "url": "https://html.spec.whatwg.org/multipage/iframe-embed-object.html#htmliframeelement"},
                 "147a58e2": {"dfnID": "147a58e2", "dfnText": "openWindow(url)", "external": true, "refSections": [{"refs": [{"id": "ref-for-dom-clients-openwindow"}], "title": "5.6. Integration with Service Workers"}], "url": "https://w3c.github.io/ServiceWorker/#dom-clients-openwindow"},
                 "188c6617": {"dfnID": "188c6617", "dfnText": "ReportBody", "external": true, "refSections": [{"refs": [{"id": "ref-for-reportbody"}], "title": "3.3. Reporting"}], "url": "https://w3c.github.io/reporting/#reportbody"},
-                "1abc08f1": {"dfnID": "1abc08f1", "dfnText": "dns-prefetch", "external": true, "refSections": [{"refs": [{"id": "ref-for-link-type-dns-prefetch"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-link-type-dns-prefetch\u2460"}, {"id": "ref-for-link-type-dns-prefetch\u2461"}], "title": "5.3. DNS Prefetching"}, {"refs": [{"id": "ref-for-link-type-dns-prefetch\u2462"}], "title": "6.4. DNS"}], "url": "https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch"},
+                "1abc08f1": {"dfnID": "1abc08f1", "dfnText": "dns-prefetch", "external": true, "refSections": [{"refs": [{"id": "ref-for-link-type-dns-prefetch"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-link-type-dns-prefetch\u2460"}, {"id": "ref-for-link-type-dns-prefetch\u2461"}], "title": "5.3. DNS Prefetching"}, {"refs": [{"id": "ref-for-link-type-dns-prefetch\u2462"}], "title": "6.5. DNS"}], "url": "https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch"},
                 "1e260fd5": {"dfnID": "1e260fd5", "dfnText": "target snapshot params", "external": true, "refSections": [{"refs": [{"id": "ref-for-target-snapshot-params"}, {"id": "ref-for-target-snapshot-params\u2460"}, {"id": "ref-for-target-snapshot-params\u2461"}, {"id": "ref-for-target-snapshot-params\u2462"}, {"id": "ref-for-target-snapshot-params\u2463"}, {"id": "ref-for-target-snapshot-params\u2464"}], "title": "5.2. Integration with HTML"}], "url": "https://html.spec.whatwg.org/multipage/browsing-the-web.html#target-snapshot-params"},
                 "22b84272": {"dfnID": "22b84272", "dfnText": "establish a WebSocket connection", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-websocket-establish"}], "title": "7.1. WebSockets"}], "url": "https://websockets.spec.whatwg.org/#concept-websocket-establish"},
                 "24cf98a1": {"dfnID": "24cf98a1", "dfnText": "environment", "external": true, "refSections": [{"refs": [{"id": "ref-for-environment"}, {"id": "ref-for-environment\u2460"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-environment\u2461"}], "title": "3.3. Reporting"}], "url": "https://html.spec.whatwg.org/multipage/webappapis.html#environment"},
                 "2594e562": {"dfnID": "2594e562", "dfnText": "navigate", "external": true, "refSections": [{"refs": [{"id": "ref-for-navigate"}], "title": "5.2. Integration with HTML"}], "url": "https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigate"},
-                "2ce6f6bb": {"dfnID": "2ce6f6bb", "dfnText": "fetch(input)", "external": true, "refSections": [{"refs": [{"id": "ref-for-dom-global-fetch"}], "title": "1.1. Threat Model"}, {"refs": [{"id": "ref-for-dom-global-fetch\u2460"}], "title": "6.4. DNS"}], "url": "https://fetch.spec.whatwg.org/#dom-global-fetch"},
+                "2ce6f6bb": {"dfnID": "2ce6f6bb", "dfnText": "fetch(input)", "external": true, "refSections": [{"refs": [{"id": "ref-for-dom-global-fetch"}], "title": "1.1. Threat Model"}, {"refs": [{"id": "ref-for-dom-global-fetch\u2460"}], "title": "6.5. DNS"}], "url": "https://fetch.spec.whatwg.org/#dom-global-fetch"},
                 "3268a8eb": {"dfnID": "3268a8eb", "dfnText": "URL (for response)", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-response-url"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-concept-response-url\u2460"}, {"id": "ref-for-concept-response-url\u2461"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-concept-response-url\u2462"}, {"id": "ref-for-concept-response-url\u2463"}, {"id": "ref-for-concept-response-url\u2464"}, {"id": "ref-for-concept-response-url\u2465"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-concept-response-url\u2466"}], "title": "5.2. Integration with HTML"}], "url": "https://fetch.spec.whatwg.org/#concept-response-url"},
                 "3d565682": {"dfnID": "3d565682", "dfnText": "WindowClient", "external": true, "refSections": [{"refs": [{"id": "ref-for-windowclient"}], "title": "5.6. Integration with Service Workers"}], "url": "https://w3c.github.io/ServiceWorker/#windowclient"},
                 "3e12e042": {"dfnID": "3e12e042", "dfnText": "environment settings object", "external": true, "refSections": [{"refs": [{"id": "ref-for-environment-settings-object"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-environment-settings-object\u2460"}, {"id": "ref-for-environment-settings-object\u2461"}], "title": "5.1. Integration with Fetch"}], "url": "https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object"},
@@ -4660,7 +4684,7 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
                 "5c4f772b": {"dfnID": "5c4f772b", "dfnText": "match", "external": true, "refSections": [{"refs": [{"id": "ref-for-url-pattern-match"}, {"id": "ref-for-url-pattern-match\u2460"}], "title": "3.2. Matching"}], "url": "https://urlpattern.spec.whatwg.org/#url-pattern-match"},
                 "5c66de35": {"dfnID": "5c66de35", "dfnText": "get a structured field value", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-header-list-get-structured-header"}, {"id": "ref-for-concept-header-list-get-structured-header\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-concept-header-list-get-structured-header\u2461"}], "title": "4.4. Obtaining and enforcing a requirement"}], "url": "https://fetch.spec.whatwg.org/#concept-header-list-get-structured-header"},
                 "60393e82": {"dfnID": "60393e82", "dfnText": "URL pattern", "external": true, "refSections": [{"refs": [{"id": "ref-for-url-pattern"}, {"id": "ref-for-url-pattern\u2460"}], "title": "2. Connection Allowlists"}, {"refs": [{"id": "ref-for-url-pattern\u2461"}, {"id": "ref-for-url-pattern\u2462"}, {"id": "ref-for-url-pattern\u2463"}, {"id": "ref-for-url-pattern\u2464"}, {"id": "ref-for-url-pattern\u2465"}, {"id": "ref-for-url-pattern\u2466"}], "title": "4.3. Comparing allowlists"}, {"refs": [{"id": "ref-for-url-pattern\u2467"}], "title": "4.4. Obtaining and enforcing a requirement"}], "url": "https://urlpattern.spec.whatwg.org/#url-pattern"},
-                "61c338be": {"dfnID": "61c338be", "dfnText": "resolve an origin", "external": true, "refSections": [{"refs": [{"id": "ref-for-resolve-an-origin"}, {"id": "ref-for-resolve-an-origin\u2460"}], "title": "5.1. Integration with Fetch"}, {"refs": [{"id": "ref-for-resolve-an-origin\u2461"}, {"id": "ref-for-resolve-an-origin\u2462"}], "title": "5.3. DNS Prefetching"}, {"refs": [{"id": "ref-for-resolve-an-origin\u2463"}], "title": "6.4. DNS"}], "url": "https://fetch.spec.whatwg.org/#resolve-an-origin"},
+                "61c338be": {"dfnID": "61c338be", "dfnText": "resolve an origin", "external": true, "refSections": [{"refs": [{"id": "ref-for-resolve-an-origin"}, {"id": "ref-for-resolve-an-origin\u2460"}], "title": "5.1. Integration with Fetch"}, {"refs": [{"id": "ref-for-resolve-an-origin\u2461"}, {"id": "ref-for-resolve-an-origin\u2462"}], "title": "5.3. DNS Prefetching"}, {"refs": [{"id": "ref-for-resolve-an-origin\u2463"}], "title": "6.5. DNS"}], "url": "https://fetch.spec.whatwg.org/#resolve-an-origin"},
                 "63340982": {"dfnID": "63340982", "dfnText": "local scheme", "external": true, "refSections": [{"refs": [{"id": "ref-for-local-scheme"}, {"id": "ref-for-local-scheme\u2460"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-local-scheme\u2461"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-local-scheme\u2462"}], "title": "5.2. Integration with HTML"}, {"refs": [{"id": "ref-for-local-scheme\u2463"}, {"id": "ref-for-local-scheme\u2464"}], "title": "6.2. Embedded Enforcement"}], "url": "https://fetch.spec.whatwg.org/#local-scheme"},
                 "649608b9": {"dfnID": "649608b9", "dfnText": "list", "external": true, "refSections": [{"refs": [{"id": "ref-for-list"}], "title": "2. Connection Allowlists"}, {"refs": [{"id": "ref-for-list\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-list\u2461"}, {"id": "ref-for-list\u2462"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-list\u2463"}], "title": "5.2. Integration with HTML"}], "url": "https://infra.spec.whatwg.org/#list"},
                 "658bcdaa": {"dfnID": "658bcdaa", "dfnText": "create navigation params from a srcdoc resource", "external": true, "refSections": [{"refs": [{"id": "ref-for-create-navigation-params-from-a-srcdoc-resource"}], "title": "5.2. Integration with HTML"}], "url": "https://html.spec.whatwg.org/multipage/browsing-the-web.html#create-navigation-params-from-a-srcdoc-resource"},
@@ -4677,7 +4701,7 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
                 "86efadaf": {"dfnID": "86efadaf", "dfnText": "policy container", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-request-policy-container"}], "title": "3.2. Matching"}], "url": "https://fetch.spec.whatwg.org/#concept-request-policy-container"},
                 "87fcd40c": {"dfnID": "87fcd40c", "dfnText": "iframe", "external": true, "refSections": [{"refs": [{"id": "ref-for-the-iframe-element"}], "title": "4.1. The connectionAllowlist attribute"}, {"refs": [{"id": "ref-for-the-iframe-element\u2460"}, {"id": "ref-for-the-iframe-element\u2461"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-the-iframe-element\u2462"}], "title": "5.2. Integration with HTML"}, {"refs": [{"id": "ref-for-the-iframe-element\u2463"}], "title": "6.2. Embedded Enforcement"}], "url": "https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-iframe-element"},
                 "8855a9aa": {"dfnID": "8855a9aa", "dfnText": "DOMString", "external": true, "refSections": [{"refs": [{"id": "ref-for-idl-DOMString"}], "title": "3.3. Reporting"}, {"refs": [{"id": "ref-for-idl-DOMString\u2460"}], "title": "4.1. The connectionAllowlist attribute"}], "url": "https://webidl.spec.whatwg.org/#idl-DOMString"},
-                "8a7dfd23": {"dfnID": "8a7dfd23", "dfnText": "postMessage(message, options)", "external": true, "refSections": [{"refs": [{"id": "ref-for-dom-window-postmessage-options"}], "title": "6.5. postMessage(...)"}], "url": "https://html.spec.whatwg.org/multipage/web-messaging.html#dom-window-postmessage-options"},
+                "8a7dfd23": {"dfnID": "8a7dfd23", "dfnText": "postMessage(message, options)", "external": true, "refSections": [{"refs": [{"id": "ref-for-dom-window-postmessage-options"}], "title": "6.6. postMessage(...)"}], "url": "https://html.spec.whatwg.org/multipage/web-messaging.html#dom-window-postmessage-options"},
                 "8e1fb11c": {"dfnID": "8e1fb11c", "dfnText": "obtain a connection", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-connection-obtain"}, {"id": "ref-for-concept-connection-obtain\u2460"}], "title": "5.1. Integration with Fetch"}, {"refs": [{"id": "ref-for-concept-connection-obtain\u2461"}, {"id": "ref-for-concept-connection-obtain\u2462"}], "title": "5.4. Preconnecting"}], "url": "https://fetch.spec.whatwg.org/#concept-connection-obtain"},
                 "8ea172e9": {"dfnID": "8ea172e9", "dfnText": "sandbox", "external": true, "refSections": [{"refs": [{"id": "ref-for-sandbox"}], "title": "6.1. Same-Origin Contexts"}], "url": "https://w3c.github.io/webappsec-csp/#sandbox"},
                 "8f26de31": {"dfnID": "8f26de31", "dfnText": "is local", "external": true, "refSections": [{"refs": [{"id": "ref-for-is-local"}], "title": "3.2. Matching"}], "url": "https://fetch.spec.whatwg.org/#is-local"},
@@ -4691,7 +4715,7 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
                 "9c19b7fc": {"dfnID": "9c19b7fc", "dfnText": "navigable", "external": true, "refSections": [{"refs": [{"id": "ref-for-navigable"}, {"id": "ref-for-navigable\u2460"}, {"id": "ref-for-navigable\u2461"}], "title": "5.2. Integration with HTML"}], "url": "https://html.spec.whatwg.org/multipage/document-sequences.html#navigable"},
                 "9c4c1e66": {"dfnID": "9c4c1e66", "dfnText": "relevant settings object", "external": true, "refSections": [{"refs": [{"id": "ref-for-relevant-settings-object"}], "title": "5.3. DNS Prefetching"}, {"refs": [{"id": "ref-for-relevant-settings-object\u2460"}, {"id": "ref-for-relevant-settings-object\u2461"}], "title": "5.6. Integration with Service Workers"}], "url": "https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object"},
                 "9cce47fd": {"dfnID": "9cce47fd", "dfnText": "sequence", "external": true, "refSections": [{"refs": [{"id": "ref-for-idl-sequence"}], "title": "3.3. Reporting"}], "url": "https://webidl.spec.whatwg.org/#idl-sequence"},
-                "a0c4f72a": {"dfnID": "a0c4f72a", "dfnText": "BroadcastChannel", "external": true, "refSections": [{"refs": [{"id": "ref-for-broadcastchannel"}], "title": "6.5. postMessage(...)"}], "url": "https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel"},
+                "a0c4f72a": {"dfnID": "a0c4f72a", "dfnText": "BroadcastChannel", "external": true, "refSections": [{"refs": [{"id": "ref-for-broadcastchannel"}], "title": "6.6. postMessage(...)"}], "url": "https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel"},
                 "a3a31c89": {"dfnID": "a3a31c89", "dfnText": "wildcard", "external": true, "refSections": [{"refs": [{"id": "ref-for-wildcard"}], "title": "4.2. Embedded Enforcement Headers"}], "url": "https://fetch.spec.whatwg.org/#wildcard"},
                 "a746ba16": {"dfnID": "a746ba16", "dfnText": "environment (for link processing options)", "external": true, "refSections": [{"refs": [{"id": "ref-for-link-options-environment"}, {"id": "ref-for-link-options-environment\u2460"}], "title": "5.4. Preconnecting"}], "url": "https://html.spec.whatwg.org/multipage/semantics.html#link-options-environment"},
                 "a7b0745e": {"dfnID": "a7b0745e", "dfnText": "list", "external": true, "refSections": [{"refs": [{"id": "ref-for-name-list"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-name-list\u2460"}, {"id": "ref-for-name-list\u2461"}, {"id": "ref-for-name-list\u2462"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-name-list\u2463"}], "title": "4.1. The connectionAllowlist attribute"}, {"refs": [{"id": "ref-for-name-list\u2464"}], "title": "4.2. Embedded Enforcement Headers"}, {"refs": [{"id": "ref-for-name-list\u2465"}, {"id": "ref-for-name-list\u2466"}, {"id": "ref-for-name-list\u2467"}], "title": "4.4. Obtaining and enforcing a requirement"}], "url": "https://www.rfc-editor.org/rfc/rfc9651#name-list"},
@@ -4714,7 +4738,7 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
                 "ae8def21": {"dfnID": "ae8def21", "dfnText": "contain", "external": true, "refSections": [{"refs": [{"id": "ref-for-list-contain"}], "title": "4.3. Comparing allowlists"}], "url": "https://infra.spec.whatwg.org/#list-contain"},
                 "allows-a-connection-allowlist-from": {"dfnID": "allows-a-connection-allowlist-from", "dfnText": "allows a connection allowlist from", "external": false, "refSections": [{"refs": [{"id": "ref-for-allows-a-connection-allowlist-from"}], "title": "4.4. Obtaining and enforcing a requirement"}], "url": "#allows-a-connection-allowlist-from"},
                 "b0d7f3c3": {"dfnID": "b0d7f3c3", "dfnText": "USVString", "external": true, "refSections": [{"refs": [{"id": "ref-for-idl-USVString"}, {"id": "ref-for-idl-USVString\u2460"}], "title": "3.3. Reporting"}], "url": "https://webidl.spec.whatwg.org/#idl-USVString"},
-                "b33787b2": {"dfnID": "b33787b2", "dfnText": "policy container", "external": true, "refSections": [{"refs": [{"id": "ref-for-policy-container"}], "title": "1.1. Threat Model"}, {"refs": [{"id": "ref-for-policy-container\u2460"}, {"id": "ref-for-policy-container\u2461"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-policy-container\u2462"}, {"id": "ref-for-policy-container\u2463"}, {"id": "ref-for-policy-container\u2464"}, {"id": "ref-for-policy-container\u2465"}, {"id": "ref-for-policy-container\u2466"}, {"id": "ref-for-policy-container\u2467"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-policy-container\u2468"}, {"id": "ref-for-policy-container\u2460\u24ea"}], "title": "5.1. Integration with Fetch"}, {"refs": [{"id": "ref-for-policy-container\u2460\u2460"}, {"id": "ref-for-policy-container\u2460\u2461"}, {"id": "ref-for-policy-container\u2460\u2462"}, {"id": "ref-for-policy-container\u2460\u2463"}, {"id": "ref-for-policy-container\u2460\u2464"}, {"id": "ref-for-policy-container\u2460\u2465"}, {"id": "ref-for-policy-container\u2460\u2466"}, {"id": "ref-for-policy-container\u2460\u2467"}], "title": "5.2. Integration with HTML"}, {"refs": [{"id": "ref-for-policy-container\u2460\u2468"}], "title": "6.1. Same-Origin Contexts"}, {"refs": [{"id": "ref-for-policy-container\u2461\u24ea"}], "title": "6.2. Embedded Enforcement"}, {"refs": [{"id": "ref-for-policy-container\u2461\u2460"}], "title": "6.3. Service Workers"}], "url": "https://html.spec.whatwg.org/multipage/browsers.html#policy-container"},
+                "b33787b2": {"dfnID": "b33787b2", "dfnText": "policy container", "external": true, "refSections": [{"refs": [{"id": "ref-for-policy-container"}], "title": "1.1. Threat Model"}, {"refs": [{"id": "ref-for-policy-container\u2460"}, {"id": "ref-for-policy-container\u2461"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-policy-container\u2462"}, {"id": "ref-for-policy-container\u2463"}, {"id": "ref-for-policy-container\u2464"}, {"id": "ref-for-policy-container\u2465"}, {"id": "ref-for-policy-container\u2466"}, {"id": "ref-for-policy-container\u2467"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-policy-container\u2468"}, {"id": "ref-for-policy-container\u2460\u24ea"}], "title": "5.1. Integration with Fetch"}, {"refs": [{"id": "ref-for-policy-container\u2460\u2460"}, {"id": "ref-for-policy-container\u2460\u2461"}, {"id": "ref-for-policy-container\u2460\u2462"}, {"id": "ref-for-policy-container\u2460\u2463"}, {"id": "ref-for-policy-container\u2460\u2464"}, {"id": "ref-for-policy-container\u2460\u2465"}, {"id": "ref-for-policy-container\u2460\u2466"}, {"id": "ref-for-policy-container\u2460\u2467"}], "title": "5.2. Integration with HTML"}, {"refs": [{"id": "ref-for-policy-container\u2460\u2468"}], "title": "6.1. Same-Origin Contexts"}, {"refs": [{"id": "ref-for-policy-container\u2461\u24ea"}], "title": "6.2. Embedded Enforcement"}, {"refs": [{"id": "ref-for-policy-container\u2461\u2460"}], "title": "6.3. Service Workers"}, {"refs": [{"id": "ref-for-policy-container\u2461\u2461"}], "title": "6.4. Shared Workers"}], "url": "https://html.spec.whatwg.org/multipage/browsers.html#policy-container"},
                 "b410a6ef": {"dfnID": "b410a6ef", "dfnText": "ASCII serialization of an origin", "external": true, "refSections": [{"refs": [{"id": "ref-for-ascii-serialisation-of-an-origin"}], "title": "3.1. Parsing"}], "url": "https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin"},
                 "bd1db03d": {"dfnID": "bd1db03d", "dfnText": "policy container (for environment settings object)", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-settings-object-policy-container"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-concept-settings-object-policy-container\u2460"}], "title": "5.6. Integration with Service Workers"}], "url": "https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container"},
                 "bf8d9616": {"dfnID": "bf8d9616", "dfnText": "failure", "external": true, "refSections": [{"refs": [{"id": "ref-for-failure"}, {"id": "ref-for-failure\u2460"}, {"id": "ref-for-failure\u2461"}, {"id": "ref-for-failure\u2462"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-failure\u2463"}, {"id": "ref-for-failure\u2464"}], "title": "5.1. Integration with Fetch"}], "url": "https://infra.spec.whatwg.org/#failure"},
@@ -4762,7 +4786,7 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
                 "element-attrdef-iframe-connectionallowlist": {"dfnID": "element-attrdef-iframe-connectionallowlist", "dfnText": "connectionAllowlist", "external": false, "refSections": [], "url": "#element-attrdef-iframe-connectionallowlist"},
                 "enumdef-connectionallowlistdisposition": {"dfnID": "enumdef-connectionallowlistdisposition", "dfnText": "ConnectionAllowlistDisposition", "external": false, "refSections": [{"refs": [{"id": "ref-for-enumdef-connectionallowlistdisposition"}], "title": "3.3. Reporting"}], "url": "#enumdef-connectionallowlistdisposition"},
                 "f02cd417": {"dfnID": "f02cd417", "dfnText": "iterate", "external": true, "refSections": [{"refs": [{"id": "ref-for-list-iterate"}, {"id": "ref-for-list-iterate\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-list-iterate\u2461"}, {"id": "ref-for-list-iterate\u2462"}, {"id": "ref-for-list-iterate\u2463"}, {"id": "ref-for-list-iterate\u2464"}, {"id": "ref-for-list-iterate\u2465"}, {"id": "ref-for-list-iterate\u2466"}], "title": "3.2. Matching"}], "url": "https://infra.spec.whatwg.org/#list-iterate"},
-                "f0811ff8": {"dfnID": "f0811ff8", "dfnText": "img", "external": true, "refSections": [{"refs": [{"id": "ref-for-the-img-element"}], "title": "6.4. DNS"}], "url": "https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element"},
+                "f0811ff8": {"dfnID": "f0811ff8", "dfnText": "img", "external": true, "refSections": [{"refs": [{"id": "ref-for-the-img-element"}], "title": "6.5. DNS"}], "url": "https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element"},
                 "f23dc013": {"dfnID": "f23dc013", "dfnText": "child navigable", "external": true, "refSections": [{"refs": [{"id": "ref-for-child-navigable"}, {"id": "ref-for-child-navigable\u2460"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-child-navigable\u2461"}], "title": "5.2. Integration with HTML"}], "url": "https://html.spec.whatwg.org/multipage/document-sequences.html#child-navigable"},
                 "f7b00a8b": {"dfnID": "f7b00a8b", "dfnText": "header list (for response)", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-response-header-list"}, {"id": "ref-for-concept-response-header-list\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-concept-response-header-list\u2461"}], "title": "4.2. Embedded Enforcement Headers"}, {"refs": [{"id": "ref-for-concept-response-header-list\u2462"}], "title": "4.4. Obtaining and enforcing a requirement"}], "url": "https://fetch.spec.whatwg.org/#concept-response-header-list"},
                 "f937b7b6": {"dfnID": "f937b7b6", "dfnText": "continue", "external": true, "refSections": [{"refs": [{"id": "ref-for-iteration-continue"}, {"id": "ref-for-iteration-continue\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-iteration-continue\u2461"}, {"id": "ref-for-iteration-continue\u2462"}, {"id": "ref-for-iteration-continue\u2463"}, {"id": "ref-for-iteration-continue\u2464"}, {"id": "ref-for-iteration-continue\u2465"}, {"id": "ref-for-iteration-continue\u2466"}], "title": "3.2. Matching"}], "url": "https://infra.spec.whatwg.org/#iteration-continue"},
@@ -4771,16 +4795,16 @@ from" data-noexport id="allows-a-connection-allowlist-from">허용한다</dfn>�
                 "fdb35d97": {"dfnID": "fdb35d97", "dfnText": "CORS check", "external": true, "refSections": [{"refs": [{"id": "ref-for-concept-cors-check"}], "title": "4.2. Embedded Enforcement Headers"}], "url": "https://fetch.spec.whatwg.org/#concept-cors-check"},
                 "grammardef-connection-allowlist-disposition-enforce": {"dfnID": "grammardef-connection-allowlist-disposition-enforce", "dfnText": "enforce", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-disposition-enforce"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2460"}, {"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2461"}, {"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2462"}, {"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2463"}, {"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2464"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2465"}, {"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2466"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2467"}, {"id": "ref-for-grammardef-connection-allowlist-disposition-enforce\u2468"}], "title": "5.2. Integration with HTML"}], "url": "#grammardef-connection-allowlist-disposition-enforce"},
                 "grammardef-connection-allowlist-disposition-report": {"dfnID": "grammardef-connection-allowlist-disposition-report", "dfnText": "report", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-disposition-report"}], "title": "3.1. Parsing"}], "url": "#grammardef-connection-allowlist-disposition-report"},
-                "grammardef-connection-allowlist-redirects": {"dfnID": "grammardef-connection-allowlist-redirects", "dfnText": "redirects", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects\u2460"}], "title": "6.6. Redirects"}], "url": "#grammardef-connection-allowlist-redirects"},
-                "grammardef-connection-allowlist-redirects-allow": {"dfnID": "grammardef-connection-allowlist-redirects-allow", "dfnText": "allow", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow\u2461"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow\u2462"}], "title": "6.6. Redirects"}], "url": "#grammardef-connection-allowlist-redirects-allow"},
-                "grammardef-connection-allowlist-redirects-block": {"dfnID": "grammardef-connection-allowlist-redirects-block", "dfnText": "block", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block"}], "title": "2. Connection Allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2460"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2461"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2462"}, {"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2463"}], "title": "4.3. Comparing allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2464"}], "title": "6.6. Redirects"}], "url": "#grammardef-connection-allowlist-redirects-block"},
+                "grammardef-connection-allowlist-redirects": {"dfnID": "grammardef-connection-allowlist-redirects", "dfnText": "redirects", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects\u2460"}], "title": "6.7. Redirects"}], "url": "#grammardef-connection-allowlist-redirects"},
+                "grammardef-connection-allowlist-redirects-allow": {"dfnID": "grammardef-connection-allowlist-redirects-allow", "dfnText": "allow", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow\u2461"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-allow\u2462"}], "title": "6.7. Redirects"}], "url": "#grammardef-connection-allowlist-redirects-allow"},
+                "grammardef-connection-allowlist-redirects-block": {"dfnID": "grammardef-connection-allowlist-redirects-block", "dfnText": "block", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block"}], "title": "2. Connection Allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2460"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2461"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2462"}, {"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2463"}], "title": "4.3. Comparing allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-redirects-block\u2464"}], "title": "6.7. Redirects"}], "url": "#grammardef-connection-allowlist-redirects-block"},
                 "grammardef-connection-allowlist-report-to": {"dfnID": "grammardef-connection-allowlist-report-to", "dfnText": "report-to", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-report-to"}], "title": "3.1. Parsing"}], "url": "#grammardef-connection-allowlist-report-to"},
                 "grammardef-connection-allowlist-response-origin": {"dfnID": "grammardef-connection-allowlist-response-origin", "dfnText": "response-origin", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-response-origin"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-response-origin\u2460"}], "title": "4.3. Comparing allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-response-origin\u2461"}, {"id": "ref-for-grammardef-connection-allowlist-response-origin\u2462"}, {"id": "ref-for-grammardef-connection-allowlist-response-origin\u2463"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-response-origin\u2464"}], "title": "5.2. Integration with HTML"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-response-origin\u2465"}], "title": "6.1. Same-Origin Contexts"}], "url": "#grammardef-connection-allowlist-response-origin"},
-                "grammardef-connection-allowlist-webrtc": {"dfnID": "grammardef-connection-allowlist-webrtc", "dfnText": "webrtc", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc\u2460"}], "title": "6.7. WebRTC"}], "url": "#grammardef-connection-allowlist-webrtc"},
-                "grammardef-connection-allowlist-webrtc-allow": {"dfnID": "grammardef-connection-allowlist-webrtc-allow", "dfnText": "allow", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow\u2461"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow\u2462"}], "title": "6.7. WebRTC"}], "url": "#grammardef-connection-allowlist-webrtc-allow"},
-                "grammardef-connection-allowlist-webrtc-block": {"dfnID": "grammardef-connection-allowlist-webrtc-block", "dfnText": "block", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block"}], "title": "2. Connection Allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2460"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2461"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2462"}, {"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2463"}], "title": "4.3. Comparing allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2464"}], "title": "6.7. WebRTC"}], "url": "#grammardef-connection-allowlist-webrtc-block"},
+                "grammardef-connection-allowlist-webrtc": {"dfnID": "grammardef-connection-allowlist-webrtc", "dfnText": "webrtc", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc\u2460"}], "title": "6.8. WebRTC"}], "url": "#grammardef-connection-allowlist-webrtc"},
+                "grammardef-connection-allowlist-webrtc-allow": {"dfnID": "grammardef-connection-allowlist-webrtc-allow", "dfnText": "allow", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow\u2461"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-allow\u2462"}], "title": "6.8. WebRTC"}], "url": "#grammardef-connection-allowlist-webrtc-allow"},
+                "grammardef-connection-allowlist-webrtc-block": {"dfnID": "grammardef-connection-allowlist-webrtc-block", "dfnText": "block", "external": false, "refSections": [{"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block"}], "title": "2. Connection Allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2460"}], "title": "3. Connection Allowlist Headers"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2461"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2462"}, {"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2463"}], "title": "4.3. Comparing allowlists"}, {"refs": [{"id": "ref-for-grammardef-connection-allowlist-webrtc-block\u2464"}], "title": "6.8. WebRTC"}], "url": "#grammardef-connection-allowlist-webrtc-block"},
                 "http-headerdef-allow-connection-allowlist-from": {"dfnID": "http-headerdef-allow-connection-allowlist-from", "dfnText": "Allow-Connection-Allowlist-From", "external": false, "refSections": [{"refs": [{"id": "ref-for-http-headerdef-allow-connection-allowlist-from"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-http-headerdef-allow-connection-allowlist-from\u2460"}], "title": "4.2. Embedded Enforcement Headers"}, {"refs": [{"id": "ref-for-http-headerdef-allow-connection-allowlist-from\u2461"}], "title": "6.2. Embedded Enforcement"}], "url": "#http-headerdef-allow-connection-allowlist-from"},
-                "http-headerdef-connection-allowlist": {"dfnID": "http-headerdef-connection-allowlist", "dfnText": "Connection-Allowlist", "external": false, "refSections": [{"refs": [{"id": "ref-for-http-headerdef-connection-allowlist"}], "title": "1. Introduction"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2461"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2462"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2463"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2464"}], "title": "4.1. The connectionAllowlist attribute"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2465"}], "title": "4.2. Embedded Enforcement Headers"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2466"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2467"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2468"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2460\u24ea"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2460\u2460"}], "title": "6.2. Embedded Enforcement"}], "url": "#http-headerdef-connection-allowlist"},
+                "http-headerdef-connection-allowlist": {"dfnID": "http-headerdef-connection-allowlist", "dfnText": "Connection-Allowlist", "external": false, "refSections": [{"refs": [{"id": "ref-for-http-headerdef-connection-allowlist"}], "title": "1. Introduction"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2460"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2461"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2462"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2463"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2464"}], "title": "4.1. The connectionAllowlist attribute"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2465"}], "title": "4.2. Embedded Enforcement Headers"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2466"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2467"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2468"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2460\u24ea"}, {"id": "ref-for-http-headerdef-connection-allowlist\u2460\u2460"}], "title": "6.2. Embedded Enforcement"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist\u2460\u2461"}], "title": "6.3. Service Workers"}], "url": "#http-headerdef-connection-allowlist"},
                 "http-headerdef-connection-allowlist-report-only": {"dfnID": "http-headerdef-connection-allowlist-report-only", "dfnText": "Connection-Allowlist-Report-Only", "external": false, "refSections": [{"refs": [{"id": "ref-for-http-headerdef-connection-allowlist-report-only"}], "title": "3.1. Parsing"}, {"refs": [{"id": "ref-for-http-headerdef-connection-allowlist-report-only\u2460"}], "title": "5.2. Integration with HTML"}], "url": "#http-headerdef-connection-allowlist-report-only"},
                 "http-headerdef-sec-required-connection-allowlist": {"dfnID": "http-headerdef-sec-required-connection-allowlist", "dfnText": "Sec-Required-Connection-Allowlist", "external": false, "refSections": [{"refs": [{"id": "ref-for-http-headerdef-sec-required-connection-allowlist"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-http-headerdef-sec-required-connection-allowlist\u2460"}], "title": "4.4. Obtaining and enforcing a requirement"}, {"refs": [{"id": "ref-for-http-headerdef-sec-required-connection-allowlist\u2461"}], "title": "5.2. Integration with HTML"}], "url": "#http-headerdef-sec-required-connection-allowlist"},
                 "policy-container-connection-allowlists": {"dfnID": "policy-container-connection-allowlists", "dfnText": "connection allowlists", "external": false, "refSections": [{"refs": [{"id": "ref-for-policy-container-connection-allowlists"}, {"id": "ref-for-policy-container-connection-allowlists\u2460"}, {"id": "ref-for-policy-container-connection-allowlists\u2461"}, {"id": "ref-for-policy-container-connection-allowlists\u2462"}], "title": "3.2. Matching"}, {"refs": [{"id": "ref-for-policy-container-connection-allowlists\u2463"}], "title": "4. Embedded Enforcement"}, {"refs": [{"id": "ref-for-policy-container-connection-allowlists\u2464"}, {"id": "ref-for-policy-container-connection-allowlists\u2465"}], "title": "5.1. Integration with Fetch"}, {"refs": [{"id": "ref-for-policy-container-connection-allowlists\u2466"}, {"id": "ref-for-policy-container-connection-allowlists\u2467"}, {"id": "ref-for-policy-container-connection-allowlists\u2468"}, {"id": "ref-for-policy-container-connection-allowlists\u2460\u24ea"}, {"id": "ref-for-policy-container-connection-allowlists\u2460\u2460"}, {"id": "ref-for-policy-container-connection-allowlists\u2460\u2461"}], "title": "5.2. Integration with HTML"}, {"refs": [{"id": "ref-for-policy-container-connection-allowlists\u2460\u2462"}], "title": "5.6. Integration with Service Workers"}], "url": "#policy-container-connection-allowlists"},
