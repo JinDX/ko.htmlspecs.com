@@ -326,7 +326,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [High Resolution Time](https://ko.htmlspecs.com/hr-time-3/)（[Source](https://www.w3.org/TR/2026/WD-hr-time-3-20260901/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Intersection Observer](https://ko.htmlspecs.com/intersection-observer/)（[Source](https://www.w3.org/TR/2023/WD-intersection-observer-20231018/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Resize Observer](https://ko.htmlspecs.com/resize-observer/)（[Source](https://www.w3.org/TR/2020/WD-resize-observer-1-20200211/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Navigation Timing Level 2](https://ko.htmlspecs.com/navigation-timing-2/)（[Source](https://www.w3.org/TR/2026/WD-navigation-timing-2-20260225/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Navigation Timing Level 2](https://ko.htmlspecs.com/navigation-timing-2/)（[Source](https://www.w3.org/TR/2026/WD-navigation-timing-2-20260901/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Soft Navigations and Interaction Contentful Paint](https://ko.htmlspecs.com/soft-navigations/)（[Source](https://wicg.github.io/soft-navigations/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Resource Timing](https://ko.htmlspecs.com/resource-timing/)（[Source](https://www.w3.org/TR/2026/CRD-resource-timing-20260420/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Element Timing API](https://ko.htmlspecs.com/element-timing/)（[Source](https://w3c.github.io/element-timing/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
