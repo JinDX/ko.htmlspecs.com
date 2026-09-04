@@ -1,0 +1,3516 @@
+<!DOCTYPE html>
+<html lang="ko" class="RFC">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>RFC 10008: HTTP QUERY 메서드</title>
+    <meta content="Julian Reschke" name="author">
+    <meta content="James M Snell" name="author">
+    <meta content="Mike Bishop" name="author">
+    <meta content="
+       
+        이 명세는 HTTP의 QUERY 메서드를 정의합니다.
+        QUERY는 요청 대상이 포함된 콘텐츠를 안전하고 멱등적인 방식으로
+        처리한 다음 해당 처리 결과로 응답하도록 요청합니다. 이는 POST 요청과 유사하지만, QUERY 요청은
+        부분적인 상태 변경에 대한 우려 없이 자동으로 반복하거나 다시 시작할
+        수 있습니다.
+       
+    " name="description">
+    <meta content="xml2rfc 3.33.0" name="generator">
+    <meta content="http" name="keyword">
+    <meta content="query" name="keyword">
+    <meta content="method" name="keyword">
+    <meta content="10008" name="rfc.number">
+    <!-- Generator version information:
+  xml2rfc 3.33.0
+    Python 3.14.4
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.0
+    platformdirs 4.9.6
+    pycountry 26.2.16
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.6.0
+    weasyprint 68.0
+-->
+    <link href="rfc10008.xml" rel="alternate" type="application/rfc+xml">
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        /*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+        /* fonts */
+        @import url('https://static.ietf.org/fonts/noto-sans/import.css');
+        /* Sans-serif */
+        @import url('https://static.ietf.org/fonts/noto-serif/import.css');
+        /* Serif (print) */
+        @import url('https://static.ietf.org/fonts/roboto-mono/import.css');
+        /* Monospace */
+
+        :root {
+            --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+            --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+            --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+        }
+
+        @viewport {
+            zoom: 1.0;
+        }
+
+        @-ms-viewport {
+            width: extend-to-zoom;
+            zoom: 1.0;
+        }
+
+        /* general and mobile first */
+        html {}
+
+        body {
+            max-width: 90%;
+            margin: 1.5em auto;
+            color: #222;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            overflow-wrap: break-word;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        #title,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1em 0 0.5em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        #title {
+            clear: both;
+            border-bottom: 1px solid #ddd;
+            margin: 0 0 0.5em 0;
+            padding: 1em 0 0.5em;
+        }
+
+        .author {
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 1em 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: -20px;
+            /* provide offset for in-page anchors */
+            padding-top: 33px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h5,
+        h6 {
+            font-size: 14px;
+        }
+
+        #n-copyright-notice {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
+        }
+
+        /* general structure */
+        p {
+            padding: 0;
+            margin: 0 0 1em 0;
+            text-align: left;
+        }
+
+        div,
+        span {
+            position: relative;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignRight.art-text pre {
+            padding: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+        }
+
+        .alignRight>*:first-child {
+            border: none;
+            margin: 0;
+            float: right;
+            clear: both;
+        }
+
+        .alignRight>*:nth-child(2) {
+            clear: both;
+            display: block;
+            border: none;
+        }
+
+        svg {
+            display: block;
+        }
+
+        @media print {
+            svg {
+                max-height: 850px;
+                max-width: 660px;
+            }
+        }
+
+        svg[font-family~="serif" i],
+        svg [font-family~="serif" i] {
+            font-family: var(--font-serif);
+        }
+
+        svg[font-family~="sans-serif" i],
+        svg [font-family~="sans-serif" i] {
+            font-family: var(--font-sans);
+        }
+
+        svg[font-family~="monospace" i],
+        svg [font-family~="monospace" i] {
+            font-family: var(--font-mono);
+        }
+
+        .alignCenter.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignCenter.art-text pre {
+            padding: 0;
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+        }
+
+        .alignCenter>*:first-child {
+            display: table;
+            border: none;
+            margin: 0 auto;
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 1em 2em;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-left: 1em;
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        .ulCompact li {
+            margin: 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+        }
+
+        ul.empty li,
+        .ulEmpty li {
+            margin-top: 0.5em;
+        }
+
+        ul.ulBare,
+        li.ulBare {
+            margin-left: 0em !important;
+        }
+
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact {
+            line-height: 100%;
+            margin: 0 0 0 2em;
+        }
+
+        /* definition lists */
+        dl {}
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        /* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+        dl>dd {
+            margin-bottom: .8em;
+            min-height: 1.3em;
+        }
+
+        dl.compact>dd,
+        .dlCompact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+        }
+
+        a[href] {
+            color: #22e;
+            /* Arlen: WCAG 2019 */
+        }
+
+        a[href]:hover {
+            background-color: #f2f2f2;
+        }
+
+        figcaption a[href],
+        a[href].selfRef {
+            color: #222;
+        }
+
+        /* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+        /* Figures */
+        tt,
+        code,
+        pre {
+            background-color: #f9f9f9;
+            font-family: var(--font-mono);
+        }
+
+        pre {
+            border: 1px solid #eee;
+            margin: 0;
+            padding: 1em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        figure blockquote {
+            margin: 0.8em 0.4em 0.4em;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0 0 1em 0;
+        }
+
+        @media screen {
+            pre {
+                overflow-x: auto;
+                max-width: 100%;
+                max-width: calc(100% - 22px);
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 1.2em 2em;
+        }
+
+        blockquote {
+            background-color: #f9f9f9;
+            color: #111;
+            /* Arlen: WCAG 2019 */
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 1em 0;
+        }
+
+        blockquote>*:last-child {
+            margin-bottom: 0;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .xref {
+            overflow-wrap: normal;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.5em 0.75em;
+        }
+
+        th {
+            text-align: left;
+            background-color: #e9e9e9;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f5f5f5;
+        }
+
+        table caption {
+            font-style: italic;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        table p {
+            /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+            margin: 0;
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            color: #666;
+            /* Arlen: AHDJ 2019 */
+            text-decoration: none;
+            visibility: hidden;
+            user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        @media screen {
+
+            aside:hover>a.pilcrow,
+            p:hover>a.pilcrow,
+            blockquote:hover>a.pilcrow,
+            div:hover>a.pilcrow,
+            li:hover>a.pilcrow,
+            pre:hover>a.pilcrow {
+                visibility: visible;
+            }
+
+            a.pilcrow:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        #identifiers dt {
+            width: 3em;
+            clear: left;
+        }
+
+        #identifiers dd {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        /* Fix PDF info block run off issue */
+        @media print {
+            #identifiers dd {
+                max-width: 100%;
+            }
+        }
+
+        #identifiers .authors .author {
+            display: inline-block;
+            margin-right: 1.5em;
+        }
+
+        #identifiers .authors .org {
+            font-style: italic;
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #666;
+            /* Arlen: WCAG 2019 */
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+        }
+
+        .docInfo .prepared {
+            float: left;
+        }
+
+        .docInfo .prepared {
+            float: right;
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+        }
+
+        nav.toc ul {
+            margin: 0 0.5em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav.toc li {
+            line-height: 1.3em;
+            margin: 0.75em 0;
+            padding-left: 1.2em;
+            text-indent: -1.2em;
+        }
+
+        /* references */
+        .references dt {
+            text-align: right;
+            font-weight: bold;
+            min-width: 7em;
+        }
+
+        .references dd {
+            margin-left: 8em;
+            overflow: auto;
+        }
+
+        .refInstance {
+            margin-bottom: 1.25em;
+        }
+
+        .refSubseries {
+            margin-bottom: 1.25em;
+        }
+
+        .references .ascii {
+            margin-bottom: 0.25em;
+        }
+
+        /* index */
+        .index ul {
+            margin: 0 0 0 1em;
+            padding: 0;
+            list-style: none;
+        }
+
+        .index ul ul {
+            margin: 0;
+        }
+
+        .index li {
+            margin: 0;
+            text-indent: -2em;
+            padding-left: 2em;
+            padding-bottom: 5px;
+        }
+
+        .indexIndex {
+            margin: 0.5em 0 1em;
+        }
+
+        .index a {
+            font-weight: 700;
+        }
+
+        /* make the index two-column on all but the smallest screens */
+        @media (min-width: 600px) {
+            .index ul {
+                -moz-column-count: 2;
+                -moz-column-gap: 20px;
+            }
+
+            .index ul ul {
+                -moz-column-count: 1;
+                -moz-column-gap: 0;
+            }
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            margin: 1em 0;
+        }
+
+        address.vcard .nameRole {
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        address.vcard .label {
+            font-family: var(--font-sans);
+            margin: 0.5em 0;
+        }
+
+        address.vcard .type {
+            display: none;
+        }
+
+        .alternative-contact {
+            margin: 1.5em 0 1em;
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        /* temporary notes */
+        .rfcEditorRemove::before {
+            position: absolute;
+            top: 0.2em;
+            right: 0.2em;
+            padding: 0.2em;
+            content: "The RFC Editor will remove this note";
+            color: #9e2a00;
+            /* Arlen: WCAG 2019 */
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+        }
+
+        .rfcEditorRemove {
+            position: relative;
+            padding-top: 1.8em;
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            border-radius: 3px;
+        }
+
+        .cref {
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        /* alternative layout for smaller screens */
+        @media screen and (max-width: 1023px) {
+            body {
+                padding-top: 2em;
+            }
+
+            #title {
+                padding: 1em 0;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: -18px;
+                /* provide offset for in-page anchors */
+                padding-top: 38px;
+            }
+
+            #identifiers dd {
+                max-width: 60%;
+            }
+
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 0;
+                margin: 0;
+                background-color: inherit;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #toc h2 {
+                margin: -1px 0 0 0;
+                padding: 4px 0 4px 6px;
+                padding-right: 1em;
+                min-width: 190px;
+                font-size: 1.1em;
+                text-align: right;
+                background-color: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            #toc h2::before {
+                /* css hamburger */
+                float: right;
+                position: relative;
+                width: 1em;
+                height: 1px;
+                left: -164px;
+                margin: 6px 0 0 0;
+                background: white none repeat scroll 0 0;
+                box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                content: "";
+            }
+
+            #toc nav {
+                display: none;
+                padding: 0.5em 1em 1em;
+                overflow: auto;
+                height: calc(100vh - 48px);
+                border-left: 1px solid #ddd;
+            }
+        }
+
+        /* alternative layout for wide screens */
+        @media screen and (min-width: 1024px) {
+            body {
+                max-width: 724px;
+                margin: 42px auto;
+                padding-left: 1.5em;
+                padding-right: 29em;
+            }
+
+            #toc {
+                position: fixed;
+                top: 42px;
+                right: 42px;
+                width: 25%;
+                margin: 0;
+                padding: 0 1em;
+                z-index: 1;
+            }
+
+            #toc h2 {
+                border-top: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 1em;
+                font-weight: normal;
+                margin: 0;
+                padding: 0.25em 1em 1em 0;
+            }
+
+            #toc nav {
+                display: block;
+                height: calc(90vh - 84px);
+                bottom: 0;
+                padding: 0.5em 0 0;
+                overflow: auto;
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc,
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            #toc {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            figure,
+            pre {
+                page-break-inside: avoid;
+            }
+
+            figure {
+                overflow: scroll;
+            }
+
+            .breakable pre {
+                break-inside: auto;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            h2+*,
+            h3+*,
+            h4+*,
+            h5+*,
+            h6+* {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        /* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+        /*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+            /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+            /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+        }
+
+        /* Changes introduced to fix issues found during implementation */
+        /* Make sure links are clickable even if overlapped by following H* */
+        a {
+            z-index: 2;
+        }
+
+        /* Separate body from document info even without intervening H1 */
+        section {
+            clear: both;
+        }
+
+
+        /* Top align author divs, to avoid names without organization dropping level with org names */
+        .author {
+            vertical-align: top;
+        }
+
+        /* Leave room in document info to show Internet-Draft on one line */
+        #identifiers dt {
+            width: 8em;
+        }
+
+        /* Don't waste quite as much whitespace between label and value in doc info */
+        #identifiers dd {
+            margin-left: 1em;
+        }
+
+        /* Give floating toc a background color (needed when it's a div inside section */
+        #toc {
+            background-color: white;
+        }
+
+        /* Make the collapsed ToC header render white on gray also when it's a link */
+        @media screen and (max-width: 1023px) {
+
+            #toc h2 a,
+            #toc h2 a:link,
+            #toc h2 a:focus,
+            #toc h2 a:hover,
+            #toc a.toplink,
+            #toc a.toplink:hover {
+                color: white;
+                background-color: #444;
+                text-decoration: none;
+            }
+        }
+
+        /* Give the bottom of the ToC some whitespace */
+        @media screen and (min-width: 1024px) {
+            #toc {
+                padding: 0 0 1em 1em;
+            }
+        }
+
+        /* Style section numbers with more space between number and title */
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        /* prevent monospace from becoming overly large */
+        tt,
+        code,
+        pre {
+            font-size: 95%;
+        }
+
+        /* Fix the height/width aspect for ascii art*/
+        .sourcecode pre,
+        .art-text pre {
+            line-height: 1.12;
+        }
+
+
+        /* Add styling for a link in the ToC that points to the top of the document */
+        a.toplink {
+            float: right;
+            margin-right: 0.5em;
+        }
+
+        /* Fix the dl styling to match the RFC 7992 attributes */
+        dl>dt,
+        dl.dlParallel>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.dlNewline>dt {
+            float: none;
+        }
+
+        /* Provide styling for table cell text alignment */
+        table td.text-left,
+        table th.text-left {
+            text-align: left;
+        }
+
+        table td.text-center,
+        table th.text-center {
+            text-align: center;
+        }
+
+        table td.text-right,
+        table th.text-right {
+            text-align: right;
+        }
+
+        /* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+        .alternative-contact {
+            margin: 0.5em 0 0.25em 0;
+        }
+
+        address .non-ascii {
+            margin: 0 0 0 2em;
+        }
+
+        /* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+        table {
+            width: auto;
+        }
+
+        /* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+        .references dd {
+            overflow: visible;
+        }
+
+        /* Control caption placement */
+        caption {
+            caption-side: bottom;
+        }
+
+        /* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+        address.vcard {
+            max-width: 30em;
+            margin-right: auto;
+        }
+
+        /* For address alignment dependent on LTR or RTL scripts */
+        address div.left {
+            text-align: left;
+        }
+
+        address div.right {
+            text-align: right;
+        }
+
+        /* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+        table.right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Give the table caption label the same styling as the figcaption */
+        caption a[href] {
+            color: #222;
+        }
+
+        @media print {
+            .toplink {
+                display: none;
+            }
+
+            /* avoid overwriting the top border line with the ToC header */
+            #toc {
+                padding-top: 1px;
+            }
+
+            /* Avoid page breaks inside dl and author address entries */
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+        }
+
+        /* Tweak the bcp14 keyword presentation */
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Tweak the invisible space above H* in order not to overlay links in text above */
+        h2 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 31px;
+        }
+
+        h3 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        h4 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        /* Float artwork pilcrow to the right */
+        @media screen {
+            .artwork a.pilcrow {
+                display: block;
+                line-height: 0.7;
+                margin-top: 0.15em;
+            }
+        }
+
+        /* Make pilcrows on dd visible */
+        @media screen {
+            dd:hover>a.pilcrow {
+                visibility: visible;
+            }
+        }
+
+        /* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+        .alignLeft.art-text,
+        .alignCenter.art-text,
+        .alignRight.art-text {
+            margin-bottom: 0;
+        }
+
+        .alignLeft,
+        .alignCenter,
+        .alignRight {
+            margin: 1em 0 0 0;
+        }
+
+        /* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+        @media print {
+            a.pilcrow {
+                display: none;
+            }
+        }
+
+        /* Styling for the external metadata */
+        div#external-metadata {
+            background-color: #eee;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            display: none;
+        }
+
+        div#internal-metadata {
+            padding: 0.5em;
+            /* to match the external-metadata padding */
+        }
+
+        /* Styling for title RFC Number */
+        h1#rfcnum {
+            clear: both;
+            margin: 0 0 -1em;
+            padding: 1em 0 0 0;
+        }
+
+        /* Make .olPercent look the same as <ol><li> */
+        dl.olPercent>dd {
+            margin-bottom: 0.25em;
+            min-height: initial;
+        }
+
+        /* Give aside some styling to set it apart */
+        aside {
+            border-left: 1px solid #ddd;
+            margin: 1em 0 1em 2em;
+            padding: 0.2em 2em;
+        }
+
+        aside>dl,
+        aside>ol,
+        aside>ul,
+        aside>table,
+        aside>p {
+            margin-bottom: 0.5em;
+        }
+
+        /* Additional page break settings */
+        @media print {
+
+            figcaption,
+            table caption {
+                page-break-before: avoid;
+            }
+        }
+
+        /* Font size adjustments for print */
+        @media print {
+            body {
+                font-size: 10pt;
+                line-height: normal;
+                max-width: 96%;
+            }
+
+            h1 {
+                font-size: 1.72em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2*1.2 */
+            h2 {
+                font-size: 1.44em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2 */
+            h3 {
+                font-size: 1.2em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2 */
+            h4 {
+                font-size: 1em;
+                padding-top: 1.5em;
+            }
+
+            h5,
+            h6 {
+                font-size: 1em;
+                margin: initial;
+                padding: 0.5em 0 0.3em;
+            }
+        }
+
+        /* Sourcecode margin in print, when there's no pilcrow */
+        @media print {
+
+            .artwork,
+            .artwork>pre,
+            .sourcecode {
+                margin-bottom: 1em;
+            }
+        }
+
+        /* Avoid narrow tables forcing too narrow table captions, which may render badly */
+        table {
+            min-width: 20em;
+        }
+
+        /* ol type a */
+        ol.type-a {
+            list-style-type: lower-alpha;
+        }
+
+        ol.type-A {
+            list-style-type: upper-alpha;
+        }
+
+        ol.type-i {
+            list-style-type: lower-roman;
+        }
+
+        ol.type-I {
+            list-style-type: upper-roman;
+        }
+
+        /* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+        table {
+            border: 1px solid #ddd;
+        }
+
+        td {
+            border-top: 1px solid #ddd;
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f8f8f8;
+        }
+
+        /* Use style rules to govern display of the TOC. */
+        @media screen and (max-width: 1023px) {
+            #toc nav {
+                display: none;
+            }
+
+            #toc.active nav {
+                display: block;
+            }
+        }
+
+        /* Add support for keepWithNext */
+        .keepWithNext {
+            break-after: avoid-page;
+            break-after: avoid-page;
+        }
+
+        /* Add support for keepWithPrevious */
+        .keepWithPrevious {
+            break-before: avoid-page;
+        }
+
+        /* Change the approach to avoiding breaks inside artwork etc. */
+        figure,
+        pre,
+        table,
+        .artwork,
+        .sourcecode {
+            break-before: auto;
+            break-after: auto;
+        }
+
+        /* Avoid breaks between <dt> and <dd> */
+        dl {
+            break-before: auto;
+            break-inside: auto;
+        }
+
+        dt {
+            break-before: auto;
+            break-after: avoid-page;
+        }
+
+        dd {
+            break-before: avoid-page;
+            break-after: auto;
+            orphans: 3;
+            widows: 3
+        }
+
+        span.break,
+        dd.break {
+            margin-bottom: 0;
+            min-height: 0;
+            break-before: auto;
+            break-inside: auto;
+            break-after: auto;
+        }
+
+        /* Undo break-before ToC */
+        @media print {
+            #toc {
+                break-before: auto;
+            }
+        }
+
+        /* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+        ul.compact p,
+        .ulCompact p,
+        ol.compact p,
+        .olCompact p {
+            margin: 0;
+        }
+
+        /* But the list as a whole needs the extra space at the end */
+        section ul.compact,
+        section .ulCompact,
+        section ol.compact,
+        section .olCompact {
+            margin-bottom: 1em;
+            /* same as p not within ul.compact etc. */
+        }
+
+        /* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+        tt,
+        code {
+            background-color: transparent;
+        }
+
+        p tt,
+        p code,
+        li tt,
+        li code,
+        dt tt,
+        dt code {
+            background-color: #f8f8f8;
+        }
+
+        /* Tweak the pre margin -- 0px doesn't come out well */
+        pre {
+            margin-top: 0.5px;
+        }
+
+        /* Tweak the compact list text */
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact,
+        dl.compact,
+        .dlCompact {
+            line-height: normal;
+        }
+
+        /* Don't add top margin for nested lists */
+        li>ul,
+        li>ol,
+        li>dl,
+        dd>ul,
+        dd>ol,
+        dd>dl,
+        dl>dd>dl {
+            margin-top: initial;
+        }
+
+        /* Elements that should not be rendered on the same line as a <dt> */
+        /* This should match the element list in writer.text.TextWriter.render_dl() */
+        dd>div.artwork:first-child,
+        dd>aside:first-child,
+        dd>blockquote:first-child,
+        dd>figure:first-child,
+        dd>ol:first-child,
+        dd>div.sourcecode:first-child,
+        dd>table:first-child,
+        dd>ul:first-child {
+            clear: left;
+        }
+
+        /* fix for weird browser behaviour when <dd/> is empty */
+        dt+dd:empty::before {
+            content: "\00a0";
+        }
+
+        /* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+        li>p {
+            margin-bottom: 0.5em
+        }
+
+        /* Don't let p margin spill out from inside list items */
+        li>p:last-of-type:only-child {
+            margin-bottom: 0;
+        }
+    </style>
+    <link href="https://www.rfc-editor.org/rfc/rfc-local.css" rel="stylesheet" type="text/css">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body-14" rel="prev">
+    <link href="https://dx.doi.org/10.17487/rfc10008" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+</head>
+
+<body class="xml2rfc">
+    <script src="https://www.rfc-editor.org/js/metadata.min.js"></script>
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">RFC 10008</td>
+                <td class="center">HTTP QUERY 메서드</td>
+                <td class="right">2026년 6월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Reschke 외</td>
+                <td class="center">표준 트랙</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-stream">스트림:</dt>
+            <dd class="stream">인터넷 엔지니어링 태스크 포스(IETF)</dd>
+            <dt class="label-rfc">RFC:</dt>
+            <dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc10008" class="eref">10008</a></dd>
+            <dt class="label-category">범주:</dt>
+            <dd class="category">표준 트랙</dd>
+            <dt class="label-published">발행:</dt>
+            <dd class="published">
+                <time datetime="2026-06" class="published">2026년 6월</time>
+            </dd>
+            <dt class="label-issn">ISSN:</dt>
+            <dd class="issn">2070-1721</dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">J. Reschke</div>
+                    <div class="org">greenbytes</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">J.M. Snell</div>
+                    <div class="org">Cloudflare</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">M. Bishop</div>
+                    <div class="org">Akamai</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="rfcnum">RFC 10008</h1>
+    <h1 id="title">HTTP QUERY 메서드</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">
+            이 명세는 HTTP의 QUERY 메서드를 정의합니다.
+            QUERY는 요청 대상이 포함된 콘텐츠를 안전하고 멱등적인 방식으로
+            처리한 다음 해당 처리 결과로 응답하도록 요청합니다. 이는 POST 요청과 유사하지만, QUERY 요청은
+            부분적인 상태 변경을 우려하지 않고 자동으로 반복하거나 다시 시작할
+            수 있습니다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 문서는 인터넷 표준 트랙 문서입니다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-boilerplate.1-2">
+                이 문서는 인터넷 엔지니어링 태스크 포스
+                (IETF)의 산출물입니다. IETF 커뮤니티의 합의를 나타냅니다. 이 문서는
+                공개 검토를 거쳤으며 인터넷 엔지니어링 운영 그룹
+                (IESG)의 발행 승인을 받았습니다. 인터넷
+                표준에 관한 자세한 정보는 RFC 7841의 섹션 2에서 확인할 수
+                있습니다.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-3">
+                이 문서의 현재 상태, 정오표 및
+                이에 대한 피드백 제공 방법에 관한 정보는
+                <span><a
+                        href="https://www.rfc-editor.org/info/rfc10008">https://www.rfc-editor.org/info/rfc10008</a></span>에서
+                확인할 수 있습니다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2026 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Revised BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="compact toc ulBare ulEmpty">
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1"
+                                class="auto internal xref">1</a>. <a href="#name-introduction"
+                                class="internal xref">소개</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1"
+                                        class="auto internal xref">1.1</a>. <a href="#name-terminology"
+                                        class="internal xref">용어</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2"
+                                        class="auto internal xref">1.2</a>. <a href="#name-notational-conventions"
+                                        class="internal xref">표기 규칙</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>. <a
+                                href="#name-query-method" class="internal xref">QUERY 메서드</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1"
+                                        class="auto internal xref">2.1</a>. <a href="#name-media-types-and-content-neg"
+                                        class="internal xref">미디어 유형 및 콘텐츠 협상</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2"
+                                        class="auto internal xref">2.2</a>. <a href="#name-equivalent-resource"
+                                        class="internal xref">동등한 리소스</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3"
+                                        class="auto internal xref">2.3</a>. <a href="#name-content-location-response-f"
+                                        class="internal xref">Content-Location 응답 필드</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4"
+                                        class="auto internal xref">2.4</a>. <a href="#name-location-response-field"
+                                        class="internal xref">Location 응답 필드</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5">
+                                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5"
+                                        class="auto internal xref">2.5</a>. <a href="#name-redirection"
+                                        class="internal xref">리디렉션</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6">
+                                <p id="section-toc.1-1.2.2.6.1"><a href="#section-2.6"
+                                        class="auto internal xref">2.6</a>. <a href="#name-conditional-requests"
+                                        class="internal xref">조건부 요청</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7">
+                                <p id="section-toc.1-1.2.2.7.1"><a href="#section-2.7"
+                                        class="auto internal xref">2.7</a>. <a href="#name-caching"
+                                        class="internal xref">캐싱</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.8">
+                                <p id="section-toc.1-1.2.2.8.1"><a href="#section-2.8"
+                                        class="auto internal xref">2.8</a>. <a href="#name-range-requests"
+                                        class="internal xref">범위 요청</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>. <a
+                                href="#name-the-accept-query-header-fie" class="internal xref">Accept-Query 헤더
+                                필드</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>. <a
+                                href="#name-security-considerations" class="internal xref">보안 고려 사항</a>
+                        </p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>. <a
+                                href="#name-iana-considerations" class="internal xref">IANA 고려 사항</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1"
+                                        class="auto internal xref">5.1</a>. <a href="#name-registration-of-the-query-m"
+                                        class="internal xref">QUERY 메서드 등록</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2"
+                                        class="auto internal xref">5.2</a>. <a href="#name-registration-of-the-accept-"
+                                        class="internal xref">Accept-Query 필드 등록</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>. <a
+                                href="#name-references" class="internal xref">참고 문헌</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1"
+                                        class="auto internal xref">6.1</a>. <a href="#name-normative-references"
+                                        class="internal xref">규범적 참고 문헌</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2"
+                                        class="auto internal xref">6.2</a>. <a href="#name-informative-references"
+                                        class="internal xref">정보 제공 참고 문헌</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref">부록 A</a>. <a
+                                href="#name-examples" class="internal xref">예제</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                                <p id="section-toc.1-1.7.2.1.1"><a href="#appendix-A.1"
+                                        class="auto internal xref">A.1</a>. <a href="#name-simple-query"
+                                        class="internal xref">간단한 쿼리</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                                <p id="section-toc.1-1.7.2.2.1"><a href="#appendix-A.2"
+                                        class="auto internal xref">A.2</a>. <a href="#name-discovery-of-query-support"
+                                        class="internal xref">QUERY 지원 확인</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                                <p id="section-toc.1-1.7.2.3.1"><a href="#appendix-A.3"
+                                        class="auto internal xref">A.3</a>. <a href="#name-discovery-of-query-formats"
+                                        class="internal xref">QUERY 형식 확인</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                                <p id="section-toc.1-1.7.2.4.1"><a href="#appendix-A.4"
+                                        class="auto internal xref">A.4</a>. <a href="#name-content-location-location-a"
+                                        class="internal xref">Content-Location, Location 및 간접 응답</a></p>
+                                <ul class="compact toc ulBare ulEmpty">
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4.2.1">
+                                        <p id="section-toc.1-1.7.2.4.2.1.1"><a href="#appendix-A.4.1"
+                                                class="auto internal xref">A.4.1</a>. <a
+                                                href="#name-using-content-location" class="internal xref">
+                                                Content-Location 사용</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4.2.2">
+                                        <p id="section-toc.1-1.7.2.4.2.2.1"><a href="#appendix-A.4.2"
+                                                class="auto internal xref">A.4.2</a>. <a href="#name-using-location"
+                                                class="internal xref">Location 사용</a></p>
+                                    </li>
+                                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4.2.3">
+                                        <p id="section-toc.1-1.7.2.4.2.3.1"><a href="#appendix-A.4.3"
+                                                class="auto internal xref">A.4.3</a>. <a href="#name-indirect-responses"
+                                                class="internal xref">간접 응답</a></p>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                                <p id="section-toc.1-1.7.2.5.1"><a href="#appendix-A.5"
+                                        class="auto internal xref">A.5</a>. <a href="#name-conditional-requests-2"
+                                        class="internal xref">조건부 요청</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
+                                <p id="section-toc.1-1.7.2.6.1"><a href="#appendix-A.6"
+                                        class="auto internal xref">A.6</a>. <a href="#name-more-query-formats"
+                                        class="internal xref">추가 쿼리 형식</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="auto internal xref">부록 B</a>. <a
+                                href="#name-selection-of-the-method-nam" class="internal xref">메서드 이름
+                                'QUERY' 선택</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+                        <p id="section-toc.1-1.9.1"><a href="#appendix-C" class="auto internal xref"></a><a
+                                href="#name-acknowledgements" class="internal xref">감사의 말</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+                        <p id="section-toc.1-1.10.1"><a href="#appendix-D" class="auto internal xref"></a><a
+                                href="#name-contributors" class="internal xref">기여자</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+                        <p id="section-toc.1-1.11.1"><a href="#appendix-E" class="auto internal xref"></a><a
+                                href="#name-authors-addresses" class="internal xref">저자 주소</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <div id="introduction">
+        <section id="section-1">
+            <h2 id="name-introduction">
+                <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                    class="section-name selfRef">소개</a>
+            </h2>
+            <p id="section-1-1">
+                이 명세는 대상 리소스가 요청을 처리하는 방법을 설명하는 표현을
+                포함하는 안전하고 멱등적인 요청(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-9.2" class="relref">[<a
+                            href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 9.2</a></span>)을
+                수행하는 수단으로 HTTP QUERY 요청 메서드를 정의합니다.<a href="#section-1-1" class="pilcrow">¶</a></p>
+            <p id="section-1-2">
+                일반적인 쿼리 패턴은 다음과 같습니다.<a href="#section-1-2" class="pilcrow">¶</a></p>
+            <div class="lang-http-message sourcecode" id="section-1-3">
+                <pre>
+GET /feed?q=foo&amp;limit=10&amp;sort=-published HTTP/1.1
+Host: example.org</pre><a href="#section-1-3" class="pilcrow">¶</a>
+            </div>
+            <p id="section-1-4">
+                그러나 전달되는 데이터가 요청 URI에 인코딩하기에 너무 많으면
+                이 패턴에는 문제가 생깁니다.<a href="#section-1-4" class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="section-1-5.1">요청은 서로 조정되지 않은 여러
+                    시스템을 통과할 수 있으므로 크기 제한을 미리 알 수 없는 경우가 많습니다(다만 <span><a
+                            href="https://rfc-editor.org/rfc/rfc9110#section-4.1" class="relref">[<a href="#RFC9110"
+                                class="cite xref">HTTP</a>]의 섹션 4.1</a></span>에서는
+                    송신자와 수신자가 최소 8000옥텟을 지원하도록 권고합니다).<a href="#section-1-5.1" class="pilcrow">¶</a>
+                </li>
+                <li class="normal" id="section-1-5.2">특정 종류의 데이터를 대상 URI로 표현하는 것은
+                    해당 데이터를 유효한 URI로 인코딩하는 데 따른 오버헤드 때문에 비효율적입니다.<a href="#section-1-5.2" class="pilcrow">¶</a>
+                </li>
+                <li class="normal" id="section-1-5.3">요청 URI는 요청 콘텐츠보다 로그에 기록될 가능성이 높으며
+                    북마크에도 나타날 수 있습니다.<a href="#section-1-5.3" class="pilcrow">¶</a>
+                </li>
+                <li class="normal" id="section-1-5.4">쿼리를 요청 URI에 직접 인코딩하면 사실상
+                    가능한 모든 쿼리 입력 조합이 서로 다른
+                    리소스로 취급됩니다.<a href="#section-1-5.4" class="pilcrow">¶</a>
+                </li>
+            </ul>
+            <p id="section-1-6">
+                GET을 사용하는 대신, 많은 구현에서는 아래 예제에 나온 것처럼
+                HTTP POST 메서드를 사용하여 쿼리를 수행합니다. 이 경우 쿼리 작업의 입력은
+                요청 URI의 쿼리 구성 요소를 사용하는 대신
+                요청 콘텐츠로 전달됩니다.<a href="#section-1-6" class="pilcrow">¶</a></p>
+            <p id="section-1-7">
+                쿼리를 요청하기 위한 HTTP POST의 일반적인 사용 예는 다음과 같습니다.<a href="#section-1-7" class="pilcrow">¶</a></p>
+            <div class="lang-http-message sourcecode" id="section-1-8">
+                <pre>
+POST /feed HTTP/1.1
+Host: example.org
+Content-Type: application/x-www-form-urlencoded
+
+q=foo&amp;limit=10&amp;sort=-published</pre><a href="#section-1-8" class="pilcrow">¶</a>
+            </div>
+            <p id="section-1-9">
+                그러나 이 변형에서는 요청이 전송되는 리소스와 서버에 대한 구체적인 지식이 없으면
+                안전하고 멱등적인 쿼리가 수행되고 있다는 사실을 쉽게 알 수 없습니다.<a href="#section-1-9" class="pilcrow">¶</a></p>
+            <p id="section-1-10">
+                QUERY 메서드는 GET과 POST 사용 사이의 간극을 메우는 해결책을 제공하며,
+                위 예제는 다음과 같이 표현됩니다.<a href="#section-1-10" class="pilcrow">¶</a></p>
+            <div class="lang-http-message sourcecode" id="section-1-11">
+                <pre>
+QUERY /feed HTTP/1.1
+Host: example.org
+Content-Type: application/x-www-form-urlencoded
+
+q=foo&amp;limit=10&amp;sort=-published</pre><a href="#section-1-11" class="pilcrow">¶</a>
+            </div>
+            <p id="section-1-12">
+                POST와 마찬가지로 쿼리 작업의 입력은 요청 URI의 일부가 아니라 요청의 콘텐츠로
+                전달됩니다. 그러나 POST와 달리 이 메서드는 명시적으로 안전하고
+                멱등적이므로 캐싱 및 자동 재시도와 같은 기능을 사용할 수 있습니다.<a href="#section-1-12" class="pilcrow">¶</a></p>
+            <p id="section-1-13">
+                중요한 리소스라면 URI로 식별되어야 한다는 설계 원칙을 고려하여,
+                이 명세는 서버가 나중에 GET 요청에서 사용할 수 있도록
+                쿼리 자체 또는 특정 쿼리 결과에 URI를 할당하는 방법을 설명합니다.<a href="#section-1-13" class="pilcrow">¶</a></p>
+            <p id="section-1-14">요약하면 다음과 같습니다.<a href="#section-1-14" class="pilcrow">¶</a></p>
+            <span id="name-summary-of-relevant-method-"></span>
+            <table class="center" id="table-1">
+                <caption>
+                    <a href="#table-1" class="selfRef">표 1</a>:
+                    <a href="#name-summary-of-relevant-method-" class="selfRef">관련 메서드
+                        속성 요약</a>
+                </caption>
+                <thead>
+                    <tr>
+                        <th class="text-left" rowspan="1" colspan="1"></th>
+                        <th class="text-left" rowspan="1" colspan="1">GET</th>
+                        <th class="text-left" rowspan="1" colspan="1">QUERY</th>
+                        <th class="text-left" rowspan="1" colspan="1">POST</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-left" rowspan="1" colspan="1">안전함</td>
+                        <td class="text-left" rowspan="1" colspan="1">예</td>
+                        <td class="text-left" rowspan="1" colspan="1">예</td>
+                        <td class="text-left" rowspan="1" colspan="1">아닐 수 있음</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left" rowspan="1" colspan="1">멱등적</td>
+                        <td class="text-left" rowspan="1" colspan="1">예</td>
+                        <td class="text-left" rowspan="1" colspan="1">예</td>
+                        <td class="text-left" rowspan="1" colspan="1">아닐 수 있음</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left" rowspan="1" colspan="1">쿼리 자체의 URI</td>
+                        <td class="text-left" rowspan="1" colspan="1">예(정의상)</td>
+                        <td class="text-left" rowspan="1" colspan="1">선택 사항(Location 응답 필드)</td>
+                        <td class="text-left" rowspan="1" colspan="1">아니요</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left" rowspan="1" colspan="1">쿼리 결과의 URI</td>
+                        <td class="text-left" rowspan="1" colspan="1">선택 사항(Content-Location 응답 필드)</td>
+                        <td class="text-left" rowspan="1" colspan="1">선택 사항(Content-Location 응답 필드)</td>
+                        <td class="text-left" rowspan="1" colspan="1">선택 사항(Content-Location 응답 필드)</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left" rowspan="1" colspan="1">캐시 가능</td>
+                        <td class="text-left" rowspan="1" colspan="1">예</td>
+                        <td class="text-left" rowspan="1" colspan="1">예</td>
+                        <td class="text-left" rowspan="1" colspan="1">예, 단 향후 GET 또는 HEAD 요청에만 해당</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left" rowspan="1" colspan="1">콘텐츠(본문)</td>
+                        <td class="text-left" rowspan="1" colspan="1">"정의된 의미 체계 없음"</td>
+                        <td class="text-left" rowspan="1" colspan="1">예상됨(의미 체계는 대상 리소스에 따름)</td>
+                        <td class="text-left" rowspan="1" colspan="1">예상됨(의미 체계는 대상 리소스에 따름)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="terminology">
+                <section id="section-1.1">
+                    <h3 id="name-terminology">
+                        <a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-terminology"
+                            class="section-name selfRef">용어</a>
+                    </h3>
+                    <p id="section-1.1-1">
+                        이 문서는 <span><a href="https://rfc-editor.org/rfc/rfc9110#section-3" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 3</a></span>에 정의된 용어를 사용합니다.<a
+                            href="#section-1.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-1.1-2">
+                        또한 URI의 쿼리 구성 요소(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-4.2.2"
+                                class="relref">[<a href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 4.2.2</a></span>)에 있는
+                        매개변수를
+                        <em>URI 쿼리 매개변수</em>라고 하고, QUERY 요청의
+                        요청 콘텐츠(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-6.4" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 6.4</a></span>)를
+                        <em>쿼리 콘텐츠</em>라고 합니다.<a href="#section-1.1-2" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="notational.conventions">
+                <section id="section-1.2">
+                    <h3 id="name-notational-conventions">
+                        <a href="#section-1.2" class="section-number selfRef">1.2. </a><a
+                            href="#name-notational-conventions" class="section-name selfRef">표기 규칙</a>
+                    </h3>
+                    <p id="section-1.2-1">
+                        이 문서의 핵심 단어 "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span
+                            class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span
+                            class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span
+                            class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span
+                            class="bcp14">NOT RECOMMENDED</span>",
+                        "<span class="bcp14">MAY</span>" 및 "<span class="bcp14">OPTIONAL</span>"은 여기에 표시된 것처럼
+                        모두 대문자로 나타나는 경우에만
+                        BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174"
+                                class="cite xref">RFC8174</a>]</span>에
+                        설명된 대로 해석해야 합니다.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="query">
+        <section id="section-2">
+            <h2 id="name-query-method">
+                <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-query-method"
+                    class="section-name selfRef">QUERY 메서드</a>
+            </h2>
+            <p id="section-2-1">
+                QUERY 메서드는 서버 측 쿼리를 시작하는 데 사용됩니다.
+                대상 URI로 식별되는 리소스의 표현을 요청하는
+                GET 메서드
+                (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.1" class="relref">[<a href="#RFC9110"
+                            class="cite xref">HTTP</a>]의 섹션
+                        7.1</a></span>에 정의됨)와 달리, QUERY
+                메서드는 대상 리소스에 해당 대상 리소스의 범위 내에서
+                쿼리 작업을 수행하도록 요청하는 데 사용됩니다.<a href="#section-2-1" class="pilcrow">¶</a></p>
+            <p id="section-2-2">
+                요청 콘텐츠와 해당 미디어 유형이 쿼리를 정의합니다.
+                오리진 서버는 대상 리소스를 기반으로 작업 범위를 결정합니다.<a href="#section-2-2" class="pilcrow">¶</a></p>
+            <p id="section-2-3">
+                Content-Type 요청 필드(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                        href="https://rfc-editor.org/rfc/rfc9110#section-8.3" class="relref">섹션 8.3</a></span>)가
+                없거나 요청 콘텐츠와 일치하지 않으면 서버는 요청을 <span class="bcp14">MUST</span> 실패 처리해야 합니다.<a href="#section-2-3"
+                    class="pilcrow">¶</a></p>
+            <p id="section-2-4">
+                모든 HTTP 메서드와 마찬가지로 대상 URI의 쿼리 부분은
+                쿼리 대상 리소스를 식별하는 데 관여합니다. 이것이 쿼리 결과에
+                직접 영향을 미치는지 여부와 그 방식은 리소스에 따라 다르며
+                이 명세의 범위를 벗어납니다.<a href="#section-2-4" class="pilcrow">¶</a></p>
+            <p id="section-2-5">
+                QUERY 요청은 대상 리소스에 대해 안전합니다
+                (<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                        href="https://rfc-editor.org/rfc/rfc9110#section-9.2.1" class="relref">섹션
+                        9.2.1</a></span>).
+                즉, 클라이언트는 대상 리소스의 상태 변경을 요청하거나
+                기대하지 않습니다. 그렇다고 해서 서버가 추가 정보를
+                검색할 수 있는 추가 HTTP 리소스를 생성하지 못하는 것은 아닙니다(섹션 <a href="#content-location" class="auto internal xref">2.3</a>
+                및 <a href="#location" class="auto internal xref">2.4</a> 참조).<a href="#section-2-5"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-6">
+                또한 QUERY 요청은 멱등적입니다
+                (<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                        href="https://rfc-editor.org/rfc/rfc9110#section-9.2.2" class="relref">섹션
+                        9.2.2</a></span>).
+                예를 들어 연결 실패 후와 같이 필요할 때
+                다시 시도하거나 반복할 수 있습니다.<a href="#section-2-6" class="pilcrow">¶</a></p>
+            <p id="section-2-7">
+                <span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.3" class="relref">[<a href="#RFC9110"
+                            class="cite xref">HTTP</a>]의 섹션 15.3</a></span>에 따라, 2xx(성공) 응답 코드는
+                요청이 성공적으로 수신되고 이해되었으며 수락되었음을 나타냅니다.<a href="#section-2-7" class="pilcrow">¶</a>
+            </p>
+            <p id="section-2-8">
+                특히 200(OK) 응답은 쿼리가
+                성공적으로 처리되었으며 그 처리 결과가
+                응답 콘텐츠에 포함되어 있음을 나타냅니다.<a href="#section-2-8" class="pilcrow">¶</a></p>
+            <div id="media.types.and.conneg">
+                <section id="section-2.1">
+                    <h3 id="name-media-types-and-content-neg">
+                        <a href="#section-2.1" class="section-number selfRef">2.1. </a><a
+                            href="#name-media-types-and-content-neg" class="section-name selfRef">미디어 유형 및
+                            콘텐츠 협상</a>
+                    </h3>
+                    <p id="section-2.1-1">
+                        QUERY 요청의 의미 체계는 요청 콘텐츠와 미디어 유형(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-8.3.1" class="relref">섹션
+                                8.3.1</a></span>) 같은 관련
+                        메타데이터 모두에 따라 달라집니다.
+                        일반적으로 콘텐츠와 메타데이터가 일치하지 않는 요청의 모든 문제는 4xx(클라이언트 오류) 응답(<span>[<a href="#RFC9110"
+                                class="cite xref">HTTP</a>], <a href="https://rfc-editor.org/rfc/rfc9110#section-15.5"
+                                class="relref">섹션 15.5</a></span>)으로 <span class="bcp14">MUST</span> 거부해야
+                        합니다.<a href="#section-2.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.1-2">
+                        아래 목록에서는 다양한 실패 사례를 설명하고 특정 상태 코드를 권장합니다.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+                    <ul class="normal">
+                        <li class="normal" id="section-2.1-3.1">
+                            요청에 미디어 유형 정보가 없으면 정의상 잘못된 요청이므로
+                            400(클라이언트 오류)과 같은 4xx 상태 코드로 실패해야 합니다.<a href="#section-2.1-3.1" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal" id="section-2.1-3.2">
+                            미디어 유형이 지정되었지만 리소스에서 지원하지 않는 경우에는 415(지원되지 않는 미디어
+                            유형)가
+                            적절합니다. 여기에는 특히 미디어 유형 자체는
+                            알려져 있지만 대상 리소스에 대한 QUERY에 특화된 의미 체계가 없는 경우가 포함됩니다. 두
+                            경우 모두
+                            Accept-Query 응답 필드(<a href="#field.accept-query" class="auto internal xref">섹션 3</a>)를 사용하여
+                            지원되는 미디어 유형을 클라이언트에 알릴 수 있습니다.<a href="#section-2.1-3.2" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal" id="section-2.1-3.3">
+                            미디어 유형이 지정되었지만 실제 요청 콘텐츠와 일치하지 않으면
+                            400(Bad Request)을 반환할 수 있습니다. 즉, 서버는 요청 콘텐츠에서
+                            미디어 유형을 추론한 다음 누락되었거나 "잘못된" 값을 재정의할 수 없습니다
+                            (즉, "콘텐츠 스니핑").<a href="#section-2.1-3.3" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal" id="section-2.1-3.4">
+                            미디어 유형이 지정되고 이해되었으며 콘텐츠도 실제로 해당
+                            유형과 일치하지만 쿼리의 실제 내용 때문에 쿼리를 처리할 수 없는 경우에는
+                            422(처리할 수 없는 콘텐츠) 상태를 사용할 수 있습니다. 예를 들어 구문상
+                            올바르지만 존재하지 않는 테이블을 식별하는 SQL 쿼리가 이에 해당합니다.<a href="#section-2.1-3.4" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal" id="section-2.1-3.5">
+                            클라이언트가 Accept
+                            필드(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                    href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">섹션
+                                    12.5.1</a></span>)를 사용하여 리소스에서 지원하지 않는 특정 응답 미디어 유형을
+                            요청하는 경우 406(Not Acceptable) 상태 코드가 적절합니다.<a href="#section-2.1-3.5" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div id="equivalent-resource">
+                <section id="section-2.2">
+                    <h3 id="name-equivalent-resource">
+                        <a href="#section-2.2" class="section-number selfRef">2.2. </a><a
+                            href="#name-equivalent-resource" class="section-name selfRef">동등한 리소스</a>
+                    </h3>
+                    <p id="section-2.2-1">
+                        특정 QUERY 요청의 <em>동등한 리소스</em>는
+                        GET 요청에 응답하고, 해당 QUERY 요청과 그 대상을 나타내며,
+                        메시지 콘텐츠와 메타데이터 모두를 고려하는 리소스입니다(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-6"
+                                class="relref">[<a href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 6</a></span>).
+                        특히 여기에는 콘텐츠의 미디어 유형과 같은 표현 메타데이터(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-8"
+                                class="relref">[<a href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 8</a></span>)가
+                        포함됩니다.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-2.2-2">
+                        다시 말해 동등한 리소스는 요청 콘텐츠를 포함함으로써
+                        QUERY를 구현하는 리소스에서 파생됩니다.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
+                    <p id="section-2.2-3">
+                        <em>동등한 리소스</em>라는 용어는 선택된 표현과 같은
+                        다른 HTTP 측면의 동작을 정의하기 위한 수단으로 사용됩니다. 서버는 이러한
+                        리소스에 URI를 할당할 수 있지만 반드시 할당할 필요는 없습니다(
+                        <span><a href="https://rfc-editor.org/rfc/rfc3986#section-1.1" class="relref">[<a
+                                    href="#RFC3986" class="cite xref">URI</a>]의 섹션 1.1</a></span> 참조). URI를 할당하면 이러한
+                        리소스는
+                        GET 요청으로 접근할 수 있게 됩니다.<a href="#section-2.2-3" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="content-location">
+                <section id="section-2.3">
+                    <h3 id="name-content-location-response-f">
+                        <a href="#section-2.3" class="section-number selfRef">2.3. </a><a
+                            href="#name-content-location-response-f" class="section-name selfRef">Content-Location
+                            응답 필드</a>
+                    </h3>
+                    <p id="section-2.3-1">
+                        성공 응답(2xx, <span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.3" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 15.3</a></span>)에는
+                        작업 결과에 해당하는 리소스의
+                        식별자를 포함하는 Content-Location
+                        헤더 필드가 포함될 수 있습니다. 자세한 내용은 <span><a href="https://rfc-editor.org/rfc/rfc9110#section-8.7"
+                                class="relref">[<a href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 8.7</a></span>을
+                        참조하십시오. 이는 클라이언트가 표시된 URI에 GET 요청을 보내
+                        방금 수행한 쿼리 작업의 결과를 검색할 수 있다는 서버의 주장을 나타냅니다.
+                        표시된 리소스는 임시일 수 있습니다.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+                    <p id="section-2.3-2">
+                        예제는 <a href="#example.content-location" class="auto internal xref">부록 A.4.1</a>을
+                        참조하십시오.<a href="#section-2.3-2" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="location">
+                <section id="section-2.4">
+                    <h3 id="name-location-response-field">
+                        <a href="#section-2.4" class="section-number selfRef">2.4. </a><a
+                            href="#name-location-response-field" class="section-name selfRef">Location 응답
+                            필드</a>
+                    </h3>
+                    <p id="section-2.4-1">
+                        서버는 QUERY 요청의 동등한 리소스(<a href="#equivalent-resource" class="auto internal xref">섹션 2.2</a>)에
+                        URI를 할당할 수 있습니다. 서버가 그렇게 하는 경우 해당 리소스의 URI를
+                        2xx 응답의 Location 헤더 필드에 포함할 수 있습니다(<span><a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-10.2.2" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                10.2.2</a></span> 참조). 이는 클라이언트가
+                        표시된 URI에 GET 요청을 보내 쿼리 콘텐츠를 다시 보내지 않고도
+                        방금 수행한 쿼리 작업을 반복할 수 있다는 주장을 나타냅니다. 이 리소스의 URI는
+                        임시일 수 있으며, 이후 요청이 실패하면 클라이언트는
+                        원래 QUERY 요청 대상과 이전에 제출한 콘텐츠를 사용하여 다시 시도할 수 있습니다.<a href="#section-2.4-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.4-2">
+                        예제는 <a href="#example.location" class="auto internal xref">부록 A.4.2</a>를 참조하십시오.<a
+                            href="#section-2.4-2" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="redirection">
+                <section id="section-2.5">
+                    <h3 id="name-redirection">
+                        <a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-redirection"
+                            class="section-name selfRef">리디렉션</a>
+                    </h3>
+                    <p id="section-2.5-1">
+                        경우에 따라 서버는 사용자 에이전트를 다른 URI로 리디렉션하여 QUERY
+                        요청에 간접적으로 응답하도록 선택할 수 있습니다(
+                        <span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.4" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 15.4</a></span> 참조).<a
+                            href="#section-2.5-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.5-2">
+                        상태 코드
+                        301(Moved Permanently, <span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-15.4.2" class="relref">섹션
+                                15.4.2</a></span>) 또는
+                        308(Permanent Redirect, <span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-15.4.9" class="relref">섹션
+                                15.4.9</a></span>) 중 하나가 있는 응답은
+                        대상 리소스가 Location 응답 필드(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-10.2.2" class="relref">섹션
+                                10.2.2</a></span>)에서 참조하는 다른 URI로 영구적으로 이동했음을 나타냅니다.
+                        마찬가지로 상태 코드
+                        302(Found, <span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-15.4.3" class="relref">섹션
+                                15.4.3</a></span>) 또는
+                        307(Temporary Redirect, <span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-15.4.8" class="relref">섹션
+                                15.4.8</a></span>) 중 하나가 있는 응답은
+                        대상 리소스가 일시적으로 이동했음을 나타냅니다. 네 경우 모두 서버는
+                        사용자 에이전트가 Location에서 참조하는 새 대상 URI로
+                        유사한 QUERY 요청을 보내 원래 QUERY 요청을 수행할 수 있음을 제안합니다.<a href="#section-2.5-2" class="pilcrow">¶</a></p>
+                    <p id="section-2.5-3">
+                        301 또는 302 응답 후 POST를 GET 요청으로 리디렉션하는 예외는
+                        QUERY 요청에 적용되지 않는다는 점에 유의하십시오.<a href="#section-2.5-3" class="pilcrow">¶</a></p>
+                    <p id="section-2.5-4">
+                        상태 코드 303(See Other, <span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.4.4"
+                                class="relref">[<a href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                15.4.4</a></span>)이 있는 QUERY 응답은
+                        원래 쿼리를 Location 응답 필드(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-10.2.2" class="relref">섹션
+                                10.2.2</a></span>)에서 참조하는 URI에 대한 일반적인 검색 요청을 통해
+                        수행할 수 있음을 나타냅니다.
+                        HTTP에서는 <a href="#example.indirect" class="auto internal xref">부록 A.4.3</a>의 예제처럼
+                        새 대상 URI로 GET 요청을 보내는 것을 의미합니다.<a href="#section-2.5-4" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="conditional">
+                <section id="section-2.6">
+                    <h3 id="name-conditional-requests">
+                        <a href="#section-2.6" class="section-number selfRef">2.6. </a><a
+                            href="#name-conditional-requests" class="section-name selfRef">조건부 요청</a>
+                    </h3>
+                    <p id="section-2.6-1">
+                        QUERY 요청의 선택된 표현(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-3.2"
+                                class="relref">[<a href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 3.2</a></span>)은 해당
+                        QUERY
+                        요청의 동등한 리소스(<a href="#equivalent-resource" class="auto internal xref">섹션 2.2</a>)에
+                        대한 GET 요청의 표현과 동일합니다.<a href="#section-2.6-1" class="pilcrow">¶</a></p>
+                    <p id="section-2.6-2">
+                        조건부 QUERY는
+                        선택된 표현(즉, 콘텐츠 협상 이후의 쿼리 결과)을
+                        <span><a href="https://rfc-editor.org/rfc/rfc9110#section-13" class="relref">[<a href="#RFC9110"
+                                    class="cite xref">HTTP</a>]의 섹션 13</a></span>에 정의된
+                        조건부 헤더 필드에서 설명하는 상황에서만
+                        응답으로 반환하도록 요청합니다.<a href="#section-2.6-2" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.6-3">
+                        예제는 <a href="#example.conditional" class="auto internal xref">부록 A.5</a>를 참조하십시오.<a
+                            href="#section-2.6-3" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="caching">
+                <section id="section-2.7">
+                    <h3 id="name-caching">
+                        <a href="#section-2.7" class="section-number selfRef">2.7. </a><a href="#name-caching"
+                            class="section-name selfRef">캐싱</a>
+                    </h3>
+                    <p id="section-2.7-1">
+                        QUERY 메서드에 대한 응답은 캐시할 수 있으며, 캐시는 <span class="bcp14">MAY</span>
+                        <span><a href="https://rfc-editor.org/rfc/rfc9111#section-4" class="relref">[<a href="#RFC9111"
+                                    class="cite xref">HTTP-CACHING</a>]의 섹션 4</a></span>에 따라 이후
+                        QUERY 요청을 충족하는 데 사용할 수 있습니다.<a href="#section-2.7-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.7-2">
+                        QUERY 요청의 캐시 키(<span><a href="https://rfc-editor.org/rfc/rfc9111#section-2" class="relref">[<a
+                                    href="#RFC9111" class="cite xref">HTTP-CACHING</a>]의 섹션 2</a></span>)에는 요청
+                        콘텐츠(<span><a href="https://rfc-editor.org/rfc/rfc9111#section-6" class="relref">[<a
+                                    href="#RFC9111" class="cite xref">HTTP-CACHING</a>]의 섹션 6</a></span>)와 관련
+                        메타데이터(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-8" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                8</a></span>)가 <span class="bcp14">MUST</span>
+                        포함되어야 합니다.<a href="#section-2.7-2" class="pilcrow">¶</a></p>
+                    <p id="section-2.7-3">
+                        캐시 효율성을 높이기 위해 캐시는 <span class="bcp14">MAY</span> 먼저 요청 콘텐츠와 관련 메타데이터에서
+                        의미상 중요하지 않은 차이를 제거할 수 있습니다. 예를 들면 다음과 같습니다.<a href="#section-2.7-3" class="pilcrow">¶</a></p>
+                    <ul class="normal">
+                        <li class="normal" id="section-2.7-4.1">콘텐츠 인코딩 제거(<span><a
+                                    href="https://rfc-editor.org/rfc/rfc9110#section-8.4" class="relref">[<a
+                                        href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 8.4</a></span>).<a
+                                href="#section-2.7-4.1" class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal" id="section-2.7-4.2">요청의 Content-Type 필드에 있는
+                            미디어 하위 유형 접미사(예: "+json"; <span><a href="https://rfc-editor.org/rfc/rfc6838#section-4.2.8"
+                                    class="relref">[<a href="#RFC6838" class="cite xref">RFC6838</a>]의 섹션
+                                    4.2.8</a></span> 참조)가 나타내는 형식 규칙에 대한 지식을 기반으로 정규화.<a href="#section-2.7-4.2"
+                                class="pilcrow">¶</a>
+                        </li>
+                        <li class="normal" id="section-2.7-4.3">요청의 Content-Type 필드가 나타내는
+                            콘텐츠 자체의 의미 체계에 대한 지식을 기반으로 정규화.<a href="#section-2.7-4.3" class="pilcrow">¶</a>
+                        </li>
+                    </ul>
+                    <p id="section-2.7-5">
+                        이러한 변환은 전적으로 캐시 키 생성 목적으로만 수행되며,
+                        요청 자체를 변경하지 않는다는 점에 유의하십시오.<a href="#section-2.7-5" class="pilcrow">¶</a></p>
+                    <p id="section-2.7-6">
+                        클라이언트는 "no-transform" 캐시 지시문(<span><a href="https://rfc-editor.org/rfc/rfc9111#section-5.2.1.6"
+                                class="relref">[<a href="#RFC9111" class="cite xref">HTTP-CACHING</a>]의 섹션
+                                5.2.1.6</a></span>)을 사용하여
+                        이러한 변환이 발생하지 않기를 원한다는 것을 나타낼 수 있습니다(다만 이 지시문은
+                        권고적일 뿐이라는 점에 유의하십시오).<a href="#section-2.7-6" class="pilcrow">¶</a></p>
+                    <p id="section-2.7-7">
+                        QUERY 메서드 응답의 캐싱은 캐시 키를 결정하기 위해
+                        요청 콘텐츠를 완전히 읽어야 하므로 본질적으로 GET 응답을
+                        캐싱하는 것보다 더 복잡하다는 점에 유의하십시오. QUERY 응답이 동등한 리소스(<a href="#equivalent-resource"
+                            class="auto internal xref">섹션 2.2</a>)의 URI를 나타내기 위해 Location 응답 필드(<a href="#location"
+                            class="auto internal xref">섹션 2.4</a>)를 제공하는 경우 클라이언트는
+                        이후 요청에 GET을 사용하여 처리를 단순화할 수 있습니다.<a href="#section-2.7-7" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="range">
+                <section id="section-2.8">
+                    <h3 id="name-range-requests">
+                        <a href="#section-2.8" class="section-number selfRef">2.8. </a><a href="#name-range-requests"
+                            class="section-name selfRef">범위 요청</a>
+                    </h3>
+                    <p id="section-2.8-1">
+                        QUERY의 범위 요청 의미 체계는
+                        <span><a href="https://rfc-editor.org/rfc/rfc9110#section-14" class="relref">[<a href="#RFC9110"
+                                    class="cite xref">HTTP</a>]의 섹션 14</a></span>에 정의된
+                        GET의 의미 체계와 동일합니다.
+                        그러나 바이트 범위 요청(작성 시점에 정의된 유일한 범위 단위)은
+                        QUERY 요청의 결과에는 거의 가치가 없습니다.<a href="#section-2.8-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="section-2.8-2">
+                        쿼리 형식은 흔히 SQL의 "FETCH FIRST ... ROWS ONLY"와 같이 결과
+                        집합을 제한하거나 페이지 단위로 처리하는 자체 방식을 정의합니다. 이러한
+                        내장 기능이 HTTP 범위 요청 대신 사용될 것으로 예상됩니다.<a href="#section-2.8-2" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="field.accept-query">
+        <section id="section-3">
+            <h2 id="name-the-accept-query-header-fie">
+                <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-accept-query-header-fie"
+                    class="section-name selfRef">Accept-Query 헤더 필드</a>
+            </h2>
+            <p id="section-3-1">
+                "Accept-Query" 응답 헤더 필드는 리소스에서
+                사용할 수 있는 특정 쿼리 형식 미디어 유형을 식별하면서
+                QUERY 메서드 지원을 직접 알리는 데 사용할 수 있습니다.<a href="#section-3-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-2">
+                Accept-Query에는 "Structured Fields" 구문 <span>[<a href="#RFC9651"
+                        class="cite xref">STRUCTURED-FIELDS</a>]</span>을 사용하는 미디어 범위(<span><a
+                        href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">[<a href="#RFC9110"
+                            class="cite xref">HTTP</a>]의 섹션 12.5.1</a></span>) 목록이 포함됩니다.
+                미디어 범위는 매개변수가 없는 미디어 범위 값을 포함하는 Token 또는
+                String의 List Structured Header Field로 표현됩니다.<a href="#section-3-2" class="pilcrow">¶</a></p>
+            <p id="section-3-3">
+                미디어 유형 매개변수가 있는 경우 String 또는 Token 유형의 Structured Field Parameter에
+                매핑됩니다. Token과 String 중 어느 것을 선택하는지는
+                의미상 중요하지 않습니다. 즉, 수신자는 <span class="bcp14">MAY</span>
+                Token을 String으로 변환할 수 있지만, 수신된 유형에 따라
+                다르게 처리해서는 <span class="bcp14">MUST NOT</span> 안 됩니다.<a href="#section-3-3" class="pilcrow">¶</a></p>
+            <p id="section-3-4">
+                미디어 유형은 Token에 정확히 매핑되지 않습니다. 예를 들어
+                선행 숫자를 허용합니다. 이러한 경우에는 String 형식을
+                사용해야 합니다.<a href="#section-3-4" class="pilcrow">¶</a></p>
+            <p id="section-3-5">
+                지원되는 와일드카드 사용은 모든 유형과 일치하는 "*/*" 또는
+                표시된 유형의 모든 하위 유형과 일치하는 "xxxx/*"뿐입니다.<a href="#section-3-5" class="pilcrow">¶</a></p>
+            <p id="section-3-6">
+                필드 값에 나열된 유형의 순서는 중요하지 않습니다.<a href="#section-3-6" class="pilcrow">¶</a></p>
+            <p id="section-3-7">
+                Accept-Query 필드의 값은 동일한 경로를 공유하는 서버의 모든 URI에 적용됩니다. 다시
+                말해 쿼리 구성 요소는 무시됩니다. 동일한 리소스에 대한 요청이
+                서로 다른 Accept-Query 값을 반환하는 경우 가장 최근에 수신한 유효한 값(
+                <span><a href="https://rfc-editor.org/rfc/rfc9111#section-4.2" class="relref">[<a href="#RFC9111"
+                            class="cite xref">HTTP-CACHING</a>]의 섹션 4.2</a></span>에 따름)을 사용합니다.<a href="#section-3-7"
+                    class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-8">
+                예를 들면 다음과 같습니다.<a href="#section-3-8" class="pilcrow">¶</a></p>
+            <div class="sourcecode" id="section-3-9">
+                <pre>
+Accept-Query: "application/jsonpath", application/sql;charset="UTF-8"</pre><a href="#section-3-9" class="pilcrow">¶</a>
+            </div>
+            <p id="section-3-10">
+                이 필드의 구문이 "Accept"(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">[<a
+                            href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 12.5.1</a></span>) 같은 다른
+                필드와 유사해 보이지만, 이 필드는 Structured Field이므로
+                <span><a href="https://rfc-editor.org/rfc/rfc9651#section-4" class="relref">[<a href="#RFC9651"
+                            class="cite xref">STRUCTURED-FIELDS</a>]의 섹션 4</a></span>에 지정된 대로 <span
+                    class="bcp14">MUST</span> 처리해야 합니다.<a href="#section-3-10" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <section id="section-4">
+        <h2 id="name-security-considerations">
+            <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-security-considerations"
+                class="section-name selfRef">보안 고려 사항</a>
+        </h2>
+        <p id="section-4-1">
+            QUERY 메서드는
+            <span>[<a href="#RFC9110" class="cite xref">HTTP</a>]</span>에 설명된 모든 HTTP 메서드와 동일한 일반적인
+            보안 고려 사항의 적용을 받습니다.<a href="#section-4-1" class="pilcrow">¶</a>
+        </p>
+        <p id="section-4-2">
+            요청 정보를 URI(예: 쿼리 구성 요소)에 전달하는 대신
+            사용할 수 있습니다. URI는 요청 콘텐츠보다 중개자에 의해
+            로그에 기록되거나 다른 방식으로 처리될 가능성이 높기 때문에 일부
+            경우에는 이 방식이 선호됩니다. 쿼리에 민감한 정보가 포함된 다른 경우에는
+            URI가 로그에 기록될 가능성 때문에 GET보다 QUERY를 사용하는 것이
+            더 적합할 수 있습니다.<a href="#section-4-2" class="pilcrow">¶</a></p>
+        <p id="section-4-3">
+            서버가 QUERY 요청의 결과를 나타내기 위해 임시 리소스를 생성하고
+            (예: Location 또는 Content-Location 필드에서 사용), 해당 리소스에 URI를 할당하며,
+            요청에 로그로 기록해서는 안 되는 민감한 정보가 포함되어 있다면 해당 URI는
+            원래 요청 콘텐츠의 민감한 부분을 포함하지 않도록 <span class="bcp14">SHOULD</span> 선택해야 합니다.<a href="#section-4-3"
+                class="pilcrow">¶</a></p>
+        <p id="section-4-4">
+            QUERY 콘텐츠를 잘못 정규화하거나 리소스가 콘텐츠를 처리하는 방식과
+            현저하게 다른 방식으로 정규화하는 캐시는
+            정규화 결과가 거짓 양성을 일으킬 경우 잘못된 응답을 반환할 수 있습니다.<a href="#section-4-4" class="pilcrow">¶</a></p>
+        <p id="section-4-5">
+            Cross-Origin Resource Sharing(CORS)을 구현하는 사용자 에이전트의 QUERY 요청은
+            QUERY가 CORS 안전 목록 메서드 집합에 속하지 않으므로
+            "프리플라이트" 요청이 필요합니다
+            (<span>[<a href="#FETCH" class="cite xref">FETCH</a>]</span> 참조).<a href="#section-4-5"
+                class="pilcrow">¶</a></p>
+    </section>
+    <div id="iana.considerations">
+        <section id="section-5">
+            <h2 id="name-iana-considerations">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations"
+                    class="section-name selfRef">IANA 고려 사항</a>
+            </h2>
+            <div id="method.registration">
+                <section id="section-5.1">
+                    <h3 id="name-registration-of-the-query-m">
+                        <a href="#section-5.1" class="section-number selfRef">5.1. </a><a
+                            href="#name-registration-of-the-query-m" class="section-name selfRef">QUERY 메서드
+                            등록</a>
+                    </h3>
+                    <p id="section-5.1-1">
+                        IANA는 <span>&lt;<a
+                                href="http://www.iana.org/assignments/http-methods">http://www.iana.org/assignments/http-methods</a>&gt;</span>의
+                        "Hypertext Transfer Protocol (HTTP) Method Registry"에 QUERY 메서드를 추가했습니다
+                        (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-16.3.1" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                16.3.1</a></span> 참조).<a href="#section-5.1-1" class="pilcrow">¶</a>
+                    </p>
+                    <span id="name-query-method-definition"></span>
+                    <table class="center" id="table-2">
+                        <caption>
+                            <a href="#table-2" class="selfRef">표 2</a>:
+                            <a href="#name-query-method-definition" class="selfRef">QUERY 메서드 정의</a>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th class="text-left" rowspan="1" colspan="1">메서드 이름</th>
+                                <th class="text-left" rowspan="1" colspan="1">안전함</th>
+                                <th class="text-left" rowspan="1" colspan="1">멱등적</th>
+                                <th class="text-left" rowspan="1" colspan="1">명세</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">QUERY</td>
+                                <td class="text-left" rowspan="1" colspan="1">예</td>
+                                <td class="text-left" rowspan="1" colspan="1">예</td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    RFC 10008의 <a href="#query" class="auto internal xref">섹션 2</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+            <div id="field.registration">
+                <section id="section-5.2">
+                    <h3 id="name-registration-of-the-accept-">
+                        <a href="#section-5.2" class="section-number selfRef">5.2. </a><a
+                            href="#name-registration-of-the-accept-" class="section-name selfRef">Accept-Query
+                            필드 등록</a>
+                    </h3>
+                    <p id="section-5.2-1">
+                        IANA는 <span>&lt;<a
+                                href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a>&gt;</span>의
+                        "Hypertext Transfer Protocol (HTTP) Field Name Registry"에
+                        Accept-Query 필드를 추가했습니다
+                        (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-16.1.1" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                16.1.1</a></span> 참조).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+                    <span id="name-accept-query-field-definiti"></span>
+                    <table class="center" id="table-3">
+                        <caption>
+                            <a href="#table-3" class="selfRef">표 3</a>:
+                            <a href="#name-accept-query-field-definiti" class="selfRef">Accept-Query 필드
+                                정의</a>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th class="text-left" rowspan="1" colspan="1">필드 이름</th>
+                                <th class="text-left" rowspan="1" colspan="1">상태</th>
+                                <th class="text-left" rowspan="1" colspan="1">구조화 유형</th>
+                                <th class="text-left" rowspan="1" colspan="1">참조</th>
+                                <th class="text-left" rowspan="1" colspan="1">설명</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left" rowspan="1" colspan="1">Accept-Query</td>
+                                <td class="text-left" rowspan="1" colspan="1">영구</td>
+                                <td class="text-left" rowspan="1" colspan="1">List</td>
+                                <td class="text-left" rowspan="1" colspan="1">
+                                    RFC 10008의 <a href="#field.accept-query" class="auto internal xref">섹션 3</a>
+                                </td>
+                                <td class="text-left" rowspan="1" colspan="1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </section>
+    </div>
+    <section id="section-6">
+        <h2 id="name-references">
+            <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-references"
+                class="section-name selfRef">참고 문헌</a>
+        </h2>
+        <section id="section-6.1">
+            <h3 id="name-normative-references">
+                <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-normative-references"
+                    class="section-name selfRef">규범적 참고 문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="RFC9110">[HTTP]</dt>
+                <dd>
+                    <span class="refAuthor">Fielding, R., 편집자</span>, <span class="refAuthor">Nottingham, M.,
+                        편집자</span>, 및 <span class="refAuthor">J. Reschke, 편집자</span>, <span class="refTitle">"HTTP
+                        의미 체계"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC
+                        9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06"
+                        class="refDate">2022년 6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc9110">https://www.rfc-editor.org/info/rfc9110</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC9111">[HTTP-CACHING]</dt>
+                <dd>
+                    <span class="refAuthor">Fielding, R., 편집자</span>, <span class="refAuthor">Nottingham, M.,
+                        편집자</span>, 및 <span class="refAuthor">J. Reschke, 편집자</span>, <span class="refTitle">"HTTP
+                        캐싱"</span>, <span class="seriesInfo">STD 98</span>, <span class="seriesInfo">RFC
+                        9111</span>, <span class="seriesInfo">DOI 10.17487/RFC9111</span>, <time datetime="2022-06"
+                        class="refDate">2022년 6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc9111">https://www.rfc-editor.org/info/rfc9111</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC2119">[RFC2119]</dt>
+                <dd>
+                    <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"요구 수준을
+                        나타내기 위해 RFC에서 사용하는 핵심 단어"</span>, <span class="seriesInfo">BCP 14</span>, <span
+                        class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time
+                        datetime="1997-03" class="refDate">1997년 3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8174">[RFC8174]</dt>
+                <dd>
+                    <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"RFC 2119 핵심 단어의 대문자와
+                        소문자 간 모호성"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC
+                        8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05"
+                        class="refDate">2017년 5월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC9651">[STRUCTURED-FIELDS]</dt>
+                <dd>
+                    <span class="refAuthor">Nottingham, M.</span> 및 <span class="refAuthor">P. Kamp</span>, <span
+                        class="refTitle">"HTTP의 구조화된 필드 값"</span>, <span class="seriesInfo">RFC
+                        9651</span>, <span class="seriesInfo">DOI 10.17487/RFC9651</span>, <time datetime="2024-09"
+                        class="refDate">2024년 9월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc9651">https://www.rfc-editor.org/info/rfc9651</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3986">[URI]</dt>
+                <dd>
+                    <span class="refAuthor">Berners-Lee, T.</span>, <span class="refAuthor">Fielding, R.</span>, 및
+                    <span class="refAuthor">L. Masinter</span>, <span class="refTitle">"통합 리소스 식별자
+                        (URI): 일반 구문"</span>, <span class="seriesInfo">STD 66</span>, <span class="seriesInfo">RFC
+                        3986</span>, <span class="seriesInfo">DOI 10.17487/RFC3986</span>, <time datetime="2005-01"
+                        class="refDate">2005년 1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+        <section id="section-6.2">
+            <h3 id="name-informative-references">
+                <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-informative-references"
+                    class="section-name selfRef">정보 제공 참고 문헌</a>
+            </h3>
+            <dl class="references">
+                <dt id="FETCH">[FETCH]</dt>
+                <dd>
+                    <span class="refAuthor">WHATWG</span>, <span class="refTitle">"FETCH"</span>, <span
+                        class="refContent">WHATWG 현행 표준</span>, <span>&lt;<a
+                            href="https://fetch.spec.whatwg.org">https://fetch.spec.whatwg.org</a>&gt;</span>. <span
+                        class="annotation">커밋 스냅샷: <span>&lt;<a
+                                href="https://fetch.spec.whatwg.org/commit-snapshots/3bab31a55154bda73f25b45a23df718616f2f64e/">https://fetch.spec.whatwg.org/commit-snapshots/3bab31a55154bda73f25b45a23df718616f2f64e/</a>&gt;</span>.</span>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC3253">[RFC3253]</dt>
+                <dd>
+                    <span class="refAuthor">Clemm, G.</span>, <span class="refAuthor">Amsden, J.</span>, <span
+                        class="refAuthor">Ellison, T.</span>, <span class="refAuthor">Kaler, C.</span>, 및 <span
+                        class="refAuthor">J. Whitehead</span>, <span class="refTitle">"WebDAV
+                        (웹 분산 저작 및 버전 관리)의 버전 관리 확장"</span>, <span class="seriesInfo">RFC 3253</span>,
+                    <span class="seriesInfo">DOI 10.17487/RFC3253</span>, <time datetime="2002-03" class="refDate">2002년
+                        3월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc3253">https://www.rfc-editor.org/info/rfc3253</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC4918">[RFC4918]</dt>
+                <dd>
+                    <span class="refAuthor">Dusseault, L., 편집자</span>, <span class="refTitle">"웹
+                        분산 저작 및 버전 관리(WebDAV)를 위한 HTTP 확장"</span>, <span class="seriesInfo">RFC 4918</span>,
+                    <span class="seriesInfo">DOI 10.17487/RFC4918</span>, <time datetime="2007-06" class="refDate">2007년
+                        6월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc4918">https://www.rfc-editor.org/info/rfc4918</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC5323">[RFC5323]</dt>
+                <dd>
+                    <span class="refAuthor">Reschke, J., 편집자</span>, <span class="refAuthor">Reddy, S.</span>, <span
+                        class="refAuthor">Davis, J.</span>, 및 <span class="refAuthor">A. Babich</span>, <span
+                        class="refTitle">"웹 분산 저작 및 버전 관리(WebDAV) SEARCH"</span>, <span class="seriesInfo">RFC
+                        5323</span>, <span class="seriesInfo">DOI 10.17487/RFC5323</span>, <time datetime="2008-11"
+                        class="refDate">2008년 11월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc5323">https://www.rfc-editor.org/info/rfc5323</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC6838">[RFC6838]</dt>
+                <dd>
+                    <span class="refAuthor">Freed, N.</span>, <span class="refAuthor">Klensin, J.</span>, 및 <span
+                        class="refAuthor">T. Hansen</span>, <span class="refTitle">"미디어 유형 명세 및
+                        등록 절차"</span>, <span class="seriesInfo">BCP 13</span>, <span class="seriesInfo">RFC 6838</span>,
+                    <span class="seriesInfo">DOI 10.17487/RFC6838</span>, <time datetime="2013-01" class="refDate">2013년
+                        1월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc6838">https://www.rfc-editor.org/info/rfc6838</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC8259">[RFC8259]</dt>
+                <dd>
+                    <span class="refAuthor">Bray, T., 편집자</span>, <span class="refTitle">"JavaScript Object Notation
+                        (JSON) 데이터 교환 형식"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC
+                        8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12"
+                        class="refDate">2017년 12월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc8259">https://www.rfc-editor.org/info/rfc8259</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="RFC9535">[RFC9535]</dt>
+                <dd>
+                    <span class="refAuthor">Gössner, S., 편집자</span>, <span class="refAuthor">Normington, G., 편집자</span>,
+                    및 <span class="refAuthor">C. Bormann, 편집자</span>, <span class="refTitle">"JSONPath: JSON용 쿼리
+                        표현식"</span>, <span class="seriesInfo">RFC 9535</span>, <span class="seriesInfo">DOI
+                        10.17487/RFC9535</span>, <time datetime="2024-02" class="refDate">2024년 2월</time>, <span>&lt;<a
+                            href="https://www.rfc-editor.org/info/rfc9535">https://www.rfc-editor.org/info/rfc9535</a>&gt;</span>.
+                </dd>
+                <dd class="break"></dd>
+                <dt id="URL">[URL]</dt>
+                <dd>
+                    <span class="refAuthor">WHATWG</span>, <span class="refTitle">"URL"</span>, <span
+                        class="refContent">WHATWG 현행 표준</span>, <span>&lt;<a
+                            href="https://url.spec.whatwg.org">https://url.spec.whatwg.org</a>&gt;</span>. <span
+                        class="annotation">커밋 스냅샷: <span>&lt;<a
+                                href="https://url.spec.whatwg.org/commit-snapshots/52526653e848c5a56598c84aa4bc8ac9025fb66b/">https://url.spec.whatwg.org/commit-snapshots/52526653e848c5a56598c84aa4bc8ac9025fb66b/</a>&gt;</span>.</span>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="XSLT">[XSLT]</dt>
+                <dd>
+                    <span class="refAuthor">Kay, M., 편집자</span>, <span class="refTitle">"XSL 변환(XSLT)
+                        버전 3.0"</span>, <span class="refContent">W3C 권고안</span>, <time datetime="2017-06-08"
+                        class="refDate">2017년 6월 8일</time>, <span>&lt;<a
+                            href="https://www.w3.org/TR/2017/REC-xslt-30-20170608/">https://www.w3.org/TR/2017/REC-xslt-30-20170608/</a>&gt;</span>.
+                    <span class="annotation">
+                        최신 버전은
+                        <span><a href="https://www.w3.org/TR/xslt-30/">https://www.w3.org/TR/xslt-30/</a></span>에서 확인할 수
+                        있습니다.
+                    </span>
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+    </section>
+    <div id="examples">
+        <section id="appendix-A">
+            <h2 id="name-examples">
+                <a href="#appendix-A" class="section-number selfRef">부록 A. </a><a href="#name-examples"
+                    class="section-name selfRef">예제</a>
+            </h2>
+            <p id="appendix-A-1">
+                아래 예제는 설명을 위한 것일 뿐입니다. 실제로 이렇게 짧은 쿼리를
+                보내야 한다면 GET을 사용하는 것이 더 적합할 가능성이 높습니다.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+            <p id="appendix-A-2">
+                대부분의 예제에서 사용되는 미디어 유형은
+                "application/x-www-form-urlencoded"입니다
+                (브라우저 사용자 클라이언트의 POST 요청에서 사용되며,
+                <span>[<a href="#URL" class="cite xref">URL</a>]</span>의
+                <a
+                    href="https://url.spec.whatwg.org/#application/x-www-form-urlencoded">"application/x-www-form-urlencoded"</a>에
+                정의되어 있습니다).
+                간결성을 위해 Content-Length 필드는 생략했습니다.<a href="#appendix-A-2" class="pilcrow">¶</a>
+            </p>
+            <div id="example.simple">
+                <section id="appendix-A.1">
+                    <h3 id="name-simple-query">
+                        <a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-simple-query"
+                            class="section-name selfRef">간단한 쿼리</a>
+                    </h3>
+                    <p id="appendix-A.1-1">다음은 직접 응답이 있는 간단한 쿼리입니다.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.1-2">
+                        <pre>
+QUERY /contacts HTTP/1.1
+Host: example.org
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+select=surname,givenname,email&amp;limit=10&amp;match=%22email=*@example.*%22</pre><a href="#appendix-A.1-2"
+                            class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.1-3">응답:<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.1-4">
+                        <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+  { "surname": "Smith",
+    "givenname": "John",
+    "email": "smith@example.org" },
+  { "surname": "Jones",
+    "givenname": "Sally",
+    "email": "sally.jones@example.com" },
+  { "surname": "Dubois",
+    "givenname": "Camille",
+    "email": "camille.dubois@example.net" }
+]</pre><a href="#appendix-A.1-4" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+            <div id="example.discovery.method">
+                <section id="appendix-A.2">
+                    <h3 id="name-discovery-of-query-support">
+                        <a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a
+                            href="#name-discovery-of-query-support" class="section-name selfRef">QUERY
+                            지원 확인</a>
+                    </h3>
+                    <p id="appendix-A.2-1">
+                        QUERY 지원을 확인하는 간단한 방법은 OPTIONS
+                        (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-9.3.7" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                9.3.7</a></span>) 메서드에서 제공됩니다.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.2-2">
+                        <pre>
+OPTIONS /contacts HTTP/1.1
+Host: example.org</pre><a href="#appendix-A.2-2" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.2-3">응답:<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.2-4">
+                        <pre>
+HTTP/1.1 200 OK
+Allow: GET, QUERY, OPTIONS, HEAD</pre><a href="#appendix-A.2-4" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.2-5">
+                        Allow 응답 필드(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.1" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션 10.2.1</a></span>)는 지정된 리소스에서
+                        지원되는 메서드 집합을 나타냅니다.<a href="#appendix-A.2-5" class="pilcrow">¶</a></p>
+                    <p id="appendix-A.2-6">
+                        OPTIONS를 사용하는 것 외에도 다른 방법이 있습니다. 예를 들어 서버 지원 여부를
+                        미리 알지 못한 상태에서 QUERY 요청을 시도할 수 있습니다. 그러면 서버는
+                        요청을 처리하거나, Allow 응답 필드를 포함하여
+                        405(Method Not Allowed,
+                        <span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.5.6" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                15.5.6</a></span>) 같은 4xx 상태로 응답할 수 있습니다.<a href="#appendix-A.2-6" class="pilcrow">¶</a>
+                    </p>
+                </section>
+            </div>
+            <div id="example.discovery.formats">
+                <section id="appendix-A.3">
+                    <h3 id="name-discovery-of-query-formats">
+                        <a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a
+                            href="#name-discovery-of-query-formats" class="section-name selfRef">QUERY
+                            형식 확인</a>
+                    </h3>
+                    <p id="appendix-A.3-1">
+                        QUERY에서 지원되는 미디어 유형은 Accept-Query
+                        응답 필드(<a href="#field.accept-query" class="auto internal xref">섹션 3</a>)를 통해 확인할 수 있습니다.<a
+                            href="#appendix-A.3-1" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.3-2">
+                        <pre>
+HEAD /contacts HTTP/1.1
+Host: example.org</pre><a href="#appendix-A.3-2" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.3-3">응답:<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.3-4">
+                        <pre>
+HTTP/1.1 200 OK
+Content-Type: application/xhtml
+Accept-Query: application/x-www-form-urlencoded, application/sql</pre><a href="#appendix-A.3-4" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.3-5">
+                        어떤 요청 메서드에 대한 응답에 Accept-Query가 포함되는지는
+                        접근 중인 리소스에 따라 달라집니다.<a href="#appendix-A.3-5" class="pilcrow">¶</a></p>
+                    <p id="appendix-A.3-6">
+                        Accept-Query를 확인하는 대신 QUERY 요청을 수행한 뒤,
+                        415 응답(Unsupported Media Type, <span><a
+                                href="https://rfc-editor.org/rfc/rfc9110#section-15.5.16" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                15.5.16</a></span>) 같은 4xx 상태가 발생한 경우
+                        Accept 응답 필드(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1"
+                                class="relref">[<a href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                12.5.1</a></span>)를 검사할 수도 있습니다.<a href="#appendix-A.3-6" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.3-7">
+                        <pre>
+HTTP/1.1 415 Unsupported Media Type
+Content-Type: application/xhtml
+Accept: application/x-www-form-urlencoded, application/sql</pre><a href="#appendix-A.3-7" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+            <div id="example.content-location.location.indirect">
+                <section id="appendix-A.4">
+                    <h3 id="name-content-location-location-a">
+                        <a href="#appendix-A.4" class="section-number selfRef">A.4. </a><a
+                            href="#name-content-location-location-a" class="section-name selfRef">Content-Location,
+                            Location 및 간접 응답</a>
+                    </h3>
+                    <p id="appendix-A.4-1">
+                        섹션 <a href="#content-location" class="auto internal xref">2.3</a> 및
+                        <a href="#location" class="auto internal xref">2.4</a>에 설명된 대로, 성공 응답의
+                        Content-Location 및 Location 응답 필드
+                        (2xx, <span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.3" class="relref">[<a
+                                    href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                15.3</a></span>)는 수신한 요청 결과 또는 동일한 작업을 수행하기 위한 이후
+                        요청에 대해 GET 요청에 응답할 대체 리소스를
+                        식별하는 방법을 제공합니다. <a href="#example.simple" class="auto internal xref">부록 A.1</a>의 예제로 돌아가면 다음과
+                        같습니다.<a href="#appendix-A.4-1" class="pilcrow">¶</a>
+                    </p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.4-2">
+                        <pre>
+QUERY /contacts HTTP/1.1
+Host: example.org
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+select=surname,givenname,email&amp;limit=10&amp;match=%22email=*@example.*%22</pre><a href="#appendix-A.4-2"
+                            class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.4-3">응답:<a href="#appendix-A.4-3" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.4-4">
+                        <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Location: /contacts/stored-results/17
+Location: /contacts/stored-queries/42
+Last-Modified: Sat, 25 Aug 2012 23:34:45 GMT
+Date: Sun, 17 Nov 2024, 16:10:24 GMT
+
+[
+  { "surname": "Smith",
+    "givenname": "John",
+    "email": "smith@example.org" },
+  { "surname": "Jones",
+    "givenname": "Sally",
+    "email": "sally.jones@example.com" },
+  { "surname": "Dubois",
+    "givenname": "Camille",
+    "email": "camille.dubois@example.net" }
+]</pre><a href="#appendix-A.4-4" class="pilcrow">¶</a>
+                    </div>
+                    <div id="example.content-location">
+                        <section id="appendix-A.4.1">
+                            <h4 id="name-using-content-location">
+                                <a href="#appendix-A.4.1" class="section-number selfRef">A.4.1. </a><a
+                                    href="#name-using-content-location" class="section-name selfRef">
+                                    Content-Location 사용</a>
+                            </h4>
+                            <p id="appendix-A.4.1-1">
+                                위에서 수신한 Content-Location 응답 필드는
+                                해당 QUERY 응답의 결과를 보유하는 리소스를 식별합니다.<a href="#appendix-A.4.1-1" class="pilcrow">¶</a></p>
+                            <div class="lang-http-message sourcecode" id="appendix-A.4.1-2">
+                                <pre>
+GET /contacts/stored-results/17 HTTP/1.1
+Host: example.org
+Accept: application/json</pre><a href="#appendix-A.4.1-2" class="pilcrow">¶</a>
+                            </div>
+                            <p id="appendix-A.4.1-3">응답:<a href="#appendix-A.4.1-3" class="pilcrow">¶</a></p>
+                            <div class="lang-http-message sourcecode" id="appendix-A.4.1-4">
+                                <pre>
+HTTP/1.1 200 OK
+Last-Modified: Sat, 25 Aug 2012 23:34:45 GMT
+Date: Sun, 17 Nov 2024, 16:10:25 GMT
+
+[
+  { "surname": "Smith",
+    "givenname": "John",
+    "email": "smith@example.org" },
+  { "surname": "Jones",
+    "givenname": "Sally",
+    "email": "sally.jones@example.com" },
+  { "surname": "Dubois",
+    "givenname": "Camille",
+    "email": "camille.dubois@example.net" }
+]</pre><a href="#appendix-A.4.1-4" class="pilcrow">¶</a>
+                            </div>
+                            <p id="appendix-A.4.1-5">
+                                서버가 이 리소스를 무기한 구현할 것이라는 보장은 없으므로,
+                                오류 응답 후 클라이언트는 새로운 대체 위치를 얻기 위해
+                                원래 QUERY 요청을 다시 수행해야 한다는 점에 유의하십시오.<a href="#appendix-A.4.1-5" class="pilcrow">¶</a></p>
+                        </section>
+                    </div>
+                    <div id="example.location">
+                        <section id="appendix-A.4.2">
+                            <h4 id="name-using-location">
+                                <a href="#appendix-A.4.2" class="section-number selfRef">A.4.2. </a><a
+                                    href="#name-using-location" class="section-name selfRef">Location 사용</a>
+                            </h4>
+                            <p id="appendix-A.4.2-1">
+                                Location 응답 필드는 원래 QUERY 요청과 동일한 프로세스와
+                                매개변수에 대한 현재 결과로 GET에 응답할 리소스를 식별합니다.<a href="#appendix-A.4.2-1" class="pilcrow">¶</a>
+                            </p>
+                            <div class="lang-http-message sourcecode" id="appendix-A.4.2-2">
+                                <pre>
+GET /contacts/stored-queries/42 HTTP/1.1
+Host: example.org
+Accept: application/json</pre><a href="#appendix-A.4.2-2" class="pilcrow">¶</a>
+                            </div>
+                            <p id="appendix-A.4.2-3">
+                                이 예제에서는 Last-Modified 필드에 표시된 대로
+                                2024-11-17T16:12:01Z에 항목 하나가 제거되었으므로 응답에는 항목이 두 개만 포함됩니다.<a href="#appendix-A.4.2-3"
+                                    class="pilcrow">¶</a></p>
+                            <div class="lang-http-message sourcecode" id="appendix-A.4.2-4">
+                                <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+Last-Modified: Sun, 17 November 2024, 16:12:01 GMT
+ETag: "42-1"
+Date: Sun, 17 Nov 2024, 16:13:17 GMT
+
+[
+  { "surname": "Smith",
+    "givenname": "John",
+    "email": "smith@example.org" },
+  { "surname": "Dubois",
+    "givenname": "Camille",
+    "email": "camille.dubois@example.net" }
+]</pre><a href="#appendix-A.4.2-4" class="pilcrow">¶</a>
+                            </div>
+                            <p id="appendix-A.4.2-5">
+                                서버가 여전히 해당 리소스를 노출하고 있고 쿼리 결과에 변경이 없다고 가정하면,
+                                다음 내용을 포함한 이후 조건부 GET 요청은 다음과 같습니다.<a href="#appendix-A.4.2-5" class="pilcrow">¶</a></p>
+                            <div class="lang-http-message sourcecode" id="appendix-A.4.2-6">
+                                <pre>
+If-None-Match: "42-1"</pre><a href="#appendix-A.4.2-6" class="pilcrow">¶</a>
+                            </div>
+                            <p id="appendix-A.4.2-7">
+                                이는 304(Not Modified) 응답(<span><a
+                                        href="https://rfc-editor.org/rfc/rfc9110#section-15.4.5" class="relref">[<a
+                                            href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                        15.4.5</a></span>)으로 이어집니다.<a href="#appendix-A.4.2-7" class="pilcrow">¶</a></p>
+                        </section>
+                    </div>
+                    <div id="example.indirect">
+                        <section id="appendix-A.4.3">
+                            <h4 id="name-indirect-responses">
+                                <a href="#appendix-A.4.3" class="section-number selfRef">A.4.3. </a><a
+                                    href="#name-indirect-responses" class="section-name selfRef">간접 응답</a>
+                            </h4>
+                            <p id="appendix-A.4.3-1">
+                                서버는 상태 코드 303(See Other,
+                                <span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.4.4" class="relref">[<a
+                                            href="#RFC9110" class="cite xref">HTTP</a>]의 섹션
+                                        15.4.4</a></span>)을 사용하여 "간접" 응답(<a href="#redirection"
+                                    class="auto internal xref">섹션 2.5</a>)을 보낼 수 있습니다.<a href="#appendix-A.4.3-1"
+                                    class="pilcrow">¶</a>
+                            </p>
+                            <p id="appendix-A.4.3-2">
+                                <a href="#example.content-location.location.indirect" class="auto internal xref">부록
+                                    A.4</a> 시작 부분의 요청이 주어지면
+                                서버는 다음과 같이 응답할 수 있습니다.<a href="#appendix-A.4.3-2" class="pilcrow">¶</a>
+                            </p>
+                            <div class="lang-http-message sourcecode" id="appendix-A.4.3-3">
+                                <pre>
+HTTP/1.1 303 See Other
+Content-Type: text/plain
+Date: Sun, 17 Nov 2024, 16:13:17 GMT
+Location: /contacts/stored-queries/42
+
+저장된 쿼리는 "/contacts/stored-queries/42"에 있습니다.</pre><a href="#appendix-A.4.3-3" class="pilcrow">¶</a>
+                            </div>
+                            <p id="appendix-A.4.3-4">
+                                이는 직접 응답에 Location을 포함하는 것과 유사하지만 쿼리
+                                결과가 반환되지 않는다는 점이 다릅니다. 이를 통해 서버는 대체
+                                리소스만 생성하거나 재사용할 수 있습니다. 이후 이 리소스는
+                                <a href="#example.location" class="auto internal xref">부록 A.4.2</a>에 표시된 대로 사용할 수
+                                있습니다.<a href="#appendix-A.4.3-4" class="pilcrow">¶</a>
+                            </p>
+                        </section>
+                    </div>
+                </section>
+            </div>
+            <div id="example.conditional">
+                <section id="appendix-A.5">
+                    <h3 id="name-conditional-requests-2">
+                        <a href="#appendix-A.5" class="section-number selfRef">A.5. </a><a
+                            href="#name-conditional-requests-2" class="section-name selfRef">조건부 요청</a>
+                    </h3>
+                    <p id="appendix-A.5-1">
+                        "application/sql" 및 "application/xslt+xml"
+                        <span>[<a href="#XSLT" class="cite xref">XSLT</a>]</span>를 요청 미디어 유형으로 지원하고,
+                        "text/csv" 형식의 응답을 생성할 수 있는 QUERY 구현 리소스를 생각해 보겠습니다. 쿼리 대상 데이터 집합에는 RFC 문서
+                        정보가 포함되어 있으며 쿼리는 10년 단위로 그룹화된 정보를 반환합니다.<a href="#appendix-A.5-1" class="pilcrow">¶</a>
+                    </p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.5-2">
+                        <pre>
+QUERY /rfc-index.xml HTTP/1.1
+Host: example.org
+Date: Sun, 7 Sep 2025, 00:00:00 GMT
+Content-Type: application/xslt+xml
+Accept: text/csv
+
+...XSLT를 사용하는 쿼리 콘텐츠...</pre><a href="#appendix-A.5-2" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.5-3">
+                        응답:<a href="#appendix-A.5-3" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.5-4">
+                        <pre>
+HTTP/1.1 200 OK
+Date: Sun, 7 Sep 2025, 00:00:00 GMT
+Location: /stored-queries/4815162342
+Content-Type: text/csv
+Accept-Query: "application/sql", "application/xslt+xml"
+Last-Modified: Sun, 31 Aug 2025, 08:44:00 GMT
+Vary: Accept-Query, Content-Encoding, Content-Type
+
+decade, total, with errata, % with errata, average page count
+1960, 26, 5, 19.2, 5.3
+1970, 666, 18, 2.7, 6.1
+1980, 376, 44, 11.7, 23.4
+1990, 1593, 269, 16.9, 25.5
+2000, 2888, 1048, 36.3, 27.3
+2010, 2954, 895, 30.3, 26.1
+2020, 1133, 230, 20.3, 26.2</pre><a href="#appendix-A.5-4" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.5-5">
+                        여기서 서버는 이후 GET과 함께 사용하기 위해 동등한
+                        리소스(<a href="#location" class="auto internal xref">섹션 2.4</a>)에
+                        "/stored-queries/4815162342" 경로를 할당했습니다.<a href="#appendix-A.5-5" class="pilcrow">¶</a></p>
+                    <p id="appendix-A.5-6">
+                        나중에 클라이언트는 쿼리를 반복하지만 결과가 변경된 경우에만
+                        반환되도록 지정합니다.<a href="#appendix-A.5-6" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.5-7">
+                        <pre>
+QUERY /rfc-index.xml HTTP/1.1
+Host: example.org
+Date: Mon, 8, Sep 2025, 11:00:00 GMT
+Content-Type: application/sql
+Accept: text/csv
+If-Modified-Since: Sun, 31 Aug 2025, 08:44:00 GMT
+Vary: Accept-Query, Content-Type
+
+...동일한 쿼리이지만 SQL을 사용...</pre><a href="#appendix-A.5-7" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.5-8">
+                        쿼리 대상 데이터가 변경되지 않았으므로 서버는 다음과 같이 응답합니다.<a href="#appendix-A.5-8" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.5-9">
+                        <pre>
+HTTP/1.1 304 Not Modified
+Date: Mon, 8 Sep 2025, 11:00:00 GMT
+Content-Type: text/csv
+Location: /stored-queries/4815162342
+Accept-Query: "application/sql", "application/xslt+xml"
+Last-Modified: Sun, 31 Aug 2025, 08:44:00 GMT
+Vary: Accept-Query, Content-Type</pre><a href="#appendix-A.5-9" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.5-10">
+                        서버가 동등한 리소스의 URI를 식별했으므로 해당 리소스에는
+                        GET으로 접근할 수 있습니다. 특히 이를 통해 쿼리 요청의
+                        콘텐츠를 다시 보낼 필요가 없습니다.<a href="#appendix-A.5-10" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.5-11">
+                        <pre>
+GET /stored-queries/4815162342 HTTP/1.1
+Host: example.org
+Date: Sun, 21, Sep 2025, 12:08:00 GMT
+Accept: text/csv
+If-Modified-Since: Sun, 31 Aug 2025, 00:00:00 GMT</pre><a href="#appendix-A.5-11" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.5-12">
+                        여기서는 데이터 집합의 상태가 실제로 변경되었으므로 새 콘텐츠가 반환됩니다.<a href="#appendix-A.5-12" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.5-13">
+                        <pre>
+HTTP/1.1 200 OK
+Date: Sun, 21, Sep 2025, 12:08:00 GMT
+Content-Type: text/csv
+Last-Modified: Thu, 18 Sep 2025, 19:56:00 GMT
+Vary: Accept-Query, Content-Encoding, Content-Type
+
+decade, total, with errata, % with errata, average page count
+1960, 26, 5, 19.2, 5.3
+1970, 666, 18, 2.7, 6.1
+1980, 376, 44, 11.7, 23.4
+1990, 1593, 269, 16.9, 25.5
+2000, 2888, 1048, 36.3, 27.3
+2010, 2954, 895, 30.3, 26.1
+2020, 1133, 230, 20.3, 26.2</pre><a href="#appendix-A.5-13" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.5-14">
+                        (이 10년 구간의 행에 변경이 있음을 확인하십시오.)<a href="#appendix-A.5-14" class="pilcrow">¶</a>
+                    </p>
+                    <p id="appendix-A.5-15">
+                        아래 다이어그램은 조건부 요청의 사용과 동등한 리소스에 URI가 할당된 경우
+                        (그리고 클라이언트가 이를 활용하는 경우) 어떻게 달라질 수 있는지를 보여줍니다.
+                        가상의 필드 이름 "Validator"는 설명 목적으로 사용됩니다.<a href="#appendix-A.5-15" class="pilcrow">¶</a></p>
+                    <span id="name-data-flow-with-query-only"></span>
+                    <figure id="figure-1">
+                        <div id="appendix-A.5-16.1">
+                            <div class="alignLeft art-svg artwork" id="appendix-A.5-16.1.2">
+                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="496" width="416"
+                                    viewBox="0 0 416 496" class="diagram" text-anchor="middle" font-family="monospace"
+                                    font-size="13px" stroke-linecap="round">
+                                    <path d="M 8,48 L 8,480" fill="none" stroke="black"></path>
+                                    <path d="M 288,304 L 288,336" fill="none" stroke="black"></path>
+                                    <path d="M 344,48 L 344,296" fill="none" stroke="black"></path>
+                                    <path d="M 344,344 L 344,480" fill="none" stroke="black"></path>
+                                    <path d="M 408,304 L 408,336" fill="none" stroke="black"></path>
+                                    <path d="M 8,80 L 336,80" fill="none" stroke="black"></path>
+                                    <path d="M 16,144 L 344,144" fill="none" stroke="black"></path>
+                                    <path d="M 8,208 L 336,208" fill="none" stroke="black"></path>
+                                    <path d="M 16,272 L 344,272" fill="none" stroke="black"></path>
+                                    <path d="M 288,304 L 408,304" fill="none" stroke="black"></path>
+                                    <path d="M 288,336 L 408,336" fill="none" stroke="black"></path>
+                                    <path d="M 8,400 L 336,400" fill="none" stroke="black"></path>
+                                    <path d="M 16,464 L 344,464" fill="none" stroke="black"></path>
+                                    <polygon class="arrowhead" points="344,400 332,394.4 332,405.6" fill="black"
+                                        transform="rotate(0,336,400)"></polygon>
+                                    <polygon class="arrowhead" points="344,208 332,202.4 332,213.6" fill="black"
+                                        transform="rotate(0,336,208)"></polygon>
+                                    <polygon class="arrowhead" points="344,80 332,74.4 332,85.6" fill="black"
+                                        transform="rotate(0,336,80)"></polygon>
+                                    <polygon class="arrowhead" points="24,464 12,458.4 12,469.6" fill="black"
+                                        transform="rotate(180,16,464)"></polygon>
+                                    <polygon class="arrowhead" points="24,272 12,266.4 12,277.6" fill="black"
+                                        transform="rotate(180,16,272)"></polygon>
+                                    <polygon class="arrowhead" points="24,144 12,138.4 12,149.6" fill="black"
+                                        transform="rotate(180,16,144)"></polygon>
+                                    <g class="text">
+                                        <text x="28" y="36">클라이언트</text>
+                                        <text x="316" y="36">리소스</text>
+                                        <text x="92" y="68">콘텐츠가 있는 QUERY</text>
+                                        <text x="308" y="116">200 OK</text>
+                                        <text x="276" y="132">Validator: foo</text>
+                                        <text x="92" y="180">콘텐츠가 있는 QUERY</text>
+                                        <text x="108" y="196">('foo'를 조건으로 함)</text>
+                                        <text x="268" y="244">304 Not Modified</text>
+                                        <text x="276" y="260">Validator: foo</text>
+                                        <text x="348" y="324">상태 변경</text>
+                                        <text x="92" y="372">콘텐츠가 있는 QUERY</text>
+                                        <text x="108" y="388">('foo'를 조건으로 함)</text>
+                                        <text x="308" y="436">200 OK</text>
+                                        <text x="276" y="452">Validator: bar</text>
+                                    </g>
+                                </svg><a href="#appendix-A.5-16.1.2" class="pilcrow">¶</a>
+                            </div>
+                        </div>
+                        <figcaption><a href="#figure-1" class="selfRef">그림 1</a>:
+                            <a href="#name-data-flow-with-query-only" class="selfRef">QUERY만 사용하는 데이터 흐름</a>
+                        </figcaption>
+                    </figure>
+                    <span id="name-data-flow-with-get-to-equiv"></span>
+                    <figure id="figure-2">
+                        <div id="appendix-A.5-17.1">
+                            <div class="alignLeft art-svg artwork" id="appendix-A.5-17.1.2">
+                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="512" width="560"
+                                    viewBox="0 0 560 512" class="diagram" text-anchor="middle" font-family="monospace"
+                                    font-size="13px" stroke-linecap="round">
+                                    <path d="M 8,48 L 8,496" fill="none" stroke="black"></path>
+                                    <path d="M 264,48 L 264,192" fill="none" stroke="black"></path>
+                                    <path d="M 432,336 L 432,368" fill="none" stroke="black"></path>
+                                    <path d="M 488,88 L 488,328" fill="none" stroke="black"></path>
+                                    <path d="M 488,376 L 488,496" fill="none" stroke="black"></path>
+                                    <path d="M 552,336 L 552,368" fill="none" stroke="black"></path>
+                                    <path d="M 8,80 L 256,80" fill="none" stroke="black"></path>
+                                    <path d="M 264,96 L 480,96" fill="none" stroke="black"></path>
+                                    <path d="M 16,176 L 264,176" fill="none" stroke="black"></path>
+                                    <path d="M 8,240 L 480,240" fill="none" stroke="black"></path>
+                                    <path d="M 16,304 L 488,304" fill="none" stroke="black"></path>
+                                    <path d="M 432,336 L 552,336" fill="none" stroke="black"></path>
+                                    <path d="M 432,368 L 552,368" fill="none" stroke="black"></path>
+                                    <path d="M 8,416 L 480,416" fill="none" stroke="black"></path>
+                                    <path d="M 16,480 L 488,480" fill="none" stroke="black"></path>
+                                    <polygon class="arrowhead" points="488,416 476,410.4 476,421.6" fill="black"
+                                        transform="rotate(0,480,416)"></polygon>
+                                    <polygon class="arrowhead" points="488,240 476,234.4 476,245.6" fill="black"
+                                        transform="rotate(0,480,240)"></polygon>
+                                    <polygon class="arrowhead" points="264,80 252,74.4 252,85.6" fill="black"
+                                        transform="rotate(0,256,80)"></polygon>
+                                    <polygon class="arrowhead" points="24,480 12,474.4 12,485.6" fill="black"
+                                        transform="rotate(180,16,480)"></polygon>
+                                    <polygon class="arrowhead" points="24,304 12,298.4 12,309.6" fill="black"
+                                        transform="rotate(180,16,304)"></polygon>
+                                    <polygon class="arrowhead" points="24,176 12,170.4 12,181.6" fill="black"
+                                        transform="rotate(180,16,176)"></polygon>
+                                    <circle cx="488" cy="96" r="6" class="opendot" fill="white" stroke="black"></circle>
+                                    <g class="text">
+                                        <text x="28" y="36">클라이언트</text>
+                                        <text x="236" y="36">리소스</text>
+                                        <text x="92" y="68">콘텐츠가 있는 QUERY</text>
+                                        <text x="416" y="68">동등한 리소스</text>
+                                        <text x="428" y="84">(/xyz 생성)</text>
+                                        <text x="228" y="132">200 OK</text>
+                                        <text x="196" y="148">Validator: foo</text>
+                                        <text x="196" y="164">Location: /xyz</text>
+                                        <text x="32" y="212">GET</text>
+                                        <text x="108" y="228">('foo'를 조건으로 함)</text>
+                                        <text x="412" y="276">304 Not Modified</text>
+                                        <text x="420" y="292">Validator: foo</text>
+                                        <text x="492" y="356">상태 변경</text>
+                                        <text x="32" y="388">GET</text>
+                                        <text x="108" y="404">('foo'를 조건으로 함)</text>
+                                        <text x="452" y="452">200 OK</text>
+                                        <text x="420" y="468">Validator: bar</text>
+                                    </g>
+                                </svg><a href="#appendix-A.5-17.1.2" class="pilcrow">¶</a>
+                            </div>
+                        </div>
+                        <figcaption><a href="#figure-2" class="selfRef">그림 2</a>:
+                            <a href="#name-data-flow-with-get-to-equiv" class="selfRef">동등한 리소스에 GET을 사용하는
+                                데이터 흐름</a>
+                        </figcaption>
+                    </figure>
+                </section>
+            </div>
+            <div id="example.more.query.formats">
+                <section id="appendix-A.6">
+                    <h3 id="name-more-query-formats">
+                        <a href="#appendix-A.6" class="section-number selfRef">A.6. </a><a
+                            href="#name-more-query-formats" class="section-name selfRef">추가 쿼리 형식</a>
+                    </h3>
+                    <p id="appendix-A.6-1">
+                        다음 예제는 RFC 정오표의 JSON 형태
+                        <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span> 데이터베이스에 대한 요청을 보여줍니다.<a
+                            href="#appendix-A.6-1" class="pilcrow">¶</a>
+                    </p>
+                    <p id="appendix-A.6-2">
+                        아래 요청은 eXtensible Stylesheet Language Transformations(XSLT)을 사용하여
+                        연도별 및 정의된 정오표 유형별로 요약된 정오표
+                        정보를 추출합니다.<a href="#appendix-A.6-2" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.6-3">
+                        <pre>
+QUERY /errata.json HTTP/1.1
+Host: example.org
+Content-Type: application/xslt+xml
+Accept: application/xml, text/csv
+
+&lt;transform xmlns="http://www.w3.org/1999/XSL/Transform"
+  xmlns:j="http://www.w3.org/2005/xpath-functions"
+  version="3.0"&gt;
+
+  &lt;output method="text"/&gt;
+
+  &lt;param name="input"/&gt;
+
+  &lt;variable name="json"
+    select="json-to-xml(unparsed-text($input))"/&gt;
+
+  &lt;variable name="sc"&gt;errata_status_code&lt;/variable&gt;
+  &lt;variable name="sd"&gt;submit_date&lt;/variable&gt;
+
+  &lt;template match="/"&gt;
+    &lt;text&gt;year, total, rejected, verified, hdu, reported&lt;/text&gt;
+    &lt;text&gt;&amp;#10;&lt;/text&gt;
+    &lt;variable name="en" select="$json//j:map"/&gt;
+    &lt;for-each-group select="$en"
+      group-by="substring-before(j:string[@key=$sd],'-')"&gt;
+      &lt;sort select="current-grouping-key()"/&gt;
+      &lt;variable name="year" select="current-grouping-key()"/&gt;
+      &lt;variable name="errata" select=
+        "$en[$year=substring-before(j:string[@key=$sd],'-')]"/&gt;
+      &lt;value-of select="concat(
+        $year,
+        ', ',
+        count($errata),
+        ', ',
+        count($errata['Rejected'=j:string[@key=$sc]]),
+        ', ',
+        count($errata['Verified'=j:string[@key=$sc]]),
+        ', ',
+        count(
+          $errata['Held for Document Update'=j:string[@key=$sc]]),
+        ', ',
+        count($errata['Reported'=j:string[@key=$sc]]),
+        '&amp;#10;')"/&gt;
+    &lt;/for-each-group&gt;
+  &lt;/template&gt;
+
+&lt;/transform&gt;</pre><a href="#appendix-A.6-3" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.6-4">
+                        응답:<a href="#appendix-A.6-4" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.6-5">
+                        <pre>
+HTTP/1.1 200 OK
+Content-Type: text/csv
+Accept-Query: "application/jsonpath", "application/xslt+xml"
+Date: Wed, 19 Feb 2025, 17:10:01 GMT
+
+year, total, rejected, verified, hdu, reported
+2000, 14, 0, 14, 0, 0
+2001, 72, 1, 70, 1, 0
+2002, 124, 8, 104, 12, 0
+2003, 63, 0, 61, 2, 0
+2004, 89, 1, 83, 5, 0
+2005, 156, 10, 96, 50, 0
+2006, 444, 54, 176, 214, 0
+2007, 429, 48, 188, 193, 0
+2008, 423, 52, 165, 206, 0
+2009, 331, 39, 148, 144, 0
+2010, 538, 80, 232, 222, 4
+2011, 367, 47, 170, 150, 0
+2012, 348, 54, 149, 145, 0
+2013, 341, 61, 169, 106, 5
+2014, 342, 73, 180, 72, 17
+2015, 343, 79, 145, 89, 30
+2016, 295, 46, 122, 82, 45
+2017, 303, 46, 120, 84, 53
+2018, 350, 61, 118, 98, 73
+2019, 335, 47, 131, 94, 63
+2020, 387, 68, 117, 123, 79
+2021, 321, 44, 148, 63, 66
+2022, 358, 37, 198, 40, 83
+2023, 262, 38, 121, 33, 70
+2024, 322, 33, 125, 23, 141
+9999, 1, 0, 0, 1, 0</pre><a href="#appendix-A.6-5" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.6-6">
+                        다른 쿼리 형식인 JSONPath
+                        <span>[<a href="#RFC9535" class="cite xref">RFC9535</a>]</span>도 지원됨을 나타내는 Accept-Query 응답 필드에
+                        유의하십시오. 아래
+                        요청은 2024년 이후 제출된 모든 거부된 정오표의
+                        식별자를 보고합니다.<a href="#appendix-A.6-6" class="pilcrow">¶</a>
+                    </p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.6-7">
+                        <pre>
+QUERY /errata.json HTTP/1.1
+Host: example.org
+Content-Type: application/jsonpath
+Accept: application/json
+
+$..[
+     ?@.errata_status_code=="Rejected"
+     &amp;&amp; @.submit_date&gt;"2024"
+   ]
+   ["doc-id"]</pre><a href="#appendix-A.6-7" class="pilcrow">¶</a>
+                    </div>
+                    <p id="appendix-A.6-8">
+                        응답:<a href="#appendix-A.6-8" class="pilcrow">¶</a></p>
+                    <div class="lang-http-message sourcecode" id="appendix-A.6-9">
+                        <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+Accept-Query: "application/jsonpath", "application/xslt+xml"
+Date: Thu, 20 Feb 2025, 09:55:42 GMT
+Last-Modified: Thu, 20 Feb 2025 06:10:01 GMT
+
+[
+  "RFC1185","RFC8407","RFC6350","RFC8467","RFC1157","RFC9543",
+  "RFC9076","RFC7656","RFC2822","RFC9460","RFC2104","RFC6797",
+  "RFC9499","RFC9557","RFC2131","RFC2328","RFC9001","RFC3325",
+  "RFC9438","RFC2526","RFC2985","RFC7643","RFC9132","RFC6376",
+  "RFC9110","RFC9460","RFC7748","RFC9497","RFC8463","RFC4035",
+  "RFC7239","RFC9083","RFC9537","RFC9537","RFC9420","RFC9000",
+  "RFC9656","RFC9110","RFC2324","RFC2549","RFC6797","RFC2549",
+  "RFC8894"
+]</pre><a href="#appendix-A.6-9" class="pilcrow">¶</a>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="selection.method.name">
+        <section id="appendix-B">
+            <h2 id="name-selection-of-the-method-nam">
+                <a href="#appendix-B" class="section-number selfRef">부록 B. </a><a
+                    href="#name-selection-of-the-method-nam" class="section-name selfRef">메서드 이름
+                    'QUERY' 선택</a>
+            </h2>
+            <p id="appendix-B-1">
+                "Hypertext Transfer Protocol (HTTP) Method Registry"(<span>&lt;<a
+                        href="http://www.iana.org/assignments/http-methods">http://www.iana.org/assignments/http-methods</a>&gt;</span>)에는
+                이미 "안전함"과 "멱등적" 속성을 가진 세 가지 다른 메서드가 있습니다.
+                "PROPFIND" <span>[<a href="#RFC4918" class="cite xref">RFC4918</a>]</span>, "REPORT" <span>[<a
+                        href="#RFC3253" class="cite xref">RFC3253</a>]</span>, 그리고
+                "SEARCH" <span>[<a href="#RFC5323" class="cite xref">RFC5323</a>]</span>입니다.<a href="#appendix-B-1"
+                    class="pilcrow">¶</a></p>
+            <p id="appendix-B-2">
+                이들 중 하나를 재사용하고 이 명세에서 새로운 메서드 "QUERY"로 정의하는 내용과
+                일치하도록 업데이트하는 것도 가능했습니다. 실제로 이 명세의 초기 단계에서는
+                "SEARCH"를 사용했습니다.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+            <p id="appendix-B-3">
+                최종적으로 "QUERY"라는 메서드 이름을 선택한 이유는 다음과 같습니다.<a href="#appendix-B-3" class="pilcrow">¶</a></p>
+            <ul class="normal">
+                <li class="normal" id="appendix-B-4.1">대안들은 요청 콘텐츠에 일반적인 미디어 유형
+                    ("application/xml")을 사용하며,
+                    요청의 의미 체계는 오직 요청 콘텐츠에만 의존합니다.<a href="#appendix-B-4.1" class="pilcrow">¶</a>
+                </li>
+                <li class="normal" id="appendix-B-4.2">또한 이들은 모두 WebDAV 활동에서 유래했으며,
+                    이에 대해서는 많은 사람이 엇갈린 감정을 가지고 있습니다.<a href="#appendix-B-4.2" class="pilcrow">¶</a>
+                </li>
+                <li class="normal" id="appendix-B-4.3">"QUERY"는 URI의 쿼리 구성 요소와의 관계를
+                    잘 나타냅니다.<a href="#appendix-B-4.3" class="pilcrow">¶</a>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <div id="acknowledgements">
+        <section id="appendix-C">
+            <h2 id="name-acknowledgements">
+                <a href="#name-acknowledgements" class="section-name selfRef">감사의 말</a>
+            </h2>
+            <p id="appendix-C-1">
+                아이디어, 검토 및 피드백을 제공해 주신 HTTP 워킹 그룹의 모든 구성원께 감사드립니다.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+            <p id="appendix-C-2">
+                다음 분들께 특별히 감사드립니다.
+                <span class="contact-name">Carsten Bormann</span>,
+                <span class="contact-name">Mark Nottingham</span>,
+                <span class="contact-name">Martin Thomson</span>,
+                <span class="contact-name">Michael Thornburgh</span>,
+                <span class="contact-name">Roberto Polli</span>,
+                <span class="contact-name">Roy Fielding</span>, 그리고
+                <span class="contact-name">Will Hawkins</span>.<a href="#appendix-C-2" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="contributors">
+        <section id="appendix-D">
+            <h2 id="name-contributors">
+                <a href="#name-contributors" class="section-name selfRef">기여자</a>
+            </h2>
+            <p id="appendix-D-1">
+                <span class="contact-name">Ashok Malhotra</span>는 이 명세로 이어진 초기 논의에
+                참여했습니다.<a href="#appendix-D-1" class="pilcrow">¶</a>
+            </p>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Ashok Malhotra</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:malhotrasahib@gmail.com" class="email">malhotrasahib@gmail.com</a>
+                </div>
+            </address>
+            <p id="appendix-D-2">
+                이 HTTP 메서드에 대한 논의는 2019년 HTTP 워크숍에서 <span class="contact-name">Asbjørn Ulsberg</span>에 의해
+                다시 시작되었습니다.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Asbjørn Ulsberg</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:asbjorn@ulsberg.no" class="email">asbjorn@ulsberg.no</a>
+                </div>
+                <div class="url">
+                    <span>URI:</span>
+                    <a href="https://asbjor.nu/" class="url">https://asbjor.nu/</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <div id="authors-addresses">
+        <section id="appendix-E">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Julian Reschke</span></div>
+                <div dir="auto" class="left"><span class="org">greenbytes GmbH</span></div>
+                <div dir="auto" class="left"><span class="street-address">Hafenweg 16</span></div>
+                <div dir="auto" class="left">
+                    <span class="postal-code">48155</span> <span class="locality">Münster</span>
+                </div>
+                <div dir="auto" class="left"><span class="country-name">독일</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:julian.reschke@greenbytes.de" class="email">julian.reschke@greenbytes.de</a>
+                </div>
+                <div class="url">
+                    <span>URI:</span>
+                    <a href="https://greenbytes.de/tech/webdav/" class="url">https://greenbytes.de/tech/webdav/</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">James M Snell</span></div>
+                <div dir="auto" class="left"><span class="org">Cloudflare</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:jasnell@gmail.com" class="email">jasnell@gmail.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Mike Bishop</span></div>
+                <div dir="auto" class="left"><span class="org">Akamai</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:mbishop@evequefou.be" class="email">mbishop@evequefou.be</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script>const toc = document.getElementById("toc");
+        toc.querySelector("h2").addEventListener("click", e => {
+            toc.classList.toggle("active");
+        });
+        toc.querySelector("nav").addEventListener("click", e => {
+            toc.classList.remove("active");
+        });
+    </script>
+    <script src="https://htmlspecs.com/dropdown.js"></script>
+</body>
+
+</html>
