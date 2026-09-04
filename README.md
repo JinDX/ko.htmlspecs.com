@@ -658,6 +658,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 ### 메서드, 상태 코드 및 프로토콜 구축
 - [Building Protocols with HTTP](https://ko.htmlspecs.com/http/rfc9205.html)（[Source](https://httpwg.org/specs/rfc9205.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [PATCH Method for HTTP](https://ko.htmlspecs.com/http/rfc5789.html)（[Source](https://httpwg.org/specs/rfc5789.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
+- [The HTTP QUERY Method](https://ko.htmlspecs.com/http/rfc10008.html)（[Source](https://www.rfc-editor.org/rfc/rfc10008.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [Additional HTTP Status Codes](https://ko.htmlspecs.com/http/rfc6585.html)（[Source](https://httpwg.org/specs/rfc6585.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [An HTTP Status Code to Report Legal Obstacles](https://ko.htmlspecs.com/http/rfc7725.html)（[Source](https://httpwg.org/specs/rfc7725.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [An HTTP Status Code for Indicating Hints](https://ko.htmlspecs.com/http/rfc8297.html)（[Source](https://httpwg.org/specs/rfc8297.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
