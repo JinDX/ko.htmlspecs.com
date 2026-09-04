@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="ko" class="RFC">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Common,Latin" name="scripts">
+    <meta content="initial-scale=1.0" name="viewport">
+    <title>RFC 10036: HTTP 메시지의 점진적 전달</title>
+    <meta content="奥 一穂 (Kazuho Oku)" name="author">
+    <meta content="Tommy Pauly" name="author">
+    <meta content="Martin Thomson" name="author">
+    <meta content='
+       이 문서는 "Incremental" HTTP 헤더 필드를 규정하며, 이 필드는
+HTTP 중개자가 HTTP 메시지를 점진적으로 전달하도록 지시합니다. 
+    ' name="description">
+    <meta content="xml2rfc 3.34.0" name="generator">
+    <meta content="stream" name="keyword">
+    <meta content="10036" name="rfc.number">
+    <!-- Generator version information:
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
+    pycountry 26.2.16
+    PyYAML 6.0.3
+    requests 2.34.2
+    wcwidth 0.8.1
+    weasyprint 69.0
+-->
+    <link href="rfc10036.xml" rel="alternate" type="application/rfc+xml">
+    <link href="#copyright" rel="license">
+    <style type="text/css">
+        /*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+        /* fonts */
+        @import url('https://static.ietf.org/fonts/noto-sans/import.css');
+        /* Sans-serif */
+        @import url('https://static.ietf.org/fonts/noto-serif/import.css');
+        /* Serif (print) */
+        @import url('https://static.ietf.org/fonts/roboto-mono/import.css');
+        /* Monospace */
+
+        :root {
+            --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+            --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+            --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+        }
+
+        @viewport {
+            zoom: 1.0;
+        }
+
+        @-ms-viewport {
+            width: extend-to-zoom;
+            zoom: 1.0;
+        }
+
+        /* general and mobile first */
+        html {}
+
+        body {
+            max-width: 90%;
+            margin: 1.5em auto;
+            color: #222;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            overflow-wrap: break-word;
+        }
+
+        .ears {
+            display: none;
+        }
+
+        /* headings */
+        #title,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 1em 0 0.5em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        #title {
+            clear: both;
+            border-bottom: 1px solid #ddd;
+            margin: 0 0 0.5em 0;
+            padding: 1em 0 0.5em;
+        }
+
+        .author {
+            padding-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 1em 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: -20px;
+            /* provide offset for in-page anchors */
+            padding-top: 33px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin-top: -36px;
+            /* provide offset for in-page anchors */
+            padding-top: 42px;
+        }
+
+        h5,
+        h6 {
+            font-size: 14px;
+        }
+
+        #n-copyright-notice {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1em;
+            margin-bottom: 1em;
+        }
+
+        /* general structure */
+        p {
+            padding: 0;
+            margin: 0 0 1em 0;
+            text-align: left;
+        }
+
+        div,
+        span {
+            position: relative;
+        }
+
+        div {
+            margin: 0;
+        }
+
+        .alignRight.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignRight.art-text pre {
+            padding: 0;
+        }
+
+        .alignRight {
+            margin: 1em 0;
+        }
+
+        .alignRight>*:first-child {
+            border: none;
+            margin: 0;
+            float: right;
+            clear: both;
+        }
+
+        .alignRight>*:nth-child(2) {
+            clear: both;
+            display: block;
+            border: none;
+        }
+
+        svg {
+            display: block;
+        }
+
+        @media print {
+            svg {
+                max-height: 850px;
+                max-width: 660px;
+            }
+        }
+
+        svg[font-family~="serif" i],
+        svg [font-family~="serif" i] {
+            font-family: var(--font-serif);
+        }
+
+        svg[font-family~="sans-serif" i],
+        svg [font-family~="sans-serif" i] {
+            font-family: var(--font-sans);
+        }
+
+        svg[font-family~="monospace" i],
+        svg [font-family~="monospace" i] {
+            font-family: var(--font-mono);
+        }
+
+        .alignCenter.art-text {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            padding: 1em 1em 0;
+            margin-bottom: 1.5em;
+        }
+
+        .alignCenter.art-text pre {
+            padding: 0;
+        }
+
+        .alignCenter {
+            margin: 1em 0;
+        }
+
+        .alignCenter>*:first-child {
+            display: table;
+            border: none;
+            margin: 0 auto;
+        }
+
+        /* lists */
+        ol,
+        ul {
+            padding: 0;
+            margin: 0 0 1em 2em;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-left: 1em;
+        }
+
+        li {
+            margin: 0 0 0.25em 0;
+        }
+
+        .ulCompact li {
+            margin: 0;
+        }
+
+        ul.empty,
+        .ulEmpty {
+            list-style-type: none;
+        }
+
+        ul.empty li,
+        .ulEmpty li {
+            margin-top: 0.5em;
+        }
+
+        ul.ulBare,
+        li.ulBare {
+            margin-left: 0em !important;
+        }
+
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact {
+            line-height: 100%;
+            margin: 0 0 0 2em;
+        }
+
+        /* definition lists */
+        dl {}
+
+        dl>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        /* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+        dl>dd {
+            margin-bottom: .8em;
+            min-height: 1.3em;
+        }
+
+        dl.compact>dd,
+        .dlCompact>dd {
+            margin-bottom: 0em;
+        }
+
+        dl>dd>dl {
+            margin-top: 0.5em;
+            margin-bottom: 0em;
+        }
+
+        /* links */
+        a {
+            text-decoration: none;
+        }
+
+        a[href] {
+            color: #22e;
+            /* Arlen: WCAG 2019 */
+        }
+
+        a[href]:hover {
+            background-color: #f2f2f2;
+        }
+
+        figcaption a[href],
+        a[href].selfRef {
+            color: #222;
+        }
+
+        /* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+        /* Figures */
+        tt,
+        code,
+        pre {
+            background-color: #f9f9f9;
+            font-family: var(--font-mono);
+        }
+
+        pre {
+            border: 1px solid #eee;
+            margin: 0;
+            padding: 1em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        figure blockquote {
+            margin: 0.8em 0.4em 0.4em;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0 0 1em 0;
+        }
+
+        @media screen {
+            pre {
+                overflow-x: auto;
+                max-width: 100%;
+                max-width: calc(100% - 22px);
+            }
+        }
+
+        /* aside, blockquote */
+        aside,
+        blockquote {
+            margin-left: 0;
+            padding: 1.2em 2em;
+        }
+
+        blockquote {
+            background-color: #f9f9f9;
+            color: #111;
+            /* Arlen: WCAG 2019 */
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 1em 0;
+        }
+
+        blockquote>*:last-child {
+            margin-bottom: 0;
+        }
+
+        cite {
+            display: block;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .xref {
+            overflow-wrap: normal;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            margin: 0 0 1em;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.5em 0.75em;
+        }
+
+        th {
+            text-align: left;
+            background-color: #e9e9e9;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f5f5f5;
+        }
+
+        table caption {
+            font-style: italic;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        table p {
+            /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+            margin: 0;
+        }
+
+        /* pilcrow */
+        a.pilcrow {
+            color: #666;
+            /* Arlen: AHDJ 2019 */
+            text-decoration: none;
+            visibility: hidden;
+            user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        @media screen {
+
+            aside:hover>a.pilcrow,
+            p:hover>a.pilcrow,
+            blockquote:hover>a.pilcrow,
+            div:hover>a.pilcrow,
+            li:hover>a.pilcrow,
+            pre:hover>a.pilcrow {
+                visibility: visible;
+            }
+
+            a.pilcrow:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* misc */
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .bcp14 {
+            font-variant: small-caps;
+        }
+
+        .role {
+            font-variant: all-small-caps;
+        }
+
+        /* info block */
+        #identifiers {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        #identifiers dt {
+            width: 3em;
+            clear: left;
+        }
+
+        #identifiers dd {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        /* Fix PDF info block run off issue */
+        @media print {
+            #identifiers dd {
+                max-width: 100%;
+            }
+        }
+
+        #identifiers .authors .author {
+            display: inline-block;
+            margin-right: 1.5em;
+        }
+
+        #identifiers .authors .org {
+            font-style: italic;
+        }
+
+        /* The prepared/rendered info at the very bottom of the page */
+        .docInfo {
+            color: #666;
+            /* Arlen: WCAG 2019 */
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2em;
+        }
+
+        .docInfo .prepared {
+            float: left;
+        }
+
+        .docInfo .prepared {
+            float: right;
+        }
+
+        /* table of contents */
+        #toc {
+            padding: 0.75em 0 2em 0;
+            margin-bottom: 1em;
+        }
+
+        nav.toc ul {
+            margin: 0 0.5em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav.toc li {
+            line-height: 1.3em;
+            margin: 0.75em 0;
+            padding-left: 1.2em;
+            text-indent: -1.2em;
+        }
+
+        /* references */
+        .references dt {
+            text-align: right;
+            font-weight: bold;
+            min-width: 7em;
+        }
+
+        .references dd {
+            margin-left: 8em;
+            overflow: auto;
+        }
+
+        .refInstance {
+            margin-bottom: 1.25em;
+        }
+
+        .refSubseries {
+            margin-bottom: 1.25em;
+        }
+
+        .references .ascii {
+            margin-bottom: 0.25em;
+        }
+
+        /* index */
+        .index ul {
+            margin: 0 0 0 1em;
+            padding: 0;
+            list-style: none;
+        }
+
+        .index ul ul {
+            margin: 0;
+        }
+
+        .index li {
+            margin: 0;
+            text-indent: -2em;
+            padding-left: 2em;
+            padding-bottom: 5px;
+        }
+
+        .indexIndex {
+            margin: 0.5em 0 1em;
+        }
+
+        .index a {
+            font-weight: 700;
+        }
+
+        /* make the index two-column on all but the smallest screens */
+        @media (min-width: 600px) {
+            .index ul {
+                -moz-column-count: 2;
+                -moz-column-gap: 20px;
+            }
+
+            .index ul ul {
+                -moz-column-count: 1;
+                -moz-column-gap: 0;
+            }
+        }
+
+        /* authors */
+        address.vcard {
+            font-style: normal;
+            margin: 1em 0;
+        }
+
+        address.vcard .nameRole {
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        address.vcard .label {
+            font-family: var(--font-sans);
+            margin: 0.5em 0;
+        }
+
+        address.vcard .type {
+            display: none;
+        }
+
+        .alternative-contact {
+            margin: 1.5em 0 1em;
+        }
+
+        hr.addr {
+            border-top: 1px dashed;
+            margin: 0;
+            color: #ddd;
+            max-width: calc(100% - 16px);
+        }
+
+        /* temporary notes */
+        .rfcEditorRemove::before {
+            position: absolute;
+            top: 0.2em;
+            right: 0.2em;
+            padding: 0.2em;
+            content: "The RFC Editor will remove this note";
+            color: #9e2a00;
+            /* Arlen: WCAG 2019 */
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+        }
+
+        .rfcEditorRemove {
+            position: relative;
+            padding-top: 1.8em;
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            border-radius: 3px;
+        }
+
+        .cref {
+            background-color: #ffd;
+            /* Arlen: WCAG 2019 */
+            padding: 2px 4px;
+        }
+
+        .crefSource {
+            font-style: italic;
+        }
+
+        /* alternative layout for smaller screens */
+        @media screen and (max-width: 1023px) {
+            body {
+                padding-top: 2em;
+            }
+
+            #title {
+                padding: 1em 0;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: -18px;
+                /* provide offset for in-page anchors */
+                padding-top: 38px;
+            }
+
+            #identifiers dd {
+                max-width: 60%;
+            }
+
+            #toc {
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                right: 0;
+                padding: 0;
+                margin: 0;
+                background-color: inherit;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #toc h2 {
+                margin: -1px 0 0 0;
+                padding: 4px 0 4px 6px;
+                padding-right: 1em;
+                min-width: 190px;
+                font-size: 1.1em;
+                text-align: right;
+                background-color: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            #toc h2::before {
+                /* css hamburger */
+                float: right;
+                position: relative;
+                width: 1em;
+                height: 1px;
+                left: -164px;
+                margin: 6px 0 0 0;
+                background: white none repeat scroll 0 0;
+                box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+                content: "";
+            }
+
+            #toc nav {
+                display: none;
+                padding: 0.5em 1em 1em;
+                overflow: auto;
+                height: calc(100vh - 48px);
+                border-left: 1px solid #ddd;
+            }
+        }
+
+        /* alternative layout for wide screens */
+        @media screen and (min-width: 1024px) {
+            body {
+                max-width: 724px;
+                margin: 42px auto;
+                padding-left: 1.5em;
+                padding-right: 29em;
+            }
+
+            #toc {
+                position: fixed;
+                top: 42px;
+                right: 42px;
+                width: 25%;
+                margin: 0;
+                padding: 0 1em;
+                z-index: 1;
+            }
+
+            #toc h2 {
+                border-top: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 1em;
+                font-weight: normal;
+                margin: 0;
+                padding: 0.25em 1em 1em 0;
+            }
+
+            #toc nav {
+                display: block;
+                height: calc(90vh - 84px);
+                bottom: 0;
+                padding: 0.5em 0 0;
+                overflow: auto;
+            }
+
+            img {
+                /* future proofing */
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        /* pagination */
+        @media print {
+            body {
+                width: 100%;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            #n-copyright-notice {
+                border-bottom: none;
+            }
+
+            #toc,
+            #n-introduction {
+                page-break-before: always;
+            }
+
+            #toc {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            figure,
+            pre {
+                page-break-inside: avoid;
+            }
+
+            figure {
+                overflow: scroll;
+            }
+
+            .breakable pre {
+                break-inside: auto;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+            }
+
+            h2+*,
+            h3+*,
+            h4+*,
+            h5+*,
+            h6+* {
+                page-break-before: avoid;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 10pt;
+            }
+
+            table {
+                border: 1px solid #ddd;
+            }
+
+            td {
+                border-top: 1px solid #ddd;
+            }
+        }
+
+        /* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+        /*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+        @page :first {
+            padding-top: 0;
+
+            @top-left {
+                content: normal;
+                border: none;
+            }
+
+            @top-center {
+                content: normal;
+                border: none;
+            }
+
+            @top-right {
+                content: normal;
+                border: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin-bottom: 45mm;
+            padding-top: 20px;
+            /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+            /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+        }
+
+        /* Changes introduced to fix issues found during implementation */
+        /* Make sure links are clickable even if overlapped by following H* */
+        a {
+            z-index: 2;
+        }
+
+        /* Separate body from document info even without intervening H1 */
+        section {
+            clear: both;
+        }
+
+
+        /* Top align author divs, to avoid names without organization dropping level with org names */
+        .author {
+            vertical-align: top;
+        }
+
+        /* Leave room in document info to show Internet-Draft on one line */
+        #identifiers dt {
+            width: 8em;
+        }
+
+        /* Don't waste quite as much whitespace between label and value in doc info */
+        #identifiers dd {
+            margin-left: 1em;
+        }
+
+        /* Give floating toc a background color (needed when it's a div inside section */
+        #toc {
+            background-color: white;
+        }
+
+        /* Make the collapsed ToC header render white on gray also when it's a link */
+        @media screen and (max-width: 1023px) {
+
+            #toc h2 a,
+            #toc h2 a:link,
+            #toc h2 a:focus,
+            #toc h2 a:hover,
+            #toc a.toplink,
+            #toc a.toplink:hover {
+                color: white;
+                background-color: #444;
+                text-decoration: none;
+            }
+        }
+
+        /* Give the bottom of the ToC some whitespace */
+        @media screen and (min-width: 1024px) {
+            #toc {
+                padding: 0 0 1em 1em;
+            }
+        }
+
+        /* Style section numbers with more space between number and title */
+        .section-number {
+            padding-right: 0.5em;
+        }
+
+        /* prevent monospace from becoming overly large */
+        tt,
+        code,
+        pre {
+            font-size: 95%;
+        }
+
+        /* Fix the height/width aspect for ascii art*/
+        .sourcecode pre,
+        .art-text pre {
+            line-height: 1.12;
+        }
+
+
+        /* Add styling for a link in the ToC that points to the top of the document */
+        a.toplink {
+            float: right;
+            margin-right: 0.5em;
+        }
+
+        /* Fix the dl styling to match the RFC 7992 attributes */
+        dl>dt,
+        dl.dlParallel>dt {
+            float: left;
+            margin-right: 1em;
+        }
+
+        dl.dlNewline>dt {
+            float: none;
+        }
+
+        /* Provide styling for table cell text alignment */
+        table td.text-left,
+        table th.text-left {
+            text-align: left;
+        }
+
+        table td.text-center,
+        table th.text-center {
+            text-align: center;
+        }
+
+        table td.text-right,
+        table th.text-right {
+            text-align: right;
+        }
+
+        /* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+        .alternative-contact {
+            margin: 0.5em 0 0.25em 0;
+        }
+
+        address .non-ascii {
+            margin: 0 0 0 2em;
+        }
+
+        /* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+        table {
+            width: auto;
+        }
+
+        /* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+        .references dd {
+            overflow: visible;
+        }
+
+        /* Control caption placement */
+        caption {
+            caption-side: bottom;
+        }
+
+        /* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+        address.vcard {
+            max-width: 30em;
+            margin-right: auto;
+        }
+
+        /* For address alignment dependent on LTR or RTL scripts */
+        address div.left {
+            text-align: left;
+        }
+
+        address div.right {
+            text-align: right;
+        }
+
+        /* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+        table.right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table.left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Give the table caption label the same styling as the figcaption */
+        caption a[href] {
+            color: #222;
+        }
+
+        @media print {
+            .toplink {
+                display: none;
+            }
+
+            /* avoid overwriting the top border line with the ToC header */
+            #toc {
+                padding-top: 1px;
+            }
+
+            /* Avoid page breaks inside dl and author address entries */
+            .vcard {
+                page-break-inside: avoid;
+            }
+
+        }
+
+        /* Tweak the bcp14 keyword presentation */
+        .bcp14 {
+            font-variant: small-caps;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Tweak the invisible space above H* in order not to overlay links in text above */
+        h2 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 31px;
+        }
+
+        h3 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        h4 {
+            margin-top: -18px;
+            /* provide offset for in-page anchors */
+            padding-top: 24px;
+        }
+
+        /* Float artwork pilcrow to the right */
+        @media screen {
+            .artwork a.pilcrow {
+                display: block;
+                line-height: 0.7;
+                margin-top: 0.15em;
+            }
+        }
+
+        /* Make pilcrows on dd visible */
+        @media screen {
+            dd:hover>a.pilcrow {
+                visibility: visible;
+            }
+        }
+
+        /* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+        .alignLeft.art-text,
+        .alignCenter.art-text,
+        .alignRight.art-text {
+            margin-bottom: 0;
+        }
+
+        .alignLeft,
+        .alignCenter,
+        .alignRight {
+            margin: 1em 0 0 0;
+        }
+
+        /* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+        @media print {
+            a.pilcrow {
+                display: none;
+            }
+        }
+
+        /* Styling for the external metadata */
+        div#external-metadata {
+            background-color: #eee;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            display: none;
+        }
+
+        div#internal-metadata {
+            padding: 0.5em;
+            /* to match the external-metadata padding */
+        }
+
+        /* Styling for title RFC Number */
+        h1#rfcnum {
+            clear: both;
+            margin: 0 0 -1em;
+            padding: 1em 0 0 0;
+        }
+
+        /* Make .olPercent look the same as <ol><li> */
+        dl.olPercent>dd {
+            margin-bottom: 0.25em;
+            min-height: initial;
+        }
+
+        /* Give aside some styling to set it apart */
+        aside {
+            border-left: 1px solid #ddd;
+            margin: 1em 0 1em 2em;
+            padding: 0.2em 2em;
+        }
+
+        aside>dl,
+        aside>ol,
+        aside>ul,
+        aside>table,
+        aside>p {
+            margin-bottom: 0.5em;
+        }
+
+        /* Additional page break settings */
+        @media print {
+
+            figcaption,
+            table caption {
+                page-break-before: avoid;
+            }
+        }
+
+        /* Font size adjustments for print */
+        @media print {
+            body {
+                font-size: 10pt;
+                line-height: normal;
+                max-width: 96%;
+            }
+
+            h1 {
+                font-size: 1.72em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2*1.2 */
+            h2 {
+                font-size: 1.44em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2*1.2 */
+            h3 {
+                font-size: 1.2em;
+                padding-top: 1.5em;
+            }
+
+            /* 1*1.2 */
+            h4 {
+                font-size: 1em;
+                padding-top: 1.5em;
+            }
+
+            h5,
+            h6 {
+                font-size: 1em;
+                margin: initial;
+                padding: 0.5em 0 0.3em;
+            }
+        }
+
+        /* Sourcecode margin in print, when there's no pilcrow */
+        @media print {
+
+            .artwork,
+            .artwork>pre,
+            .sourcecode {
+                margin-bottom: 1em;
+            }
+        }
+
+        /* Avoid narrow tables forcing too narrow table captions, which may render badly */
+        table {
+            min-width: 20em;
+        }
+
+        /* ol type a */
+        ol.type-a {
+            list-style-type: lower-alpha;
+        }
+
+        ol.type-A {
+            list-style-type: upper-alpha;
+        }
+
+        ol.type-i {
+            list-style-type: lower-roman;
+        }
+
+        ol.type-I {
+            list-style-type: upper-roman;
+        }
+
+        /* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+        table {
+            border: 1px solid #ddd;
+        }
+
+        td {
+            border-top: 1px solid #ddd;
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        tr:nth-child(2n+1)>td {
+            background-color: #f8f8f8;
+        }
+
+        /* Use style rules to govern display of the TOC. */
+        @media screen and (max-width: 1023px) {
+            #toc nav {
+                display: none;
+            }
+
+            #toc.active nav {
+                display: block;
+            }
+        }
+
+        /* Add support for keepWithNext */
+        .keepWithNext {
+            break-after: avoid-page;
+            break-after: avoid-page;
+        }
+
+        /* Add support for keepWithPrevious */
+        .keepWithPrevious {
+            break-before: avoid-page;
+        }
+
+        /* Change the approach to avoiding breaks inside artwork etc. */
+        figure,
+        pre,
+        table,
+        .artwork,
+        .sourcecode {
+            break-before: auto;
+            break-after: auto;
+        }
+
+        /* Avoid breaks between <dt> and <dd> */
+        dl {
+            break-before: auto;
+            break-inside: auto;
+        }
+
+        dt {
+            break-before: auto;
+            break-after: avoid-page;
+        }
+
+        dd {
+            break-before: avoid-page;
+            break-after: auto;
+            orphans: 3;
+            widows: 3
+        }
+
+        span.break,
+        dd.break {
+            margin-bottom: 0;
+            min-height: 0;
+            break-before: auto;
+            break-inside: auto;
+            break-after: auto;
+        }
+
+        /* Undo break-before ToC */
+        @media print {
+            #toc {
+                break-before: auto;
+            }
+        }
+
+        /* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+        ul.compact p,
+        .ulCompact p,
+        ol.compact p,
+        .olCompact p {
+            margin: 0;
+        }
+
+        /* But the list as a whole needs the extra space at the end */
+        section ul.compact,
+        section .ulCompact,
+        section ol.compact,
+        section .olCompact {
+            margin-bottom: 1em;
+            /* same as p not within ul.compact etc. */
+        }
+
+        /* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+        tt,
+        code {
+            background-color: transparent;
+        }
+
+        p tt,
+        p code,
+        li tt,
+        li code,
+        dt tt,
+        dt code {
+            background-color: #f8f8f8;
+        }
+
+        /* Tweak the pre margin -- 0px doesn't come out well */
+        pre {
+            margin-top: 0.5px;
+        }
+
+        /* Tweak the compact list text */
+        ul.compact,
+        .ulCompact,
+        ol.compact,
+        .olCompact,
+        dl.compact,
+        .dlCompact {
+            line-height: normal;
+        }
+
+        /* Don't add top margin for nested lists */
+        li>ul,
+        li>ol,
+        li>dl,
+        dd>ul,
+        dd>ol,
+        dd>dl,
+        dl>dd>dl {
+            margin-top: initial;
+        }
+
+        /* Elements that should not be rendered on the same line as a <dt> */
+        /* This should match the element list in writer.text.TextWriter.render_dl() */
+        dd>div.artwork:first-child,
+        dd>aside:first-child,
+        dd>blockquote:first-child,
+        dd>figure:first-child,
+        dd>ol:first-child,
+        dd>div.sourcecode:first-child,
+        dd>table:first-child,
+        dd>ul:first-child {
+            clear: left;
+        }
+
+        /* fix for weird browser behaviour when <dd/> is empty */
+        dt+dd:empty::before {
+            content: "\00a0";
+        }
+
+        /* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+        li>p {
+            margin-bottom: 0.5em
+        }
+
+        /* Don't let p margin spill out from inside list items */
+        li>p:last-of-type:only-child {
+            margin-bottom: 0;
+        }
+    </style>
+    <link href="https://www.rfc-editor.org/rfc/rfc-local.css" rel="stylesheet" type="text/css">
+    <link href="https://dx.doi.org/10.17487/rfc10036" rel="alternate">
+    <link href="urn:issn:2070-1721" rel="alternate">
+    <link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-incremental-04" rel="prev">
+</head>
+
+<body class="xml2rfc">
+    <script src="https://www.rfc-editor.org/js/metadata.min.js"></script>
+    <table class="ears">
+        <thead>
+            <tr>
+                <td class="left">RFC 10036</td>
+                <td class="center">HTTP 메시지의 점진적 전달</td>
+                <td class="right">2026년 8월</td>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td class="left">Oku 외</td>
+                <td class="center">표준 트랙</td>
+                <td class="right">[페이지]</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="external-metadata" class="document-information"></div>
+    <div id="internal-metadata" class="document-information">
+        <dl id="identifiers">
+            <dt class="label-stream">스트림:</dt>
+            <dd class="stream">인터넷 엔지니어링 태스크 포스(IETF)</dd>
+            <dt class="label-rfc">RFC:</dt>
+            <dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc10036" class="eref">10036</a></dd>
+            <dt class="label-category">범주:</dt>
+            <dd class="category">표준 트랙</dd>
+            <dt class="label-published">게시:</dt>
+            <dd class="published">
+                <time datetime="2026-08" class="published">2026년 8월</time>
+            </dd>
+            <dt class="label-issn">ISSN:</dt>
+            <dd class="issn">2070-1721</dd>
+            <dt class="label-authors">저자:</dt>
+            <dd class="authors">
+                <div class="author">
+                    <div class="author-name">K. Oku</div>
+                    <div class="org">Fastly</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">T. Pauly</div>
+                    <div class="org">Apple</div>
+                </div>
+                <div class="author">
+                    <div class="author-name">M. Thomson</div>
+                    <div class="org">Mozilla</div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <h1 id="rfcnum">RFC 10036</h1>
+    <h1 id="title">HTTP 메시지의 점진적 전달</h1>
+    <section id="section-abstract">
+        <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+        <p id="section-abstract-1">이 문서는 HTTP 중개자에게 HTTP 메시지를 점진적으로 전달하도록 지시하는
+            "Incremental" HTTP 헤더 필드를 명세합니다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+    </section>
+    <div id="status-of-memo">
+        <section id="section-boilerplate.1">
+            <h2 id="name-status-of-this-memo">
+                <a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+            </h2>
+            <p id="section-boilerplate.1-1">
+                이 문서는 인터넷 표준 트랙 문서입니다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a>
+            </p>
+            <p id="section-boilerplate.1-2">
+                이 문서는 인터넷 엔지니어링 태스크 포스
+                (IETF)의 산출물입니다. 이 문서는 IETF 커뮤니티의 합의를 나타냅니다. 이 문서는
+                공개 검토를 거쳤으며 인터넷 엔지니어링 운영 그룹
+                (IESG)의 게시 승인을 받았습니다. 인터넷 표준에 관한 추가
+                정보는 RFC 7841의 섹션 2에서 확인할 수
+                있습니다.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.1-3">
+                이 문서의 현재 상태, 모든
+                정오표 및 이에 대한 피드백 제공 방법에 관한 정보는
+                <span><a
+                        href="https://www.rfc-editor.org/info/rfc10036">https://www.rfc-editor.org/info/rfc10036</a></span>에서
+                확인할 수 있습니다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="copyright">
+        <section id="section-boilerplate.2">
+            <h2 id="name-copyright-notice">
+                <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+            </h2>
+            <p id="section-boilerplate.2-1">
+                Copyright (c) 2026 IETF Trust and the persons identified as the
+                document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+            <p id="section-boilerplate.2-2">
+                This document is subject to BCP 78 and the IETF Trust's Legal
+                Provisions Relating to IETF Documents
+                (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>)
+                in effect on the date of
+                publication of this document. Please review these documents
+                carefully, as they describe your rights and restrictions with
+                respect to this document. Code Components extracted from this
+                document must include Revised BSD License text as described in
+                Section 4.e of the Trust Legal Provisions and are provided without
+                warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2"
+                    class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="toc">
+        <section id="section-toc.1">
+            <a href="#" onclick="scroll(0,0)" class="toplink">▲</a>
+            <h2 id="name-table-of-contents">
+                <a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+            </h2>
+            <nav class="toc">
+                <ul class="compact toc ulBare ulEmpty">
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+                        <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1"
+                                class="auto internal xref">1</a>. <a href="#name-introduction"
+                                class="internal xref">소개</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+                        <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2"
+                                class="auto internal xref">2</a>. <a href="#name-conventions-and-definitions"
+                                class="internal xref">규칙 및 정의</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+                        <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3"
+                                class="auto internal xref">3</a>. <a href="#name-the-incremental-header-fiel"
+                                class="internal xref">Incremental 헤더 필드</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+                        <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>. <a
+                                href="#name-security-considerations" class="internal xref">보안 고려 사항</a>
+                        </p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1"
+                                        class="auto internal xref">4.1</a>. <a href="#name-permanent-rejection"
+                                        class="internal xref">영구 거부</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2"
+                                        class="auto internal xref">4.2</a>. <a href="#name-temporary-rejection"
+                                        class="internal xref">일시적 거부</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3"
+                                        class="auto internal xref">4.3</a>. <a href="#name-handling-of-small-packets"
+                                        class="internal xref">작은 패킷 처리</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+                        <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>. <a
+                                href="#name-iana-considerations" class="internal xref">IANA 고려 사항</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+                        <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>. <a
+                                href="#name-references" class="internal xref">참고 문헌</a></p>
+                        <ul class="compact toc ulBare ulEmpty">
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1"
+                                        class="auto internal xref">6.1</a>. <a href="#name-normative-references"
+                                        class="internal xref">규범적 참고 문헌</a></p>
+                            </li>
+                            <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2"
+                                        class="auto internal xref">6.2</a>. <a href="#name-informative-references"
+                                        class="internal xref">비규범적 참고 문헌</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+                        <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref"></a><a
+                                href="#name-acknowledgments" class="internal xref">감사의 말</a></p>
+                    </li>
+                    <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+                        <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="auto internal xref"></a><a
+                                href="#name-authors-addresses" class="internal xref">저자 주소</a></p>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+    <div id="introduction">
+        <section id="section-1">
+            <h2 id="name-introduction">
+                <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction"
+                    class="section-name selfRef">소개</a>
+            </h2>
+            <p id="section-1-1">HTTP <span>[<a href="#RFC9110" class="cite xref">HTTP</a>]</span>는 수신자가 전체 HTTP
+                메시지를 수신한 후에 처리하도록 기다릴 필요 없이 HTTP
+                메시지의 일부가 도착하는 즉시 처리를 시작할 수 있도록 허용합니다.<a href="#section-1-1" class="pilcrow">¶</a></p>
+            <p id="section-1-2">일부 애플리케이션은 이 기능을 활용하도록 특별히 설계되어
+                있습니다.<a href="#section-1-2" class="pilcrow">¶</a></p>
+            <p id="section-1-3">예를 들어 Server-Sent Events <span>[<a href="#SSE" class="cite xref">SSE</a>]</span>는
+                장시간 지속되는 HTTP 응답을 사용하며, 여기서
+                서버는 알림을 사용할 수 있게 되는 즉시 계속해서 전송합니다.<a href="#section-1-3" class="pilcrow">¶</a></p>
+            <p id="section-1-4">Chunked Oblivious HTTP Messages
+                <span>[<a href="#I-D.ietf-ohai-chunked-ohttp" class="cite xref">CHUNKED-OHTTP</a>]</span>의 경우 클라이언트는
+                HTTP 요청을 열고
+                애플리케이션 데이터를 점진적으로 전송하며, 서버는 HTTP 요청이 완전히 완료되기
+                전에도 응답을 시작할 수 있습니다. 이러한 방식으로 HTTP
+                요청-응답 쌍은 사실상 양방향
+                통신 채널을 만들 수 있습니다.<a href="#section-1-4" class="pilcrow">¶</a>
+            </p>
+            <p id="section-1-5">데이터의 점진적 전달에 의존하는 애플리케이션은 HTTP
+                중개자가 개입하면 취약해집니다.
+                이는 HTTP 중개자가 전체 HTTP 메시지를 다운스트림으로 전달하기 전에
+                버퍼링하는 것이 허용될 뿐만 아니라 실제로 자주 그렇게 배포되기
+                때문입니다(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.6" class="relref">섹션 7.6</a> of [<a
+                        href="#RFC9110" class="cite xref">HTTP</a>]</span>).<a href="#section-1-5" class="pilcrow">¶</a>
+            </p>
+            <p id="section-1-6">클라이언트와 서버 사이에 이러한 버퍼링 HTTP 중개자가 존재하면
+                이러한 애플리케이션은 의도한 대로 작동하지 않을 수 있습니다.<a href="#section-1-6" class="pilcrow">¶</a></p>
+            <p id="section-1-7">Server-Sent Events의 경우 HTTP
+                응답을 전달하기 전에 완전히 버퍼링하려는 중개자는 무기한 기다리게 될 수 있습니다.
+                클라이언트는 응답의 어떤 부분도 받지 못할 수 있습니다.<a href="#section-1-7" class="pilcrow">¶</a>
+            </p>
+            <p id="section-1-8">양방향 교환이 포함된 요청의 경우,
+                요청 또는 응답 중 하나의 전체 메시지를 버퍼링하려는 중개자는
+                어떤 데이터도 전달되지 못하게 합니다.<a href="#section-1-8" class="pilcrow">¶</a></p>
+            <p id="section-1-9">이러한 동작을 방지하기 위해 이 문서는 HTTP 중개자가 완전한 메시지를
+                수신하기 전에 HTTP 메시지를 다운스트림으로 전달하기 시작하도록 요청하는
+                "Incremental" HTTP 헤더 필드를 명세합니다.<a href="#section-1-9" class="pilcrow">¶</a></p>
+            <p id="section-1-10">이 표시는 중개자에서 지원되지 않을 수 있습니다.
+                이 필드를 인식하지 못하는 중개자는 동작을 변경하지 않습니다.
+                이 필드를 지원하는 중개자는 대신 요청을 거부하도록 선택할 수 있습니다.
+                <a href="#security" class="auto internal xref">섹션 4</a>를 참조하십시오.<a href="#section-1-10"
+                    class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="conventions-and-definitions">
+        <section id="section-2">
+            <h2 id="name-conventions-and-definitions">
+                <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions"
+                    class="section-name selfRef">규칙 및 정의</a>
+            </h2>
+            <p id="section-2-1">이 문서에서 핵심어 "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>",
+                "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL
+                    NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span
+                    class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+                "<span class="bcp14">MAY</span>" 및 "<span class="bcp14">OPTIONAL</span>"은 여기에 표시된 것처럼
+                모두 대문자로 나타나는
+                경우에만 BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174"
+                        class="cite xref">RFC8174</a>]</span>에 설명된 대로
+                해석해야 합니다.<a href="#section-2-1" class="pilcrow">¶</a></p>
+            <p id="section-2-2">이 문서는 Item 및 Boolean의 구조화된 필드 정의
+                <span>[<a href="#RFC9651" class="cite xref">STRUCTURED-FIELDS</a>]</span>를 사용합니다.<a href="#section-2-2"
+                    class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="the-incremental-header-field">
+        <section id="section-3">
+            <h2 id="name-the-incremental-header-fiel">
+                <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-incremental-header-fiel"
+                    class="section-name selfRef">Incremental 헤더 필드</a>
+            </h2>
+            <p id="section-3-1">Incremental HTTP 헤더 필드는 전체
+                메시지가 수신되기 전에 HTTP 중개자가 메시지를 다운스트림으로 전달하기 시작하기를 바라는 송신자의 의도를 나타냅니다.<a href="#section-3-1"
+                    class="pilcrow">¶</a></p>
+            <p id="section-3-2">Incremental 헤더 필드는 Item 유형의 구조화된 필드
+                <span>[<a href="#RFC9651" class="cite xref">STRUCTURED-FIELDS</a>]</span>로 정의됩니다.
+                Boolean 값(<span><a href="https://rfc-editor.org/rfc/rfc9651#section-3.3.6" class="relref">섹션 3.3.6</a>
+                    of [<a href="#RFC9651" class="cite xref">STRUCTURED-FIELDS</a>]</span>)만 유효하며,
+                다른 유형이 포함된 경우 수신자는 해당 필드를 무시합니다.<a href="#section-3-2" class="pilcrow">¶</a>
+            </p>
+            <div class="lang-http-message sourcecode" id="section-3-3">
+                <pre>
+Incremental: ?1
+</pre><a href="#section-3-3" class="pilcrow">¶</a>
+            </div>
+            <p id="section-3-4">참 값("?1")은 아래에 설명된 대로 송신자가 중개자에게
+                메시지를 점진적으로 전달하도록 요청함을 나타냅니다.<a href="#section-3-4" class="pilcrow">¶</a></p>
+            <div class="lang-http-message sourcecode" id="section-3-5">
+                <pre>
+Incremental: ?0
+</pre><a href="#section-3-5" class="pilcrow">¶</a>
+            </div>
+            <p id="section-3-6">거짓 값("?0")은 <span>[<a href="#RFC9110" class="cite xref">HTTP</a>]</span>에 정의된 기본 동작을
+                나타내며, 이 경우
+                중개자는 전체 메시지를 전달하기 전에 버퍼링할 수 있습니다. 그러나
+                이 명시적 신호는 중개자가
+                버퍼링을 선택할 때 더 큰 확신을 줄 수 있습니다.<a href="#section-3-6" class="pilcrow">¶</a></p>
+            <p id="section-3-7">Incremental HTTP 헤더 필드는 각 HTTP 메시지에 적용됩니다. 따라서
+                HTTP 요청과 응답 모두를 점진적으로 전달해야 하는 경우
+                Incremental HTTP 헤더 필드는 HTTP 요청과
+                응답 모두에 <span class="bcp14">MUST</span> 설정되어야 합니다.<a href="#section-3-7" class="pilcrow">¶</a></p>
+            <p id="section-3-8">참 값을 가진 Incremental 헤더 필드가 포함된 헤더 섹션을 수신하면
+                HTTP 중개자는 전체 메시지를 전달하기 전에
+                <span class="bcp14">SHOULD NOT</span> 버퍼링해야 합니다. 대신 중개자는 헤더 섹션을
+                다운스트림으로 <span class="bcp14">SHOULD</span> 전송하고 메시지 콘텐츠의 바이트가
+                도착하는 즉시 계속 전달해야 합니다. Incremental 헤더 필드는 메시지 콘텐츠가
+                전달되는 방식만을 나타내므로, 중개자는 메시지의 전체 헤더 및 트레일러
+                섹션을 다운스트림으로 전달하기 전에 여전히 버퍼링할 수 있습니다.<a href="#section-3-8" class="pilcrow">¶</a>
+            </p>
+            <p id="section-3-9">중개자가 메시지 본문을 점진적으로 전달하는 것을 전면적으로 거부하기로 결정한 경우
+                중개자는 전체 메시지를 버퍼링한 후 전달하는 대신
+                오류 응답을 <span class="bcp14">MUST</span> 생성해야 합니다. 중개자가
+                거부할 수 있는 일반적인 시나리오는 <a href="#security" class="auto internal xref">섹션
+                    4</a>에서 설명합니다.<a href="#section-3-9" class="pilcrow">¶</a></p>
+            <p id="section-3-10">점진적 전달 사용 요청은 HTTP 구현에도 적용됩니다.
+                대부분의 HTTP API는 메시지 콘텐츠를 점진적으로 전송하는 기능을 제공하지만,
+                어떤 이유로든 이를 제공하지 않는 경우 Incremental
+                헤더 필드의 존재를 활용하여 버퍼링을 줄이거나 비활성화하는 것이 <span class="bcp14">SHOULD</span> 권장됩니다.<a href="#section-3-10"
+                    class="pilcrow">¶</a></p>
+            <p id="section-3-11">Incremental 필드는 중개자에서 지원되지 않을 수 있습니다.
+                이 필드를 인식하지 못하거나
+                지원하지 않는 중개자는 명시적으로 달리 요청하더라도
+                메시지를 버퍼링할 수 있습니다.
+                따라서 클라이언트와 서버는 모든 중개자가 메시지를 점진적으로
+                전달하라는 요청을 이해하고 준수할 것이라고 기대할 수 없습니다.
+                점진적 전달 지원에 의존하는 클라이언트는 사전 지식을 활용하거나
+                개별 리소스에 대한 지원 여부를 탐색할 수 있습니다.<a href="#section-3-11" class="pilcrow">¶</a></p>
+            <p id="section-3-12">Incremental 헤더 필드는 요청과 응답 모두에 존재할 경우
+                중개자에게 조기 응답(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.5" class="relref">섹션 7.5</a> of
+                    [<a href="#RFC9110" class="cite xref">HTTP</a>]</span>)을 전달하고
+                양방향에서 메시지 콘텐츠를 점진적으로 전송하도록 요청하므로 HTTP를 통한
+                양방향 바이트 채널의 구축을 용이하게 합니다. 그러나 HTTP를 통해
+                양방향 프로토콜을 개발할 때는 Extended CONNECT <span>[<a href="#RFC8441"
+                        class="cite xref">RFC8441</a>]</span><span>[<a href="#RFC9220"
+                        class="cite xref">RFC9220</a>]</span>가
+                일반적으로 HTTP의 아키텍처와 더 일관됩니다.<a href="#section-3-12" class="pilcrow">¶</a></p>
+            <p id="section-3-13">이 문서는 Incremental 헤더 필드
+                값에 대한 매개변수를 정의하지 않지만 향후 문서에서 매개변수를 정의할 수 있습니다. 수신자는
+                알 수 없는 매개변수를 <span class="bcp14">MUST</span> 무시해야 합니다.<a href="#section-3-13" class="pilcrow">¶</a></p>
+        </section>
+    </div>
+    <div id="security">
+        <section id="section-4">
+            <h2 id="name-security-considerations">
+                <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-security-considerations"
+                    class="section-name selfRef">보안 고려 사항</a>
+            </h2>
+            <p id="section-4-1">점진적 전달을 요청하는 요청이나 응답을 수신할 때
+                중개자는 보안상의 이유로 HTTP 요청을 거부할 수 있습니다.
+                다음 하위 섹션에서는
+                중개자가 요청을 거부할 수 있는 일반적인 시나리오를 살펴봅니다.<a href="#section-4-1" class="pilcrow">¶</a></p>
+            <p id="section-4-2">Incremental 필드의 값을 근거로 요청을 거부하는 것은
+                중개자가 해당 필드를 이해하는 경우에만 발생한다는 점에 유의하십시오.<a href="#section-4-2" class="pilcrow">¶</a></p>
+            <div id="permanent-rejection">
+                <section id="section-4.1">
+                    <h3 id="name-permanent-rejection">
+                        <a href="#section-4.1" class="section-number selfRef">4.1. </a><a
+                            href="#name-permanent-rejection" class="section-name selfRef">영구 거부</a>
+                    </h3>
+                    <p id="section-4.1-1">일부 중개자는 HTTP 메시지의 콘텐츠를 검사하고 해당 콘텐츠가
+                        안전한 것으로 판단되는 경우에만 전달합니다. 이러한 방식으로 메시지
+                        전체를 확인해야 하는 모든 기능은 점진적 전달과 호환되지 않습니다.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+                    <p id="section-4.1-2">중개자가 메시지를 점진적으로 전달하도록 요청받았지만 그렇게 할 수 없는 경우,
+                        해당 메시지가 요청이든 응답이든 관계없이
+                        메시지 콘텐츠에 대한 보안상의 우려 때문이라면
+                        중개자는 incremental_refused Proxy-Status 응답 헤더 필드를 포함한
+                        501 (Not Implemented) 오류로 <span class="bcp14">SHOULD</span> 응답해야 합니다
+                        (<a href="#iana-considerations" class="auto internal xref">섹션 5</a>).<a href="#section-4.1-2"
+                            class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="temporary-rejection">
+                <section id="section-4.2">
+                    <h3 id="name-temporary-rejection">
+                        <a href="#section-4.2" class="section-number selfRef">4.2. </a><a
+                            href="#name-temporary-rejection" class="section-name selfRef">일시적 거부</a>
+                    </h3>
+                    <p id="section-4.2-1">HTTP 요청 또는 연결을 처리하는 데 필요한 리소스를 절약하기 위해
+                        중개자가 전달하는 동시
+                        HTTP 요청의 최대 수를 제한하고 이
+                        한도를 초과하는 요청을 버퍼링하는 것이 일반적입니다.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+                    <p id="section-4.2-2">이러한 중개자는 점진적 요청의 최대 수에
+                        도달한 경우에도 비점진적 요청에 사용할 용량이 남도록
+                        점진적이라고 표시된 요청에 더 제한적인 동시성 제한을 적용할 수
+                        있습니다. 이 방식은 서로 다른 유형의 요청 처리를 균형 있게 하고
+                        모든 요청에 대한 서비스 가용성을 유지하는 데 도움이 됩니다.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+                    <p id="section-4.2-3">동시성 제한에 도달하여 점진적 요청을 거부할 때
+                        중개자는 429 (Too Many Requests) 오류로 <span class="bcp14">SHOULD</span> 응답해야 하며
+                        (<span><a href="https://rfc-editor.org/rfc/rfc6585#section-4" class="relref">섹션 4</a> of
+                            [<a href="#RFC6585" class="cite xref">EXTRA-STATUS</a>]</span>),
+                        connection_limit_reached Proxy-Status 응답 헤더 필드를 함께 제공해야 합니다
+                        (<span><a href="https://rfc-editor.org/rfc/rfc9209#section-2.3.12" class="relref">섹션
+                                2.3.12</a> of [<a href="#RFC9209" class="cite xref">PROXY-STATUS</a>]</span>).<a
+                            href="#section-4.2-3" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+            <div id="handling-of-small-packets">
+                <section id="section-4.3">
+                    <h3 id="name-handling-of-small-packets">
+                        <a href="#section-4.3" class="section-number selfRef">4.3. </a><a
+                            href="#name-handling-of-small-packets" class="section-name selfRef">작은
+                            패킷 처리</a>
+                    </h3>
+                    <p id="section-4.3-1">성능과 효율성을 위해 점진적 메시지에도 중개자가
+                        소량의 버퍼링을 사용할 수 있습니다. 즉시 전달은 중개자가 많은 작은
+                        패킷을 처리하는 데 불필요한 작업을 하도록 악용될 수 있습니다. 점진적 전달을 활성화하면 대신 버퍼링되는
+                        바이트 수 또는 전달하기 전에 버퍼를 유지하는 시간에 제한을 설정할 수 있습니다.
+                        모든 버퍼링은 효율성을 높이더라도 애플리케이션 지연 시간에 부정적인 영향을 줄 수
+                        있습니다. 모든 경우에 중개자는 데이터를 버퍼에
+                        무기한 보관할 수 없으므로 시간 제한 또는
+                        바이트 제한 중 하나에 도달하면 데이터를 전달해야 합니다.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="iana-considerations">
+        <section id="section-5">
+            <h2 id="name-iana-considerations">
+                <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations"
+                    class="section-name selfRef">IANA 고려 사항</a>
+            </h2>
+            <p id="section-5-1">Incremental이라는 이름의 HTTP 필드가
+                <span><a href="https://rfc-editor.org/rfc/rfc9110#section-18.4" class="relref">섹션 18.4</a> of [<a
+                        href="#RFC9110" class="cite xref">HTTP</a>]</span>의 절차에 따라
+                "Hypertext Transfer Protocol (HTTP) Field Name Registry"에 등록되었습니다.
+                다음 값이 등록되었습니다.<a href="#section-5-1" class="pilcrow">¶</a>
+            </p>
+            <span class="break"></span>
+            <dl class="dlCompact dlParallel" id="section-5-2">
+                <dt id="section-5-2.1">필드 이름:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-2.2">
+                    <p id="section-5-2.2.1">Incremental<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-2.3">상태:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-2.4">
+                    <p id="section-5-2.4.1">영구<a href="#section-5-2.4.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-2.5">구조화된 유형:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-2.6">
+                    <p id="section-5-2.6.1">Item<a href="#section-5-2.6.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-2.7">참조:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-2.8">
+                    <p id="section-5-2.8.1">이 문서<a href="#section-5-2.8.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-2.9">설명:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-2.10">
+                    <p id="section-5-2.10.1">없음<a href="#section-5-2.10.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+            <p id="section-5-3">HTTP 프록시 오류 유형이 아래와 같이 "HTTP Proxy Error Types" 레지스트리에
+                등록되었습니다.<a href="#section-5-3" class="pilcrow">¶</a></p>
+            <span class="break"></span>
+            <dl class="dlCompact dlParallel" id="section-5-4">
+                <dt id="section-5-4.1">이름:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-4.2">
+                    <p id="section-5-4.2.1">incremental_refused<a href="#section-5-4.2.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-4.3">설명:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-4.4">
+                    <p id="section-5-4.4.1">HTTP 메시지에 Incremental HTTP 헤더 필드가 포함되어 있었지만
+                        중개자가 메시지를 점진적으로 전달하는 것을 거부했습니다.<a href="#section-5-4.4.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-4.5">추가 매개변수:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-4.6">
+                    <p id="section-5-4.6.1">없음<a href="#section-5-4.6.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-4.7">권장 HTTP 상태 코드:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-4.8">
+                    <p id="section-5-4.8.1">501<a href="#section-5-4.8.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-4.9">중개자에 의해서만 생성되는 응답:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-4.10">
+                    <p id="section-5-4.10.1">true<a href="#section-5-4.10.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+                <dt id="section-5-4.11">참조:</dt>
+                <dd style="margin-left: 1.5em" id="section-5-4.12">
+                    <p id="section-5-4.12.1">이 문서<a href="#section-5-4.12.1" class="pilcrow">¶</a></p>
+                </dd>
+                <dd class="break"></dd>
+            </dl>
+        </section>
+    </div>
+    <div id="sec-combined-references">
+        <section id="section-6">
+            <h2 id="name-references">
+                <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-references"
+                    class="section-name selfRef">참고 문헌</a>
+            </h2>
+            <div id="sec-normative-references">
+                <section id="section-6.1">
+                    <h3 id="name-normative-references">
+                        <a href="#section-6.1" class="section-number selfRef">6.1. </a><a
+                            href="#name-normative-references" class="section-name selfRef">규범적 참고 문헌</a>
+                    </h3>
+                    <dl class="references">
+                        <dt id="RFC6585">[EXTRA-STATUS]</dt>
+                        <dd>
+                            <span class="refAuthor">Nottingham, M.</span> 및 <span class="refAuthor">R.
+                                Fielding</span>, <span class="refTitle">"추가 HTTP 상태 코드"</span>, <span
+                                class="seriesInfo">RFC 6585</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC6585</span>, <time datetime="2012-04" class="refDate">2012년 4월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc6585">https://www.rfc-editor.org/info/rfc6585</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9110">[HTTP]</dt>
+                        <dd>
+                            <span class="refAuthor">Fielding, R., 편집자</span>, <span class="refAuthor">Nottingham, M.,
+                                편집자</span> 및 <span class="refAuthor">J. Reschke, 편집자</span>, <span
+                                class="refTitle">"HTTP 의미론"</span>, <span class="seriesInfo">STD 97</span>, <span
+                                class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">2022년 6월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9110">https://www.rfc-editor.org/info/rfc9110</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9209">[PROXY-STATUS]</dt>
+                        <dd>
+                            <span class="refAuthor">Nottingham, M.</span> 및 <span class="refAuthor">P. Sikora</span>,
+                            <span class="refTitle">"Proxy-Status HTTP 응답 헤더 필드"</span>, <span class="seriesInfo">RFC
+                                9209</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC9209</span>, <time datetime="2022-06" class="refDate">2022년 6월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9209">https://www.rfc-editor.org/info/rfc9209</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC2119">[RFC2119]</dt>
+                        <dd>
+                            <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"요구 사항 수준을 나타내기 위해
+                                RFC에서 사용하는 핵심어"</span>, <span class="seriesInfo">BCP 14</span>,
+                            <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">1997년 3월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC8174">[RFC8174]</dt>
+                        <dd>
+                            <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"RFC 2119 핵심어의 대문자와
+                                소문자 간 모호성"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC
+                                8174</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">2017년 5월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9651">[STRUCTURED-FIELDS]</dt>
+                        <dd>
+                            <span class="refAuthor">Nottingham, M.</span> 및 <span class="refAuthor">P. Kamp</span>,
+                            <span class="refTitle">"HTTP를 위한 구조화된 필드 값"</span>, <span class="seriesInfo">RFC
+                                9651</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC9651</span>, <time datetime="2024-09" class="refDate">2024년 9월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9651">https://www.rfc-editor.org/info/rfc9651</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+            <div id="sec-informative-references">
+                <section id="section-6.2">
+                    <h3 id="name-informative-references">
+                        <a href="#section-6.2" class="section-number selfRef">6.2. </a><a
+                            href="#name-informative-references" class="section-name selfRef">비규범적 참고 문헌</a>
+                    </h3>
+                    <dl class="references">
+                        <dt id="I-D.ietf-ohai-chunked-ohttp">[CHUNKED-OHTTP]</dt>
+                        <dd>
+                            <span class="refAuthor">Pauly, T.</span> 및 <span class="refAuthor">M. Thomson</span>,
+                            <span class="refTitle">"청크된 Oblivious HTTP 메시지"</span>, <span class="refContent">진행 중인
+                                작업</span>, <span class="seriesInfo">인터넷 초안,
+                                draft-ietf-ohai-chunked-ohttp-08</span>, <time datetime="2026-02-18"
+                                class="refDate">2026년 2월
+                                18일</time>, <span>&lt;<a
+                                    href="https://datatracker.ietf.org/doc/html/draft-ietf-ohai-chunked-ohttp-08">https://datatracker.ietf.org/doc/html/draft-ietf-ohai-chunked-ohttp-08</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC8441">[RFC8441]</dt>
+                        <dd>
+                            <span class="refAuthor">McManus, P.</span>, <span class="refTitle">"HTTP/2를 사용한 WebSocket
+                                부트스트래핑"</span>, <span class="seriesInfo">RFC 8441</span>, <span class="seriesInfo">DOI
+                                10.17487/RFC8441</span>, <time datetime="2018-09" class="refDate">2018년 9월</time>,
+                            <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc8441">https://www.rfc-editor.org/info/rfc8441</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="RFC9220">[RFC9220]</dt>
+                        <dd>
+                            <span class="refAuthor">Hamilton, R.</span>, <span class="refTitle">"HTTP/3을 사용한
+                                WebSocket 부트스트래핑"</span>, <span class="seriesInfo">RFC 9220</span>, <span
+                                class="seriesInfo">DOI 10.17487/RFC9220</span>, <time datetime="2022-06"
+                                class="refDate">2022년 6월</time>, <span>&lt;<a
+                                    href="https://www.rfc-editor.org/info/rfc9220">https://www.rfc-editor.org/info/rfc9220</a>&gt;</span>.
+                        </dd>
+                        <dd class="break"></dd>
+                        <dt id="SSE">[SSE]</dt>
+                        <dd>
+                            <span class="refAuthor">WHATWG</span>, <span class="refTitle">"HTML - Server-Sent
+                                Events"</span>, <span class="refContent">WHATWG 현행 표준</span>, <span>&lt;<a
+                                    href="https://html.spec.whatwg.org/multipage/server-sent-events.html">https://html.spec.whatwg.org/multipage/server-sent-events.html</a>&gt;</span>.
+                            <span class="annotation">커밋 스냅샷: <span>&lt;<a
+                                        href="https://html.spec.whatwg.org/commit-snapshots/6f84b26bd6eb8bd0e0e8df9819e43e901867166b/">https://html.spec.whatwg.org/commit-snapshots/6f84b26bd6eb8bd0e0e8df9819e43e901867166b/</a>&gt;</span></span>
+                        </dd>
+                        <dd class="break"></dd>
+                    </dl>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div id="acknowledgments">
+        <section id="appendix-A">
+            <h2 id="name-acknowledgments">
+                <a href="#name-acknowledgments" class="section-name selfRef">감사의 말</a>
+            </h2>
+            <p id="appendix-A-1">저자들은 이 명세에 대한
+                논의와 피드백을 제공해 주신 IETF HTTP 워킹 그룹의 많은 구성원께 감사드립니다. 특히 저자들은
+                면밀한 검토와 변경 제안을 해 주신 <span class="contact-name">Mark Thomas</span>, <span class="contact-name">Piotr
+                    Sikora</span>,
+                <span class="contact-name">Thibault Meunier</span>, <span class="contact-name">Marius Kleidl</span>,
+                <span class="contact-name">Ben Schwartz</span>,
+                <span class="contact-name">Willy Tarreau</span>, <span class="contact-name">Will Hawkins</span>, <span
+                    class="contact-name">Mark Nottingham</span> 및
+                <span class="contact-name">Lucas Pardue</span>께 감사드립니다.<a href="#appendix-A-1" class="pilcrow">¶</a>
+            </p>
+        </section>
+    </div>
+    <div id="authors-addresses">
+        <section id="appendix-B">
+            <h2 id="name-authors-addresses">
+                <a href="#name-authors-addresses" class="section-name selfRef">저자 주소</a>
+            </h2>
+            <address class="vcard">
+                <div class="ascii">
+                    <div dir="auto" class="left"><span class="fn nameRole">Kazuho Oku</span></div>
+                    <div dir="auto" class="left"><span class="org">Fastly</span></div>
+                    <div class="email">
+                        <span>이메일:</span>
+                        <a href="mailto:kazuhooku@gmail.com" class="email">kazuhooku@gmail.com</a>
+                    </div>
+                </div>
+                <div class="alternative-contact">추가 연락처 정보:</div>
+                <div class="non-ascii">
+                    <div dir="auto" class="left"><span class="fn nameRole">奥 一穂</span></div>
+                    <div dir="auto" class="left"><span class="org">Fastly</span></div>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Tommy Pauly</span></div>
+                <div dir="auto" class="left"><span class="org">Apple</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:tpauly@apple.com" class="email">tpauly@apple.com</a>
+                </div>
+            </address>
+            <address class="vcard">
+                <div dir="auto" class="left"><span class="fn nameRole">Martin Thomson</span></div>
+                <div dir="auto" class="left"><span class="org">Mozilla</span></div>
+                <div class="email">
+                    <span>이메일:</span>
+                    <a href="mailto:mt@lowentropy.net" class="email">mt@lowentropy.net</a>
+                </div>
+            </address>
+        </section>
+    </div>
+    <script>const toc = document.getElementById("toc");
+        toc.querySelector("h2").addEventListener("click", e => {
+            toc.classList.toggle("active");
+        });
+        toc.querySelector("nav").addEventListener("click", e => {
+            toc.classList.remove("active");
+        });
+    </script>
+</body>
+
+</html>
