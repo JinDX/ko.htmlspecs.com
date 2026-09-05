@@ -558,7 +558,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [CSS Positioned Layout Module Level 3](https://ko.htmlspecs.com/css/css-position-3/)（[Source](https://www.w3.org/TR/2025/WD-css-position-3-20251007/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Positioned Layout Module Level 4](https://ko.htmlspecs.com/css/css-position-4/)（[Source](https://www.w3.org/TR/2025/WD-css-position-4-20251007/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Box Sizing Module Level 3](https://ko.htmlspecs.com/css/css-sizing-3/)（[Source](https://www.w3.org/TR/2026/WD-css-sizing-3-20260904/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [CSS Box Sizing Module Level 4](https://ko.htmlspecs.com/css/css-sizing-4/)（[Source](https://www.w3.org/TR/2021/WD-css-sizing-4-20210520/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [CSS Box Sizing Module Level 4](https://ko.htmlspecs.com/css/css-sizing-4/)（[Source](https://www.w3.org/TR/2026/WD-css-sizing-4-20260904/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Box Alignment Module Level 3](https://ko.htmlspecs.com/css/css-align-3/)（[Source](https://www.w3.org/TR/2026/WD-css-align-3-20260130/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Gaps Module Level 1](https://ko.htmlspecs.com/css/css-gaps-1/)（[Source](https://www.w3.org/TR/2026/WD-css-gaps-1-20260624/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [CSS Anchor Positioning Module Level 1](https://ko.htmlspecs.com/css/css-anchor-position-1/)（[Source](https://www.w3.org/TR/2026/WD-css-anchor-position-1-20260327/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
