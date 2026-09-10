@@ -506,32 +506,31 @@
             align-items: baseline
         }
 
-        :is(h2, h3, h4, h5, h6):not(#toc>h2, #abstract>h2, #sotd>h2, .head>h2):has(+a.self-link) {
+        :is(h2, h3, h4, h5, h6):not(:where(#toc>h2, #abstract>h2, #sotd>h2, .head>h2)):has(+a.self-link) {
             position: relative;
             left: -.5em
         }
 
-        :is(h2, h3, h4, h5, h6):not(#toch2)+a.self-link {
+        :is(h2, h3, h4, h5, h6):not(:where(#toch2))+a.self-link {
             color: inherit;
             order: -1;
             position: relative;
             left: -1.1em;
             font-size: 1rem;
-            opacity: .5
+            opacity: .8;
+            text-decoration: none
         }
 
         :is(h2, h3, h4, h5, h6)+a.self-link::before {
-            content: "§";
-            text-decoration: none;
-            color: var(--heading-text)
+            content: "§"
         }
 
         :is(h2, h3)+a.self-link {
             top: -.2em
         }
 
-        :is(h4, h5, h6)+a.self-link::before {
-            color: #000
+        :is(h2, h3)+a.self-link::before {
+            color: var(--heading-text)
         }
 
         @media (max-width:767px) {
@@ -556,6 +555,7 @@
         }
     </style>
     <meta name="color-scheme" content="light">
+    <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/dark.css" disabled="">
     <!-- <meta name="revision" content="1a30b4bb8781c562aac0f2e33fbdc8e36529f91c"> -->
     <meta name="description" content="EditContext는 작성자가 텍스트 입력 과정에 더 직접적으로 참여할 수 있도록 하는 API입니다.">
     <link rel="canonical" href="https://www.w3.org/TR/edit-context/">
@@ -868,12 +868,12 @@
     "infra",
     "input-events"
   ],
-  "gitRevision": "de324390a56499051e76cb17d38b7daa4cc2c5ec",
-  "publishDate": "2026-06-16",
+  "gitRevision": "a9058b81ced5d76260b838d422ba61f220e43604",
+  "publishDate": "2026-09-09",
   "previousMaturity": "WD",
-  "previousPublishDate": "2026-06-10",
-  "publishISODate": "2026-06-16T00:00:00.000Z",
-  "generatedSubtitle": "W3C Working Draft 16 June 2026"
+  "previousPublishDate": "2026-06-16",
+  "publishISODate": "2026-09-09T00:00:00.000Z",
+  "generatedSubtitle": "W3C Working Draft 09 September 2026"
 }</script>
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-WD">
 </head>
@@ -885,14 +885,14 @@
             </a></p>
         <h1 id="title" class="title">EditContext API</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C 작업 초안</a> <time class="dt-published"
-                datetime="2026-06-16">2026년 6월 16일</time></p>
+                datetime="2026-09-09">2026년 9월 9일</time></p>
         <details open="">
             <summary>이 문서에 대한 자세한 정보</summary>
             <dl>
                 <dt>이 버전:</dt>
                 <dd>
                     <a class="u-url"
-                        href="https://www.w3.org/TR/2026/WD-edit-context-20260616/">https://www.w3.org/TR/2026/WD-edit-context-20260616/</a>
+                        href="https://www.w3.org/TR/2026/WD-edit-context-20260909/">https://www.w3.org/TR/2026/WD-edit-context-20260909/</a>
                 </dd>
                 <dt>최신 공개 버전:</dt>
                 <dd>
@@ -2502,9 +2502,13 @@
                                 class="internalDFN" id="ref-for-dfn-composition-start-4">조합 시작</a>에 <var>text</var>의 길이를
                             더한 값으로 설정합니다.
                         </li>
-                        <li><var>editContext</var>와 <var>text</var>가 주어진 상태로 <a data-link-type="dfn|abstract-op"
-                                href="#dfn-dispatch-text-update-event" class="internalDFN"
-                                id="ref-for-dfn-dispatch-text-update-event-1">텍스트 업데이트 이벤트 디스패치</a>를 수행합니다.</li>
+                        <li>
+                            <a data-link-type="dfn|abstract-op" href="#dfn-dispatch-text-update-event"
+                                class="internalDFN" id="ref-for-dfn-dispatch-text-update-event-1">텍스트 업데이트
+                                이벤트 디스패치</a>에 <var>editContext</var>, <var>text</var>, <var>insertionStart</var>와
+                            <var>insertionEnd</var> 중 최솟값,
+                            그리고 <var>insertionStart</var>와 <var>insertionEnd</var> 중 최댓값을 전달합니다.
+                        </li>
                         <li>
                             <var>editContext</var>의 <a data-link-type="dfn|abstract-op" href="#dfn-is-composing"
                                 class="internalDFN" id="ref-for-dfn-is-composing-8">조합 중</a>이 true이면:
@@ -2559,24 +2563,27 @@
                     <ol>
                         <li><var>oldActiveEditContext</var>를 <var>document</var>의 <a data-link-type="dfn|abstract-op"
                                 href="#dfn-active-editcontext" class="internalDFN"
-                                id="ref-for-dfn-active-editcontext-9">활성 EditContext</a>로 둡니다.</li>
-                        <li><var>newActiveEditContext</var>를 <var>document</var>가 주어진 상태로 <a
+                                id="ref-for-dfn-active-editcontext-9">활성 EditContext</a>로 합니다.</li>
+                        <li><var>newActiveEditContext</var>를 <var>document</var>가 주어졌을 때 <a
                                 data-link-type="dfn|abstract-op" href="#dfn-determine-the-active-editcontext"
-                                class="internalDFN" id="ref-for-dfn-determine-the-active-editcontext-1">활성 EditContext를
-                                결정</a>하는 단계를 실행한 결과로 둡니다.</li>
-                        <li><var>oldActiveEditContext</var>가 null이 아니라면, <var>oldActiveEditContext</var>가 주어진 상태로 <a
+                                class="internalDFN" id="ref-for-dfn-determine-the-active-editcontext-1">활성
+                                EditContext를 결정</a>하는 단계를 실행한 결과로 합니다.</li>
+                        <li><var>oldActiveEditContext</var>가 null이 아니고
+                            <var>newActiveEditContext</var>와 같지 않으면, <var>oldActiveEditContext</var>가 주어졌을 때 <a
                                 data-link-type="dfn|abstract-op" href="#dfn-deactivate-an-editcontext"
                                 class="internalDFN" id="ref-for-dfn-deactivate-an-editcontext-3">EditContext를 비활성화</a>하는
-                            단계를 실행합니다.</li>
-                        <li><var>newActiveEditContext</var>가 null이 아니라면:
+                            단계를
+                            실행합니다.
+                        </li>
+                        <li><var>newActiveEditContext</var>가 null이 아니면, 다음을 수행합니다:
                             <ol>
                                 <li><a data-link-type="dfn|abstract-op" href="#dfn-text-edit-context"
                                         class="internalDFN" id="ref-for-dfn-text-edit-context-20">텍스트 편집
                                         컨텍스트</a>의 <a data-link-type="dfn|abstract-op" href="#dfn-text-state"
                                         class="internalDFN" id="ref-for-dfn-text-state-4">텍스트 상태</a>를
-                                    <var>editContext</var>의 <a data-link-type="dfn|abstract-op" href="#dfn-text-state"
-                                        class="internalDFN" id="ref-for-dfn-text-state-5">텍스트
-                                        상태</a>에 있는 값들과 일치하도록 업데이트합니다.
+                                    <var>newActiveEditContext</var>의 <a data-link-type="dfn|abstract-op"
+                                        href="#dfn-text-state" class="internalDFN" id="ref-for-dfn-text-state-5">텍스트
+                                        상태</a>에 있는 값과 일치하도록 업데이트합니다.
                                 </li>
                             </ol>
                         </li>
@@ -2586,16 +2593,16 @@
                         </li>
                     </ol>
                     <div class="note" role="note" id="issue-container-generatedID-7">
-                        <div class="note-title marker" id="h-note-7"><span>Note</span></div>
+                        <div class="note-title marker" id="h-note-7"><span>참고</span></div>
                         <p class="">
                             <a data-link-type="dfn|abstract-op" href="#dfn-text-edit-context" class="internalDFN"
                                 id="ref-for-dfn-text-edit-context-21">텍스트 편집 컨텍스트</a>의 <a
                                 data-link-type="dfn|abstract-op" href="#dfn-text-state" class="internalDFN"
                                 id="ref-for-dfn-text-state-6">텍스트 상태</a>를 업데이트하는 단계는 플랫폼별 <a
                                 data-link-type="dfn|abstract-op" href="#dfn-text-input-service" class="internalDFN"
-                                id="ref-for-dfn-text-input-service-17">텍스트 입력 서비스</a> 위에 만들어진 추상화의 성격에 따라 달라진다는 점에
-                            유의하십시오.
-                            그 세부 사항은 이 명세의 일부가 아닙니다.
+                                id="ref-for-dfn-text-input-service-17">텍스트 입력 서비스</a> 위에 생성된 추상화의
+                            특성에 따라 달라진다는 점에 유의합니다.
+                            이러한 세부 사항은 이 명세의 일부가 아닙니다.
                         </p>
                     </div>
                 </div>
@@ -2615,26 +2622,40 @@
                                 href="#dom-editcontext" class="internalDFN"
                                 id="ref-for-dom-editcontext-27"><code>EditContext</code></a></dd>
                         <dd><var>text</var>, 문자열</dd>
+                        <dd><var>updateRangeStart</var>, <var>editContext</var>의 이전 <a data-link-type="idl"
+                                href="#dom-editcontext-text" class="internalDFN"
+                                id="ref-for-dom-editcontext-text-1"><code>text</code></a> 내의 오프셋</dd>
+                        <dd><var>updateRangeEnd</var>, <var>editContext</var>의 이전 <a data-link-type="idl"
+                                href="#dom-editcontext-text" class="internalDFN"
+                                id="ref-for-dom-editcontext-text-2"><code>text</code></a> 내의 오프셋</dd>
                         <dt>출력</dt>
                         <dd>없음</dd>
                     </dl>
                     <ol>
                         <li>
-                            <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">이벤트를
-                                발화</a>합니다. 이름은 "textupdate"이며 <var>editContext</var>에서 <a data-link-type="idl"
-                                data-lt="TextUpdateEvent" href="#dom-textupdateevent" class="internalDFN"
-                                id="ref-for-dom-textupdateevent-3"><code>TextUpdateEvent</code></a>를 사용합니다. 이때
+                            <var>editContext</var>에서 "textupdate"라는 이름의 <a data-link-type="dfn"
+                                href="https://dom.spec.whatwg.org/#concept-event-fire">이벤트를 발생</a>시키되, <a
+                                data-link-type="idl" data-lt="TextUpdateEvent" href="#dom-textupdateevent"
+                                class="internalDFN" id="ref-for-dom-textupdateevent-3"><code>TextUpdateEvent</code></a>를
+                            사용하고,
+                            <a data-link-type="idl" href="#dom-textupdateevent-updaterangestart" class="internalDFN"
+                                id="ref-for-dom-textupdateevent-updaterangestart-1"><code>updateRangeStart</code></a>를
+                            <var>updateRangeStart</var>로 초기화하고,
+                            <a data-link-type="idl" href="#dom-textupdateevent-updaterangeend" class="internalDFN"
+                                id="ref-for-dom-textupdateevent-updaterangeend-1"><code>updateRangeEnd</code></a>를
+                            <var>updateRangeEnd</var>로 초기화하고,
                             <a data-link-type="idl" href="#dom-textupdateevent-text" class="internalDFN"
-                                id="ref-for-dom-textupdateevent-text-1"><code>text</code></a>는 <var>text</var>로 초기화되고,
+                                id="ref-for-dom-textupdateevent-text-1"><code>text</code></a>를
+                            <var>text</var>로 초기화하고,
                             <a data-link-type="idl" href="#dom-textupdateevent-selectionstart" class="internalDFN"
-                                id="ref-for-dom-textupdateevent-selectionstart-1"><code>selectionStart</code></a>는
-                            |<var>editContext</var>의 <a data-link-type="dfn|abstract-op" href="#dfn-selection-start"
-                                class="internalDFN" id="ref-for-dfn-selection-start-4">선택 시작</a>으로 초기화되며,
+                                id="ref-for-dom-textupdateevent-selectionstart-1"><code>selectionStart</code></a>를
+                            <var>editContext</var>의 <a data-link-type="dfn|abstract-op" href="#dfn-selection-start"
+                                class="internalDFN" id="ref-for-dfn-selection-start-4">선택 시작</a>으로 초기화하고,
                             <a data-link-type="idl" href="#dom-textupdateevent-selectionend" class="internalDFN"
-                                id="ref-for-dom-textupdateevent-selectionend-1"><code>selectionEnd</code></a>는
+                                id="ref-for-dom-textupdateevent-selectionend-1"><code>selectionEnd</code></a>를
                             <var>editContext</var>의 <a data-link-type="dfn|abstract-op" href="#dfn-selection-end"
                                 class="internalDFN" id="ref-for-dfn-selection-end-4">선택
-                                끝</a>으로 초기화됩니다.
+                                끝</a>으로 초기화합니다.
                         </li>
                     </ol>
                 </div>
@@ -2775,14 +2796,21 @@
                     </dl>
                     <ol>
                         <li><var>editContext</var>의 <a data-link-type="dfn|abstract-op" href="#dfn-is-composing"
-                                class="internalDFN" id="ref-for-dfn-is-composing-10">조합 중</a>을 false로 설정합니다.</li>
-                        <li>
-                            <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">이벤트를
-                                발화</a>합니다. 이름은
-                            <a href="https://w3c.github.io/uievents/#event-type-compositionend">compositionend</a>이며,
-                            <var>editContext</var>에서 <a data-link-type="interface" data-lt="CompositionEvent"
-                                href="https://www.w3.org/TR/uievents/#compositionevent"><code>CompositionEvent</code></a>를
-                            사용합니다.
+                                class="internalDFN" id="ref-for-dfn-is-composing-10">조합 중 여부</a>가 true이면, 다음을 수행합니다:
+                            <ol>
+                                <li><var>editContext</var>의 <a data-link-type="dfn|abstract-op" href="#dfn-is-composing"
+                                        class="internalDFN" id="ref-for-dfn-is-composing-11">조합
+                                        중 여부</a>를 false로 설정합니다.</li>
+                                <li>
+                                    <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">이벤트를
+                                        발생</a>시키되, 이름은
+                                    <a
+                                        href="https://w3c.github.io/uievents/#event-type-compositionend">compositionend</a>이고
+                                    <var>editContext</var>에서 <a data-link-type="interface" data-lt="CompositionEvent"
+                                        href="https://www.w3.org/TR/uievents/#compositionevent"><code>CompositionEvent</code></a>를
+                                    사용합니다.
+                                </li>
+                            </ol>
                         </li>
                     </ol>
                 </div>
@@ -2921,7 +2949,7 @@ interface <dfn data-export="" data-dfn-type="interface" id="dom-editcontext" dat
             <dl>
                 <dt>text</dt>
                 <dd><a data-link-type="idl" href="#dom-editcontext-text" class="internalDFN"
-                        id="ref-for-dom-editcontext-text-1"><code>text</code></a> 게터 단계는 <a data-link-type="dfn"
+                        id="ref-for-dom-editcontext-text-3"><code>text</code></a> 게터 단계는 <a data-link-type="dfn"
                         href="https://webidl.spec.whatwg.org/#this">this</a>의 <a data-link-type="dfn|abstract-op"
                         href="#dfn-text" class="internalDFN" id="ref-for-dfn-text-15">텍스트</a>를 반환하는 것입니다.</dd>
 
@@ -3175,12 +3203,12 @@ interface <dfn data-export="" data-dfn-type="interface" id="dom-textupdateevent"
 };</span></code></pre>
             <dl>
                 <dt><a data-link-type="idl" href="#dom-textupdateevent-updaterangestart" class="internalDFN"
-                        id="ref-for-dom-textupdateevent-updaterangestart-1"><code>updateRangeStart</code></a>, of type
+                        id="ref-for-dom-textupdateevent-updaterangestart-2"><code>updateRangeStart</code></a>, of type
                     unsigned long, readonly</dt>
                 <dd>교체될 범위의 시작 위치입니다.</dd>
 
                 <dt><a data-link-type="idl" href="#dom-textupdateevent-updaterangeend" class="internalDFN"
-                        id="ref-for-dom-textupdateevent-updaterangeend-1"><code>updateRangeEnd</code></a>, of type
+                        id="ref-for-dom-textupdateevent-updaterangeend-2"><code>updateRangeEnd</code></a>, of type
                     unsigned long, readonly</dt>
                 <dd>교체될 범위의 끝 위치입니다.</dd>
 
@@ -3699,7 +3727,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
             </li>
             <li>
                 <a href="#ref-for-dfn-is-composing-10" title="§ 3.1.8 Deactivate an EditContext">§ 3.1.8 Deactivate an
-                    EditContext</a>
+                    EditContext</a> <a href="#ref-for-dfn-is-composing-11" title="Reference 2">(2)</a>
             </li>
         </ul>
     </div>
@@ -4571,7 +4599,11 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
         <p><b>Referenced in:</b></p>
         <ul>
             <li>
-                <a href="#ref-for-dom-editcontext-text-1" title="§ 3.2 EditContext Interface">§ 3.2 EditContext
+                <a href="#ref-for-dom-editcontext-text-1" title="§ 3.1.5 Dispatch text update event">§ 3.1.5 Dispatch
+                    text update event</a> <a href="#ref-for-dom-editcontext-text-2" title="Reference 2">(2)</a>
+            </li>
+            <li>
+                <a href="#ref-for-dom-editcontext-text-3" title="§ 3.2 EditContext Interface">§ 3.2 EditContext
                     Interface</a>
             </li>
         </ul>
@@ -4884,7 +4916,11 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
         <p><b>Referenced in:</b></p>
         <ul>
             <li>
-                <a href="#ref-for-dom-textupdateevent-updaterangestart-1" title="§ 4.1 TextUpdateEvent">§ 4.1
+                <a href="#ref-for-dom-textupdateevent-updaterangestart-1" title="§ 3.1.5 Dispatch text update event">§
+                    3.1.5 Dispatch text update event</a>
+            </li>
+            <li>
+                <a href="#ref-for-dom-textupdateevent-updaterangestart-2" title="§ 4.1 TextUpdateEvent">§ 4.1
                     TextUpdateEvent</a>
             </li>
         </ul>
@@ -4903,7 +4939,11 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
         <p><b>Referenced in:</b></p>
         <ul>
             <li>
-                <a href="#ref-for-dom-textupdateevent-updaterangeend-1" title="§ 4.1 TextUpdateEvent">§ 4.1
+                <a href="#ref-for-dom-textupdateevent-updaterangeend-1" title="§ 3.1.5 Dispatch text update event">§
+                    3.1.5 Dispatch text update event</a>
+            </li>
+            <li>
+                <a href="#ref-for-dom-textupdateevent-updaterangeend-2" title="§ 4.1 TextUpdateEvent">§ 4.1
                     TextUpdateEvent</a>
             </li>
         </ul>
@@ -5656,7 +5696,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
                 if (!pre) return;
                 var sel = this.dataset.copyHeader;
                 var clone = pre.cloneNode(true);
-                if (sel) { var h = clone.querySelector(sel); if (h) h.remove(); }
+                if (sel) {var h = clone.querySelector(sel); if (h) h.remove();}
                 navigator.clipboard.writeText(clone.textContent);
             });
         });
@@ -5735,7 +5775,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
                     [...HL_COLORS.keys()].forEach(key => HL_COLORS.set(key, true));
                 };
                 if (hightligtedElems.length) {
-                    document.body.addEventListener("click", resetListener, { once: true });
+                    document.body.addEventListener("click", resetListener, {once: true});
                 }
             }
 
@@ -5755,7 +5795,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
              */
             function getHighlightColor(target) {
                 // return current colors if applicable
-                const { value } = target.classList;
+                const {value} = target.classList;
                 const re = /respec-hl-\w+/;
                 const activeClass = re.test(value) && value.match(re);
                 if (activeClass) return activeClass[0];
@@ -5846,7 +5886,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
                                                     * @param {KeyboardEvent|MouseEvent} event
                                                     */
                                                    return event => {
-                                                       const { target, type } = event;
+                                                       const {target, type} = event;
 
                                                        if (!(target instanceof HTMLElement)) return;
 
@@ -5907,14 +5947,14 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
                                                        event.clientY >= rect.top
                                                    ) {
                                                        // The event probably happened inside the bounding rect...
-                                                       return { x: event.clientX, y: event.clientY };
+                                                       return {x: event.clientX, y: event.clientY};
                                                    }
 
                                                    // Offset to the middle of the element
                                                    const x = rect.x + rect.width / 2;
                                                    // Placed at the bottom of the element
                                                    const y = rect.y + rect.height;
-                                                   return { x, y };
+                                                   return {x, y};
                                                }
 
                                                /**
@@ -5945,7 +5985,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
                                                 * @param {HTMLElement} panel
                                                 * @param {{ x: number, y: number }} clickPosition
                                                 */
-                                               function displayPanel(dfn, panel, { x, y }) {
+                                               function displayPanel(dfn, panel, {x, y}) {
                                                    panel.hidden = false;
                                                    // distance (px) between edge of panel and the pointing triangle (caret)
                                                    const MARGIN = 20;
@@ -5955,7 +5995,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
                                                    let closestTop = 0;
                                                    let minDiff = Infinity;
                                                    for (const rect of dfnRects) {
-                                                       const { top, bottom } = rect;
+                                                       const {top, bottom} = rect;
                                                        const diffFromClickY = Math.abs((top + bottom) / 2 - y);
                                                        if (diffFromClickY < minDiff) {
                                                            minDiff = diffFromClickY;
@@ -6013,7 +6053,7 @@ interface <dfn data-export="" data-dfn-type="interface" data-idl="interface" dat
                                                            mo.disconnect();
                                                        }
                                                    });
-                                                   mo.observe(panel, { attributes: true, attributeFilter: ["hidden"] });
+                                                   mo.observe(panel, {attributes: true, attributeFilter: ["hidden"]});
                                                }
 
                                                /**
