@@ -90,7 +90,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [ODRL Information Model 2.2](https://ko.htmlspecs.com/odrl-model/)（[Source](https://www.w3.org/TR/2018/REC-odrl-model-20180215/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [ODRL Vocabulary & Expression 2.2](https://ko.htmlspecs.com/odrl-vocab/)（[Source](https://www.w3.org/TR/2018/REC-odrl-vocab-20180215/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [GraphQL](https://ko.htmlspecs.com/graphql/)（[Source](https://spec.graphql.org/draft/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [OpenAPI Specification v3.2.0](https://ko.htmlspecs.com/openapi/)（[Source](https://spec.openapis.org/oas/latest.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [OpenAPI Specification v3.2.1](https://ko.htmlspecs.com/openapi/)（[Source](https://spec.openapis.org/oas/latest.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [URI Template](https://ko.htmlspecs.com/uri-template/)（[Source](https://www.rfc-editor.org/rfc/rfc6570.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 - [JSON Schema Core](https://ko.htmlspecs.com/json-schema-core/)（[Source](https://json-schema.org/draft/2020-12/json-schema-core) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [JSON Schema Validation](https://ko.htmlspecs.com/json-schema-validation/)（[Source](https://json-schema.org/draft/2020-12/json-schema-validation) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
