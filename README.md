@@ -385,6 +385,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [WebOTP API](https://ko.htmlspecs.com/web-otp/)（[Source](https://wicg.github.io/web-otp/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Web Authentication: An API for accessing Public Key Credentials Level 2](https://ko.htmlspecs.com/webauthn-2/)（[Source](https://www.w3.org/TR/2021/REC-webauthn-2-20210408/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Web Authentication: An API for accessing Public Key Credentials Level 3](https://ko.htmlspecs.com/webauthn-3/)（[Source](https://www.w3.org/TR/2026/REC-webauthn-3-20260825/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Web Authentication: An API for accessing Public Key Credentials Level 4](https://ko.htmlspecs.com/webauthn-4/)（[Source](https://www.w3.org/TR/2026/WD-webauthn-4-20260915/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [A Well-Known URL for Relying Party Passkey Endpoints](https://ko.htmlspecs.com/passkey-endpoints/)（[Source](https://www.w3.org/TR/2026/WD-passkey-endpoints-1-20260114/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [A Well-Known URL for Changing Passwords](https://ko.htmlspecs.com/change-password-url/)（[Source](https://www.w3.org/TR/2024/WD-change-password-url-20240603/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Credential Management Level 1](https://ko.htmlspecs.com/credential-management-1/)（[Source](https://www.w3.org/TR/2026/WD-credential-management-1-20260903/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
