@@ -180,7 +180,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Autofill Event](https://ko.htmlspecs.com/autofill-event/)（[Source](https://wicg.github.io/autofill-event/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 
 ### 기기, 센서 및 하드웨어 인터페이스
-- [Web Serial API](https://ko.htmlspecs.com/serial/)（[Source](https://wicg.github.io/serial/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
+- [Web Serial API](https://ko.htmlspecs.com/serial/)（[Source](https://serial.spec.whatwg.org/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebHID API](https://ko.htmlspecs.com/hid/)（[Source](https://hid.spec.whatwg.org/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [WebUSB API](https://ko.htmlspecs.com/webusb/)（[Source](https://wicg.github.io/webusb/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Web Smart Card API](https://ko.htmlspecs.com/web-smart-card/)（[Source](https://wicg.github.io/web-smart-card/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
