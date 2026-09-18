@@ -430,7 +430,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Permissions Policy](https://ko.htmlspecs.com/permissions-policy/)（[Source](https://www.w3.org/TR/2026/WD-permissions-policy-1-20260618/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Document Policy](https://ko.htmlspecs.com/document-policy/)（[Source](https://wicg.github.io/document-policy/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Capability Delegation](https://ko.htmlspecs.com/capability-delegation/)（[Source](https://wicg.github.io/capability-delegation/spec.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [Global Privacy Control (GPC)](https://ko.htmlspecs.com/gpc/)（[Source](https://www.w3.org/TR/2026/WD-gpc-20260611/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Global Privacy Control (GPC)](https://ko.htmlspecs.com/gpc/)（[Source](https://www.w3.org/TR/2026/WD-gpc-20260917/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Privacy Principles](https://ko.htmlspecs.com/privacy-principles/)（[Source](https://www.w3.org/TR/2025/STMT-privacy-principles-20250515/) ![Statement](https://img.shields.io/badge/STMT-6c757d)）
 - [Isolated Contexts](https://ko.htmlspecs.com/isolated-contexts/)（[Source](https://wicg.github.io/isolated-web-apps/isolated-contexts.html) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Controlled Frame API](https://ko.htmlspecs.com/controlled-frame/)（[Source](https://wicg.github.io/controlled-frame/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
