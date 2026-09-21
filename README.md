@@ -367,7 +367,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Threat Model for the Web](https://ko.htmlspecs.com/threat-model-web/)（[Source](https://www.w3.org/TR/2026/DNOTE-threat-model-web-20260721/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [W3C Standards Vulnerability Disclosure & Handling Process and Policy](https://ko.htmlspecs.com/security-disclosure/)（[Source](https://www.w3.org/TR/2026/DNOTE-security-disclosure-20260824/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [Referrer Policy](https://ko.htmlspecs.com/referrer-policy/)（[Source](https://www.w3.org/TR/2017/CR-referrer-policy-20170126/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
-- [Fetch Metadata Request Headers](https://ko.htmlspecs.com/fetch-metadata/)（[Source](https://www.w3.org/TR/2025/WD-fetch-metadata-20250401/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Fetch Metadata Request Headers](https://ko.htmlspecs.com/fetch-metadata/)（[Source](https://www.w3.org/TR/2026/WD-fetch-metadata-20260921/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Mixed Content](https://ko.htmlspecs.com/mixed-content/)（[Source](https://www.w3.org/TR/2023/CRD-mixed-content-20230223/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Trusted Types](https://ko.htmlspecs.com/trusted-types/)（[Source](https://www.w3.org/TR/2026/WD-trusted-types-20260623/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Clear Site Data](https://ko.htmlspecs.com/clear-site-data/)（[Source](https://www.w3.org/TR/2017/WD-clear-site-data-20171130/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
