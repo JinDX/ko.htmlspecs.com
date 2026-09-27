@@ -264,7 +264,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 미디어 형식, 자막 및 코덱
 - [WebVTT: The Web Video Text Tracks Format](https://ko.htmlspecs.com/webvtt1/)（[Source](https://www.w3.org/TR/2026/CRD-webvtt1-20260520/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [Timed Text Markup Language 2 (TTML2)](https://ko.htmlspecs.com/ttml2/)（[Source](https://www.w3.org/TR/2018/REC-ttml2-20181108/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
+- [Timed Text Markup Language 2 (TTML2)](https://ko.htmlspecs.com/ttml2/)（[Source](https://www.w3.org/TR/2021/CR-ttml2-20210309/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [IMSC Text Profile 1.3](https://ko.htmlspecs.com/ttml-imsc1.3/)（[Source](https://www.w3.org/TR/2026/REC-ttml-imsc1.3-20260521/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
 - [Dubbing and Audio description Profiles of TTML2](https://ko.htmlspecs.com/dapt/)（[Source](https://www.w3.org/TR/2026/CRD-dapt-20260626/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Media Source Extensions](https://ko.htmlspecs.com/media-source-2/)（[Source](https://www.w3.org/TR/2026/WD-media-source-2-20260807/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
