@@ -211,7 +211,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 창, 화면 및 시스템 통합
 - [Screen Orientation](https://ko.htmlspecs.com/screen-orientation/)（[Source](https://www.w3.org/TR/2026/WD-screen-orientation-20260806/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Screen Wake Lock](https://ko.htmlspecs.com/screen-wake-lock/)（[Source](https://www.w3.org/TR/2024/WD-screen-wake-lock-20241024/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Screen Wake Lock](https://ko.htmlspecs.com/screen-wake-lock/)（[Source](https://www.w3.org/TR/2026/WD-screen-wake-lock-20260929/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Local Font Access](https://ko.htmlspecs.com/local-font-access/)（[Source](https://wicg.github.io/local-font-access/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Idle Detection API](https://ko.htmlspecs.com/idle-detection/)（[Source](https://wicg.github.io/idle-detection/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [EyeDropper API](https://ko.htmlspecs.com/eyedropper-api/)（[Source](https://wicg.github.io/eyedropper-api/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
