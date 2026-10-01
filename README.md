@@ -35,7 +35,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Strings on the Web: Language and Direction Metadata](https://ko.htmlspecs.com/string-meta/)（[Source](https://www.w3.org/TR/2026/WD-string-meta-20260716/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Internationalization Best Practices for Spec Developers](https://ko.htmlspecs.com/international-specs/)（[Source](https://www.w3.org/TR/2026/NOTE-international-specs-20260807/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Character Model for the World Wide Web: String Matching](https://ko.htmlspecs.com/charmod-norm/)（[Source](https://www.w3.org/TR/2026/WD-charmod-norm-20260716/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [String Searching](https://ko.htmlspecs.com/string-search/)（[Source](https://www.w3.org/TR/2025/DNOTE-string-search-20260927/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
+- [String Searching](https://ko.htmlspecs.com/string-search/)（[Source](https://www.w3.org/TR/2026/DNOTE-string-search-20260930/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [Language enablement index](https://ko.htmlspecs.com/typography/)（[Source](https://www.w3.org/TR/2024/DNOTE-typography-20241115/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [Tags for Identifying Languages (BCP 47)](https://ko.htmlspecs.com/bcp47/)（[Source](https://www.rfc-editor.org/rfc/rfc5646.html) ![RFC](https://img.shields.io/badge/RFC-0057B8)）
 
