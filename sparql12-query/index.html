@@ -1325,7 +1325,7 @@
   "copyrightStart": "2008",
   "github": "https://github.com/w3c/sparql-query",
   "wgPublicList": "public-rdf-star-wg",
-  "previousPublishDate": "2026-09-21",
+  "previousPublishDate": "2026-09-30",
   "prevRecURI": "https://www.w3.org/TR/2013/REC-sparql11-query-20130321",
   "prevRecShortname": "sparql11-query",
   "previousMaturity": "WD",
@@ -1365,10 +1365,10 @@
   "lint": {
     "no-unused-dfns": false
   },
-  "gitRevision": "5ff2230cc0d1d0dae66df44f3a207e6abfeede46",
-  "publishDate": "2026-09-30",
-  "publishISODate": "2026-09-30T00:00:00.000Z",
-  "generatedSubtitle": "W3C Working Draft 30 September 2026"
+  "gitRevision": "7f707ffea120bc1170eb71c65bef6a1901c25128",
+  "publishDate": "2026-10-01",
+  "publishISODate": "2026-10-01T00:00:00.000Z",
+  "generatedSubtitle": "W3C Working Draft 01 October 2026"
 }</script>
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-WD">
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/dark.css" disabled="">
@@ -1381,14 +1381,14 @@
             </a></p>
         <h1 id="title" class="title">SPARQL 1.2 질의 언어</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C 작업 초안</a> <time class="dt-published"
-                datetime="2026-09-30">2026년 9월 30일</time></p>
+                datetime="2026-10-01">2026년 10월 1일</time></p>
         <details open="">
             <summary>이 문서에 대한 자세한 정보</summary>
             <dl>
                 <dt>이 버전:</dt>
                 <dd>
                     <a class="u-url"
-                        href="https://www.w3.org/TR/2026/WD-sparql12-query-20260930/">https://www.w3.org/TR/2026/WD-sparql12-query-20260930/</a>
+                        href="https://www.w3.org/TR/2026/WD-sparql12-query-20261001/">https://www.w3.org/TR/2026/WD-sparql12-query-20261001/</a>
                 </dd>
                 <dt>최신 공개 버전:</dt>
                 <dd>
@@ -7485,6 +7485,14 @@ WHERE { ?annot  a:annotates  &lt;http://www.w3.org/TR/rdf-sparql-query/&gt; .
                 <li><a href="#func-logical-or">logical-or</a> 또는 <a href="#func-logical-and">logical-and</a>가
                     양쪽 분기에서 오류를 만나면, <a data-link-type="dfn|abstract-op" href="#dfn-sparql-eval-error"
                         class="internalDFN" id="ref-for-dfn-sparql-eval-error-4">오류</a> 중 <em>어느 하나</em>를 생성합니다.
+                </li>
+                <li>
+                    SPARQL 표현식이 변수이고
+                    해당 표현식을 평가하는 기준이 되는 솔루션 매핑에 그 변수가 포함되어 있는 경우,
+                    이 평가의 결과는 솔루션 매핑이 해당
+                    변수에 할당하는 RDF 용어입니다.
+                    SPARQL 표현식이 솔루션 매핑에 포함되지 않은 변수인 경우,
+                    해당 표현식을 평가한 결과는 오류입니다.
                 </li>
             </ul>
             <p>true(<span class="truth">T</span>), false
@@ -14134,15 +14142,24 @@ ppeval(<var>x</var>:term, <a href="#defn_ppeOneOrMorePath" class="ppeOp">OneOrMo
             </div>
             <div class="defn">
                 <p><b>정의: <span id="eval_negatedPropertySet">NegatedPropertySet의 평가</span></b></p>
-                <pre class="nohighlight">Write <var>μ'</var> as the extension of a solution mapping:
-<var>μ'</var>(<var>μ</var>, <var>x</var>) = <var>μ</var>(<var>x</var>)   if <var>x</var> is a variable
-<var>μ'</var>(<var>μ</var>, <var>t</var>) = <var>t</var>      if <var>t</var> is an RDF term</pre>
+                <p><var>S</var>를 비어 있지 않은 IRI 집합이라고 합니다.
+                    <var>G</var>를 <a href="#defn_ActiveGraph">활성 그래프</a>라고 합니다.</p>
                 <pre
-                    class="nohighlight">Let <var>x</var> and <var>y</var> be variables or RDF terms, <var>S</var> a set of IRIs,
-and <var>G</var> the <a href="#defn_ActiveGraph">active graph</a>.
+                    class="nohighlight">ppeval(<var>vx</var>:var, <a href="#defn_ppeNPS" class="ppeOp">NPS</a>(<var>S</var>), <var>vy</var>:var) =
+     { { (<var>vx</var>, <var>s</var>), (<var>vy</var>, <var>o</var>) } |
+         ∃ an IRI <var>p</var> such that <var>p</var> ∉ <var>S</var> and the triple (<var>s</var>, <var>p</var>, <var>o</var>) is in <var>G</var> }
 
-   ppeval(<var>x</var>, <a href="#defn_ppeNPS" class="ppeOp">NPS</a>(<var>S</var>), <var>y</var>) =
-       { <var>μ</var> | ∃ triple(<var>μ'</var>(<var>μ</var>, <var>x</var>), <var>p</var>, <var>μ'</var>(<var>μ</var>, <var>y</var>)) in <var>G</var>, such that the IRI of <var>p</var> ∉ <var>S</var> }</pre>
+ppeval(<var>vx</var>:var, <a href="#defn_ppeNPS" class="ppeOp">NPS</a>(<var>S</var>), <var>y</var>:term) =
+     { { (<var>vx</var>, <var>s</var>) } |
+         ∃ an IRI <var>p</var> such that <var>p</var> ∉ <var>S</var> and the triple (<var>s</var>, <var>p</var>, <var>y</var>) is in <var>G</var> }
+
+ppeval(<var>x</var>:term, <a href="#defn_ppeNPS" class="ppeOp">NPS</a>(<var>S</var>), <var>vy</var>:var) =
+     { { (<var>vy</var>, <var>o</var>) } |
+         ∃ an IRI <var>p</var> such that <var>p</var> ∉ <var>S</var> and the triple (<var>x</var>, <var>p</var>, <var>o</var>) is in <var>G</var> }
+
+ppeval(<var>x</var>:term, <a href="#defn_ppeNPS" class="ppeOp">NPS</a>(<var>S</var>), <var>y</var>:term) =
+     { {} |
+         ∃ an IRI <var>p</var> such that <var>p</var> ∉ <var>S</var> and the triple (<var>x</var>, <var>p</var>, <var>y</var>) is in <var>G</var> }</pre>
             </div>
         </section>
         <section id="sparqlAlgebra">
@@ -19311,7 +19328,7 @@ _:x rdf:type xsd:decimal .</pre>
 
                     <a href="https://www.w3.org/TR/sparql12-query/"><cite>SPARQL 1.2 쿼리 언어</cite></a>. Olaf
 
-                    Hartig; Andy Seaborne; Ruben Taelman; Gregory Williams; Thomas Pellissier Tanon. W3C. 2026년 9월 21일
+                    Hartig; Andy Seaborne; Ruben Taelman; Gregory Williams; Thomas Pellissier Tanon. W3C. 2026년 9월 30일
 
                     . W3C 작업 초안. URL: <a
                         href="https://www.w3.org/TR/sparql12-query/">https://www.w3.org/TR/sparql12-query/</a>
