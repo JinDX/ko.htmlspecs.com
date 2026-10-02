@@ -452,7 +452,6 @@
         }
     </style>
     <meta name="color-scheme" content="light">
-    <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/dark.css" disabled="">
     <!-- <meta name="revision" content="350d2f029d98aa0ad6d2631ad5a5534565da9a02"> -->
     <meta name="description" content="이 문서는 사용자 에이전트가 웹 콘텐츠 언어로부터
         접근 가능한 객체의 이름과 설명을
@@ -491,14 +490,14 @@
   "name": "Accessible Name and Description Computation 1.2",
   "inLanguage": "en-US",
   "license": "https://www.w3.org/copyright/software-license-2023/",
-  "datePublished": "2026-09-23",
+  "datePublished": "2026-10-02",
   "copyrightHolder": {
     "name": "World Wide Web Consortium",
     "url": "https://www.w3.org/"
   },
   "discussionUrl": "https://github.com/w3c/accname/issues/",
   "alternativeHeadline": "",
-  "isBasedOn": "https://www.w3.org/TR/2026/WD-accname-1.2-20260922/",
+  "isBasedOn": "https://www.w3.org/TR/2026/WD-accname-1.2-20260923/",
   "description": "This document describes how user agents determine the names and\n        descriptions of accessible objects\n        from web content languages. This information is in turn exposed through\n        accessibility APIs so that assistive technologies can identify these objects and present\n        their names or descriptions to users. Documenting the algorithm through which names and descriptions are to be determined promotes interoperable exposure of these properties among different\n        accessibility APIs and helps to ensure that this information appears in a manner consistent with author intent.",
   "editor": [
     {
@@ -1081,14 +1080,15 @@
     "wai-aria-1.2",
     "infra"
   ],
-  "gitRevision": "46d4e44fd29f76142f58308279ce6509a779b1e8",
-  "publishDate": "2026-09-23",
+  "gitRevision": "40cccbd3dd7779b10a4334cf9eba9b74aeca754e",
+  "publishDate": "2026-10-02",
   "previousMaturity": "WD",
-  "previousPublishDate": "2026-09-22",
-  "publishISODate": "2026-09-23T00:00:00.000Z",
-  "generatedSubtitle": "W3C Working Draft 23 September 2026"
+  "previousPublishDate": "2026-09-23",
+  "publishISODate": "2026-10-02T00:00:00.000Z",
+  "generatedSubtitle": "W3C Working Draft 02 October 2026"
 }</script>
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-WD">
+    <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/dark.css" disabled="">
 </head>
 
 <body class="h-entry" data-cite="dom core-aam-1.2 wai-aria-1.2 infra">
@@ -1098,14 +1098,14 @@
             </a></p>
         <h1 id="title" class="title">접근 가능한 이름 및 설명 계산 1.2</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C 작업 초안</a> <time class="dt-published"
-                datetime="2026-09-23">2026년 9월 23일</time></p>
+                datetime="2026-10-02">2026년 10월 2일</time></p>
         <details open="">
             <summary>이 문서에 대한 자세한 정보</summary>
             <dl>
                 <dt>이 버전:</dt>
                 <dd>
                     <a class="u-url"
-                        href="https://www.w3.org/TR/2026/WD-accname-1.2-20260923/">https://www.w3.org/TR/2026/WD-accname-1.2-20260923/</a>
+                        href="https://www.w3.org/TR/2026/WD-accname-1.2-20261002/">https://www.w3.org/TR/2026/WD-accname-1.2-20261002/</a>
                 </dd>
                 <dt>최신 공개 버전:</dt>
                 <dd>
@@ -1358,7 +1358,7 @@
             </li>
         </ol>
     </nav>
-    <section id="intro" class="informative">
+    <section id="intro" class="informative" data-cite="wai-aria">
         <div class="header-wrapper">
             <h2 id="x1-introduction"><bdi class="secno">1. </bdi>소개</h2><a class="self-link" href="#intro"
                 aria-label="Section 1에 대한 퍼머링크."></a>
@@ -1367,48 +1367,51 @@
 
         <p>
             <a class="termref informative" data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent">사용자
-                에이전트</a>는 <abbr title="문서 객체 모델">DOM</abbr>
-            [<cite><a class="bibref" data-link-type="biblio" href="#bib-dom" title="DOM 표준">DOM</a></cite>]에서 정보를
-            가져와 <a class="termref informative" data-link-type="dfn"
-                href="https://www.w3.org/TR/wai-aria-1.2/#dfn-accessibility-tree">접근성 트리</a>라는 병렬 구조를 생성하며, 이 구조는 <a
+                에이전트</a>는 <abbr title="문서 객체 모델">DOM</abbr>에서 정보를 가져오고
+            [<cite><a class="bibref" data-link-type="biblio" href="#bib-dom" title="DOM 표준">DOM</a></cite>]
+            접근성 트리라고 하는 병렬 구조를
+            <a class="termref informative" data-link-type="dfn"
+                href="https://www.w3.org/TR/wai-aria/#dfn-accessibility-tree">접근성 트리</a>로 생성하며, 이는 <a
                 class="termref informative" data-link-type="dfn"
-                href="https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-object">접근 가능한 객체</a>로 구성된다. 접근 가능한
-            객체는 자신의 <a class="termref informative respec-offending-element" title="일치하는 정의를 찾을 수 없습니다."
-                id="respec-offender-no-matching-definition-found">역할</a>,
-            <a class="termref informative" data-link-type="dfn"
-                href="https://www.w3.org/TR/wai-aria-1.2/#dfn-state">상태</a> 및 <a data-link-type="dfn"
-                href="https://www.w3.org/TR/wai-aria-1.2/#dfn-property">속성</a>에 관한 정보를 제공한다. 예를 들어 역할이
-            <code>menuitem</code>이고, 현재 <code>enabled</code> 상태이며,
-            하위 메뉴로 연결됨을 나타내는 <code>haspopup</code> 속성이 있는 접근 가능한 객체가 있다.
+                href="https://www.w3.org/TR/wai-aria/#dfn-accessible-object">접근 가능한 객체</a>로 구성됩니다. 접근 가능한
+            객체는 자신의 <a class="termref informative" data-link-type="dfn"
+                data-cite-href="https://www.w3.org/TR/wai-aria-1.3/#dfn-role"
+                href="https://www.w3.org/TR/wai-aria-1.3/#dfn-role">역할</a>,
+            <a class="termref informative" data-link-type="dfn" href="https://www.w3.org/TR/wai-aria/#dfn-state">상태</a>
+            및 <a data-link-type="dfn" href="https://www.w3.org/TR/wai-aria/#dfn-property">속성</a>에 관한 정보를 제공합니다. 한 예로 접근
+            가능한 객체가
+            <code>menuitem</code> 역할을 가지며, 현재 <code>enabled</code> 상태이고,
+            하위 메뉴로 이어짐을 나타내는 <code>haspopup</code> 속성을 가진 경우가 있습니다.
         </p>
         <p>
-            이 문서에서 설명하는 접근 가능한 객체의 두 속성은 <a class="termref informative internalDFN" href="#dfn-accessible-name"
-                data-link-type="dfn" id="ref-for-dfn-accessible-name-2">접근 가능한 이름</a>과 <a
+            이 문서에서 설명하는 접근 가능한 객체의 두 가지 속성은 해당 객체의 <a class="termref informative internalDFN"
+                href="#dfn-accessible-name" data-link-type="dfn" id="ref-for-dfn-accessible-name-2">접근 가능한 이름</a>과 <a
                 class="termref informative internalDFN" href="#dfn-accessible-description" data-link-type="dfn"
-                id="ref-for-dfn-accessible-description-2">접근 가능한 설명</a>이다. 이름은 객체의 목적에 대한 정보를
-            제공하는 짧은 레이블이다. 메뉴 항목의 접근 가능한 이름의 예는
-            <code>New</code>이며, 이는 해당 메뉴 항목이 새 문서, 창 등의 생성을
-            제공함을 의미한다.
+                id="ref-for-dfn-accessible-description-2">접근 가능한 설명</a>입니다. 이름은 짧은 레이블로,
+            객체의 목적에 관한 정보를 제공합니다. 메뉴 항목의 접근 가능한 이름의 예로
+            <code>새로 만들기</code>가 있으며, 이는 해당 메뉴 항목이 새
+            문서, 창 등을 생성하는 기능을 제공함을 나타냅니다.
         </p>
         <p>
-            설명은 접근 가능한 객체의 성격을 더 명확히 하는 짧은 설명이다. 이름이 충분하다면
-            설명을 제공하는 것이 항상 필요한 것은 아니지만, 사용자가 객체의 사용을 더 잘
-            이해하는 데 도움이 될 수 있다.
+            설명은 접근 가능한 객체의 성격을 더욱 명확하게 하는 짧은 설명입니다. 이름만으로 충분하다면
+            항상 설명을 제공할 필요는 없지만,
+            사용자가 객체의 용도를 더 잘 이해하는 데 도움이 될 수 있습니다.
         </p>
         <p>
             <a class="termref informative" data-link-type="dfn"
-                href="https://www.w3.org/TR/wai-aria-1.2/#dfn-accessibility-api">접근성 <abbr
-                    title="Application Programming Interfaces">API</abbr></a>는 현재 접근 가능한 이름과 설명을 위해 평면적인, 구조화되지 않은
-            문자열을 지원한다. 따라서 이름/설명 계산의 결과는 평면 문자열이다.
+                href="https://www.w3.org/TR/wai-aria/#dfn-accessibility-api">접근성 <abbr
+                    title="애플리케이션 프로그래밍 인터페이스">API</abbr></a>는 현재 구조화되지 않은 평면
+            문자열을 접근 가능한 이름 및 설명에 지원합니다. 따라서 이름/설명 계산의 결과는
+            평면 문자열입니다.
         </p>
         <p>
             "접근 가능한 이름"과 "접근 가능한 설명"이라는 용어는 이들이
             <a class="termref informative" data-link-type="dfn"
-                href="https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-object">접근 가능한 객체</a>의 속성이며
+                href="https://www.w3.org/TR/wai-aria/#dfn-accessible-object">접근 가능한 객체</a>가
             <a class="termref informative" data-link-type="dfn"
-                href="https://www.w3.org/TR/wai-aria-1.2/#dfn-accessibility-api">접근성 <abbr
-                    title="Application Programming Interfaces">API</abbr></a>를 통해 노출된다는 점을 강조하기 위해 사용된다. 그러나 이후에는
-            단순히 "이름"과 "설명"이라고 자주 지칭한다.
+                href="https://www.w3.org/TR/wai-aria/#dfn-accessibility-api">접근성 <abbr
+                    title="애플리케이션 프로그래밍 인터페이스">API</abbr></a>를 통해 노출하는 속성임을 강조하기 위해 사용됩니다. 그러나 이후에는 흔히
+            간단히 "이름"과 "설명"이라고 합니다.
         </p>
     </section>
     <section class="informative" id="terms">
@@ -1778,7 +1781,7 @@
                     </dd>
                 </dl>
             </section>
-            <section id="computation-steps">
+            <section data-cite="wai-aria" id="computation-steps">
                 <div class="header-wrapper">
                     <h4 id="x4-3-2-computation-steps"><bdi class="secno">4.3.2 </bdi>계산 단계</h4><a class="self-link"
                         href="#computation-steps" aria-label="Section 4.3.2에 대한 퍼머링크"></a>
@@ -1799,7 +1802,7 @@
                             <li id="comp_hidden_not_referenced">
                                 <span id="step2A"></span><em>참조되지 않은 숨김:</em> <code>current node</code>가
                                 <span class="informative"><a data-link-type="dfn"
-                                        href="https://www.w3.org/TR/wai-aria-1.2/#dfn-hidden">숨겨진</a></span>
+                                        href="https://www.w3.org/TR/wai-aria/#dfn-hidden">숨겨진</a></span>
                                 상태이고 <strong>다음에 해당하는 경우</strong>:
                                 <ol class="acc-ol">
                                     <li><code>aria-labelledby</code> 또는
@@ -1996,7 +1999,7 @@
                             <li id="comp_embedded_control">
                                 <span id="step2C"></span><em>임베디드 컨트롤:</em> 그렇지 않고,
                                 <code>current node</code>가 다른 <a class="termref informative" data-link-type="dfn"
-                                    href="https://www.w3.org/TR/wai-aria-1.2/#dfn-widget">위젯</a>의 레이블
+                                    href="https://www.w3.org/TR/wai-aria/#dfn-widget">위젯</a>의 레이블
                                 (예: <code>aria-labelledby</code>가 직접 참조하는 모든 요소) 안에 임베드된 컨트롤이며,
                                 사용자가 해당 임베디드 컨트롤의 값을 조정할 수 있는 경우,
                                 다음 방식으로 임베디드 컨트롤을 텍스트 대안의 일부로 반환한다:
@@ -2143,9 +2146,9 @@
                             </li>
                             <li id="comp_name_from_content">
                                 <span id="step2F"></span><em>콘텐츠에서 이름 가져오기:</em> 그렇지 않고,
-                                <code>current node's</code> <a class="termref informative respec-offending-element"
-                                    title="일치하는 정의를 찾을 수 없습니다."
-                                    id="respec-offender-no-matching-definition-found-0">역할</a>이
+                                <code>current node's</code> <a class="termref informative" data-link-type="dfn"
+                                    data-cite-href="https://www.w3.org/TR/wai-aria-1.3/#dfn-role"
+                                    href="https://www.w3.org/TR/wai-aria-1.3/#dfn-role">역할</a>이
                                 <a class="specref" href="https://www.w3.org/TR/wai-aria-1.3/#namefromcontent">콘텐츠에서
                                     이름 가져오기</a>를 허용하거나, <code>current node</code>가
                                 <code>aria-labelledby</code>, <code>aria-describedby</code>에 의해 참조되거나,
@@ -2491,14 +2494,12 @@
                     <li>Joey Arhar (Google LLC)</li>
                     <li>Bernardo Barlach (Google LLC)</li>
                     <li>Benjamin Beaudry (Microsoft Corporation)</li>
-                    <li>Curt Bellew (Oracle Corporation)</li>
                     <li>Zoë Bijl (<abbr title="World Wide Web Consortium">W3C</abbr> Invited Experts)</li>
                     <li>Gautier Chomel (EDRLab)</li>
                     <li>Aleksandar Cindrikj (Netcetera)</li>
                     <li>Keith Cirkel (Mozilla Foundation)</li>
                     <li>Daniel Clark (Microsoft Corporation)</li>
                     <li>James Craig (Apple Inc.)</li>
-                    <li>Chris Cuellar (Bocoup)</li>
                     <li>Diego Della Rossa (UsableNet)</li>
                     <li>Joanmarie Diggs (Igalia)</li>
                     <li>Tamsin Ewing (<abbr title="World Wide Web Consortium">W3C</abbr>)</li>
@@ -2586,6 +2587,8 @@
                     <li>Roman Toda (Foxit software)</li>
                     <li>David Tseng (Google LLC)</li>
                     <li>Cybozu <abbr title="World Wide Web Consortium">W3C</abbr> (Cybozu)</li>
+                    <li>Tyler Wilcock (Apple Inc.)</li>
+                    <li>Jan Williams (TPGi)</li>
                 </ul>
             </section>
             <section class="section" id="ack_funders">
@@ -2621,49 +2624,48 @@
             <dl class="bibliography">
                 <dt id="bib-core-aam-1-2">[CORE-AAM-1.2]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/core-aam-1.2/"><cite>Core Accessibility API Mappings 1.2</cite></a>.
-                    Valerie Young; Cynthia Shelly. W3C. 2026년 8월 5일. CRD. URL: <a
+                    <a href="https://www.w3.org/TR/core-aam-1.2/"><cite>핵심 접근성 API 매핑 1.2</cite></a>.
+                    Valerie Young; Cynthia Shelly. W3C. 2026년 9월 23일. CRD. URL: <a
                         href="https://www.w3.org/TR/core-aam-1.2/">https://www.w3.org/TR/core-aam-1.2/</a>
                 </dd>
                 <dt id="bib-css2">[CSS2]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/CSS2/"><cite>Cascading Style Sheets Level 2 Revision 1 (CSS 2.1)
-                            Specification</cite></a>. Bert Bos; Tantek Çelik; Ian Hickson; Håkon Wium Lie. W3C. 2011년 6월
-                    7일.
-                    W3C 권고안. URL: <a href="https://www.w3.org/TR/CSS2/">https://www.w3.org/TR/CSS2/</a>
+                    <a href="https://www.w3.org/TR/CSS2/"><cite>종속형 시트 레벨 2 개정 1 (CSS 2.1)
+                            명세</cite></a>. Bert Bos; Tantek Çelik; Ian Hickson; Håkon Wium Lie. W3C. 2011년 6월 7일
+                    . W3C 권고안. URL: <a href="https://www.w3.org/TR/CSS2/">https://www.w3.org/TR/CSS2/</a>
                 </dd>
                 <dt id="bib-dom">[DOM]</dt>
                 <dd>
-                    <a href="https://dom.spec.whatwg.org/"><cite>DOM Standard</cite></a>. Anne van Kesteren. WHATWG.
-                    Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
+                    <a href="https://dom.spec.whatwg.org/"><cite>DOM 표준</cite></a>. Anne van Kesteren. WHATWG.
+                    현행 표준. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
                 </dd>
                 <dt id="bib-html-aam-1-0">[html-aam-1.0]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/html-aam-1.0/"><cite>HTML Accessibility API Mappings 1.0</cite></a>.
-                    Scott O'Hara; Rahim Abdi. W3C. 2026년 8월 5일. W3C 작업 초안. URL: <a
+                    <a href="https://www.w3.org/TR/html-aam-1.0/"><cite>HTML 접근성 API 매핑 1.0</cite></a>.
+                    Scott O'Hara; Rahim Abdi. W3C. 2026년 9월 23일. W3C 작업 초안. URL: <a
                         href="https://www.w3.org/TR/html-aam-1.0/">https://www.w3.org/TR/html-aam-1.0/</a>
                 </dd>
                 <dt id="bib-infra">[infra]</dt>
                 <dd>
-                    <a href="https://infra.spec.whatwg.org/"><cite>Infra Standard</cite></a>. Anne van Kesteren; Domenic
-                    Denicola. WHATWG. Living Standard. URL: <a
+                    <a href="https://infra.spec.whatwg.org/"><cite>Infra 표준</cite></a>. Anne van Kesteren; Domenic
+                    Denicola. WHATWG. 현행 표준. URL: <a
                         href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
                 </dd>
                 <dt id="bib-rfc2119">[RFC2119]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc2119/"><cite>RFC에서 요구 수준을 나타내기 위해 사용하는
-                            핵심 단어</cite></a>. S. Bradner. IETF. 1997년 3월. Best Current Practice. URL: <a
+                    <a href="https://www.rfc-editor.org/info/rfc2119/"><cite>요구사항 수준을 나타내기 위해 RFC에서 사용하는
+                            핵심 단어</cite></a>. S. Bradner. IETF. 1997년 3월. 최선의 현행 관행. URL: <a
                         href="https://www.rfc-editor.org/info/rfc2119/">https://www.rfc-editor.org/info/rfc2119/</a>
                 </dd>
                 <dt id="bib-rfc8174">[RFC8174]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc8174/"><cite>RFC
-                            2119 핵심 단어에서 대문자와 소문자의 모호성</cite></a>. B. Leiba. IETF. 2017년 5월. Best Current Practice. URL:
-                    <a href="https://www.rfc-editor.org/info/rfc8174/">https://www.rfc-editor.org/info/rfc8174/</a>
+                    <a href="https://www.rfc-editor.org/info/rfc8174/"><cite>RFC에서 대문자와 소문자 사용의 모호성
+                            2119 핵심 단어</cite></a>. B. Leiba. IETF. 2017년 5월. 최선의 현행 관행. URL: <a
+                        href="https://www.rfc-editor.org/info/rfc8174/">https://www.rfc-editor.org/info/rfc8174/</a>
                 </dd>
                 <dt id="bib-wai-aria">[WAI-ARIA]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/wai-aria-1.1/"><cite>Accessible Rich Internet Applications (WAI-ARIA)
+                    <a href="https://www.w3.org/TR/wai-aria-1.1/"><cite>접근 가능한 리치 인터넷 애플리케이션 (WAI-ARIA)
                             1.1</cite></a>. Joanmarie Diggs; Shane McCarron; Michael Cooper; Richard Schwerdtfeger;
                     James Craig. W3C. 2017년 12월 14일. W3C 권고안. URL: <a
                         href="https://www.w3.org/TR/wai-aria-1.1/">https://www.w3.org/TR/wai-aria-1.1/</a>
@@ -2842,7 +2844,7 @@
                     [...HL_COLORS.keys()].forEach(key => HL_COLORS.set(key, true));
                 };
                 if (hightligtedElems.length) {
-                    document.body.addEventListener("click", resetListener, {once: true});
+                    document.body.addEventListener("click", resetListener, { once: true });
                 }
             }
 
@@ -2862,7 +2864,7 @@
              */
             function getHighlightColor(target) {
                 // return current colors if applicable
-                const {value} = target.classList;
+                const { value } = target.classList;
                 const re = /respec-hl-\w+/;
                 const activeClass = re.test(value) && value.match(re);
                 if (activeClass) return activeClass[0];
@@ -2953,7 +2955,7 @@
                                                     * @param {KeyboardEvent|MouseEvent} event
                                                     */
                                                    return event => {
-                                                       const {target, type} = event;
+                                                       const { target, type } = event;
 
                                                        if (!(target instanceof HTMLElement)) return;
 
@@ -3014,14 +3016,14 @@
                                                        event.clientY >= rect.top
                                                    ) {
                                                        // The event probably happened inside the bounding rect...
-                                                       return {x: event.clientX, y: event.clientY};
+                                                       return { x: event.clientX, y: event.clientY };
                                                    }
 
                                                    // Offset to the middle of the element
                                                    const x = rect.x + rect.width / 2;
                                                    // Placed at the bottom of the element
                                                    const y = rect.y + rect.height;
-                                                   return {x, y};
+                                                   return { x, y };
                                                }
 
                                                /**
@@ -3052,7 +3054,7 @@
                                                 * @param {HTMLElement} panel
                                                 * @param {{ x: number, y: number }} clickPosition
                                                 */
-                                               function displayPanel(dfn, panel, {x, y}) {
+                                               function displayPanel(dfn, panel, { x, y }) {
                                                    panel.hidden = false;
                                                    // distance (px) between edge of panel and the pointing triangle (caret)
                                                    const MARGIN = 20;
@@ -3062,7 +3064,7 @@
                                                    let closestTop = 0;
                                                    let minDiff = Infinity;
                                                    for (const rect of dfnRects) {
-                                                       const {top, bottom} = rect;
+                                                       const { top, bottom } = rect;
                                                        const diffFromClickY = Math.abs((top + bottom) / 2 - y);
                                                        if (diffFromClickY < minDiff) {
                                                            minDiff = diffFromClickY;
@@ -3120,7 +3122,7 @@
                                                            mo.disconnect();
                                                        }
                                                    });
-                                                   mo.observe(panel, {attributes: true, attributeFilter: ["hidden"]});
+                                                   mo.observe(panel, { attributes: true, attributeFilter: ["hidden"] });
                                                }
 
                                                /**
