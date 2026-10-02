@@ -37,7 +37,7 @@
         src="https://resources.whatwg.org/logo.svg" height="100"></a>
     <hgroup>
       <h1 class="allcaps">HTML</h1>
-      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class="pubdate">2026년 10월 1일</span>
+      <p id="living-standard">현행 표준 — 마지막 업데이트 <span class="pubdate">2026년 10월 2일</span>
       </p>
     </hgroup>
 
@@ -68,7 +68,7 @@
         <a href="https://github.com/whatwg/html/commits" class="changes"><span><strong>커밋</strong>
             <code>GitHub에서</code></span></a>
         <a id="commit-snapshot-link"
-          href="https://html.spec.whatwg.org/commit-snapshots/6992cb519a02db34f653ddd54c50fad2565285f5/" class="changes"
+          href="https://html.spec.whatwg.org/commit-snapshots/5facb53a8b013f209aa789ea0726e404f12c83d9/" class="changes"
           title="'y' 키를 누를 수도 있습니다"><span><strong>스냅샷</strong>
             <code>이 커밋 기준</code></span></a>
       </div>
@@ -2006,7 +2006,9 @@
             <li><a href="#the-messageeventtarget-mixin"><span class="secno">9.4.3</span>
                 <code>MessageEventTarget</code> 믹스인</a></li>
             <li><a href="#message-ports"><span class="secno">9.4.4</span> 메시지 포트</a></li>
-            <li><a href="#ports-and-garbage-collection"><span class="secno">9.4.5</span> 포트 및 가비지
+            <li><a href="#broadcasting-to-many-ports"><span class="secno">9.4.5</span> 여러 포트로 브로드캐스트하기</a>
+            </li>
+            <li><a href="#ports-and-garbage-collection"><span class="secno">9.4.6</span> 포트 및 가비지
                 컬렉션</a></li>
           </ol>
         </li>
@@ -190501,20 +190503,6 @@ document<c- p="">.</c->domain <c- o="">=</c-> <c- t="">'example.com'</c-><c- p="
               href="#concept-document-salvageable">복구 가능</a></i> 상태를 false로 설정한다.</p>
       </li>
       <li>
-        <p><var>ports</var>를 <a href="#concept-relevant-global" id="destroying-documents:concept-relevant-global">관련 전역
-            객체</a>의
-          <a href="#concept-document-window" id="destroying-documents:concept-document-window">연결된
-            <code>Document</code></a>가 <var>document</var>인
-          <code id="destroying-documents:messageport"><a href="#messageport">MessagePort</a></code>의
-          목록으로 설정한다.
-        </p>
-      </li>
-      <li>
-        <p><var>ports</var>의 각 <var>port</var>에 대해
-          <var>port</var>를 <a href="#disentangle" id="destroying-documents:disentangle">분리</a>한다.
-        </p>
-      </li>
-      <li>
         <p>이 명세와 <a href="#other-applicable-specifications" id="destroying-documents:other-applicable-specifications">기타
             적용 가능한 명세</a>에서 정의한
           <var>document</var>에 대한 <a href="#unloading-document-cleanup-steps"
@@ -190648,8 +190636,8 @@ document<c- p="">.</c->domain <c- o="">=</c-> <c- t="">'example.com'</c-><c- p="
         </p>
       </li>
       <li>
-        <p><var>document</var>의 <a href="#concept-relevant-global"
-            id="destroying-documents:concept-relevant-global-2">관련 전역 객체</a>가 주어졌을 때
+        <p><var>document</var>의 <a href="#concept-relevant-global" id="destroying-documents:concept-relevant-global">관련
+            전역 객체</a>가 주어졌을 때
           <a href="#navigation-and-traversal-task-source"
             id="destroying-documents:navigation-and-traversal-task-source-2">탐색 및 순회 작업 소스</a>에
           <a href="#queue-a-global-task" id="destroying-documents:queue-a-global-task-2">전역 작업을 대기열에 추가</a>하여 다음 단계를
@@ -225654,9 +225642,6 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
   <c- b="">undefined</c-> <a href="#dom-messageport-postmessage-options" id="message-ports:dom-messageport-postmessage-options"><c- g="">postMessage</c-></a>(<c- b="">any</c-> <c- g="">message</c->, <c- b="">optional</c-> <a href="#structuredserializeoptions" id="message-ports:structuredserializeoptions"><c- n="">StructuredSerializeOptions</c-></a> <c- g="">options</c-> = {});
   <c- b="">undefined</c-> <a href="#dom-messageport-start" id="message-ports:dom-messageport-start"><c- g="">start</c-></a>();
   <c- b="">undefined</c-> <a href="#dom-messageport-close" id="message-ports:dom-messageport-close"><c- g="">close</c-></a>();
-
-  // event handlers
-  <c- b="">attribute</c-> <a href="#eventhandler" id="message-ports:eventhandler"><c- n="">EventHandler</c-></a> <a href="#handler-messageport-onclose" id="message-ports:handler-messageport-onclose"><c- g="">onclose</c-></a>;
 };
 
 <a href="#messageport" id="message-ports:messageport"><c- n="">MessagePort</c-></a> <c- b="">includes</c-> <a href="#messageeventtarget" id="message-ports:messageeventtarget"><c- n="">MessageEventTarget</c-></a>;
@@ -225896,37 +225881,14 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
         <p><var>initiatorPort</var>와 <var>otherPort</var>의 얽힘을 해제하여, 더 이상 서로
           얽혀 있거나 연결되어 있지 않게 합니다.</p>
       </li>
-      <li>
-        <p><var>otherPort</var>에서 <code id="message-ports:event-close"><a href="#event-close">close</a></code>라는 이름의 <a
-            href="https://dom.spec.whatwg.org/#concept-event-fire" id="message-ports:concept-event-fire"
-            data-x-internal="concept-event-fire">이벤트를 발생시킵니다</a>.</p>
-      </li>
     </ol>
 
-    <div class="note">
-      <p>포트가 명시적으로 닫히지 않았더라도 <code id="message-ports:event-close-2"><a href="#event-close">close</a></code> 이벤트가 발생합니다.
-        이 이벤트가 디스패치되는 경우는 다음과 같습니다.</p>
-
-      <ul>
-        <li><code id="message-ports:dom-messageport-close-2"><a href="#dom-messageport-close">close()</a></code>
-          메서드가 호출된 경우</li>
-        <li><code id="message-ports:document"><a href="#document">Document</a></code>가 <a href="#destroy-a-document"
-            id="message-ports:destroy-a-document">파기된</a> 경우 또는</li>
-        <li><code id="message-ports:messageport-13"><a href="#messageport">MessagePort</a></code>가 <a
-            href="#ports-and-garbage-collection">가비지
-            컬렉션된</a> 경우</li>
-      </ul>
-
-      <p><var>initiatorPort</var>가 명시적으로 닫기를 실행했거나, 그 <code
-          id="message-ports:document-2"><a href="#document">Document</a></code>가 더 이상 존재하지 않거나,
-        위에서 설명한 대로 이미 가비지 컬렉션되었으므로, 이벤트는 <var>otherPort</var>에서만 디스패치합니다.</p>
-    </div>
   </div>
 
   <hr>
 
   <div data-algorithm="">
-    <p id="transferMessagePort"><code id="message-ports:messageport-14"><a href="#messageport">MessagePort</a></code>
+    <p id="transferMessagePort"><code id="message-ports:messageport-13"><a href="#messageport">MessagePort</a></code>
       객체는 <a href="#transferable-objects" id="message-ports:transferable-objects">전송 가능한
         객체</a>입니다. <var>value</var>와
       <var>dataHolder</var>가 주어졌을 때, 해당 객체의 <a href="#transfer-steps" id="message-ports:transfer-steps">전송 단계</a>는 다음과
@@ -226052,7 +226014,7 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
           <li>
             <p><var>finalTargetPort</var>를 현재 해당 태스크가 들어 있는 <a href="#port-message-queue"
                 id="message-ports:port-message-queue-13">포트 메시지 큐</a>의
-              <code id="message-ports:messageport-15"><a href="#messageport">MessagePort</a></code>로 둡니다.
+              <code id="message-ports:messageport-14"><a href="#messageport">MessagePort</a></code>로 둡니다.
             </p>
 
             <p class="note"><var>targetPort</var> 자체가 전송되어 모든 태스크가 함께 이동한 경우,
@@ -226077,7 +226039,7 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
             <p>이 과정에서 예외가 발생하면 이를 포착하고, <var>messageEventTarget</var>에서
               <code id="message-ports:messageevent"><a href="#messageevent">MessageEvent</a></code>를 사용하여
               <code id="message-ports:event-messageerror-2"><a href="#event-messageerror">messageerror</a></code>라는
-              이름의 <a href="https://dom.spec.whatwg.org/#concept-event-fire" id="message-ports:concept-event-fire-2"
+              이름의 <a href="https://dom.spec.whatwg.org/#concept-event-fire" id="message-ports:concept-event-fire"
                 data-x-internal="concept-event-fire">이벤트를 발생시킨</a>
               다음 반환합니다.
             </p>
@@ -226087,7 +226049,7 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
           </li>
           <li>
             <p><var>newPorts</var>를 <var>deserializeRecord</var>.[[TransferredValues]]에 있는 모든
-              <code id="message-ports:messageport-16"><a href="#messageport">MessagePort</a></code> 객체로 구성된 새로운
+              <code id="message-ports:messageport-15"><a href="#messageport">MessagePort</a></code> 객체로 구성된 새로운
               <a id="message-ports:frozen-array" href="https://webidl.spec.whatwg.org/#dfn-frozen-array-type"
                 data-x-internal="frozen-array">고정
                 배열</a>로 둡니다. 객체가 있다면 상대적 순서를 유지합니다.
@@ -226097,7 +226059,7 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
             <p><var>messageEventTarget</var>에서
               <code id="message-ports:messageevent-2"><a href="#messageevent">MessageEvent</a></code>를 사용하여
               <code id="message-ports:event-message-3"><a href="#event-message">message</a></code>라는 이름의
-              <a href="https://dom.spec.whatwg.org/#concept-event-fire" id="message-ports:concept-event-fire-3"
+              <a href="https://dom.spec.whatwg.org/#concept-event-fire" id="message-ports:concept-event-fire-2"
                 data-x-internal="concept-event-fire">이벤트를 발생시킵니다</a>.
               이때 <code id="message-ports:dom-messageevent-data"><a href="#dom-messageevent-data">data</a></code> 속성은
               <var>messageClone</var>으로, <code
@@ -226187,35 +226149,9 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
 
   <hr>
 
-  <p>다음은 <code id="message-ports:messageport-17"><a href="#messageport">MessagePort</a></code>
-    인터페이스를 구현하는 모든 객체가 <a href="#event-handler-idl-attributes" id="message-ports:event-handler-idl-attributes">이벤트 처리기
-      IDL 속성</a>으로 지원해야 하는
-    <a href="#event-handlers" id="message-ports:event-handlers">이벤트 처리기</a>와 그에 대응하는
-    <a href="#event-handler-event-type" id="message-ports:event-handler-event-type">이벤트 처리기 이벤트
-      유형</a>입니다.
-  </p>
-
-  <table>
-    <thead>
-      <tr>
-        <th><a href="#event-handlers" id="message-ports:event-handlers-2">이벤트 처리기</a> </th>
-        <th><a href="#event-handler-event-type" id="message-ports:event-handler-event-type-2">이벤트 처리기 이벤트
-            유형</a>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><dfn data-dfn-for="MessagePort" id="handler-messageport-onclose"
-            data-dfn-type="attribute"><code>onclose</code></dfn> </td>
-        <td> <code id="message-ports:event-close-3"><a href="#event-close">close</a></code>
-        </td>
-      </tr>
-    </tbody>
-  </table>
 
   <div data-algorithm="">
-    <p><code id="message-ports:messageport-18"><a href="#messageport">MessagePort</a></code> 객체의
+    <p><code id="message-ports:messageport-16"><a href="#messageport">MessagePort</a></code> 객체의
       <code
         id="message-ports:handler-messageeventtarget-onmessage"><a href="#handler-messageeventtarget-onmessage">onmessage</a></code>
       IDL 속성이 처음 설정될 때에는, <code
@@ -226225,64 +226161,74 @@ o<c- p="">.</c->contentWindow<c- p="">.</c->postMessage<c- p="">(</c-><c- t="">'
   </div>
 
 
+  <h4 id="broadcasting-to-many-ports"><span class="secno">9.4.5</span> 여러 포트로 브로드캐스트하기<a
+      href="#broadcasting-to-many-ports" class="self-link"></a></h4>
+
+  <p><i>이 절은 비규범적입니다.</i></p>
+
+  <p>여러 포트로 브로드캐스트하는 것은 원칙적으로 비교적 간단합니다. 전송할
+    <code id="broadcasting-to-many-ports:messageport"><a href="#messageport">MessagePort</a></code> 객체의 배열을 유지하여
+    메시지를 보내고, 배열을 순회하여
+    메시지를 전송합니다. 그러나 여기에는 다소 불행한 영향이 하나 있습니다. 포트가 가비지
+    컬렉션되는 것을 방지한다는 점입니다. 상대방이 사라진 경우에도 마찬가지입니다. 이 문제를 방지하려면 간단한
+    프로토콜을 구현하여 상대방이 여전히 존재함을 확인하도록 합니다. 일정
+    시간이 지나도 그렇게 하지 않으면 사라진 것으로 간주하고, <code
+      id="broadcasting-to-many-ports:messageport-2"><a href="#messageport">MessagePort</a></code> 객체를 닫은 다음
+    가비지
+    컬렉션되도록 합니다.
+  </p>
 
 
-  <h4 id="ports-and-garbage-collection"><span class="secno">9.4.5</span> 포트 및 가비지
+
+  <h4 id="ports-and-garbage-collection"><span class="secno">9.4.6</span> 포트 및 가비지
     컬렉션<a href="#ports-and-garbage-collection" class="self-link"></a></h4>
 
 
   <div data-algorithm="">
     <p><code id="ports-and-garbage-collection:messageport"><a href="#messageport">MessagePort</a></code> 객체
-      <var>o</var>가 가비지 컬렉션될 때 <var>o</var>가
-      얽혀 있다면, 사용자 에이전트는 <var>o</var>의 <a href="#disentangle" id="ports-and-garbage-collection:disentangle">얽힘을 해제해야</a>
-      합니다.
+      <var>o</var>가 얽혀 있을 때, 사용자 에이전트는
+      <var>o</var>와 얽힌 <code
+        id="ports-and-garbage-collection:messageport-2"><a href="#messageport">MessagePort</a></code> 객체가
+      <var>o</var>에 대한 강한 참조를 가진 것처럼 동작하거나,
+      <var>o</var>의 <a href="#concept-relevant-global" id="ports-and-garbage-collection:concept-relevant-global">관련 전역
+        객체</a>가 강한 참조를
+      <var>o</var>에 가진 것처럼 동작해야 합니다.
     </p>
   </div>
 
-  <div data-algorithm="">
-    <p><code id="ports-and-garbage-collection:messageport-2"><a href="#messageport">MessagePort</a></code> 객체
-      <var>o</var>가 얽혀 있고 <code
-        id="ports-and-garbage-collection:event-message"><a href="#event-message">message</a></code> 또는 <code
-        id="ports-and-garbage-collection:event-messageerror"><a href="#event-messageerror">messageerror</a></code>
-      이벤트 리스너가 등록되어 있는 경우, 사용자 에이전트는 <var>o</var>와 얽힌
-      <code id="ports-and-garbage-collection:messageport-3"><a href="#messageport">MessagePort</a></code> 객체가
-      <var>o</var>에 대한 강한 참조를 가진 것처럼 동작해야 합니다.
-    </p>
+  <div class="note">
+    <p>따라서 메시지 포트는 수신된 후 이벤트 리스너가 지정되고 나서 잊혀질 수 있으며, 해당
+      이벤트 리스너가 메시지를 수신할 수 있는 한 채널은 유지됩니다.</p>
+
+    <p>물론 채널의 양쪽에서 이런 일이 발생한다면, 두 포트는 모두 가비지
+      컬렉션될 수 있습니다. 서로에 대한 강한 참조를 가지고 있더라도 라이브 코드에서 도달할 수
+      없기 때문입니다.</p>
   </div>
 
-  <p>또한 <code id="ports-and-garbage-collection:messageport-4"><a href="#messageport">MessagePort</a></code>
-    객체에서 디스패치될 이벤트를 참조하는 <a href="#concept-task" id="ports-and-garbage-collection:concept-task">태스크</a>가 <a
-      href="#task-queue" id="ports-and-garbage-collection:task-queue">태스크 큐</a>에 존재하거나,
-    해당 <code id="ports-and-garbage-collection:messageport-6"><a href="#messageport">MessagePort</a></code>
-    객체의 <a href="#port-message-queue" id="ports-and-garbage-collection:port-message-queue">포트 메시지 큐</a>가 활성화되어 있고 비어 있지
-    않은 동안에는
-    그 <code id="ports-and-garbage-collection:messageport-5"><a href="#messageport">MessagePort</a></code>
-    객체를 가비지 컬렉션해서는 안 됩니다.
+  <p>또한 <code id="ports-and-garbage-collection:messageport-3"><a href="#messageport">MessagePort</a></code>
+    객체는 해당 객체에서 디스패치될 이벤트를 참조하는 <a href="#concept-task" id="ports-and-garbage-collection:concept-task">태스크</a>가
+    <a href="#task-queue" id="ports-and-garbage-collection:task-queue">태스크
+      큐</a>에 존재하는 동안 또는 해당 <code
+      id="ports-and-garbage-collection:messageport-4"><a href="#messageport">MessagePort</a></code> 객체에서 디스패치될 동안이나,
+    <code id="ports-and-garbage-collection:messageport-5"><a href="#messageport">MessagePort</a></code> 객체의 <a
+      href="#port-message-queue" id="ports-and-garbage-collection:port-message-queue">포트 메시지 큐</a>가 활성화되어
+    있고 비어 있지 않은 동안에는 가비지 컬렉션되어서는 안 됩니다.
   </p>
 
 
 
 
-  <div class="note">
-
-    <p>따라서 이벤트 리스너가 지정된 메시지 포트를 수신한 뒤 해당 포트에 대한 참조를 잊더라도,
-      그 이벤트 리스너가 메시지를 수신할 수 있는 동안에는 채널이 유지됩니다.</p>
-
-    <p>물론 채널 양쪽에서 모두 이러한 상황이 발생하면, 두 포트가 서로를 강하게 참조하고 있더라도
-      실행 중인 코드에서 도달할 수 없으므로 두 포트 모두 가비지 컬렉션될 수 있습니다. 그러나 메시지
-      포트에 대기 중인 메시지가 있다면 가비지 컬렉션되지 않습니다.</p>
-
-  </div>
-
 
 
   <p class="note">작성자는 <code
-      id="ports-and-garbage-collection:messageport-7"><a href="#messageport">MessagePort</a></code>
-    객체의 얽힘을 해제하여 해당 리소스를 회수할 수 있도록 객체를 명시적으로 닫을 것을 강하게 권장합니다.
-    많은 <code id="ports-and-garbage-collection:messageport-8"><a href="#messageport">MessagePort</a></code>
-    객체를 생성한 뒤 닫지 않고 폐기하면, 특히 가비지 컬렉션에 프로세스 간 조정이 필요할 수 있는
-    <code id="ports-and-garbage-collection:messageport-9"><a href="#messageport">MessagePort</a></code>의 경우
-    가비지 컬렉션이 반드시 즉시 수행되는 것은 아니므로 일시적인 메모리 사용량이 크게 증가할 수 있습니다.
+      id="ports-and-garbage-collection:messageport-6"><a href="#messageport">MessagePort</a></code>
+    객체를 명시적으로 닫아 얽힘을 해제함으로써 해당 리소스를 회수할 수 있도록 할 것을 강력히 권장합니다. 많은
+    <code id="ports-and-garbage-collection:messageport-7"><a href="#messageport">MessagePort</a></code> 객체를 생성하고
+    닫지 않은 채 폐기하면 일시적인 메모리 사용량이 크게
+    증가할 수 있습니다. 가비지 컬렉션이 반드시 신속하게 수행되는 것은 아니기 때문이며, 특히
+    프로세스 간 조정이 가비지 컬렉션에 필요할 수 있는 <code
+      id="ports-and-garbage-collection:messageport-8"><a href="#messageport">MessagePort</a></code>의 경우
+    더욱 그렇습니다.
   </p>
 
 
@@ -279794,7 +279740,7 @@ select::picker-icon {
         </td>
       </tr>
       <tr>
-        <td> <dfn data-dfn-for="CloseWatcher,HTMLElement,MessagePort" id="event-close"
+        <td> <dfn data-dfn-for="CloseWatcher,HTMLElement" id="event-close"
             data-dfn-type="event"><code>close</code></dfn>
           <div class="mdn-anno wrapped before"><button onclick="toggleStatus(this)" class="mdn-anno-btn"><b
                 title="모든 최신 엔진에서 지원됩니다." class="all-engines-flag">✔</b><span>MDN</span></button>
@@ -279824,14 +279770,12 @@ select::picker-icon {
             id="events-2:event-8"><a data-x-internal="event" href="https://dom.spec.whatwg.org/#interface-event">Event</a></code>
         </td>
         <td> <code id="events-2:closewatcher-3"><a href="#closewatcher">CloseWatcher</a></code>, <code
-            id="events-2:the-dialog-element-3"><a href="#the-dialog-element">dialog</a></code> 요소, <code
-            id="events-2:messageport"><a href="#messageport">MessagePort</a></code>
+            id="events-2:the-dialog-element-3"><a href="#the-dialog-element">dialog</a></code> 요소
         </td>
-        <td> <code id="events-2:closewatcher-4"><a href="#closewatcher">CloseWatcher</a></code> 객체나
+        <td> <code id="events-2:closewatcher-4"><a href="#closewatcher">CloseWatcher</a></code> 객체 또는
           <code id="events-2:the-dialog-element-4"><a href="#the-dialog-element">dialog</a></code> 요소가
-          <a href="#close-request" id="events-2:close-request-2">닫기 요청</a>이나 웹 개발자 코드에 의해
-          닫힐 때, 또는 <code id="events-2:messageport-2"><a href="#messageport">MessagePort</a></code> 객체가
-          <a href="#disentangle" id="events-2:disentangle">분리될</a> 때 발생합니다.
+          <a href="#close-request" id="events-2:close-request-2">닫기 요청</a> 또는 웹 개발자
+          코드에 의해 닫힐 때 발생합니다.
 
         </td>
       </tr>
@@ -280395,7 +280339,7 @@ select::picker-icon {
         </td>
         <td> <code id="events-2:window-13"><a href="#window">Window</a></code>, <code
             id="events-2:eventsource"><a href="#eventsource">EventSource</a></code>, <code
-            id="events-2:messageport-3"><a href="#messageport">MessagePort</a></code>, <code
+            id="events-2:messageport"><a href="#messageport">MessagePort</a></code>, <code
             id="events-2:broadcastchannel"><a href="#broadcastchannel">BroadcastChannel</a></code>, <code
             id="events-2:dedicatedworkerglobalscope"><a href="#dedicatedworkerglobalscope">DedicatedWorkerGlobalScope</a></code>,
           <code id="events-2:worker-2"><a href="#worker">Worker</a></code>, <code
@@ -280517,7 +280461,7 @@ select::picker-icon {
         <td> <code id="events-2:messageevent-3"><a href="#messageevent">MessageEvent</a></code>
         </td>
         <td> <code id="events-2:window-14"><a href="#window">Window</a></code>, <code
-            id="events-2:messageport-4"><a href="#messageport">MessagePort</a></code>, <code
+            id="events-2:messageport-2"><a href="#messageport">MessagePort</a></code>, <code
             id="events-2:broadcastchannel-2"><a href="#broadcastchannel">BroadcastChannel</a></code>, <code
             id="events-2:dedicatedworkerglobalscope-2"><a href="#dedicatedworkerglobalscope">DedicatedWorkerGlobalScope</a></code>,
           <code id="events-2:worker-3"><a href="#worker">Worker</a></code>, <code
