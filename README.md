@@ -101,7 +101,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 
 ### 수학
 - [MathML Core](https://ko.htmlspecs.com/mathml-core/)（[Source](https://www.w3.org/TR/2025/CR-mathml-core-20250624/) ![Candidate Recommendation](https://img.shields.io/badge/CR-cfd510)）
-- [MathML4](https://ko.htmlspecs.com/mathml4/)（[Source](https://www.w3.org/TR/2026/WD-mathml4-20261002/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [MathML4](https://ko.htmlspecs.com/mathml4/)（[Source](https://www.w3.org/TR/2026/WD-mathml4-20261008/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 웹 앱, 설치 및 수명주기
 - [Web Application Manifest](https://ko.htmlspecs.com/appmanifest/)（[Source](https://www.w3.org/TR/2026/WD-appmanifest-20261008/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
