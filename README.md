@@ -280,7 +280,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Linear PCM WebCodecs Registration](https://ko.htmlspecs.com/webcodecs-pcm-codec-registration/)（[Source](https://www.w3.org/TR/2026/DNOTE-webcodecs-pcm-codec-registration-20260608/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [u-law PCM WebCodecs Registration](https://ko.htmlspecs.com/webcodecs-ulaw-codec-registration/)（[Source](https://www.w3.org/TR/2026/DNOTE-webcodecs-ulaw-codec-registration-20261016/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [Vorbis WebCodecs Registration](https://ko.htmlspecs.com/webcodecs-vorbis-codec-registration/)（[Source](https://www.w3.org/TR/2026/DNOTE-webcodecs-vorbis-codec-registration-20260608/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
-- [VP8 WebCodecs Registration](https://ko.htmlspecs.com/webcodecs-vp8-codec-registration/)（[Source](https://www.w3.org/TR/2024/DNOTE-webcodecs-vp8-codec-registration-20240909/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
+- [VP8 WebCodecs Registration](https://ko.htmlspecs.com/webcodecs-vp8-codec-registration/)（[Source](https://www.w3.org/TR/2026/DNOTE-webcodecs-vp8-codec-registration-20261016/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [VP9 WebCodecs Registration](https://ko.htmlspecs.com/webcodecs-vp9-codec-registration/)（[Source](https://www.w3.org/TR/2025/DNOTE-webcodecs-vp9-codec-registration-20250514/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 
 ### 그래픽, 이미지, GPU 및 WebXR
