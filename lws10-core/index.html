@@ -426,6 +426,141 @@
 
     <link rel="stylesheet" href="https://www.w3.org/TR/lws10-core/local.css">
 
+    <style>
+        /* Tabbed examples: one pane per media type (see the script below). */
+        .example-tabs {
+            margin: 1em 0;
+        }
+
+        .example-tabs>.tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25em;
+            margin-bottom: -1px;
+        }
+
+        .example-tabs>.tab-bar button {
+            font: inherit;
+            font-size: .85em;
+            padding: .3em .7em;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            border-radius: .3em .3em 0 0;
+            background: #f4f4f4;
+            color: inherit;
+        }
+
+        .example-tabs>.tab-bar button[aria-selected="true"] {
+            background: #fff;
+            font-weight: bold;
+        }
+
+        .example-tabs>[data-tab] {
+            border: 1px solid #ccc;
+            padding: 0 .5em;
+        }
+
+        .example-tabs>[data-tab]>pre {
+            margin: .5em 0;
+        }
+
+        /* Without script (and in print), show every pane under its label. */
+        .example-tabs:not(.ready)>[data-tab]::before {
+            content: attr(data-tab);
+            display: block;
+            font-weight: bold;
+            padding-top: .3em;
+        }
+
+        @media print {
+            .example-tabs>.tab-bar {
+                display: none;
+            }
+
+            .example-tabs>[data-tab][hidden] {
+                display: block;
+            }
+        }
+    </style>
+
+    <script>
+        // Tabbed examples: each .example-tabs block gets one tab per child with
+        // a data-tab label. Turtle and N-Triples panes are highlighted here,
+        // because ReSpec's highlighter has no Turtle grammar. Inline so that it
+        // works in PR previews and published copies, which carry no local files.
+        (function () {
+            const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const span = (c, t) => '<span class="hljs-' + c + '">' + esc(t) + "</span>";
+            const TURTLE = /(#[^\n]*)|(<[^>\s]*>)|("(?:[^"\\\n]|\\.)*")(\^\^|@[A-Za-z-]+)?|(@prefix|@base|\ba\b)|([A-Za-z][\w-]*:[\w.-]*|:[\w.-]+)|(\b\d+\b)/g;
+            function turtle(text) {
+                let out = "", last = 0, m;
+                TURTLE.lastIndex = 0;
+                while ((m = TURTLE.exec(text))) {
+                    out += esc(text.slice(last, m.index));
+                    if (m[1]) out += span("comment", m[1]);
+                    else if (m[2]) out += span("link", m[2]);
+                    else if (m[3]) out += span("string", m[3]) + (m[4] ? esc(m[4]) : "");
+                    else if (m[5]) out += span("keyword", m[5]);
+                    else if (m[6]) {
+                        const i = m[6].indexOf(":") + 1;
+                        out += span("literal", m[6].slice(0, i)) + (i < m[6].length ? span("attr", m[6].slice(i)) : "");
+                    }
+                    else out += span("number", m[7]);
+                    last = TURTLE.lastIndex;
+                }
+                return out + esc(text.slice(last));
+            }
+            function highlight(code) {
+                code.innerHTML = turtle(code.textContent);
+                code.classList.add("hljs");
+                code.dataset.lwsHighlighted = "";
+            }
+            function build() {
+                let n = 0;
+                for (const box of document.querySelectorAll(".example-tabs")) {
+                    for (const old of box.querySelectorAll(":scope > .tab-bar")) old.remove();
+                    const panes = [...box.querySelectorAll(":scope > [data-tab]")];
+                    if (!panes.length) continue;
+                    for (const pane of panes) {
+                        if (!/turtle|n-triples/.test(pane.dataset.tab)) continue;
+                        for (const code of pane.querySelectorAll("pre code.nohighlight:not([data-lws-highlighted])")) highlight(code);
+                    }
+                    const bar = document.createElement("div");
+                    bar.className = "tab-bar";
+                    bar.setAttribute("role", "tablist");
+                    const select = (i) => panes.forEach((pane, j) => {
+                        pane.hidden = i !== j;
+                        bar.children[j].setAttribute("aria-selected", String(i === j));
+                    });
+                    panes.forEach((pane, i) => {
+                        const button = document.createElement("button");
+                        button.type = "button";
+                        const id = "lws-tab-" + n++;
+                        button.id = id;
+                        button.setAttribute("role", "tab");
+                        button.setAttribute("aria-controls", id + "-panel");
+                        pane.id = id + "-panel";
+                        pane.setAttribute("role", "tabpanel");
+                        pane.setAttribute("aria-labelledby", id);
+                        button.textContent = pane.dataset.tab;
+                        button.addEventListener("click", () => select(i));
+                        bar.append(button);
+                    });
+                    box.prepend(bar);
+                    box.classList.add("ready");
+                    select(0);
+                }
+            }
+            function start() {
+                if (document.respec) document.respec.ready.then(build);
+                else build();
+            }
+            if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+            else start();
+        })();
+    </script>
+
 
     <meta name="color-scheme" content="light">
     <!-- <meta name="revision" content="d6af1a1dfe22e76ef5637f238d32e20e41b2b23e"> -->
@@ -461,14 +596,14 @@
   "name": "Linked Web Storage Protocol 1.0",
   "inLanguage": "en",
   "license": "https://www.w3.org/copyright/software-license-2023/",
-  "datePublished": "2026-10-15",
+  "datePublished": "2026-10-16",
   "copyrightHolder": {
     "name": "World Wide Web Consortium",
     "url": "https://www.w3.org/"
   },
   "discussionUrl": "https://github.com/w3c/lws-protocol/issues/",
   "alternativeHeadline": "",
-  "isBasedOn": "https://www.w3.org/TR/2026/WD-lws10-core-20261014/",
+  "isBasedOn": "https://www.w3.org/TR/2026/WD-lws10-core-20261016/",
   "description": "[@@ from charter]",
   "editor": [
     {
@@ -1009,6 +1144,134 @@
       }
     },
     {
+      "id": "https://www.rfc-editor.org/info/rfc6906/",
+      "type": "TechArticle",
+      "name": "The 'profile' Link Relation Type",
+      "url": "https://www.rfc-editor.org/info/rfc6906/",
+      "creator": [
+        {
+          "name": "E. Wilde"
+        }
+      ],
+      "publisher": {
+        "name": "IETF"
+      }
+    },
+    {
+      "id": "https://www.w3.org/TR/rdf12-concepts/",
+      "type": "TechArticle",
+      "name": "RDF 1.2 Concepts and Abstract Data Model",
+      "url": "https://www.w3.org/TR/rdf12-concepts/",
+      "creator": [
+        {
+          "name": "Andy Seaborne"
+        },
+        {
+          "name": "Gregg Kellogg"
+        },
+        {
+          "name": "Olaf Hartig"
+        },
+        {
+          "name": "Pierre-Antoine Champin"
+        }
+      ],
+      "publisher": {
+        "name": "W3C"
+      }
+    },
+    {
+      "id": "https://www.w3.org/TR/json-ld11/",
+      "type": "TechArticle",
+      "name": "JSON-LD 1.1",
+      "url": "https://www.w3.org/TR/json-ld11/",
+      "creator": [
+        {
+          "name": "Gregg Kellogg"
+        },
+        {
+          "name": "Pierre-Antoine Champin"
+        },
+        {
+          "name": "Dave Longley"
+        }
+      ],
+      "publisher": {
+        "name": "W3C"
+      }
+    },
+    {
+      "id": "https://www.w3.org/TR/rdf12-turtle/",
+      "type": "TechArticle",
+      "name": "RDF 1.2 Turtle",
+      "url": "https://www.w3.org/TR/rdf12-turtle/",
+      "creator": [
+        {
+          "name": "Gregg Kellogg"
+        },
+        {
+          "name": "Andy Seaborne"
+        },
+        {
+          "name": "Dominik Tomaszuk"
+        }
+      ],
+      "publisher": {
+        "name": "W3C"
+      }
+    },
+    {
+      "id": "https://www.w3.org/TR/rdf12-trig/",
+      "type": "TechArticle",
+      "name": "RDF 1.2 TriG",
+      "url": "https://www.w3.org/TR/rdf12-trig/",
+      "creator": [
+        {
+          "name": "Gregg Kellogg"
+        },
+        {
+          "name": "Dominik Tomaszuk"
+        }
+      ],
+      "publisher": {
+        "name": "W3C"
+      }
+    },
+    {
+      "id": "https://www.w3.org/TR/rdf12-n-triples/",
+      "type": "TechArticle",
+      "name": "RDF 1.2 N-Triples",
+      "url": "https://www.w3.org/TR/rdf12-n-triples/",
+      "creator": [
+        {
+          "name": "Gregg Kellogg"
+        },
+        {
+          "name": "Dominik Tomaszuk"
+        }
+      ],
+      "publisher": {
+        "name": "W3C"
+      }
+    },
+    {
+      "id": "https://www.w3.org/TR/rdf12-n-quads/",
+      "type": "TechArticle",
+      "name": "RDF 1.2 N-Quads",
+      "url": "https://www.w3.org/TR/rdf12-n-quads/",
+      "creator": [
+        {
+          "name": "Gregg Kellogg"
+        },
+        {
+          "name": "Dominik Tomaszuk"
+        }
+      ],
+      "publisher": {
+        "name": "W3C"
+      }
+    },
+    {
       "id": "https://www.rfc-editor.org/info/rfc2119/",
       "type": "TechArticle",
       "name": "Key words for use in RFCs to Indicate Requirement Levels",
@@ -1034,26 +1297,6 @@
       ],
       "publisher": {
         "name": "IETF"
-      }
-    },
-    {
-      "id": "https://www.w3.org/TR/json-ld11/",
-      "type": "TechArticle",
-      "name": "JSON-LD 1.1",
-      "url": "https://www.w3.org/TR/json-ld11/",
-      "creator": [
-        {
-          "name": "Gregg Kellogg"
-        },
-        {
-          "name": "Pierre-Antoine Champin"
-        },
-        {
-          "name": "Dave Longley"
-        }
-      ],
-      "publisher": {
-        "name": "W3C"
       }
     },
     {
@@ -1497,12 +1740,12 @@
   "lint": {
     "no-unused-dfns": false
   },
-  "gitRevision": "0e7ad1892cab93c623af294cc5d9f36151e297fa",
-  "publishDate": "2026-10-15",
+  "gitRevision": "4f85230da32b8b2e20863ae538b4e9ad31e217be",
+  "publishDate": "2026-10-16",
   "previousMaturity": "WD",
-  "previousPublishDate": "2026-10-14",
-  "publishISODate": "2026-10-15T00:00:00.000Z",
-  "generatedSubtitle": "W3C Working Draft 15 October 2026"
+  "previousPublishDate": "2026-10-16",
+  "publishISODate": "2026-10-16T00:00:00.000Z",
+  "generatedSubtitle": "W3C Working Draft 16 October 2026"
 }</script>
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-WD">
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/dark.css" disabled="">
@@ -1515,14 +1758,14 @@
             </a></p>
         <h1 id="title" class="title">연결된 웹 스토리지 프로토콜 1.0</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C 작업 초안</a> <time class="dt-published"
-                datetime="2026-10-15">2026년 10월 15일</time></p>
+                datetime="2026-10-16">2026년 10월 16일</time></p>
         <details open="">
             <summary>이 문서에 대한 자세한 정보</summary>
             <dl>
                 <dt>이 버전:</dt>
                 <dd>
                     <a class="u-url"
-                        href="https://www.w3.org/TR/2026/WD-lws10-core-20261015/">https://www.w3.org/TR/2026/WD-lws10-core-20261015/</a>
+                        href="https://www.w3.org/TR/2026/WD-lws10-core-20261016/">https://www.w3.org/TR/2026/WD-lws10-core-20261016/</a>
                 </dd>
                 <dt>최신 게시 버전:</dt>
                 <dd>
@@ -1899,19 +2142,21 @@
                     <li class="tocline"><a class="tocxref" href="#lws-media-type-0"><bdi class="secno">12.1 </bdi>LWS
                             미디어 유형</a>
                         <ol class="toc">
-                            <li class="tocline"><a class="tocxref" href="#media-type-equivalence"><bdi
-                                        class="secno">12.1.1 </bdi>미디어 유형 동등성</a></li>
-                            <li class="tocline"><a class="tocxref" href="#pagination"><bdi class="secno">12.1.2
+                            <li class="tocline"><a class="tocxref" href="#lws-profile"><bdi class="secno">12.1.1
+                                    </bdi>LWS 프로파일</a></li>
+                            <li class="tocline"><a class="tocxref" href="#content-negotiation"><bdi class="secno">12.1.2
+                                    </bdi>콘텐츠 협상</a></li>
+                            <li class="tocline"><a class="tocxref" href="#pagination"><bdi class="secno">12.1.3
                                     </bdi>페이지네이션</a>
                                 <ol class="toc">
                                     <li class="tocline"><a class="tocxref" href="#pagination-model"><bdi
-                                                class="secno">12.1.2.1 </bdi>페이지네이션 모델</a></li>
+                                                class="secno">12.1.3.1 </bdi>페이지네이션 모델</a></li>
                                     <li class="tocline"><a class="tocxref" href="#pagination-link-relations"><bdi
-                                                class="secno">12.1.2.2 </bdi>페이지네이션 링크 관계</a></li>
+                                                class="secno">12.1.3.2 </bdi>페이지네이션 링크 관계</a></li>
                                     <li class="tocline"><a class="tocxref" href="#requesting-pages"><bdi
-                                                class="secno">12.1.2.3 </bdi>페이지 요청</a></li>
+                                                class="secno">12.1.3.3 </bdi>페이지 요청</a></li>
                                     <li class="tocline"><a class="tocxref" href="#example-paginated-container"><bdi
-                                                class="secno">12.1.2.4 </bdi>예: 페이지네이션된 컨테이너</a></li>
+                                                class="secno">12.1.3.4 </bdi>예: 페이지네이션된 컨테이너</a></li>
                                 </ol>
                             </li>
                         </ol>
@@ -3545,12 +3790,13 @@ signature</code></pre>
                 <h3 id="x8-1-container-representation"><bdi class="secno">8.1 </bdi>컨테이너 표현</h3><a class="self-link"
                     href="#container-representation" aria-label="제8.1절의 퍼머링크"></a>
             </div>
-            <p>클라이언트가 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-21">컨테이너</a>를 검색하면, 서버는 <a href="#dfn-containers" class="internalDFN"
-                    data-link-type="dfn" id="ref-for-dfn-containers-22">컨테이너</a>와 그 콘텐츠를 설명하는 구조화된 <dfn
-                    data-plurals="container representations" id="dfn-container-representation" tabindex="0"
-                    aria-haspopup="dialog" data-dfn-type="dfn">컨테이너 표현</dfn>을 반환한다. 이 절에서는 컨테이너 표현의 필수 및
-                선택적 속성을 정의한다.</p>
+            <p>LWS <dfn data-plurals="container representations" id="dfn-container-representation" tabindex="0"
+                    aria-haspopup="dialog" data-dfn-type="dfn">컨테이너 표현</dfn>은 <a href="#dfn-containers"
+                    class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-21">컨테이너</a>와 그 콘텐츠를 설명합니다. 이
+                절에서는 해당 표현이
+                <code>application/lws+json</code>으로 제공될 때의 필수 및 선택적 속성을 정의합니다. 다른 RDF 미디어
+                유형의 표현은 <a href="#content-negotiation">콘텐츠 협상</a>을 통해 요청할 수 있습니다.
+            </p>
             <section id="container-properties">
                 <div class="header-wrapper">
                     <h4 id="x8-1-1-container-properties"><bdi class="secno">8.1.1 </bdi>컨테이너 속성</h4><a class="self-link"
@@ -3559,19 +3805,19 @@ signature</code></pre>
                 <p>컨테이너 표현은 다음 속성을 포함해야 한다:</p>
                 <ul>
                     <li><strong><code>id</code></strong>: <a href="#dfn-containers" class="internalDFN"
-                            data-link-type="dfn" id="ref-for-dfn-containers-23">컨테이너</a>의 URI.</li>
+                            data-link-type="dfn" id="ref-for-dfn-containers-22">컨테이너</a>의 URI.</li>
                     <li><strong><code>type</code></strong>: 값 <code>"Container"</code>.</li>
                     <li><strong><code>totalItems</code></strong>: 클라이언트에게 공개될 수 있는,
                         <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                            id="ref-for-dfn-containers-24">컨테이너</a>에 포함된 리소스의 총 개수를 나타내는 정수.
+                            id="ref-for-dfn-containers-23">컨테이너</a>에 포함된 리소스의 총 개수를 나타내는 정수.
                         이 개수는 정확한 것이 <em class="rfc2119">SHOULD</em>되지만
                         근사치일 <em class="rfc2119">MAY</em> 있다.
                     </li>
                     <li><strong><code>items</code></strong>: 포함된 리소스 설명의 배열(아래 참조).
                         <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                            id="ref-for-dfn-containers-25">컨테이너</a>가 비어 있는 경우, 이는 빈 배열이어야 한다.
+                            id="ref-for-dfn-containers-24">컨테이너</a>가 비어 있는 경우, 이는 빈 배열이어야 한다.
                         <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                            id="ref-for-dfn-containers-26">컨테이너</a> 목록이
+                            id="ref-for-dfn-containers-25">컨테이너</a> 목록이
                         페이지네이션되는 경우, <code>items</code>는 현재 페이지의 리소스만 포함한다. 자세한 내용은
                         <a href="#pagination">페이지네이션</a>을 참조하라.
                     </li>
@@ -3584,7 +3830,7 @@ signature</code></pre>
                         aria-label="제8.1.2절의 퍼머링크"></a>
                 </div>
                 <p><code>items</code> 배열의 각 항목은 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-containers-27">컨테이너</a> 안에 포함된 리소스를 설명한다. 포함된 리소스 설명은
+                        id="ref-for-dfn-containers-26">컨테이너</a> 안에 포함된 리소스를 설명한다. 포함된 리소스 설명은
                     다음을 포함해야 한다:</p>
                 <ul>
                     <li><strong><code>id</code></strong>: 포함된 리소스의 URI.</li>
@@ -3611,9 +3857,21 @@ signature</code></pre>
                         예시</h4><a class="self-link" href="#example-container-representation"
                         aria-label="제8.1.3절의 퍼머링크"></a>
                 </div>
-                <p>다음 예시는 두 개의 리소스를 포함하는 <code>/alice/notes/</code>의 <a href="#dfn-containers" class="internalDFN"
-                        data-link-type="dfn" id="ref-for-dfn-containers-28">컨테이너</a>를 보여준다:</p>
-                <pre><code class="json hljs" aria-busy="false"><span class="hljs-punctuation">{</span>
+                <p>다음 예시는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-27">컨테이너</a>를 보여 줍니다. 이 컨테이너는
+                    <code>https://storage.example/alice/notes/</code>에 위치하며 두 개의 리소스를 포함합니다. 다른 탭에서는
+                    동일한 컨테이너를 <a href="#dfn-lws-profile" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-lws-profile-1">LWS 프로파일</a>에 따른 다른 RDF 미디어 유형으로 보여 줍니다.
+                </p>
+                <div class="example-tabs ready" data-base="https://storage.example/alice/notes/">
+                    <div class="tab-bar" role="tablist"><button type="button" id="lws-tab-0" role="tab"
+                            aria-controls="lws-tab-0-panel" aria-selected="true">application/lws+json</button><button
+                            type="button" id="lws-tab-1" role="tab" aria-controls="lws-tab-1-panel"
+                            aria-selected="false">text/turtle</button><button type="button" id="lws-tab-2" role="tab"
+                            aria-controls="lws-tab-2-panel" aria-selected="false">application/n-triples</button></div>
+                    <div data-tab="application/lws+json" id="lws-tab-0-panel" role="tabpanel"
+                        aria-labelledby="lws-tab-0">
+                        <pre><code class="json hljs" aria-busy="false"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">"@context"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"https://www.w3.org/ns/lws/v1"</span><span class="hljs-punctuation">,</span>
   <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/alice/notes/"</span><span class="hljs-punctuation">,</span>
   <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Container"</span><span class="hljs-punctuation">,</span>
@@ -3636,6 +3894,47 @@ signature</code></pre>
   <span class="hljs-punctuation">]</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
+                    </div>
+                    <div data-tab="text/turtle" id="lws-tab-1-panel" role="tabpanel" aria-labelledby="lws-tab-1"
+                        hidden="">
+                        <pre><code class="nohighlight hljs" data-lws-highlighted=""><span class="hljs-keyword">@prefix</span> <span class="hljs-literal">lws:</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#&gt;</span> .
+<span class="hljs-keyword">@prefix</span> <span class="hljs-literal">dcterms:</span> <span class="hljs-link">&lt;http://purl.org/dc/terms/&gt;</span> .
+<span class="hljs-keyword">@prefix</span> <span class="hljs-literal">schema:</span> <span class="hljs-link">&lt;http://schema.org/&gt;</span> .
+<span class="hljs-keyword">@prefix</span> <span class="hljs-literal">xsd:</span> <span class="hljs-link">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span> .
+
+<span class="hljs-link">&lt;&gt;</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">lws:</span><span class="hljs-attr">Container</span> ;
+  <span class="hljs-literal">lws:</span><span class="hljs-attr">totalItems</span> <span class="hljs-number">2</span> ;
+  <span class="hljs-literal">lws:</span><span class="hljs-attr">items</span> <span class="hljs-link">&lt;shoppinglist.txt&gt;</span>, <span class="hljs-link">&lt;todo.json&gt;</span> .
+
+<span class="hljs-link">&lt;shoppinglist.txt&gt;</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">lws:</span><span class="hljs-attr">DataResource</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">format</span> <span class="hljs-string">"text/plain"</span> ;
+  <span class="hljs-literal">schema:</span><span class="hljs-attr">size</span> <span class="hljs-string">"47"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">long</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">modified</span> <span class="hljs-string">"2025-11-24T12:00:00Z"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">dateTime</span> .
+
+<span class="hljs-link">&lt;todo.json&gt;</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">lws:</span><span class="hljs-attr">DataResource</span>, <span class="hljs-link">&lt;http://example.org/customType&gt;</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">format</span> <span class="hljs-string">"application/json"</span> ;
+  <span class="hljs-literal">schema:</span><span class="hljs-attr">size</span> <span class="hljs-string">"2048"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">long</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">modified</span> <span class="hljs-string">"2025-11-24T13:00:00Z"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">dateTime</span> .
+</code></pre>
+                    </div>
+                    <div data-tab="application/n-triples" id="lws-tab-2-panel" role="tabpanel"
+                        aria-labelledby="lws-tab-2" hidden="">
+                        <pre><code class="nohighlight hljs" data-lws-highlighted=""><span class="hljs-link">&lt;https://storage.example/alice/notes/&gt;</span> <span class="hljs-link">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#Container&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/&gt;</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#totalItems&gt;</span> <span class="hljs-string">"2"</span>^^<span class="hljs-link">&lt;http://www.w3.org/2001/XMLSchema#integer&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/&gt;</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#items&gt;</span> <span class="hljs-link">&lt;https://storage.example/alice/notes/shoppinglist.txt&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/&gt;</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#items&gt;</span> <span class="hljs-link">&lt;https://storage.example/alice/notes/todo.json&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/shoppinglist.txt&gt;</span> <span class="hljs-link">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#DataResource&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/shoppinglist.txt&gt;</span> <span class="hljs-link">&lt;http://purl.org/dc/terms/format&gt;</span> <span class="hljs-string">"text/plain"</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/shoppinglist.txt&gt;</span> <span class="hljs-link">&lt;http://schema.org/size&gt;</span> <span class="hljs-string">"47"</span>^^<span class="hljs-link">&lt;http://www.w3.org/2001/XMLSchema#long&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/shoppinglist.txt&gt;</span> <span class="hljs-link">&lt;http://purl.org/dc/terms/modified&gt;</span> <span class="hljs-string">"2025-11-24T12:00:00Z"</span>^^<span class="hljs-link">&lt;http://www.w3.org/2001/XMLSchema#dateTime&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/todo.json&gt;</span> <span class="hljs-link">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#DataResource&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/todo.json&gt;</span> <span class="hljs-link">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;</span> <span class="hljs-link">&lt;http://example.org/customType&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/todo.json&gt;</span> <span class="hljs-link">&lt;http://purl.org/dc/terms/format&gt;</span> <span class="hljs-string">"application/json"</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/todo.json&gt;</span> <span class="hljs-link">&lt;http://schema.org/size&gt;</span> <span class="hljs-string">"2048"</span>^^<span class="hljs-link">&lt;http://www.w3.org/2001/XMLSchema#long&gt;</span> .
+<span class="hljs-link">&lt;https://storage.example/alice/notes/todo.json&gt;</span> <span class="hljs-link">&lt;http://purl.org/dc/terms/modified&gt;</span> <span class="hljs-string">"2025-11-24T13:00:00Z"</span>^^<span class="hljs-link">&lt;http://www.w3.org/2001/XMLSchema#dateTime&gt;</span> .
+</code></pre>
+                    </div>
+                </div>
             </section>
         </section>
     </section>
@@ -3682,7 +3981,7 @@ signature</code></pre>
             및 응답 스니펫)는 일반적인 사용법을 설명하기 위한 <strong>비규범적</strong> 예제입니다. 실제
             요구 사항은 설명문과 표에 명시되어 있습니다. 또한 이 바인딩은 HTTP를 다루지만(초기
             대상 프로토콜), 원칙적으로 LWS 작업은 향후 다른 프로토콜에도 바인딩될 수 있습니다.
-            <a href="#dfn-containers" class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-29">컨테이너</a>
+            <a href="#dfn-containers" class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-28">컨테이너</a>
             표현에 대한 미디어 유형 요구 사항은 <a href="#lws-media-type" class="sec-ref"><bdi class="secno">12. </bdi>LWS 미디어 유형</a>에서
             정의합니다.
         </p>
@@ -3698,7 +3997,7 @@ signature</code></pre>
                 Web Linking [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8288"
                         title="Web Linking">RFC8288</a></cite>]의 원칙을 기반으로 합니다. 메타데이터는 검색 가능성을 향상시키고, 자체 설명적 API를 지원하며,
                 리소스 작업 및 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-30">container</a> 계층 구조에 맞춰집니다.</p>
+                    id="ref-for-dfn-containers-29">container</a> 계층 구조에 맞춰집니다.</p>
             <p><strong>메타데이터 모델</strong>
                 LWS의 모든 메타데이터는 리소스(링크 컨텍스트)에서 시작되는 유형이 지정된 링크 집합으로 표현됩니다.
                 각 링크는 다음으로 구성됩니다:</p>
@@ -3711,10 +4010,10 @@ signature</code></pre>
                 <a href="#dfn-data-resources" class="internalDFN" data-link-type="dfn"
                     id="ref-for-dfn-data-resources-2">data resources</a>의 경우 메타데이터에는 각 표현이 포함되며,
                 각 표현에는 형식과 선택적 sizeInBytes가 있습니다. <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-31">containers</a> 및 <a href="#dfn-data-resources" class="internalDFN"
+                    id="ref-for-dfn-containers-30">containers</a> 및 <a href="#dfn-data-resources" class="internalDFN"
                     data-link-type="dfn" id="ref-for-dfn-data-resources-3">data resources</a>의 경우, 부모 <a
                     href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-32">container</a> 리소스에 대한 링크를 해당 리소스의 메타데이터 일부로 간주합니다.
+                    id="ref-for-dfn-containers-31">container</a> 리소스에 대한 링크를 해당 리소스의 메타데이터 일부로 간주합니다.
             </p>
             <p><strong><a href="#dfn-linkset-resource" class="internalDFN" data-link-type="dfn"
                         id="ref-for-dfn-linkset-resource-2">Linkset Resource</a></strong>
@@ -3742,7 +4041,7 @@ signature</code></pre>
                 </li>
                 <li><a href="#dfn-containment" class="internalDFN" data-link-type="dfn"
                         id="ref-for-dfn-containment-8">포함 관계</a>: 서버는 루트가 아닌 모든 리소스에 대해 부모 <a href="#dfn-containers"
-                        class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-33">컨테이너</a>를 가리키는
+                        class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-32">컨테이너</a>를 가리키는
                     <code>rel="up"</code>이 있는
                     Link 헤더를 <em class="rfc2119">반드시</em> 포함해야 한다.
                 </li>
@@ -3839,81 +4138,90 @@ signature</code></pre>
                     href="#create-resource" aria-label="제9.2절의 퍼머링크"></a>
             </div>
 
-            <p><strong>리소스 생성</strong> 작업은 새 <a href="#dfn-served-resource" id="ref-for-dfn-served-resource-6">제공되는
+
+            <p>이 <strong>리소스 생성</strong> 작업은 새 <a href="#dfn-served-resource" id="ref-for-dfn-served-resource-6">제공
                     리소스</a>를 기존 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-34">컨테이너</a>에 추가한다.
-                이 작업은 <a href="#dfn-data-resources" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-data-resources-4">데이터 리소스</a>와 하위 컨테이너 생성을 모두 처리한다.</p>
+                    id="ref-for-dfn-containers-33">컨테이너</a>에 추가합니다. 이
+                작업은 <a href="#dfn-data-resources" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-data-resources-4">데이터 리소스</a>와 하위 컨테이너의 생성을 모두 처리합니다.</p>
             <p><strong>입력:</strong></p>
             <ul>
                 <li><strong>대상 컨테이너:</strong> 새 리소스가 생성될 <a href="#dfn-containers" class="internalDFN"
-                        data-link-type="dfn" id="ref-for-dfn-containers-35">컨테이너</a>의 식별자.</li>
-                <li><strong>식별자 힌트:</strong> 새 리소스의 식별자에 대한 선택적 제안. 서버는
-                    이 힌트를 사용할 수 있지만, 반드시 사용할 필요는 없다.</li>
-                <li><strong>콘텐츠:</strong> 새 리소스의 초기 콘텐츠와 유형.</li>
+                        data-link-type="dfn" id="ref-for-dfn-containers-34">컨테이너</a>의
+                    식별자입니다.</li>
+                <li><strong>식별자 힌트:</strong> 새 리소스의 식별자에 대한 선택적 제안입니다. 서버는
+                    이 힌트를 사용할 수 있지만 반드시 사용해야 하는 것은 아닙니다.</li>
+                <li><strong>콘텐츠:</strong> 새 리소스의 초기 콘텐츠와 유형입니다.</li>
             </ul>
             <p><strong>동작:</strong></p>
             <ul>
-                <li><strong>식별자 생성:</strong> 서버는 새 리소스의 최종 식별자(URI)를 결정한다.
-                    식별자 힌트가 제공된 경우, 서버는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-containers-36">컨테이너</a> 내의 고유성과 유효성을
-                    보장하면서 이를 반영하려고 시도한다. 힌트가 제공되지 않은 경우, 서버는 고유 식별자를 생성한다.</li>
-                <li><strong>컨테이너 구성원 관계 갱신:</strong> 서버는 새 리소스를 대상 <a href="#dfn-containers" class="internalDFN"
-                        data-link-type="dfn" id="ref-for-dfn-containers-37">컨테이너</a>의 구성원 목록에 원자적으로 추가한다.</li>
-                <li><strong>메타데이터 초기화:</strong> 서버는 새 리소스에 대한 시스템 메타데이터를 초기화한다.
-                    리소스에 연결된 <a href="#dfn-metadata-resource" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-metadata-resource-2">메타데이터 리소스</a>가 있는 경우,
-                    그것도 초기화된다.</li>
+                <li><strong>식별자 생성:</strong> 서버는 새
+                    리소스의 최종 식별자(URI)를 결정합니다. 식별자 힌트가 제공된 경우 서버는
+                    <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-35">컨테이너</a> 내에서 고유성과 유효성을 보장하면서 이를 반영하려고 합니다. 힌트가 제공되지 않으면
+                    서버는 고유한 식별자를 생성합니다.
+                </li>
+                <li><strong>컨테이너 구성원 목록 갱신:</strong> 서버는 새 리소스를 대상
+                    <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-36">컨테이너</a>의 구성원 목록에 원자적으로 추가합니다.
+                </li>
+                <li><strong>메타데이터 초기화:</strong> 서버는 새
+                    리소스의 시스템 메타데이터를 초기화합니다. 리소스에 연결된 <a href="#dfn-metadata-resource" class="internalDFN"
+                        data-link-type="dfn" id="ref-for-dfn-metadata-resource-2">메타데이터 리소스</a>가 있다면 이 역시
+                    초기화합니다.</li>
             </ul>
             <p><strong>가능한 응답:</strong></p>
             <ul>
-                <li><strong id="dfn-created">Created:</strong> 작업이 성공했다. 서버는 새로 생성된 리소스의
-                    최종 식별자를 반환한다.</li>
-                <li><strong>Target Not Found:</strong> 지정된 대상 <a href="#dfn-containers" class="internalDFN"
-                        data-link-type="dfn" id="ref-for-dfn-containers-38">컨테이너</a>가
-                    존재하지 않는다.</li>
-                <li><strong>Not Permitted:</strong> 클라이언트의 식별자는 알려져 있지만, 이 <a href="#dfn-containers" class="internalDFN"
-                        data-link-type="dfn" id="ref-for-dfn-containers-39">컨테이너</a>에서 리소스를 생성할 권한이 없다.</li>
-                <li><strong>Unknown Requester:</strong> 서버가 클라이언트의 식별자를 인식하지 못하며
-                    인증을 요구한다.</li>
-                <li><strong>Conflict:</strong> 생성된 식별자를 가진 리소스가 이미 존재하거나 다른 상태 충돌이 있다.</li>
-                <li><strong>Unknown Error:</strong> 예상치 못한 내부 오류가 발생했다.</li>
+                <li><strong id="dfn-created">생성됨:</strong> 작업이 성공했습니다. 서버는 새로 생성된
+                    리소스의 최종 식별자를 반환합니다.</li>
+                <li><strong>대상을 찾을 수 없음:</strong> 지정된 대상 <a href="#dfn-containers" class="internalDFN"
+                        data-link-type="dfn" id="ref-for-dfn-containers-37">컨테이너</a>가
+                    존재하지 않습니다.</li>
+                <li><strong>허용되지 않음:</strong> 클라이언트의 신원은 확인되었지만
+                    이 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-38">컨테이너</a>에 리소스를 생성할 권한이 없습니다.</li>
+                <li><strong>알 수 없는 요청자:</strong> 서버가 클라이언트의 신원을 인식하지 못하여
+                    인증을 요구합니다.</li>
+                <li><strong>충돌:</strong> 생성된 식별자를 가진 리소스가 이미 존재하거나
+                    다른 상태 충돌이 발생했습니다.</li>
+                <li><strong>알 수 없는 오류:</strong> 예기치 않은 내부 오류가 발생했습니다.</li>
             </ul>
             <p>새 리소스는 대상 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-40">컨테이너</a> URI에 POST를 사용하여 생성하며, 서버가
-                최종 식별자를 할당한다. 클라이언트는 [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8288"
-                        title="웹 링크">RFC8288</a></cite>]의 웹 링크 구문에 따라 POST 요청에
-                하나 이상의 <code>Link</code> 헤더를 포함하여 새 리소스의 초기 사용자 관리 메타데이터를 <em class="rfc2119">제공할 수 있다</em>. 서버 관리
-                메타데이터는 생성 시 서버에서
-                <em class="rfc2119">반드시</em> 자동으로 생성해야 하며 클라이언트가 제공한 링크로 <em class="rfc2119">재정의해서는 안 된다</em>.
-            </p>
-            <p>성공하면 서버는 새 URI를 <code>Location</code> 헤더에 포함하여 201 상태 코드를 <em class="rfc2119">반드시</em> 반환해야 한다. 서버는 부모 <a
-                    href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-41">컨테이너</a>에 대한 링크
-                (<code>rel="up"</code>) 및 생성된 리소스의 전용 <a href="#dfn-linkset-resource" class="internalDFN"
-                    data-link-type="dfn" id="ref-for-dfn-linkset-resource-7">링크 집합 리소스</a>에
-                대한 링크(<code>rel="linkset"; type="application/linkset+json"</code>)를 비롯한 주요 서버 관리
-                메타데이터의 <code>Link</code> 헤더를 <em class="rfc2119">반드시</em> 포함해야 한다. 추가 링크에는
+                    id="ref-for-dfn-containers-39">컨테이너</a> URI에 POST 요청을 보내 생성하며, 서버가
+                최종 식별자를 할당합니다. 클라이언트는 새 리소스의 초기 사용자 관리 메타데이터를 <em class="rfc2119">제공할 수 있습니다</em>.
+                이를 위해 POST 요청에 하나 이상의 <code>Link</code> 헤더를 포함하며,
+                [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8288" title="웹 연결">RFC8288</a></cite>]의 웹
+                연결 구문을 따릅니다. 서버 관리 메타데이터는 <em class="rfc2119">반드시</em>
+                리소스 생성 시 서버가 자동으로 생성해야 하며, <em class="rfc2119">절대로</em>
+                클라이언트가 제공한 링크로 덮어써서는 안 됩니다.</p>
+            <p>성공한 경우 서버는 <em class="rfc2119">반드시</em> 새 URI를 포함한 201 상태 코드를
+                <code>Location</code> 헤더와 함께 반환해야 합니다. 서버는 <em class="rfc2119">반드시</em> 주요 서버 관리 메타데이터에 대한
+                <code>Link</code> 헤더를
+                포함해야 하며, 여기에는 상위 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-containers-40">컨테이너</a>에 대한 링크
+                (<code>rel="up"</code>)와 생성된 리소스의 전용 <a href="#dfn-linkset-resource" class="internalDFN"
+                    data-link-type="dfn" id="ref-for-dfn-linkset-resource-7">링크셋 리소스</a>에 대한 링크
+                (<code>rel="linkset"; type="application/linkset+json"</code>)가 포함됩니다. 추가 링크에는 <em
+                    class="rfc2119">가능하면</em> <code>rel="type"</code>을 포함하는 것이 좋습니다(이는
                 <code>https://www.w3.org/ns/lws#Container</code> 또는
-                <code>https://www.w3.org/ns/lws#DataResource</code>를 나타내는 <code>rel="type"</code>을 <em
-                    class="rfc2119">포함하는 것이 좋다</em>. 본문은 비어 있거나 리소스의 최소 표현을
-                <em class="rfc2119">포함할 수 있다</em>. 일관성을 유지하기 위해 모든 메타데이터 생성과 연결은
-                리소스 생성과 함께 <em class="rfc2119">반드시</em> 원자적으로 수행되어야 한다.
+                <code>https://www.w3.org/ns/lws#DataResource</code>를 나타냅니다). 본문은 <em class="rfc2119">비워 둘 수도 있고</em>
+                리소스의 최소한의 표현을 포함할 수도 있습니다. 일관성을 유지하기 위해 모든 메타데이터 생성 및 연결은 <em class="rfc2119">반드시</em> 리소스 생성과 원자적으로
+                수행되어야 합니다.
             </p>
-            <p><strong>POST(컨테이너 URI에 전송)</strong> – <em>서버에서 할당한 이름으로 생성:</em>
+            <p><strong>POST (컨테이너 URI 대상)</strong> – <em>서버가 할당한 이름으로 생성:</em>
                 POST를 사용하여 기존 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-42">컨테이너</a> 내부에 새 리소스를 추가한다.
-                서버가 리소스의 식별자를 할당한다. 클라이언트는 생성할 리소스의 유형을 다음과 같이 나타낸다.</p>
+                    id="ref-for-dfn-containers-41">컨테이너</a> 내부에 새 리소스를 추가합니다. 서버가
+                리소스의 식별자를 할당합니다. 클라이언트는 다음과 같이 생성할 리소스의 유형을 지정합니다.</p>
             <ul>
                 <li><strong><a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                            id="ref-for-dfn-containers-43">컨테이너</a></strong>를 생성하려면 클라이언트는
-                    Container 유형을 가리키는 <code>rel="type"</code>이 있는 <code>Link</code> 헤더를 <em class="rfc2119">반드시</em>
-                    포함해야 한다.
+                            id="ref-for-dfn-containers-42">컨테이너</a></strong>를 생성하려면 클라이언트는 <em class="rfc2119">반드시</em>
+                    Container 유형을 가리키는 <code>rel="type"</code>이 있는
+                    <code>Link</code> 헤더를 포함해야 합니다.
                     <code>Link: &lt;https://www.w3.org/ns/lws#Container&gt;; rel="type"</code>.
                 </li>
                 <li><strong><a href="#dfn-data-resources" class="internalDFN" data-link-type="dfn"
-                            id="ref-for-dfn-data-resources-5">데이터 리소스</a></strong>를 생성하려면 클라이언트가
-                    적절한 <code>Content-Type</code> 헤더와 함께 요청 본문에 리소스 콘텐츠를 포함한다.</li>
+                            id="ref-for-dfn-data-resources-5">데이터 리소스</a></strong>를 생성하려면 클라이언트는
+                    적절한 <code>Content-Type</code> 헤더와 함께 요청 본문에 리소스 콘텐츠를 포함합니다.</li>
             </ul>
             <p><strong>예시(POST를 사용하여 새 데이터 리소스 생성):</strong></p>
             <pre><code aria-busy="false" class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/alice/notes/</span> <span class="hljs-meta">HTTP/1.1</span>
@@ -3930,12 +4238,11 @@ apples
 orange juice
 </code></pre>
             <p>이 예시에서 클라이언트는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-44">컨테이너</a>
-                <code>/alice/notes/</code>에 POST한다. <code>text/plain</code> 콘텐츠(식료품 목록)를 제공하고
-                새 리소스의 이름으로 <code>shoppinglist.txt</code>를 제안한다.
-                <code>/alice/notes/</code>가 존재하고 클라이언트가 인가된 경우 서버는 새 <a href="#dfn-data-resources" class="internalDFN"
-                    data-link-type="dfn" id="ref-for-dfn-data-resources-6">데이터 리소스</a>를 생성하여 <a href="#dfn-containers"
-                    class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-45">컨테이너</a>의 멤버 목록에 추가한다.
+                    id="ref-for-dfn-containers-43">컨테이너</a> <code>/alice/notes/</code>에 POST 요청을 보냅니다.
+                <code>text/plain</code> 콘텐츠(식료품 목록)를 제공합니다. <code>/alice/notes/</code>가 존재하고
+                클라이언트에 권한이 있다면 서버는 새 <a href="#dfn-data-resources" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-data-resources-6">데이터 리소스</a>를 생성하고 이를 <a href="#dfn-containers" class="internalDFN"
+                    data-link-type="dfn" id="ref-for-dfn-containers-44">컨테이너</a>의 구성원 목록에 추가합니다.
             </p>
             <p><strong>예시(POST에 대한 응답 — 데이터 리소스):</strong></p>
             <pre><code aria-busy="false" class="hljs http"><span class="hljs-meta">HTTP/1.1</span> <span class="hljs-number">201</span> Created
@@ -3946,19 +4253,18 @@ orange juice
 <span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;https://www.w3.org/ns/lws#DataResource&gt;; rel="type"
 <span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>0
 </code></pre>
-            <p>성공하면 새 URI를 <code>Location</code> 헤더에 포함하여 201 Created를 반환한다. 본문은
-                비어 있거나 최소 표현일 수 있다.
+            <p>성공한 경우 <code>Location</code> 헤더에 새 URI를 포함하여 201 Created를 반환합니다. 본문은
+                비어 있거나 최소한의 표현을 포함할 수 있습니다.
                 대상 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-46">컨테이너</a> <code>/alice/notes/</code>가 존재하지 않으면
-                더 적절한 다른 상태 코드가 없는 한 서버는 404 오류 상태를 <em class="rfc2119">반드시</em> 반환해야 한다.
+                    id="ref-for-dfn-containers-45">컨테이너</a> <code>/alice/notes/</code>가 존재하지 않는다면 서버는
+                다른 상태 코드가 더 적절한 경우를 제외하고 <em class="rfc2119">반드시</em> 404 오류 상태를 반환해야 합니다.
             </p>
             <p><strong><a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-containers-47">컨테이너</a> 생성:</strong> 새 <a href="#dfn-containers"
-                    class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-48">컨테이너</a>를 생성하려면 클라이언트는
-                Container 유형을 나타내는
-                <code>Link</code> 헤더와 함께 기존 부모 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-49">컨테이너</a>에 POST를 사용한다.
-                예를 들면 다음과 같다.
+                        id="ref-for-dfn-containers-46">컨테이너</a> 생성:</strong> 새 <a href="#dfn-containers"
+                    class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-47">컨테이너</a>를 생성하려면 클라이언트는 기존 상위
+                <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-containers-48">컨테이너</a>에 Container 유형을 나타내는 <code>Link</code> 헤더를 포함하여
+                POST 요청을 보냅니다. 예를 들면 다음과 같습니다.
             </p>
             <pre><code aria-busy="false" class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/alice/</span> <span class="hljs-meta">HTTP/1.1</span>
 <span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>example.com
@@ -3974,27 +4280,27 @@ orange juice
 <span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;https://www.w3.org/ns/lws#Container&gt;; rel="type"
 <span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>0
 </code></pre>
-            <p>이 요청은 <code>/alice/notes/</code>에 새 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-50">컨테이너</a>를 생성하며,
-                <code>rel="type"</code>이 <code>https://www.w3.org/ns/lws#Container</code>인 항목을 포함한
-                서버 생성 메타데이터도 함께 생성한다.
-            </p>
-            <p><strong>생성에 관한 추가 참고 사항(HTTP 바인딩):</strong></p>
+            <p>이 요청은 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-containers-49">컨테이너</a>를 <code>/alice/notes/</code>에 새로 생성하며, 서버가 생성한
+                메타데이터에는 <code>rel="type"</code>으로 <code>https://www.w3.org/ns/lws#Container</code>가 포함됩니다.</p>
+            <p><strong>생성 작업에 관한 추가 참고 사항(HTTP 바인딩):</strong></p>
             <ul>
-                <li>POST는 멱등성이 없다. 이를 반복하면 중복 항목이 생성될 수 있으므로 클라이언트는 의도하지 않은
-                    재시도를 <em class="rfc2119">피하는 것이 좋으며</em>, 이를 방지하기 위해 고유 식별자나 검사를 사용해야 한다.</li>
-                <li>메타데이터 업데이트는 원자적으로 수행된다. 서버는 성공을 반환하기 전에 <a href="#dfn-linkset-resource" class="internalDFN"
-                        data-link-type="dfn" id="ref-for-dfn-linkset-resource-8">링크 집합 리소스</a>가 생성되고 필수 서버 관리 필드로
-                    채워지도록 <em class="rfc2119">반드시</em> 보장해야 한다.</li>
-                <li>검색 가능성을 위해 서버는 하드코딩된 URI 없이 클라이언트를 안내하도록 401 응답에
-                    <code>rel="https://www.w3.org/ns/lws#storage"</code>가 있는 <code>Link</code> 헤더를
-                    <em class="rfc2119">포함하는 것이 좋다</em>.
+                <li>POST는 멱등성이 없습니다. 반복하면 중복 리소스가 생성될 수 있으므로 클라이언트는 <em class="rfc2119">가능하면</em>
+                    의도하지 않은 재시도를 피하거나 고유 식별자 및 검사를 사용하여 중복을 방지하는 것이 좋습니다.</li>
+                <li>메타데이터 갱신은 원자적으로 수행됩니다. 서버는 <em class="rfc2119">반드시</em> <a href="#dfn-linkset-resource"
+                        class="internalDFN" data-link-type="dfn" id="ref-for-dfn-linkset-resource-8">링크셋 리소스</a>가 생성되고
+                    필수
+                    서버 관리 필드로 채워진 후에 성공 응답을 반환하도록 보장해야 합니다.</li>
+                <li>발견 가능성을 높이기 위해 서버는 <em class="rfc2119">가능하면</em> 401 응답에 <code>Link</code> 헤더를 포함하고,
+                    <code>rel="https://www.w3.org/ns/lws#storage"</code>를 사용하여 URI가 하드코딩되지 않은 클라이언트에
+                    안내를 제공하는 것이 좋습니다.
                 </li>
             </ul>
-            <p><strong>메타데이터 관리 및 검색(생성과 관련됨):</strong>
-                메타데이터는 주로 읽기 작업을 통해 검색하지만 생성 중에 만들어진다. 클라이언트는 생성 직후 새
-                리소스 URI에 GET 또는 HEAD를 사용하여 이를 검색할 수 있다. 클라이언트는 특정 메타데이터 링크와
-                속성을 포함하도록 요청하기 위해 <code>Prefer</code> 헤더를 사용할 수 있다(관계 유형을 통해).
+            <p><strong>메타데이터 관리 및 검색(생성과 관련):</strong>
+                메타데이터는 주로 읽기 작업을 통해 검색되지만, 생성 과정에서 만들어집니다. 클라이언트는
+                리소스 생성 직후 새 리소스 URI에 GET 또는 HEAD 요청을 보내 메타데이터를 검색할 수 있습니다. 클라이언트는
+                <code>Prefer</code> 헤더를 사용하여 특정 메타데이터 링크(관계 유형을 통해)와
+                속성을 포함하도록 요청할 수 있습니다.
             </p>
 
         </section>
@@ -4006,48 +4312,45 @@ orange juice
             </div>
 
             <p>기존 리소스의 표현 또는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-51">컨테이너</a>의 목록을 검색합니다.</p>
+                    id="ref-for-dfn-containers-50">컨테이너</a>의 목록을 가져옵니다.</p>
             <ul>
                 <li><strong>입력</strong>: 대상 식별자 및 선택적 매개변수입니다.</li>
                 <li><strong>동작</strong>:<ul>
                         <li>컨테이너가 아닌 리소스의 경우 서버는 리소스 콘텐츠를 반환합니다.</li>
                         <li><a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                                id="ref-for-dfn-containers-52">컨테이너</a>의 경우 서버는 <a
-                                href="#container-membership-and-authorization">권한 부여</a>에 따라 필터링될 <em class="rfc2119">수
-                                있는</em> 멤버
-                            리소스의 목록을 반환합니다. 목록에는 각 멤버의
-                            핵심 메타데이터가 포함되어야 합니다.</li>
+                                id="ref-for-dfn-containers-51">컨테이너</a>의 경우 서버는 구성원
+                            리소스 목록을 반환하며, 이 목록은 <em class="rfc2119">선택적으로</em> <a
+                                href="#container-membership-and-authorization">권한 부여</a>에 따라 필터링할 수 있습니다. 목록에는
+                            각 구성원의 핵심 메타데이터가 포함되어야 합니다.</li>
                     </ul>
                 </li>
                 <li><strong>결과</strong>: 요청된 표현 또는 실패 알림입니다.</li>
             </ul>
-            <p>리소스 읽기 작업은 HTTP GET 요청(헤더만 요청하는 경우 HEAD)을 사용하여 리소스 표현을 요청합니다.
+            <p>리소스 읽기 작업은 HTTP GET 요청을 사용하여 리소스 표현을 요청합니다(헤더만 요청할 때는 HEAD 사용).
                 동작은 대상 URL이 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-53">컨테이너</a>인지 컨테이너가 아닌 리소스(<a href="#dfn-data-resources"
+                    id="ref-for-dfn-containers-52">컨테이너</a>인지, 컨테이너가 아닌 리소스(<a href="#dfn-data-resources"
                     class="internalDFN" data-link-type="dfn" id="ref-for-dfn-data-resources-7">데이터 리소스</a>)인지에 따라 달라집니다.
                 서버는 <em class="rfc2119">반드시</em>
-                메타데이터를 통해 리소스 유형을 구분해야 합니다. 모든 응답은 <em class="rfc2119">반드시</em> Section 8.1에 정의된
-                메타데이터와 통합되어야 하며, 여기에는
+                메타데이터를 통해 리소스 유형을 구분해야 합니다. 모든 응답은 <em class="rfc2119">반드시</em>
+                8.1절에 정의된 메타데이터와 통합되어야 하며, 여기에는
                 <code>rel="linkset"</code>, <code>rel="up"</code>, <code>rel="type"</code>과 같은 주요 관계에 대한
-                <code>Link</code> 헤더가 포함됩니다. 서버는 <em class="rfc2119">반드시</em> 읽기 중에 리소스 상태와 해당 메타데이터 간의 원자성을 보장해야 합니다.
+                <code>Link</code> 헤더가 포함됩니다. 서버는 <em class="rfc2119">반드시</em> 읽기 작업 중 리소스 상태와 메타데이터 간의 원자성을 보장해야 합니다.
             </p>
-            <p><strong>GET (컨테이너가 아닌 리소스)</strong> – <em>리소스 콘텐츠 검색:</em>
-                전체 콘텐츠를 가져오려면 리소스 URI로 GET을 전송합니다(권한이 있는 경우). 200 OK와 함께 저장된 미디어 유형과 일치하는 Content-Type을 가진
-                데이터가 포함된 본문으로 응답합니다. 서버는 부분
-                검색을 위해 [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc7233"
-                        title="하이퍼텍스트 전송 프로토콜 (HTTP/1.1): 범위 요청">RFC7233</a></cite>]에 따른 범위 요청을 <em
-                    class="rfc2119">반드시</em> 지원해야 합니다.
-                응답은
+            <p><strong>GET (컨테이너가 아닌 리소스)</strong> – <em>리소스 콘텐츠 가져오기:</em>
+                전체 콘텐츠를 가져오려면 리소스 URI에 GET 요청을 보냅니다(권한이 있는 경우). 서버는 데이터가 포함된 본문과
+                저장된 미디어 유형에 일치하는 Content-Type을 사용하여 200 OK로 응답합니다. 서버는 <em class="rfc2119">반드시</em>
+                부분 검색을 위해 [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc7233"
+                        title="하이퍼텍스트 전송 프로토콜(HTTP/1.1): 범위 요청">RFC7233</a></cite>]에 따른 범위 요청을
+                지원해야 합니다. 응답에는 <em class="rfc2119">반드시</em>
                 [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc9110"
-                        title="HTTP 의미론">RFC9110</a></cite>]에 정의된 <code>ETag</code> 헤더를 <em class="rfc2119">반드시</em>
-                포함해야 합니다.</p>
-            <p><strong>예제 (파일에 대한 GET):</strong></p>
+                        title="HTTP 의미 체계">RFC9110</a></cite>]에 정의된 <code>ETag</code> 헤더가 포함되어야 합니다.</p>
+            <p><strong>예시(파일에 대한 GET 요청):</strong></p>
             <pre><code aria-busy="false" class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/alice/notes/shoppinglist.txt</span> <span class="hljs-meta">HTTP/1.1</span>
 <span class="hljs-attribute">Authorization</span><span class="hljs-punctuation">: </span>Bearer &lt;token&gt;
 <span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>text/plain
 </code></pre>
-            <p>이는 <code>/alice/notes/shoppinglist.txt</code>의 콘텐츠를 요청하며, 클라이언트가
-                이를 텍스트 형식으로 받기를 원함을 나타냅니다. 리소스가 존재하고 텍스트이며 클라이언트가 접근 권한을 가지고 있다고 가정하면:</p>
+            <p>이 요청은 <code>/alice/notes/shoppinglist.txt</code>의 콘텐츠를 가져오며, 클라이언트가
+                이를 텍스트 형식으로 받기를 원한다는 것을 나타냅니다. 리소스가 존재하고 텍스트이며 클라이언트에 접근 권한이 있다고 가정하면 다음과 같습니다.</p>
             <pre><code aria-busy="false" class="hljs http"><span class="hljs-meta">HTTP/1.1</span> <span class="hljs-number">200</span> OK
 <span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>text/plain; charset=UTF-8
 <span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>34
@@ -4065,39 +4368,50 @@ chocolate bars
 hash
 eggs
 </code></pre>
-            <p>서버는 텍스트 콘텐츠(<code>Content-Length</code>에 표시된 대로 총 34바이트)를 반환했습니다.
-                콘텐츠는 파일에 저장된 데이터와 정확히 동일합니다. <code>ETag: "abc123456"</code>은 캐싱 및
-                조건부 요청을 위한 검증자입니다. 응답에는 메타데이터 검색 가능성을 위한 <code>Link</code> 헤더가 포함되며,
-                <code>up</code> 및 <code>type</code>과 같은 필수 필드를 포함합니다.
-            </p>
+            <p>서버는 텍스트 콘텐츠를 반환했습니다(<code>Content-Length</code>에 표시된 대로 총 34바이트).
+                콘텐츠는 파일에 저장된 데이터와 정확히 일치합니다. <code>ETag: "abc123456"</code>은
+                캐싱 및 조건부 요청에 사용되는 유효성 검사자입니다. 응답에는 메타데이터의
+                발견 가능성을 위한 <code>Link</code> 헤더가 포함되며, <code>up</code> 및 <code>type</code>과 같은 필수 필드도 포함됩니다.</p>
             <p><strong>GET (<a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-containers-54">컨테이너</a> 리소스)</strong> – <em><a href="#dfn-containers"
-                        class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-55">컨테이너</a>의 콘텐츠 나열:</em>
+                        id="ref-for-dfn-containers-53">컨테이너</a> 리소스)</strong> – <em><a href="#dfn-containers"
+                        class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-54">컨테이너</a>의 콘텐츠 나열:</em>
                 대상 URI가 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-56">컨테이너</a>(메타데이터 유형을 통해 결정됨)에 해당하는 경우 GET 요청은
+                    id="ref-for-dfn-containers-55">컨테이너</a>에 해당하는 경우(메타데이터 유형을 통해 결정됨), GET 요청은
                 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-57">컨테이너</a>의 멤버 목록을 반환합니다. 응답 본문은 <a
-                    href="#dfn-container-representation" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-container-representation-3">컨테이너 표현</a> 절에 정의된 <a
-                    href="#container-representation">컨테이너 표현</a>이며, LWS 컨테이너 미디어
-                유형을 사용합니다. 목록에는 각 멤버의 메타데이터인 리소스 식별자(<em class="rfc2119">필수</em>), 유형(<em class="rfc2119">필수</em>), 미디어
-                유형(DataResources의 경우 <em class="rfc2119">필수</em>), 크기(<em class="rfc2119">권장</em>), 그리고
+                    id="ref-for-dfn-containers-56">컨테이너</a>의 구성원 목록을 반환합니다.
+                <code>Content-Type: application/lws+json</code>인 응답은 <a href="#dfn-container-representation"
+                    class="internalDFN" data-link-type="dfn" id="ref-for-dfn-container-representation-3">컨테이너
+                    표현</a>이며, <a href="#container-representation">컨테이너
+                    표현</a> 절에 정의되어 있습니다. 이 표현에서 목록에는 각 구성원의 메타데이터가 포함됩니다.
+                리소스 식별자(<em class="rfc2119">필수</em>), 유형(<em class="rfc2119">필수</em>), 미디어 유형
+                (DataResources의 경우 <em class="rfc2119">필수</em>), 크기(<em class="rfc2119">권장</em>),
                 수정 타임스탬프(<em class="rfc2119">권장</em>)가 포함됩니다.
             </p>
-            <p><strong>예제 (컨테이너에 대한 GET):</strong></p>
-            <pre><code aria-busy="false" class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/alice/notes/</span> <span class="hljs-meta">HTTP/1.1</span>
+            <p><strong>예시(컨테이너에 대한 GET 요청):</strong> <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-containers-57">컨테이너</a>가 존재하고 클라이언트에 접근 권한이 있다고 가정합니다.
+                각 탭은 서로 다른 미디어 유형으로 동일한 요청을 보여 줍니다. <a href="#content-negotiation" class="sec-ref"><bdi
+                        class="secno">12.1.2 </bdi>콘텐츠 협상</a>을 참조하세요.</p>
+            <div class="example-tabs ready">
+                <div class="tab-bar" role="tablist"><button type="button" id="lws-tab-3" role="tab"
+                        aria-controls="lws-tab-3-panel" aria-selected="true">application/lws+json</button><button
+                        type="button" id="lws-tab-4" role="tab" aria-controls="lws-tab-4-panel"
+                        aria-selected="false">text/turtle (LWS 프로파일)</button></div>
+                <div data-tab="application/lws+json" id="lws-tab-3-panel" role="tabpanel" aria-labelledby="lws-tab-3">
+                    <p>요청:</p>
+                    <pre><code class="http hljs" aria-busy="false"><span class="hljs-keyword">GET</span> <span class="hljs-string">/alice/notes/</span> <span class="hljs-meta">HTTP/1.1</span>
 <span class="hljs-attribute">Authorization</span><span class="hljs-punctuation">: </span>Bearer &lt;token&gt;
 <span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/lws+json
 </code></pre>
-            <p>컨테이너가 존재하고 클라이언트가 접근 권한을 가지고 있다고 가정하면:</p>
-            <pre><code aria-busy="false" class="hljs http"><span class="hljs-meta">HTTP/1.1</span> <span class="hljs-number">200</span> OK
+                    <p>응답 헤더:</p>
+                    <pre><code class="http hljs" aria-busy="false"><span class="hljs-meta">HTTP/1.1</span> <span class="hljs-number">200</span> OK
 <span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/lws+json
 <span class="hljs-attribute">ETag</span><span class="hljs-punctuation">: </span>"container-etag-789"
 <span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;/alice/notes/.meta&gt;; rel="linkset"; type="application/linkset+json"
 <span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;/alice/&gt;; rel="up"
 <span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;https://www.w3.org/ns/lws#Container&gt;; rel="type"
-
-<span class="language-json"><span class="hljs-punctuation">{</span>
+</code></pre>
+                    <p>응답 본문:</p>
+                    <pre><code class="json hljs" aria-busy="false"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">"@context"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"https://www.w3.org/ns/lws/v1"</span><span class="hljs-punctuation">,</span>
   <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/alice/notes/"</span><span class="hljs-punctuation">,</span>
   <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Container"</span><span class="hljs-punctuation">,</span>
@@ -4119,43 +4433,80 @@ eggs
     <span class="hljs-punctuation">}</span>
   <span class="hljs-punctuation">]</span>
 <span class="hljs-punctuation">}</span>
-</span></code></pre>
-            <p>이 예제에서 <code>/alice/notes/</code>는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+</code></pre>
+                </div>
+                <div data-tab="text/turtle (LWS profile)" id="lws-tab-4-panel" role="tabpanel"
+                    aria-labelledby="lws-tab-4" hidden="">
+                    <p>요청:</p>
+                    <pre><code class="http hljs" aria-busy="false"><span class="hljs-keyword">GET</span> <span class="hljs-string">/alice/notes/</span> <span class="hljs-meta">HTTP/1.1</span>
+<span class="hljs-attribute">Authorization</span><span class="hljs-punctuation">: </span>Bearer &lt;token&gt;
+<span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>text/turtle; profile="https://www.w3.org/ns/lws/v1"
+</code></pre>
+                    <p>응답 헤더:</p>
+                    <pre><code class="http hljs" aria-busy="false"><span class="hljs-meta">HTTP/1.1</span> <span class="hljs-number">200</span> OK
+<span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>text/turtle; profile="https://www.w3.org/ns/lws/v1"
+<span class="hljs-attribute">ETag</span><span class="hljs-punctuation">: </span>"container-etag-789"
+<span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;/alice/notes/.meta&gt;; rel="linkset"; type="application/linkset+json"
+<span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;/alice/&gt;; rel="up"
+<span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;https://www.w3.org/ns/lws#Container&gt;; rel="type"
+</code></pre>
+                    <p>응답 본문:</p>
+                    <pre><code class="nohighlight hljs" data-lws-highlighted=""><span class="hljs-keyword">@prefix</span> <span class="hljs-literal">lws:</span> <span class="hljs-link">&lt;https://www.w3.org/ns/lws#&gt;</span> .
+<span class="hljs-keyword">@prefix</span> <span class="hljs-literal">dcterms:</span> <span class="hljs-link">&lt;http://purl.org/dc/terms/&gt;</span> .
+<span class="hljs-keyword">@prefix</span> <span class="hljs-literal">schema:</span> <span class="hljs-link">&lt;http://schema.org/&gt;</span> .
+<span class="hljs-keyword">@prefix</span> <span class="hljs-literal">xsd:</span> <span class="hljs-link">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span> .
+
+<span class="hljs-link">&lt;&gt;</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">lws:</span><span class="hljs-attr">Container</span> ;
+  <span class="hljs-literal">lws:</span><span class="hljs-attr">totalItems</span> <span class="hljs-number">2</span> ;
+  <span class="hljs-literal">lws:</span><span class="hljs-attr">items</span> <span class="hljs-link">&lt;shoppinglist.txt&gt;</span>, <span class="hljs-link">&lt;todo.json&gt;</span> .
+
+<span class="hljs-link">&lt;shoppinglist.txt&gt;</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">lws:</span><span class="hljs-attr">DataResource</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">format</span> <span class="hljs-string">"text/plain"</span> ;
+  <span class="hljs-literal">schema:</span><span class="hljs-attr">size</span> <span class="hljs-string">"47"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">long</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">modified</span> <span class="hljs-string">"2025-11-24T12:00:00Z"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">dateTime</span> .
+
+<span class="hljs-link">&lt;todo.json&gt;</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">lws:</span><span class="hljs-attr">DataResource</span>, <span class="hljs-link">&lt;http://example.org/customType&gt;</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">format</span> <span class="hljs-string">"application/json"</span> ;
+  <span class="hljs-literal">schema:</span><span class="hljs-attr">size</span> <span class="hljs-string">"2048"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">long</span> ;
+  <span class="hljs-literal">dcterms:</span><span class="hljs-attr">modified</span> <span class="hljs-string">"2025-11-24T13:00:00Z"</span>^^<span class="hljs-literal">xsd:</span><span class="hljs-attr">dateTime</span> .
+</code></pre>
+                </div>
+            </div>
+            <p>이 예시에서 <code>/alice/notes/</code>는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
                     id="ref-for-dfn-containers-58">컨테이너</a>입니다. 응답은
-                LWS 컨텍스트가 포함된 JSON-LD를 사용하며, 필수 메타데이터와 함께 멤버를 나열합니다. 각 항목에는 <code>type</code>,
-                <code>id</code>, <code>format</code>, <code>size</code>, <code>modified</code> 타임스탬프가 평면
+                LWS 컨텍스트가 포함된 JSON-LD를 사용하여 필수 메타데이터와 함께 구성원 목록을 제공합니다. 각 항목에는 <code>type</code>,
+                <code>id</code>, <code>format</code>, <code>size</code>, <code>modified</code> 타임스탬프가 평면적인
                 속성으로 포함됩니다.
             </p>
-            <p>모든 경우에 서버는 응답
-                헤더에 다음 메타데이터를 <em class="rfc2119">반드시</em> 포함해야 합니다: [<cite><a class="bibref" data-link-type="biblio"
-                        href="#bib-rfc9110" title="HTTP 의미론">RFC9110</a></cite>]에 정의된 <code>ETag</code> 헤더 및 해당 리소스가
-                <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-59">컨테이너</a>임을 나타내는 <code>rel="linkset"</code>, <code>rel="up"</code>,
-                <code>rel="type"</code>이 포함된 <code>Link</code> 헤더입니다.
+            <p>모든 경우에 서버는 <em class="rfc2119">반드시</em> 응답 헤더에 다음 메타데이터를 포함해야 합니다.
+                [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc9110"
+                        title="HTTP 의미 체계">RFC9110</a></cite>]에 정의된 <code>ETag</code> 헤더와
+                <code>rel="linkset"</code>, <code>rel="up"</code>, <code>rel="type"</code>이 포함된 <code>Link</code> 헤더이며,
+                이를 통해 해당 리소스가 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-containers-59">컨테이너</a>임을 나타냅니다.
             </p>
             <p><strong>HEAD (모든 리소스 또는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-containers-60">컨테이너</a>)</strong> – <em>헤더/메타데이터만:</em>
-                LWS 서버는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-containers-61">컨테이너</a>와 컨테이너가 아닌 리소스 모두에 대해 HEAD [<cite><a class="bibref"
-                        data-link-type="biblio" href="#bib-rfc9110" title="HTTP 의미론">RFC9110</a></cite>]를 <em
-                    class="rfc2119">반드시</em> 지원해야 하며,
-                GET과 동일한 헤더(<code>Content-Type</code>, 메타데이터를 위한 <code>Link</code> 포함)를 반환하지만
-                본문은 반환하지 않습니다. 이를 통해 콘텐츠를 전송하지 않고
-                메타데이터를 검색할 수 있습니다.
+                        id="ref-for-dfn-containers-60">컨테이너</a>)</strong> – <em>헤더/메타데이터만 가져오기:</em>
+                LWS 서버는 <em class="rfc2119">반드시</em> <a class="bibref" data-link-type="biblio" href="#bib-rfc9110"
+                    title="HTTP 의미 체계">RFC9110</a>의 HEAD 요청을
+                <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                    id="ref-for-dfn-containers-61">컨테이너</a>와 컨테이너가 아닌 리소스 모두에 대해 지원해야 하며, GET과 동일한 헤더
+                (<code>Content-Type</code>, 메타데이터용 <code>Link</code> 포함)를 반환하되 본문은 포함하지 않아야 합니다. 이를 통해
+                콘텐츠를 전송하지 않고 메타데이터를 가져올 수 있습니다.
             </p>
-            <p><strong>캐싱 및 조건부 요청:</strong> LWS는 HTTP 캐싱 의미론을 활용합니다. 서버는 [<cite><a class="bibref"
-                        data-link-type="biblio" href="#bib-rfc9110" title="HTTP 의미론">RFC9110</a></cite>]에 정의된 조건부 요청을
-                <em class="rfc2119">지원하는 것이 좋으며</em>,
-                여기에는 엔터티 태그(<code>ETags</code>) 및 날짜 기반 검증자(예:
-                <code>If-Modified-Since</code> 헤더)와 같은 메커니즘이 포함됩니다. 리소스 또는 <a href="#dfn-containers" class="internalDFN"
-                    data-link-type="dfn" id="ref-for-dfn-containers-62">컨테이너</a> 목록이
-                변경되지 않은 경우 중복 전송을 방지하기 위해 <code>304 Not Modified</code>로 응답합니다.
+            <p><strong>캐싱 및 조건부 요청:</strong> LWS는 HTTP 캐싱 의미 체계를 활용합니다. 서버는 <em class="rfc2119">가능하면</em> [<cite><a
+                        class="bibref" data-link-type="biblio" href="#bib-rfc9110"
+                        title="HTTP 의미 체계">RFC9110</a></cite>]에 정의된 조건부 요청을 지원하는 것이 좋습니다.
+                여기에는 엔터티 태그(<code>ETags</code>) 및 날짜 기반 유효성 검사자(
+                <code>If-Modified-Since</code> 헤더 등)와 같은 메커니즘이 포함됩니다. 리소스 또는 <a href="#dfn-containers"
+                    class="internalDFN" data-link-type="dfn" id="ref-for-dfn-containers-62">컨테이너</a> 목록이
+                변경되지 않았다면 불필요한 전송을 방지하기 위해 <code>304 Not Modified</code>로 응답합니다.
             </p>
-            <p><strong>검색 가능성과 인가:</strong> 검색 가능성을 높이기 위해,
-                <code>401 Unauthorized</code> 응답에는 <code>WWW-Authenticate</code> 헤더가 포함되며,
-                <code>resource_metadata</code> 매개변수를 포함합니다. 이는 <a href="#authorization-server-discovery">인가 서버 검색</a>에
-                설명되어 있으며, 클라이언트는 이를 통해
-                하드코딩된 URI 없이 인가 서버의 위치를 찾을 수 있습니다.
+            <p><strong>발견 가능성 및 권한 부여:</strong> 발견 가능성을 높이기 위해
+                <code>401 Unauthorized</code> 응답에는
+                <code>resource_metadata</code> 매개변수가 포함된 <code>WWW-Authenticate</code> 헤더가 포함됩니다. 이는 <a
+                    href="#authorization-server-discovery">인가 서버 발견</a>에 설명되어 있으며, 클라이언트가
+                하드코딩된 URI 없이 인가 서버를 찾을 수 있도록 합니다.
             </p>
 
         </section>
@@ -6048,118 +6399,148 @@ Content-Type: application/linkset+json
                     href="#lws-media-type-0" aria-label="12.1절의 영구 링크"></a>
             </div>
             <p>LWS <a href="#dfn-storage-description-resource" class="internalDFN" data-link-type="dfn"
-                    id="ref-for-dfn-storage-description-resource-12">스토리지 설명</a>은 <em class="rfc2119">반드시</em>
-                <code>application/lws+cid</code> 미디어 유형으로 직렬화할 수 있어야 한다.
+                    id="ref-for-dfn-storage-description-resource-12">저장소 설명</a>은 <em class="rfc2119">반드시</em>
+                <code>application/lws+cid</code> 미디어 유형으로 직렬화할 수 있어야 합니다.
                 <code>application/lws+cid</code> 미디어 유형은
                 <abbr title="월드 와이드 웹 컨소시엄">W3C</abbr> 제어 식별자 문서 [<cite><a class="bibref" data-link-type="biblio"
-                        href="#bib-cid-1-0" title="제어 식별자 v1.0">CID-1.0</a></cite>]를 특수화하고 LWS 어휘로 확장한 문서를 식별한다.
+                        href="#bib-cid-1-0" title="제어 식별자 v1.0">CID-1.0</a></cite>]를 LWS 어휘로 확장한 특수한 문서를 식별합니다.
             </p>
             <p>LWS <a href="#dfn-container-representation" class="internalDFN" data-link-type="dfn"
                     id="ref-for-dfn-container-representation-4">컨테이너 표현</a>은 <em class="rfc2119">반드시</em>
-                <code>application/lws+json</code> 미디어 유형을 지원해야 한다.
+                <code>application/lws+json</code> 미디어 유형을 지원해야 합니다.
             </p>
             <p>LWS 컨테이너 표현은 JSON-LD 규칙을 사용하지만, LWS의 제약 조건과 요구 사항은
-                특정 미디어 유형의 사용을 정당화한다. LWS 컨테이너는 JSON-LD의 제한된 프로파일로 간주할 수 있으므로,
-                구현은 <code>application/ld+json; profile="https://www.w3.org/ns/lws/v1"</code>
-                미디어 유형을 <code>application/lws+json</code>과 동등한 것으로 <em class="rfc2119">간주하는 것이 좋다</em>.
-            </p>
-            <section id="media-type-equivalence">
+                별도의 미디어 유형을 사용하는 근거가 됩니다.</p>
+            <section id="lws-profile">
                 <div class="header-wrapper">
-                    <h4 id="x12-1-1-media-type-equivalence"><bdi class="secno">12.1.1 </bdi>미디어 유형 동등성</h4>
-                    <a class="self-link" href="#media-type-equivalence" aria-label="12.1.1절의 영구 링크"></a>
+                    <h4 id="x12-1-1-lws-profile"><bdi class="secno">12.1.1 </bdi>LWS 프로파일</h4><a class="self-link"
+                        href="#lws-profile" aria-label="12.1.1절의 고유 링크"></a>
                 </div>
-                <p><a href="#dfn-container-representation" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-container-representation-5">컨테이너 표현</a>에서
-                    <code>application/lws+json</code>, <code>application/ld+json</code> 및
-                    <code>application/json</code> 미디어 유형은 동등하다. 응답 본문은 <a href="#container-representation"
-                        class="sec-ref"><bdi class="secno">8.1 </bdi>컨테이너
-                        표현</a>에 정의된 <a href="#dfn-container-representation" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-container-representation-6">컨테이너 표현</a> 구조를
-                    준수하는 동일한 JSON-LD 문서이며, <code>Content-Type</code> 응답 헤더만 달라진다. 서버는
-                    이러한 미디어 유형 중 하나에 대한 요청을 <em class="rfc2119">반드시</em> 수용해야 하며,
-                    <code>Content-Type</code> 응답 헤더를 요청된 미디어 유형으로 <em class="rfc2119">반드시</em> 설정해야 한다.
+                <p>URI <code>https://www.w3.org/ns/lws/v1</code>은 <dfn id="dfn-lws-profile" tabindex="0"
+                        aria-haspopup="dialog" data-dfn-type="dfn">LWS 프로파일</dfn> [<cite><a class="bibref"
+                            data-link-type="biblio" href="#bib-rfc6906" title="'profile' 링크 관계 유형">RFC6906</a></cite>]을
+                    식별합니다. <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-73">컨테이너</a>의 표현은 동일한 <a href="#dfn-lws-profile" class="internalDFN"
+                        data-link-type="dfn" id="ref-for-dfn-lws-profile-2">LWS 프로파일</a>을
+                    준수하려면 동일한 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-74">컨테이너</a> 상태 및 페이지의 <code>application/lws+json</code>
+                    표현과 RDF 동형이어야 합니다. 즉, 해당 표현이 인코딩하는 RDF가
+                    <a href="https://www.w3.org/TR/rdf12-concepts/#section-dataset-isomorphism">RDF 데이터셋
+                        비교</a> [<cite><a class="bibref" data-link-type="biblio" href="#bib-rdf12-concepts"
+                            title="RDF 1.2 개념 및 추상 데이터 모델">RDF12-CONCEPTS</a></cite>]에 정의된 바와 같이,
+                    <code>application/lws+json</code> 표현을 JSON-LD [<cite><a class="bibref" data-link-type="biblio"
+                            href="#bib-json-ld11" title="JSON-LD 1.1">JSON-LD11</a></cite>]로 해석할 때 인코딩되는 RDF와 동형이어야 합니다.
+                    <code>application/lws+json</code>
+                    표현은 항상 <a href="#dfn-lws-profile" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-lws-profile-3">LWS 프로파일</a>을 준수합니다.
                 </p>
-                <p>컨테이너 응답의 <code>Content-Type</code>은 요청의
-                    <code>Accept</code> 헤더에 따라 달라지므로, 이러한 응답에는
-                    <code>Vary: Accept</code> 헤더를 <em class="rfc2119">포함하는 것이 좋다</em> [<cite><a class="bibref"
-                            data-link-type="biblio" href="#bib-rfc9110" title="HTTP 의미론">RFC9110</a></cite>].
+            </section>
+            <section id="content-negotiation">
+                <div class="header-wrapper">
+                    <h4 id="x12-1-2-content-negotiation"><bdi class="secno">12.1.2 </bdi>콘텐츠 협상</h4><a class="self-link"
+                        href="#content-negotiation" aria-label="12.1.2절의 고유 링크"></a>
+                </div>
+                <p>서버는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-75">컨테이너</a>에 대한 <code>application/lws+json</code> 요청을 <em
+                        class="rfc2119">반드시</em>
+                    수용해야 하며, 선택된 표현의 미디어 유형으로
+                    <code>Content-Type</code> 응답 헤더를 <em class="rfc2119">반드시</em> 설정해야 합니다.
                 </p>
-                <p><strong>참고(비규범적):</strong> 이 동등성은 위의 세 가지 미디어 유형에만 적용된다.
-                    다른 모든 HTTP 리소스와 마찬가지로, 서버는 표준 콘텐츠 협상 [<cite><a class="bibref" data-link-type="biblio"
-                            href="#bib-rfc9110" title="HTTP 의미론">RFC9110</a></cite>]을
-                    통해 컨테이너의 추가 표현(예:
-                    <code>text/turtle</code>)을 제공할 수 있다. 이 사양은 이러한 지원을 요구하지도 배제하지도 않는다.
+                <p>클라이언트는 RDF 미디어 유형의 <code>profile</code> 매개변수에 <a href="#dfn-lws-profile" class="internalDFN"
+                        data-link-type="dfn" id="ref-for-dfn-lws-profile-4">LWS 프로파일</a>의 URI를 포함하여 <a
+                        href="#dfn-lws-profile" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-lws-profile-5">LWS 프로파일</a>에 따른 표현을 요청합니다.
+                    이 매개변수를 정의하는 RDF 미디어 유형에는 <code>application/ld+json</code>
+                    [<cite><a class="bibref" data-link-type="biblio" href="#bib-json-ld11"
+                            title="JSON-LD 1.1">JSON-LD11</a></cite>], <code>text/turtle</code> [<cite><a class="bibref"
+                            data-link-type="biblio" href="#bib-rdf12-turtle"
+                            title="RDF 1.2 Turtle">RDF12-TURTLE</a></cite>], <code>application/trig</code> [<cite><a
+                            class="bibref" data-link-type="biblio" href="#bib-rdf12-trig"
+                            title="RDF 1.2 TriG">RDF12-TRIG</a></cite>], <code>application/n-triples</code> [<cite><a
+                            class="bibref" data-link-type="biblio" href="#bib-rdf12-n-triples"
+                            title="RDF 1.2 N-Triples">RDF12-N-TRIPLES</a></cite>], <code>application/n-quads</code>
+                    [<cite><a class="bibref" data-link-type="biblio" href="#bib-rdf12-n-quads"
+                            title="RDF 1.2 N-Quads">RDF12-N-QUADS</a></cite>]가 포함됩니다. 서버가 이러한 미디어 유형을 선택한다면
+                    응답은 <em class="rfc2119">반드시</em> <a href="#dfn-lws-profile" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-lws-profile-6">LWS 프로파일</a>을
+                    준수해야 합니다. 즉, <code>application/lws+json</code> 표현과 RDF 동형이어야 하며,
+                    <code>Content-Type</code>에는 <em class="rfc2119">반드시</em> 동일한
+                    <code>profile</code> 매개변수가 포함되어야 합니다. 서버는 해당 미디어 유형으로 <a href="#dfn-lws-profile" class="internalDFN"
+                        data-link-type="dfn" id="ref-for-dfn-lws-profile-7">LWS 프로파일</a>에 따른 표현을 생성할 수 없다면
+                    그러한 미디어 유형을 <em class="rfc2119">선택해서는 안 됩니다</em>.
+                </p>
+                <p>선택된 표현이 요청의 <code>Accept</code> 헤더에 따라 달라지는 경우 응답에는 <em class="rfc2119">가능하면</em>
+                    <code>Vary: Accept</code> 헤더를 포함하는 것이 좋습니다 [<cite><a class="bibref" data-link-type="biblio"
+                            href="#bib-rfc9110" title="HTTP 의미 체계">RFC9110</a></cite>].
                 </p>
             </section>
             <section id="pagination">
                 <div class="header-wrapper">
-                    <h4 id="x12-1-2-pagination"><bdi class="secno">12.1.2 </bdi>페이지네이션</h4><a class="self-link"
-                        href="#pagination" aria-label="12.1.2절의 영구 링크"></a>
+                    <h4 id="x12-1-3-pagination"><bdi class="secno">12.1.3 </bdi>페이지네이션</h4><a class="self-link"
+                        href="#pagination" aria-label="12.1.3절의 고유 링크"></a>
                 </div>
                 <p><a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-containers-73">컨테이너</a>와 같은 특정 복합 리소스는 많은 리소스를 보유할 수 있다.
-                    클라이언트가 목록을 점진적으로 가져올 수 있도록, 서버는 멤버 수가 서버에서 정한 임계값을 초과하는
-                    <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
-                        id="ref-for-dfn-containers-74">컨테이너</a>에 대해 페이지네이션을 <em class="rfc2119">지원하는 것이 좋다</em>.
-                </p>
+                        id="ref-for-dfn-containers-76">컨테이너</a>와 같은 일부 복합 리소스에는 많은 리소스가 포함될 수 있습니다.
+                    클라이언트가 목록을 점진적으로 가져올 수 있도록 서버는 <em class="rfc2119">가능하면</em>
+                    구성원 수가 서버에서 정한 임계값을 초과하는 <a href="#dfn-containers" class="internalDFN" data-link-type="dfn"
+                        id="ref-for-dfn-containers-77">컨테이너</a>에 대해 페이지네이션을 지원하는 것이 좋습니다.</p>
                 <section id="pagination-model">
                     <div class="header-wrapper">
-                        <h5 id="x12-1-2-1-pagination-model"><bdi class="secno">12.1.2.1 </bdi>페이지네이션 모델</h5><a
-                            class="self-link" href="#pagination-model" aria-label="12.1.2.1절의 영구 링크"></a>
+                        <h5 id="x12-1-3-1-pagination-model"><bdi class="secno">12.1.3.1 </bdi>페이지네이션 모델</h5><a
+                            class="self-link" href="#pagination-model" aria-label="12.1.3.1절의 고유 링크"></a>
                     </div>
-                    <p>페이지네이션은 링크를 기반으로 한다. 서버는 HTTP <code>Link</code> 헤더
+                    <p>페이지네이션은 링크 기반입니다. 서버는 HTTP <code>Link</code> 헤더를 통해 페이지네이션 URI를 제공하며
                         [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8288"
-                                title="웹 링크">RFC8288</a></cite>]를 통해 페이지네이션 URI를 제공하여,
-                        클라이언트가 숫자 오프셋에 의존하지 않고 전체 목록을 탐색할 수 있도록 한다.</p>
-                    <p>목록에 페이지네이션이 적용되면 응답 본문에는 현재 페이지의 항목만 포함된다.
-                        복합 리소스의 <code>id</code>, <code>type</code> 및 <code>totalItems</code> 속성은
-                        전체 멤버 구성을 나타내지만, <code>items</code>에는
-                        현재 페이지의 리소스만 포함된다.</p>
+                                title="웹 연결">RFC8288</a></cite>],
+                        클라이언트가 숫자 오프셋에 의존하지 않고 전체 목록을 탐색할 수 있도록 합니다.</p>
+                    <p>목록이 페이지네이션된 경우 응답 본문에는 현재 페이지의 항목만 포함됩니다.
+                        복합 리소스의 <code>id</code>, <code>type</code>, <code>totalItems</code> 속성은
+                        전체 구성원 목록을 반영하는 반면, <code>items</code>에는
+                        현재 페이지의 리소스만 포함됩니다.</p>
                 </section>
                 <section id="pagination-link-relations">
                     <div class="header-wrapper">
-                        <h5 id="x12-1-2-2-pagination-link-relations"><bdi class="secno">12.1.2.2 </bdi>페이지네이션 링크
+                        <h5 id="x12-1-3-2-pagination-link-relations"><bdi class="secno">12.1.3.2 </bdi>페이지네이션 링크
                             관계</h5><a class="self-link" href="#pagination-link-relations"
-                            aria-label="12.1.2.2절의 영구 링크"></a>
+                            aria-label="12.1.3.2절의 고유 링크"></a>
                     </div>
-                    <p>페이지네이션 URI는 다음과 같은 표준 링크 관계를 사용하여 <code>Link</code> 헤더로 전달된다.</p>
+                    <p>페이지네이션 URI는 다음 표준 링크
+                        관계를 사용하여 <code>Link</code> 헤더로 전달됩니다.</p>
                     <ul>
-                        <li><strong><code>rel="first"</code></strong>: 결과의 첫 페이지 URI. 페이지네이션된 응답에 <em
-                                class="rfc2119">반드시</em> 있어야 한다.</li>
-                        <li><strong><code>rel="last"</code></strong>: 결과의 마지막 페이지 URI. 페이지네이션된 응답에 <em
-                                class="rfc2119">있을 수 있다</em>.</li>
-                        <li><strong><code>rel="next"</code></strong>: 결과의 다음 페이지 URI. 이후
-                            페이지가 있으면 <em class="rfc2119">반드시</em> 있어야 한다. 마지막 페이지에서는 <em class="rfc2119">반드시</em> 생략해야
-                            한다.</li>
-                        <li><strong><code>rel="prev"</code></strong>: 결과의 이전 페이지 URI. 앞선
-                            페이지가 있으면 <em class="rfc2119">있을 수 있다</em>. 첫 페이지에서는 <em class="rfc2119">반드시</em> 생략해야 한다.
-                        </li>
+                        <li><strong><code>rel="first"</code></strong>: 결과의 첫 페이지 URI입니다. 페이지네이션된 응답에는 <em
+                                class="rfc2119">반드시</em> 포함되어야 합니다.</li>
+                        <li><strong><code>rel="last"</code></strong>: 결과의 마지막 페이지 URI입니다. 페이지네이션된 응답에 <em
+                                class="rfc2119">포함할 수 있습니다</em>.</li>
+                        <li><strong><code>rel="next"</code></strong>: 결과의 다음 페이지 URI입니다. 후속
+                            페이지가 있는 경우 <em class="rfc2119">반드시</em> 포함되어야 합니다.
+                            마지막 페이지에서는 <em class="rfc2119">반드시</em> 생략해야 합니다.</li>
+                        <li><strong><code>rel="prev"</code></strong>: 결과의 이전 페이지 URI입니다. 앞선
+                            페이지가 있는 경우 <em class="rfc2119">포함할 수 있습니다</em>.
+                            첫 페이지에서는 <em class="rfc2119">반드시</em> 생략해야 합니다.</li>
                     </ul>
-                    <p>모든 페이지네이션 URI는 클라이언트에 불투명하다. 클라이언트는 페이지네이션
-                        URI를 구성하거나 수정하지 <em class="rfc2119">않는 것이 좋다</em>. 서버에서 제공한 URI를
-                        <em class="rfc2119">사용하는 것이 좋다</em>.
-                    </p>
+                    <p>모든 페이지네이션 URI는 클라이언트에 불투명합니다. 클라이언트는 <em class="rfc2119">가능하면</em>
+                        페이지네이션 URI를 직접 생성하거나 수정하지 않는 것이 좋으며,
+                        서버에서 제공한 URI를 <em class="rfc2119">사용하는 것이 좋습니다</em>.</p>
                 </section>
                 <section id="requesting-pages">
                     <div class="header-wrapper">
-                        <h5 id="x12-1-2-3-requesting-pages"><bdi class="secno">12.1.2.3 </bdi>페이지 요청</h5><a
-                            class="self-link" href="#requesting-pages" aria-label="12.1.2.3절의 영구 링크"></a>
+                        <h5 id="x12-1-3-3-requesting-pages"><bdi class="secno">12.1.3.3 </bdi>페이지 요청</h5><a
+                            class="self-link" href="#requesting-pages" aria-label="12.1.3.3절의 고유 링크"></a>
                     </div>
-                    <p>클라이언트는 첫 페이지를 가져오기 위해 복합 리소스의 URI를 요청한다. 응답에는
-                        클라이언트가 이후 페이지를 가져오기 위해 따라가는 페이지네이션
-                        Link 헤더가 포함된다. 서버는 이전 탐색 중 얻은 페이지네이션 URI를 통해
-                        특정 페이지에 직접 액세스하는 기능도 <em class="rfc2119">지원할 수 있다</em>.</p>
-                    <p>페이지네이션된 응답이 반환되면 서버는 <em class="rfc2119">반드시</em> 200
-                        OK로 응답해야 한다. 응답 본문의 <code>totalItems</code>
-                        속성은 현재 페이지만이 아니라 모든 페이지에 걸친 전체 항목 수를
-                        <em class="rfc2119">나타내는 것이 좋다</em>.
-                    </p>
+                    <p>클라이언트는 첫 페이지를 얻기 위해 복합 리소스의 URI를 요청합니다. 응답에는
+                        후속 페이지를 가져오기 위해 클라이언트가 따라가는 페이지네이션
+                        Link 헤더가 포함됩니다. 서버는 <em class="rfc2119">선택적으로</em>
+                        이전 탐색에서 얻은 페이지네이션 URI를 통해 특정 페이지에 직접 접근하는 기능도 지원할 수 있습니다.</p>
+                    <p>페이지네이션된 응답을 반환할 때 서버는 <em class="rfc2119">반드시</em> 200
+                        OK로 응답해야 합니다. 응답 본문의 <code>totalItems</code>
+                        속성은 <em class="rfc2119">가능하면</em> 현재 페이지만이 아니라 모든 페이지에 걸친
+                        전체 항목 수를 반영하는 것이 좋습니다.</p>
                 </section>
                 <section id="example-paginated-container">
                     <div class="header-wrapper">
-                        <h5 id="x12-1-2-4-example-paginated-container"><bdi class="secno">12.1.2.4 </bdi>예:
+                        <h5 id="x12-1-3-4-example-paginated-container"><bdi class="secno">12.1.3.4 </bdi>예:
                             페이지네이션된 컨테이너</h5><a class="self-link" href="#example-paginated-container"
-                            aria-label="12.1.2.4절의 영구 링크"></a>
+                            aria-label="12.1.3.4절의 고유 링크"></a>
                     </div>
                     <p>요청:</p>
                     <pre><code aria-busy="false" class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/alice/photos/</span> <span class="hljs-meta">HTTP/1.1</span>
@@ -6763,11 +7144,6 @@ Content-Type: application/linkset+json
                 사용을 정당화하는 여러 제약 조건과 추가 요구 사항이 있다는 점에 유의하라.
             </p>
 
-            <p>
-                LWS 컨테이너는 JSON-LD의 제한된 프로필로 간주할 수 있으므로, 구현은
-                <code>application/ld+json; profile="https://www.w3.org/ns/lws/v1"</code> 미디어 유형을
-                <code>application/lws+json</code>과 동등한 것으로 간주하는 것이 좋다.
-            </p>
         </section>
 
         <section id="iana-media-type-cid-registry">
@@ -6833,25 +7209,25 @@ Content-Type: application/linkset+json
             <dl class="bibliography">
                 <dt id="bib-activitystreams-core">[ACTIVITYSTREAMS-CORE]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/activitystreams-core/"><cite>Activity Streams 2.0</cite></a>. James
+                    <a href="https://www.w3.org/TR/activitystreams-core/"><cite>활동 스트림 2.0</cite></a>. James
                     Snell; Evan Prodromou. W3C. 2017년 5월 23일. W3C 권고안. URL: <a
                         href="https://www.w3.org/TR/activitystreams-core/">https://www.w3.org/TR/activitystreams-core/</a>
                 </dd>
                 <dt id="bib-activitystreams-vocabulary">[ACTIVITYSTREAMS-VOCABULARY]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/activitystreams-vocabulary/"><cite>Activity Vocabulary</cite></a>.
+                    <a href="https://www.w3.org/TR/activitystreams-vocabulary/"><cite>활동 어휘</cite></a>.
                     James Snell; Evan Prodromou. W3C. 2017년 5월 23일. W3C 권고안. URL: <a
                         href="https://www.w3.org/TR/activitystreams-vocabulary/">https://www.w3.org/TR/activitystreams-vocabulary/</a>
                 </dd>
                 <dt id="bib-cid-1-0">[CID-1.0]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/cid-1.0/"><cite>Controlled Identifiers v1.0</cite></a>. Michael
+                    <a href="https://www.w3.org/TR/cid-1.0/"><cite>제어 식별자 v1.0</cite></a>. Michael
                     Jones; Manu Sporny. W3C. 2025년 5월 15일. W3C 권고안. URL: <a
                         href="https://www.w3.org/TR/cid-1.0/">https://www.w3.org/TR/cid-1.0/</a>
                 </dd>
                 <dt id="bib-foaf">[FOAF]</dt>
                 <dd>
-                    <a href="http://xmlns.com/foaf/spec/"><cite>FOAF 어휘 명세 0.99 (Paddington
+                    <a href="http://xmlns.com/foaf/spec/"><cite>FOAF 어휘 명세 0.99(패딩턴
                             판)</cite></a>. Dan Brickley; Libby Miller. FOAF 프로젝트. 2014년 1월 14일. URL: <a
                         href="http://xmlns.com/foaf/spec/">http://xmlns.com/foaf/spec/</a>
                 </dd>
@@ -6875,27 +7251,58 @@ Content-Type: application/linkset+json
                 </dd>
                 <dt id="bib-openid-connect-core">[OPENID-CONNECT-CORE]</dt>
                 <dd>
-                    <a href="https://openid.net/specs/openid-connect-core-1_0.html"><cite>정오표 세트 2를 반영한 OpenID Connect
-                            Core 1.0
-                        </cite></a>. N. Sakimura; J. Bradley; M. Jones; B. de Medeiros; C.
-                    Mortimore. OpenID Foundation. 2023년 12월 15일. 최종판. URL: <a
+                    <a href="https://openid.net/specs/openid-connect-core-1_0.html"><cite>OpenID Connect 핵심 명세 1.0
+                            정오표 모음 2 반영</cite></a>. N. Sakimura; J. Bradley; M. Jones; B. de Medeiros; C.
+                    Mortimore. OpenID 재단. 2023년 12월 15일. 최종본. URL: <a
                         href="https://openid.net/specs/openid-connect-core-1_0.html">https://openid.net/specs/openid-connect-core-1_0.html</a>
+                </dd>
+                <dt id="bib-rdf12-concepts">[RDF12-CONCEPTS]</dt>
+                <dd>
+                    <a href="https://www.w3.org/TR/rdf12-concepts/"><cite>RDF 1.2 개념 및 추상 데이터
+                            모델</cite></a>. Andy Seaborne; Gregg Kellogg; Olaf Hartig; Pierre-Antoine Champin. W3C. 2026년
+                    4월 7일.
+                    W3C 후보 권고안. URL: <a
+                        href="https://www.w3.org/TR/rdf12-concepts/">https://www.w3.org/TR/rdf12-concepts/</a>
+                </dd>
+                <dt id="bib-rdf12-n-quads">[RDF12-N-QUADS]</dt>
+                <dd>
+                    <a href="https://www.w3.org/TR/rdf12-n-quads/"><cite>RDF 1.2 N-Quads</cite></a>. Gregg Kellogg;
+                    Dominik Tomaszuk. W3C. 2026년 10월 10일. W3C 작업 초안. URL: <a
+                        href="https://www.w3.org/TR/rdf12-n-quads/">https://www.w3.org/TR/rdf12-n-quads/</a>
+                </dd>
+                <dt id="bib-rdf12-n-triples">[RDF12-N-TRIPLES]</dt>
+                <dd>
+                    <a href="https://www.w3.org/TR/rdf12-n-triples/"><cite>RDF 1.2 N-Triples</cite></a>. Gregg Kellogg;
+                    Dominik Tomaszuk. W3C. 2026년 10월 7일. W3C 작업 초안. URL: <a
+                        href="https://www.w3.org/TR/rdf12-n-triples/">https://www.w3.org/TR/rdf12-n-triples/</a>
+                </dd>
+                <dt id="bib-rdf12-trig">[RDF12-TRIG]</dt>
+                <dd>
+                    <a href="https://www.w3.org/TR/rdf12-trig/"><cite>RDF 1.2 TriG</cite></a>. Gregg Kellogg; Dominik
+                    Tomaszuk. W3C. 2026년 10월 7일. W3C 작업 초안. URL: <a
+                        href="https://www.w3.org/TR/rdf12-trig/">https://www.w3.org/TR/rdf12-trig/</a>
+                </dd>
+                <dt id="bib-rdf12-turtle">[RDF12-TURTLE]</dt>
+                <dd>
+                    <a href="https://www.w3.org/TR/rdf12-turtle/"><cite>RDF 1.2 Turtle</cite></a>. Gregg Kellogg; Andy
+                    Seaborne; Dominik Tomaszuk. W3C. 2026년 10월 7일. W3C 작업 초안. URL: <a
+                        href="https://www.w3.org/TR/rdf12-turtle/">https://www.w3.org/TR/rdf12-turtle/</a>
                 </dd>
                 <dt id="bib-rfc2119">[RFC2119]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc2119/"><cite>요구 수준을 나타내기 위해 RFC에서 사용하는
-                            핵심어</cite></a>. S. Bradner. IETF. 1997년 3월. 최선의 현행 관행. URL: <a
+                    <a href="https://www.rfc-editor.org/info/rfc2119/"><cite>RFC에서 요구 수준을 나타내는 데 사용하는
+                            핵심 단어</cite></a>. S. Bradner. IETF. 1997년 3월. 현행 모범 사례. URL: <a
                         href="https://www.rfc-editor.org/info/rfc2119/">https://www.rfc-editor.org/info/rfc2119/</a>
                 </dd>
                 <dt id="bib-rfc3339">[RFC3339]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc3339/"><cite>인터넷의 날짜와 시간:
-                            타임스탬프</cite></a>. G. Klyne; C. Newman. IETF. 2002년 7월. 제안 표준. URL: <a
+                    <a href="https://www.rfc-editor.org/info/rfc3339/"><cite>인터넷에서의 날짜와 시간:
+                            타임스탬프</cite></a>. G. Klyne; C. Newman. IETF. 2002년 7월. 표준 제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc3339/">https://www.rfc-editor.org/info/rfc3339/</a>
                 </dd>
                 <dt id="bib-rfc3986">[RFC3986]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc3986/"><cite>URI(Uniform Resource Identifier): 일반
+                    <a href="https://www.rfc-editor.org/info/rfc3986/"><cite>통합 자원 식별자(URI): 일반
                             구문</cite></a>. T. Berners-Lee; R. Fielding; L. Masinter. IETF. 2005년 1월. 인터넷
                     표준. URL: <a
                         href="https://www.rfc-editor.org/info/rfc3986/">https://www.rfc-editor.org/info/rfc3986/</a>
@@ -6903,114 +7310,120 @@ Content-Type: application/linkset+json
                 <dt id="bib-rfc4918">[RFC4918]</dt>
                 <dd>
                     <a href="https://www.rfc-editor.org/info/rfc4918/"><cite>웹 분산
-                            저작 및 버전 관리(WebDAV)를 위한 HTTP 확장</cite></a>. L. Dusseault, 편집. IETF. 2007년 6월. 제안
-                    표준. URL: <a
+                            저작 및 버전 관리(WebDAV)를 위한 HTTP 확장</cite></a>. L. Dusseault, 편집자. IETF. 2007년 6월. 표준
+                    제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc4918/">https://www.rfc-editor.org/info/rfc4918/</a>
                 </dd>
                 <dt id="bib-rfc5789">[RFC5789]</dt>
                 <dd>
                     <a href="https://httpwg.org/specs/rfc5789.html"><cite>HTTP용 PATCH 메서드</cite></a>. L.
-                    Dusseault; J. Snell. IETF. 2010년 3월. 제안 표준. URL: <a
+                    Dusseault; J. Snell. IETF. 2010년 3월. 표준 제안. URL: <a
                         href="https://httpwg.org/specs/rfc5789.html">https://httpwg.org/specs/rfc5789.html</a>
                 </dd>
                 <dt id="bib-rfc6749">[RFC6749]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc6749/"><cite>OAuth 2.0 권한 부여
-                            프레임워크</cite></a>. D. Hardt, 편집. IETF. 2012년 10월. 제안 표준. URL: <a
+                    <a href="https://www.rfc-editor.org/info/rfc6749/"><cite>OAuth 2.0 인가
+                            프레임워크</cite></a>. D. Hardt, 편집자. IETF. 2012년 10월. 표준 제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc6749/">https://www.rfc-editor.org/info/rfc6749/</a>
                 </dd>
                 <dt id="bib-rfc6750">[RFC6750]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc6750/"><cite>OAuth 2.0 권한 부여 프레임워크:
-                            Bearer 토큰 사용</cite></a>. M. Jones; D. Hardt. IETF. 2012년 10월. 제안 표준.
+                    <a href="https://www.rfc-editor.org/info/rfc6750/"><cite>OAuth 2.0 인가 프레임워크:
+                            Bearer 토큰 사용</cite></a>. M. Jones; D. Hardt. IETF. 2012년 10월. 표준 제안.
                     URL: <a href="https://www.rfc-editor.org/info/rfc6750/">https://www.rfc-editor.org/info/rfc6750/</a>
                 </dd>
                 <dt id="bib-rfc6902">[RFC6902]</dt>
                 <dd>
                     <a href="https://www.rfc-editor.org/info/rfc6902/"><cite>JavaScript 객체 표기법(JSON)
-                            패치</cite></a>. P. Bryan, 편집; M. Nottingham, 편집. IETF. 2013년 4월. 제안 표준.
+                            패치</cite></a>. P. Bryan, 편집자; M. Nottingham, 편집자. IETF. 2013년 4월. 표준 제안.
                     URL: <a href="https://www.rfc-editor.org/info/rfc6902/">https://www.rfc-editor.org/info/rfc6902/</a>
+                </dd>
+                <dt id="bib-rfc6906">[RFC6906]</dt>
+                <dd>
+                    <a href="https://www.rfc-editor.org/info/rfc6906/"><cite>'profile' 링크 관계
+                            유형</cite></a>. E. Wilde. IETF. 2013년 3월. 정보 제공용. URL: <a
+                        href="https://www.rfc-editor.org/info/rfc6906/">https://www.rfc-editor.org/info/rfc6906/</a>
                 </dd>
                 <dt id="bib-rfc7231">[RFC7231]</dt>
                 <dd>
                     <a href="https://httpwg.org/specs/rfc7231.html"><cite>하이퍼텍스트 전송 프로토콜(HTTP/1.1):
-                            의미 체계 및 콘텐츠</cite></a>. R. Fielding, 편집; J. Reschke, 편집. IETF. 2014년 6월.
-                    제안 표준. URL: <a
+                            의미 체계 및 콘텐츠</cite></a>. R. Fielding, 편집자; J. Reschke, 편집자. IETF. 2014년 6월.
+                    표준 제안. URL: <a
                         href="https://httpwg.org/specs/rfc7231.html">https://httpwg.org/specs/rfc7231.html</a>
                 </dd>
                 <dt id="bib-rfc7233">[RFC7233]</dt>
                 <dd>
                     <a href="https://httpwg.org/specs/rfc7233.html"><cite>하이퍼텍스트 전송 프로토콜(HTTP/1.1): 범위
-                            요청</cite></a>. R. Fielding, 편집; Y. Lafon, 편집; J. Reschke, 편집. IETF. 2014년 6월.
-                    제안 표준. URL: <a
+                            요청</cite></a>. R. Fielding, 편집자; Y. Lafon, 편집자; J. Reschke, 편집자. IETF. 2014년 6월.
+                    표준 제안. URL: <a
                         href="https://httpwg.org/specs/rfc7233.html">https://httpwg.org/specs/rfc7233.html</a>
                 </dd>
                 <dt id="bib-rfc7240">[RFC7240]</dt>
                 <dd>
                     <a href="https://www.rfc-editor.org/info/rfc7240/"><cite>HTTP용 Prefer 헤더</cite></a>. J.
-                    Snell. IETF. 2014년 6월. 제안 표준. URL: <a
+                    Snell. IETF. 2014년 6월. 표준 제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc7240/">https://www.rfc-editor.org/info/rfc7240/</a>
                 </dd>
                 <dt id="bib-rfc8174">[RFC8174]</dt>
                 <dd>
                     <a href="https://www.rfc-editor.org/info/rfc8174/"><cite>RFC
-                            2119 핵심어의 대문자와 소문자 모호성</cite></a>. B. Leiba. IETF. 2017년 5월. 최선의 현행 관행. URL: <a
+                            2119 키워드의 대문자와 소문자 구분에 관한 모호성</cite></a>. B. Leiba. IETF. 2017년 5월. 현행 모범 사례. URL: <a
                         href="https://www.rfc-editor.org/info/rfc8174/">https://www.rfc-editor.org/info/rfc8174/</a>
                 </dd>
                 <dt id="bib-rfc8288">[RFC8288]</dt>
                 <dd>
-                    <a href="https://httpwg.org/specs/rfc8288.html"><cite>웹 링크</cite></a>. M. Nottingham. IETF.
-                    2017년 10월. 제안 표준. URL: <a
+                    <a href="https://httpwg.org/specs/rfc8288.html"><cite>웹 연결</cite></a>. M. Nottingham. IETF.
+                    2017년 10월. 표준 제안. URL: <a
                         href="https://httpwg.org/specs/rfc8288.html">https://httpwg.org/specs/rfc8288.html</a>
                 </dd>
                 <dt id="bib-rfc8414">[RFC8414]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc8414/"><cite>OAuth 2.0 권한 부여 서버
-                            메타데이터</cite></a>. M. Jones; N. Sakimura; J. Bradley. IETF. 2018년 6월. 제안 표준.
+                    <a href="https://www.rfc-editor.org/info/rfc8414/"><cite>OAuth 2.0 인가 서버
+                            메타데이터</cite></a>. M. Jones; N. Sakimura; J. Bradley. IETF. 2018년 6월. 표준 제안.
                     URL: <a href="https://www.rfc-editor.org/info/rfc8414/">https://www.rfc-editor.org/info/rfc8414/</a>
                 </dd>
                 <dt id="bib-rfc8693">[RFC8693]</dt>
                 <dd>
                     <a href="https://www.rfc-editor.org/info/rfc8693/"><cite>OAuth 2.0 토큰 교환</cite></a>. M.
-                    Jones; A. Nadalin; B. Campbell, 편집; J. Bradley; C. Mortimore. IETF. 2020년 1월. 제안
-                    표준. URL: <a
+                    Jones; A. Nadalin; B. Campbell, 편집자; J. Bradley; C. Mortimore. IETF. 2020년 1월. 표준
+                    제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc8693/">https://www.rfc-editor.org/info/rfc8693/</a>
                 </dd>
                 <dt id="bib-rfc9068">[RFC9068]</dt>
                 <dd>
                     <a href="https://www.rfc-editor.org/info/rfc9068/"><cite>OAuth 2.0
-                            액세스 토큰용 JSON 웹 토큰(JWT) 프로필</cite></a>. V. Bertocci. IETF. 2021년 10월. 제안 표준. URL: <a
+                            액세스 토큰용 JSON 웹 토큰(JWT) 프로파일</cite></a>. V. Bertocci. IETF. 2021년 10월. 표준 제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc9068/">https://www.rfc-editor.org/info/rfc9068/</a>
                 </dd>
                 <dt id="bib-rfc9110">[RFC9110]</dt>
                 <dd>
-                    <a href="https://httpwg.org/specs/rfc9110.html"><cite>HTTP 의미 체계</cite></a>. R. Fielding, 편집;
-                    M. Nottingham, 편집; J. Reschke, 편집. IETF. 2022년 6월. 인터넷 표준. URL: <a
+                    <a href="https://httpwg.org/specs/rfc9110.html"><cite>HTTP 의미 체계</cite></a>. R. Fielding, 편집자;
+                    M. Nottingham, 편집자; J. Reschke, 편집자. IETF. 2022년 6월. 인터넷 표준. URL: <a
                         href="https://httpwg.org/specs/rfc9110.html">https://httpwg.org/specs/rfc9110.html</a>
                 </dd>
                 <dt id="bib-rfc9112">[rfc9112]</dt>
                 <dd>
-                    <a href="https://httpwg.org/specs/rfc9112.html"><cite>HTTP/1.1</cite></a>. R. Fielding, 편집; M.
-                    Nottingham, 편집; J. Reschke, 편집. IETF. 2022년 6월. 인터넷 표준. URL: <a
+                    <a href="https://httpwg.org/specs/rfc9112.html"><cite>HTTP/1.1</cite></a>. R. Fielding, 편집자; M.
+                    Nottingham, 편집자; J. Reschke, 편집자. IETF. 2022년 6월. 인터넷 표준. URL: <a
                         href="https://httpwg.org/specs/rfc9112.html">https://httpwg.org/specs/rfc9112.html</a>
                 </dd>
                 <dt id="bib-rfc9264">[RFC9264]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc9264/"><cite>Linkset: 링크 집합용 미디어 타입 및 링크 관계
-                            타입</cite></a>. E. Wilde; H. Van de Sompel. IETF. 2022년 7월. 제안
-                    표준. URL: <a
+                    <a href="https://www.rfc-editor.org/info/rfc9264/"><cite>링크셋: 미디어 유형 및 링크 관계
+                            링크 집합을 위한 유형</cite></a>. E. Wilde; H. Van de Sompel. IETF. 2022년 7월. 표준
+                    제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc9264/">https://www.rfc-editor.org/info/rfc9264/</a>
                 </dd>
                 <dt id="bib-rfc9457">[RFC9457]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc9457/"><cite>HTTP API용 문제 세부 정보</cite></a>.
-                    M. Nottingham; E. Wilde; S. Dalal. IETF. 2023년 7월. 제안 표준. URL: <a
+                    <a href="https://www.rfc-editor.org/info/rfc9457/"><cite>HTTP API의 문제 상세 정보</cite></a>.
+                    M. Nottingham; E. Wilde; S. Dalal. IETF. 2023년 7월. 표준 제안. URL: <a
                         href="https://www.rfc-editor.org/info/rfc9457/">https://www.rfc-editor.org/info/rfc9457/</a>
                 </dd>
                 <dt id="bib-rfc9728">[RFC9728]</dt>
                 <dd>
-                    <a href="https://www.rfc-editor.org/info/rfc9728/"><cite>OAuth 2.0 보호된 리소스
-                            메타데이터</cite></a>. M.B. Jones; P. Hunt; A. Parecki. IETF. 2025년 4월. 제안 표준.
+                    <a href="https://www.rfc-editor.org/info/rfc9728/"><cite>OAuth 2.0 보호 리소스
+                            메타데이터</cite></a>. M.B. Jones; P. Hunt; A. Parecki. IETF. 2025년 4월. 표준 제안.
                     URL: <a href="https://www.rfc-editor.org/info/rfc9728/">https://www.rfc-editor.org/info/rfc9728/</a>
                 </dd>
                 <dt id="bib-url">[URL]</dt>
@@ -7020,14 +7433,14 @@ Content-Type: application/linkset+json
                 </dd>
                 <dt id="bib-webarch">[WebArch]</dt>
                 <dd>
-                    <a href="https://www.w3.org/TR/webarch/"><cite>월드 와이드 웹 아키텍처, 제
-                            1권</cite></a>. Ian Jacobs; Norman Walsh. W3C. 2004년 12월 15일. W3C 권고안. URL: <a
+                    <a href="https://www.w3.org/TR/webarch/"><cite>월드 와이드 웹 아키텍처, 제1
+                            권</cite></a>. Ian Jacobs; Norman Walsh. W3C. 2004년 12월 15일. W3C 권고안. URL: <a
                         href="https://www.w3.org/TR/webarch/">https://www.w3.org/TR/webarch/</a>
                 </dd>
                 <dt id="bib-xmlschema11-2">[XMLSCHEMA11-2]</dt>
                 <dd>
                     <a href="https://www.w3.org/TR/xmlschema11-2/"><cite>W3C XML 스키마 정의 언어(XSD) 1.1
-                            제2부: 데이터 타입</cite></a>. David Peterson; Sandy Gao; Ashok Malhotra; Michael
+                            제2부: 데이터 유형</cite></a>. David Peterson; Sandy Gao; Ashok Malhotra; Michael
                     Sperberg-McQueen; Henry Thompson; Paul V. Biron 외. W3C. 2012년 4월 5일. W3C 권고안. URL:
                     <a href="https://www.w3.org/TR/xmlschema11-2/">https://www.w3.org/TR/xmlschema11-2/</a>
                 </dd>
@@ -7620,54 +8033,54 @@ Content-Type: application/linkset+json
             </li>
             <li>
                 <a href="#ref-for-dfn-containers-21" title="§ 8.1 Container Representation">§ 8.1 Container
-                    Representation</a> <a href="#ref-for-dfn-containers-22" title="Reference 2">(2)</a>
+                    Representation</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-23" title="§ 8.1.1 Container Properties">§ 8.1.1 Container
-                    Properties</a> <a href="#ref-for-dfn-containers-24" title="Reference 2">(2)</a> <a
-                    href="#ref-for-dfn-containers-25" title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-26"
+                <a href="#ref-for-dfn-containers-22" title="§ 8.1.1 Container Properties">§ 8.1.1 Container
+                    Properties</a> <a href="#ref-for-dfn-containers-23" title="Reference 2">(2)</a> <a
+                    href="#ref-for-dfn-containers-24" title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-25"
                     title="Reference 4">(4)</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-27" title="§ 8.1.2 Contained Resource Description">§ 8.1.2 Contained
+                <a href="#ref-for-dfn-containers-26" title="§ 8.1.2 Contained Resource Description">§ 8.1.2 Contained
                     Resource Description</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-28" title="§ 8.1.3 Example Container Representation">§ 8.1.3 Example
+                <a href="#ref-for-dfn-containers-27" title="§ 8.1.3 Example Container Representation">§ 8.1.3 Example
                     Container Representation</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-29" title="§ 9. Operations">§ 9. Operations</a>
+                <a href="#ref-for-dfn-containers-28" title="§ 9. Operations">§ 9. Operations</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-30" title="§ 9.1 Metadata">§ 9.1 Metadata</a> <a
-                    href="#ref-for-dfn-containers-31" title="Reference 2">(2)</a> <a href="#ref-for-dfn-containers-32"
-                    title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-33" title="Reference 4">(4)</a>
+                <a href="#ref-for-dfn-containers-29" title="§ 9.1 Metadata">§ 9.1 Metadata</a> <a
+                    href="#ref-for-dfn-containers-30" title="Reference 2">(2)</a> <a href="#ref-for-dfn-containers-31"
+                    title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-32" title="Reference 4">(4)</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-34" title="§ 9.2 Create resource">§ 9.2 Create resource</a> <a
-                    href="#ref-for-dfn-containers-35" title="Reference 2">(2)</a> <a href="#ref-for-dfn-containers-36"
-                    title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-37" title="Reference 4">(4)</a> <a
-                    href="#ref-for-dfn-containers-38" title="Reference 5">(5)</a> <a href="#ref-for-dfn-containers-39"
-                    title="Reference 6">(6)</a> <a href="#ref-for-dfn-containers-40" title="Reference 7">(7)</a> <a
-                    href="#ref-for-dfn-containers-41" title="Reference 8">(8)</a> <a href="#ref-for-dfn-containers-42"
-                    title="Reference 9">(9)</a> <a href="#ref-for-dfn-containers-43" title="Reference 10">(10)</a> <a
-                    href="#ref-for-dfn-containers-44" title="Reference 11">(11)</a> <a href="#ref-for-dfn-containers-45"
-                    title="Reference 12">(12)</a> <a href="#ref-for-dfn-containers-46" title="Reference 13">(13)</a> <a
-                    href="#ref-for-dfn-containers-47" title="Reference 14">(14)</a> <a href="#ref-for-dfn-containers-48"
-                    title="Reference 15">(15)</a> <a href="#ref-for-dfn-containers-49" title="Reference 16">(16)</a> <a
-                    href="#ref-for-dfn-containers-50" title="Reference 17">(17)</a>
+                <a href="#ref-for-dfn-containers-33" title="§ 9.2 Create resource">§ 9.2 Create resource</a> <a
+                    href="#ref-for-dfn-containers-34" title="Reference 2">(2)</a> <a href="#ref-for-dfn-containers-35"
+                    title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-36" title="Reference 4">(4)</a> <a
+                    href="#ref-for-dfn-containers-37" title="Reference 5">(5)</a> <a href="#ref-for-dfn-containers-38"
+                    title="Reference 6">(6)</a> <a href="#ref-for-dfn-containers-39" title="Reference 7">(7)</a> <a
+                    href="#ref-for-dfn-containers-40" title="Reference 8">(8)</a> <a href="#ref-for-dfn-containers-41"
+                    title="Reference 9">(9)</a> <a href="#ref-for-dfn-containers-42" title="Reference 10">(10)</a> <a
+                    href="#ref-for-dfn-containers-43" title="Reference 11">(11)</a> <a href="#ref-for-dfn-containers-44"
+                    title="Reference 12">(12)</a> <a href="#ref-for-dfn-containers-45" title="Reference 13">(13)</a> <a
+                    href="#ref-for-dfn-containers-46" title="Reference 14">(14)</a> <a href="#ref-for-dfn-containers-47"
+                    title="Reference 15">(15)</a> <a href="#ref-for-dfn-containers-48" title="Reference 16">(16)</a> <a
+                    href="#ref-for-dfn-containers-49" title="Reference 17">(17)</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-51" title="§ 9.3 Read resource">§ 9.3 Read resource</a> <a
-                    href="#ref-for-dfn-containers-52" title="Reference 2">(2)</a> <a href="#ref-for-dfn-containers-53"
-                    title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-54" title="Reference 4">(4)</a> <a
-                    href="#ref-for-dfn-containers-55" title="Reference 5">(5)</a> <a href="#ref-for-dfn-containers-56"
-                    title="Reference 6">(6)</a> <a href="#ref-for-dfn-containers-57" title="Reference 7">(7)</a> <a
-                    href="#ref-for-dfn-containers-58" title="Reference 8">(8)</a> <a href="#ref-for-dfn-containers-59"
-                    title="Reference 9">(9)</a> <a href="#ref-for-dfn-containers-60" title="Reference 10">(10)</a> <a
-                    href="#ref-for-dfn-containers-61" title="Reference 11">(11)</a> <a href="#ref-for-dfn-containers-62"
-                    title="Reference 12">(12)</a>
+                <a href="#ref-for-dfn-containers-50" title="§ 9.3 Read resource">§ 9.3 Read resource</a> <a
+                    href="#ref-for-dfn-containers-51" title="Reference 2">(2)</a> <a href="#ref-for-dfn-containers-52"
+                    title="Reference 3">(3)</a> <a href="#ref-for-dfn-containers-53" title="Reference 4">(4)</a> <a
+                    href="#ref-for-dfn-containers-54" title="Reference 5">(5)</a> <a href="#ref-for-dfn-containers-55"
+                    title="Reference 6">(6)</a> <a href="#ref-for-dfn-containers-56" title="Reference 7">(7)</a> <a
+                    href="#ref-for-dfn-containers-57" title="Reference 8">(8)</a> <a href="#ref-for-dfn-containers-58"
+                    title="Reference 9">(9)</a> <a href="#ref-for-dfn-containers-59" title="Reference 10">(10)</a> <a
+                    href="#ref-for-dfn-containers-60" title="Reference 11">(11)</a> <a href="#ref-for-dfn-containers-61"
+                    title="Reference 12">(12)</a> <a href="#ref-for-dfn-containers-62" title="Reference 13">(13)</a>
             </li>
             <li>
                 <a href="#ref-for-dfn-containers-63" title="§ 9.5 Delete resource">§ 9.5 Delete resource</a> <a
@@ -7679,8 +8092,16 @@ Content-Type: application/linkset+json
                     title="Reference 9">(9)</a> <a href="#ref-for-dfn-containers-72" title="Reference 10">(10)</a>
             </li>
             <li>
-                <a href="#ref-for-dfn-containers-73" title="§ 12.1.2 Pagination">§ 12.1.2 Pagination</a> <a
+                <a href="#ref-for-dfn-containers-73" title="§ 12.1.1 LWS Profile">§ 12.1.1 LWS Profile</a> <a
                     href="#ref-for-dfn-containers-74" title="Reference 2">(2)</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-containers-75" title="§ 12.1.2 Content Negotiation">§ 12.1.2 Content
+                    Negotiation</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-containers-76" title="§ 12.1.3 Pagination">§ 12.1.3 Pagination</a> <a
+                    href="#ref-for-dfn-containers-77" title="Reference 2">(2)</a>
             </li>
         </ul>
     </div>
@@ -8430,9 +8851,32 @@ Content-Type: application/linkset+json
                 <a href="#ref-for-dfn-container-representation-4" title="§ 12.1 LWS Media Type">§ 12.1 LWS Media
                     Type</a>
             </li>
+        </ul>
+    </div>
+    <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-lws-profile"
+        aria-label="Links in this document to definition: LWS profile">
+        <span class="caret"></span>
+        <div>
+            <a class="self-link" href="#dfn-lws-profile"
+                aria-label="Permalink for definition: LWS profile. Activate to close this dialog.">Permalink</a>
+
+
+        </div>
+        <p><b>Referenced in:</b></p>
+        <ul>
             <li>
-                <a href="#ref-for-dfn-container-representation-5" title="§ 12.1.1 Media Type Equivalence">§ 12.1.1 Media
-                    Type Equivalence</a> <a href="#ref-for-dfn-container-representation-6" title="Reference 2">(2)</a>
+                <a href="#ref-for-dfn-lws-profile-1" title="§ 8.1.3 Example Container Representation">§ 8.1.3 Example
+                    Container Representation</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-lws-profile-2" title="§ 12.1.1 LWS Profile">§ 12.1.1 LWS Profile</a> <a
+                    href="#ref-for-dfn-lws-profile-3" title="Reference 2">(2)</a>
+            </li>
+            <li>
+                <a href="#ref-for-dfn-lws-profile-4" title="§ 12.1.2 Content Negotiation">§ 12.1.2 Content
+                    Negotiation</a> <a href="#ref-for-dfn-lws-profile-5" title="Reference 2">(2)</a> <a
+                    href="#ref-for-dfn-lws-profile-6" title="Reference 3">(3)</a> <a href="#ref-for-dfn-lws-profile-7"
+                    title="Reference 4">(4)</a>
             </li>
         </ul>
     </div>
