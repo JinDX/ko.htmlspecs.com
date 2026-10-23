@@ -1107,7 +1107,7 @@
 
                 const img = document.createElement("img");
                 img.src = URL.createObjectURL(blob);
-                img.onload = () => window.URL.revokeObjectURL(this.src);
+                img.onload = () => window.URL.revokeObjectURL(img.src);
 
                 document.body.appendChild(img);
               }
@@ -2466,7 +2466,7 @@
                                 |record:NDEFRecordInit|, |context|, |recordsDepth|로
                                 <a>create NDEF record</a>를 실행한 결과를 |ndef|로 두거나,
                                 기반 플랫폼이 |ndef|에 동등한 값을 제공하도록 합니다.
-                                알고리즘이 예외 |e|를 던지면, |promise|를 |e|로 거부하고 이 단계들을 중단합니다.
+                                알고리즘이 예외 |e|를 던지면, 그 예외 |e|를 [= exception/throw =] 합니다.
                             </li>
                             <li>
                                 |output|에 |ndef|를 추가합니다.
@@ -2475,7 +2475,7 @@
                     </li>
                     <li>
                         |output|과 |context|로 <a>check created records</a>를 실행했을 때
-                        |error: Error|를 던지면, |promise|를 |error|로 거부하고 이 단계들을 중단합니다.
+                        |error: Error|를 던지면, 그 |error|를 [= exception/throw =] 합니다.
                     </li>
                     <li>
                         |output|을 반환합니다.
@@ -2544,7 +2544,7 @@
                         <li>
                             |record|의 <a>recordType</a>에 따라 아래 지정된 알고리즘을
                             |record|, |ndef|, |context|, |recordsDepth|와 함께 호출하고 그 결과를 반환합니다.
-                            예외 |e|가 발생하면, |promise|를 |e|로 거부하고 이 단계들을 중단합니다.
+                            예외 |e|가 발생하면, 그 예외 |e|를 [= exception/throw =] 합니다.
                             <dl>
                                 <dt>"`empty`"</dt>
                                 <ul>
@@ -2589,17 +2589,17 @@
                             <ul>
                                 <li>
                                     |context|가 `""`(즉, |record|가 다른 <a>NDEF record</a>의 페이로드가 아님)이면,
-                                    {{TypeError}}로 |promise|를 거부하고 이 단계들을 중단합니다.
+                                    {{TypeError}}를 [= exception/throw =] 합니다.
                                 </li>
                                 <li>
                                     |record|의 <a>recordType</a>에 대해
                                     <a>validate local type</a> 단계를 실행한 결과가 false이면,
-                                    {{TypeError}}로 |promise|를 거부하고 이 단계들을 중단합니다.
+                                    {{TypeError}}를 [= exception/throw =] 합니다.
                                 </li>
                                 <li>
                                     |record|, |ndef|, |context|, |recordsDepth|로
                                     <a>map local type to NDEF</a>를 실행한 결과를 반환합니다.
-                                    예외 |e|가 발생하면, |promise|를 |e|로 거부하고 이 단계들을 중단합니다.
+                                    예외 |e|가 발생하면, 그 예외 |e|를 [= exception/throw =] 합니다.
                                 </li>
                             </ul>
                         </li>
@@ -2607,7 +2607,7 @@
                             |record|의 <a>recordType</a>에 대해 <a>validate external type</a>을 실행한 결과가 true이면,
                             |record|, |ndef|, |context|, |recordsDepth|로
                             <a>map external data to NDEF</a>를 반환합니다.
-                            예외 |e|가 발생하면, |promise|를 |e|로 거부하고 이 단계들을 중단합니다.
+                            예외 |e|가 발생하면, 그 예외 |e|를 [= exception/throw =] 합니다.
                         </li>
                         <li>
                             그렇지 않다면, {{TypeError}}를 [= exception/throw =] 하고
@@ -3940,7 +3940,7 @@
                 <aside class="note" data-link-for="NDEFRecord">
                     <p>
                         유니코드 표준은 UTF-8, UTF-16, UTF-32 등의 여러 인코딩을 정의합니다.
-                        UTF-8은 웹에서 선호되는 인코딩이며, [=code points=]가 단일 바이트로 표현되므로
+                        UTF-8은 웹에서 선호되는 인코딩이며, 단일 바이트 코드 단위를 사용하고 [=code points=]를 1~4바이트의 시퀀스로 표현하므로
                         엔디안 독립적이라는 장점이 있습니다.
                     </p>
                     <p>
@@ -3954,7 +3954,7 @@
                         다시 읽힌다는 것을 의미합니다.
                     </p>
                     <p>
-                        UTF-16의 경우, 각 [=code point=]가 두 바이트에 걸치므로
+                        UTF-16의 경우, 각 [=code point=]를 하나 또는 두 개의 2바이트 코드 단위로 표현하므로
                         읽기와 쓰기 간에 바이트 순서가 다를 수 있습니다.
                         이 때문에 UTF-16 인코딩 텍스트는 일반적으로 `0xFEFF`로 쓰이는
                         바이트 순서 표시(BOM)를 포함합니다. 호스트 머신과 NDEF 사이의
