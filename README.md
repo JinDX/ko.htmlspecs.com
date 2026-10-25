@@ -258,7 +258,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [MediaStream Image Capture](https://ko.htmlspecs.com/image-capture/)（[Source](https://www.w3.org/TR/2025/WD-image-capture-20250423/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Encrypted Media Extensions](https://ko.htmlspecs.com/encrypted-media-2/)（[Source](https://www.w3.org/TR/2026/WD-encrypted-media-2-20261013/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Remote Playback](https://ko.htmlspecs.com/remote-playback/)（[Source](https://www.w3.org/TR/2024/CRD-remote-playback-20240430/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
-- [Open Screen Application Protocol](https://ko.htmlspecs.com/openscreen-application/)（[Source](https://www.w3.org/TR/2026/WD-openscreen-application-20260210/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Open Screen Application Protocol](https://ko.htmlspecs.com/openscreen-application/)（[Source](https://www.w3.org/TR/2026/WD-openscreen-application-20261024/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Open Screen Network Protocol](https://ko.htmlspecs.com/openscreen-network/)（[Source](https://www.w3.org/TR/2026/WD-openscreen-network-20260210/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 미디어 형식, 자막 및 코덱
