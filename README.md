@@ -143,7 +143,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Badging API](https://ko.htmlspecs.com/badging/)（[Source](https://www.w3.org/TR/2026/WD-badging-20260427/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 저장소, 파일 및 데이터 접근
-- [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB/)（[Source](https://www.w3.org/TR/2026/WD-IndexedDB-3-20261029/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Indexed Database API 3.0](https://ko.htmlspecs.com/IndexedDB/)（[Source](https://www.w3.org/TR/2026/WD-IndexedDB-3-20261030/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Storage](https://ko.htmlspecs.com/storage/)（[Source](https://storage.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Storage Buckets](https://ko.htmlspecs.com/storage-buckets/)（[Source](https://wicg.github.io/storage-buckets/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [File API](https://ko.htmlspecs.com/FileAPI/)（[Source](https://www.w3.org/TR/2026/WD-FileAPI-20260912/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
