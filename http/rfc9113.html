@@ -3593,7 +3593,7 @@ CONTINUATION Frame {
                                 처리되어야 합니다(<a href="#malformed" title="Malformed Messages">섹션 8.1.1</a>).</p>
                         </div>
                         <div id="rfc.section.8.1.p.9">
-                            <p>요청을 여는 <a href="#HEADERS" title="HEADERS">HEADERS</a> 프레임을 받은 후에 END_STREAM 플래그가 설정되지 않은
+                            <p>요청을 여는 <a href="#HEADERS" title="HEADERS">HEADERS</a> 프레임을 받은 후 또는 최종(정보성이 아닌) 상태 코드를 받은 후에 END_STREAM 플래그가 설정되지 않은
                                 다른 <a href="#HEADERS" title="HEADERS">HEADERS</a> 프레임을 수신하면 해당 요청 또는 응답은 잘못된 형식으로 간주되어야
                                 합니다(<a href="#malformed" title="Malformed Messages">섹션 8.1.1</a>).</p>
                         </div>
@@ -3601,7 +3601,7 @@ CONTINUATION Frame {
                             <p>HTTP 요청/응답 교환은 단일 스트림을 완전히 소비합니다. 요청은 스트림을 "open" 상태로 만드는 <a href="#HEADERS"
                                     title="HEADERS">HEADERS</a> 프레임으로 시작합니다. 요청은 END_STREAM 플래그가 설정된 프레임으로 끝나며, 이는
                                 클라이언트에 대해 스트림을 "half-closed (local)"로, 서버에 대해 "half-closed (remote)"로 만듭니다. 응답 스트림은 0개
-                                이상의 중간 응답(HEADERS 프레임)으로 시작한 뒤 최종 상태 코드를 포함하는 HEADERS 프레임으로 끝납니다.</p>
+                                이상의 중간 응답(HEADERS 프레임)으로 시작하며, 이어서 최종 상태 코드를 포함하는 HEADERS 프레임이 옵니다.</p>
                         </div>
                         <div id="rfc.section.8.1.p.11">
                             <p>서버가 END_STREAM 플래그가 설정된 프레임을 전송하거나 클라이언트가 이를 수신하면 응답이 완료됩니다(필요한 CONTINUATION 프레임 포함). 서버는
@@ -3950,10 +3950,10 @@ cookie: e=f
                         </div>
                         <div id="rfc.section.8.4.p.5">
                             <p>약속된 요청은 안전(safe)하고 캐시 가능(cacheable)해야 합니다(관련 RFC 섹션 참조). 약속된 요청은 본문이나 트레일러 섹션을 포함할 수
-                                없습니다. 클라이언트가 캐시 가능하지 않거나 안전하지 않거나 요청 본문이 있음을 나타내는 약속된 요청을 수신하면 해당 약속된 스트림을 <a
+                                없습니다. 클라이언트가 캐시 가능하지 않거나 안전한 것으로 알려져 있지 않거나 요청 본문이 있음을 나타내는 약속된 요청을 수신하면 해당 약속된 스트림을 <a
                                     href="#StreamErrorHandler" title="Stream Error Handling">섹션 5.4.2</a>에 따라 <a
                                     href="#RST_STREAM" title="RST_STREAM">RST_STREAM</a>으로 재설정하고 오류 유형으로 <a
-                                    href="#PROTOCOL_ERROR">PROTOCOL_ERROR</a>를 사용해야 합니다.</p>
+                                    href="#PROTOCOL_ERROR">PROTOCOL_ERROR</a>를 사용해야 합니다. 클라이언트가 새로 정의된 메서드를 안전한 것으로 인식하지 못하면 이로 인해 약속된 스트림이 재설정될 수 있다는 점에 유의해야 합니다.</p>
                         </div>
                         <div id="rfc.section.8.4.p.6">
                             <p>캐시 가능한 푸시된 응답은 클라이언트가 HTTP 캐시를 구현한 경우 저장될 수 있습니다. 푸시된 응답은 약속된 스트림 식별자에 의해 식별되는 스트림이 아직 열려
@@ -4117,7 +4117,7 @@ cookie: e=f
                         <div id="rfc.section.8.5.p.6">
                             <p>각 피어가 보낸 초기 HEADERS 프레임 이후의 모든 후속 DATA 프레임은 TCP 연결에서 전송되는 데이터에 해당합니다. 클라이언트가 보낸 DATA 프레임의
                                 페이로드는 프록시가 TCP 서버로 전송하고, TCP 서버로부터 수신된 데이터는 프록시가 DATA 프레임으로 조립하여 전송합니다. 연결된 스트림에서 DATA
-                                이외의 프레임 유형이나 스트림 관리 프레임(RST_STREAM, WINDOW_UPDATE, PRIORITY) 이외의 프레임은 전송해서는 안 되며 수신 시
+                                프레임 및 스트림 관리 프레임(RST_STREAM, WINDOW_UPDATE, PRIORITY) 이외의 프레임은 전송해서는 안 되며 수신 시
                                 스트림 오류로 처리되어야 합니다.</p>
                         </div>
                         <div id="rfc.section.8.5.p.7">
@@ -4377,7 +4377,7 @@ cookie: e=f
                             <h4 id="rfc.section.9.1.1"><a href="#rfc.section.9.1.1">9.1.1.</a>&nbsp;<a href="#reuse">연결
                                     재사용</a></h4>
                             <div id="rfc.section.9.1.1.p.1">
-                                <p>CONNECT 메서드(<a href="#CONNECT" title="The CONNECT Method">섹션 8.5</a>)를 사용하여 직접 또는 터널을
+                                <p>직접 또는 CONNECT 메서드(<a href="#CONNECT" title="The CONNECT Method">섹션 8.5</a>)를 사용하여 만든 터널을
                                     통해 생성된 원본 서버에 대한 연결은 서로 다른 URI authority 구성요소를 가진 요청들에 대해 재사용할 수 있습니다(<em
                                         class="bcp14">MAY</em>). 원본 서버가 권한을 가지고 있는 한 연결은 재사용될 수 있습니다(<a
                                         href="#authority" title="Server Authority">섹션 10.1</a>). TLS가 없는 TCP 연결의 경우에는
@@ -4589,7 +4589,7 @@ cookie: e=f
                         </div>
                         <div id="rfc.section.10.3.p.3">
                             <p>중개자는 필드 이름이나 값이 유효하지 않은 필드를 다른 이유로 거부할 수 있습니다 — 특히 RFC 9110의 섹션 5에 정의된 HTTP ABNF 문법에 부합하지
-                                않는 필드들입니다. 최소한의 검증(섹션 8.2)이 수행되지 않는 중개자는 유효하지 않은 필드 이름 또는 값을 포함한 메시지를 전달할 수 있습니다.</p>
+                                않는 필드들입니다. 최소한의 검증(섹션 8.2) 이외의 필드 검증을 수행하지 않는 중개자는 유효하지 않은 필드 이름 또는 값을 포함한 메시지를 전달할 수 있습니다.</p>
                         </div>
                         <div id="rfc.section.10.3.p.4">
                             <p>중개자는 전달 전에 제거해야 하는 필드를 수신하면(예: RFC 9110 섹션 7.6.1 참조) 해당 헤더 필드를 제거하거나 대체해야 합니다(<em
@@ -4718,7 +4718,7 @@ cookie: e=f
                         <h3 id="rfc.section.10.6"><a href="#rfc.section.10.6">10.6.</a>&nbsp;<a
                                 href="#n-use-of-compression">압축 사용</a></h3>
                         <div id="rfc.section.10.6.p.1">
-                            <p>압축은 공격자가 동일한 문맥에서 공격자가 제어하는 데이터와 비밀 데이터를 함께 압축할 때 비밀 데이터를 복구하도록 허용할 수 있습니다. HTTP/2는 필드
+                            <p>압축은 비밀 데이터가 공격자가 제어하는 데이터와 동일한 문맥에서 함께 압축될 때 공격자가 비밀 데이터를 복구할 수 있게 할 수 있습니다. HTTP/2는 필드
                                 라인(<a href="#FieldBlock" title="Field Section Compression and Decompression">섹션
                                     4.3</a>)의 압축을 가능하게 하며, 다음의 우려사항은 HTTP 압축된 콘텐츠 인코딩의 사용에도 적용됩니다.</p>
                         </div>
