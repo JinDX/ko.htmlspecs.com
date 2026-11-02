@@ -19,7 +19,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Infra](https://ko.htmlspecs.com/infra/)（[Source](https://infra.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [User Agents](https://ko.htmlspecs.com/user-agents/)（[Source](https://www.w3.org/TR/2026/NOTE-user-agents-20261022/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Compatibility](https://ko.htmlspecs.com/compat/)（[Source](https://compat.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
-- [Web Platform Design Principles](https://ko.htmlspecs.com/design-principles/)（[Source](https://www.w3.org/TR/2026/NOTE-design-principles-20260914/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
+- [Web Platform Design Principles](https://ko.htmlspecs.com/design-principles/)（[Source](https://www.w3.org/TR/2026/NOTE-design-principles-20261102/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Web Sustainability Guidelines (WSG)](https://ko.htmlspecs.com/web-sustainability-guidelines/)（[Source](https://www.w3.org/TR/2026/DNOTE-web-sustainability-guidelines-20261016/) ![Note Draft](https://img.shields.io/badge/DNOTE-ffcc00)）
 - [Compression](https://ko.htmlspecs.com/compression/)（[Source](https://compression.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
 - [Quirks Mode](https://ko.htmlspecs.com/quirks/)（[Source](https://quirks.spec.whatwg.org/) ![Living Standard](https://img.shields.io/badge/LS-3c790a)）
