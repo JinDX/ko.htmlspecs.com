@@ -939,14 +939,14 @@
         <h1 id="title" class="title">VCALM v1.0</h1>
         <h2 id="subtitle" class="subtitle">수명 주기 관리를 위한 검증 가능한 자격 증명 API</h2>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C 작업 초안</a> <time class="dt-published"
-                datetime="2026-10-13">2026년 10월 13일</time></p>
+                datetime="2026-11-10">2026년 11월 10일</time></p>
         <details open="">
             <summary>이 문서에 대한 자세한 정보</summary>
             <dl>
                 <dt>이 버전:</dt>
                 <dd>
                     <a class="u-url"
-                        href="https://www.w3.org/TR/2026/WD-vcalm-1.0-20261013/">https://www.w3.org/TR/2026/WD-vcalm-1.0-20261013/</a>
+                        href="https://www.w3.org/TR/2026/WD-vcalm-1.0-20261110/">https://www.w3.org/TR/2026/WD-vcalm-1.0-20261110/</a>
                 </dd>
                 <dt>최신 공개 버전:</dt>
                 <dd>
@@ -4489,7 +4489,7 @@ Issuer, Holder, Verifier라는 검증 가능한 자격 증명 역할을 보여 �
 
                 <p>
                     <code>QueryByExample</code>을 위한 JSON Schema는
-                    소프트웨어 시스템에 통합할 수 있도록 <a href="https://www.w3.org/TR/2026/WD-vcalm-1.0-20261013/schemas/qbe.json">별도 파일로 제공됩니다</a>.
+                    소프트웨어 시스템에 통합할 수 있도록 <a href="https://www.w3.org/TR/2026/WD-vcalm-1.0-20261110/schemas/qbe.json">별도 파일로 제공됩니다</a>.
                 </p>
 
                 <p>
@@ -9975,6 +9975,7 @@ interaction-url = <a href="https://url.spec.whatwg.org/#concept-url">URL</a></pr
                 상태 목록 자격 증명을 구현하는 방법에 관한
                 규범적 예시를 제공합니다.
             </p>
+<p>상태 서비스가 둘 이상의 인덱스 할당 컨텍스트를 관리하는 경우, 클라이언트는 상태 목록을 만들 때 <code>indexAllocator</code> 값을 제공해도 <em class="rfc2119">된다</em>. 이 값은 목록을 참조할 자격 증명에 <code>statusListIndex</code> 값을 할당하는 데 사용되는 공유 할당 상태(예: 테넌트별 또는 <code>statusPurpose</code>별 레지스트리)를 식별한다. 목록 생성 시(또는 발급 시 인덱스를 처음 할당할 때) <code>indexAllocator</code>가 제공되면, 해당 할당 상태에 의존하는 후속 상태 업데이트는 구현이 단일 기본 할당자를 모호함 없이 추론할 수 있는 경우를 제외하고 동일한 <code>indexAllocator</code> 값을 재사용해야 <em class="rfc2119">한다</em>.</p>
 
             <div class="api-detail" data-api-endpoint="post /status-lists">
                 <p>POST /status-lists - 새로운 상태 목록을 생성합니다</p>
@@ -9996,7 +9997,7 @@ interaction-url = <a href="https://url.spec.whatwg.org/#concept-url">URL</a></pr
                             <td style="vertical-align: top;"><code>id</code> [string]</td>
                             <td>상태 목록의 선택적 식별자입니다. 제공하지 않으면 서비스에서 생성합니다.
                             </td>
-                        </tr>
+                        </tr><tr><td style="vertical-align: top;"><code>indexAllocator</code> [string]</td><td>이 상태 목록과 연결된 인덱스 할당 컨텍스트의 선택적 식별자. 제공된 경우, 같은 할당 상태에 의존하는 상태 업데이트는 이 값을 재사용해야 한다(`UpdateCredentialStatusRequest.indexAllocator` 참조).</td></tr>
                         <tr>
                             <td style="vertical-align: top;"><code>options</code> [object]</td>
                             <td>객체</td>
@@ -10200,6 +10201,9 @@ interaction-url = <a href="https://url.spec.whatwg.org/#concept-url">URL</a></pr
                 해당 목록 내 인덱스 포함), 새로운 상태 값이 지정됩니다.
                 상태 서비스는 이에 따라 상태 목록 자격 증명을 업데이트합니다.
             </p>
+<p>발급자 인스턴스는 자신이 발급하는 검증 가능한 자격 증명에 하나 이상의 상태 항목을 할당할 책임이 있다. 발급자 소프트웨어는 상태 메타데이터(예: 상태 목록 또는 목록 인덱스)를 과도하게 또는 잘못 할당하지 않도록 해야 한다. 과도하게 할당되거나 잘못 할당되거나 사용되지 않는 정보는 검증 가능한 자격 증명의 보유자와 발급자 모두에게 개인정보 보호상 피해를 줄 수 있기 때문이다. 고가용성, 수평 확장, 분산 아키텍처 또는 이들의 조합에서는 서로 다른 구성 요소 간에 상태 할당 상태를 적절하게 공유하고 식별하고 참조하지 않으면 이 작업이 특히 어려울 수 있다. <code>indexAllocator</code> 필드는 공유 상태를 식별하고 참조하는 데 사용할 수 있으며, 이를 통해 더 나은 조정과 상태 메타데이터의 원자적 할당 및 사용이 가능하다.</p>
+<p>상태 메커니즘은 각 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifiable-credential">검증 가능한 자격 증명</a>을 목록의 <code>statusListIndex</code>와 연결한다(예: <cite><a href="https://www.w3.org/TR/vc-bitstring-status-list/">Bitstring Status List v1.0</a></cite> 사양 참조). 이러한 인덱스를 할당하는 구현은 일반적으로 사용 중인 값을 추적하여 인덱스가 잘못 재사용되지 않고 상태 업데이트가 올바른 항목을 수정하도록 한다. 상태 서비스가 둘 이상의 추적기(예: 테넌트별, 배포별 또는 <code>statusPurpose</code>별 할당자)를 지원하는 경우, 선택적 <code>indexAllocator</code> 요청 필드는 이번 업데이트에 적용되는 할당자 컨텍스트를 지정한다. 같은 식별자는 일반적으로 발급 시 인덱스를 최초로 할당할 때(또는 목록을 프로비저닝할 때) 확정되거나 반환되므로, 이 사양에서 목록 생성과 자격 증명 발급이 별개의 API 인터페이스이더라도 발급 흐름과 상태 업데이트 흐름의 일관성이 유지된다.</p>
+<div class="note" id="note-indexallocator-values"><div class="note-title marker">참고: indexAllocator 값</div><p>허용되는 <code>indexAllocator</code> 문자열은 구현 정의이며, 이 사양은 특정 값이나 이를 위한 검색 메커니즘을 요구하지 않는다.</p></div>
 
             <div class="api-detail" data-api-endpoint="post /credentials/status">
                 <p>POST /credentials/status - 발급된 자격 증명의 상태를 업데이트합니다</p>
@@ -10240,7 +10244,7 @@ interaction-url = <a href="https://url.spec.whatwg.org/#concept-url">URL</a></pr
                         </tr>
                         <tr>
                             <td style="vertical-align: top;"><code>indexAllocator</code> [string]</td>
-                            <td>서비스에서 VC에 사용되거나 할당되는 인덱스를 파악하는 데 사용합니다.</td>
+                            <td>상태 서비스가 이 요청에 사용해야 하는 인덱스 할당 컨텍스트의 선택적 식별자. 비트열 상태 목록과 같은 상태 메커니즘은 각 자격 증명을 목록 안의 `statusListIndex`와 연결한다. 구현은 흔히 내부 기록(가용 목록, 카운터, 테넌트별 풀 등)을 유지하여 인덱스가 중복 할당되지 않고 업데이트가 올바른 행을 대상으로 하도록 한다. 여러 할당자가 있는 경우(예: 테넌트, 환경 또는 `statusPurpose`별 별도 파이프라인), `indexAllocator`는 `credentialId` 및 `credentialStatus`와 함께 어떤 레지스트리나 정책을 참조하거나 업데이트할지 서비스에 알려 준다. 구현이 단일 기본 할당자를 추론하거나 `credentialStatus`가 이미 목록 항목을 완전히 식별하는 경우 생략할 수 있다. 허용되는 값은 구현마다 다르며 이 사양은 이름 레지스트리를 정의하지 않는다.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -11148,7 +11152,7 @@ interaction-url = <a href="https://url.spec.whatwg.org/#concept-url">URL</a></pr
                 <dt id="bib-digital-credentials">[digital-credentials]</dt>
                 <dd>
                     <a href="https://www.w3.org/TR/digital-credentials/"><cite>디지털 자격 증명</cite></a>. Marcos
-                    Caceres; Tim Cappalli; Mohamed Amir Yosef. W3C. 2026년 9월 4일. W3C 작업 초안. URL: <a
+                    Caceres; Tim Cappalli; Mohamed Amir Yosef. W3C. 2026년 11월 5일. W3C 작업 초안. URL: <a
                         href="https://www.w3.org/TR/digital-credentials/">https://www.w3.org/TR/digital-credentials/</a>
                 </dd>
                 <dt id="bib-infra">[infra]</dt>
@@ -11244,13 +11248,13 @@ interaction-url = <a href="https://url.spec.whatwg.org/#concept-url">URL</a></pr
                 <dt id="bib-vc-recognized-entities">[VC-RECOGNIZED-ENTITIES]</dt>
                 <dd>
                     <a href="https://www.w3.org/TR/vc-recognized-entities-1.0/"><cite>인정된 엔터티
-                            v1.0</cite></a>. Manu Sporny. W3C. 2026년 9월 6일. W3C 작업 초안. URL: <a
+                            v1.0</cite></a>. Manu Sporny. W3C. 2026년 11월 4일. W3C 작업 초안. URL: <a
                         href="https://www.w3.org/TR/vc-recognized-entities-1.0/">https://www.w3.org/TR/vc-recognized-entities-1.0/</a>
                 </dd>
                 <dt id="bib-vcalm">[VCALM]</dt>
                 <dd>
                     <a href="https://www.w3.org/TR/vcalm-1.0/"><cite>VCALM v1.0</cite></a>. Patrick St-Louis; Kayode
-                    Ezike; Manu Sporny; Ted Thibodeau Jr. W3C. 2026년 10월 12일. W3C 작업 초안. URL: <a
+                    Ezike; Manu Sporny; Ted Thibodeau Jr. W3C. 2026년 10월 13일. W3C 작업 초안. URL: <a
                         href="https://www.w3.org/TR/vcalm-1.0/">https://www.w3.org/TR/vcalm-1.0/</a>
                 </dd>
             </dl>
