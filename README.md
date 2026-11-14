@@ -231,7 +231,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Audio API](https://ko.htmlspecs.com/webaudio/)（[Source](https://www.w3.org/TR/2026/WD-webaudio-1.1-20260922/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Audio Output Devices API](https://ko.htmlspecs.com/audio-output/)（[Source](https://www.w3.org/TR/2025/CRD-audio-output-20251009/) ![Candidate Recommendation Draft](https://img.shields.io/badge/CRD-e2a669)）
 - [Audio Session](https://ko.htmlspecs.com/audio-session/)（[Source](https://www.w3.org/TR/2024/WD-audio-session-20241113/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
-- [Media Session](https://ko.htmlspecs.com/mediasession/)（[Source](https://www.w3.org/TR/2026/WD-mediasession-20261109/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
+- [Media Session](https://ko.htmlspecs.com/mediasession/)（[Source](https://www.w3.org/TR/2026/WD-mediasession-20261114/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 
 ### 오디오/비디오 캡처, WebRTC 및 재생
 - [WebRTC](https://ko.htmlspecs.com/webrtc/)（[Source](https://www.w3.org/TR/2025/REC-webrtc-20250313/) ![Recommendation](https://img.shields.io/badge/REC-309c40)）
