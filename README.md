@@ -108,7 +108,7 @@ HTML 및 관련 API, CSS 표준 시리즈, HTTP 표준 시리즈 🌐📡
 - [Web Application Manifest](https://ko.htmlspecs.com/appmanifest/)（[Source](https://www.w3.org/TR/2026/WD-appmanifest-20261118/) ![Working Draft](https://img.shields.io/badge/WD-e66e33)）
 - [Web App Launch Handler API](https://ko.htmlspecs.com/web-app-launch/)（[Source](https://wicg.github.io/web-app-launch/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Manifest Incubations](https://ko.htmlspecs.com/manifest-incubations/)（[Source](https://wicg.github.io/manifest-incubations/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
-- [Developing Localizable Manifests](https://ko.htmlspecs.com/localizable-manifests/)（[Source](https://www.w3.org/TR/2025/NOTE-localizable-manifests-20250214/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
+- [Developing Localizable Manifests](https://ko.htmlspecs.com/localizable-manifests/)（[Source](https://www.w3.org/TR/2026/NOTE-localizable-manifests-20261120/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Web App Manifest - Application Information](https://ko.htmlspecs.com/manifest-app-info/)（[Source](https://www.w3.org/TR/2023/NOTE-manifest-app-info-20230821/) ![Note](https://img.shields.io/badge/NOTE-309c40)）
 - [Get Installed Related Apps API](https://ko.htmlspecs.com/get-installed-related-apps/)（[Source](https://wicg.github.io/get-installed-related-apps/spec/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
 - [Sub Apps API](https://ko.htmlspecs.com/sub-apps/)（[Source](https://wicg.github.io/sub-apps/) ![Draft](https://img.shields.io/badge/Draft-ffcc00)）
