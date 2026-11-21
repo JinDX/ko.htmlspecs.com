@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="ko" class="RFC">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>RFC 9931: HTTP/1.1의 낙관적 프로토콜 전환에 관한 보안 고려 사항</title>
+<meta content="Benjamin M. Schwartz" name="author">
+<meta content="
+       In HTTP/1.1, the client can request a change to a new protocol on the existing connection.  This document discusses the security considerations that apply to data sent by the client before this request is confirmed and adds new requirements to RFCs 9112 and 9298 to avoid related security issues. 
+    " name="description">
+<meta content="xml2rfc 3.32.0" name="generator">
+<meta content="Request Smuggling" name="keyword">
+<meta content="False Start" name="keyword">
+<meta content="HTTP CONNECT" name="keyword">
+<meta content="9931" name="rfc.number">
+<!-- Generator version information:
+  xml2rfc 3.32.0
+    Python 3.14.3
+    ConfigArgParse 1.7.1
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.0.2
+    platformdirs 4.9.2
+    pycountry 26.2.16
+    PyYAML 6.0.3
+    requests 2.32.5
+    wcwidth 0.6.0
+    weasyprint 65.0
+-->
+<link href="https://www.rfc-editor.org/rfc/rfc9931.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://static.ietf.org/fonts/noto-sans/import.css'); /* Sans-serif */
+@import url('https://static.ietf.org/fonts/noto-serif/import.css'); /* Serif (print) */
+@import url('https://static.ietf.org/fonts/roboto-mono/import.css'); /* Monospace */
+
+:root {
+  --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+  --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+  --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+}
+
+@viewport {
+  zoom: 1.0;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+@media print {
+  svg {
+    max-height: 850px;
+    max-width: 660px;
+  }
+}
+svg[font-family~="serif" i], svg [font-family~="serif" i] {
+  font-family: var(--font-serif);
+}
+svg[font-family~="sans-serif" i], svg [font-family~="sans-serif" i] {
+  font-family: var(--font-sans);
+}
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  display: table;
+  border: none;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre {
+  background-color: #f9f9f9;
+  font-family: var(--font-mono);
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+.xref {
+  overflow-wrap: normal;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    max-width: 100%;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: var(--font-sans);
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  .breakable pre {
+    break-inside: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+.sourcecode pre,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .artwork > pre,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: upper-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr {
+  break-inside: avoid;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code, dt tt, dt code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the compact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > blockquote:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div.sourcecode:first-child,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type:only-child {
+  margin-bottom: 0;
+}
+</style>
+<link href="https://www.rfc-editor.org/rfc/rfc-local.css" rel="stylesheet" type="text/css">
+<link href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-optimistic-upgrade-06" rel="prev">
+  <link href="https://dx.doi.org/10.17487/rfc9931" rel="alternate">
+  <link href="urn:issn:2070-1721" rel="alternate">
+  </head>
+<body class="xml2rfc">
+<script src="https://www.rfc-editor.org/js/metadata.min.js"></script>
+<table class="ears">
+<thead><tr>
+<td class="left">RFC 9931</td>
+<td class="center">낙관적 HTTP 업그레이드의 보안</td>
+<td class="right">2026년 3월</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Schwartz</td>
+<td class="center">표준 트랙</td>
+<td class="right">[페이지]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-stream">문서 스트림:</dt>
+<dd class="stream">Internet Engineering Task Force (IETF)</dd>
+<dt class="label-rfc">RFC:</dt>
+<dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc9931" class="eref">9931</a></dd>
+<dt class="label-updates">갱신 대상:</dt>
+<dd class="updates">
+<a href="https://www.rfc-editor.org/rfc/rfc9112" class="eref">9112</a>, <a href="https://www.rfc-editor.org/rfc/rfc9298" class="eref">9298</a> </dd>
+<dt class="label-category">분류:</dt>
+<dd class="category">표준 트랙</dd>
+<dt class="label-published">발행:</dt>
+<dd class="published">
+<time datetime="2026-03" class="published">2026년 3월</time>
+    </dd>
+<dt class="label-issn">ISSN:</dt>
+<dd class="issn">2070-1721</dd>
+<dt class="label-authors">저자:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">B. Schwartz</div>
+<div class="org">Meta Platforms, Inc.</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="rfcnum">RFC 9931</h1>
+<h1 id="title">HTTP/1.1의 낙관적 프로토콜 전환에 관한 보안 고려 사항</h1>
+<p class="translation-note">이 페이지는 IETF RFC 9931(B. Schwartz, 2026년 3월)의 비공식 한국어 발췌 번역이며 IETF의 승인을 받지 않았고 전체 번역이 아닙니다. 4.1절의 세 번째 문단과 그림 1의 구체적인 공격 예시는 생략하고, 명시적으로 표시한 편집자의 비실행적 요약으로 대체했습니다. 그 밖의 프로토콜 요구 사항과 방어 규정은 원문에 따라 번역했습니다. 원문의 저작권, 라이선스, 면책 조항 및 저자 표시는 유지했습니다. <a href="https://www.rfc-editor.org/rfc/rfc9931.html">공식 영어 출판본</a>을 기준으로 하며 생략한 위치는 <a href="https://www.rfc-editor.org/rfc/rfc9931.html#section-4.1">공식 4.1절</a>을 참조하세요.</p><section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">초록</a></h2>
+<p id="section-abstract-1">HTTP/1.1에서 클라이언트는 기존 연결에서 새 프로토콜로 전환하도록 요청할 수 있습니다. 이 문서는 해당 요청이 확인되기 전에 클라이언트가 보내는 데이터에 관한 보안 고려 사항을 설명하고, 관련 보안 문제를 방지하기 위해 RFC 9112와 RFC 9298에 새로운 요구 사항을 추가합니다.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">이 메모의 상태</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+            이 문서는 인터넷 표준 트랙 문서입니다.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+            이 문서는 인터넷 엔지니어링 태스크
+            포스(IETF)의 결과물로서 IETF 커뮤니티의 합의를
+            나타냅니다. 공개 검토를 거쳤으며 인터넷
+            엔지니어링 운영 그룹(IESG)의 발행 승인을
+            받았습니다. 인터넷 표준에 관한 자세한 
+            내용은 RFC 7841의 2절을 참조하세요.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+            이 문서의 현재 상태,
+            정오표 및 의견 제출 방법은
+            <span><a href="https://www.rfc-editor.org/info/rfc9931">https://www.rfc-editor.org/info/rfc9931</a></span>에서 확인할 수 있습니다.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">저작권 고지</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">목차</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-overview" class="internal xref">개요</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-requirements-language" class="internal xref">요구 사항 용어</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-background" class="internal xref">배경</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-possible-security-issues" class="internal xref">발생 가능한 보안 문제</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-request-smuggling" class="internal xref">요청 스머글링</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-parser-exploits" class="internal xref">파서 취약점 악용</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-operational-issues" class="internal xref">운영상의 문제</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-impact-on-http-upgrade-with" class="internal xref">기존 업그레이드 토큰을 사용하는 HTTP Upgrade에 미치는 영향</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-tls" class="internal xref">"TLS"</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-websocket-websocket" class="internal xref">"WebSocket"/"websocket"</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-connect-udp" class="internal xref">"connect-udp"</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-connect-ip" class="internal xref">"connect-ip"</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-guidance-for-future-upgrade" class="internal xref">향후 업그레이드 토큰에 대한 지침</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-selection-of-request-method" class="internal xref">요청 메서드 선택</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-requirements-for-http-conne" class="internal xref">HTTP CONNECT의 요구 사항</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">보안 고려 사항</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA 고려 사항</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-references" class="internal xref">참고 문헌</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-normative-references" class="internal xref">규범적 참고 문헌</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-informative-references" class="internal xref">정보성 참고 문헌</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">감사의 말</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">저자 주소</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="overview">
+<section id="section-1">
+      <h2 id="name-overview">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-overview" class="section-name selfRef">개요</a>
+      </h2>
+<p id="section-1-1">이 문서는 같은 연결에서 HTTP/1.1을 다른 프로토콜로 전환할 때 발생하는 보안 고려 사항을 설명하며 다음을 제공합니다:<a href="#section-1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-2.1">
+          <p id="section-1-2.1.1">관련 표준 검토;<a href="#section-1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-2.2">
+          <p id="section-1-2.2.1">전환이 확인되기 전에 클라이언트가 데이터를 보낼 경우 발생할 수 있는 보안 위험 논의;<a href="#section-1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-2.3">
+          <p id="section-1-2.3.1">기존 업그레이드 토큰의 보안 평가; 그리고<a href="#section-1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-2.4">
+          <p id="section-1-2.4.1">구현 및 향후 표준 문서에 대한 지침.<a href="#section-1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-1-3"> <span>[<a href="#RFC9112" class="cite xref">HTTP/1.1</a>]</span> 및 <span>[<a href="#RFC9298" class="cite xref">CONNECT-UDP</a>]</span>에 대한 갱신 사항과 새로운 규범적 요구 사항은 각각 <a href="#connect" class="auto internal xref">8</a> 절과 <a href="#connect-udp" class="auto internal xref">6.3</a>절에 제시됩니다.<a href="#section-1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-requirements-language">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-requirements-language" class="section-name selfRef">요구 사항 용어</a>
+      </h2>
+<p id="section-2-1">
+    이 문서의 키워드 "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>",
+    "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>",
+    "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+    "<span class="bcp14">MAY</span>", "<span class="bcp14">OPTIONAL</span>" 는 여기에 표시된 것처럼 모두
+    대문자로 나타나는 경우에만 BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span>
+        <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> 에 설명된
+    의미로 해석합니다.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="background">
+<section id="section-3">
+      <h2 id="name-background">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-background" class="section-name selfRef">배경</a>
+      </h2>
+<p id="section-3-1">HTTP/1.1 <span>[<a href="#RFC9112" class="cite xref">HTTP/1.1</a>]</span> 및 이후 버전에서는 하나의 연결로 여러 요청을 처리할 수 있습니다. HTTP/2 <span>[<a href="#RFC9113" class="cite xref">HTTP/2</a>]</span> 와 HTTP/3 <span>[<a href="#RFC9114" class="cite xref">HTTP/3</a>]</span>에서는 각 요청을 스트림 ID로 명시적으로 구분하므로 다중화할 수 있습니다. 그러나 HTTP/1.1의 요청은 엄격히 순차적이며, 이전 요청의 종료로 다음 요청을 암묵적으로 구분합니다.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">HTTP/1.1은 클라이언트가 연결의 나머지 부분에 사용할 프로토콜을 변경할 수 있는 유일한 HTTP
+버전이기도 합니다. 이러한 전환을 요청하는 방식은 두 가지입니다. 하나는 Upgrade 헤더 필드입니다(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a href="https://rfc-editor.org/rfc/rfc9110#section-7.8" class="relref">7.8절</a></span>). 요청에 이 필드가 포함되면 클라이언트가 해당 연결에서
+HTTP/1.1 이외의 프로토콜을 사용하려 함을 나타냅니다. 서버가 변경을
+수락하면 101(Switching Protocols, 프로토콜 전환) 상태 코드를 반환합니다(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a href="https://rfc-editor.org/rfc/rfc9110#section-15.2.2" class="relref">15.2.2절</a></span>).<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">다른 방식은 HTTP CONNECT 메서드입니다(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-9.3.6" class="relref">9.3.6절</a> , [<a href="#RFC9110" class="cite xref">HTTP</a>]</span>). 이는 지정된 호스트와 포트에 TCP 연결을 설정하려는 클라이언트의 의도를 나타냅니다. 수락한 경우 서버는 요청이 수락되고 TCP 연결이 설정되었음을 나타내는 2xx(Successful, 성공) 응답을 보냅니다. 이후 이 TCP 연결은 HTTP/1.1 연결이 아닌 TCP 터널로 작동합니다.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">두 방식 모두 서버가 요청을 거부할 수 있도록 합니다. 예를 들어 <span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.8" class="relref">7.8절</a> ([<a href="#RFC9110" class="cite xref">HTTP</a>]</span> )은 다음과 같이 규정합니다:<a href="#section-3-4" class="pilcrow">¶</a></p>
+<blockquote id="section-3-5">
+        <p id="section-3-5.1">서버가 해당 연결에서 현재 프로토콜을 계속 사용하려는 경우, 수신한 Upgrade 헤더 필드를 무시할 수 있습니다( <span class="bcp14">MAY</span> ).<a href="#section-3-5.1" class="pilcrow">¶</a></p>
+</blockquote>
+<p id="section-3-6">또한 <span><a href="https://rfc-editor.org/rfc/rfc9110#section-9.3.6" class="relref">9.3.6절</a> ([<a href="#RFC9110" class="cite xref">HTTP</a>]</span> )은 다음과 같이 규정합니다:<a href="#section-3-6" class="pilcrow">¶</a></p>
+<blockquote id="section-3-7">
+        <p id="section-3-7.1">서버는 대상 포트 번호가 비어 있거나 유효하지 않은 CONNECT 요청을 거부해야 합니다( <span class="bcp14">MUST</span> ). 일반적으로 400(Bad Request, 잘못된 요청) 상태 코드로 응답합니다.<a href="#section-3-7.1" class="pilcrow">¶</a></p>
+</blockquote>
+<p id="section-3-8">업그레이드 거부는 흔히 발생하며 다음과 같은 여러 이유가 있습니다:<a href="#section-3-8" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-9.1">
+          <p id="section-3-9.1.1">서버가 클라이언트가 제시한 업그레이드 토큰(즉, 제안한 새 프로토콜)을 하나도 지원하지 않아 HTTP/1.1을 계속 사용합니다.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-9.2">
+          <p id="section-3-9.2.1">서버가 이 리소스에 대한 해당 요청에서는 제안된 프로토콜로 업그레이드해도 HTTP/1.1보다 개선되지 않는다고 판단하여 HTTP/1.1로 응답합니다.<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-9.3">
+          <p id="section-3-9.3.1">서버가 프로토콜 업그레이드 전에 클라이언트 인증을 요구하므로 401(Authentication Required, 인증 필요) 상태 코드를 반환하고 Authorization 응답 헤더 필드에 인증 질의를 제공합니다(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a href="https://rfc-editor.org/rfc/rfc9110#section-11.6.2" class="relref">11.6.2절</a></span>).<a href="#section-3-9.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-9.4">
+          <p id="section-3-9.4.1">리소스가 이동하여 서버가 3xx(Redirection, 리디렉션) 상태 코드를 반환합니다(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a href="https://rfc-editor.org/rfc/rfc9110#section-3.4" class="relref">3.4절</a></span>).<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-10">마찬가지로 서버는 다음과 같은 경우 HTTP CONNECT 요청을 자주 거부합니다:<a href="#section-3-10" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-11.1">
+          <p id="section-3-11.1.1">서버가 HTTP CONNECT를 지원하지 않습니다.<a href="#section-3-11.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-11.2">
+          <p id="section-3-11.2.1">서버 정책이 지정된 목적지를 허용하지 않습니다.<a href="#section-3-11.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-11.3">
+          <p id="section-3-11.3.1">목적지를 확인할 수 없거나, 도달할 수 없거나, 목적지가 연결을 수락하지 않습니다.<a href="#section-3-11.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-11.4">
+          <p id="section-3-11.4.1">프록시가 진행하기 전에 클라이언트 인증을 요구합니다.<a href="#section-3-11.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-12">요청을 거부한 후 서버는 해당 연결에서 수신한 바이트를 계속 HTTP/1.1에 따라 해석합니다.<a href="#section-3-12" class="pilcrow">¶</a></p>
+<p id="section-3-13"><span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.8" class="relref">7.8절</a> ([<a href="#RFC9110" class="cite xref">HTTP</a>]</span> )은 다음과 같이 규정하기도 합니다:<a href="#section-3-13" class="pilcrow">¶</a></p>
+<blockquote id="section-3-14">
+        <p id="section-3-14.1">클라이언트는 요청 메시지를 완전히 전송하기 전에는 연결에서 업그레이드된 프로토콜을 사용하기 시작할 수 없습니다(즉, 메시지 중간에 전송하는 프로토콜을 바꿀 수 없습니다).<a href="#section-3-14.1" class="pilcrow">¶</a></p>
+</blockquote>
+<p id="section-3-15">즉, 요청 메시지 전송 완료는 클라이언트가 새 프로토콜을 사용하기 시작하기 위한 <strong>필요</strong> 조건입니다. 그러나 서버가 요청을 거부할 수 있으므로 <strong>충분</strong> 조건은 아니라는 점을 분명히 해야 합니다.<a href="#section-3-15" class="pilcrow">¶</a></p>
+<p id="section-3-16">경우에 따라 클라이언트는 서버가 요청한 프로토콜 전환을 수락할 가능성이 높다고 예상할 수 있습니다. 예를 들어 특정 업그레이드 토큰을 사용한 요청이 최근 성공했다면 같은 토큰을 사용하는 후속 요청도 성공할 것으로 기대할 수 있습니다. 예상이 맞으면 서버 응답을 기다리지 않고 새 프로토콜의 첫 바이트를 즉시 “낙관적으로” 보내어 지연을 줄일 수 있는 경우가 많습니다. 이 문서는 이러한 “낙관적” 동작이 보안에 미치는 영향을 살펴봅니다.<a href="#section-3-16" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="possible-security-issues">
+<section id="section-4">
+      <h2 id="name-possible-security-issues">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-possible-security-issues" class="section-name selfRef">발생 가능한 보안 문제</a>
+      </h2>
+<p id="section-4-1">HTTP/1.1 연결에 서로 다른 두 당사자(클라이언트와 서버)만 관여한다면 프로토콜 전환은 새로운 보안 문제를 일으키지 않습니다. 각 당사자는 상대방이 언제든 연결로 임의의 데이터를 보낼 수 있다는 점에 이미 대비해야 하기 때문입니다. 그러나 요청이나 응답에 제3자 데이터가 포함되면 HTTP 연결에는 두 당사자보다 많은 주체가 관여하는 경우가 흔합니다. 예를 들어 브라우저(첫 번째 당사자)가 한 출처(두 번째 당사자)에 보내는 HTTP 요청의 경로, 헤더 또는 내용을 다른 출처의 웹사이트(세 번째 당사자)가 제어할 수 있습니다. WebSocket <span>[<a href="#RFC6455" class="cite xref">WEBSOCKET</a>]</span>같은 전환 후 프로토콜도 제3자가 선택한 데이터를 전송하는 데 자주 사용됩니다.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">제3자 데이터 출처를 신뢰할 수 없다면 제공되는 데이터는 “공격자가 제어하는” 데이터일 수 있습니다. 공격자가 제어하는 데이터와 낙관적 프로토콜 전환의 조합은 두 가지 중대한 보안 문제를 일으킵니다.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<div id="request-smuggling">
+<section id="section-4.1">
+        <h3 id="name-request-smuggling">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-request-smuggling" class="section-name selfRef">요청 스머글링</a>
+        </h3>
+<p id="section-4.1-1">요청 스머글링 공격(<span>[<a href="#RFC9112" class="cite xref">HTTP/1.1</a>], <a href="https://rfc-editor.org/rfc/rfc9112#section-11.2" class="relref">11.2절</a></span>)에서는 공격자가 제어하는 데이터가 서버에서 추가 HTTP 요청으로 해석되도록 선택됩니다. 이를 통해 공격자는 클라이언트가 어떤 요청을 보낼지에 관한 자체 규칙을 우회하면서 클라이언트를 대신하여 요청할 수 있습니다. 클라이언트와 서버가 서로 주고받는 데이터를 다르게 해석하면 요청 스머글링이 발생할 수 있습니다.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">서버가 프로토콜 전환 요청을 수락하면 이후 바이트를 새 프로토콜에 따라 해석하고, 거부하면 HTTP/1.1로 해석합니다. 그러나 클라이언트는 서버 응답의 상태 코드를 받기 전까지 어떤 해석이 적용될지 알 수 없습니다. 새 프로토콜을 낙관적으로 사용하면 서버가 새 프로토콜에 포함된 공격자 제어 데이터를 클라이언트가 보낸 추가 HTTP 요청으로 해석할 위험이 생깁니다.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">【편집자 요약이며 RFC 원문의 번역이 아닙니다】이 부분의 구체적인 공격 예시는 생략합니다. 신뢰할 수 없는 데이터가 연결 수준 인증의 신뢰 경계를 넘을 수 있다는 위험을 설명하는 부분입니다. 원문의 인증(<span>[<a href="#RFC8446" class="cite xref">TLS</a>], <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">4.4.2절</a></span>) 및 요청 의미론(<span>[<a href="#RFC9110" class="cite xref">HTTP</a>], <a href="https://rfc-editor.org/rfc/rfc9110#section-9.3.3" class="relref">9.3.3절</a></span>) 참조는 명세의 배경을 이해하도록 유지하지만 메시지, 페이로드 또는 실행 순서는 제공하지 않습니다.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<span id="name-example-request-smuggling-a"></span><figure id="figure-1">
+          <div class="alignLeft art-text artwork" id="section-4.1-4.1">
+<pre>
+【편집자 요약: 원래 그림의 메시지와 실행 순서는 생략】
+프로토콜 해석의 불일치로 신뢰할 수 없는 데이터가 인증의 신뢰 경계를 넘을 위험이 있습니다.
+방어 요구 사항은 8절을, 공식 원본 링크는 페이지 앞부분의 안내를 참조하세요.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">그림 1</a>:
+<a href="#name-example-request-smuggling-a" class="selfRef">HTTP CONNECT 요청 스머글링 예시(구체적인 메시지 생략)</a>
+          </figcaption></figure>
+</section>
+</div>
+<div id="parser-exploits">
+<section id="section-4.2">
+        <h3 id="name-parser-exploits">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-parser-exploits" class="section-name selfRef">파서 취약점 악용</a>
+        </h3>
+<p id="section-4.2-1">관련된 또 다른 공격 유형은 프로토콜 해석의 불일치를 이용하여 서버의 요청 파싱 로직에 있는 취약점을 악용합니다. 이는 서버가 HTTP 클라이언트는 신뢰하지만 전환 후 데이터 출처는 신뢰하지 않는 경우에 해당합니다. HTTP 요청 데이터의 일부 또는 전부를 공격자가 제어하지 않는다는 가정하에 서버 소프트웨어가 개발되었다면, 낙관적 전송이 이 가정을 깨뜨려 서버의 HTTP 요청 파서 취약점을 노출할 수 있습니다.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="operational-issues">
+<section id="section-5">
+      <h2 id="name-operational-issues">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-operational-issues" class="section-name selfRef">운영상의 문제</a>
+      </h2>
+<p id="section-5-1">서버가 전환 요청을 거부하더라도 연결은 HTTP/1.1에 계속 사용할 수 있습니다. 전환 거부에 대응하여 연결을 닫아야 한다는 일반적 요구 사항은 없으며, 해당 서버로 추가 HTTP 요청을 보낼 가능성이 높다면 연결 유지가 성능상 유리합니다. 따라서 전환이 거부되었다는 이유로 연결을 닫는 것은 일반적으로 적절하지 않습니다.<a href="#section-5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="existing">
+<section id="section-6">
+      <h2 id="name-impact-on-http-upgrade-with">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-impact-on-http-upgrade-with" class="section-name selfRef">기존 업그레이드 토큰을 사용하는 HTTP Upgrade에 미치는 영향</a>
+      </h2>
+<p id="section-6-1">이 절에서는 작성 시점에 사용 중인 것으로 여겨지는 일부 등록된 업그레이드 토큰 <span>[<a href="#IANA-UPGR" class="cite xref">IANA-UPGR</a>]</span> 에 이 문서의 고려 사항이 미치는 영향을 설명합니다.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div id="tls">
+<section id="section-6.1">
+        <h3 id="name-tls">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-tls" class="section-name selfRef">"TLS"</a>
+        </h3>
+<p id="section-6.1-1">“TLS” 계열 업그레이드 토큰은 <span>[<a href="#RFC2817" class="cite xref">RFC2817</a>]</span>에 정의되어 있으며 서버가 업그레이드를 거부할 가능성을 올바르게 강조합니다. 클라이언트가 이를 무시하고 TLS 데이터를 낙관적으로 보내더라도 그 결과는 유효한 HTTP/1.1이 될 수 없습니다. TLS 연결의 첫 옥텟은 22(ContentType.handshake)여야 하지만 HTTP/1.1 메서드에서는 이 문자를 허용하지 않기 때문입니다( <span>[<a href="#RFC8446" class="cite xref">TLS</a>]의 <a href="https://rfc-editor.org/rfc/rfc8446#section-5.1" class="relref">5.1절</a></span> 및 <span>[<a href="#RFC9112" class="cite xref">HTTP/1.1</a>]의 <a href="https://rfc-editor.org/rfc/rfc9112#section-3" class="relref">3절</a></span>참조). 준수하는 HTTP/1.1 서버는 이를 파싱 오류로 처리하고 추가 요청을 처리하지 않은 채 연결을 닫습니다.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="websocketwebsocket">
+<section id="section-6.2">
+        <h3 id="name-websocket-websocket">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-websocket-websocket" class="section-name selfRef">"WebSocket"/"websocket"</a>
+        </h3>
+<p id="section-6.2-1"><span><a href="https://rfc-editor.org/rfc/rfc6455#section-4.1" class="relref">4.1절</a> ([<a href="#RFC6455" class="cite xref">WEBSOCKET</a>]</span> )은 다음과 같이 규정합니다:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<blockquote id="section-6.2-2">
+          <p id="section-6.2-2.1">클라이언트는 시작 핸드셰이크를 보낸 후 추가 데이터를 보내기 전에 서버의 응답을 기다려야 합니다( <span class="bcp14">MUST</span> ).<a href="#section-6.2-2.1" class="pilcrow">¶</a></p>
+</blockquote>
+<p id="section-6.2-3">따라서 WebSocket 프로토콜은 HTTP Upgrade의 낙관적 사용을 이미 금지합니다. 또한 클라이언트에서 서버로 보내는 프레임에 높은 엔트로피의 마스킹을 적용하도록 요구합니다(<span><a href="https://rfc-editor.org/rfc/rfc6455#section-5.1" class="relref">5.1절</a> , [<a href="#RFC6455" class="cite xref">WEBSOCKET</a>]</span>).<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="connect-udp">
+<section id="section-6.3">
+        <h3 id="name-connect-udp">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-connect-udp" class="section-name selfRef">"connect-udp"</a>
+        </h3>
+<p id="section-6.3-1"><span><a href="https://rfc-editor.org/rfc/rfc9298#section-5" class="relref">5절</a> ([<a href="#RFC9298" class="cite xref">CONNECT-UDP</a>]</span> )은 다음과 같이 규정합니다:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<blockquote id="section-6.3-2">
+          <p id="section-6.3-2.1">클라이언트는 UDP 프록시 요청에 대한 응답을 받기 전에 HTTP 데이터그램으로 UDP 패킷을 낙관적으로 보내기 시작할 수 있습니다( <span class="bcp14">MAY</span> ).<a href="#section-6.3-2.1" class="pilcrow">¶</a></p>
+</blockquote>
+<p id="section-6.3-3">그러나 HTTP/1.1에서 이 “프록시 요청”은 HTTP Upgrade 요청입니다. 공격자가 제어하는 UDP 목적지 주소가 유효하지 않은 경우 등 특정 상황에서는 업그레이드가 거부될 가능성이 높습니다. 또한 “connect-udp” 프로토콜 스트림에는 클라이언트 기기의 다른 애플리케이션에서 온 UDP 패킷과 같은 신뢰할 수 없는 데이터가 포함될 수 있습니다. 따라서 요청 스머글링 공격이 가능해집니다. 이를 방지하기 위해 이 문서는 위 문구를 다음과 같이 대체하여 HTTP/1.1에서는 어떠한 낙관적 전송도 허용하지 않습니다:<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+<blockquote id="section-6.3-4">
+          <p id="section-6.3-4.1">클라이언트는 사용 중인 HTTP 버전이 HTTP/2 이상인 경우에만 UDP 프록시 요청의 응답을 받기 전에 HTTP 데이터그램으로 UDP 패킷을 낙관적으로 보내기 시작할 수 있습니다( <span class="bcp14">MAY</span> ). 요청 스머글링 위험 때문에 HTTP/1.x에서는 UDP 패킷을 낙관적으로 보내서는 안 됩니다( <span class="bcp14">MUST NOT</span> ).<a href="#section-6.3-4.1" class="pilcrow">¶</a></p>
+</blockquote>
+</section>
+</div>
+<div id="connect-ip">
+<section id="section-6.4">
+        <h3 id="name-connect-ip">
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-connect-ip" class="section-name selfRef">"connect-ip"</a>
+        </h3>
+<p id="section-6.4-1">“connect-ip” 업그레이드 토큰은 <span>[<a href="#RFC9484" class="cite xref">CONNECT-IP</a>]</span>에 정의되어 있습니다.  <span><a href="https://rfc-editor.org/rfc/rfc9484#section-11" class="relref">11절</a> ([<a href="#RFC9484" class="cite xref">CONNECT-IP</a>]</span> )은 HTTP/1.1에서 클라이언트가 패킷을 낙관적으로 보내는 것을 금지하여 이 문제를 방지합니다.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="guidance-for-future-upgrade-tokens">
+<section id="section-7">
+      <h2 id="name-guidance-for-future-upgrade">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-guidance-for-future-upgrade" class="section-name selfRef">향후 업그레이드 토큰에 대한 지침</a>
+      </h2>
+<p id="section-7-1">이 문서에서 논의하는 보안 문제를 줄이거나 없애는 좋은 설계 사례가 이미 여러 가지 있으며 향후 명세에도 적용할 수 있습니다:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7-2.1">
+          <p id="section-7-2.1.1">HTTP Upgrade의 낙관적 사용을 금지합니다(<span><a href="https://rfc-editor.org/rfc/rfc6455#section-4.1" class="relref">4.1절</a> , [<a href="#RFC6455" class="cite xref">WEBSOCKET</a>]</span> 및 <span><a href="https://rfc-editor.org/rfc/rfc9484#section-11" class="relref">11절</a> , [<a href="#RFC9484" class="cite xref">CONNECT-IP</a>]</span>).<a href="#section-7-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-7-2.2">
+          <p id="section-7-2.2.1">HTTP/1.1 처리를 의도적으로 종료하는 고정 프리앰블을 삽입합니다(<span><a href="https://rfc-editor.org/rfc/rfc9113#section-3.4" class="relref">3.4절</a> , [<a href="#RFC9113" class="cite xref">HTTP/2</a>]</span>).<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-7-2.3">
+          <p id="section-7-2.3.1">클라이언트에서 서버로 보내는 데이터에 높은 엔트로피의 마스킹을 적용합니다(<span><a href="https://rfc-editor.org/rfc/rfc6455#section-5.1" class="relref">5.1절</a> , [<a href="#RFC6455" class="cite xref">WEBSOCKET</a>]</span>).<a href="#section-7-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-7-3">향후 업그레이드 토큰 명세는 여기서 논의한 보안 문제를 고려하고 구현에서 이를 방지하는 방법을 명확히 안내해야 합니다.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<div id="selection-of-request-methods">
+<section id="section-7.1">
+        <h3 id="name-selection-of-request-method">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-selection-of-request-method" class="section-name selfRef">요청 메서드 선택</a>
+        </h3>
+<p id="section-7.1-1">“TLS” 같은 일부 업그레이드 토큰은 일반적인 모든 HTTP 메서드와 함께 사용할 수 있도록 정의되어 있습니다. 업그레이드된 프로토콜은 HTTP 의미론을 계속 제공하며 해당 HTTP 요청에 대한 응답을 전달합니다.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2"> <a href="#existing" class="auto internal xref">6절</a> 에서 언급한 다른 업그레이드 토큰은 HTTP 의미론을 유지하지 않으므로 메서드가 중요하지 않습니다. 이 토큰들은 모두 내용이 없는 GET 요청에 대해서만 규정되어 있습니다.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">향후 업그레이드 토큰 명세에서는 HTTP 메서드가 그 밖의 측면에서 중요하지 않고 요청에 메시지 내용을 실을 필요도 없다면, 내용이 없는 GET 요청으로 사용을 제한해야 합니다. 이는 다른 업그레이드 토큰과의 일관성을 높이고 서버 구현을 단순화합니다.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="connect">
+<section id="section-8">
+      <h2 id="name-requirements-for-http-conne">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-requirements-for-http-conne" class="section-name selfRef">HTTP CONNECT의 요구 사항</a>
+      </h2>
+<p id="section-8-1">이 문서는 이 절의 나머지 내용을 포함하도록 <span>[<a href="#RFC9112" class="cite xref">HTTP/1.1</a>]</span> 을 갱신합니다. 이 절의 요구 사항은 HTTP/1.1에만 적용됩니다.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">신뢰할 수 없는 TCP 클라이언트를 대신하여 CONNECT 요청을 보내는 프록시 클라이언트는 다음 중 하나 또는 둘 다를 수행해야 합니다( <span class="bcp14">MUST</span> ):<a href="#section-8-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-8-3">
+ <li id="section-8-3.1">
+          <p id="section-8-3.1.1">2xx(Successful, 성공) 응답을 기다린 후에만 TCP 페이로드 데이터를 전달합니다.<a href="#section-8-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-8-3.2">
+          <p id="section-8-3.2.1">“Connection: close” 요청 헤더를 보냅니다.<a href="#section-8-3.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-8-4">이 두 가지 동작 중 적어도 하나를 구현하지 않는 프록시 클라이언트는 간단한 요청 스머글링 공격에 취약합니다(<span>[<a href="#RFC9112" class="cite xref">HTTP/1.1</a>], <a href="https://rfc-editor.org/rfc/rfc9112#section-11.2" class="relref">11.2절</a></span>).<a href="#section-8-4" class="pilcrow">¶</a></p>
+<p id="section-8-5">작성 시점에 일부 프록시 클라이언트는 위와 같은 취약점이 있는 것으로 여겨집니다. 완화 조치로서 프록시 서버는 CONNECT 요청을 거부할 때 해당 연결에서 추가 요청을 처리하지 않고 기반 연결을 닫아야 합니다( <span class="bcp14">MUST</span> ). 요청에 “close” 연결 옵션이 포함되어 있는지와 관계없이 이 요구 사항이 적용됩니다.<a href="#section-8-5" class="pilcrow">¶</a></p>
+<p id="section-8-6">이 완화 조치는 올바르게 구현된 클라이언트에서도 연결 설정을 느리게 만드는 경우가 많으며, 특히 407(Proxy Authentication Required, 프록시 인증 필요) 응답을 반환할 때 그렇습니다. 이 공격에 취약하지 않은 HTTP/2 또는 HTTP/3을 사용하면 이러한 성능 저하를 피할 수 있습니다.<a href="#section-8-6" class="pilcrow">¶</a></p>
+<p id="section-8-7">성능 최적화를 위해, 클라이언트가 신뢰할 수 없는 TCP 페이로드를 전달하기 전에 2xx(Successful, 성공) 응답을 기다리는 것으로 알려져 있다면(즉, 위 항목 1을 준수한다면), 프록시 서버는 이 완화 조치를 비활성화할 수 있습니다( <span class="bcp14">MAY</span> ). 요청의 User-Agent 헤더 필드와 사용자 에이전트 공급업체의 준수 관련 문서를 사용하여 준수하는 클라이언트를 식별할 수 있습니다.<a href="#section-8-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-9">
+      <h2 id="name-security-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">보안 고려 사항</a>
+      </h2>
+<p id="section-9-1">이 문서는 HTTP/1.1에서 프로토콜 전환을 낙관적으로 사용하는 것과 관련된 보안 고려 사항을 설명합니다.<a href="#section-9-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-10">
+      <h2 id="name-iana-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA 고려 사항</a>
+      </h2>
+<p id="section-10-1">이 문서에는 IANA가 수행할 작업이 없습니다.<a href="#section-10-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-11">
+      <h2 id="name-references">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references" class="section-name selfRef">참고 문헌</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-11.1">
+        <h3 id="name-normative-references">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">규범적 참고 문헌</a>
+        </h3>
+<dl class="references">
+<dt id="RFC9298">[CONNECT-UDP]</dt>
+        <dd>
+<span class="refAuthor">Schinazi, D.</span>, <span class="refTitle">"Proxying UDP in HTTP"</span>, <span class="seriesInfo">RFC 9298</span>, <span class="seriesInfo">DOI 10.17487/RFC9298</span>, <time datetime="2022-08" class="refDate">August 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9298">https://www.rfc-editor.org/info/rfc9298</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9110">[HTTP]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9110">https://www.rfc-editor.org/info/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9112">[HTTP/1.1]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP/1.1"</span>, <span class="seriesInfo">STD 99</span>, <span class="seriesInfo">RFC 9112</span>, <span class="seriesInfo">DOI 10.17487/RFC9112</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9112">https://www.rfc-editor.org/info/rfc9112</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-11.2">
+        <h3 id="name-informative-references">
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">정보성 참고 문헌</a>
+        </h3>
+<dl class="references">
+<dt id="RFC9484">[CONNECT-IP]</dt>
+        <dd>
+<span class="refAuthor">Pauly, T., Ed.</span>, <span class="refAuthor">Schinazi, D.</span>, <span class="refAuthor">Chernyakhovsky, A.</span>, <span class="refAuthor">Kühlewind, M.</span>, and <span class="refAuthor">M. Westerlund</span>, <span class="refTitle">"Proxying IP in HTTP"</span>, <span class="seriesInfo">RFC 9484</span>, <span class="seriesInfo">DOI 10.17487/RFC9484</span>, <time datetime="2023-10" class="refDate">October 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9484">https://www.rfc-editor.org/info/rfc9484</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9113">[HTTP/2]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">C. Benfield, Ed.</span>, <span class="refTitle">"HTTP/2"</span>, <span class="seriesInfo">RFC 9113</span>, <span class="seriesInfo">DOI 10.17487/RFC9113</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9113">https://www.rfc-editor.org/info/rfc9113</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9114">[HTTP/3]</dt>
+        <dd>
+<span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"HTTP/3"</span>, <span class="seriesInfo">RFC 9114</span>, <span class="seriesInfo">DOI 10.17487/RFC9114</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9114">https://www.rfc-editor.org/info/rfc9114</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA-UPGR">[IANA-UPGR]</dt>
+        <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"Hypertext Transfer Protocol (HTTP) Upgrade Token Registry"</span>, <span>&lt;<a href="https://www.iana.org/assignments/http-upgrade-tokens/">https://www.iana.org/assignments/http-upgrade-tokens/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2817">[RFC2817]</dt>
+        <dd>
+<span class="refAuthor">Khare, R.</span> and <span class="refAuthor">S. Lawrence</span>, <span class="refTitle">"Upgrading to TLS Within HTTP/1.1"</span>, <span class="seriesInfo">RFC 2817</span>, <span class="seriesInfo">DOI 10.17487/RFC2817</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2817">https://www.rfc-editor.org/info/rfc2817</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8446">[TLS]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6455">[WEBSOCKET]</dt>
+      <dd>
+<span class="refAuthor">Fette, I.</span> and <span class="refAuthor">A. Melnikov</span>, <span class="refTitle">"The WebSocket Protocol"</span>, <span class="seriesInfo">RFC 6455</span>, <span class="seriesInfo">DOI 10.17487/RFC6455</span>, <time datetime="2011-12" class="refDate">December 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6455">https://www.rfc-editor.org/info/rfc6455</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-A">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">감사의 말</a>
+      </h2>
+<p id="appendix-A-1">이 문서는 다음 분들의 귀중한 검토와 제안으로 개선되었습니다:<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-A-2.1">
+          <p id="appendix-A-2.1.1"><span class="contact-name">Mike Bishop</span><a href="#appendix-A-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.2">
+          <p id="appendix-A-2.2.1"><span class="contact-name">Mohamed Boucadair</span><a href="#appendix-A-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.3">
+          <p id="appendix-A-2.3.1"><span class="contact-name">Gorry Fairhurst</span><a href="#appendix-A-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.4">
+          <p id="appendix-A-2.4.1"><span class="contact-name">Mark Nottingham</span><a href="#appendix-A-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.5">
+          <p id="appendix-A-2.5.1"><span class="contact-name">Kazuho Oku</span><a href="#appendix-A-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.6">
+          <p id="appendix-A-2.6.1"><span class="contact-name">Lucas Pardue</span><a href="#appendix-A-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.7">
+          <p id="appendix-A-2.7.1"><span class="contact-name">David Schinazi</span><a href="#appendix-A-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.8">
+          <p id="appendix-A-2.8.1"><span class="contact-name">Glenn Strauss</span><a href="#appendix-A-2.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.9">
+          <p id="appendix-A-2.9.1"><span class="contact-name">Michael Sweet</span><a href="#appendix-A-2.9.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.10">
+          <p id="appendix-A-2.10.1"><span class="contact-name">Willy Tarreau</span><a href="#appendix-A-2.10.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.11">
+          <p id="appendix-A-2.11.1"><span class="contact-name">Martin Thomson</span><a href="#appendix-A-2.11.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">저자 주소</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Benjamin M. Schwartz</span></div>
+<div dir="auto" class="left"><span class="org">Meta Platforms, Inc.</span></div>
+<div class="email">
+<span>이메일:</span>
+<a href="mailto:ietf@bemasc.net" class="email">ietf@bemasc.net</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+<script src="https://htmlspecs.com/dropdown.js"></script></body>
+</html>
