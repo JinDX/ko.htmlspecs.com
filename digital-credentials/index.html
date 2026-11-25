@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <!-- <meta name="generator" content="ReSpec 37.6.0"> -->
+    <!-- <meta name="generator" content="ReSpec 37.6.1"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <style>
 span.example-title{text-transform:none}
@@ -179,7 +179,7 @@ ul.index code{color:inherit}
 #index-defined-here .print-only{display:initial}
 }
 </style>
-    <!-- <meta name="revision" content="10de1719938966abb53a6aa13213b0bbec5ce890"> -->
+    <!-- <meta name="revision" content="7312dbe7e8b57d7428efd9a0849773b8f56c30bd"> -->
     <meta name="description" content="이 문서는 사용자 에이전트가 운전면허증, 정부 발급 신분증 또는
         기타 유형의 디지털 자격 증명과 같은 디지털 자격 증명의
         제시 및 발급을 중개할 수 있도록 하는 API를 명세한다. 이 API는
@@ -323,23 +323,30 @@ var[data-type]:hover::after,var[data-type]:hover::before{opacity:1}
       "date": "2025-02-25",
       "publisher": "W3C",
       "id": "identity-web-impact"
+    },
+    "web-dev-strict-csp-article": {
+      "title": "Mitigate cross-site scripting (XSS) with a strict Content Security Policy (CSP)",
+      "href": "https://web.dev/articles/strict-csp",
+      "date": "2024-09-13",
+      "publisher": "web.dev",
+      "id": "web-dev-strict-csp-article"
     }
   },
   "xref": {
     "profile": "web-platform"
   },
-  "gitRevision": "10de1719938966abb53a6aa13213b0bbec5ce890",
-  "publishDate": "2026-11-23",
+  "gitRevision": "7312dbe7e8b57d7428efd9a0849773b8f56c30bd",
+  "publishDate": "2026-11-25",
   "previousMaturity": "WD",
-  "previousPublishDate": "2026-11-19",
-  "publishISODate": "2026-11-23T00:00:00.000Z",
-  "generatedSubtitle": "W3C Working Draft 23 November 2026"
+  "previousPublishDate": "2026-11-23",
+  "publishISODate": "2026-11-25T00:00:00.000Z",
+  "generatedSubtitle": "W3C Working Draft 25 November 2026"
 }</script>
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-WD">
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/dark.css" disabled="">
 </head>
 
-<body data-cite="WEBIDL credential-management permissions-policy vc-data-model HTML INFRA URL WEBIDL DOM FETCH"
+<body data-cite="WEBIDL credential-management permissions-policy secure-contexts vc-data-model HTML INFRA URL WEBIDL DOM FETCH"
     class="h-entry">
     <div class="head">
         <p class="logos"><a class="logo" href="https://www.w3.org/"><img alt="W3C" height="48"
@@ -347,14 +354,14 @@ var[data-type]:hover::after,var[data-type]:hover::before{opacity:1}
             </a></p>
         <h1 id="title" class="title">디지털 자격 증명</h1>
         <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C 작업 초안</a> <time class="dt-published"
-                datetime="2026-11-23">2026년 11월 23일</time></p>
+                datetime="2026-11-25">2026년 11월 25일</time></p>
         <details open="">
             <summary>이 문서에 대한 자세한 정보</summary>
             <dl>
                 <dt>이 버전:</dt>
                 <dd>
                     <a class="u-url"
-                        href="https://www.w3.org/TR/2026/WD-digital-credentials-20261123/">https://www.w3.org/TR/2026/WD-digital-credentials-20261123/</a>
+                        href="https://www.w3.org/TR/2026/WD-digital-credentials-20261125/">https://www.w3.org/TR/2026/WD-digital-credentials-20261125/</a>
                 </dd>
                 <dt>최신 공개 버전:</dt>
                 <dd>
@@ -775,12 +782,15 @@ var[data-type]:hover::after,var[data-type]:hover::before{opacity:1}
                     <li class="tocline"><a class="tocxref" href="#content-process-compromise"><bdi class="secno">10.3 </bdi>
                             침해된 콘텐츠 프로세스에서 발생하는 위조 요청
                         </a></li>
-                    <li class="tocline"><a class="tocxref" href="#signing-presentation-requests"><bdi class="secno">10.4
+                    <li class="tocline"><a class="tocxref" href="#verifier-hardening-against-script-injection"><bdi class="secno">10.4 </bdi>
+                            스크립트 삽입에 대비한 검증자 보안 강화
+                        </a></li>
+                    <li class="tocline"><a class="tocxref" href="#signing-presentation-requests"><bdi class="secno">10.5
                             </bdi>
                             프레젠테이션 요청 서명
                         </a></li>
                     <li class="tocline"><a class="tocxref" href="#cross-device-security-and-proximity"><bdi
-                                class="secno">10.5 </bdi>
+                                class="secno">10.6 </bdi>
                             장치 간 보안 및 근접성
                         </a></li>
                 </ol>
@@ -4209,6 +4219,18 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     프로토콜이나 자격 증명 형식에서 발생하는 위협은 <a data-link-type="dfn|abstract-op" href="#dfn-protocol-and-format-vulnerabilities" class="internalDFN" id="ref-for-nov19-ko-49">프로토콜 및 형식 취약점</a>으로 별도로 설명한다.
                     </dd>
                     <dt>
+          <dfn data-noexport="" id="dfn-verifier-origin-script-compromise" tabindex="0" aria-haspopup="dialog" data-dfn-type="dfn">검증자 출처의 스크립트 침해</dfn>
+        </dt>
+                <dd>
+                    교차 사이트 스크립팅이나 침해된 의존성을 이용하는 등의 방식으로 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-7">검증자</a> 출처에서 스크립트를 실행할 수 있는 공격자는 <a data-link-type="dfn|abstract-op" href="#dfn-credential-response" class="internalDFN" id="ref-for-dfn-credential-response-3">자격 증명 응답</a>(<a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-8">검증자</a>가 복호화하여 페이지에 공개한 응답)을 읽거나 그 출처에서 자체 자격 증명 요청을 시작하려고 합니다.
+                </dd>
+                <dt>
+          <dfn data-noexport="" id="dfn-browser-extension-access" tabindex="0" aria-haspopup="dialog" data-dfn-type="dfn">브라우저 확장 프로그램 접근</dfn>
+        </dt>
+                <dd>
+                    사용자가 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-9">검증자</a> 페이지에서 실행하도록 허용한 브라우저 확장 프로그램은 그 페이지를 거치는 내용을 읽거나 변경합니다. 여기에는 발신 자격 증명 요청과 <a data-link-type="dfn|abstract-op" href="#dfn-credential-response" class="internalDFN" id="ref-for-dfn-credential-response-4">자격 증명 응답</a>(<a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-10">검증자</a>가 페이지에 공개한 응답)이 포함됩니다.
+                </dd>
+                <dt>
                         <dfn data-noexport="" id="dfn-api-flooding" tabindex="0" aria-haspopup="dialog"
                             data-dfn-type="dfn">API 플러딩</dfn>
                     </dt>
@@ -4356,11 +4378,11 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 Digital Credential API의 WebIDL <a data-link-type="dfn"
                     href="https://webidl.spec.whatwg.org/#dfn-interface" id="ref-for-index-term-interfaces-1">인터페이스</a>는
                 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context"
-                    id="ref-for-index-term-secure-contexts-1">보안 컨텍스트</a>에서만 노출되어, <a data-link-type="dfn|abstract-op"
+                    id="ref-for-index-term-secure-context-2">보안 컨텍스트</a>에서만 노출되어, <a data-link-type="dfn|abstract-op"
                     href="#dfn-network-tampering" class="internalDFN" id="ref-for-dfn-network-tampering-1">네트워크 변조</a>가
                 <a data-link-type="dfn" data-lt="secure contexts"
                     href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context"
-                    id="ref-for-index-term-secure-contexts-2">안전하지 않은 컨텍스트</a>를 통해 발생할 위험을 줄입니다(예: 악성 스크립트가
+                    id="ref-for-index-term-secure-context-3">안전하지 않은 컨텍스트</a>를 통해 발생할 위험을 줄입니다(예: 악성 스크립트가
                 네트워크를 통해 삽입되는 경우). 자세한 내용은
                 <a data-matched-text="[[[secure-contexts#security-considerations]]]"
                     href="https://www.w3.org/TR/secure-contexts/#security-considerations" class="sec-ref">§&nbsp;<bdi
@@ -4522,11 +4544,32 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             id="ref-for-dfn-digital-credential-chooser-14">디지털 자격 증명 선택기</a>에 도달하기 전에 이미 검사되고 소비되므로, 그 상태를 두 번째로 검사하는 것을 별개의 단계로 표현할 수 없기 때문이다.</p>
       </div>
     </section>
-<section id="signing-presentation-requests">
+<section id="verifier-hardening-against-script-injection"><div class="header-wrapper"><h3 id="x10-4-verifier-hardening-against-script-injection"><bdi class="secno">10.4 </bdi> 스크립트 삽입에 대비한 검증자 보안 강화</h3><a class="self-link" href="#verifier-hardening-against-script-injection" aria-label="섹션 10.4의 영구 링크"></a></div>
+      <p>
+            <a href="#DC-API" data-matched-text="[[[#DC-API|Digital Credentials API]]]">디지털 자격 증명 API</a>는 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context" id="ref-for-index-term-secure-context-4">보안 컨텍스트</a>에서만 노출됩니다. 이는 페이지가 <a data-link-type="dfn" href="https://www.w3.org/TR/secure-contexts/#potentially-trustworthy-origin" id="ref-for-index-term-potentially-trustworthy-origin-1">잠재적으로 신뢰할 수 있는 출처</a>(예: HTTPS)를 통해 사용자에게 도달했다는 뜻이지, 그 페이지에서 실행되는 모든 스크립트를 신뢰할 수 있다는 뜻은 아닙니다. 여기서 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-11">검증자</a>는 사용자가 방문 중이고 자격 증명을 요청하는 사이트입니다. 공격자는 사용자 브라우저의 해당 사이트 페이지 안에서 실행되는 스크립트입니다. 교차 사이트 스크립팅 결함을 통해 삽입되거나, 침해된 서드 파티 라이브러리와 함께 불러와지거나, 변조된 스크립트로 제공될 수 있습니다. <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-12">검증자</a> 서버가 완전히 안전하더라도 문제는 페이지에 있습니다. 위협 모델은 이를 <a data-link-type="dfn|abstract-op" href="#dfn-verifier-origin-script-compromise" class="internalDFN" id="ref-for-dfn-verifier-origin-script-compromise-1">검증자 출처의 스크립트 침해</a>라고 부릅니다.
+        </p>
+      <p>
+            그곳에서 실행되는 스크립트는 사이트 자체 코드와 동일한 접근 권한을 가집니다. <a data-link-type="dfn|abstract-op" href="#dfn-credential-response" class="internalDFN" id="ref-for-dfn-credential-response-5">자격 증명 응답</a>은 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-13">검증자</a>가 복호화하여 페이지에 돌려준 뒤 해당 스크립트가 읽을 수 있습니다. 스크립트는 API를 직접 호출할 수도 있으며, 이 경우 요청은 사이트 자체 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-index-term-origin-11">출처</a>에서 오므로 사이트가 보낸 요청처럼 보입니다.
+        </p>
+      <p>
+            응답을 반드시 암호화하면(<a href="#encrypting-credential-responses" data-matched-text="[[[#encrypting-credential-responses]]]" class="sec-ref"><bdi class="secno">11.3.1.7 </bdi> 자격 증명 응답 암호화</a> 참조) 이 공격으로부터 응답을 보호할 수 있지만, 응답이 암호화된 상태로 유지되는 동안에만 그렇습니다. 요청을 변경하지 않는 삽입 스크립트는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-14">검증자</a>가 페이지에서 응답을 복호화하거나, 서버에서 복호화한 평문을 페이지에 다시 보낼 때만 이를 읽습니다. 요청을 변경하거나 자체 요청을 시작하는 스크립트는 대신 자신의 응답 암호화 키를 제공할 수 있습니다. 요청에 서명을 요구하는 <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager" id="ref-for-index-term-credential-manager-27">자격 증명 관리자</a>만 이를 탐지할 수 있습니다. 이때 서명 키는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-15">검증자</a>의 것으로 인식하는 키여야 합니다(<a href="#signing-presentation-requests" data-matched-text="[[[#signing-presentation-requests]]]" class="sec-ref"><bdi class="secno">10.5 </bdi> 프레젠테이션 요청 서명</a> 참조). 따라서 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-16">검증자</a>는 <a data-link-type="dfn|abstract-op" href="#dfn-credential-response" class="internalDFN" id="ref-for-dfn-credential-response-6">자격 증명 응답</a>을 서버에서 복호화하고 복호화 키를 페이지에 두지 않는 것이 권장됩니다. 페이지에 평문이 필요한 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-17">검증자</a>는 공격자에게도 같은 접근 권한을 주게 되므로, <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-18">검증자</a>는 페이지가 실제로 사용하는 데이터만 공개하는 것이 권장됩니다.
+        </p>
+      <p>
+            모든 요청을 <a data-link-type="dfn|abstract-op" href="#dfn-digital-credential-chooser" class="internalDFN" id="ref-for-dfn-digital-credential-chooser-18">디지털 자격 증명 선택기</a> 또는 <a data-link-type="dfn|abstract-op" href="#dfn-credential-manager-chooser" class="internalDFN" id="ref-for-dfn-credential-manager-chooser-9">자격 증명 관리자 선택기</a>를 통해 중개하면 API가 드러나지 않게 악용되는 것을 줄일 수 있습니다. 어느 선택기도 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-19">검증자</a>가 페이지에 이미 공개한 데이터를 삽입 스크립트가 읽는 것은 막지 못합니다.
+        </p>
+      <p>
+            <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-20">검증자</a>가 심층 방어의 일환으로 스크립트 삽입에 대비해 페이지의 보안을 강화하는 것이 권장됩니다. 강력한 <cite><a class="bibref" data-link-type="biblio" href="#bib-csp3" title="Content Security Policy Level 3">콘텐츠 보안 정책</a></cite>, 예를 들어 허용 출처 목록 대신 논스나 해시를 사용하는 엄격한 정책([<cite><a class="bibref" data-link-type="biblio" href="#bib-web-dev-strict-csp-article" title="Mitigate cross-site scripting (XSS) with a strict Content Security Policy (CSP)">web-dev-strict-csp-article</a></cite>] 참조)은 삽입되었거나 승인되지 않은 일부 스크립트가 페이지에서 실행되지 않도록 할 수 있습니다. 단, 이처럼 엄격한 정책은 작성하기도, 사이트가 성장하면서 계속 유지하기도 어려우므로 실제로는 위험을 완전히 없애지 않고 줄이는 역할을 합니다. <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-21">검증자</a>는 DOM 기반 삽입의 위험을 줄이는 <cite><a data-matched-text="[[[trusted-types]]]" href="https://www.w3.org/TR/trusted-types/">Trusted Types</a></cite>와, 변조되거나 침해된 서드 파티 스크립트를 방어하는 <cite><a data-matched-text="[[[SRI]]]" href="https://www.w3.org/TR/sri-2/">하위 리소스 무결성</a></cite>도 사용하는 것이 권장됩니다. <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-22">검증자</a>는 <code>Integrity-Policy:
+        blocked-destinations=(script)</code> 헤더를 보낼 수도 있습니다(<a data-matched-text="[[[SRI#integrity-policy-section]]]" href="https://www.w3.org/TR/sri-2/#integrity-policy-section" class="sec-ref">§ <bdi class="secno">3.8 </bdi>Integrity-Policy</a> 참조). 그러면 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-27">사용자 에이전트</a>는 무결성 메타데이터가 없는 외부 스크립트와 no-CORS 외부 스크립트 요청을 차단합니다. <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-23">검증자</a>는 서명된 요청을 사용하여 아래 한계 내에서 <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager" id="ref-for-index-term-credential-manager-28">자격 증명 관리자</a>가 변조된 요청이나 교체된 응답 암호화 키를 탐지하게 할 수도 있습니다(<a href="#signing-presentation-requests" data-matched-text="[[[#signing-presentation-requests]]]" class="sec-ref"><bdi class="secno">10.5 </bdi> 프레젠테이션 요청 서명</a> 참조).
+        </p>
+      <p>
+            이러한 조치는 위협을 줄이지만 없애지는 못합니다. 콘텐츠 보안 정책, <cite><a data-matched-text="[[[trusted-types]]]" href="https://www.w3.org/TR/trusted-types/">Trusted Types</a></cite>, <cite><a data-matched-text="[[[SRI]]]" href="https://www.w3.org/TR/sri-2/">하위 리소스 무결성</a></cite>는 <a data-link-type="dfn|abstract-op" href="#dfn-browser-extension-access" class="internalDFN" id="ref-for-dfn-browser-extension-access-1">브라우저 확장 프로그램 접근</a>에 대응하지 못합니다. 사용자가 페이지에서 실행하도록 허용한 브라우저 확장 프로그램은 해당 페이지에 완전한 접근 권한을 가지며 전송 전에 요청을 읽거나 다시 쓸 수 있습니다. 서명된 요청은 <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager" id="ref-for-index-term-credential-manager-29">자격 증명 관리자</a>가 이미 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-24">검증자</a>의 것으로 인식하는 키로 서명을 확인하고 대신 들어온 서명되지 않은 요청도 거부할 때에만 도움이 됩니다. 그렇지 않으면 확장 프로그램은 서명을 제거하고 대신 서명되지 않은 요청을 보내면서 자체 응답 암호화 키를 제공할 수 있습니다. <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-25">검증자</a>가 서버에서 각 요청을 구성하고 서명하며 페이지에서 온 요청에는 절대 서명하지 않으면 확장 프로그램이 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier" id="ref-for-index-term-verifiers-26">검증자</a>의 서명을 위조하는 것은 막지만, 서명을 제거하는 것은 막지 못합니다. <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager" id="ref-for-index-term-credential-manager-30">자격 증명 관리자</a>가 어떤 요청을 받아들이는지는 이 명세가 아니라 해당 자격 증명이 속한 생태계에서 결정합니다(<a href="#signing-presentation-requests" data-matched-text="[[[#signing-presentation-requests]]]" class="sec-ref"><bdi class="secno">10.5 </bdi> 프레젠테이션 요청 서명</a> 참조). 페이지의 스크립트 실행 모델 밖에 있는 삽입 경로도 이러한 메커니즘이 대응할 수 있는 범위를 벗어납니다.
+        </p>
+      </section>
+    <section id="signing-presentation-requests">
             <div class="header-wrapper">
-        <h3 id="x10-4-signing-presentation-requests"><bdi class="secno">10.4 </bdi>
+        <h3 id="x10-5-signing-presentation-requests"><bdi class="secno">10.5 </bdi>
           프레젠테이션 요청 서명
-        </h3><a class="self-link" href="#signing-presentation-requests" aria-label="Permalink for Section 10.4"></a>
+        </h3><a class="self-link" href="#signing-presentation-requests" aria-label="Permalink for Section 10.5"></a>
       </div>
 
 
@@ -4534,7 +4577,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <a data-link-type="dfn|abstract-op" href="#dfn-presentation-protocol" class="internalDFN"
                     id="ref-for-dfn-presentation-protocol-23">제시 프로토콜</a>이 요청에
                 서명하는 방법을 제공하는 경우, <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                    id="ref-for-index-term-verifiers-7">검증자</a>는 이를 사용할 것을 강력히 권장한다.
+                    id="ref-for-index-term-verifiers-27">검증자</a>는 이를 사용할 것을 강력히 권장한다.
             </p>
             <p>
                 서명되지 않은 요청은 검증자 자신의 페이지에서 실행되는 스크립트에 의해
@@ -4546,21 +4589,21 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     암호화</a>하는 데 사용되는 매개변수를 바꿔 응답이 검증자가 아니라
                 공격자에게 암호화되도록 할 수도 있다. API를 <a data-link-type="dfn"
                     href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context"
-                    id="ref-for-index-term-secure-contexts-3">보안 컨텍스트</a>에서 사용하도록 요구해도 이를 막을 수 없다.
+                    id="ref-for-index-term-secure-context-5">보안 컨텍스트</a>에서 사용하도록 요구해도 이를 막을 수 없다.
                 공격자가 이미 그 안에 있기 때문이다. 서명되지 않은 요청의 경우, <a data-link-type="dfn"
                     href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-24">자격 증명 관리자</a>는
+                    id="ref-for-index-term-credential-manager-31">자격 증명 관리자</a>는
                 검증자가 자신의 페이지에 그러한 스크립트가 없도록 유지했다고
                 신뢰해야 한다. 반면 서명된 요청은 <a data-link-type="dfn"
                     href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-25">자격 증명 관리자</a>가 확인할 수 있는 정보를 제공하므로,
+                    id="ref-for-index-term-credential-manager-32">자격 증명 관리자</a>가 확인할 수 있는 정보를 제공하므로,
                 변경 사항이 감지되지 않은 채 넘어가는 대신
                 이를 감지할 수 있다.
             </p>
             <p>
                 그렇더라도 서명은 <a data-link-type="dfn"
                     href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-26">자격 증명 관리자</a>가
+                    id="ref-for-index-term-credential-manager-33">자격 증명 관리자</a>가
                 해당 서명이 요청을 수행하는 검증자의 것임을 확인할 수 있는 경우에만
                 도움이 된다. 페이지 내부의 스크립트는 자신이 보유한 키로
                 변경된 요청에 다시 서명할 수 있으므로, 해당 서명을 이미
@@ -4574,16 +4617,16 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 제공한다(다음 참조:
                 <a href="#cross-device-security-and-proximity"
                     data-matched-text="[[[#cross-device-security-and-proximity]]]" class="sec-ref"><bdi
-                        class="secno">10.5 </bdi>
+                        class="secno">10.6 </bdi>
                     기기 간 보안 및 근접성</a>).
             </p>
         </section>
         <section id="cross-device-security-and-proximity">
             <div class="header-wrapper">
-        <h3 id="x10-5-cross-device-security-and-proximity"><bdi class="secno">10.5 </bdi>
+        <h3 id="x10-6-cross-device-security-and-proximity"><bdi class="secno">10.6 </bdi>
           장치 간 보안 및 근접성
         </h3><a class="self-link" href="#cross-device-security-and-proximity"
-          aria-label="Permalink for Section 10.5"></a>
+          aria-label="Permalink for Section 10.6"></a>
       </div>
 
 
@@ -4592,7 +4635,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <a data-link-type="dfn|abstract-op" href="#dfn-digital-credential" class="internalDFN"
                     id="ref-for-dfn-digital-credential-32">디지털 자격 증명</a>을 제시하는 기기 간 경험을 지원한다. 예를 들어
                 <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-27">자격 증명 관리자</a> 역할을 하는 스마트폰에서 주
+                    id="ref-for-index-term-credential-manager-34">자격 증명 관리자</a> 역할을 하는 스마트폰에서 주
                 기기인 노트북으로 제시할 수 있다. 구체적인 데이터 교환
                 프로토콜(예: 암호화 형식 및 전송 방식)은 이 API의
                 범위를 벗어나지만, 이러한 기기 간 상호작용은 일반적으로
@@ -4607,16 +4650,16 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 Low Energy를 통한)을 강제하여 원격 릴레이 공격을 완화함으로써 보안을 보장한다. 특히
                 기기 간 흐름에서는 <a data-link-type="dfn"
                     href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-28">자격 증명 관리자</a>가 주 기기에서 전달된
+                    id="ref-for-index-term-credential-manager-35">자격 증명 관리자</a>가 주 기기에서 전달된
                 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin"
-                    id="ref-for-index-term-origin-2">출처</a> 문자열을 본질적으로 신뢰할 수 없다. 주
+                    id="ref-for-index-term-origin-12">출처</a> 문자열을 본질적으로 신뢰할 수 없다. 주
                 기기 또는 그 브라우저가 침해되었을 수 있기 때문이다. 따라서
                 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                    id="ref-for-index-term-verifiers-8">검증자</a>가 자신의 신원을 암호학적으로
+                    id="ref-for-index-term-verifiers-28">검증자</a>가 자신의 신원을 암호학적으로
                 증명하는 서명된 요청을 사용하는 프로토콜은
                 브라우저가 주장한 <a data-link-type="dfn"
                     href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin"
-                    id="ref-for-index-term-origin-3">출처</a>에만 의존하는 것보다 훨씬 더 강력한 보안
+                    id="ref-for-index-term-origin-13">출처</a>에만 의존하는 것보다 훨씬 더 강력한 보안
                 보장을 제공한다.
             </p>
         </section>
@@ -4642,7 +4685,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
         <p>
             Digital Credentials API는 여러 기술 계층과 다양한 참여자가 있는
             복잡한 생태계에 통합된다(여기에는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                id="ref-for-index-term-verifiers-9">검증자</a>, <a data-link-type="dfn"
+                id="ref-for-index-term-verifiers-29">검증자</a>, <a data-link-type="dfn"
                 href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-holders" id="ref-for-index-term-holders-21">소지자</a>,
             <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                 id="ref-for-index-term-issuers-9">발급자</a> 등이 포함되지만 이에
@@ -4676,7 +4719,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
         <p>
             대신 이러한 고려 사항은 Digital Credentials API
             자체에 초점을 맞추고, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                id="ref-for-index-term-user-agents-21">사용자 에이전트</a>가 API 구현에서
+                id="ref-for-index-term-user-agents-28">사용자 에이전트</a>가 API 구현에서
             상호작용하는 생태계의 관련 개인정보 보호 속성을 고려하면서
             <a data-link-type="dfn" href="https://www.w3.org/TR/privacy-principles/#dfn-user-agent-duties"
                 id="ref-for-index-term-user-agent-duties-1">사용자 에이전트의 의무</a>를 어떻게 충족할 수 있는지 설명한다.
@@ -4714,7 +4757,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             </p>
             <p>
                 이 API는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                    id="ref-for-index-term-verifiers-10">검증자</a>와
+                    id="ref-for-index-term-verifiers-30">검증자</a>와
                 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-holders"
                     id="ref-for-index-term-holders-22">보유자</a> 사이의 연결 인터페이스를 제공한다. 즉, <a
                     data-link-type="dfn|abstract-op" data-lt="presentation protocol" href="#dfn-presentation-protocol"
@@ -4740,12 +4783,12 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             </p>
             <p>
                 디지털 자격 증명 API는 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-22">사용자
+                    id="ref-for-index-term-user-agents-29">사용자
                     에이전트</a>가 사용자를 대신하여 중개할 수 있는 기능을
                 제공합니다(예: <a data-link-type="dfn|abstract-op" href="#dfn-digital-credential-chooser" class="internalDFN"
-                    id="ref-for-dfn-digital-credential-chooser-15">디지털 자격 증명 선택기</a> 또는 <a
+                    id="ref-for-dfn-digital-credential-chooser-19">디지털 자격 증명 선택기</a> 또는 <a
                     data-link-type="dfn|abstract-op" href="#dfn-credential-manager-chooser" class="internalDFN"
-                    id="ref-for-dfn-credential-manager-chooser-4">자격 증명 관리자 선택기</a> 형태로). 이를 통해
+                    id="ref-for-dfn-credential-manager-chooser-10">자격 증명 관리자 선택기</a> 형태로). 이를 통해
                 요청에 맥락을 부여하고
                 <a href="#permission-prior-to-credential-manager-selection" data-matched-text="[[[#permission-prior-to-credential-manager-selection|prevent
           immediate exposure to holder applications]]]">보유자 애플리케이션에
@@ -4765,7 +4808,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     <a data-matched-text="[[[privacy-principles#purpose-limitation|purpose limitation]]]"
                         href="https://www.w3.org/TR/privacy-principles/#purpose-limitation">목적 제한</a>, 사용자에게 설명하기 쉬운 특성,
                     그리고 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-23">사용자 에이전트</a>가 제공하는 개인정보 보호 및 보안 보호 기능을 가능하게 한다.
+                        id="ref-for-index-term-user-agents-30">사용자 에이전트</a>가 제공하는 개인정보 보호 및 보안 보호 기능을 가능하게 한다.
                 </aside>
             </div>
         </section>
@@ -4788,18 +4831,18 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 이는 일부 사용자가 자격 증명 정보를 교환하는 가장
                 개인정보 보호 친화적인 수단을 원하지 않거나 사용할 수 없을 수도 있음을 의미한다.
                 그럼에도 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-24">사용자 에이전트</a>는 기본적으로 개인정보를 보호하는 경험을
+                    id="ref-for-index-term-user-agents-31">사용자 에이전트</a>는 기본적으로 개인정보를 보호하는 경험을
                 사용자에게 제공하고 피해로부터 보호해야 한다.
             </p>
             <p>
                 이러한 선호와 사용 사례의 스펙트럼 때문에
                 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-25">사용자 에이전트</a>가 사용자가 자신의
+                    id="ref-for-index-term-user-agents-32">사용자 에이전트</a>가 사용자가 자신의
                 개인 정보를 노출하려는 것인지 아니면 그렇게 하도록 속고 있는지 구별하기
                 어려울 수 있다. 따라서 교환이 시작되기 전에 모든
                 사용자가 어떤 데이터를 공유하며 정보 교환에 누가 참여하는지 이해하도록 보장하는 것은
                 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-26">사용자 에이전트</a>의 책임이다.
+                    id="ref-for-index-term-user-agents-33">사용자 에이전트</a>의 책임이다.
             </p>
         </section>
         <section id="presentation-protocol-and-credential-format">
@@ -4817,7 +4860,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <a data-link-type="dfn|abstract-op" href="#dfn-presentation-protocol" class="internalDFN"
                     id="ref-for-dfn-presentation-protocol-26">제시 프로토콜</a>과 자격 증명 형식은
                 사용자 개인정보 보호라는 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-27">사용자 에이전트</a>의 목표에 매우 중요하다.
+                    id="ref-for-index-term-user-agents-34">사용자 에이전트</a>의 목표에 매우 중요하다.
             </p>
             <section id="presentation-protocol-considerations-for-user-privacy">
                 <div class="header-wrapper">
@@ -4890,10 +4933,10 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-holders"
                             id="ref-for-index-term-holders-24">보유자</a>가
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-11">검증자</a>가 요청한 최소한의 필수 정보만
+                            id="ref-for-index-term-verifiers-31">검증자</a>가 요청한 최소한의 필수 정보만
                         공유할 수 있도록 한다. 프로토콜은
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-12">검증자</a>가 필요한 정확한 클레임을 지정할 수 있도록
+                            id="ref-for-index-term-verifiers-32">검증자</a>가 필요한 정확한 클레임을 지정할 수 있도록
                         하여 선택적 공개를 지원할 것으로 예상된다.
                     </p>
                 </section>
@@ -4909,15 +4952,15 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                             불가능성</a>은
                         사용자가 자격 증명의 속성을 여러 번 제시하는 경우, <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-13">검증자</a>가 이러한 별도의
+                            id="ref-for-index-term-verifiers-33">검증자</a>가 이러한 별도의
                         제시를 연결하여 동일한 사용자에 관한 것이라고 결론 내릴 수 없도록 보장하는 속성이다
                         (검증자-검증자 연결 가능성). 또는 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-14">검증자</a>가
+                            id="ref-for-index-term-verifiers-34">검증자</a>가
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                             id="ref-for-index-term-issuers-10">발급자</a>와 공모하여
                         <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-29">자격 증명 관리자</a>에서
+                            id="ref-for-index-term-credential-manager-36">자격 증명 관리자</a>에서
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                             id="ref-for-index-term-issuers-11">발급자</a>로 자격 증명이 교환되었다는 사실을
                         보고할 수 없도록 하는 속성이다 (검증자-발급자 연결 가능성).
@@ -4926,7 +4969,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                             id="ref-for-index-term-issuers-12">발급자</a>가 유지할 수 있는 속성이다.
                         예를 들어 개별 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-15">검증자</a>를 위해 새로운 자격 증명을 발급하는
+                            id="ref-for-index-term-verifiers-35">검증자</a>를 위해 새로운 자격 증명을 발급하는
                         방식으로 유지할 수 있다.
                     </p>
                     <p>
@@ -4935,7 +4978,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                             href="https://www.w3.org/TR/vc-data-model-2.0/#zero-knowledge-proofs">영지식
                             증명</a>을 통해 달성할 수 있지만,
                         암호화된 응답과 같은 API의 설계 선택으로 인해 <a data-link-type="dfn"
-                            href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-28">사용자
+                            href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-35">사용자
                             에이전트</a>가
                         실제 환경에서 검증자-발급자 연결 불가능성이 달성되었음을 증명하는 것은 불가능하다.
                         그럼에도 불구하고 프로토콜은 가능한 경우 연결 가능성을 제한하도록 요청된다.
@@ -4947,19 +4990,19 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     </p>
                     <p>
                         Digital Credentials API를 통해 <a data-link-type="dfn"
-                            href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-29">사용자
+                            href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-36">사용자
                             에이전트</a>는
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-16">검증자</a>와 <a data-link-type="dfn"
+                            id="ref-for-index-term-verifiers-36">검증자</a>와 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-30">자격 증명 관리자</a>가 연결 불가능한
+                            id="ref-for-index-term-credential-manager-37">자격 증명 관리자</a>가 연결 불가능한
                         속성을 교환하도록 지원할 수 있지만, 응답 암호화로 인해
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-17">검증자</a>와
+                            id="ref-for-index-term-verifiers-37">검증자</a>와
                         <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-31">자격 증명 관리자</a> 사이에 연결 가능한 정보가 전달되지 않는다고 보장할 수는
+                            id="ref-for-index-term-credential-manager-38">자격 증명 관리자</a> 사이에 연결 가능한 정보가 전달되지 않는다고 보장할 수는
                         없다. <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-30">사용자 에이전트</a>는
+                            id="ref-for-index-term-user-agents-37">사용자 에이전트</a>는
                         사용자 권한 경험에서 이 사실을 고려할 것을 권장한다.
                     </p>
                     <div class="issue" id="issue-container-number-279">
@@ -4995,7 +5038,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     </p>
                     <p>
                         연결 불가능성과 마찬가지로, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-31">사용자
+                            id="ref-for-index-term-user-agents-38">사용자
                             에이전트</a>가
                         사용자가 자격 증명 요청을 계속 진행하도록 권한을 부여한 후
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
@@ -5003,13 +5046,13 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         검증에 적극적으로 관여하지 않는다고 보장하는 것은 불가능하다. 그 시점부터
                         이 결정은 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-32">자격 증명 관리자</a>에게 달려 있다.
+                            id="ref-for-index-term-credential-manager-39">자격 증명 관리자</a>에게 달려 있다.
                         일부 자격 증명
                         관리자는 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-32">사용자
+                            id="ref-for-index-term-user-agents-39">사용자
                             에이전트</a>로 간주될 수 있지만, 일반적으로
                         <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-33">사용자 에이전트</a>가
+                            id="ref-for-index-term-user-agents-40">사용자 에이전트</a>가
                         <a href="#DC-API" data-matched-text="[[[#DC-API|Digital Credentials API]]]">Digital Credentials
                             API</a>를 구현할 때 그 권한
                         경험을 사용자 확인 전에
@@ -5024,9 +5067,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         프로토콜은 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                             id="ref-for-index-term-issuers-15">발급자</a>,
                         <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-33">자격 증명 관리자</a> 및 <a data-link-type="dfn"
+                            id="ref-for-index-term-credential-manager-40">자격 증명 관리자</a> 및 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-18">검증자</a>가 "본거지로 연락하기" 메커니즘에 대한
+                            id="ref-for-index-term-verifiers-38">검증자</a>가 "본거지로 연락하기" 메커니즘에 대한
                         의존성을 피하거나 줄일 수 있는 메커니즘을 지원해야 한다.
                     </p>
                     <div class="issue" id="issue-container-number-279-0">
@@ -5063,7 +5106,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                             누산기</a>와 같은 오프라인 철회 방법을 지원할 것으로 기대된다. 또한 프로토콜 설계와
                         명세는 가능한 경우 철회 목적으로 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-19">검증자</a>가 관여하는 것을
+                            id="ref-for-index-term-verifiers-39">검증자</a>가 관여하는 것을
                         억제할 것으로 기대된다.
                     </p>
                     <div class="issue" id="issue-container-number-280">
@@ -5108,20 +5151,20 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     </div>
                     <p>
                         검증자 권한 부여는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-20">검증자</a>가 자신의 신원을 증명하고 특정 속성 또는
+                            id="ref-for-index-term-verifiers-40">검증자</a>가 자신의 신원을 증명하고 특정 속성 또는
                         자격 증명을 요청할 정당한 권한이 있음을 입증하는 과정을 의미한다. 이는 정부가 발급한
                         자격 증명과 같은 민감한 데이터를 교환할 때 특히 유용하다. 검증자 권한 부여는
                         불필요하거나 악의적인 자격 증명 요청을 제한하고, <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-21">검증자</a>의 접근이 등록한 특정 자격 증명 속성으로
+                            id="ref-for-index-term-verifiers-41">검증자</a>의 접근이 등록한 특정 자격 증명 속성으로
                         제한되도록 보장할 수 있다.
                     </p>
                     <p>
                         검증자 권한 부여 확인은 일반적으로
                         <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-34">자격 증명 관리자</a>가 처리하지만,
+                            id="ref-for-index-term-credential-manager-41">자격 증명 관리자</a>가 처리하지만,
                         <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-34">사용자 에이전트</a>는 이러한 체계의 존재가
+                            id="ref-for-index-term-user-agents-41">사용자 에이전트</a>는 이러한 체계의 존재가
                         API 남용을 방지하고 충분한 정보를 바탕으로 한 사용자 권한 경험을 설계하는 데
                         도움이 된다고 판단할 수 있다.
                     </p>
@@ -5135,7 +5178,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                                     aria-label="GitHub 레이블: privacy-tracker">privacy-tracker</a></span></div>
                         <p class="">
                             <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                                id="ref-for-index-term-user-agents-35">사용자 에이전트</a>가 검증자
+                                id="ref-for-index-term-user-agents-42">사용자 에이전트</a>가 검증자
                             권한 부여를 이해할 수 있도록 하는 조항을 프로토콜에 포함하도록 요구해야 하는가?
                         </p>
                     </div>
@@ -5152,26 +5195,26 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         "전송" 중에 사용자 정보가 다른 당사자에게 노출되는 것을 방지하고,
                         사용자 속성을 안전하게 처리하고 저장하도록
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-22">검증자</a>를 장려하기 위해, 프로토콜은
+                            id="ref-for-index-term-verifiers-42">검증자</a>를 장려하기 위해, 프로토콜은
                         자격 증명 교환에서 암호화된
                         응답을 지원하고 의무화해야 한다. 암호화 키가
                         요청 안에 담겨 전달되면, <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-23">검증자</a>의 페이지에 있는 스크립트, 예를 들어
+                            id="ref-for-index-term-verifiers-43">검증자</a>의 페이지에 있는 스크립트, 예를 들어
                         브라우저 확장 프로그램이 삽입한 스크립트는 서명되지 않은
                         요청 안의 해당 키를 교체할 수 있다. 그러면 응답은
                         <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-24">검증자</a>가 아닌 공격자를 대상으로 암호화된다. 서명된 요청에서는 <a
+                            id="ref-for-index-term-verifiers-44">검증자</a>가 아닌 공격자를 대상으로 암호화된다. 서명된 요청에서는 <a
                             data-link-type="dfn"
                             href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-35">자격 증명 관리자</a>가 이러한 변경을 감지할 수 있지만,
+                            id="ref-for-index-term-credential-manager-42">자격 증명 관리자</a>가 이러한 변경을 감지할 수 있지만,
                         이는 서명 검증에 사용하는 키를
                         이미 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-25">검증자</a>의 것으로 인식하고 있는 경우에만 가능하다(
+                            id="ref-for-index-term-verifiers-45">검증자</a>의 것으로 인식하고 있는 경우에만 가능하다(
                         <a href="#signing-presentation-requests"
                             data-matched-text="[[[#signing-presentation-requests]]]" class="sec-ref"><bdi
-                                class="secno">10.4 </bdi>
+                                class="secno">10.5 </bdi>
                             프레젠테이션 요청 서명</a> 참조).
                     </p>
                     <div class="issue closed" id="issue-container-number-109">
@@ -5248,28 +5291,28 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             </p>
             <ul>
                 <li>이상적으로는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-26">검증자</a>가 자격 증명 요청을 스스로 규제하는 것이
+                        id="ref-for-index-term-verifiers-46">검증자</a>가 자격 증명 요청을 스스로 규제하는 것이
                     바람직하다. 그러나 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-36">사용자
+                        id="ref-for-index-term-user-agents-43">사용자
                         에이전트</a>의 관점에서,
                     <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-27">검증자</a>는 잠재적인 공격자이며,
+                        id="ref-for-index-term-verifiers-47">검증자</a>는 잠재적인 공격자이며,
                     설계 시 사용자의 최선의 이익을 고려하지 않을 수도 있다. Digital Credentials API는
                     모든 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-28">검증자</a>가 불필요한 요청과 남용을
+                        id="ref-for-index-term-verifiers-48">검증자</a>가 불필요한 요청과 남용을
                     유발하는 동기를 가질 수 있다는 가정하에 동작하며, 그에 따라
                     사용자를 보호한다.
                 </li>
                 <li><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-37">사용자 에이전트</a>는 웹상의 위험한 콘텐츠와
+                        id="ref-for-index-term-user-agents-44">사용자 에이전트</a>는 웹상의 위험한 콘텐츠와
                     권한 요청으로부터 사용자를 보호할 책임이 있으며
                     사용자를 대신해 개입하여 요청을 사전에 거부하거나
                     사전 승인을 요구할 수 있다. 이를 지원하기 위해 이 명세는
                     자격 증명 요청을 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-38">사용자
+                        id="ref-for-index-term-user-agents-45">사용자
                         에이전트</a>가 읽을 수 있도록 요구한다
                     (즉, <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-29">검증자</a>까지 종단 간 암호화되지 않아야 한다. 다음 참조:
+                        id="ref-for-index-term-verifiers-49">검증자</a>까지 종단 간 암호화되지 않아야 한다. 다음 참조:
                     <a href="#protocols" data-matched-text="[[[#protocols]]]" class="sec-ref"><bdi class="secno">5.
                         </bdi>
                         프로토콜</a> 및 <a href="#prepare-credential-requests"
@@ -5281,9 +5324,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         id="ref-for-index-term-issuers-18">발급자</a>와 입법자는 (특히 정부가 발급한)
                     자격 증명의 사용을 목적 증명이 있는 특정
                     <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-30">검증자</a>로 제한하기로 결정할 수 있다. <a data-link-type="dfn"
+                        id="ref-for-index-term-verifiers-50">검증자</a>로 제한하기로 결정할 수 있다. <a data-link-type="dfn"
                         href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                        id="ref-for-index-term-credential-manager-36">자격 증명 관리자</a>는
+                        id="ref-for-index-term-credential-manager-43">자격 증명 관리자</a>는
                     법률이나 정책에 따라 이러한 제한을 시행해야 할 수 있다.
                 </li>
                 <li>개인 정보를 공유할지 여부에 대한 최종 결정은
@@ -5291,7 +5334,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         data-lt="initiate the credential request" href="#dfn-initiate-the-credential-request"
                         class="internalDFN" id="ref-for-dfn-initiate-the-credential-request-2">요구한다</a>.
                     즉, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-39">사용자 에이전트</a>가 사용자에게 자격 증명 선택기를
+                        id="ref-for-index-term-user-agents-46">사용자 에이전트</a>가 사용자에게 자격 증명 선택기를
                     표시해야 하며, 다른 당사자도 추가로 확인이나 동의를
                     요구할 수 있다.
                 </li>
@@ -5306,12 +5349,12 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             <p>
                 두 유형의 자격 증명 모두에 적용되는 위험 완화와 사용자 통제
                 보장의 핵심 요소는 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-40">사용자
+                    id="ref-for-index-term-user-agents-47">사용자
                     에이전트</a>가
                 자격 증명 요청 메타데이터를 검사하고 이를 바탕으로 결정하거나 UI
                 표시를 구성할 수 있는 능력이다. 이 명세는 요청을 암호화하지 않은 상태로 전송하고
                 관련 정보를 포함하도록 하는 프로토콜 요구 사항을 통해 이러한 <a data-link-type="dfn"
-                    href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-41">사용자
+                    href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-48">사용자
                     에이전트</a>의 접근을 보장한다(다음 참조: <a href="#protocols" data-matched-text="[[[#protocols]]]"
                     class="sec-ref"><bdi class="secno">5. </bdi>
                     프로토콜</a>
@@ -5367,11 +5410,11 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         Digital Credentials API 자체가 유발하는 것이 아니라 생태계 전체에서
                         디지털 자격 증명의 채택이 증가하면서 발생하는 것이다. 다만
                         <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-42">사용자
+                            id="ref-for-index-term-user-agents-49">사용자
                             에이전트</a>가 Digital Credentials API를 구현하면
                         이러한 추세가 더 가속될 가능성이 있다. 따라서 API를 구현하는
                         <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-43">사용자 에이전트</a>는 이 효과를 고려해야 한다.
+                            id="ref-for-index-term-user-agents-50">사용자 에이전트</a>는 이 효과를 고려해야 한다.
                         사용자에게 해로운 결과를 초래할 수 있기 때문이다:
                     </p>
                     <ul>
@@ -5391,7 +5434,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                                 href="https://www.rfc-editor.org/info/rfc6973/#section-5.1.1">감시</a>
                             가능성 증가와 온라인 서비스의 가명 사용에 대한 제한. <a data-link-type="dfn"
                                 href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                                id="ref-for-index-term-verifiers-31">검증자</a>와 <a data-link-type="dfn"
+                                id="ref-for-index-term-verifiers-51">검증자</a>와 <a data-link-type="dfn"
                                 href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                                 id="ref-for-index-term-issuers-19">발급자</a> 또는 다른 당사자가 공모하면
                             웹에서 사용자의 활동을 면밀히 감시하고
@@ -5432,10 +5475,10 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         법률과 규정도 제정하는 것이 바람직하다. 교환에 참여하는 모든 당사자는
                         법적으로 의무가 있든 없든 간에, 존재하는 경우 정부의 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-32">검증자</a> 인증
+                            id="ref-for-index-term-verifiers-52">검증자</a> 인증
                         체계를 지원하는 것이 권고된다. <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-33">검증자</a> 인증 체계(예:
+                            id="ref-for-index-term-verifiers-53">검증자</a> 인증 체계(예:
                         <a
                             href="https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a2327-topic-27---registration-of-pid-providers-providers-of-qeaas-pub-eaas-and-non-qualified-eaas-and-relying-parties">
                             EUDI 접근 및 등록 인증서</a>)를 지원하고 통합하면
@@ -5445,7 +5488,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     </p>
                     <p>
                         Digital Credentials API를 구현하는 <a data-link-type="dfn"
-                            href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-44">사용자
+                            href="https://infra.spec.whatwg.org/#user-agent" id="ref-for-index-term-user-agents-51">사용자
                             에이전트</a>가 위험을 줄이고 사용자의
                         이해를 높이며 특정 유형의 피해를 방지하기 위해 취할 수 있는
                         다른 실질적인 조치도 있다:
@@ -5462,7 +5505,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                             <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                                 id="ref-for-index-term-issuers-20">발급자</a>를 숨김으로써
                             <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                                id="ref-for-index-term-verifiers-34">검증자</a> 기반 감시와 잠재적인
+                                id="ref-for-index-term-verifiers-54">검증자</a> 기반 감시와 잠재적인
                             차별을 방지할 수 있다.
                         </li>
                         <li>유용한 맥락과 명확하게 이해할 수 있는 권한
@@ -5473,11 +5516,11 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     </ul>
                     <p>
                         또한 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-45">사용자
+                            id="ref-for-index-term-user-agents-52">사용자
                             에이전트</a>가 이러한 완화책의 부재를 고려한 권한
                         경험을 설계하는 것이 매우 중요하다. 예를 들어
                         어떠한 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-35">검증자</a> 인증 체계도 없는 상태에서 정부 자격 증명의
+                            id="ref-for-index-term-verifiers-55">검증자</a> 인증 체계도 없는 상태에서 정부 자격 증명의
                         개인 정보를 교환하는 경우이다. 이러한 유형의 교환에는
                         더 높은 수준의 마찰과 관련 위험을 강조하는 명확한 사용자 메시지를
                         적용하는 것이 권고된다.
@@ -5532,7 +5575,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         교차 사이트 추적 및 신원 연결 목적으로 악용될 가능성을 갖는다.
                         디지털 자격 증명 기반 추적 체계에 참여하는 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-36">검증자</a>는 사용자가 자신의 개인정보에 미치는 영향을
+                            id="ref-for-index-term-verifiers-56">검증자</a>는 사용자가 자신의 개인정보에 미치는 영향을
                         충분히 이해하지 못한 채 여러 사이트에서 식별자 자격 증명을 공유하도록
                         유도하는 인센티브("웹용
                         로열티 카드")를 만들 수 있다.
@@ -5554,7 +5597,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     <p>
                         비정부 발급 자격 증명의 경우
                         <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-46">사용자 에이전트</a>가 요청된 자격 증명
+                            id="ref-for-index-term-user-agents-53">사용자 에이전트</a>가 요청된 자격 증명
                         형식과 개인정보 보호 속성을 이해하고,
                         사용자에게 표시되는 맥락과 각 자격 증명 유형에 적합한 마찰 수준을
                         결정하는 위험 프레임워크를 구축하는 것이 권고된다.
@@ -5566,16 +5609,16 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     <p>
                         요청 중인 자격 증명 유형을 인식하는
                         <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-47">사용자 에이전트</a>는 해당 자격 증명에 가장 적합하도록
+                            id="ref-for-index-term-user-agents-54">사용자 에이전트</a>는 해당 자격 증명에 가장 적합하도록
                         권한 경험을 맞춤화하고, 사용자가 이를 공유했을 때의 결과를 이해할 수 있도록
                         돕는 것이 권장된다.
                     </p>
                     <p>
                         <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-48">사용자 에이전트</a>가 모든 자격 증명
+                            id="ref-for-index-term-user-agents-55">사용자 에이전트</a>가 모든 자격 증명
                         요청을 이해할 수 있을 것으로 기대해서는 안 된다. 요청 중인 자격 증명의 유형을
                         인식하지 못하는 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                            id="ref-for-index-term-user-agents-49">사용자 에이전트</a>는 권한 경험에서 사용자의
+                            id="ref-for-index-term-user-agents-56">사용자 에이전트</a>는 권한 경험에서 사용자의
                         마찰을 크게 늘리고, 알 수 없는 자격 증명을 웹사이트와 공유할 때의
                         위험을 사용자에게 명확하게 전달하는 것이 권고된다. 적절한 수준의 마찰과 투명성을
                         적용하려면
@@ -5585,7 +5628,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         브라우저는 자격 증명 요청에 대한 지식을
                         운영 체제에 위임할 수 있으며, 운영 체제는 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                            id="ref-for-index-term-credential-manager-37">자격 증명 관리자</a>가
+                            id="ref-for-index-term-credential-manager-44">자격 증명 관리자</a>가
                         알려진 자격 증명 유형을 등록하도록 요구하고 알 수 없는 자격 증명 유형의 교환 요청을
                         거부하도록 할 수 있다.
                     </p>
@@ -5605,7 +5648,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         <p class="">
                             사용자에게 적절한 투명성을 제공해야 한다는 필요는
                             명시적인 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                                id="ref-for-index-term-user-agents-50">사용자 에이전트</a>의 동의 없이도 생태계가 새로운 자격 증명
+                                id="ref-for-index-term-user-agents-57">사용자 에이전트</a>의 동의 없이도 생태계가 새로운 자격 증명
                             형식을 개발할 수 있게 하려는 바람과 충돌한다.
                         </p>
                     </div>
@@ -5632,7 +5675,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         <p class="">
                             불필요하고 악의적인 요청을 하는 <a data-link-type="dfn"
                                 href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                                id="ref-for-index-term-verifiers-37">검증자</a>를 위한
+                                id="ref-for-index-term-verifiers-57">검증자</a>를 위한
                             상호운용 가능한 악용 신고 시스템을 고려한다.
                         </p>
                     </div>
@@ -5670,16 +5713,16 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <p>
                     이 공격은 서드파티 공격자(예:
                     <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-38">검증자</a>의 페이지에 삽입되었지만 추적 목적으로 적극적으로
+                        id="ref-for-index-term-verifiers-58">검증자</a>의 페이지에 삽입되었지만 추적 목적으로 적극적으로
                     협력하지는 않는 스크립트)에게는 더 어려울 수 있다. 응답
                     암호화가 필수이고 응답은
                     <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-39">검증자</a>의 서버에서 복호화되어야 하기 때문이다. 따라서 <a data-link-type="dfn"
+                        id="ref-for-index-term-verifiers-59">검증자</a>의 서버에서 복호화되어야 하기 때문이다. 따라서 <a data-link-type="dfn"
                         href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-40">검증자</a>는 복호화된 정보를
+                        id="ref-for-index-term-verifiers-60">검증자</a>는 복호화된 정보를
                     클라이언트 측 JavaScript에 다시 반영하지 않도록 할 수 있다. 그러나 모든
                     <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-41">검증자</a>가 그렇게 하기로 선택하는 것은 아니다.
+                        id="ref-for-index-term-verifiers-61">검증자</a>가 그렇게 하기로 선택하는 것은 아니다.
                 </p>
             </section>
             <section id="leaking-incidental-data-with-credential-presentations">
@@ -5691,13 +5734,13 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <p>
                     자격 증명의 진위를 보장하기 위해, 이를
                     <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-42">검증자</a>에게 제시할 때는 일반적으로
+                        id="ref-for-index-term-verifiers-62">검증자</a>에게 제시할 때는 일반적으로
                     <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-43">검증자</a>가 접근을 요청하는 콘텐츠보다 더 많은 정보가 포함된다. 일반적으로
+                        id="ref-for-index-term-verifiers-63">검증자</a>가 접근을 요청하는 콘텐츠보다 더 많은 정보가 포함된다. 일반적으로
                     최소한 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-issuers"
                         id="ref-for-index-term-issuers-22">발급자</a>와 <a data-link-type="dfn"
                         href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                        id="ref-for-index-term-credential-manager-38">자격 증명 관리자</a>의 서명과,
+                        id="ref-for-index-term-credential-manager-45">자격 증명 관리자</a>의 서명과,
                     잠재적으로 다른 메타데이터도 포함된다.
                 </p>
                 <p>
@@ -5708,11 +5751,11 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <p>
                     Digital Credentials API는 자격 증명 응답의 콘텐츠를 제어하지 않지만,
                     <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-51">사용자 에이전트</a>는 요청된 것 이외에
+                        id="ref-for-index-term-user-agents-58">사용자 에이전트</a>는 요청된 것 이외에
                     어떤 정보가 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-44">검증자</a>와 공유될 가능성이 있는지를 명확하게 강조하고,
+                        id="ref-for-index-term-verifiers-64">검증자</a>와 공유될 가능성이 있는지를 명확하게 강조하고,
                     더 광범위하게는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-45">검증자</a>가 API를 통해 수행하는 핑거프린팅을 식별하고 차단함으로써
+                        id="ref-for-index-term-verifiers-65">검증자</a>가 API를 통해 수행하는 핑거프린팅을 식별하고 차단함으로써
                     이러한 유형의 추적으로부터 사용자를 보호하는 데 도움을 줄 수 있다.
                 </p>
             </section>
@@ -5731,19 +5774,19 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                         data-lt="issuance protocol" href="#dfn-issuance-protocol" class="internalDFN"
                         id="ref-for-dfn-issuance-protocol-22">발급</a> 프로토콜이
                     <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-52">사용자 에이전트</a>에서 지원되는지에 관한 정보를
+                        id="ref-for-index-term-user-agents-59">사용자 에이전트</a>에서 지원되는지에 관한 정보를
                     <a data-link-type="idl" data-lt="userAgentAllowsProtocol()"
                         href="#dom-digitalcredential-useragentallowsprotocol" class="internalDFN"
                         id="ref-for-dom-digitalcredential-useragentallowsprotocol-5"><code>userAgentAllowsProtocol</code></a><code>()</code>을
                     통해 노출한다.
                     이는 예를 들어 사용자의 기기에 어떤
                     <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                        id="ref-for-index-term-credential-manager-39">자격 증명 관리자</a> 애플리케이션이 설치되어 있는지에 따라
+                        id="ref-for-index-term-credential-manager-46">자격 증명 관리자</a> 애플리케이션이 설치되어 있는지에 따라
                     응답을 맞춤화하지 않음으로써 브라우저
                     핑거프린팅과 사용자 기기 구성에 관한 정보의 노출을 완화한다.
                     따라서 반환되는 정보는 기껏해야
                     <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-53">사용자 에이전트</a> 버전과 동등한 수준이다.
+                        id="ref-for-index-term-user-agents-60">사용자 에이전트</a> 버전과 동등한 수준이다.
                 </p>
             </section>
             <section id="avoiding-leaks-of-credential-availability">
@@ -5775,7 +5818,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     때문에 요청을 거부하는 경우와 동일한 일반 오류를 반환합니다. 또한
                     인위적인 지연에 의존하지 않고 타이밍 공격을
                     방지하기 위해, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-54">사용자
+                        id="ref-for-index-term-user-agents-61">사용자
                         에이전트</a>는 일치하는 자격 증명이 없는 경우 사용자에게 표시되는 대화상자(예: 빈 선택기 또는
                     알림)를 표시하여, 프롬프트
                     닫기 지연 시간이 사용자의 취소와 구별되지 않도록 합니다.
@@ -5803,9 +5846,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 가능성을 제공한다. 또한 사용자의 브라우징 활동 일부와
                 특정 웹사이트 및/또는
                 <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-40">자격 증명 관리자</a>에 자신을 식별하려는 의도도 드러낸다. 자격 증명 요청에서
+                    id="ref-for-index-term-credential-manager-47">자격 증명 관리자</a>에 자신을 식별하려는 의도도 드러낸다. 자격 증명 요청에서
                 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-55">사용자 에이전트</a>의 중요한 책임 중 하나는 정보 교환을
+                    id="ref-for-index-term-user-agents-62">사용자 에이전트</a>의 중요한 책임 중 하나는 정보 교환을
                 진행하기 위한 사용자의 권한을 얻는 것이다.
             </p>
             <p>
@@ -5815,7 +5858,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             </p>
             <ul>
                 <li>자격 증명을 요청하는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-46">검증자</a>의 출처.
+                        id="ref-for-index-term-verifiers-66">검증자</a>의 출처.
                 </li>
                 <li>요청되고 있는 정보 또는 요청에
                     응답함으로써 공개되는 정보.
@@ -5824,7 +5867,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 </li>
                 <li>자격 증명 요청을 이행하는 데 어떤 <a data-link-type="dfn"
                         href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                        id="ref-for-index-term-credential-manager-41">자격 증명 관리자</a>를 사용할 수 있는지.
+                        id="ref-for-index-term-credential-manager-48">자격 증명 관리자</a>를 사용할 수 있는지.
                 </li>
                 <li>요청된 정보를 공유하는 데 어떤 자격 증명이
                     사용되는지.
@@ -5832,7 +5875,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             </ul>
             <p>
                 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-56">사용자 에이전트</a>는 구현 시 사용자와 관련된 어떠한 정보도
+                    id="ref-for-index-term-user-agents-63">사용자 에이전트</a>는 구현 시 사용자와 관련된 어떠한 정보도
                 교환되기 전에 나열된 세부 정보를 사용자에게 완전히 공개하도록
                 하는 것이 권장된다.
             </p>
@@ -5904,7 +5947,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <p>
                     사용자 시스템의 기술적 아키텍처에 따라
                     "<a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-57">사용자
+                        id="ref-for-index-term-user-agents-64">사용자
                         에이전트</a>"의 정의에는 브라우저와
                     운영 체제처럼 소프트웨어 스택의 여러 협력 계층이 포함될 가능성이 높다.
                     이러한 계층에서 가장 중요한 우선순위는 안전하고 충분한 정보에 기반한 사용자 권한 경험이어야 한다.
@@ -5916,7 +5959,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 </p>
                 <p>
                     이러한 이유로 권한을 요청하는 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-58">사용자 에이전트</a>는
+                        id="ref-for-index-term-user-agents-65">사용자 에이전트</a>는
                     안전하다고 판단되는 경우 이상적인 사용자 경험을 위해
                     소프트웨어 계층을 통합하는 것이 권장된다. 예를 들어
                     브라우저가 운영 체제의 API 계약을 신뢰하여 적절한 프롬프트를
@@ -5932,11 +5975,11 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 </div>
                 <p>
                     사용자 권한 흐름의 일부로 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-59">사용자
+                        id="ref-for-index-term-user-agents-66">사용자
                         에이전트</a>는
                     사용자가 자격 증명 요청을 <a data-link-type="dfn"
                         href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                        id="ref-for-index-term-credential-manager-42">자격 증명 관리자</a>에게 전달할지 여부와
+                        id="ref-for-index-term-credential-manager-49">자격 증명 관리자</a>에게 전달할지 여부와
                     어떤 자격 증명 관리자를 선택할지 결정할 권한을 유지하도록
                     보장해야 한다. 이는 요청의 일부로 정보 공개가
                     발생하고, 자격 증명
@@ -5951,26 +5994,26 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 </div>
                 <p>
                     <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-60">사용자
+                        id="ref-for-index-term-user-agents-67">사용자
                         에이전트</a>가 중재하는 권한은 동의가 아니며,
                     동의에는 서로 다른 법적 및 규제 환경에 따라 달라질 수 있는
                     구체적인 법적 정의가 있고, 정보를
                     <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                        id="ref-for-index-term-credential-manager-43">자격 증명 관리자</a>가 <a data-link-type="dfn"
+                        id="ref-for-index-term-credential-manager-50">자격 증명 관리자</a>가 <a data-link-type="dfn"
                         href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-47">검증자</a>와 공유하기 전에 수집해야 할 수도 있으며,
+                        id="ref-for-index-term-verifiers-67">검증자</a>와 공유하기 전에 수집해야 할 수도 있으며,
                     또는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                        id="ref-for-index-term-verifiers-48">검증자</a> 자체가 요청을 시작하기 전에 수집해야
+                        id="ref-for-index-term-verifiers-68">검증자</a> 자체가 요청을 시작하기 전에 수집해야
                     할 수도 있다. 동의를 얻기 위한 프레임워크와 규정이 아직
                     개발 중인 가운데, 이 API는 필요한 정보의 교환을
                     가능하게 하는 것을 목표로 하며, 여기에는 다음이 포함될 수 있다:
                 </p>
                 <ul>
                     <li>자격 증명을 수신하는 <a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-49">검증자</a>의 개인정보 보호정책.
+                            id="ref-for-index-term-verifiers-69">검증자</a>의 개인정보 보호정책.
                     </li>
                     <li><a data-link-type="dfn" href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-50">검증자</a>가 정보를 요청하는
+                            id="ref-for-index-term-verifiers-70">검증자</a>가 정보를 요청하는
                         목적.
                     </li>
                     <li>정보가 어떤 용도로 사용되는지.
@@ -5982,7 +6025,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     </li>
                     <li>자격 증명에 접근하기 위한 <a data-link-type="dfn"
                             href="https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifier"
-                            id="ref-for-index-term-verifiers-51">검증자</a>의 적법성과 등록에 관한
+                            id="ref-for-index-term-verifiers-71">검증자</a>의 적법성과 등록에 관한
                         주장, 예를 들어 <a
                             href="https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a2327-topic-27---registration-of-pid-providers-providers-of-qeaas-pub-eaas-and-non-qualified-eaas-and-relying-parties">
                             EUDI 접근 및 등록 인증서</a>.
@@ -5991,7 +6034,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 <p>
                     이러한 정보가 구조화된 형식으로 더 많이 제공됨에 따라,
                     <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-61">사용자 에이전트</a>와 이 명세도 이를 활용하여
+                        id="ref-for-index-term-user-agents-68">사용자 에이전트</a>와 이 명세도 이를 활용하여
                     사용자 권한 경험을 개선할 것으로 예상한다.
                 </p>
             </section>
@@ -6009,7 +6052,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 브라우저 관리형 지속 상태나 로컬 저장소 메커니즘을 도입하지 않습니다. 이
                 API를 통해 요청된 자격 증명은 외부 <a data-link-type="dfn"
                     href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-44">자격 증명 관리자</a> 또는 운영 체제에서 저장하고 관리합니다.
+                    id="ref-for-index-term-credential-manager-51">자격 증명 관리자</a> 또는 운영 체제에서 저장하고 관리합니다.
                 따라서 사용자가 특정 출처 또는 전체에 대해 브라우징 데이터(예: 쿠키
                 또는 로컬 저장소)를 삭제하더라도, 일반적으로 이러한 외부 관리자에
                 보관된 자격 증명은 삭제되거나 영향을
@@ -6034,11 +6077,11 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 </bdi>
                 범위</a> 참조). 다음 지침은
             <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                id="ref-for-index-term-user-agents-62">사용자 에이전트</a> 및 <a data-link-type="dfn|abstract-op"
+                id="ref-for-index-term-user-agents-69">사용자 에이전트</a> 및 <a data-link-type="dfn|abstract-op"
                 href="#dfn-digital-credential-chooser" class="internalDFN"
-                id="ref-for-dfn-digital-credential-chooser-16">디지털 자격 증명 선택기</a>, <a data-link-type="dfn|abstract-op"
+                id="ref-for-dfn-digital-credential-chooser-20">디지털 자격 증명 선택기</a>, <a data-link-type="dfn|abstract-op"
                 href="#dfn-credential-manager-chooser" class="internalDFN"
-                id="ref-for-dfn-credential-manager-chooser-5">자격 증명 관리자 선택기</a>와 그 주변 흐름을
+                id="ref-for-dfn-credential-manager-chooser-11">자격 증명 관리자 선택기</a>와 그 주변 흐름을
             구현하는 플랫폼에 적용되며, [<cite><a class="bibref" data-link-type="biblio" href="#bib-wcag22"
                     title="웹 콘텐츠 접근성 지침(WCAG) 2.2">WCAG22</a></cite>]의 관련 성공 기준을 참조합니다. 어느 선택기든
             비웹 사용자 인터페이스인 경우에는 해당
@@ -6067,7 +6110,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
         </p>
         <p>
             작업이 실패하면 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                id="ref-for-index-term-user-agents-63">사용자 에이전트</a>는 여러 가지
+                id="ref-for-index-term-user-agents-70">사용자 에이전트</a>는 여러 가지
             서로 다른 오류 중 하나로 거부합니다. 예를 들어 "<a data-link-type="exception"
                 href="https://webidl.spec.whatwg.org/#notallowederror"
                 id="ref-for-index-term-notallowederror-exception-9"><code>NotAllowedError</code></a>",
@@ -6101,9 +6144,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             안 됩니다(<a data-matched-text="[[[WCAG22#motion-actuation]]]"
                 href="https://www.w3.org/TR/WCAG22/#motion-actuation" class="sec-ref">§&nbsp;성공 기준 2.5.4 움직임 작동</a> 참조).
             <a data-link-type="dfn|abstract-op" href="#dfn-digital-credential-chooser" class="internalDFN"
-                id="ref-for-dfn-digital-credential-chooser-17">디지털 자격 증명 선택기</a>와 <a data-link-type="dfn|abstract-op"
+                id="ref-for-dfn-digital-credential-chooser-21">디지털 자격 증명 선택기</a>와 <a data-link-type="dfn|abstract-op"
                 href="#dfn-credential-manager-chooser" class="internalDFN"
-                id="ref-for-dfn-credential-manager-chooser-6">자격 증명 관리자 선택기</a>는
+                id="ref-for-dfn-credential-manager-chooser-12">자격 증명 관리자 선택기</a>는
             의미 있는 포커스 순서로 컨트롤을 표시하고(<a data-matched-text="[[[WCAG22#focus-order]]]"
                 href="https://www.w3.org/TR/WCAG22/#focus-order" class="sec-ref">§&nbsp;성공 기준 2.4.3 포커스 순서</a> 참조), 선택기가
             열릴 때 포커스를 선택기 내부로
@@ -6124,7 +6167,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             특성에만 의존하지 않는 것이 좋습니다(<em class="rfc2119">SHOULD NOT</em>).
             이 단계는 일반적으로 플랫폼 또는 <a data-link-type="dfn"
                 href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                id="ref-for-index-term-credential-manager-45">자격 증명 관리자</a>가 수행하며, 그 밖의 측면은 이 명세의 범위를
+                id="ref-for-index-term-credential-manager-52">자격 증명 관리자</a>가 수행하며, 그 밖의 측면은 이 명세의 범위를
             벗어납니다.
         </p>
         <p>
@@ -6244,7 +6287,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                 언어 및 방향 메타데이터와 현지화된 대안을 제공할 것으로 기대한다.
             </li>
             <li>API가 플랫폼으로 전달하며 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                    id="ref-for-index-term-user-agents-64">사용자
+                    id="ref-for-index-term-user-agents-71">사용자
                     에이전트</a> 또는 플랫폼이
                 표시할 수 있는 유일한 값은 <a data-link-type="dfn|abstract-op" href="#dfn-document-origin" class="internalDFN" id="ref-for-nov19-ko-66">문서 오리진</a>과 <a data-link-type="dfn|abstract-op" href="#dfn-top-level-origin"
                     class="internalDFN" id="ref-for-dfn-top-level-origin-2">최상위 오리진</a>이다.
@@ -6256,9 +6299,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             <li>자격 증명 상호작용 중 사용자에게 표시되는 그 밖의 모든 텍스트는
                 웹사이트에서 렌더링되거나(호스트 언어를 통해 언어와 방향 지원을
                 제공하는 HTML을 사용함), 플랫폼의 <a data-link-type="dfn|abstract-op" href="#dfn-digital-credential-chooser"
-                    class="internalDFN" id="ref-for-dfn-digital-credential-chooser-18">디지털 자격 증명 선택기</a>
+                    class="internalDFN" id="ref-for-dfn-digital-credential-chooser-22">디지털 자격 증명 선택기</a>
                 및 <a data-link-type="dfn|abstract-op" href="#dfn-credential-manager-chooser" class="internalDFN"
-                    id="ref-for-dfn-credential-manager-chooser-7">자격 증명 관리자 선택기</a>에서 렌더링됩니다. 선택기는
+                    id="ref-for-dfn-credential-manager-chooser-13">자격 증명 관리자 선택기</a>에서 렌더링됩니다. 선택기는
                 이 명세의 범위를 벗어납니다.
                 선택기에서 자격 증명 콘텐츠를 표시하는 경우, 자격 증명 형식 및
                 프로토콜에서 제공하는 해당 콘텐츠의 언어와 방향에 따라 표시됩니다.
@@ -6285,7 +6328,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             문서는 <cite><a data-matched-text="[[[webdriver-bidi]]]" href="https://www.w3.org/TR/webdriver-bidi/">WebDriver
                     BiDi</a></cite>
             명세의 확장 모듈을 정의한다. <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                id="ref-for-index-term-user-agents-65">사용자 에이전트</a>가
+                id="ref-for-index-term-user-agents-72">사용자 에이전트</a>가
             이를 지원하는 것은 <em class="rfc2119">선택 사항</em>이다.
         </p>
         <section id="the-digitalcredentials-module">
@@ -6304,7 +6347,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     href="https://www.w3.org/TR/credential-management-1/#dom-credential-create-slot"
                     id="ref-for-index-term-create-origin-options-sameoriginwithancestors-for-credential-3"><code>[[Create]](<var>origin</var>, <var>options</var>, <var>sameOriginWithAncestors</var>)</code></a>
                 호출 중 <a data-link-type="dfn" href="https://www.w3.org/TR/credential-management-1/#credential-manager"
-                    id="ref-for-index-term-credential-manager-46">자격 증명 관리자</a>의 원격 엔드 동작을 관리하고
+                    id="ref-for-index-term-credential-manager-53">자격 증명 관리자</a>의 원격 엔드 동작을 관리하고
                 시뮬레이션하기 위한 명령이 포함된다.
             </p>
             <section id="types">
@@ -6585,7 +6628,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             </p>
             <ol class="algorithm">
                 <li><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#user-agent"
-                        id="ref-for-index-term-user-agents-66">사용자 에이전트</a>가 자동화 제어 중이 아니면
+                        id="ref-for-index-term-user-agents-73">사용자 에이전트</a>가 자동화 제어 중이 아니면
                     <code>false</code>를 반환한다.
                 </li>
                 <li><var>context ID</var>를 <var>global</var>의 <a data-link-type="dfn"
@@ -6668,7 +6711,10 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
       </div>
 
       <ul class="index">
-<li><a class="index-term" href="#dfn-clear-the-abort-signal">중단 신호 지우기</a> <span class="print-only">§6.7</span></li>
+<li>
+      <a class="index-term" href="#dfn-browser-extension-access">브라우저 확장 프로그램 접근</a> 
+    <span class="print-only">§10.1.1</span></li>
+                <li><a class="index-term" href="#dfn-clear-the-abort-signal">중단 신호 지우기</a> <span class="print-only">§6.7</span></li>
 <li><a class="index-term" href="#dfn-return-to-idle">유휴 상태로 돌아가기</a> <span class="print-only">§6.8</span></li>
 
         <li>
@@ -7114,6 +7160,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
           <span class="print-only">§6.4</span>
         </li>
         <li>
+      <a class="index-term" href="#dfn-verifier-origin-script-compromise">검증자 출처의 스크립트 침해</a> 
+    <span class="print-only">§10.1.1</span></li>
+                <li>
           <a class="index-term" href="#cddl-value-digitalcredentials-virtualwalletaction-wait"><code>"wait"</code></a>
           <span class="print-only">§14.1.1</span>
         </li>
@@ -7304,6 +7353,14 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
           </ul>
         </li>
         <li>
+        [<cite><a class="bibref" data-link-type="biblio" href="#bib-secure-contexts">SECURE-CONTEXTS</a></cite>] defines the following:
+        <ul>
+          <li>
+    <span class="index-term" data-href="https://www.w3.org/TR/secure-contexts/#potentially-trustworthy-origin" id="index-term-potentially-trustworthy-origin" tabindex="0" aria-haspopup="dialog">잠재적으로 신뢰할 수 있는 출처</span>
+  </li>
+        </ul>
+      </li>
+            <li>
           <cite><a class="bibref" data-link-type="biblio" href="#bib-html">HTML 표준</a></cite> 은 다음을 정의합니다.
           <ul>
             <li>
@@ -7396,7 +7453,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
             </li>
             <li>
               <span class="index-term" data-href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context"
-                id="index-term-secure-contexts" tabindex="0" aria-haspopup="dialog">보안 컨텍스트</span>
+                id="index-term-secure-context" tabindex="0" aria-haspopup="dialog">보안 컨텍스트</span>
             </li>
             <li>
               <span class="index-term"
@@ -7908,20 +7965,20 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-<li><a href="#ref-for-dfn-credential-manager-chooser-1" title="2.3 디지털 자격 증명 요청">2.3 디지털 자격 증명 요청</a></li>
-<li><a href="#ref-for-nov19-ko-4" title="6. 자격 증명 요청 코디네이터">6. 자격 증명 요청 코디네이터</a></li>
-<li><a href="#ref-for-dfn-credential-manager-chooser-2" title="6.5 자격 증명 요청 중단">6.5 자격 증명 요청 중단</a></li>
-<li><a href="#ref-for-nov19-ko-11" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-dfn-credential-manager-chooser-1" title="§ 2.3 디지털 자격 증명 요청">§ 2.3 디지털 자격 증명 요청</a> </li>
+        <li><a href="#ref-for-nov19-ko-4" title="§ 6. 자격 증명 요청 코디네이터">§ 6. 자격 증명 요청 코디네이터</a> </li>
+        <li><a href="#ref-for-dfn-credential-manager-chooser-2" title="§ 6.5 자격 증명 요청 중단">§ 6.5 자격 증명 요청 중단</a> </li>
+        <li><a href="#ref-for-nov19-ko-11" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-26" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-34" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
-<li><a href="#ref-for-dfn-credential-manager-chooser-3" title="7. 디지털 자격 증명 API">7. 디지털 자격 증명 API</a></li>
-<li><a href="#ref-for-nov19-ko-61" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-dfn-credential-manager-chooser-4" title="11.1 설계 고려 사항 및 대안">11.1 설계 고려 사항 및 대안</a></li>
-<li><a href="#ref-for-dfn-credential-manager-chooser-5" title="12. 접근성 고려 사항">12. 접근성 고려 사항</a></li>
-<li><a href="#ref-for-dfn-credential-manager-chooser-6" title="12. 접근성 고려 사항">12. 접근성 고려 사항</a></li>
-<li><a href="#ref-for-dfn-credential-manager-chooser-7" title="13. 국제화 고려 사항">13. 국제화 고려 사항</a></li>
-      </ul>
+        <li><a href="#ref-for-dfn-credential-manager-chooser-3" title="§ 7. 디지털 자격 증명 API">§ 7. 디지털 자격 증명 API</a> </li>
+        <li><a href="#ref-for-nov19-ko-61" title="§ 10.2 완화책">§ 10.2 완화책</a> </li>
+        <li><a href="#ref-for-dfn-credential-manager-chooser-9" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+        <li><a href="#ref-for-dfn-credential-manager-chooser-10" title="§ 11.1 설계 고려 사항 및 대안">§ 11.1 설계 고려 사항 및 대안</a> </li>
+        <li><a href="#ref-for-dfn-credential-manager-chooser-11" title="§ 12. 접근성 고려 사항">§ 12. 접근성 고려 사항</a> <a href="#ref-for-dfn-credential-manager-chooser-12" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-dfn-credential-manager-chooser-13" title="§ 13. 국제화 고려 사항">§ 13. 국제화 고려 사항</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-credential-request"
       aria-label="Links in this document to definition: Credential request">
@@ -7960,14 +8017,12 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-        <li>
-          <a href="#ref-for-dfn-credential-response-1" title="§ 6. Credential Request Coordinator">§ 6. 자격 증명 요청 코디네이터</a>
-        </li>
-        <li>
-          <a href="#ref-for-dfn-credential-response-2" title="§ 10. Security Considerations">§ 10. 보안 고려 사항</a>
-        </li>
-      </ul>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-dfn-credential-response-1" title="§ 6. 자격 증명 요청 코디네이터">§ 6. 자격 증명 요청 코디네이터</a> </li>
+        <li><a href="#ref-for-dfn-credential-response-2" title="§ 10. 보안 고려 사항">§ 10. 보안 고려 사항</a> </li>
+        <li><a href="#ref-for-dfn-credential-response-3" title="§ 10.1.1 범위 내 위협">§ 10.1.1 범위 내 위협</a> <a href="#ref-for-dfn-credential-response-4" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-dfn-credential-response-5" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> <a href="#ref-for-dfn-credential-response-6" title="Reference 2">(2)</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-digital-credential"
       aria-label="Links in this document to definition: Digital credential">
@@ -8030,29 +8085,26 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-<li><a href="#ref-for-dfn-digital-credential-chooser-1" title="2.3 디지털 자격 증명 요청">2.3 디지털 자격 증명 요청</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-2" title="4. 용어">4. 용어</a></li>
-<li><a href="#ref-for-nov19-ko-3" title="6. 자격 증명 요청 코디네이터">6. 자격 증명 요청 코디네이터</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-3" title="6.5 자격 증명 요청 중단">6.5 자격 증명 요청 중단</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-4" title="6.5 자격 증명 요청 중단">6.5 자격 증명 요청 중단</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-5" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-dfn-digital-credential-chooser-1" title="§ 2.3 디지털 자격 증명 요청">§ 2.3 디지털 자격 증명 요청</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-2" title="§ 4. 용어">§ 4. 용어</a> </li>
+        <li><a href="#ref-for-nov19-ko-3" title="§ 6. 자격 증명 요청 코디네이터">§ 6. 자격 증명 요청 코디네이터</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-3" title="§ 6.5 자격 증명 요청 중단">§ 6.5 자격 증명 요청 중단</a> <a href="#ref-for-dfn-digital-credential-chooser-4" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-5" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-25" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-dfn-digital-credential-chooser-6" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-dfn-digital-credential-chooser-7" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-dfn-digital-credential-chooser-8" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-9" title="7. 디지털 자격 증명 API">7. 디지털 자격 증명 API</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-10" title="8.1 [[DiscoverFromExternalSource]](origin, options, sameOriginWithAncestors) 내부 메서드">8.1 [[DiscoverFromExternalSource]](origin, options, sameOriginWithAncestors) 내부 메서드</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-11" title="10.1.1 범위 내 위협">10.1.1 범위 내 위협</a></li>
-<li><a href="#ref-for-nov19-ko-60" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-12" title="10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청">10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-13" title="10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청">10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-14" title="10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청">10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-15" title="11.1 설계 고려 사항 및 대안">11.1 설계 고려 사항 및 대안</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-16" title="12. 접근성 고려 사항">12. 접근성 고려 사항</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-17" title="12. 접근성 고려 사항">12. 접근성 고려 사항</a></li>
-<li><a href="#ref-for-dfn-digital-credential-chooser-18" title="13. 국제화 고려 사항">13. 국제화 고려 사항</a></li>
-      </ul>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-9" title="§ 7. 디지털 자격 증명 API">§ 7. 디지털 자격 증명 API</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-10" title="§ 8.1 [[DiscoverFromExternalSource]](origin, options, sameOriginWithAncestors) 내부 메서드">§ 8.1 [[DiscoverFromExternalSource]](origin, options, sameOriginWithAncestors) 내부 메서드</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-11" title="§ 10.1.1 범위 내 위협">§ 10.1.1 범위 내 위협</a> </li>
+        <li><a href="#ref-for-nov19-ko-60" title="§ 10.2 완화책">§ 10.2 완화책</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-12" title="§ 10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청">§ 10.3 침해된 콘텐츠 프로세스에서 발생하는 위조 요청</a> <a href="#ref-for-dfn-digital-credential-chooser-13" title="Reference 2">(2)</a> <a href="#ref-for-dfn-digital-credential-chooser-14" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-18" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-19" title="§ 11.1 설계 고려 사항 및 대안">§ 11.1 설계 고려 사항 및 대안</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-20" title="§ 12. 접근성 고려 사항">§ 12. 접근성 고려 사항</a> <a href="#ref-for-dfn-digital-credential-chooser-21" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-dfn-digital-credential-chooser-22" title="§ 13. 국제화 고려 사항">§ 13. 국제화 고려 사항</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-issuance-protocol"
       aria-label="Links in this document to definition: Issuance protocol">
@@ -9631,6 +9683,42 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
         </li>
       </ul>
     </div>
+<div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-verifier-origin-script-compromise" aria-label="Details for definition: 검증자 출처의 스크립트 침해">
+      <span class="caret"></span>
+      <div>
+        <a class="self-link" href="#dfn-verifier-origin-script-compromise" aria-label="Permalink for definition: 검증자 출처의 스크립트 침해. Activate to close this dialog.">영구 링크</a>
+         
+        
+      </div>
+      <p><b>참조 위치:</b></p>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-dfn-verifier-origin-script-compromise-1" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+    </ul> 
+    </div>
+<div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-browser-extension-access" aria-label="Details for definition: 브라우저 확장 프로그램 접근">
+      <span class="caret"></span>
+      <div>
+        <a class="self-link" href="#dfn-browser-extension-access" aria-label="Permalink for definition: 브라우저 확장 프로그램 접근. Activate to close this dialog.">영구 링크</a>
+         
+        
+      </div>
+      <p><b>참조 위치:</b></p>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-dfn-browser-extension-access-1" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+    </ul> 
+    </div>
+<div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-index-term-potentially-trustworthy-origin" aria-label="Details for definition: 잠재적으로 신뢰할 수 있는 출처">
+      <span class="caret"></span>
+      <div>
+        <a class="self-link" href="https://www.w3.org/TR/secure-contexts/#potentially-trustworthy-origin" aria-label="Permalink for definition: 잠재적으로 신뢰할 수 있는 출처. Activate to close this dialog.">영구 링크</a>
+         
+        
+      </div>
+      <p><b>참조 위치:</b></p>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-index-term-potentially-trustworthy-origin-1" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+    </ul> 
+    </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-dfn-api-flooding"
       aria-label="Links in this document to definition: API Flooding">
       <span class="caret"></span>
@@ -10240,57 +10328,43 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-<li><a href="#ref-for-index-term-credential-manager-1" title="1. 소개">1. 소개</a></li>
-<li><a href="#ref-for-index-term-credential-manager-2" title="2.3 디지털 자격 증명 요청">2.3 디지털 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-credential-manager-3" title="3. 범위">3. 범위</a></li>
-<li><a href="#ref-for-index-term-credential-manager-4" title="3. 범위">3. 범위</a></li>
-<li><a href="#ref-for-index-term-credential-manager-5" title="4. 용어">4. 용어</a></li>
-<li><a href="#ref-for-index-term-credential-manager-6" title="4. 용어">4. 용어</a></li>
-<li><a href="#ref-for-index-term-credential-manager-7" title="6. 자격 증명 요청 코디네이터">6. 자격 증명 요청 코디네이터</a></li>
-<li><a href="#ref-for-index-term-credential-manager-8" title="6. 자격 증명 요청 코디네이터">6. 자격 증명 요청 코디네이터</a></li>
-<li><a href="#ref-for-index-term-credential-manager-9" title="6. 자격 증명 요청 코디네이터">6. 자격 증명 요청 코디네이터</a></li>
-<li><a href="#ref-for-nov19-ko-13" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-index-term-credential-manager-1" title="§ 1. 소개">§ 1. 소개</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-2" title="§ 2.3 디지털 자격 증명 요청">§ 2.3 디지털 자격 증명 요청</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-3" title="§ 3. 범위">§ 3. 범위</a> <a href="#ref-for-index-term-credential-manager-4" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-5" title="§ 4. 용어">§ 4. 용어</a> <a href="#ref-for-index-term-credential-manager-6" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-7" title="§ 6. 자격 증명 요청 코디네이터">§ 6. 자격 증명 요청 코디네이터</a> <a href="#ref-for-index-term-credential-manager-8" title="Reference 2">(2)</a> <a href="#ref-for-index-term-credential-manager-9" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-nov19-ko-13" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-index-term-credential-manager-10" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-33" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-67" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
-<li><a href="#ref-for-index-term-credential-manager-11" title="7. 디지털 자격 증명 API">7. 디지털 자격 증명 API</a></li>
-<li><a href="#ref-for-index-term-credential-manager-12" title="7. 디지털 자격 증명 API">7. 디지털 자격 증명 API</a></li>
-<li><a href="#ref-for-index-term-credential-manager-13" title="7.2.1 requests 멤버">7.2.1 requests 멤버</a></li>
-<li><a href="#ref-for-index-term-credential-manager-14" title="7.3 DigitalCredentialGetRequest 딕셔너리">7.3 DigitalCredentialGetRequest 딕셔너리</a></li>
-<li><a href="#ref-for-index-term-credential-manager-15" title="7.3.2 data 멤버">7.3.2 data 멤버</a></li>
-<li><a href="#ref-for-index-term-credential-manager-16" title="7.6.2 data 멤버">7.6.2 data 멤버</a></li>
-<li><a href="#ref-for-index-term-credential-manager-17" title="7.7.3 userAgentAllowsProtocol() 메서드">7.7.3 userAgentAllowsProtocol() 메서드</a></li>
-<li><a href="#ref-for-index-term-credential-manager-18" title="10.1.1 범위 내 위협">10.1.1 범위 내 위협</a></li>
-<li><a href="#ref-for-index-term-credential-manager-19" title="10.1.2 범위 외 위협">10.1.2 범위 외 위협</a></li>
-<li><a href="#ref-for-index-term-credential-manager-20" title="10.1.2 범위 외 위협">10.1.2 범위 외 위협</a></li>
-<li><a href="#ref-for-index-term-credential-manager-21" title="10.1.2 범위 외 위협">10.1.2 범위 외 위협</a></li>
-<li><a href="#ref-for-index-term-credential-manager-22" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-index-term-credential-manager-23" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-index-term-credential-manager-24" title="10.4 프레젠테이션 요청 서명">10.4 프레젠테이션 요청 서명</a></li>
-<li><a href="#ref-for-index-term-credential-manager-25" title="10.4 프레젠테이션 요청 서명">10.4 프레젠테이션 요청 서명</a></li>
-<li><a href="#ref-for-index-term-credential-manager-26" title="10.4 프레젠테이션 요청 서명">10.4 프레젠테이션 요청 서명</a></li>
-<li><a href="#ref-for-index-term-credential-manager-27" title="10.5 장치 간 보안 및 근접성">10.5 장치 간 보안 및 근접성</a></li>
-<li><a href="#ref-for-index-term-credential-manager-28" title="10.5 장치 간 보안 및 근접성">10.5 장치 간 보안 및 근접성</a></li>
-<li><a href="#ref-for-index-term-credential-manager-29" title="11.3.1.2 연결 불가능한 제시">11.3.1.2 연결 불가능한 제시</a></li>
-<li><a href="#ref-for-index-term-credential-manager-30" title="11.3.1.2 연결 불가능한 제시">11.3.1.2 연결 불가능한 제시</a></li>
-<li><a href="#ref-for-index-term-credential-manager-31" title="11.3.1.2 연결 불가능한 제시">11.3.1.2 연결 불가능한 제시</a></li>
-<li><a href="#ref-for-index-term-credential-manager-32" title="11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">11.3.1.3 &quot;본거지에 연락&quot; 메커니즘</a></li>
-<li><a href="#ref-for-index-term-credential-manager-33" title="11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">11.3.1.3 &quot;본거지에 연락&quot; 메커니즘</a></li>
-<li><a href="#ref-for-index-term-credential-manager-34" title="11.3.1.6 검증자 권한 부여 지원">11.3.1.6 검증자 권한 부여 지원</a></li>
-<li><a href="#ref-for-index-term-credential-manager-35" title="11.3.1.7 자격 증명 응답 암호화">11.3.1.7 자격 증명 응답 암호화</a></li>
-<li><a href="#ref-for-index-term-credential-manager-36" title="11.4 불필요한 자격 증명 요청">11.4 불필요한 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-credential-manager-37" title="11.4.2.3 불필요한 비정부 자격 증명 요청 완화">11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-credential-manager-38" title="11.5.2 자격 증명 제시를 통한 부수적 데이터 유출">11.5.2 자격 증명 제시를 통한 부수적 데이터 유출</a></li>
-<li><a href="#ref-for-index-term-credential-manager-39" title="11.5.3 프로토콜 가용성을 통한 기기 속성 노출">11.5.3 프로토콜 가용성을 통한 기기 속성 노출</a></li>
-<li><a href="#ref-for-index-term-credential-manager-40" title="11.6 사용자 권한 및 투명성">11.6 사용자 권한 및 투명성</a></li>
-<li><a href="#ref-for-index-term-credential-manager-41" title="11.6 사용자 권한 및 투명성">11.6 사용자 권한 및 투명성</a></li>
-<li><a href="#ref-for-index-term-credential-manager-42" title="11.6.3 자격 증명 관리자 선택 전 권한">11.6.3 자격 증명 관리자 선택 전 권한</a></li>
-<li><a href="#ref-for-index-term-credential-manager-43" title="11.6.4 권한과 동의">11.6.4 권한과 동의</a></li>
-<li><a href="#ref-for-index-term-credential-manager-44" title="11.7 데이터 삭제 및 지속 상태">11.7 데이터 삭제 및 지속 상태</a></li>
-<li><a href="#ref-for-index-term-credential-manager-45" title="12. 접근성 고려 사항">12. 접근성 고려 사항</a></li>
-<li><a href="#ref-for-index-term-credential-manager-46" title="14.1 digitalCredentials 모듈">14.1 digitalCredentials 모듈</a></li>
-      </ul>
+        <li><a href="#ref-for-index-term-credential-manager-11" title="§ 7. 디지털 자격 증명 API">§ 7. 디지털 자격 증명 API</a> <a href="#ref-for-index-term-credential-manager-12" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-13" title="§ 7.2.1 requests 멤버">§ 7.2.1 requests 멤버</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-14" title="§ 7.3 DigitalCredentialGetRequest 딕셔너리">§ 7.3 DigitalCredentialGetRequest 딕셔너리</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-15" title="§ 7.3.2 data 멤버">§ 7.3.2 data 멤버</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-16" title="§ 7.6.2 data 멤버">§ 7.6.2 data 멤버</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-17" title="§ 7.7.3 userAgentAllowsProtocol() 메서드">§ 7.7.3 userAgentAllowsProtocol() 메서드</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-18" title="§ 10.1.1 범위 내 위협">§ 10.1.1 범위 내 위협</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-19" title="§ 10.1.2 범위 외 위협">§ 10.1.2 범위 외 위협</a> <a href="#ref-for-index-term-credential-manager-20" title="Reference 2">(2)</a> <a href="#ref-for-index-term-credential-manager-21" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-22" title="§ 10.2 완화책">§ 10.2 완화책</a> <a href="#ref-for-index-term-credential-manager-23" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-27" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> <a href="#ref-for-index-term-credential-manager-28" title="Reference 2">(2)</a> <a href="#ref-for-index-term-credential-manager-29" title="Reference 3">(3)</a> <a href="#ref-for-index-term-credential-manager-30" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-31" title="§ 10.5 프레젠테이션 요청 서명">§ 10.5 프레젠테이션 요청 서명</a> <a href="#ref-for-index-term-credential-manager-32" title="Reference 2">(2)</a> <a href="#ref-for-index-term-credential-manager-33" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-34" title="§ 10.6 장치 간 보안 및 근접성">§ 10.6 장치 간 보안 및 근접성</a> <a href="#ref-for-index-term-credential-manager-35" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-36" title="§ 11.3.1.2 연결 불가능한 제시">§ 11.3.1.2 연결 불가능한 제시</a> <a href="#ref-for-index-term-credential-manager-37" title="Reference 2">(2)</a> <a href="#ref-for-index-term-credential-manager-38" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-39" title="§ 11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">§ 11.3.1.3 "본거지에 연락" 메커니즘</a> <a href="#ref-for-index-term-credential-manager-40" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-41" title="§ 11.3.1.6 검증자 권한 부여 지원">§ 11.3.1.6 검증자 권한 부여 지원</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-42" title="§ 11.3.1.7 자격 증명 응답 암호화">§ 11.3.1.7 자격 증명 응답 암호화</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-43" title="§ 11.4 불필요한 자격 증명 요청">§ 11.4 불필요한 자격 증명 요청</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-44" title="§ 11.4.2.3 불필요한 비정부 자격 증명 요청 완화">§ 11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-45" title="§ 11.5.2 자격 증명 제시를 통한 부수적 데이터 유출">§ 11.5.2 자격 증명 제시를 통한 부수적 데이터 유출</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-46" title="§ 11.5.3 프로토콜 가용성을 통한 기기 속성 노출">§ 11.5.3 프로토콜 가용성을 통한 기기 속성 노출</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-47" title="§ 11.6 사용자 권한 및 투명성">§ 11.6 사용자 권한 및 투명성</a> <a href="#ref-for-index-term-credential-manager-48" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-49" title="§ 11.6.3 자격 증명 관리자 선택 전 권한">§ 11.6.3 자격 증명 관리자 선택 전 권한</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-50" title="§ 11.6.4 권한과 동의">§ 11.6.4 권한과 동의</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-51" title="§ 11.7 데이터 삭제 및 지속 상태">§ 11.7 데이터 삭제 및 지속 상태</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-52" title="§ 12. 접근성 고려 사항">§ 12. 접근성 고려 사항</a> </li>
+        <li><a href="#ref-for-index-term-credential-manager-53" title="§ 14.1 digitalCredentials 모듈">§ 14.1 digitalCredentials 모듈</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true"
       id="dfn-panel-for-index-term-credentialcreationoptions"
@@ -10901,20 +10975,15 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-<li><a href="#ref-for-nov19-ko-7" title="6. 자격 증명 요청 코디네이터">6. 자격 증명 요청 코디네이터</a></li>
-<li><a href="#ref-for-index-term-origin-1" title="6.2 자격 증명 요청 준비">6.2 자격 증명 요청 준비</a></li>
-<li><a href="#ref-for-nov19-ko-8" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
-<li><a href="#ref-for-nov19-ko-35" title="7.8.1 요청 컨텍스트 구조체">7.8.1 요청 컨텍스트 구조체</a></li>
-<li><a href="#ref-for-nov19-ko-36" title="7.8.1 요청 컨텍스트 구조체">7.8.1 요청 컨텍스트 구조체</a></li>
-<li><a href="#ref-for-nov19-ko-42" title="7.8.1 요청 컨텍스트 구조체">7.8.1 요청 컨텍스트 구조체</a></li>
-<li><a href="#ref-for-nov19-ko-43" title="7.8.1 요청 컨텍스트 구조체">7.8.1 요청 컨텍스트 구조체</a></li>
-<li><a href="#ref-for-nov19-ko-47" title="7.8.1 요청 컨텍스트 구조체">7.8.1 요청 컨텍스트 구조체</a></li>
-<li><a href="#ref-for-nov19-ko-54" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-nov19-ko-62" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-index-term-origin-2" title="10.5 장치 간 보안 및 근접성">10.5 장치 간 보안 및 근접성</a></li>
-<li><a href="#ref-for-index-term-origin-3" title="10.5 장치 간 보안 및 근접성">10.5 장치 간 보안 및 근접성</a></li>
-      </ul>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-nov19-ko-7" title="§ 6. 자격 증명 요청 코디네이터">§ 6. 자격 증명 요청 코디네이터</a> </li>
+        <li><a href="#ref-for-index-term-origin-1" title="§ 6.2 자격 증명 요청 준비">§ 6.2 자격 증명 요청 준비</a> </li>
+        <li><a href="#ref-for-nov19-ko-8" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
+        <li><a href="#ref-for-nov19-ko-35" title="§ 7.8.1 요청 컨텍스트 구조체">§ 7.8.1 요청 컨텍스트 구조체</a> <a href="#ref-for-nov19-ko-36" title="Reference 2">(2)</a> <a href="#ref-for-nov19-ko-42" title="Reference 3">(3)</a> <a href="#ref-for-nov19-ko-43" title="Reference 4">(4)</a> <a href="#ref-for-nov19-ko-47" title="Reference 5">(5)</a> </li>
+        <li><a href="#ref-for-nov19-ko-54" title="§ 10.2 완화책">§ 10.2 완화책</a> <a href="#ref-for-nov19-ko-62" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-origin-11" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+        <li><a href="#ref-for-index-term-origin-12" title="§ 10.6 장치 간 보안 및 근접성">§ 10.6 장치 간 보안 및 근접성</a> <a href="#ref-for-index-term-origin-13" title="Reference 2">(2)</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true"
       id="dfn-panel-for-index-term-origin-for-environment-settings-object"
@@ -11001,7 +11070,7 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 <li><a href="#ref-for-nov19-ko-37" title="7.8.1 요청 컨텍스트 구조체">7.8.1 요청 컨텍스트 구조체</a></li>
       </ul>
     </div>
-<div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-index-term-secure-contexts"
+<div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-index-term-secure-context"
       aria-label="Links in this document to definition: secure contexts">
       <span class="caret"></span>
       <div>
@@ -11011,9 +11080,12 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-<li><a href="#ref-for-nov19-ko-48">10.1.1 범위 내 위협</a></li><li><a href="#ref-for-index-term-secure-contexts-1">10.2 완화책</a></li><li><a href="#ref-for-index-term-secure-contexts-2">10.2 완화책</a></li><li><a href="#ref-for-index-term-secure-contexts-3">10.4 프레젠테이션 요청 서명</a></li>
-</ul>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-nov19-ko-48" title="§ 10.1.1 범위 내 위협">§ 10.1.1 범위 내 위협</a> </li>
+        <li><a href="#ref-for-index-term-secure-context-2" title="§ 10.2 완화책">§ 10.2 완화책</a> <a href="#ref-for-index-term-secure-context-3" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-secure-context-4" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+        <li><a href="#ref-for-index-term-secure-context-5" title="§ 10.5 프레젠테이션 요청 서명">§ 10.5 프레젠테이션 요청 서명</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-index-term-top-level-traversable"
       aria-label="Links in this document to definition: top-level traversable">
@@ -11367,82 +11439,48 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-<li><a href="#ref-for-index-term-user-agents-1" title="">ref-for-index-term-user-agents-1</a></li>
-<li><a href="#ref-for-index-term-user-agents-2" title="2.2 프로토콜이 허용되는지 확인">2.2 프로토콜이 허용되는지 확인</a></li>
-<li><a href="#ref-for-index-term-user-agents-3" title="3. 범위">3. 범위</a></li>
-<li><a href="#ref-for-index-term-user-agents-4" title="3. 범위">3. 범위</a></li>
-<li><a href="#ref-for-index-term-user-agents-5" title="4. 용어">4. 용어</a></li>
-<li><a href="#ref-for-index-term-user-agents-6" title="4. 용어">4. 용어</a></li>
-<li><a href="#ref-for-index-term-user-agents-7" title="5. 프로토콜">5. 프로토콜</a></li>
-<li><a href="#ref-for-index-term-user-agents-8" title="5. 프로토콜">5. 프로토콜</a></li>
-<li><a href="#ref-for-index-term-user-agents-9" title="5. 프로토콜">5. 프로토콜</a></li>
-<li><a href="#ref-for-nov19-ko-1" title="6. 자격 증명 요청 코디네이터">6. 자격 증명 요청 코디네이터</a></li>
-<li><a href="#ref-for-index-term-user-agents-10" title="6.4 자격 증명 요청 검증">6.4 자격 증명 요청 검증</a></li>
-<li><a href="#ref-for-index-term-user-agents-11" title="6.4 자격 증명 요청 검증">6.4 자격 증명 요청 검증</a></li>
-<li><a href="#ref-for-index-term-user-agents-12" title="6.4 자격 증명 요청 검증">6.4 자격 증명 요청 검증</a></li>
-<li><a href="#ref-for-index-term-user-agents-13" title="6.4 자격 증명 요청 검증">6.4 자격 증명 요청 검증</a></li>
-<li><a href="#ref-for-index-term-user-agents-14" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-index-term-user-agents-1" title="§ 초록">§ 초록</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-2" title="§ 2.2 프로토콜이 허용되는지 확인">§ 2.2 프로토콜이 허용되는지 확인</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-3" title="§ 3. 범위">§ 3. 범위</a> <a href="#ref-for-index-term-user-agents-4" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-5" title="§ 4. 용어">§ 4. 용어</a> <a href="#ref-for-index-term-user-agents-6" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-7" title="§ 5. 프로토콜">§ 5. 프로토콜</a> <a href="#ref-for-index-term-user-agents-8" title="Reference 2">(2)</a> <a href="#ref-for-index-term-user-agents-9" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-nov19-ko-1" title="§ 6. 자격 증명 요청 코디네이터">§ 6. 자격 증명 요청 코디네이터</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-10" title="§ 6.4 자격 증명 요청 검증">§ 6.4 자격 증명 요청 검증</a> <a href="#ref-for-index-term-user-agents-11" title="Reference 2">(2)</a> <a href="#ref-for-index-term-user-agents-12" title="Reference 3">(3)</a> <a href="#ref-for-index-term-user-agents-13" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-14" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-index-term-user-agents-15" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-17" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-19" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-27" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
 <li><a href="#ref-for-nov19-ko-29" title="6.9 자격 증명 요청 시작">6.9 자격 증명 요청 시작</a></li>
-<li><a href="#ref-for-index-term-user-agents-16" title="7. 디지털 자격 증명 API">7. 디지털 자격 증명 API</a></li>
-<li><a href="#ref-for-index-term-user-agents-17" title="7.7 DigitalCredential 인터페이스">7.7 DigitalCredential 인터페이스</a></li>
-<li><a href="#ref-for-index-term-user-agents-18" title="7.7 DigitalCredential 인터페이스">7.7 DigitalCredential 인터페이스</a></li>
-<li><a href="#ref-for-index-term-user-agents-19" title="10.1.2 범위 외 위협">10.1.2 범위 외 위협</a></li>
-<li><a href="#ref-for-index-term-user-agents-20" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-nov19-ko-52" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-nov19-ko-58" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-nov19-ko-65" title="10.2 완화책">10.2 완화책</a></li>
-<li><a href="#ref-for-index-term-user-agents-21" title="11. 개인정보 보호 고려 사항">11. 개인정보 보호 고려 사항</a></li>
-<li><a href="#ref-for-index-term-user-agents-22" title="11.1 설계 고려 사항 및 대안">11.1 설계 고려 사항 및 대안</a></li>
-<li><a href="#ref-for-index-term-user-agents-23" title="11.1 설계 고려 사항 및 대안">11.1 설계 고려 사항 및 대안</a></li>
-<li><a href="#ref-for-index-term-user-agents-24" title="11.2 개인정보 보호의 스펙트럼">11.2 개인정보 보호의 스펙트럼</a></li>
-<li><a href="#ref-for-index-term-user-agents-25" title="11.2 개인정보 보호의 스펙트럼">11.2 개인정보 보호의 스펙트럼</a></li>
-<li><a href="#ref-for-index-term-user-agents-26" title="11.2 개인정보 보호의 스펙트럼">11.2 개인정보 보호의 스펙트럼</a></li>
-<li><a href="#ref-for-index-term-user-agents-27" title="11.3 제시 프로토콜 및 자격 증명 형식">11.3 제시 프로토콜 및 자격 증명 형식</a></li>
-<li><a href="#ref-for-index-term-user-agents-28" title="11.3.1.2 연결 불가능한 제시">11.3.1.2 연결 불가능한 제시</a></li>
-<li><a href="#ref-for-index-term-user-agents-29" title="11.3.1.2 연결 불가능한 제시">11.3.1.2 연결 불가능한 제시</a></li>
-<li><a href="#ref-for-index-term-user-agents-30" title="11.3.1.2 연결 불가능한 제시">11.3.1.2 연결 불가능한 제시</a></li>
-<li><a href="#ref-for-index-term-user-agents-31" title="11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">11.3.1.3 &quot;본거지에 연락&quot; 메커니즘</a></li>
-<li><a href="#ref-for-index-term-user-agents-32" title="11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">11.3.1.3 &quot;본거지에 연락&quot; 메커니즘</a></li>
-<li><a href="#ref-for-index-term-user-agents-33" title="11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">11.3.1.3 &quot;본거지에 연락&quot; 메커니즘</a></li>
-<li><a href="#ref-for-index-term-user-agents-34" title="11.3.1.6 검증자 권한 부여 지원">11.3.1.6 검증자 권한 부여 지원</a></li>
-<li><a href="#ref-for-index-term-user-agents-35" title="11.3.1.6 검증자 권한 부여 지원">11.3.1.6 검증자 권한 부여 지원</a></li>
-<li><a href="#ref-for-index-term-user-agents-36" title="11.4 불필요한 자격 증명 요청">11.4 불필요한 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-user-agents-37" title="11.4 불필요한 자격 증명 요청">11.4 불필요한 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-user-agents-38" title="11.4 불필요한 자격 증명 요청">11.4 불필요한 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-user-agents-39" title="11.4 불필요한 자격 증명 요청">11.4 불필요한 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-user-agents-40" title="11.4 불필요한 자격 증명 요청">11.4 불필요한 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-user-agents-41" title="11.4 불필요한 자격 증명 요청">11.4 불필요한 자격 증명 요청</a></li>
-<li><a href="#ref-for-index-term-user-agents-42" title="11.4.1.2 정부 자격 증명 요청 확산의 위험">11.4.1.2 정부 자격 증명 요청 확산의 위험</a></li>
-<li><a href="#ref-for-index-term-user-agents-43" title="11.4.1.2 정부 자격 증명 요청 확산의 위험">11.4.1.2 정부 자격 증명 요청 확산의 위험</a></li>
-<li><a href="#ref-for-index-term-user-agents-44" title="11.4.1.3 불필요한 정부 자격 증명 요청 완화">11.4.1.3 불필요한 정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-user-agents-45" title="11.4.1.3 불필요한 정부 자격 증명 요청 완화">11.4.1.3 불필요한 정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-user-agents-46" title="11.4.2.3 불필요한 비정부 자격 증명 요청 완화">11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-user-agents-47" title="11.4.2.3 불필요한 비정부 자격 증명 요청 완화">11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-user-agents-48" title="11.4.2.3 불필요한 비정부 자격 증명 요청 완화">11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-user-agents-49" title="11.4.2.3 불필요한 비정부 자격 증명 요청 완화">11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-user-agents-50" title="11.4.2.3 불필요한 비정부 자격 증명 요청 완화">11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a></li>
-<li><a href="#ref-for-index-term-user-agents-51" title="11.5.2 자격 증명 제시를 통한 부수적 데이터 유출">11.5.2 자격 증명 제시를 통한 부수적 데이터 유출</a></li>
-<li><a href="#ref-for-index-term-user-agents-52" title="11.5.3 프로토콜 가용성을 통한 기기 속성 노출">11.5.3 프로토콜 가용성을 통한 기기 속성 노출</a></li>
-<li><a href="#ref-for-index-term-user-agents-53" title="11.5.3 프로토콜 가용성을 통한 기기 속성 노출">11.5.3 프로토콜 가용성을 통한 기기 속성 노출</a></li>
-<li><a href="#ref-for-index-term-user-agents-54" title="11.5.4 자격 증명 가용성 유출 방지">11.5.4 자격 증명 가용성 유출 방지</a></li>
-<li><a href="#ref-for-index-term-user-agents-55" title="11.6 사용자 권한 및 투명성">11.6 사용자 권한 및 투명성</a></li>
-<li><a href="#ref-for-index-term-user-agents-56" title="11.6 사용자 권한 및 투명성">11.6 사용자 권한 및 투명성</a></li>
-<li><a href="#ref-for-index-term-user-agents-57" title="11.6.2 여러 사용자 에이전트 통합">11.6.2 여러 사용자 에이전트 통합</a></li>
-<li><a href="#ref-for-index-term-user-agents-58" title="11.6.2 여러 사용자 에이전트 통합">11.6.2 여러 사용자 에이전트 통합</a></li>
-<li><a href="#ref-for-index-term-user-agents-59" title="11.6.3 자격 증명 관리자 선택 전 권한">11.6.3 자격 증명 관리자 선택 전 권한</a></li>
-<li><a href="#ref-for-index-term-user-agents-60" title="11.6.4 권한과 동의">11.6.4 권한과 동의</a></li>
-<li><a href="#ref-for-index-term-user-agents-61" title="11.6.4 권한과 동의">11.6.4 권한과 동의</a></li>
-<li><a href="#ref-for-index-term-user-agents-62" title="12. 접근성 고려 사항">12. 접근성 고려 사항</a></li>
-<li><a href="#ref-for-index-term-user-agents-63" title="12. 접근성 고려 사항">12. 접근성 고려 사항</a></li>
-<li><a href="#ref-for-index-term-user-agents-64" title="13. 국제화 고려 사항">13. 국제화 고려 사항</a></li>
-<li><a href="#ref-for-index-term-user-agents-65" title="14. 자동화 테스트">14. 자동화 테스트</a></li>
-<li><a href="#ref-for-index-term-user-agents-66" title="14.2 가상 지갑 동작 처리">14.2 가상 지갑 동작 처리</a></li>
-      </ul>
+        <li><a href="#ref-for-index-term-user-agents-16" title="§ 7. 디지털 자격 증명 API">§ 7. 디지털 자격 증명 API</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-17" title="§ 7.7 DigitalCredential 인터페이스">§ 7.7 DigitalCredential 인터페이스</a> <a href="#ref-for-index-term-user-agents-18" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-19" title="§ 10.1.2 범위 외 위협">§ 10.1.2 범위 외 위협</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-20" title="§ 10.2 완화책">§ 10.2 완화책</a> <a href="#ref-for-nov19-ko-52" title="Reference 2">(2)</a> <a href="#ref-for-nov19-ko-58" title="Reference 3">(3)</a> <a href="#ref-for-nov19-ko-65" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-27" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-28" title="§ 11. 개인정보 보호 고려 사항">§ 11. 개인정보 보호 고려 사항</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-29" title="§ 11.1 설계 고려 사항 및 대안">§ 11.1 설계 고려 사항 및 대안</a> <a href="#ref-for-index-term-user-agents-30" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-31" title="§ 11.2 개인정보 보호의 스펙트럼">§ 11.2 개인정보 보호의 스펙트럼</a> <a href="#ref-for-index-term-user-agents-32" title="Reference 2">(2)</a> <a href="#ref-for-index-term-user-agents-33" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-34" title="§ 11.3 제시 프로토콜 및 자격 증명 형식">§ 11.3 제시 프로토콜 및 자격 증명 형식</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-35" title="§ 11.3.1.2 연결 불가능한 제시">§ 11.3.1.2 연결 불가능한 제시</a> <a href="#ref-for-index-term-user-agents-36" title="Reference 2">(2)</a> <a href="#ref-for-index-term-user-agents-37" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-38" title="§ 11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">§ 11.3.1.3 "본거지에 연락" 메커니즘</a> <a href="#ref-for-index-term-user-agents-39" title="Reference 2">(2)</a> <a href="#ref-for-index-term-user-agents-40" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-41" title="§ 11.3.1.6 검증자 권한 부여 지원">§ 11.3.1.6 검증자 권한 부여 지원</a> <a href="#ref-for-index-term-user-agents-42" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-43" title="§ 11.4 불필요한 자격 증명 요청">§ 11.4 불필요한 자격 증명 요청</a> <a href="#ref-for-index-term-user-agents-44" title="Reference 2">(2)</a> <a href="#ref-for-index-term-user-agents-45" title="Reference 3">(3)</a> <a href="#ref-for-index-term-user-agents-46" title="Reference 4">(4)</a> <a href="#ref-for-index-term-user-agents-47" title="Reference 5">(5)</a> <a href="#ref-for-index-term-user-agents-48" title="Reference 6">(6)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-49" title="§ 11.4.1.2 정부 자격 증명 요청 확산의 위험">§ 11.4.1.2 정부 자격 증명 요청 확산의 위험</a> <a href="#ref-for-index-term-user-agents-50" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-51" title="§ 11.4.1.3 불필요한 정부 자격 증명 요청 완화">§ 11.4.1.3 불필요한 정부 자격 증명 요청 완화</a> <a href="#ref-for-index-term-user-agents-52" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-53" title="§ 11.4.2.3 불필요한 비정부 자격 증명 요청 완화">§ 11.4.2.3 불필요한 비정부 자격 증명 요청 완화</a> <a href="#ref-for-index-term-user-agents-54" title="Reference 2">(2)</a> <a href="#ref-for-index-term-user-agents-55" title="Reference 3">(3)</a> <a href="#ref-for-index-term-user-agents-56" title="Reference 4">(4)</a> <a href="#ref-for-index-term-user-agents-57" title="Reference 5">(5)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-58" title="§ 11.5.2 자격 증명 제시를 통한 부수적 데이터 유출">§ 11.5.2 자격 증명 제시를 통한 부수적 데이터 유출</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-59" title="§ 11.5.3 프로토콜 가용성을 통한 기기 속성 노출">§ 11.5.3 프로토콜 가용성을 통한 기기 속성 노출</a> <a href="#ref-for-index-term-user-agents-60" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-61" title="§ 11.5.4 자격 증명 가용성 유출 방지">§ 11.5.4 자격 증명 가용성 유출 방지</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-62" title="§ 11.6 사용자 권한 및 투명성">§ 11.6 사용자 권한 및 투명성</a> <a href="#ref-for-index-term-user-agents-63" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-64" title="§ 11.6.2 여러 사용자 에이전트 통합">§ 11.6.2 여러 사용자 에이전트 통합</a> <a href="#ref-for-index-term-user-agents-65" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-66" title="§ 11.6.3 자격 증명 관리자 선택 전 권한">§ 11.6.3 자격 증명 관리자 선택 전 권한</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-67" title="§ 11.6.4 권한과 동의">§ 11.6.4 권한과 동의</a> <a href="#ref-for-index-term-user-agents-68" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-69" title="§ 12. 접근성 고려 사항">§ 12. 접근성 고려 사항</a> <a href="#ref-for-index-term-user-agents-70" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-71" title="§ 13. 국제화 고려 사항">§ 13. 국제화 고려 사항</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-72" title="§ 14. 자동화 테스트">§ 14. 자동화 테스트</a> </li>
+        <li><a href="#ref-for-index-term-user-agents-73" title="§ 14.2 가상 지갑 동작 처리">§ 14.2 가상 지갑 동작 처리</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-index-term-express-permission"
       aria-label="Links in this document to definition: express permission">
@@ -11708,110 +11746,33 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
 
       </div>
       <p><b>참조 위치:</b></p>
-      <ul>
-        <li>
-          <a href="#ref-for-index-term-verifiers-1" title="§ 1. Introduction">§ 1. 소개</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-2" title="§ 4. Terminology">§ 4. 용어</a> <a
-            href="#ref-for-index-term-verifiers-3" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-4"
-            title="Reference 3">(3)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-5" title="§ 5. Protocols">§ 5. 프로토콜</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-6" title="§ 7.7.3 The userAgentAllowsProtocol() method">§ 7.7.3 The
-            userAgentAllowsProtocol() method</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-7" title="§ 10.4 Signing presentation requests">§ 10.4 Signing 제시 요청</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-8" title="§ 10.5 Cross-Device Security and Proximity">§ 10.5 장치 간 보안 및 근접성</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-9" title="§ 11. Privacy Considerations">§ 11. 개인정보 보호 고려 사항</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-10" title="§ 11.1 Design Considerations and Alternatives">§ 11.1 설계 고려 사항 및 대안</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-11" title="§ 11.3.1.1 Selective disclosure">§ 11.3.1.1 Selective
-            disclosure</a> <a href="#ref-for-index-term-verifiers-12" title="Reference 2">(2)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-13" title="§ 11.3.1.2 Unlinkable presentations">§ 11.3.1.2 Unlinkable
-            presentations</a> <a href="#ref-for-index-term-verifiers-14" title="Reference 2">(2)</a> <a
-            href="#ref-for-index-term-verifiers-15" title="Reference 3">(3)</a> <a
-            href="#ref-for-index-term-verifiers-16" title="Reference 4">(4)</a> <a
-            href="#ref-for-index-term-verifiers-17" title="Reference 5">(5)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-18" title="§ 11.3.1.3 &quot;Phone home&quot; mechanisms">§ 11.3.1.3
-            "Phone home" mechanisms</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-19" title="§ 11.3.1.4 Unlinkable revocation">§ 11.3.1.4 Unlinkable
-            revocation</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-20" title="§ 11.3.1.6 Support for verifier authorization">§ 11.3.1.6
-            Support for verifier authorization</a> <a href="#ref-for-index-term-verifiers-21"
-            title="Reference 2">(2)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-22" title="§ 11.3.1.7 Encrypting credential responses">§ 11.3.1.7 Encrypting 자격 증명 응답</a> <a href="#ref-for-index-term-verifiers-23" title="Reference 2">(2)</a>
-          <a href="#ref-for-index-term-verifiers-24" title="Reference 3">(3)</a> <a
-            href="#ref-for-index-term-verifiers-25" title="Reference 4">(4)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-26" title="§ 11.4 Unnecessary Requests for Credentials">§ 11.4 불필요한 자격 증명 요청</a> <a href="#ref-for-index-term-verifiers-27"
-            title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-28" title="Reference 3">(3)</a> <a
-            href="#ref-for-index-term-verifiers-29" title="Reference 4">(4)</a> <a
-            href="#ref-for-index-term-verifiers-30" title="Reference 5">(5)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-31"
-            title="§ 11.4.1.2 Risk of proliferation of requests for government credentials">§ 11.4.1.2 Risk of
-            proliferation of requests for government credentials</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-32"
-            title="§ 11.4.1.3 Mitigating unnecessary requests for government credentials">§ 11.4.1.3 Mitigating
-            unnecessary requests for government credentials</a> <a href="#ref-for-index-term-verifiers-33"
-            title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-34" title="Reference 3">(3)</a> <a
-            href="#ref-for-index-term-verifiers-35" title="Reference 4">(4)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-36"
-            title="§ 11.4.2.2 Risk of proliferation of requests for non-government credentials">§ 11.4.2.2 Risk of
-            proliferation of requests for non-government credentials</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-37" title="§ 11.4.2.4 Reporting abuse">§ 11.4.2.4 Reporting abuse</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-38" title="§ 11.5.1 Browser fingerprinting">§ 11.5.1 브라우저 지문 채취</a> <a href="#ref-for-index-term-verifiers-39" title="Reference 2">(2)</a> <a
-            href="#ref-for-index-term-verifiers-40" title="Reference 3">(3)</a> <a
-            href="#ref-for-index-term-verifiers-41" title="Reference 4">(4)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-42"
-            title="§ 11.5.2 Leaking incidental data with credential presentations">§ 11.5.2 자격 증명 제시를 통한 부수적 데이터 유출</a> <a href="#ref-for-index-term-verifiers-43" title="Reference 2">(2)</a> <a
-            href="#ref-for-index-term-verifiers-44" title="Reference 3">(3)</a> <a
-            href="#ref-for-index-term-verifiers-45" title="Reference 4">(4)</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-46" title="§ 11.6 User Permission and Transparency">§ 11.6 사용자 권한 및 투명성</a>
-        </li>
-        <li>
-          <a href="#ref-for-index-term-verifiers-47" title="§ 11.6.4 Permission vs. Consent">§ 11.6.4 권한과 동의</a> <a href="#ref-for-index-term-verifiers-48" title="Reference 2">(2)</a> <a
-            href="#ref-for-index-term-verifiers-49" title="Reference 3">(3)</a> <a
-            href="#ref-for-index-term-verifiers-50" title="Reference 4">(4)</a> <a
-            href="#ref-for-index-term-verifiers-51" title="Reference 5">(5)</a>
-        </li>
-      </ul>
+      <ul class="dfn-panel-refs">
+        <li><a href="#ref-for-index-term-verifiers-1" title="§ 1. 소개">§ 1. 소개</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-2" title="§ 4. 용어">§ 4. 용어</a> <a href="#ref-for-index-term-verifiers-3" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-4" title="Reference 3">(3)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-5" title="§ 5. 프로토콜">§ 5. 프로토콜</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-6" title="§ 7.7.3 userAgentAllowsProtocol() 메서드">§ 7.7.3 userAgentAllowsProtocol() 메서드</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-7" title="§ 10.1.1 범위 내 위협">§ 10.1.1 범위 내 위협</a> <a href="#ref-for-index-term-verifiers-8" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-9" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-10" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-11" title="§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화">§ 10.4 스크립트 삽입에 대비한 검증자 보안 강화</a> <a href="#ref-for-index-term-verifiers-12" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-13" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-14" title="Reference 4">(4)</a> <a href="#ref-for-index-term-verifiers-15" title="Reference 5">(5)</a> <a href="#ref-for-index-term-verifiers-16" title="Reference 6">(6)</a> <a href="#ref-for-index-term-verifiers-17" title="Reference 7">(7)</a> <a href="#ref-for-index-term-verifiers-18" title="Reference 8">(8)</a> <a href="#ref-for-index-term-verifiers-19" title="Reference 9">(9)</a> <a href="#ref-for-index-term-verifiers-20" title="Reference 10">(10)</a> <a href="#ref-for-index-term-verifiers-21" title="Reference 11">(11)</a> <a href="#ref-for-index-term-verifiers-22" title="Reference 12">(12)</a> <a href="#ref-for-index-term-verifiers-23" title="Reference 13">(13)</a> <a href="#ref-for-index-term-verifiers-24" title="Reference 14">(14)</a> <a href="#ref-for-index-term-verifiers-25" title="Reference 15">(15)</a> <a href="#ref-for-index-term-verifiers-26" title="Reference 16">(16)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-27" title="§ 10.5 프레젠테이션 요청 서명">§ 10.5 프레젠테이션 요청 서명</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-28" title="§ 10.6 장치 간 보안 및 근접성">§ 10.6 장치 간 보안 및 근접성</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-29" title="§ 11. 개인정보 보호 고려 사항">§ 11. 개인정보 보호 고려 사항</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-30" title="§ 11.1 설계 고려 사항 및 대안">§ 11.1 설계 고려 사항 및 대안</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-31" title="§ 11.3.1.1 선택적 공개">§ 11.3.1.1 선택적 공개</a> <a href="#ref-for-index-term-verifiers-32" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-33" title="§ 11.3.1.2 연결 불가능한 제시">§ 11.3.1.2 연결 불가능한 제시</a> <a href="#ref-for-index-term-verifiers-34" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-35" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-36" title="Reference 4">(4)</a> <a href="#ref-for-index-term-verifiers-37" title="Reference 5">(5)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-38" title="§ 11.3.1.3 &quot;본거지에 연락&quot; 메커니즘">§ 11.3.1.3 "본거지에 연락" 메커니즘</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-39" title="§ 11.3.1.4 연결 불가능한 철회">§ 11.3.1.4 연결 불가능한 철회</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-40" title="§ 11.3.1.6 검증자 권한 부여 지원">§ 11.3.1.6 검증자 권한 부여 지원</a> <a href="#ref-for-index-term-verifiers-41" title="Reference 2">(2)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-42" title="§ 11.3.1.7 자격 증명 응답 암호화">§ 11.3.1.7 자격 증명 응답 암호화</a> <a href="#ref-for-index-term-verifiers-43" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-44" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-45" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-46" title="§ 11.4 불필요한 자격 증명 요청">§ 11.4 불필요한 자격 증명 요청</a> <a href="#ref-for-index-term-verifiers-47" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-48" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-49" title="Reference 4">(4)</a> <a href="#ref-for-index-term-verifiers-50" title="Reference 5">(5)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-51" title="§ 11.4.1.2 정부 자격 증명 요청 확산의 위험">§ 11.4.1.2 정부 자격 증명 요청 확산의 위험</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-52" title="§ 11.4.1.3 불필요한 정부 자격 증명 요청 완화">§ 11.4.1.3 불필요한 정부 자격 증명 요청 완화</a> <a href="#ref-for-index-term-verifiers-53" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-54" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-55" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-56" title="§ 11.4.2.2 비정부 자격 증명 요청 확산의 위험">§ 11.4.2.2 비정부 자격 증명 요청 확산의 위험</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-57" title="§ 11.4.2.4 악용 신고">§ 11.4.2.4 악용 신고</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-58" title="§ 11.5.1 브라우저 지문 채취">§ 11.5.1 브라우저 지문 채취</a> <a href="#ref-for-index-term-verifiers-59" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-60" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-61" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-62" title="§ 11.5.2 자격 증명 제시를 통한 부수적 데이터 유출">§ 11.5.2 자격 증명 제시를 통한 부수적 데이터 유출</a> <a href="#ref-for-index-term-verifiers-63" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-64" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-65" title="Reference 4">(4)</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-66" title="§ 11.6 사용자 권한 및 투명성">§ 11.6 사용자 권한 및 투명성</a> </li>
+        <li><a href="#ref-for-index-term-verifiers-67" title="§ 11.6.4 권한과 동의">§ 11.6.4 권한과 동의</a> <a href="#ref-for-index-term-verifiers-68" title="Reference 2">(2)</a> <a href="#ref-for-index-term-verifiers-69" title="Reference 3">(3)</a> <a href="#ref-for-index-term-verifiers-70" title="Reference 4">(4)</a> <a href="#ref-for-index-term-verifiers-71" title="Reference 5">(5)</a> </li>
+    </ul>
     </div>
 <div class="dfn-panel" hidden="" role="dialog" aria-modal="true" id="dfn-panel-for-index-term-error"
       aria-label="Links in this document to definition: error">
@@ -12693,6 +12654,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     2025-03-26. URL: <a
                         href="https://github.com/w3c/credential-considerations/blob/main/credentials-considerations.md">https://github.com/w3c/credential-considerations/blob/main/credentials-considerations.md</a>
                 </dd>
+                <dt id="bib-csp3">[CSP3]</dt><dd>
+      <a href="https://www.w3.org/TR/CSP3/"><cite>Content Security Policy Level 3</cite></a>. Mike West; Antonio Sartori.  W3C. 27 October 2026. W3C Working Draft. URL: <a href="https://www.w3.org/TR/CSP3/">https://www.w3.org/TR/CSP3/</a>
+    </dd>
                 <dt id="bib-custom-schemes">[custom-schemes]</dt>
                 <dd>
                     <a href="https://github.com/w3c-fedid/digital-credentials/blob/main/custom-schemes.md"><cite>신원 제시를
@@ -12746,6 +12710,9 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     2023년 11월 10일. CRD. URL: <a
                         href="https://www.w3.org/TR/secure-contexts/">https://www.w3.org/TR/secure-contexts/</a>
                 </dd>
+                <dt id="bib-sri">[SRI]</dt><dd>
+      <a href="https://www.w3.org/TR/sri-2/"><cite>Subresource Integrity</cite></a>. Frederik Braun.  W3C. 20 March 2026. W3C Working Draft. URL: <a href="https://www.w3.org/TR/sri-2/">https://www.w3.org/TR/sri-2/</a>
+    </dd>
                 <dt id="bib-threat-model-decentralized-credentials">[threat-model-decentralized-credentials]</dt>
                 <dd>
                     <a href="https://www.w3.org/TR/threat-model-decentralized-credentials/"><cite>탈중앙화
@@ -12753,11 +12720,17 @@ interface <a class="internalDFN idlID" data-link-type="interface" href="#dom-dig
                     DNOTE. URL: <a
                         href="https://www.w3.org/TR/threat-model-decentralized-credentials/">https://www.w3.org/TR/threat-model-decentralized-credentials/</a>
                 </dd>
+                <dt id="bib-trusted-types">[trusted-types]</dt><dd>
+      <a href="https://www.w3.org/TR/trusted-types/"><cite>Trusted Types</cite></a>. Krzysztof Kotowicz.  W3C. 7 October 2026. W3C Working Draft. URL: <a href="https://www.w3.org/TR/trusted-types/">https://www.w3.org/TR/trusted-types/</a>
+    </dd>
                 <dt id="bib-url">[URL]</dt>
                 <dd>
                     <a href="https://url.spec.whatwg.org/"><cite>URL 표준</cite></a>. Anne van Kesteren. WHATWG.
                     현행 표준. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
                 </dd>
+            <dt id="bib-web-dev-strict-csp-article">[web-dev-strict-csp-article]</dt><dd>
+      <a href="https://web.dev/articles/strict-csp"><cite>Mitigate cross-site scripting (XSS) with a strict Content Security Policy (CSP)</cite></a>.  web.dev. 2024-09-13. URL: <a href="https://web.dev/articles/strict-csp">https://web.dev/articles/strict-csp</a>
+    </dd>
             </dl>
         </section>
     </section>
